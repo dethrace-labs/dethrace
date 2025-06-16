@@ -377,6 +377,7 @@ tFlic_spec gMain_flic_list[372] = {
     { "MAI2OPFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "MAI2OPGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u }
 };
+// GLOBAL: CARM95 0x518420
 int gFlic_bunch0[29] = {
     10,
     11,
@@ -408,6 +409,7 @@ int gFlic_bunch0[29] = {
     135,
     45
 };
+// GLOBAL: CARM95 0x518498
 int gFlic_bunch1[31] = {
     140,
     141,
@@ -441,8 +443,11 @@ int gFlic_bunch1[31] = {
     43,
     154
 };
+// GLOBAL: CARM95 0x518518
 int gFlic_bunch2[8] = { 70, 71, 72, 73, 74, 56, 57, 59 };
+// GLOBAL: CARM95 0x518538
 int gFlic_bunch3[13] = { 40, 41, 42, 43, 44, 45, 50, 51, 73, 74, 56, 57, 59 };
+// GLOBAL: CARM95 0x518570
 int gFlic_bunch4[22] = {
     80,
     81,
@@ -467,7 +472,9 @@ int gFlic_bunch4[22] = {
     120,
     121
 };
+// GLOBAL: CARM95 0x5185c8
 int gFlic_bunch5[5] = { 100, 101, 42, 43, 45 };
+// GLOBAL: CARM95 0x5185e0
 int gFlic_bunch6[51] = {
     190,
     191,
@@ -521,8 +528,11 @@ int gFlic_bunch6[51] = {
     43,
     284
 };
+// GLOBAL: CARM95 0x5186b0
 int gFlic_bunch7[7] = { 130, 131, 132, 42, 43, 135, 45 };
+// GLOBAL: CARM95 0x5186d0
 int gFlic_bunch8[16] = { 290, 291, 292, 293, 294, 295, 296, 297, 42, 43, 154, 301, 42, 43, 304, 305 };
+// GLOBAL: CARM95 0x518710
 tFlic_bunch gFlic_bunch[9] = {
     { COUNT_OF(gFlic_bunch0), gFlic_bunch0 },
     { COUNT_OF(gFlic_bunch1), gFlic_bunch1 },

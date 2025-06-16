@@ -65,6 +65,7 @@ br_angle gOld_yaw__car = 0; // suffix added to avoid duplicate symbol
 br_angle gOld_zoom = 0;
 // GLOBAL: CARM95 0x514cf8
 br_vector3 gCamera_pos_before_collide = { { 0 } };
+// GLOBAL: CARM95 0x514d08
 int gMetal_crunch_sound_id__car[5] = {
     // suffix added to avoid duplicate symbol
     5000,

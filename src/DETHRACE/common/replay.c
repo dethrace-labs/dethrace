@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x50a1b0
 char* gReplay_pixie_names[10] = {
     "REPLAY.PIX",
     "RBUTTONS.PIX",

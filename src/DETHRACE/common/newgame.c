@@ -49,6 +49,7 @@ tRadio_bastards gRadio_bastards__newgame[11] = { // suffix added to avoid duplic
 // clang-format on
 char _name1[] = "xxxxxxxx.TXT"; // keep compiler happy
 char _name2[] = "yyyyyyyy.TXT"; // keep compiler happy
+// GLOBAL: CARM95 0x51ea80
 char* gBasic_car_names[2] = { _name1, _name2 };
 tNet_game_options gNet_settings[8];
 tJoinable_game gGames_to_join[6];

@@ -117,6 +117,7 @@ char* gRaces_file_names[] = {
     "NETRACES.TXT",
     "NETRACES.TXT"
 };
+// GLOBAL: CARM95 0x50a5a0
 char* gNet_avail_names[] = { "never", "eagle", "hawk", "all" };
 // GLOBAL: CARM95 0x50a5b0
 char* gFloorpan_names[] = { "GBUNDER.MAT", "BGLUNDER.MAT", "GRIMBOT.MAT", "DDBASE.MAT", "HFUNDER.MAT" };

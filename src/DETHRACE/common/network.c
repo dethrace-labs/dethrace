@@ -39,6 +39,7 @@ int gNet_service_disable = 0;
 int gIn_net_service = 0;
 // GLOBAL: CARM95 0x50d230
 int gPlayer_list_batch_number = 0;
+// GLOBAL: CARM95 0x50d234
 int gOnly_receive_guarantee_replies = 0;
 // GLOBAL: CARM95 0x50d238
 void* gMessage_to_free;
@@ -75,6 +76,7 @@ tMax_message* gMax_messages;
 int gNext_guarantee;
 // GLOBAL: CARM95 0x534c84
 tU32 gAsk_time;
+// GLOBAL: CARM95 0x551420
 int gNet_initialised;
 // GLOBAL: CARM95 0x534c60
 int gDont_allow_joiners;
@@ -104,6 +106,7 @@ int gReceived_game_scores;
 #define MAX_MESAGE_STACK_SIZE 512
 
 // IDA: int __cdecl NetInitialise()
+// FUNCTION: CARM95 0x4463c0
 int NetInitialise(void) {
     int i;
     LOG_TRACE("()");
@@ -249,6 +252,7 @@ void NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) {
 }
 
 // IDA: void __cdecl InitialisePlayerStati()
+// FUNCTION: CARM95 0x44754e
 void InitialisePlayerStati(void) {
     int i;
     LOG_TRACE("()");
@@ -963,6 +967,7 @@ tU32 NetGetContentsSize(tNet_message_type pType, tS32 pSize_decider) {
 }
 
 // IDA: tU32 __usercall NetGetMessageSize@<EAX>(tNet_message_type pType@<EAX>, tS32 pSize_decider@<EDX>)
+// FUNCTION: CARM95 0x447dd9
 tU32 NetGetMessageSize(tNet_message_type pType, tS32 pSize_decider) {
     LOG_TRACE("(%d, %d)", pType, pSize_decider);
 
@@ -1162,6 +1167,7 @@ int NetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage) {
 }
 
 // IDA: tNet_message* __usercall NetGetNextMessage@<EAX>(tNet_game_details *pDetails@<EAX>, void **pSender_address@<EDX>)
+// FUNCTION: CARM95 0x448475
 tNet_message* NetGetNextMessage(tNet_game_details* pDetails, void** pSender_address) {
     LOG_TRACE("(%p, %p)", pDetails, pSender_address);
 

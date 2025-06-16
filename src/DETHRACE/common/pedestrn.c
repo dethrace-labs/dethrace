@@ -69,6 +69,7 @@ char* gInstruc_commands[10] = {
     "faction",
     "reverse"
 };
+// GLOBAL: CARM95 0x511798
 float gMin_ped_gib_speeds[4] = { 10000.f, .005f, .002f, .001f };
 float gPed_gib_distrib[4] = { 0.f, 0.33f, 0.34f, 0.33f };
 float gPed_gib_speeds[4] = { 0.f, 1.f, 1.f, 1.f };
@@ -94,6 +95,7 @@ int gPed_gib_maxes[4][5] = {
     { 3, 3, 2, 3, 3 },
     { 3, 3, 3, 3, 3 },
 };
+// GLOBAL: CARM95 0x5118c8
 br_scalar gExploding_ped_scale[3] = { 0.0028f, 0.0033f, 0.0045f };
 // GLOBAL: CARM95 0x5118d8
 br_vector3 gZero_v__pedestrn; // suffix added to avoid duplicate symbol
@@ -143,6 +145,7 @@ br_material* gPath_mat_normal;
 // GLOBAL: CARM95 0x536b1c
 br_material* gInit_pos_mat_calc;
 int gPed_other;
+// GLOBAL: CARM95 0x550a98
 int gAttracted_pedestrians;
 // GLOBAL: CARM95 0x536aac
 int gPed_ref_num;

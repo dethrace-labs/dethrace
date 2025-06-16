@@ -44,6 +44,7 @@ int gPalette_munged;
 int gColourValues[1];
 // GLOBAL: CARM95 0x520048
 int gNext_transient;
+// GLOBAL: CARM95 0x520050
 int gCursor_x_offsets[8] = {
     6,
     8,
@@ -54,6 +55,7 @@ int gCursor_x_offsets[8] = {
     16,
     36,
 };
+// GLOBAL: CARM95 0x520070
 int gCursor_y_offsets[8] = {
     26,
     19,
@@ -86,6 +88,7 @@ int gCursor_gib_y_offsets[8] = {
     93,
     106,
 };
+// GLOBAL: CARM95 0x5200d0
 int gCursor_giblet_sequence0[7] = {
     6,
     0,
@@ -95,6 +98,7 @@ int gCursor_giblet_sequence0[7] = {
     4,
     5,
 };
+// GLOBAL: CARM95 0x5200f0
 int gCursor_giblet_sequence1[5] = {
     4,
     6,
@@ -102,6 +106,7 @@ int gCursor_giblet_sequence1[5] = {
     8,
     9,
 };
+// GLOBAL: CARM95 0x520108
 int gCursor_giblet_sequence2[5] = {
     4,
     10,
@@ -109,6 +114,7 @@ int gCursor_giblet_sequence2[5] = {
     12,
     13,
 };
+// GLOBAL: CARM95 0x520120
 int gCursor_giblet_sequence3[5] = {
     4,
     14,
@@ -123,6 +129,7 @@ int* gCursor_giblet_sequences[4] = {
     gCursor_giblet_sequence2,
     gCursor_giblet_sequence3,
 };
+// GLOBAL: CARM95 0x520148
 char* gFont_names[21] = {
     "TYPEABLE",
     "ORANGHED",

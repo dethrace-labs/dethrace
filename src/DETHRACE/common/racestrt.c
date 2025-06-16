@@ -26,6 +26,7 @@
 #include "world.h"
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x50f198
 int gGrid_number_colour[4] = { 49u, 201u, 1u, 201u };
 // GLOBAL: CARM95 0x50f1a8
 int gJust_bought_part;
