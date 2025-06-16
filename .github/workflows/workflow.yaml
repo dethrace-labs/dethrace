@@ -51,7 +51,8 @@ jobs:
           cmake-generator: Ninja
           cmake-toolchain-file: ${{ matrix.platform.cmake-toolchain-file }}
           discriminator: ${{ matrix.platform.arch }}
-          version: 2-latest
+          version: 3-latest
+          version-sdl2-compat: 2-head
           version-sdl12-compat: 1-head
       - name: 'Prepare sources for release'
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
@@ -71,6 +72,7 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE=${{ matrix.platform.cmake-toolchain-file }} \
             -DDETHRACE_PLATFORM_SDL1=ON \
             -DDETHRACE_PLATFORM_SDL2=ON \
+            -DDETHRACE_PLATFORM_SDL3=ON \
             -DDETHRACE_PLATFORM_SDL_DYNAMIC=ON \
             ${{ matrix.platform.cmake-args }}
       - name: 'Build (CMake)'

@@ -65,6 +65,7 @@ static const char* const possible_locations[] = {
 static void* sdl2_so;
 #endif
 
+#define SDL_NAME "SDL2"
 #define OBJECT_NAME sdl2_so
 #define SYMBOL_PREFIX SDL2_
 #define FOREACH_SDLX_SYM FOREACH_SDL2_SYM

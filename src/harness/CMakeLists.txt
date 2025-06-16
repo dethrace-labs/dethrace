@@ -86,6 +86,21 @@ if(DETHRACE_PLATFORM_SDL2)
     endif()
 endif()
 
+if(DETHRACE_PLATFORM_SDL3)
+    target_sources(harness PRIVATE
+        platforms/sdl3.c
+        platforms/sdl3_scancode_to_dinput.h
+        platforms/sdl3_syms.h
+    )
+    target_compile_definitions(harness PRIVATE DETHRACE_PLATFORM_SDL3)
+    if(DETHRACE_PLATFORM_SDL_DYNAMIC)
+        set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/platforms/sdl3.c" APPEND PROPERTY INCLUDE_DIRECTORIES "$<TARGET_PROPERTY:SDL3::SDL3,INTERFACE_INCLUDE_DIRECTORIES>")
+        set_property(GLOBAL APPEND PROPERTY DETHRACE_BUILD_RPATHS "$<TARGET_FILE_DIR:SDL3::SDL3>")
+    else()
+        target_link_libraries(harness PRIVATE SDL3::SDL3)
+    endif()
+endif()
+
 if(DETHRACE_PLATFORM_SDL_DYNAMIC)
     target_compile_definitions(harness PRIVATE DETHRACE_SDL_DYNAMIC)
     target_link_libraries(harness PRIVATE ${CMAKE_DL_LIBS})
