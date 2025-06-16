@@ -7,20 +7,20 @@ static int null_set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight
     return 0;
 }
 
-static void null_destroy_window(void* hWnd) {
+static void null_destroy_window(void) {
     null_time += 1;
 }
 
-static int null_show_error_message(void* window, char* text, char* caption) {
+static int null_show_error_message(char* title, char* text) {
     null_time += 1;
     return 0;
 }
 
-static void null_get_and_handle_message(MSG_* msg) {
+static void null_get_and_handle_message(void) {
     null_time += 1;
 }
 
-static void null_get_keyboard_state(unsigned int count, uint8_t* buffer) {
+static void null_get_keyboard_state(uint32_t* buffer) {
     null_time += 1;
 }
 
@@ -39,7 +39,7 @@ static int null_show_cursor(int show) {
     return 0;
 }
 
-static void null_set_palette(PALETTEENTRY_* palette) {
+static void null_set_palette(br_colour* palette) {
     null_time += 1;
 }
 

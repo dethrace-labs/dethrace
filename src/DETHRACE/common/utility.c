@@ -1063,7 +1063,7 @@ br_pixelmap* PaletteOf16Bits(br_pixelmap* pSrc) {
     if (g16bit_palette == NULL) {
         g16bit_palette = BrPixelmapAllocate(BR_PMT_RGB_565, 1, 256, g16bit_palette, 0);
         if (g16bit_palette == NULL) {
-            FatalError(94, "16-bit palette");
+            FatalError(kFatalError_OOMCarmageddon_S, "16-bit palette");
         }
     }
     if (!g16bit_palette_valid || pSrc != gSource_for_16bit_palette) {

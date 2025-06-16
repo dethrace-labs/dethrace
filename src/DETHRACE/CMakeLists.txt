@@ -164,21 +164,16 @@ target_sources(dethrace_obj PRIVATE
 
     # dethrace-added cross platform sys and network implementation
     pc-all/allnet.c
-    # added in future PR
-    # pc-all/allsys.c
+    pc-all/allsys.c
 
     # original win95 sys and network
     # pc-win95/win95sys.c
     # pc-win95/ssdx.c
     # pc-win95/ssdx.h
 
-    # todo remove from normal compile
-    pc-win95/dinput.h
-
     # original dos sys and network
     #pc-dos/dosnet.c
-    # todo remove from normal compile
-    pc-dos/dossys.c
+    # pc-dos/dossys.c
 )
 
 # Create our main game binary.

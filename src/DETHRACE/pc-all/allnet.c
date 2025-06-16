@@ -285,6 +285,7 @@ int PDNetInitialise(void) {
     gNumber_of_networks = 1;
     sa_len = sizeof(struct sockaddr_in);
     dr_dprintf("PDNetInitialise()");
+    gNumber_of_networks = 1;
 
     memset(&gAny_addr, 0, sizeof(gAny_addr));
     memset(&gLocal_addr, 0, sizeof(gLocal_addr));

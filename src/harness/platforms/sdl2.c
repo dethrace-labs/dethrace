@@ -4,8 +4,8 @@
 #include "harness/config.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
-#include "sdl2_scancode_to_dinput.h"
 #include "sdl2_syms.h"
+#include "sdl_scancode_map.h"
 
 SDL_COMPILE_TIME_ASSERT(sdl2_platform_requires_SDL2, SDL_MAJOR_VERSION == 2);
 
@@ -21,7 +21,10 @@ static int render_width, render_height;
 
 static Uint32 last_frame_time;
 
-static uint8_t directinput_key_state[SDL_NUM_SCANCODES];
+void (*gKeyHandler_func)(void);
+
+// 32 bytes, 1 bit per key. Matches dos executable behavior
+static uint32_t key_state[8];
 
 static struct {
     int x, y;
@@ -30,29 +33,28 @@ static struct {
 
 // Callbacks back into original game code
 extern void QuitGame(void);
-extern uint32_t gKeyboard_bits[8];
 extern br_pixelmap* gBack_screen;
 
 #ifdef DETHRACE_SDL_DYNAMIC
 #ifdef _WIN32
-static const char * const possible_locations[] = {
+static const char* const possible_locations[] = {
     "SDL2.dll",
 };
 #elif defined(__APPLE__)
 #define SHARED_OBJECT_NAME "libSDL2"
 #define SDL2_LIBNAME "libSDL2.dylib"
 #define SDL2_FRAMEWORK "SDL2.framework/Versions/A/SDL2"
-static const char * const possible_locations[] = {
-    "@loader_path/" SDL2_LIBNAME, /* MyApp.app/Contents/MacOS/libSDL2_dylib */
-    "@loader_path/../Frameworks/" SDL2_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL2_framework */
-    "@executable_path/" SDL2_LIBNAME, /* MyApp.app/Contents/MacOS/libSDL2_dylib */
+static const char* const possible_locations[] = {
+    "@loader_path/" SDL2_LIBNAME,                     /* MyApp.app/Contents/MacOS/libSDL2_dylib */
+    "@loader_path/../Frameworks/" SDL2_FRAMEWORK,     /* MyApp.app/Contents/Frameworks/SDL2_framework */
+    "@executable_path/" SDL2_LIBNAME,                 /* MyApp.app/Contents/MacOS/libSDL2_dylib */
     "@executable_path/../Frameworks/" SDL2_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL2_framework */
-    NULL,  /* /Users/username/Library/Frameworks/SDL2_framework */
-    "/Library/Frameworks" SDL2_FRAMEWORK, /* /Library/Frameworks/SDL2_framework */
-    SDL2_LIBNAME /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
+    NULL,                                             /* /Users/username/Library/Frameworks/SDL2_framework */
+    "/Library/Frameworks" SDL2_FRAMEWORK,             /* /Library/Frameworks/SDL2_framework */
+    SDL2_LIBNAME                                      /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
-static const char * const possible_locations[] = {
+static const char* const possible_locations[] = {
     "libSDL2-2.0.so.0",
     "libSDL2-2.0.so",
 };
@@ -60,7 +62,7 @@ static const char * const possible_locations[] = {
 #endif
 
 #ifdef DETHRACE_SDL_DYNAMIC
-static void *sdl2_so;
+static void* sdl2_so;
 #endif
 
 #define OBJECT_NAME sdl2_so
@@ -102,9 +104,11 @@ static int SDL2_Harness_SetWindowPos(void* hWnd, int x, int y, int nWidth, int n
     return 0;
 }
 
-static void SDL2_Harness_DestroyWindow(void* hWnd) {
+static void SDL2_Harness_DestroyWindow(void) {
     // SDL2_GL_DeleteContext(context);
-    SDL2_DestroyWindow(window);
+    if (window != NULL) {
+        SDL2_DestroyWindow(window);
+    }
     SDL2_Quit();
     window = NULL;
 }
@@ -115,9 +119,8 @@ static int is_only_key_modifier(int modifier_flags, int flag_check) {
     return (modifier_flags & flag_check) && (modifier_flags & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI)) == (modifier_flags & flag_check);
 }
 
-static void SDL2_Harness_ProcessWindowMessages(MSG_* msg) {
+static void SDL2_Harness_ProcessWindowMessages(void) {
     SDL_Event event;
-    int dinput_key;
 
     while (SDL2_PollEvent(&event)) {
         switch (event.type) {
@@ -139,21 +142,19 @@ static void SDL2_Harness_ProcessWindowMessages(MSG_* msg) {
                 }
             }
 
-            // Map incoming SDL scancode to DirectInput DIK_* key code.
-            // https://github.com/DanielGibson/Snippets/blob/master/sdl2_scancode_to_dinput.h
-            dinput_key = sdlScanCodeToDirectInputKeyNum[event.key.keysym.scancode];
-            if (dinput_key == 0) {
+            // Map incoming SDL scancode to PC scan code as used by game code
+            int dethrace_scancode = sdl_scancode_map[event.key.keysym.scancode];
+            if (dethrace_scancode == 0) {
                 LOG_WARN("unexpected scan code %s (%d)", SDL2_GetScancodeName(event.key.keysym.scancode), event.key.keysym.scancode);
                 return;
             }
-            // DInput expects high bit to be set if key is down
-            // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ee418261(v=vs.85)
-            directinput_key_state[dinput_key] = (event.type == SDL_KEYDOWN ? 0x80 : 0);
+
             if (event.type == SDL_KEYDOWN) {
-                gKeyboard_bits[dinput_key >> 5] |= (1 << (dinput_key & 0x1F));
+                key_state[dethrace_scancode >> 5] |= (1 << (dethrace_scancode & 0x1F));
             } else {
-                gKeyboard_bits[dinput_key >> 5] &= ~(1 << (dinput_key & 0x1F));
+                key_state[dethrace_scancode >> 5] &= ~(1 << (dethrace_scancode & 0x1F));
             }
+            gKeyHandler_func();
             break;
 
         case SDL_WINDOWEVENT:
@@ -168,8 +169,12 @@ static void SDL2_Harness_ProcessWindowMessages(MSG_* msg) {
     }
 }
 
-static void SDL2_Harness_GetKeyboardState(unsigned int count, uint8_t* buffer) {
-    memcpy(buffer, directinput_key_state, count);
+static void SDL2_Harness_SetKeyHandler(void (*handler_func)(void)) {
+    gKeyHandler_func = handler_func;
+}
+
+static void SDL2_Harness_GetKeyboardState(uint32_t* buffer) {
+    memcpy(buffer, key_state, sizeof(key_state));
 }
 
 static int SDL2_Harness_GetMouseButtons(int* pButton1, int* pButton2) {
@@ -223,9 +228,9 @@ static void limit_fps(void) {
     last_frame_time = SDL2_GetTicks();
 }
 
-static int SDL2_Harness_ShowErrorMessage(void* window, char* text, char* caption) {
-    fprintf(stderr, "%s", text);
-    SDL2_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, caption, text, window);
+static int SDL2_Harness_ShowErrorMessage(char* title, char* message) {
+    fprintf(stderr, "%s", message);
+    SDL2_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window);
     return 0;
 }
 
@@ -319,7 +324,7 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
 
 static void SDL2_Harness_Swap(br_pixelmap* back_buffer) {
 
-    SDL2_Harness_ProcessWindowMessages(NULL);
+    SDL2_Harness_ProcessWindowMessages();
 
     if (gl_context != NULL) {
         SDL2_GL_SwapWindow(window);
@@ -372,6 +377,7 @@ static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
     platform->ShowCursor = SDL2_ShowCursor;
     platform->SetWindowPos = SDL2_Harness_SetWindowPos;
     platform->DestroyWindow = SDL2_Harness_DestroyWindow;
+    platform->SetKeyHandler = SDL2_Harness_SetKeyHandler;
     platform->GetKeyboardState = SDL2_Harness_GetKeyboardState;
     platform->GetMousePosition = SDL2_Harness_GetMousePosition;
     platform->GetMouseButtons = SDL2_Harness_GetMouseButtons;
