@@ -57,6 +57,7 @@ tS3_outlet_ptr gPedestrians_outlet;
 // GLOBAL: CARM95 0x5149a8
 tS3_outlet_ptr gMusic_outlet;
 tS3_sound_id gMIDI_id;
+// GLOBAL: CARM95 0x550a20
 tS3_outlet_ptr gIndexed_outlets[6];
 // GLOBAL: CARM95 0x538284
 tU32 gLast_sound_service;

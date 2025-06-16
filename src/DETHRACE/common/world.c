@@ -82,16 +82,23 @@ int gRendering_accessories;
 int gNumber_of_actors;
 // GLOBAL: CARM95 0x50c7e4
 int gNumber_of_lights;
+// GLOBAL: CARM95 0x5514e0
 br_actor* gActor_array[500];
+// GLOBAL: CARM95 0x532af0
 float* gGroove_funk_bindings[960];
+// GLOBAL: CARM95 0x532220
 br_actor* gDelete_list[500];
+// GLOBAL: CARM95 0x551cb0
 br_actor* gLight_array[50];
+// GLOBAL: CARM95 0x533b18
 br_model* gAdditional_models[1000];
+// GLOBAL: CARM95 0x534ac0
 br_actor* gSpec_vol_actors[100];
 // GLOBAL: CARM95 0x533a00
 tPath_name gAdditional_actor_path;
 // GLOBAL: CARM95 0x5329f0
 tPath_name gAdditional_model_path;
+// GLOBAL: CARM95 0x533b00
 tU32 gPrevious_groove_times[2];
 // GLOBAL: CARM95 0x551d78
 int gRace_file_version;

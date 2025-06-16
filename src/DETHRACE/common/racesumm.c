@@ -24,9 +24,11 @@
 #include "utility.h"
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x530e38
 int gPlayer_lookup[6];
 // GLOBAL: CARM95 0x530e58
 tMouse_area gOld_back_button;
+// GLOBAL: CARM95 0x530ec0
 tWreck_info gWreck_array[30];
 // GLOBAL: CARM95 0x530e94
 br_actor* gWreck_root;

@@ -31,6 +31,7 @@ int gSpark_flags;
 int gNext_shrapnel;
 // GLOBAL: CARM95 0x5149f4
 int gShrapnel_flags;
+// GLOBAL: CARM95 0x5149f8
 br_model* gShrapnel_model[2];
 // GLOBAL: CARM95 0x514a00
 int gSmoke_flags;
@@ -57,17 +58,24 @@ int gIt_type;
 br_pixelmap* gIt_shade_table;
 // GLOBAL: CARM95 0x514a30
 br_pixelmap** gDust_table = &gShade_list[8];
+// GLOBAL: CARM95 0x538618
 br_pixelmap* gFlame_map[20];
 tBRender_smoke* gBR_smoke_pointers[30];
+// GLOBAL: CARM95 0x538298
 tSplash gSplash[32];
+// GLOBAL: CARM95 0x538b00
 br_material* gSplash_material[20];
 tBRender_smoke gBR_smoke_structs[30];
+// GLOBAL: CARM95 0x538de8
 tSmoke_column gSmoke_column[25];
 // GLOBAL: CARM95 0x538668
 br_matrix4 gCameraToScreen;
+// GLOBAL: CARM95 0x5398d8
 tSpark gSparks[32];
+// GLOBAL: CARM95 0x5509c0
 br_pixelmap* gShade_list[16];
 int gN_BR_smoke_structs;
+// GLOBAL: CARM95 0x5386b0
 tSmoke gSmoke[25];
 // GLOBAL: CARM95 0x53a0e0
 tU32 gSplash_flags;
@@ -85,6 +93,7 @@ int gDust_rotate;
 br_camera* gSpark_cam;
 // GLOBAL: CARM95 0x538288
 br_material* gBlack_material;
+// GLOBAL: CARM95 0x538b50
 tShrapnel gShrapnel[15];
 
 // gSmoke_column has 25 elements but all the code just checks the first 5 elements

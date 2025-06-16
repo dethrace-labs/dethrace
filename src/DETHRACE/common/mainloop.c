@@ -69,6 +69,7 @@ int gWasted_flash_state;
 int gLast_time_headup;
 // GLOBAL: CARM95 0x53a1a0
 int gTime_bonus_headup;
+// GLOBAL: CARM95 0x53a0f0
 int gQueued_wasted_massages[5];
 // GLOBAL: CARM95 0x53a124
 tU32 gTime_bonus_start;

@@ -69,6 +69,7 @@ int gOppo_paths_shown;
 int gMade_path_filename;
 // GLOBAL: CARM95 0x507130
 int gBIG_APC_index = -1;
+// GLOBAL: CARM95 0x507138
 char* gPath_section_type_names[3];
 // GLOBAL: CARM95 0x507144
 int gMin_bangness = 100;
@@ -90,6 +91,7 @@ int gSFS_total_cycles;
 int gSFS_max_cycles;
 // GLOBAL: CARM95 0x50716c
 float gOpponent_nastyness_frigger = 1.f;
+// GLOBAL: CARM95 0x530ca8
 char gOppo_path_filename[256];
 // GLOBAL: CARM95 0x530df0
 br_scalar gIn_view_distance;

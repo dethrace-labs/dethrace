@@ -17,7 +17,9 @@ char* gOil_pixie_names[1] = { "OIL.PIX" };
 int gNext_oil_pixie = 0;
 br_scalar gZ_buffer_diff;
 br_scalar gMin_z_diff;
+// GLOBAL: CARM95 0x551dc0
 br_pixelmap* gOil_pixies[1];
+// GLOBAL: CARM95 0x551dd0
 tOil_spill_info gOily_spills[15];
 
 // IDA: void __cdecl InitOilSpills()

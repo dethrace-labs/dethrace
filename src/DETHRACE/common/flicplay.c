@@ -31,6 +31,7 @@ int gPending_flic = -1;
 int gPlay_from_disk;
 // GLOBAL: CARM95 0x514fbc
 int gTrans_enabled = 1;
+// GLOBAL: CARM95 0x514fc0
 br_pixelmap* gPanel_buffer[2];
 // GLOBAL: CARM95 0x514fc8
 tU32 gSound_time;
@@ -544,12 +545,19 @@ tFlic_bunch gFlic_bunch[9] = {
     { COUNT_OF(gFlic_bunch7), gFlic_bunch7 },
     { COUNT_OF(gFlic_bunch8), gFlic_bunch8 },
 };
+// GLOBAL: CARM95 0x518758
 char gLast_flic_name[14];
+// GLOBAL: CARM95 0x53d060
 tU32 gPanel_flic_data_length[2];
+// GLOBAL: CARM95 0x53d1b8
 tU32 gLast_panel_frame_time[2];
+// GLOBAL: CARM95 0x53d0b8
 tU8* gPanel_flic_data[2];
+// GLOBAL: CARM95 0x53d0c0
 int gPanel_flic_top[2];
+// GLOBAL: CARM95 0x53d0d8
 tFlic_descriptor gPanel_flic[2];
+// GLOBAL: CARM95 0x53d0b0
 int gPanel_flic_left[2];
 // GLOBAL: CARM95 0x53d0cc
 int gPending_pending_flic = -1;
@@ -557,6 +565,7 @@ int gPending_pending_flic = -1;
 int gSound_ID;
 // GLOBAL: CARM95 0x53d06c
 int gTranslation_count;
+// GLOBAL: CARM95 0x53d070
 tDR_font* gTrans_fonts[15];
 // GLOBAL: CARM95 0x53d0d0
 tTranslation_record* gTranslations;

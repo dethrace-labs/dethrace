@@ -25,8 +25,11 @@ int gLast_credit_headup__displays; // suffix added to avoid duplicate symbol
 int gLast_time_credit_headup;
 // GLOBAL: CARM95 0x521684
 tDR_font* gCached_font;
+// GLOBAL: CARM95 0x541598
 br_font* gBR_fonts[4];
+// GLOBAL: CARM95 0x541160
 tQueued_headup gQueued_headups[4];
+// GLOBAL: CARM95 0x544e30
 int gOld_times[10];
 // GLOBAL: CARM95 0x541590
 int gLast_fancy_headup;
@@ -44,6 +47,7 @@ tU32 gLast_earn_time;
 tU32 gLast_time_credit_amount;
 // GLOBAL: CARM95 0x541150
 int gLast_credit_amount;
+// GLOBAL: CARM95 0x53fdd8
 tHeadup gHeadups[15];
 // GLOBAL: CARM95 0x544e60
 int gLaps_headup;
@@ -57,6 +61,7 @@ int gTime_awarded_headup;
 int gPed_kill_count_headup;
 // GLOBAL: CARM95 0x544eec
 int gDim_amount;
+// GLOBAL: CARM95 0x544e70
 br_pixelmap* gHeadup_images[32]; // Modified by DethRace for the demo
 // GLOBAL: CARM95 0x544e58
 int gNet_cash_headup;

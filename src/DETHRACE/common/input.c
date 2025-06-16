@@ -31,9 +31,11 @@ tRolling_letter* gRolling_letters;
 int gCurrent_cursor;
 // GLOBAL: CARM95 0x53a4c0
 int gCurrent_position;
+// GLOBAL: CARM95 0x53a200
 int gLetter_x_coords[15];
 // GLOBAL: CARM95 0x53a240
 int gVisible_length;
+// GLOBAL: CARM95 0x53a1b8
 int gLetter_y_coords[15];
 int gThe_key;
 // GLOBAL: CARM95 0x53a444
@@ -44,7 +46,9 @@ int gThe_length;
 tU32 gLast_roll;
 // GLOBAL: CARM95 0x53a244
 int gLast_key_down;
+// GLOBAL: CARM95 0x5507e0
 int gKey_mapping[67];
+// GLOBAL: CARM95 0x53a450
 char gCurrent_typing[110];
 
 #define NBR_ROLLING_LETTERS 500

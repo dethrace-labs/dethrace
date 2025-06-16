@@ -3,6 +3,7 @@
 
 // GLOBAL: CARM95 0x520038
 br_scalar gYon_factor;
+// GLOBAL: CARM95 0x530c80
 br_material* gMaterial[2];
 int g16bit_palette_valid;
 tException_list gExceptions;

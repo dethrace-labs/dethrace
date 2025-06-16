@@ -542,7 +542,9 @@ int gAllow_car_flying;
 int gEntering_message;
 // GLOBAL: CARM95 0x51cf38
 tU32 gPalette_fade_time; // was gRecover_timer
+// GLOBAL: CARM95 0x53d608
 char* gAbuse_text[10];
+// GLOBAL: CARM95 0x53d648
 char gString[84];
 // GLOBAL: CARM95 0x53d5f8
 int gToo_late;

@@ -16,6 +16,7 @@
 char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
 // GLOBAL: CARM95 0x507038
 char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
+// GLOBAL: CARM95 0x530190
 tSkid gSkids[100];
 
 // IDA: void __usercall StretchMark(tSkid *pMark@<EAX>, br_vector3 *pFrom@<EDX>, br_vector3 *pTo@<EBX>, br_scalar pTexture_start)

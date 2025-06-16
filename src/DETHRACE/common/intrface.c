@@ -12,6 +12,7 @@
 #include "sound.h"
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x53a4d8
 int gDisabled_choices[10];
 // GLOBAL: CARM95 0x53a500
 int gCurrent_mode;

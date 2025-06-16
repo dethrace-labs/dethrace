@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+// GLOBAL: CARM95 0x536278
 tSave_game* gSaved_games[8];
 // GLOBAL: CARM95 0x536270
 int gStarted_typing;

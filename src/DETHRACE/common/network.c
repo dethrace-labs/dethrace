@@ -57,7 +57,9 @@ int gRace_only_flags[33] = {
 };
 // GLOBAL: CARM95 0x50d2cc
 int gJoin_list_mode;
+// GLOBAL: CARM95 0x535dd0
 tNet_game_player_info gNew_net_players[6];
+// GLOBAL: CARM95 0x534c90
 tGuaranteed_message gGuarantee_list[100]; // DOS debug symbols has this as [150]
 // GLOBAL: CARM95 0x534c70
 tMid_message* gMid_messages;

@@ -260,6 +260,7 @@ char* gMem_names[246] = {
 };
 
 // Is 118 in DOS executable, with last entry unused
+// GLOBAL: CARM95 0x537960
 br_resource_class gStainless_classes[117];
 
 // IDA: void __cdecl SetNonFatalAllocationErrors()

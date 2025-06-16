@@ -226,17 +226,27 @@ br_pixelmap* gCurrent_splash;
 br_pixelmap* gCurrent_conversion_table;
 // GLOBAL: CARM95 0x5209e0
 int gMap_colours[4] = { 4, 0, 52, 132 };
+// GLOBAL: CARM95 0x53e798
 br_vector3 gShadow_points[8];
 // GLOBAL: CARM95 0x53f940
 tConcussion gConcussion;
+// GLOBAL: CARM95 0x53f080
 tClip_details gShadow_clip_planes[8];
+// GLOBAL: CARM95 0x53e5f8
 br_actor* gLollipops[100];
+// GLOBAL: CARM95 0x53f8d8
 tWobble_spec gWobble_array[5];
+// GLOBAL: CARM95 0x53f0c0
 tSaved_table gSaved_shade_tables[100];
+// GLOBAL: CARM95 0x53e808
 tCursor_giblet gCursor_giblets[45];
+// GLOBAL: CARM95 0x53f3f0
 tTransient_bm gTransient_bitmaps[50];
+// GLOBAL: CARM95 0x54ff30
 float gCosine_array[64];
+// GLOBAL: CARM95 0x54b300
 br_pixelmap* gCursors[8];
+// GLOBAL: CARM95 0x550040
 br_pixelmap* gCursor_giblet_images[18];
 // GLOBAL: CARM95 0x53e790
 br_pixelmap* gEval_1;
@@ -285,9 +295,11 @@ br_pixelmap* gCurrent_palette;
 br_pixelmap* gRender_palette;
 // GLOBAL: CARM95 0x54ff08
 float gCamera_to_horiz_angle;
+// GLOBAL: CARM95 0x54b2d0
 int gColours[9];
 // GLOBAL: CARM95 0x550088
 br_pixelmap* gFlic_palette;
+// GLOBAL: CARM95 0x54b330
 tDR_font gFonts[21];
 // GLOBAL: CARM95 0x550094
 char* gCurrent_palette_pixels;

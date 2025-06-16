@@ -71,7 +71,9 @@ char* gInstruc_commands[10] = {
 };
 // GLOBAL: CARM95 0x511798
 float gMin_ped_gib_speeds[4] = { 10000.f, .005f, .002f, .001f };
+// GLOBAL: CARM95 0x5117a8
 float gPed_gib_distrib[4] = { 0.f, 0.33f, 0.34f, 0.33f };
+// GLOBAL: CARM95 0x5117b8
 float gPed_gib_speeds[4] = { 0.f, 1.f, 1.f, 1.f };
 // GLOBAL: CARM95 0x5117c8
 int gPed_size_counts[4] = { 3, 5, 5, 5 };
@@ -89,6 +91,7 @@ char* gPed_geb_names[4][5] = {
     { "GHAND.PIX", "GCHUNK02.PIX", "GEYEBALL.PIX", "GCOLON.PIX", "GCHUNK01.PIX" },
     { "GCHUNK04.PIX", "GSPLAT1.PIX", "GCHUNK03.PIX", "GSPLAT2.PIX", "GSPLATOT.PIX" }
 };
+// GLOBAL: CARM95 0x511878
 int gPed_gib_maxes[4][5] = {
     { 1, 1, 1, 0, 0 },
     { 3, 3, 3, 3, 3 },
@@ -113,10 +116,15 @@ int gPedestrians_on = 0;
 int gVesuvian_corpses = 0;
 // GLOBAL: CARM95 0x5118e4
 br_material* gPed_material = NULL;
+// GLOBAL: CARM95 0x5378c8
 int gPed_gib_counts[4][5];
+// GLOBAL: CARM95 0x536c48
 tPedestrian_instruction gPed_instrucs[100];
+// GLOBAL: CARM95 0x537418
 tPed_gib gPed_gibs[30];
+// GLOBAL: CARM95 0x536ab0
 tPed_gib_materials gPed_gib_materials[4];
+// GLOBAL: CARM95 0x536b58
 tProximity_ray gProximity_rays[20];
 int gPed_colliding;
 // GLOBAL: CARM95 0x550a90

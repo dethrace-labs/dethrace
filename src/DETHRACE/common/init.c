@@ -55,7 +55,9 @@ int gRender_indent;
 tU32 gAustere_time;
 // GLOBAL: CARM95 0x54b2bc
 int gInitial_rank;
+// GLOBAL: CARM95 0x54b2b0
 int gCredits_per_rank[3];
+// GLOBAL: CARM95 0x54b2c0
 int gInitial_credits[3];
 // GLOBAL: CARM95 0x54b2a0
 int gNet_mode_of_last_game;

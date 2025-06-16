@@ -61,6 +61,7 @@ tGrid_draw gDraw_grid_status;
 tNet_sequence_type gNet_race_sequence__racestrt; // suffix added to avoid duplicate symbol
 // GLOBAL: CARM95 0x53642c
 br_pixelmap* gTaken_image;
+// GLOBAL: CARM95 0x536370
 int gGrid_number_x_coords[31];
 // GLOBAL: CARM95 0x5363f4
 int gGrid_transition_stage;

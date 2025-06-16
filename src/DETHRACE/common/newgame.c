@@ -51,10 +51,13 @@ char _name1[] = "xxxxxxxx.TXT"; // keep compiler happy
 char _name2[] = "yyyyyyyy.TXT"; // keep compiler happy
 // GLOBAL: CARM95 0x51ea80
 char* gBasic_car_names[2] = { _name1, _name2 };
+// GLOBAL: CARM95 0x5500c0
 tNet_game_options gNet_settings[8];
+// GLOBAL: CARM95 0x53e5c0
 tJoinable_game gGames_to_join[6];
 // GLOBAL: CARM95 0x53e5b8
 tNet_game_options* gOptions;
+// GLOBAL: CARM95 0x5500a0
 int gNet_target[7];
 // GLOBAL: CARM95 0x53e5f0
 int gLast_graph_sel__newgame;                   // suffix added to avoid duplicate symbol

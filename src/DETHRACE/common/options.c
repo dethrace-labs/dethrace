@@ -48,11 +48,13 @@ tRadio_bastards gRadio_bastards__options[13] = {
 int gKey_count;
 // GLOBAL: CARM95 0x53d1d0
 int gLast_graph_sel__options; // suffix added to avoid duplicate symbol
+// GLOBAL: CARM95 0x53d2f0
 char* gKey_names[125];
 // GLOBAL: CARM95 0x53d4e4
 int gPending_entry;
 // GLOBAL: CARM95 0x53d2ec
 tInterface_spec* gThe_interface_spec__options; // suffix added to avoid duplicate symbol
+// GLOBAL: CARM95 0x53d1e0
 int gOrig_key_mapping[67];
 // GLOBAL: CARM95 0x53d1d8
 br_pixelmap* gDials_pix;

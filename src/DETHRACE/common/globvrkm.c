@@ -16,10 +16,13 @@ int gCar_flying;
 int gCamera_reset;
 // GLOBAL: CARM95 0x50d3a0
 tCar_spec* gCar_to_view = &gProgram_state.current_car;
+// GLOBAL: CARM95 0x551438
 br_actor* gCamera_list[2];
+// GLOBAL: CARM95 0x551450
 tCar_spec* gActive_car_list[25];
 // GLOBAL: CARM95 0x5514cc
 int gNum_active_cars;
+// GLOBAL: CARM95 0x5514c0
 float gRecovery_cost[3];
 // GLOBAL: CARM95 0x5514d0
 br_scalar gCamera_height;

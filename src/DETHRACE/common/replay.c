@@ -52,6 +52,7 @@ int gProgress_line_left[2] = { 70, 141 };
 int gProgress_line_right[2] = { 279, 558 };
 // GLOBAL: CARM95 0x50a1f8
 int gProgress_line_top[2] = { 178, 429 };
+// GLOBAL: CARM95 0x531dd0
 br_pixelmap* gReplay_pixies[10];
 // GLOBAL: CARM95 0x531db8
 int gKey_down;

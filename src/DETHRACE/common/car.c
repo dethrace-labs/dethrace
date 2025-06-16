@@ -107,6 +107,7 @@ int gEliminate_faces = 0;
 br_vector3 gZero_v__car = { { 0 } }; // suffix added to avoid duplicate symbol
 // GLOBAL: CARM95 0x514d74
 tU32 gSwitch_time = 0;
+// GLOBAL: CARM95 0x514d78
 tSave_camera gSave_camera[2];
 // GLOBAL: CARM95 0x514d90
 tU32 gLast_mechanics_time;
@@ -141,7 +142,9 @@ int gCar_simplification_level = 0;
 int gNum_active_non_cars = 0;
 // GLOBAL: CARM95 0x514e30
 int gCamera_has_collided = 0;
+// GLOBAL: CARM95 0x53a5b8
 tFace_ref gFace_list__car[150]; // suffix added to avoid duplicate symbol
+// GLOBAL: CARM95 0x550680
 tNon_car_spec* gActive_non_car_list[50];
 // GLOBAL: CARM95 0x53a57c
 int gOver_shoot;

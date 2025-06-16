@@ -56,6 +56,7 @@ FILE* gDiagnostic_file;
 br_vector3 gDisabled_vector;
 // GLOBAL: CARM95 0x52136c
 tU32 gI_am_cheating;
+// GLOBAL: CARM95 0x54b220
 char gNet_player_name[32];
 // GLOBAL: CARM95 0x545440
 br_matrix34 gRearview_camera_to_world;
@@ -63,6 +64,7 @@ br_matrix34 gRearview_camera_to_world;
 tSpecial_volume gDefault_default_water_spec_vol;
 // GLOBAL: CARM95 0x545400
 br_matrix34 gCamera_to_world;
+// GLOBAL: CARM95 0x5454d0
 tRace_list_spec gRace_list[100];
 // GLOBAL: CARM95 0x546820
 tPath_name gApplication_path;
@@ -72,6 +74,7 @@ float gPinball_factor;
 float gOpponent_speed_factor;
 // GLOBAL: CARM95 0x54b250
 float gCar_crush_min_fold;
+// GLOBAL: CARM95 0x549fc0
 float gNet_recovery_cost[7];
 // GLOBAL: CARM95 0x545474
 float gCar_crush_softness;
@@ -81,11 +84,13 @@ br_vector3* gOur_pos;
 float gCar_crush_max_fold;
 // GLOBAL: CARM95 0x54a020
 tBrender_storage gNet_cars_storage_space;
+// GLOBAL: CARM95 0x545380
 float gNet_softness[7];
 // GLOBAL: CARM95 0x54a094
 tS32 gJoystick_deadzone;
 // GLOBAL: CARM95 0x54b270
 float gCar_crush_limit_deviant;
+// GLOBAL: CARM95 0x5452e0
 float gNet_offensive[7];
 // GLOBAL: CARM95 0x545470
 float gCar_crush_split_chance;
@@ -93,6 +98,7 @@ float gCar_crush_split_chance;
 float gGravity_multiplier;
 // GLOBAL: CARM95 0x545364
 float gCar_crush_wibble;
+// GLOBAL: CARM95 0x549fe0
 float gRepair_cost[3];
 // GLOBAL: CARM95 0x5454c0
 float gCop_speed_factor;
@@ -102,6 +108,7 @@ float gDefault_gravity;
 tU32 gKeys_pressed;
 // GLOBAL: CARM95 0x54a054
 tSpecial_volume* gDefault_water_spec_vol;
+// GLOBAL: CARM95 0x549f60
 float gNet_repair_cost[7];
 // GLOBAL: CARM95 0x54537c
 br_font* gFont_7;
@@ -121,6 +128,7 @@ tU32 gRace_finished;
 tU32 gFrame_start_time;
 // GLOBAL: CARM95 0x546930
 tProgram_state gProgram_state;
+// GLOBAL: CARM95 0x545370
 tU32 gCredit_period_single[3];
 // GLOBAL: CARM95 0x54b240
 tU32 gRace_start;
@@ -130,6 +138,7 @@ tBrender_storage gTrack_storage_space;
 tU32 gFrame_period;
 // GLOBAL: CARM95 0x5467ac
 tU32 gCredit_period;
+// GLOBAL: CARM95 0x545300
 tU32 gCredit_period_network[7];
 // GLOBAL: CARM95 0x5467c0
 tBrender_storage gOur_car_storage_space;
@@ -175,16 +184,21 @@ br_actor* gArrow_actor;
 br_pixelmap* gIcons_pix_low_res;
 // GLOBAL: CARM95 0x545324
 br_pixelmap* gDepth_buffer;
+// GLOBAL: CARM95 0x54a080
 int gInitial_net_credits[5];
+// GLOBAL: CARM95 0x5467a0
 float gCar_cred_value[3];
 // GLOBAL: CARM95 0x545430
 int gNo_races_yet;
+// GLOBAL: CARM95 0x5453a0
 int gJump_start_fine[3];
 // GLOBAL: CARM95 0x5454bc
 int gReal_graf_data_index;
+// GLOBAL: CARM95 0x549ff0
 float gCar_time_value[3];
 // GLOBAL: CARM95 0x54679c
 int gTyping_slot;
+// GLOBAL: CARM95 0x54b260
 int gCunning_stunt_bonus[3];
 // GLOBAL: CARM95 0x54b258
 int gKnobbled_frame_period;
@@ -192,7 +206,9 @@ int gKnobbled_frame_period;
 br_actor* gNon_track_actor;
 // GLOBAL: CARM95 0x546790
 int gWait_for_it;
+// GLOBAL: CARM95 0x54a070
 int gCheck_point_cash[3];
+// GLOBAL: CARM95 0x54a010
 int gPoints_per_second[3];
 // GLOBAL: CARM95 0x5453fc
 br_actor* gUniverse_actor;
@@ -200,6 +216,7 @@ br_actor* gUniverse_actor;
 br_actor* gTrack_actor;
 // GLOBAL: CARM95 0x5467f4
 int gMap_mode;
+// GLOBAL: CARM95 0x54b290
 int gPed_time_value[3];
 // GLOBAL: CARM95 0x545328
 int gAbandon_game;
@@ -213,15 +230,19 @@ int gTotal_laps;
 int gFree_repairs;
 // GLOBAL: CARM95 0x546924
 int gFreeze_timer;
+// GLOBAL: CARM95 0x549ea0
 int gRoll_over_creds[3];
 // GLOBAL: CARM95 0x545320
 int gShow_peds_on_map;
 // GLOBAL: CARM95 0x5453f4
 int gOn_drugs;
+// GLOBAL: CARM95 0x54b280
 int gWasted_time[3];
 // GLOBAL: CARM95 0x54a008
 int gCheckpoint;
+// GLOBAL: CARM95 0x546800
 int gRoll_over_time[3];
+// GLOBAL: CARM95 0x545350
 int gWasted_creds[3];
 // GLOBAL: CARM95 0x54a004
 int gTimer;

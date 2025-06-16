@@ -142,7 +142,9 @@ char* gFizzle_names[3] = { "CIRCLES.PIX", "SQUARES.PIX", "DIAMONDS.PIX" };
 br_vector3 gZero_v__powerup; // suffix added to avoid duplicate symbol
 // GLOBAL: CARM95 0x50bc58
 int gPed_harvest_sounds[4] = { 4010, 4012, 4030, 4032 };
+// GLOBAL: CARM95 0x5320a0
 tHeadup_icon gIcon_list[20];
+// GLOBAL: CARM95 0x5321f0
 br_pixelmap* gFizzle_in[3];
 // GLOBAL: CARM95 0x5321fc
 int gNumber_of_powerups;

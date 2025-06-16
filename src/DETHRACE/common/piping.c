@@ -78,6 +78,7 @@ tPipe_chunk* gMr_chunky;
 tCar_spec* gCar_ptr;
 // GLOBAL: CARM95 0x532068
 br_vector3 gZero_vector;
+// GLOBAL: CARM95 0x532050
 tPipe_chunk_type gReentrancy_array[5];
 // GLOBAL: CARM95 0x532000
 tU32 gLast_time;

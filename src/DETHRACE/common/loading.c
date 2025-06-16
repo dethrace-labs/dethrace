@@ -127,7 +127,9 @@ int gAllow_open_to_fail = 1;
 int gDecode_thing = '@';
 // GLOBAL: CARM95 0x50a5d0
 char gDecode_string[] = { 0x9B, 0x52, 0x93, 0x9F, 0x52, 0x98, 0x9B, 0x96, 0x96, 0x9E, 0x9B, 0xA0, 0x99, 0x0 };
+// GLOBAL: CARM95 0x531f00
 int gFunk_groove_flags[30];
+// GLOBAL: CARM95 0x531f80
 char gDef_def_water_screen_name[32];
 // GLOBAL: CARM95 0x531dfc
 br_material* gDestn_screen_mat;
@@ -141,6 +143,7 @@ int gGroove_funk_offset;
 int gDemo_armour;
 // GLOBAL: CARM95 0x551db0
 int gDemo_rank;
+// GLOBAL: CARM95 0x551d90
 int gDemo_opponents[5];
 // GLOBAL: CARM95 0x551da4
 int gDemo_power;
