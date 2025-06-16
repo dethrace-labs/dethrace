@@ -78,8 +78,10 @@ int gTest_toggle;
 // GLOBAL: CARM95 0x507118
 int gAlready_elasticating;
 
+// GLOBAL: CARM95 0x50711c
 int gVertices_used_in_non_edit_paths;
 
+// GLOBAL: CARM95 0x507120
 int gFaces_used_in_non_edit_paths;
 
 // GLOBAL: CARM95 0x507124
@@ -143,6 +145,8 @@ int gSFS_cycles_this_time;
 
 // GLOBAL: CARM95 0x530dec
 br_scalar gMinimum_yness_before_knackerisation;
+
+// GLOBAL: CARM95 0x530dd4
 int gWanky_arse_tit_fuck;
 
 // GLOBAL: CARM95 0x530df4

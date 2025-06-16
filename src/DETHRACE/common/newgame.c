@@ -80,6 +80,7 @@ tNet_sequence_type gNet_race_sequence__newgame; // suffix added to avoid duplica
 // GLOBAL: CARM95 0x550098
 tNet_game_type gLast_game_type;
 
+// GLOBAL: CARM95 0x53e5ac
 int gCurrent_net_game_count;
 
 // GLOBAL: CARM95 0x53e5f4
