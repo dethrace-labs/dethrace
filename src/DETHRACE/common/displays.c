@@ -19,55 +19,81 @@
 
 // GLOBAL: CARM95 0x521678
 int gLast_fancy_index;
+
 // GLOBAL: CARM95 0x52167c
 int gLast_credit_headup__displays; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x521680
 int gLast_time_credit_headup;
+
 // GLOBAL: CARM95 0x521684
 tDR_font* gCached_font;
+
 // GLOBAL: CARM95 0x541598
 br_font* gBR_fonts[4];
+
 // GLOBAL: CARM95 0x541160
 tQueued_headup gQueued_headups[4];
+
 // GLOBAL: CARM95 0x544e30
 int gOld_times[10];
+
 // GLOBAL: CARM95 0x541590
 int gLast_fancy_headup;
+
 // GLOBAL: CARM95 0x541594
 tU32 gLast_time_earn_time;
+
 // GLOBAL: CARM95 0x5415a8
 tU32 gLast_centre_headup;
+
 // GLOBAL: CARM95 0x5415ac
 tU32 gLast_fancy_time;
+
 // GLOBAL: CARM95 0x541158
 int gQueued_headup_count;
+
 // GLOBAL: CARM95 0x54114c
 tU32 gLast_earn_time;
+
 // GLOBAL: CARM95 0x541154
 tU32 gLast_time_credit_amount;
+
 // GLOBAL: CARM95 0x541150
 int gLast_credit_amount;
+
 // GLOBAL: CARM95 0x53fdd8
 tHeadup gHeadups[15];
+
 // GLOBAL: CARM95 0x544e60
 int gLaps_headup;
+
 // GLOBAL: CARM95 0x544e68
 int gCar_kill_count_headup;
+
 // GLOBAL: CARM95 0x544e5c
 int gTimer_headup;
+
 // GLOBAL: CARM95 0x544e6c
 int gTime_awarded_headup;
+
 // GLOBAL: CARM95 0x544e64
 int gPed_kill_count_headup;
+
 // GLOBAL: CARM95 0x544eec
 int gDim_amount;
+
 // GLOBAL: CARM95 0x544e70
 br_pixelmap* gHeadup_images[32]; // Modified by DethRace for the demo
+
 // GLOBAL: CARM95 0x544e58
 int gNet_cash_headup;
+
 // GLOBAL: CARM95 0x544e1c
 int gNet_ped_headup;
+
 int gCredits_lost_headup;
+
 // GLOBAL: CARM95 0x544e20
 int gCredits_won_headup;
 

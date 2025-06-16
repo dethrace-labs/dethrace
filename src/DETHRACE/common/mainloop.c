@@ -39,40 +39,58 @@
 
 // GLOBAL: CARM95 0x514afc
 int gNasty_kludgey_cockpit_variable;
+
 // GLOBAL: CARM95 0x514b00
 tInfo_mode gInfo_mode;
+
 // GLOBAL: CARM95 0x514b04
 tU32 gLast_tick_count;
+
 // GLOBAL: CARM95 0x514b08
 tU32 gActual_last_tick_count;
+
 // GLOBAL: CARM95 0x514b0c
 tU32 gAverage_frame_period;
+
 // GLOBAL: CARM95 0x53a1a8
 tU32 gOld_camera_time;
+
 // GLOBAL: CARM95 0x53a118
 tU32 gLast_wasted_massage_start;
+
 // GLOBAL: CARM95 0x53a114
 float gMr_odo;
+
 // GLOBAL: CARM95 0x53a0e8
 tU32 gWasted_last_flash;
+
 // GLOBAL: CARM95 0x53a120
 tTime_bonus_state gTime_bonus_state;
+
 // GLOBAL: CARM95 0x53a104
 int gQueued_wasted_massages_count;
+
 // GLOBAL: CARM95 0x53a11c
 int gTime_bonus;
+
 // GLOBAL: CARM95 0x53a1a4
 int gRace_bonus_headup;
+
 // GLOBAL: CARM95 0x53a10c
 int gWasted_flash_state;
+
 // GLOBAL: CARM95 0x53a110
 int gLast_time_headup;
+
 // GLOBAL: CARM95 0x53a1a0
 int gTime_bonus_headup;
+
 // GLOBAL: CARM95 0x53a0f0
 int gQueued_wasted_massages[5];
+
 // GLOBAL: CARM95 0x53a124
 tU32 gTime_bonus_start;
+
 // GLOBAL: CARM95 0x53a108
 int gLast_credit_headup__mainloop; // suffix added to avoid duplicate symbol
 

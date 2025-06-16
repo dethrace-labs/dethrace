@@ -42,8 +42,10 @@
 // GLOBAL: CARM95 0x520040
 int gPalette_munged;
 int gColourValues[1];
+
 // GLOBAL: CARM95 0x520048
 int gNext_transient;
+
 // GLOBAL: CARM95 0x520050
 int gCursor_x_offsets[8] = {
     6,
@@ -55,6 +57,7 @@ int gCursor_x_offsets[8] = {
     16,
     36,
 };
+
 // GLOBAL: CARM95 0x520070
 int gCursor_y_offsets[8] = {
     26,
@@ -66,6 +69,7 @@ int gCursor_y_offsets[8] = {
     12,
     5,
 };
+
 // GLOBAL: CARM95 0x520090
 int gCursor_gib_x_offsets[8] = {
     82,
@@ -77,6 +81,7 @@ int gCursor_gib_x_offsets[8] = {
     66,
     36,
 };
+
 // GLOBAL: CARM95 0x5200b0
 int gCursor_gib_y_offsets[8] = {
     74,
@@ -88,6 +93,7 @@ int gCursor_gib_y_offsets[8] = {
     93,
     106,
 };
+
 // GLOBAL: CARM95 0x5200d0
 int gCursor_giblet_sequence0[7] = {
     6,
@@ -98,6 +104,7 @@ int gCursor_giblet_sequence0[7] = {
     4,
     5,
 };
+
 // GLOBAL: CARM95 0x5200f0
 int gCursor_giblet_sequence1[5] = {
     4,
@@ -106,6 +113,7 @@ int gCursor_giblet_sequence1[5] = {
     8,
     9,
 };
+
 // GLOBAL: CARM95 0x520108
 int gCursor_giblet_sequence2[5] = {
     4,
@@ -114,6 +122,7 @@ int gCursor_giblet_sequence2[5] = {
     12,
     13,
 };
+
 // GLOBAL: CARM95 0x520120
 int gCursor_giblet_sequence3[5] = {
     4,
@@ -122,6 +131,7 @@ int gCursor_giblet_sequence3[5] = {
     16,
     17,
 };
+
 // GLOBAL: CARM95 0x520138
 int* gCursor_giblet_sequences[4] = {
     gCursor_giblet_sequence0,
@@ -129,6 +139,7 @@ int* gCursor_giblet_sequences[4] = {
     gCursor_giblet_sequence2,
     gCursor_giblet_sequence3,
 };
+
 // GLOBAL: CARM95 0x520148
 char* gFont_names[21] = {
     "TYPEABLE",
@@ -153,6 +164,7 @@ char* gFont_names[21] = {
     "LITPLAQ1",
     "DRKPLAQ1"
 };
+
 // GLOBAL: CARM95 0x5201a0
 br_colour gRGB_colours[9] = {
     0u,
@@ -177,6 +189,7 @@ br_matrix34 gIdentity34 = {
         { 0.0, 0.0, 1.0 },
         { 0.0, 0.0, 0.0 } }
 };
+
 // GLOBAL: CARM95 0x520228
 tShadow_level gShadow_level = eShadow_us_only;
 br_scalar gShadow_hither_z_move;
@@ -208,133 +221,197 @@ int gArrows[2][4][60] =
 
 // GLOBAL: CARM95 0x5209b8
 float gMap_render_x = 80.f;
+
 // GLOBAL: CARM95 0x5209bc
 float gMap_render_y = 6.f;
+
 // GLOBAL: CARM95 0x5209c0
 float gMap_render_width = 64.f;
+
 // GLOBAL: CARM95 0x5209c4
 float gMap_render_height = 40.f;
+
 // GLOBAL: CARM95 0x5209c8
 int gMouse_started;
+
 // GLOBAL: CARM95 0x5209cc
 int gFaded_palette;
+
 // GLOBAL: CARM95 0x5209d0
 int gAR_fudge_headups;
+
 // GLOBAL: CARM95 0x5209d4
 br_pixelmap* gCurrent_splash;
+
 // GLOBAL: CARM95 0x5209d8
 br_pixelmap* gCurrent_conversion_table;
+
 // GLOBAL: CARM95 0x5209e0
 int gMap_colours[4] = { 4, 0, 52, 132 };
+
 // GLOBAL: CARM95 0x53e798
 br_vector3 gShadow_points[8];
+
 // GLOBAL: CARM95 0x53f940
 tConcussion gConcussion;
+
 // GLOBAL: CARM95 0x53f080
 tClip_details gShadow_clip_planes[8];
+
 // GLOBAL: CARM95 0x53e5f8
 br_actor* gLollipops[100];
+
 // GLOBAL: CARM95 0x53f8d8
 tWobble_spec gWobble_array[5];
+
 // GLOBAL: CARM95 0x53f0c0
 tSaved_table gSaved_shade_tables[100];
+
 // GLOBAL: CARM95 0x53e808
 tCursor_giblet gCursor_giblets[45];
+
 // GLOBAL: CARM95 0x53f3f0
 tTransient_bm gTransient_bitmaps[50];
+
 // GLOBAL: CARM95 0x54ff30
 float gCosine_array[64];
+
 // GLOBAL: CARM95 0x54b300
 br_pixelmap* gCursors[8];
+
 // GLOBAL: CARM95 0x550040
 br_pixelmap* gCursor_giblet_images[18];
+
 // GLOBAL: CARM95 0x53e790
 br_pixelmap* gEval_1;
 br_pixelmap* gEval_2;
+
 // GLOBAL: CARM95 0x53f8b8
 br_vector3 gShadow_light_z;
+
 // GLOBAL: CARM95 0x53f8a8
 br_vector3 gShadow_light_x;
+
 // GLOBAL: CARM95 0x53e7f8
 int gShadow_dim_amount;
+
 // GLOBAL: CARM95 0x53f8a0
 int gNumber_of_lollipops;
+
 // GLOBAL: CARM95 0x53f8c8
 br_vector3 gShadow_light_ray;
+
 // GLOBAL: CARM95 0x53e788
 int gFancy_shadow;
+
 // GLOBAL: CARM95 0x53f93c
 br_model* gShadow_model;
+
 // GLOBAL: CARM95 0x53e7fc
 br_actor* gShadow_actor;
+
 // GLOBAL: CARM95 0x53f928
 int gShadow_clip_plane_count;
+
 // GLOBAL: CARM95 0x53e800
 br_pixelmap* gPalette_conversion_table;
+
 // GLOBAL: CARM95 0x53f92c
 br_material* gShadow_material;
+
 // GLOBAL: CARM95 0x53f3e8
 int gSaved_table_count;
+
 // GLOBAL: CARM95 0x53f3e0
 int gCurrent_cursor_index;
+
 // GLOBAL: CARM95 0x53f930
 int gPalette_index;
+
 // GLOBAL: CARM95 0x53f3e4
 int gCursor_transient_index;
+
 // GLOBAL: CARM95 0x53f934
 char* gScratch_pixels;
+
 // GLOBAL: CARM95 0x53f078
 br_pixelmap* gScratch_palette;
+
 // GLOBAL: CARM95 0x53e78c
 int gLast_palette_change;
+
 // GLOBAL: CARM95 0x53f8a4
 br_pixelmap* gOrig_render_palette;
+
 // GLOBAL: CARM95 0x550030
 br_pixelmap* gCurrent_palette;
+
 // GLOBAL: CARM95 0x54fefc
 br_pixelmap* gRender_palette;
+
 // GLOBAL: CARM95 0x54ff08
 float gCamera_to_horiz_angle;
+
 // GLOBAL: CARM95 0x54b2d0
 int gColours[9];
+
 // GLOBAL: CARM95 0x550088
 br_pixelmap* gFlic_palette;
+
 // GLOBAL: CARM95 0x54b330
 tDR_font gFonts[21];
+
 // GLOBAL: CARM95 0x550094
 char* gCurrent_palette_pixels;
+
 // GLOBAL: CARM95 0x54b320
 int gWidth;
+
 // GLOBAL: CARM95 0x54ff18
 int gMap_render_height_i;
+
 // GLOBAL: CARM95 0x550038
 int gScreen_wobble_x;
+
 // GLOBAL: CARM95 0x550034
 int gScreen_wobble_y;
+
 // GLOBAL: CARM95 0x54ff0c
 br_scalar gCurrent_ambience;
+
 // GLOBAL: CARM95 0x54b2cc
 int gY_offset;
+
 // GLOBAL: CARM95 0x55008c
 int gMap_render_width_i;
+
 // GLOBAL: CARM95 0x550090
 int gMouse_in_use;
+
 // GLOBAL: CARM95 0x54b2f8
 int gHeight;
+
 // GLOBAL: CARM95 0x54ff00
 int gMouse_last_y_coord;
+
 // GLOBAL: CARM95 0x54b2f4
 int gMouse_last_x_coord;
+
 // GLOBAL: CARM95 0x54ff20
 br_scalar gAmbient_adjustment;
+
 // GLOBAL: CARM95 0x54ff14
 int gMap_render_x_i;
+
 // GLOBAL: CARM95 0x54ff24
 int gX_offset;
+
 // GLOBAL: CARM95 0x54ff10
 int gMap_render_y_i;
+
 // GLOBAL: CARM95 0x54ff04
 int gMirror_on__graphics; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x54ff1c
 br_scalar gYon_squared;
 

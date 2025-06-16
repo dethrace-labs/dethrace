@@ -28,65 +28,95 @@
 
 // GLOBAL: CARM95 0x50f198
 int gGrid_number_colour[4] = { 49u, 201u, 1u, 201u };
+
 // GLOBAL: CARM95 0x50f1a8
 int gJust_bought_part;
+
 // GLOBAL: CARM95 0x50f1ac
 tU32 gLast_host_query;
+
 // GLOBAL: CARM95 0x550acc
 br_pixelmap* gDead_car;
+
 // GLOBAL: CARM95 0x536408
 int gFade_away_parts_shop;
+
 // GLOBAL: CARM95 0x53635c
 tU32 gDare_start_time;
+
 // GLOBAL: CARM95 0x536418
 int gRefund_rate;
+
 // GLOBAL: CARM95 0x53640c
 int gSwap_grid_2;
+
 // GLOBAL: CARM95 0x536410
 int gSwap_grid_1;
+
 // GLOBAL: CARM95 0x5363f0
 int gChange_race_net_mode;
+
 // GLOBAL: CARM95 0x53641c
 tParts_category gPart_category;
 tU32 gNet_synch_start;
+
 // GLOBAL: CARM95 0x53634c
 tNet_game_details* gChoose_car_net_game;
+
 // GLOBAL: CARM95 0x536404
 int gPart_index;
+
 // GLOBAL: CARM95 0x53636c
 int gChallenger_index__racestrt; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x536360
 tGrid_draw gDraw_grid_status;
+
 // GLOBAL: CARM95 0x5363ec
 tNet_sequence_type gNet_race_sequence__racestrt; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x53642c
 br_pixelmap* gTaken_image;
+
 // GLOBAL: CARM95 0x536370
 int gGrid_number_x_coords[31];
+
 // GLOBAL: CARM95 0x5363f4
 int gGrid_transition_stage;
+
 // GLOBAL: CARM95 0x536428
 int gGrid_y_adjust;
+
 // GLOBAL: CARM95 0x536400
 br_pixelmap* gBullet_image;
+
 // GLOBAL: CARM95 0x5363f8
 br_pixelmap* gDeceased_image;
+
 // GLOBAL: CARM95 0x536364
 int gBest_pos_available;
+
 // GLOBAL: CARM95 0x536358
 int gChallenger_position;
+
 // GLOBAL: CARM95 0x536414
 int gOpponent_index;
+
 // GLOBAL: CARM95 0x5363fc
 int gChallenge_time;
+
 // GLOBAL: CARM95 0x536354
 int gOriginal_position;
+
 // GLOBAL: CARM95 0x536420
 int gCurrent_race_index;
+
 // GLOBAL: CARM95 0x536350
 tInterface_spec* gStart_interface_spec;
+
 // GLOBAL: CARM95 0x536424
 int gCurrent_car_index;
+
 // GLOBAL: CARM95 0x536368
 int gOur_starting_position;
 

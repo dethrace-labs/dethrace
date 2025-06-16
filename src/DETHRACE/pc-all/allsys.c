@@ -51,10 +51,12 @@ tS32 gJoystick_range2x;
 tS32 gJoystick_range1y;
 tS32 gJoystick_range1x;
 int gNo_voodoo;
+
 // GLOBAL: CARM95 0x51d5d0
 int gSwitched_resolution;
 br_pixelmap* gReal_back_screen;
 tS32 gJoystick_min1x;
+
 // GLOBAL: CARM95 0x51d59c
 br_pixelmap* gTemp_screen;
 tU32 gUpper_loop_limit;

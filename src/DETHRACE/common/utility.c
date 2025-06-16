@@ -31,21 +31,28 @@
 
 // GLOBAL: CARM95 0x521488
 int gIn_check_quit = 0;
+
 // GLOBAL: CARM95 0x52148c
 tU32 gLost_time = 0;
 #if BR_ENDIAN_BIG
+
 // GLOBAL: CARM95 0x521490
 tU32 gLong_key[4] = { 0x6c1b995f, 0xb9cd5f13, 0xcb04200e, 0x5e1ca10e };
+
 // GLOBAL: CARM95 0x5214a0
 tU32 gOther_long_key[4] = { 0x67a8d626, 0xb6dd451b, 0x327e2213, 0x15c29437 };
 #else
+
 // GLOBAL: CARM95 0x521490
 tU32 gLong_key[4] = { 0x5f991b6c, 0x135fcdb9, 0x0e2004cb, 0x0ea11c5e };
+
 // GLOBAL: CARM95 0x5214a0
 tU32 gOther_long_key[4] = { 0x26d6a867, 0x1b45ddb6, 0x13227e32, 0x3794c215 };
 #endif
+
 // GLOBAL: CARM95 0x5214b0
 int gEncryption_method = 0;
+// GLOBAL: CARM95 0x544ef0
 char* gMisc_strings[250];
 br_pixelmap* g16bit_palette;
 br_pixelmap* gSource_for_16bit_palette;

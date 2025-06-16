@@ -40,45 +40,65 @@ char* gReplay_pixie_names[10] = {
     "FWDEND.PIX",
     "CAMERA.PIX",
 };
+
 // GLOBAL: CARM95 0x50a1d8
 int gSingle_frame_mode = 0;
+
 // GLOBAL: CARM95 0x50a1dc
 tU32 gCam_change_time = 0;
+
 // GLOBAL: CARM95 0x50a1e0
 int gSave_file = 0;
+
 // GLOBAL: CARM95 0x50a1e8
 int gProgress_line_left[2] = { 70, 141 };
+
 // GLOBAL: CARM95 0x50a1f0
 int gProgress_line_right[2] = { 279, 558 };
+
 // GLOBAL: CARM95 0x50a1f8
 int gProgress_line_top[2] = { 178, 429 };
+
 // GLOBAL: CARM95 0x531dd0
 br_pixelmap* gReplay_pixies[10];
+
 // GLOBAL: CARM95 0x531db8
 int gKey_down;
 int gNo_cursor;
+
 // GLOBAL: CARM95 0x531db4
 int gSave_frame_number;
+
 // GLOBAL: CARM95 0x531da8
 int gCam_change_button_down;
+
 // GLOBAL: CARM95 0x531da0
 tU32 gAction_replay_start_time;
+
 // GLOBAL: CARM95 0x531dc4
 tU32 gLast_replay_zappy_screen;
+
 // GLOBAL: CARM95 0x531dc0
 tS32 gStopped_time;
+
 // GLOBAL: CARM95 0x531dbc
 float gPending_replay_rate;
+
 // GLOBAL: CARM95 0x531da4
 tU32 gAction_replay_end_time;
+
 // GLOBAL: CARM95 0x531dcc
 float gReplay_rate;
+
 // GLOBAL: CARM95 0x531db0
 int gSave_bunch_ID;
+
 // GLOBAL: CARM95 0x531dac
 int gPlay_direction;
+
 // GLOBAL: CARM95 0x531dc8
 int gPaused;
+
 // GLOBAL: CARM95 0x551db4
 tAction_replay_camera_type gAction_replay_camera_mode;
 

@@ -18,30 +18,43 @@
 
 // GLOBAL: CARM95 0x50f064
 tS3_sound_tag gWhirr_noise = 0;
+
 // GLOBAL: CARM95 0x5362b0
 tFlic_descriptor gPrat_flic;
+
 // GLOBAL: CARM95 0x536334
 tPrat_sequence* gPratcam_sequences;
+
 // GLOBAL: CARM95 0x536324
 tPrat_flic_spec* gPratcam_flics;
+
 // GLOBAL: CARM95 0x536320
 int gCurrent_pratcam_chunk;
+
 // GLOBAL: CARM95 0x53632c
 int gPending_ambient_prat;
+
 // GLOBAL: CARM95 0x5362a0
 int gCurrent_pratcam_index;
+
 // GLOBAL: CARM95 0x536340
 br_pixelmap* gPrat_buffer;
+
 // GLOBAL: CARM95 0x536330
 int gNumber_of_prat_sequences;
+
 // GLOBAL: CARM95 0x5362a4
 int gNumber_of_prat_flics;
+
 // GLOBAL: CARM95 0x53633c
 tU32 gLast_pratcam_frame_time;
+
 // GLOBAL: CARM95 0x536328
 int gCurrent_pratcam_precedence;
+
 // GLOBAL: CARM95 0x536338
 int gCurrent_ambient_prat_sequence;
+
 // GLOBAL: CARM95 0x5362a8
 int gCurrent_pratcam_alternative;
 

@@ -23,125 +23,183 @@
 
 // GLOBAL: CARM95 0x5070d0
 br_actor* gOppo_path_actor;
+
 // GLOBAL: CARM95 0x5070d4
 br_model* gOppo_path_model;
+
 // GLOBAL: CARM95 0x5070d8
 br_material* gMat_dk_yel;
+
 // GLOBAL: CARM95 0x5070dc
 br_material* gMat_md_yel;
+
 // GLOBAL: CARM95 0x5070e0
 br_material* gMat_lt_yel;
+
 // GLOBAL: CARM95 0x5070e4
 br_material* gMat_dk_red;
+
 // GLOBAL: CARM95 0x5070e8
 br_material* gMat_lt_red;
+
 // GLOBAL: CARM95 0x5070ec
 br_material* gMat_dk_grn;
+
 // GLOBAL: CARM95 0x5070f0
 br_material* gMat_lt_grn;
+
 // GLOBAL: CARM95 0x5070f4
 br_material* gMat_dk_blu;
+
 // GLOBAL: CARM95 0x5070f8
 br_material* gMat_lt_blu;
+
 // GLOBAL: CARM95 0x5070fc
 br_material* gMat_dk_turq;
+
 // GLOBAL: CARM95 0x507100
 br_material* gMat_lt_turq;
+
 // GLOBAL: CARM95 0x507104
 br_material* gMat_dk_gry;
+
 // GLOBAL: CARM95 0x507108
 br_material* gMat_md_gry;
+
 // GLOBAL: CARM95 0x50710c
 br_material* gMat_lt_gry;
+
 // GLOBAL: CARM95 0x507110
 int gMellow_opponents;
+
 // GLOBAL: CARM95 0x507114
 int gTest_toggle;
+
 // GLOBAL: CARM95 0x507118
 int gAlready_elasticating;
 int gVertices_used_in_non_edit_paths;
 int gFaces_used_in_non_edit_paths;
+
 // GLOBAL: CARM95 0x507124
 int gMats_allocated;
+
 // GLOBAL: CARM95 0x507128
 int gOppo_paths_shown;
+
 // GLOBAL: CARM95 0x50712c
 int gMade_path_filename;
+
 // GLOBAL: CARM95 0x507130
 int gBIG_APC_index = -1;
+
 // GLOBAL: CARM95 0x507138
 char* gPath_section_type_names[3];
+
 // GLOBAL: CARM95 0x507144
 int gMin_bangness = 100;
+
 // GLOBAL: CARM95 0x507148
 int gMax_bangness;
+
 // GLOBAL: CARM95 0x50714c
 tU32 gNext_elastication;
+
 // GLOBAL: CARM95 0x507150
 tU32 gNext_write_during_elastication;
 char* gCop_name = "Faceless Cop";
 char* gDrone_name = "Innocent Civilian";
+
 // GLOBAL: CARM95 0x50715c
 int gChallenger_index__opponent = -1; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x507160
 int gSFS_count;
+
 // GLOBAL: CARM95 0x507164
 int gSFS_total_cycles;
+
 // GLOBAL: CARM95 0x507168
 int gSFS_max_cycles;
+
 // GLOBAL: CARM95 0x50716c
 float gOpponent_nastyness_frigger = 1.f;
+
 // GLOBAL: CARM95 0x530ca8
 char gOppo_path_filename[256];
+
 // GLOBAL: CARM95 0x530df0
 br_scalar gIn_view_distance;
+
 // GLOBAL: CARM95 0x530de8
 tU8* gBit_per_node;
+
 // GLOBAL: CARM95 0x530da8
 int gGrudge_reduction_per_period;
+
 // GLOBAL: CARM95 0x530df8
 int gSFS_cycles_this_time;
+
 // GLOBAL: CARM95 0x530dec
 br_scalar gMinimum_yness_before_knackerisation;
 int gWanky_arse_tit_fuck;
+
 // GLOBAL: CARM95 0x530df4
 br_scalar gHead_on_cos_value;
+
 // GLOBAL: CARM95 0x530de0
 tU32 gNext_grudge_reduction;
+
 // GLOBAL: CARM95 0x530dd0
 br_scalar gCop_pursuit_speed_percentage_multiplier;
+
 // GLOBAL: CARM95 0x530db8
 br_scalar gDefinite_cop_pursuit_speed;
+
 // GLOBAL: CARM95 0x530dd8
 int gAcknowledged_start;
+
 // GLOBAL: CARM95 0x530ca0
 int gStart_jumped;
+
 // GLOBAL: CARM95 0x530dc8
 int gNum_of_opponents_getting_near;
+
 // GLOBAL: CARM95 0x530dcc
 int gNumber_of_cops_before_faffage;
+
 // GLOBAL: CARM95 0x530dc0
 int gFirst_frame;
+
 // GLOBAL: CARM95 0x530dac
 tU32 gAcme_frame_count;
+
 // GLOBAL: CARM95 0x530dbc
 br_scalar gDefinite_no_cop_pursuit_speed;
+
 // GLOBAL: CARM95 0x530de4
 int gNum_of_opponents_completing_race;
+
 // GLOBAL: CARM95 0x530c98
 int gNum_of_opponents_pursuing;
+
 // GLOBAL: CARM95 0x530dc4
 int gActive_car_list_rebuild_required;
+
 // GLOBAL: CARM95 0x530db4
 br_scalar gFrame_period_for_this_munging_in_secs;
+
 // GLOBAL: CARM95 0x530c94
 int gBig_bang;
+
 // GLOBAL: CARM95 0x530ddc
 int gProcessing_opponents;
+
 // GLOBAL: CARM95 0x5520e0
 tU32 gFrame_period_for_this_munging;
+
 // GLOBAL: CARM95 0x5520e4
 tU32 gTime_stamp_for_this_munging;
+
 // GLOBAL: CARM95 0x530c90
 tS16 gMobile_section;
 

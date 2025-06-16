@@ -99,12 +99,16 @@ float gFloat_sine_table[91] = {
     1.0f,
 };
 br_fixed_ls gFixed_sine_table[91];
+
 // GLOBAL: CARM95 0x53e4b8
 br_matrix23 mat23tmp1;
+
 // GLOBAL: CARM95 0x53e4d0
 br_matrix23 mat23tmp2;
+
 // GLOBAL: CARM95 0x53e4e8
 br_matrix34 mattmp1__trig; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x53e518
 br_matrix34 mattmp2__trig; // suffix added to avoid duplicate symbol
 

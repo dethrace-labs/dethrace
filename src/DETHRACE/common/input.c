@@ -13,41 +13,59 @@
 
 // GLOBAL: CARM95 0x514c70
 int gEdge_trigger_mode;
+
 // GLOBAL: CARM95 0x514c74
 tU32 gLast_poll_keys;
+
 // GLOBAL: CARM95 0x514c78
 int gInsert_mode;
+
 // GLOBAL: CARM95 0x514c80
 int gGo_ahead_keys[3] = { 51, 52, 106 }; // enter, return, space
+
 // GLOBAL: CARM95 0x5507c0
 tJoy_array gJoy_array;
+
 // GLOBAL: CARM95 0x53a250
 tKey_array gKey_array;
+
 // GLOBAL: CARM95 0x53a248
 int gKey_poll_counter;
+
 // GLOBAL: CARM95 0x53a1f8
 tRolling_letter* gRolling_letters;
+
 // GLOBAL: CARM95 0x53a440
 int gCurrent_cursor;
+
 // GLOBAL: CARM95 0x53a4c0
 int gCurrent_position;
+
 // GLOBAL: CARM95 0x53a200
 int gLetter_x_coords[15];
+
 // GLOBAL: CARM95 0x53a240
 int gVisible_length;
+
 // GLOBAL: CARM95 0x53a1b8
 int gLetter_y_coords[15];
 int gThe_key;
+
 // GLOBAL: CARM95 0x53a444
 tU32 gLast_key_down_time;
+
 // GLOBAL: CARM95 0x53a1f4
 int gThe_length;
+
 // GLOBAL: CARM95 0x53a448
 tU32 gLast_roll;
+
 // GLOBAL: CARM95 0x53a244
 int gLast_key_down;
+
 // GLOBAL: CARM95 0x5507e0
 int gKey_mapping[67];
+
 // GLOBAL: CARM95 0x53a450
 char gCurrent_typing[110];
 

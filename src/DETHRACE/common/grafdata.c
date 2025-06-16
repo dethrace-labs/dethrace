@@ -569,6 +569,7 @@ tGraf_data gGraf_data[2] = {
 
 // GLOBAL: CARM95 0x551d88
 tGraf_data* gCurrent_graf_data;
+
 // GLOBAL: CARM95 0x551d84
 int gGraf_data_index;
 

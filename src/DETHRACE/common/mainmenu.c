@@ -22,15 +22,20 @@
 #include <stdlib.h>
 
 // GLOBAL: CARM95 0x536264
-char* gPalette_copy__mainmenu;    // suffix added to avoid duplicate symbol
+char* gPalette_copy__mainmenu; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x53625c
 int gPixel_buffer_size__mainmenu; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x536260
 tInterface_spec* gMain_menu_spec;
+
 // GLOBAL: CARM95 0x536268
 int gMouse_was_started__mainmenu; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x53626c
 int gReplace_background;
+
 // GLOBAL: CARM95 0x536258
 char* gPixels_copy__mainmenu; // suffix added to avoid duplicate symbol
 

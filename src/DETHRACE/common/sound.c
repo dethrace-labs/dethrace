@@ -18,57 +18,83 @@
 
 // GLOBAL: CARM95 0x514928
 int gSound_detail_level = 1;
+
 // GLOBAL: CARM95 0x51492c
 int gVirgin_pass = 1;
+
 // GLOBAL: CARM95 0x514930
 int gOld_sound_detail_level = -1;
+
 // GLOBAL: CARM95 0x514934
 int gLast_tune = -1;
+
 // GLOBAL: CARM95 0x514938
 int gRandom_MIDI_tunes[3] = { 9500, 9501, 9502 };
+
 // GLOBAL: CARM95 0x514948
 int gRandom_Rockin_MIDI_tunes[3] = { 9500, 9501, 9502 };
+
 // GLOBAL: CARM95 0x514958
 int gRandom_CDA_tunes[8] = { 9600, 9601, 9602, 9603, 9604, 9605, 9606, 9607 }; /* dethrace: Changed to size 8 */
+
 // GLOBAL: CARM95 0x514978
 int gCDA_is_playing;
+
 // GLOBAL: CARM95 0x51497c
 int gServicing_sound;
+
 // GLOBAL: CARM95 0x514980
 int gSong_repeat_count;
+
 // GLOBAL: CARM95 0x514984
 int gSound_sources_inited;
+
 // GLOBAL: CARM95 0x514988
 int gMusic_available;
+
 // GLOBAL: CARM95 0x51498c
 tS3_sound_tag gCDA_tag;
+
 // GLOBAL: CARM95 0x514990
 int gCD_fully_installed;
+
 // GLOBAL: CARM95 0x514994
 tS3_outlet_ptr gEffects_outlet;
+
 // GLOBAL: CARM95 0x514998
 tS3_outlet_ptr gCar_outlet;
+
 // GLOBAL: CARM95 0x51499c
 tS3_outlet_ptr gEngine_outlet;
+
 // GLOBAL: CARM95 0x5149a0
 tS3_outlet_ptr gDriver_outlet;
+
 // GLOBAL: CARM95 0x5149a4
 tS3_outlet_ptr gPedestrians_outlet;
+
 // GLOBAL: CARM95 0x5149a8
 tS3_outlet_ptr gMusic_outlet;
 tS3_sound_id gMIDI_id;
+
 // GLOBAL: CARM95 0x550a20
 tS3_outlet_ptr gIndexed_outlets[6];
+
 // GLOBAL: CARM95 0x538284
 tU32 gLast_sound_service;
+
 // GLOBAL: CARM95 0x550a1c
 int gCD_is_disabled;
+
 // GLOBAL: CARM95 0x550a00
 br_vector3 gCamera_left;
+
 // GLOBAL: CARM95 0x550a10
 br_vector3 gCamera_position;
+
 // GLOBAL: CARM95 0x550a40
 br_vector3 gOld_camera_position;
+
 // GLOBAL: CARM95 0x550a50
 br_vector3 gCamera_velocity;
 
@@ -755,7 +781,7 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
                     gCDA_is_playing = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
 #if defined(DETHRACE_FIX_BUGS)
                     // Initial CD music volume was not set correctly
-                    DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);                    
+                    DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);
 #endif
                     gCDA_tag = gCDA_is_playing;
                     if (!gCDA_is_playing) {

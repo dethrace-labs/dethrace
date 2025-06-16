@@ -14,8 +14,10 @@
 
 // GLOBAL: CARM95 0x507030
 char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
+
 // GLOBAL: CARM95 0x507038
 char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
+
 // GLOBAL: CARM95 0x530190
 tSkid gSkids[100];
 

@@ -27,11 +27,14 @@
 
 // GLOBAL: CARM95 0x51e910
 tU8* gFrank_flic_data;
+
 // GLOBAL: CARM95 0x51e914
 tU8* gAnne_flic_data;
+
 // GLOBAL: CARM95 0x51e918
 int gNet_storage_allocated;
 // clang-format off
+
 // GLOBAL: CARM95 0x51e920
 tRadio_bastards gRadio_bastards__newgame[11] = { // suffix added to avoid duplicate symbol
     { 1,  32, 0, { 245,   0,   0,   0,   0, }, },
@@ -49,38 +52,54 @@ tRadio_bastards gRadio_bastards__newgame[11] = { // suffix added to avoid duplic
 // clang-format on
 char _name1[] = "xxxxxxxx.TXT"; // keep compiler happy
 char _name2[] = "yyyyyyyy.TXT"; // keep compiler happy
+
 // GLOBAL: CARM95 0x51ea80
 char* gBasic_car_names[2] = { _name1, _name2 };
+
 // GLOBAL: CARM95 0x5500c0
 tNet_game_options gNet_settings[8];
+
 // GLOBAL: CARM95 0x53e5c0
 tJoinable_game gGames_to_join[6];
+
 // GLOBAL: CARM95 0x53e5b8
 tNet_game_options* gOptions;
+
 // GLOBAL: CARM95 0x5500a0
 int gNet_target[7];
+
 // GLOBAL: CARM95 0x53e5f0
-int gLast_graph_sel__newgame;                   // suffix added to avoid duplicate symbol
+int gLast_graph_sel__newgame; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x53e59c
-tInterface_spec* gThe_interface_spec__newgame;  // suffix added to avoid duplicate symbol
+tInterface_spec* gThe_interface_spec__newgame; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x53e5a8
 tNet_sequence_type gNet_race_sequence__newgame; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x550098
 tNet_game_type gLast_game_type;
 int gCurrent_net_game_count;
+
 // GLOBAL: CARM95 0x53e5f4
 tU32 gAnne_flic_data_length;
+
 // GLOBAL: CARM95 0x53e5a0
 int gShifted_default_yet;
 char* gNet_name;
+
 // GLOBAL: CARM95 0x53e598
 tU32 gFrank_flic_data_length;
+
 // GLOBAL: CARM95 0x53e5a4
 int gLast_net_choose_box;
+
 // GLOBAL: CARM95 0x53e594
 int gCurrent_game_selection;
+
 // GLOBAL: CARM95 0x53e5b4
 int gRace_index;
+
 // GLOBAL: CARM95 0x53e590
 int gRadio_selected;
 

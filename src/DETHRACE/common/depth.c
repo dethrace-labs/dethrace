@@ -21,63 +21,93 @@
 #include <stdlib.h>
 
 tDepth_effect gDistance_depth_effects[4];
+
 // GLOBAL: CARM95 0x513430
 int gSky_on;
+
 // GLOBAL: CARM95 0x513434
 int gDepth_cueing_on;
+
 // GLOBAL: CARM95 0x513438
 tDepth_effect_type gSwap_depth_effect_type;
+
 // GLOBAL: CARM95 0x537930
 br_scalar gSky_height;
+
 // GLOBAL: CARM95 0x53794c
 br_scalar gSky_x_multiplier;
+
 // GLOBAL: CARM95 0x537944
 br_scalar gSky_width;
+
 // GLOBAL: CARM95 0x537950
 br_scalar gSky_y_multiplier;
+
 tU32 gLast_depth_change;
+
 // GLOBAL: CARM95 0x537934
 br_scalar gOld_yon;
+
 // GLOBAL: CARM95 0x550a68
 br_pixelmap* gWater_shade_table;
+
 // GLOBAL: CARM95 0x53795c
 br_material* gHorizon_material;
+
 // GLOBAL: CARM95 0x53792c
 br_model* gRearview_sky_model;
+
 // GLOBAL: CARM95 0x537924
 int gFog_shade_table_power;
+
 // GLOBAL: CARM95 0x53793c
 br_actor* gRearview_sky_actor;
+
 // GLOBAL: CARM95 0x537958
 int gAcid_shade_table_power;
+
 // GLOBAL: CARM95 0x537948
 int gWater_shade_table_power;
+
 // GLOBAL: CARM95 0x537920
 br_model* gForward_sky_model;
+
 // GLOBAL: CARM95 0x537954
 br_actor* gForward_sky_actor;
+
 // GLOBAL: CARM95 0x537938
 int gDepth_shade_table_power;
+
 // GLOBAL: CARM95 0x550a74
 br_pixelmap* gFog_shade_table;
+
 // GLOBAL: CARM95 0x550a80
 int gSwap_depth_effect_start;
+
 // GLOBAL: CARM95 0x550a60
 br_pixelmap* gDepth_shade_table;
+
 // GLOBAL: CARM95 0x550a78
 tSpecial_volume* gLast_camera_special_volume;
+
 // GLOBAL: CARM95 0x550a64
 br_pixelmap* gAcid_shade_table;
+
 // GLOBAL: CARM95 0x550a7c
 int gSwap_depth_effect_end;
+
 // GLOBAL: CARM95 0x550a5c
 br_pixelmap* gSwap_sky_texture;
+
 // GLOBAL: CARM95 0x537928
 br_angle gOld_fov;
+
 // GLOBAL: CARM95 0x550a6e
 br_angle gSky_image_width;
+
 // GLOBAL: CARM95 0x550a6c
 br_angle gSky_image_height;
+
 // GLOBAL: CARM95 0x550a70
 br_angle gSky_image_underground;
 

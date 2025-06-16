@@ -14,16 +14,22 @@
 
 // GLOBAL: CARM95 0x53a4d8
 int gDisabled_choices[10];
+
 // GLOBAL: CARM95 0x53a500
 int gCurrent_mode;
+
 // GLOBAL: CARM95 0x53a508
 tU32 gStart_time;
+
 // GLOBAL: CARM95 0x53a504
 int gCurrent_choice;
+
 // GLOBAL: CARM95 0x53a4c8
 tInterface_spec* gSpec;
+
 // GLOBAL: CARM95 0x53a4d0
 int gAlways_typing;
+
 // GLOBAL: CARM95 0x53a4cc
 int gDisabled_count;
 

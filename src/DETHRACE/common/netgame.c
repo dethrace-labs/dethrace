@@ -30,20 +30,28 @@
 
 // GLOBAL: CARM95 0x50c5e0
 int gPowerup_cost[4] = { 1500, 2500, 4000, 6000 };
+
 // GLOBAL: CARM95 0x50c5f0
 int gGame_scores[6] = { 1, 2, 3, 4, 6, 10 };
+
 // GLOBAL: CARM95 0x53220c
 int gPed_target;
+
 // GLOBAL: CARM95 0x532210
 int gNot_shown_race_type_headup;
+
 // GLOBAL: CARM95 0x532208
 tU32 gLast_it_change;
+
 // GLOBAL: CARM95 0x532204
 tU32 gTime_for_punishment;
+
 // GLOBAL: CARM95 0x532200
 tNet_game_player_info* gLast_lepper;
+
 // GLOBAL: CARM95 0x551d7c
 int gInitialised_grid;
+
 // GLOBAL: CARM95 0x551d80
 int gIt_or_fox;
 

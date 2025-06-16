@@ -36,26 +36,35 @@
 #define PEDESTRIAN_MAGIC FOURCC('P', 'e', 'd', '!')
 #define ActorToPedestrianData(ACTOR) ((tPedestrian_data*)((ACTOR)->type_data))
 
-#define GET_PEDESTRIAN_INDEX(P) ((P)-gPedestrian_array)
+#define GET_PEDESTRIAN_INDEX(P) ((P) - gPedestrian_array)
 
 // GLOBAL: CARM95 0x511740
 int gDetect_peds = 1;
+
 // GLOBAL: CARM95 0x511744
 int gReally_stupid_ped_bug_enable = 0;
+
 // GLOBAL: CARM95 0x511748
 int gPed_sound_disable = 0;
+
 // GLOBAL: CARM95 0x51174c
 int gVesuvians_last_time = 0;
+
 // GLOBAL: CARM95 0x511750
 int gSend_peds = 1;
+
 // GLOBAL: CARM95 0x511754
 tU32 gLast_ped_message_send = 0;
+
 // GLOBAL: CARM95 0x511758
 tPedestrian_instruction* gInitial_instruction = NULL;
+
 // GLOBAL: CARM95 0x511760
 char* gRate_commands[3] = { "fixed", "speed", "variable" };
+
 // GLOBAL: CARM95 0x51176c
 char* gCollide_commands[1] = { "collide" };
+
 // GLOBAL: CARM95 0x511770
 char* gInstruc_commands[10] = {
     "point",
@@ -69,14 +78,19 @@ char* gInstruc_commands[10] = {
     "faction",
     "reverse"
 };
+
 // GLOBAL: CARM95 0x511798
 float gMin_ped_gib_speeds[4] = { 10000.f, .005f, .002f, .001f };
+
 // GLOBAL: CARM95 0x5117a8
 float gPed_gib_distrib[4] = { 0.f, 0.33f, 0.34f, 0.33f };
+
 // GLOBAL: CARM95 0x5117b8
 float gPed_gib_speeds[4] = { 0.f, 1.f, 1.f, 1.f };
+
 // GLOBAL: CARM95 0x5117c8
 int gPed_size_counts[4] = { 3, 5, 5, 5 };
+
 // GLOBAL: CARM95 0x5117d8
 char* gPed_gib_names[4][5] = {
     { "BIGGIBS.PIX", "BIGGIBS2.PIX", "BIGGIBS3.PIX", "", "" },
@@ -84,6 +98,7 @@ char* gPed_gib_names[4][5] = {
     { "HAND.PIX", "CHUNK02.PIX", "EYEBALL.PIX", "COLON.PIX", "CHUNK01.PIX" },
     { "CHUNK04.PIX", "SPLAT1.PIX", "CHUNK03.PIX", "SPLAT2.PIX", "SPLATOUT.PIX" }
 };
+
 // GLOBAL: CARM95 0x511828
 char* gPed_geb_names[4][5] = {
     { "GBIGGIBS.PIX", "GBIGGIB2.PIX", "GBIGGIB3.PIX", "", "" },
@@ -91,6 +106,7 @@ char* gPed_geb_names[4][5] = {
     { "GHAND.PIX", "GCHUNK02.PIX", "GEYEBALL.PIX", "GCOLON.PIX", "GCHUNK01.PIX" },
     { "GCHUNK04.PIX", "GSPLAT1.PIX", "GCHUNK03.PIX", "GSPLAT2.PIX", "GSPLATOT.PIX" }
 };
+
 // GLOBAL: CARM95 0x511878
 int gPed_gib_maxes[4][5] = {
     { 1, 1, 1, 0, 0 },
@@ -98,90 +114,131 @@ int gPed_gib_maxes[4][5] = {
     { 3, 3, 2, 3, 3 },
     { 3, 3, 3, 3, 3 },
 };
+
 // GLOBAL: CARM95 0x5118c8
 br_scalar gExploding_ped_scale[3] = { 0.0028f, 0.0033f, 0.0045f };
+
 // GLOBAL: CARM95 0x5118d8
 br_vector3 gZero_v__pedestrn; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x5118e8
 int gPed_instruc_count = 0;
+
 // GLOBAL: CARM95 0x536b50
 int gPed_count;
+
 // GLOBAL: CARM95 0x5118f0
 br_actor* gPath_actor = NULL;
+
 // GLOBAL: CARM95 0x5118f4
 br_actor* gCurrent_ped_path_actor = NULL;
+
 // GLOBAL: CARM95 0x5118f8
 int gPedestrians_on = 0;
+
 // GLOBAL: CARM95 0x5118fc
 int gVesuvian_corpses = 0;
+
 // GLOBAL: CARM95 0x5118e4
 br_material* gPed_material = NULL;
+
 // GLOBAL: CARM95 0x5378c8
 int gPed_gib_counts[4][5];
+
 // GLOBAL: CARM95 0x536c48
 tPedestrian_instruction gPed_instrucs[100];
+
 // GLOBAL: CARM95 0x537418
 tPed_gib gPed_gibs[30];
+
 // GLOBAL: CARM95 0x536ab0
 tPed_gib_materials gPed_gib_materials[4];
+
 // GLOBAL: CARM95 0x536b58
 tProximity_ray gProximity_rays[20];
 int gPed_colliding;
+
 // GLOBAL: CARM95 0x550a90
 float gZombie_factor;
+
 // GLOBAL: CARM95 0x550aac
 int gRespawn_variance;
+
 // GLOBAL: CARM95 0x550a94
 br_scalar gPed_scale_factor;
+
 // GLOBAL: CARM95 0x550a8c
 int gTotal_peds;
+
 // GLOBAL: CARM95 0x550aa0
 int gPedestrian_harvest;
 br_vector3 gPed_pos_camera;
+
 // GLOBAL: CARM95 0x550aa4
 int gMin_respawn_time;
+
 // GLOBAL: CARM95 0x536b38
 br_material* gPath_mat_calc;
+
 // GLOBAL: CARM95 0x550aa8
 float gPedestrian_speed_factor;
+
 // GLOBAL: CARM95 0x550a88
 int gExploding_pedestrians;
+
 // GLOBAL: CARM95 0x550a84
 int gBlind_pedestrians;
+
 // GLOBAL: CARM95 0x536b18
 br_material* gPath_mat_normal;
+
 // GLOBAL: CARM95 0x536b1c
 br_material* gInit_pos_mat_calc;
 int gPed_other;
+
 // GLOBAL: CARM95 0x550a98
 int gAttracted_pedestrians;
+
 // GLOBAL: CARM95 0x536aac
 int gPed_ref_num;
+
 // GLOBAL: CARM95 0x536b24
 br_scalar gMax_distance_squared;
+
 // GLOBAL: CARM95 0x536b28
 br_model* gPed_model;
+
 // GLOBAL: CARM95 0x536b20
 float gDanger_level;
+
 // GLOBAL: CARM95 0x536b40
 br_vector3 gDanger_direction;
+
 // GLOBAL: CARM95 0x536b4c
 int gInit_ped_instruc;
+
 // GLOBAL: CARM95 0x536b10
 int gCurrent_lollipop_index;
+
 // GLOBAL: CARM95 0x536aa8
 int gVesuvians_this_time;
 int gNumber_of_ped_gibs;
+
 // GLOBAL: CARM95 0x536b14
 tPedestrian_data* gFlag_waving_bastard;
+
 // GLOBAL: CARM95 0x5118ec
 int gNumber_of_pedestrians = 0;
+
 // GLOBAL: CARM95 0x536b30
 br_pixelmap* gProx_ray_shade_table;
+
 // GLOBAL: CARM95 0x53791c
 tPedestrian_data* gPedestrian_array;
+
 // GLOBAL: CARM95 0x536b34
 tU32 gLast_ped_splat_time;
+
 // GLOBAL: CARM95 0x537918
 int gCurrent_ped_multiplier;
 

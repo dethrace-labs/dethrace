@@ -27,6 +27,7 @@
 
 // GLOBAL: CARM95 0x519ad8
 int gKey_defns[18] = { 48, 49, 46, 47, 53, 44, 59, 57, 55, 45, 50, 51, 52, 56, 62, 63, 64, 66 };
+
 // GLOBAL: CARM95 0x519b20
 tRadio_bastards gRadio_bastards__options[13] = {
     // suffix added to avoid duplicate symbol
@@ -44,20 +45,28 @@ tRadio_bastards gRadio_bastards__options[13] = {
     { 3, 150, 0, { 132, 164, 207, 0, 0 } },
     { 4, 153, 0, { 177, 199, 220, 242, 0 } },
 };
+
 // GLOBAL: CARM95 0x53d1d4
 int gKey_count;
+
 // GLOBAL: CARM95 0x53d1d0
 int gLast_graph_sel__options; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x53d2f0
 char* gKey_names[125];
+
 // GLOBAL: CARM95 0x53d4e4
 int gPending_entry;
+
 // GLOBAL: CARM95 0x53d2ec
 tInterface_spec* gThe_interface_spec__options; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x53d1e0
 int gOrig_key_mapping[67];
+
 // GLOBAL: CARM95 0x53d1d8
 br_pixelmap* gDials_pix;
+
 // GLOBAL: CARM95 0x53d4e8
 int gCurrent_key;
 

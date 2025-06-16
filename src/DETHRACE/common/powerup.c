@@ -60,6 +60,7 @@ tGot_proc* gGot_procs[34] = {
     SetPedHarvest,
     SetVesuvianCorpses,
 };
+
 // GLOBAL: CARM95 0x50bb20
 tLose_proc* gLose_procs[34] = {
     NULL,
@@ -97,6 +98,7 @@ tLose_proc* gLose_procs[34] = {
     ResetPedHarvest,
     ResetVesuvianCorpses,
 };
+
 // GLOBAL: CARM95 0x50bba8
 tPeriodic_proc* gPeriodic_procs[34] = {
     NULL,
@@ -134,28 +136,38 @@ tPeriodic_proc* gPeriodic_procs[34] = {
     NULL,
     NULL,
 };
+
 // GLOBAL: CARM95 0x50bc30
 tU32* gReal_render_palette;
+
 // GLOBAL: CARM95 0x50bc38
 char* gFizzle_names[3] = { "CIRCLES.PIX", "SQUARES.PIX", "DIAMONDS.PIX" };
+
 // GLOBAL: CARM95 0x50bc48
 br_vector3 gZero_v__powerup; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x50bc58
 int gPed_harvest_sounds[4] = { 4010, 4012, 4030, 4032 };
+
 // GLOBAL: CARM95 0x5320a0
 tHeadup_icon gIcon_list[20];
+
 // GLOBAL: CARM95 0x5321f0
 br_pixelmap* gFizzle_in[3];
+
 // GLOBAL: CARM95 0x5321fc
 int gNumber_of_powerups;
+
 // GLOBAL: CARM95 0x5321e4
 int gFizzle_height;
+
 // GLOBAL: CARM95 0x5321e0
 int gNumber_of_icons;
+
 // GLOBAL: CARM95 0x5321e8
 tPowerup* gPowerup_array;
 
-#define GET_POWERUP_INDEX(POWERUP) ((POWERUP)-gPowerup_array)
+#define GET_POWERUP_INDEX(POWERUP) ((POWERUP) - gPowerup_array)
 
 // IDA: void __usercall LosePowerupX(tPowerup *pThe_powerup@<EAX>, int pTell_net_players@<EDX>)
 // FUNCTION: CARM95 0x42cff6

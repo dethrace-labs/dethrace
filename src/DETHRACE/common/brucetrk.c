@@ -16,6 +16,7 @@
 
 // GLOBAL: CARM95 0x53e488
 br_actor* gMr_blendy;
+
 // GLOBAL: CARM95 0x550244
 int gDefault_blend_pc;
 

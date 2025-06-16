@@ -14,7 +14,7 @@
 #include <string.h>
 
 // GLOBAL: CARM95 0x5120a0
-char* gError_messages[126] = {
+char* gError_messages[] = {
     "Unable to support this screen depth setting",
     "Couldn't allocate off-screen buffer",
     "Couldn't allocate Z-Buffer",

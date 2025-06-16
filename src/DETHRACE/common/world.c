@@ -32,93 +32,137 @@
 
 // GLOBAL: CARM95 0x50c710
 int gFunkotronics_array_size;
+
 // GLOBAL: CARM95 0x50c714
 int gGroovidelics_array_size;
+
 // GLOBAL: CARM95 0x50c718
 int gSpec_vol_mode;
+
 // GLOBAL: CARM95 0x50c71c
 tFunkotronic_spec* gFunkotronics_array;
+
 // GLOBAL: CARM95 0x50c720
 tGroovidelic_spec* gGroovidelics_array;
+
 // GLOBAL: CARM95 0x50c728
 char* gFunk_type_names[] = { "spin", "rock", "throb", "slither", "roll" };
+
 // GLOBAL: CARM95 0x50c740
 char* gFunk_anim_names[] = { "frames", "flic" };
+
 // GLOBAL: CARM95 0x50c748
 char* gTime_mode_names[] = { "approximate", "accurate" };
+
 // GLOBAL: CARM95 0x50c750
 char* gFunk_move_names[] = { "linear", "harmonic", "flash", "controlled", "absolute", "continuous" };
+
 // GLOBAL: CARM95 0x50c768
 char* gFunk_nature_names[] = { "constant", "distance", "lastlap", "otherlaps" };
+
 // GLOBAL: CARM95 0x50c778
 char* gGroove_nature_names[] = { "constant", "distance" };
+
 // GLOBAL: CARM95 0x50c780
 char* gAxis_names[] = { "x", "y", "z" };
+
 // GLOBAL: CARM95 0x50c790
 char* gLollipop_names[] = { "xlollipop", "ylollipop", "zlollipop" };
+
 // GLOBAL: CARM95 0x50c7a0
 char* gGroove_path_names[] = { "straight", "circular" };
+
 // GLOBAL: CARM95 0x50c7a8
 char* gGroove_object_names[] = { "spin", "rock", "throb", "shear" };
+
 // GLOBAL: CARM95 0x50c7b8
 char* gDepth_effect_names[] = { "dark", "fog" };
+
 // GLOBAL: CARM95 0x50c7c0
 br_actor* gGroove_by_proxy_actor;
+
 // GLOBAL: CARM95 0x50c7c4
 tRotate_mode gCurrent_rotate_mode = eRotate_mode_y;
+
 // GLOBAL: CARM95 0x50c7c8
 tScale_mode gCurrent_scale_mode = eScale_mode_all;
+
 // GLOBAL: CARM95 0x50c7cc
 int gNumber_of_additional_models;
+
 // GLOBAL: CARM95 0x50c7d0
 tRoad_texturing_level gRoad_texturing_level = eRTL_full;
+
 // GLOBAL: CARM95 0x50c7d4
 tWall_texturing_level gWall_texturing_level = eWTL_full;
+
 // GLOBAL: CARM95 0x50c7d8
 tCar_texturing_level gCar_texturing_level = eCTL_full;
+
 // GLOBAL: CARM95 0x50c7dc
 int gRendering_accessories;
+
 // GLOBAL: CARM95 0x50c7e0
 int gNumber_of_actors;
+
 // GLOBAL: CARM95 0x50c7e4
 int gNumber_of_lights;
+
 // GLOBAL: CARM95 0x5514e0
 br_actor* gActor_array[500];
+
 // GLOBAL: CARM95 0x532af0
 float* gGroove_funk_bindings[960];
+
 // GLOBAL: CARM95 0x532220
 br_actor* gDelete_list[500];
+
 // GLOBAL: CARM95 0x551cb0
 br_actor* gLight_array[50];
+
 // GLOBAL: CARM95 0x533b18
 br_model* gAdditional_models[1000];
+
 // GLOBAL: CARM95 0x534ac0
 br_actor* gSpec_vol_actors[100];
+
 // GLOBAL: CARM95 0x533a00
 tPath_name gAdditional_actor_path;
+
 // GLOBAL: CARM95 0x5329f0
 tPath_name gAdditional_model_path;
+
 // GLOBAL: CARM95 0x533b00
 tU32 gPrevious_groove_times[2];
+
 // GLOBAL: CARM95 0x551d78
 int gRace_file_version;
+
 // GLOBAL: CARM95 0x5339f0
 br_vector3 gActor_centre;
+
 // GLOBAL: CARM95 0x532218
 float gTemp;
+
 // GLOBAL: CARM95 0x533b0c
 br_actor* gLast_actor;
+
 // GLOBAL: CARM95 0x533b08
 br_actor* gKnown_actor;
+
 // GLOBAL: CARM95 0x534ab8
 br_actor* gAdditional_actors;
+
 // GLOBAL: CARM95 0x533b10
 int gDelete_count;
+
 // GLOBAL: CARM95 0x5339fc
 br_scalar gNearest_distance;
+
 // GLOBAL: CARM95 0x534c50
 br_actor* gNearest_actor;
 br_actor* gStandard_lamp;
+
 // GLOBAL: CARM95 0x534abc
 br_scalar gSight_distance_squared;
 

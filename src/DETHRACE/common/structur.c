@@ -32,12 +32,16 @@
 
 // GLOBAL: CARM95 0x509a60
 int gLast_wrong_checkpoint;
+
 // GLOBAL: CARM95 0x509a64
 int gMirror_on__structur = 1; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x509a68
 int gPratcam_on = 1;
+
 // GLOBAL: CARM95 0x509a6c
 int gCockpit_on = 1;
+
 // GLOBAL: CARM95 0x509a70
 int gOpponent_mix[10][5] = {
     { 3, 4, 4, 5, 5 },
@@ -51,8 +55,10 @@ int gOpponent_mix[10][5] = {
     { 1, 1, 2, 3, 3 },
     { 1, 1, 2, 2, 3 }
 };
+
 // GLOBAL: CARM95 0x509b38
 tU32 gLast_checkpoint_time;
+
 // GLOBAL: CARM95 0x551dbc
 tRace_over_reason gRace_over_reason;
 

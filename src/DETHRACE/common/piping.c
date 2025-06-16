@@ -23,14 +23,19 @@
 
 // GLOBAL: CARM95 0x50ba00
 tU8* gPipe_buffer_start = NULL;
+
 // GLOBAL: CARM95 0x50ba04
 int gDisable_sound = 0;
+
 // GLOBAL: CARM95 0x50ba08
 int gDisable_advance = 0;
+
 // GLOBAL: CARM95 0x50ba0c
 int gMax_rewind_chunks = 1000;
+
 // GLOBAL: CARM95 0x50ba10
 float gWall_severity = 0.f;
+
 // GLOBAL: CARM95 0x50ba18
 tPipe_reset_proc* gReset_procs[32] = {
     NULL,
@@ -67,58 +72,84 @@ tPipe_reset_proc* gReset_procs[32] = {
     NULL,
 };
 tPiped_registration_snapshot gRegistration_snapshots[5];
+
 // GLOBAL: CARM95 0x531ffc
 tPipe_smudge_data* gSmudge_space;
+
 // GLOBAL: CARM95 0x532010
 tU32 gOldest_time;
 int gCurrent_snapshot_registration_index;
+
 // GLOBAL: CARM95 0x531fa0
 tPipe_chunk* gMr_chunky;
+
 // GLOBAL: CARM95 0x532040
 tCar_spec* gCar_ptr;
+
 // GLOBAL: CARM95 0x532068
 br_vector3 gZero_vector;
+
 // GLOBAL: CARM95 0x532050
 tPipe_chunk_type gReentrancy_array[5];
+
 // GLOBAL: CARM95 0x532000
 tU32 gLast_time;
+
 // GLOBAL: CARM95 0x53204c
 tPipe_model_geometry_data* gModel_geometry_space;
+
 // GLOBAL: CARM95 0x531ff8
 tU32 gEnd_time;
+
 // GLOBAL: CARM95 0x532094
 tU32 gTrigger_time;
+
 // GLOBAL: CARM95 0x532074
 int gReentrancy_count;
+
 // GLOBAL: CARM95 0x532030
 br_vector3 gCar_pos;
+
 // GLOBAL: CARM95 0x532020
 br_vector3 gReference_pos;
+
 // GLOBAL: CARM95 0x532004
 br_scalar gMax_distance;
+
 // GLOBAL: CARM95 0x532084
 tU32 gLoop_abort_time;
+
 // GLOBAL: CARM95 0x532078
 br_vector3 gWall_impact_point;
+
 // GLOBAL: CARM95 0x532044
 tU8* gPipe_buffer_working_end;
+
 // GLOBAL: CARM95 0x532098
 tU32 gYoungest_time;
+
 // GLOBAL: CARM95 0x53208c
 tU8* gPipe_buffer_phys_end;
 tU8* gLocal_buffer_record_ptr;
+
 // GLOBAL: CARM95 0x532018
 tU8* gPipe_play_ptr;
+
 // GLOBAL: CARM95 0x532048
 tU8* gEnd_of_session;
+
 // GLOBAL: CARM95 0x53201c
 tU8* gPipe_record_ptr;
+
 // GLOBAL: CARM95 0x53200c
 tU8* gPipe_buffer_oldest;
+
 // GLOBAL: CARM95 0x532088
 tU32 gPipe_buffer_size;
+
 // GLOBAL: CARM95 0x532014
 tU8* gLocal_buffer;
+
 // GLOBAL: CARM95 0x532090
 tU32 gLocal_buffer_size;
 tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)

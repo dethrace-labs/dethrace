@@ -31,73 +31,105 @@
 tU32 gMess_max_flags;
 tU32 gMess_mid_flags;
 tU32 gMess_min_flags;
+
 // GLOBAL: CARM95 0x50d224
 tU32 gGuarantee_number;
+
 // GLOBAL: CARM95 0x50d228
 int gNet_service_disable = 0;
+
 // GLOBAL: CARM95 0x50d22c
 int gIn_net_service = 0;
+
 // GLOBAL: CARM95 0x50d230
 int gPlayer_list_batch_number = 0;
+
 // GLOBAL: CARM95 0x50d234
 int gOnly_receive_guarantee_replies = 0;
+
 // GLOBAL: CARM95 0x50d238
 void* gMessage_to_free;
+
 // GLOBAL: CARM95 0x50d23c
 tNet_message* gBroadcast_stack;
+
 // GLOBAL: CARM95 0x50d240
 tNet_message* gTo_host_stack;
+
 // GLOBAL: CARM95 0x50d244
 tU32 gLast_flush_message = 0;
+
 // GLOBAL: CARM95 0x50d248
 int gRace_only_flags[33] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
     1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
     0
 };
+
 // GLOBAL: CARM95 0x50d2cc
 int gJoin_list_mode;
+
 // GLOBAL: CARM95 0x535dd0
 tNet_game_player_info gNew_net_players[6];
+
 // GLOBAL: CARM95 0x534c90
 tGuaranteed_message gGuarantee_list[100]; // DOS debug symbols has this as [150]
+
 // GLOBAL: CARM95 0x534c70
 tMid_message* gMid_messages;
+
 // GLOBAL: CARM95 0x534c74
 tU32 gLast_player_list_received;
+
 // GLOBAL: CARM95 0x534c7c
 tMin_message* gMin_messages;
 void (*gAdd_proc)(tNet_game_details*);
+
 // GLOBAL: CARM95 0x534c64
 int gReceiving_batch_number;
+
 // GLOBAL: CARM95 0x536250
 int gReceiving_new_players;
+
 // GLOBAL: CARM95 0x534c80
 tMax_message* gMax_messages;
+
 // GLOBAL: CARM95 0x534c58
 int gNext_guarantee;
+
 // GLOBAL: CARM95 0x534c84
 tU32 gAsk_time;
+
 // GLOBAL: CARM95 0x551420
 int gNet_initialised;
+
 // GLOBAL: CARM95 0x534c60
 int gDont_allow_joiners;
+
 // GLOBAL: CARM95 0x536254
 tNet_game_details* gCurrent_join_poll_game;
+
 // GLOBAL: CARM95 0x534c8c
 int gMessage_header_size;
+
 // GLOBAL: CARM95 0x534c5c
 int gJoin_poll_index;
+
 // GLOBAL: CARM95 0x534c88
 int gJoin_request_denied;
+
 // GLOBAL: CARM95 0x534c68
 int gHost_died;
+
 // GLOBAL: CARM95 0x535dc4
 int gCar_was_taken;
+
 // GLOBAL: CARM95 0x534c78
 int gBastard_has_answered;
+
 // GLOBAL: CARM95 0x535dc8
 int gTime_for_next_one;
+
 // GLOBAL: CARM95 0x5514d4
 int gReceived_game_scores;
 

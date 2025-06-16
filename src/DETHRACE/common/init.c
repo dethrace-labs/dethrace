@@ -43,24 +43,34 @@
 
 // GLOBAL: CARM95 0x52115c
 int gGame_initialized;
+
 // GLOBAL: CARM95 0x521160
 int gBr_initialized;
+
 // GLOBAL: CARM95 0x521164
 int gBrZb_initialized;
+
 // GLOBAL: CARM95 0x521168
 int gInitialisation_finished;
+
 // GLOBAL: CARM95 0x52116c
 int gRender_indent;
+
 // GLOBAL: CARM95 0x53fdd0
 tU32 gAustere_time;
+
 // GLOBAL: CARM95 0x54b2bc
 int gInitial_rank;
+
 // GLOBAL: CARM95 0x54b2b0
 int gCredits_per_rank[3];
+
 // GLOBAL: CARM95 0x54b2c0
 int gInitial_credits[3];
+
 // GLOBAL: CARM95 0x54b2a0
 int gNet_mode_of_last_game;
+
 // GLOBAL: CARM95 0x54b29c
 br_material* gDefault_track_material;
 

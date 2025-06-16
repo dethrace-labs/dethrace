@@ -12,26 +12,37 @@
 
 // GLOBAL: CARM95 0x51e8fc
 int gPling_materials = 1;
+
 // GLOBAL: CARM95 0x51e900
 br_material* gSub_material;
+
 // GLOBAL: CARM95 0x51e904
 br_material* gReal_material;
+
 // GLOBAL: CARM95 0x51e908
 int gNfaces;
+
 // GLOBAL: CARM95 0x53e558
 br_matrix34 gPick_model_to_view__finteray; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x53e588
 int gTemp_group;
+
 // GLOBAL: CARM95 0x53e54c
 br_model* gNearest_model;
+
 // GLOBAL: CARM95 0x53e58c
 br_model* gSelected_model;
+
 // GLOBAL: CARM95 0x53e554
 int gNearest_face_group;
+
 // GLOBAL: CARM95 0x53e548
 int gNearest_face;
+
 // GLOBAL: CARM95 0x53e550
 br_scalar gNearest_T;
+
 // GLOBAL: CARM95 0x550240
 tFace_ref* gPling_face;
 
@@ -762,10 +773,10 @@ int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
         BrVector3Scale(&c[i], (br_vector3*)bnds->mat->m[i], b.v[i]);
     }
     for (i = 0; i < 3; i++) {
-      bnds->real_bounds.min.v[i] += MIN(0.f, c[0].v[i]) + MIN(0.f, c[1].v[i]) + MIN(0.f, c[2].v[i]);
-      bnds->real_bounds.max.v[i] += MAX(0.f, c[0].v[i]) + MAX(0.f, c[1].v[i]) + MAX(0.f, c[2].v[i]);
-  }
-  return max_face - ActorBoxPick(bnds, gTrack_actor, model_unk1, material_unk1, face_list, max_face, NULL);
+        bnds->real_bounds.min.v[i] += MIN(0.f, c[0].v[i]) + MIN(0.f, c[1].v[i]) + MIN(0.f, c[2].v[i]);
+        bnds->real_bounds.max.v[i] += MAX(0.f, c[0].v[i]) + MAX(0.f, c[1].v[i]) + MAX(0.f, c[2].v[i]);
+    }
+    return max_face - ActorBoxPick(bnds, gTrack_actor, model_unk1, material_unk1, face_list, max_face, NULL);
 }
 
 // IDA: int __usercall ActorBoxPick@<EAX>(tBounds *bnds@<EAX>, br_actor *ap@<EDX>, br_model *model@<EBX>, br_material *material@<ECX>, tFace_ref *face_list, int max_face, br_matrix34 *pMat)
@@ -1367,7 +1378,7 @@ void Scale(int pD, int factor) {
     for (v = 0; v < gSelected_model->nvertices; v++) {
         for (f = 0; f < gSelected_model->nfaces; f++) {
             if (faces[f].material == gSub_material
-                    && (faces[f].vertices[0] == v || faces[f].vertices[1] == v || faces[f].vertices[2] == v)) {
+                && (faces[f].vertices[0] == v || faces[f].vertices[1] == v || faces[f].vertices[2] == v)) {
                 verts[v].map.v[pD] = (factor + d) / d * verts[v].map.v[pD];
                 break;
             }

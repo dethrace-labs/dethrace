@@ -83,14 +83,19 @@ tToggle_element gToggle_array[] = {
     { KEYMAP_INFO, KEYMAP_SHIFT_ANY, 1, 1, 0, ToggleInfo },
     { KEYMAP_INFO, KEYMAP_CONTROL_ANY, 1, 1, 0, ToggleInfo }
 };
+
 // GLOBAL: CARM95 0x51b5c8
 int gRepair_last_time;
+
 // GLOBAL: CARM95 0x51b5cc
 int gHad_auto_recover;
+
 // GLOBAL: CARM95 0x51b5d0
 tU32 gLast_repair_time;
+
 // GLOBAL: CARM95 0x51b5d4
 tEdit_mode gWhich_edit_mode = eEdit_mode_options;
+// GLOBAL: CARM95 0x51b5d8
 char* gEdit_mode_names[10] = {
     "Cheat",
     "Accessories",
@@ -105,6 +110,7 @@ char* gEdit_mode_names[10] = {
 };
 
 // order is: { None, CTRL, ALT, CTRL+ALT, SHIFT, CTRL+SHIFT, ALT+SHIFT, CTRL+ALT+SHIFT }
+
 // GLOBAL: CARM95 0x51b600
 tEdit_func* gEdit_funcs[10][18][8] = {
     { // CHEAT EDIT MODE
@@ -536,24 +542,34 @@ tCheat gKev_keys[44] = {
     { .code = 0x30a19fab, .code2 = 0x2b0c2782, .action_proc = GetPowerup, .num = 45 },
     { .code = 0x0, .code2 = 0x0, .action_proc = 0x0, .num = 0x0 }
 };
+
 // GLOBAL: CARM95 0x51cf30
 int gAllow_car_flying;
+
 // GLOBAL: CARM95 0x51cf34
 int gEntering_message;
+
 // GLOBAL: CARM95 0x51cf38
 tU32 gPalette_fade_time; // was gRecover_timer
+
 // GLOBAL: CARM95 0x53d608
 char* gAbuse_text[10];
+
 // GLOBAL: CARM95 0x53d648
 char gString[84];
+
 // GLOBAL: CARM95 0x53d5f8
 int gToo_late;
+
 // GLOBAL: CARM95 0x53d5fc
 int gRecover_timer;
+
 // GLOBAL: CARM95 0x53d63c
 int gRecovery_voucher_count;
+
 // GLOBAL: CARM95 0x550550
 int gInstant_handbrake;
+
 // GLOBAL: CARM95 0x550554
 int gAuto_repair;
 

@@ -38,15 +38,19 @@
 
 // GLOBAL: CARM95 0x514cb0
 int gDoing_physics = 0;
+
 // GLOBAL: CARM95 0x514cb4
 br_scalar gDt = 0.f;
 // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x514cb8
 int gCollision_detection_on__car = 1;
 // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x514cc0
 br_vector3 gGround_normal__car = { { 0.0f, 1.0f, 0.0f } };
-// suffix added to avoid duplicate symbol
+
+// GLOBAL: CARM95 0x00514cd0
 void (*ControlCar[6])(tCar_spec*, br_scalar) = {
     &ControlCar1,
     &ControlCar2,
@@ -55,16 +59,22 @@ void (*ControlCar[6])(tCar_spec*, br_scalar) = {
     &ControlCar5,
     NULL,
 };
+
 // GLOBAL: CARM95 0x514ce8
-int gControl__car = 3;      // suffix added to avoid duplicate symbol
+int gControl__car = 3; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x514df8
-int gFace_num__car = 1;     // suffix added to avoid duplicate symbol
+int gFace_num__car = 1; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x514cf0
 br_angle gOld_yaw__car = 0; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x514cf4
 br_angle gOld_zoom = 0;
+
 // GLOBAL: CARM95 0x514cf8
 br_vector3 gCamera_pos_before_collide = { { 0 } };
+
 // GLOBAL: CARM95 0x514d08
 int gMetal_crunch_sound_id__car[5] = {
     // suffix added to avoid duplicate symbol
@@ -74,6 +84,7 @@ int gMetal_crunch_sound_id__car[5] = {
     5003,
     5004,
 };
+
 // GLOBAL: CARM95 0x514d20
 int gMetal_scrape_sound_id__car[3] = {
     // suffix added to avoid duplicate symbol
@@ -81,95 +92,137 @@ int gMetal_scrape_sound_id__car[3] = {
     5011,
     5012,
 };
+
 // GLOBAL: CARM95 0x514d2c
 int gCar_car_collisions = 1;
+
 // GLOBAL: CARM95 0x514d30
 int gFreeze_mechanics = 0;
+
 // GLOBAL: CARM95 0x514d34
 tU32 gLast_cunning_stunt = 0;
+
 // GLOBAL: CARM95 0x514d38
 tU32 gWild_start = 0;
+
 // GLOBAL: CARM95 0x514d3c
 tU32 gQuite_wild_start = 0;
+
 // GLOBAL: CARM95 0x514d40
 tU32 gQuite_wild_end = 0;
+
 // GLOBAL: CARM95 0x514d44
 tU32 gOn_me_wheels_start = 0;
+
 // GLOBAL: CARM95 0x514d48
 int gWoz_upside_down_at_all = 0;
+
 // GLOBAL: CARM95 0x514d50
 tS3_sound_tag gSkid_tag[2] = { 0, 0 };
+
 // GLOBAL: CARM95 0x514d58
 tCar_spec* gLast_car_to_skid[2] = { NULL, NULL };
+
 // GLOBAL: CARM95 0x514d60
 int gEliminate_faces = 0;
+
 // GLOBAL: CARM95 0x514d68
 br_vector3 gZero_v__car = { { 0 } }; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x514d74
 tU32 gSwitch_time = 0;
+
 // GLOBAL: CARM95 0x514d78
 tSave_camera gSave_camera[2];
+
 // GLOBAL: CARM95 0x514d90
 tU32 gLast_mechanics_time;
+
 // GLOBAL: CARM95 0x514d94
 int gOpponent_viewing_mode;
+
 // GLOBAL: CARM95 0x514d98
 int gNet_player_to_view_index = -1;
+
 // GLOBAL: CARM95 0x514d9c
 int gDouble_pling_water = 0;
+
 // GLOBAL: CARM95 0x514da0
 int gStop_opponents_moving = 0;
+
 // GLOBAL: CARM95 0x514da8
 float gDefensive_powerup_factor[6] = { 1.0f, 0.825f, 0.65f, 0.475f, 0.3f, 0.01f };
+
 // GLOBAL: CARM95 0x514dc0
 float gOffensive_powerup_factor[6] = { 1.0f, 1.5f, 2.0f, 3.0f, 5.0f, 10.0f };
+
 // GLOBAL: CARM95 0x514dd8
 float gEngine_powerup_factor[6] = { 1.3f, 1.9f, 2.5f, 3.2f, 4.0f, 10.0f };
+
 // GLOBAL: CARM95 0x514df0
 br_angle gPanning_camera_angle;
+
 // GLOBAL: CARM95 0x514df2
 br_scalar gPanning_camera_height;
+
 // GLOBAL: CARM95 0x514cec
 int gFace_count;
+
 // GLOBAL: CARM95 0x514e00
 float gCar_simplification_factor[2][5] = {
     { 10.0f, 3.0f, 1.5f, 0.75f, 0.0f },
     { 10.0f, 5.0f, 2.5f, 1.5f, 0.0f }
 };
+
 // GLOBAL: CARM95 0x514e28
 int gCar_simplification_level = 0;
+
 // GLOBAL: CARM95 0x514e2c
 int gNum_active_non_cars = 0;
+
 // GLOBAL: CARM95 0x514e30
 int gCamera_has_collided = 0;
+
 // GLOBAL: CARM95 0x53a5b8
 tFace_ref gFace_list__car[150]; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x550680
 tNon_car_spec* gActive_non_car_list[50];
+
 // GLOBAL: CARM95 0x53a57c
 int gOver_shoot;
+
 // GLOBAL: CARM95 0x53a574
 br_scalar gMin_world_y;
 br_scalar gAccel;
+
 // GLOBAL: CARM95 0x53a518
 br_vector3 gAverage_grid_position;
+
 // GLOBAL: CARM95 0x53cfe8
 br_actor* gPed_actor;
 int gCollision_count;
+
 // GLOBAL: CARM95 0x53d000
 int gCamera_frozen;
+
 // GLOBAL: CARM95 0x53a584
 int gMaterial_index;
+
 // GLOBAL: CARM95 0x53a578
 int gInTheSea;
+
 // GLOBAL: CARM95 0x53a524
 int gCamera_mode;
 br_scalar gOur_yaw__car;            // suffix added to avoid duplicate symbol
 br_scalar gGravity__car;            // suffix added to avoid duplicate symbol
 br_vector3 gNew_ground_normal__car; // suffix added to avoid duplicate symbol
+// GLOBAL: CARM95 0x550750
 char gNon_car_spec_list[100];
+
 // GLOBAL: CARM95 0x550670
 tU32 gMechanics_time_sync;
+
 // GLOBAL: CARM95 0x550748
 int gNum_cars_and_non_cars;
 

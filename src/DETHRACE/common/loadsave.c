@@ -24,8 +24,10 @@
 
 // GLOBAL: CARM95 0x536278
 tSave_game* gSaved_games[8];
+
 // GLOBAL: CARM95 0x536270
 int gStarted_typing;
+
 // GLOBAL: CARM95 0x536274
 int gSave_allowed;
 

@@ -17,24 +17,34 @@
 
 // GLOBAL: CARM95 0x514fa0
 int gPalette_allocate_count;
+
 // GLOBAL: CARM95 0x514fa4
 int gPalette_fuck_prevention;
+
 // GLOBAL: CARM95 0x514fa8
 int gDark_mode;
+
 // GLOBAL: CARM95 0x514fac
 int gTransparency_on;
+
 // GLOBAL: CARM95 0x514fb0
 int gPanel_flic_disable;
+
 // GLOBAL: CARM95 0x514fb4
 int gPending_flic = -1;
+
 // GLOBAL: CARM95 0x514fb8
 int gPlay_from_disk;
+
 // GLOBAL: CARM95 0x514fbc
 int gTrans_enabled = 1;
+
 // GLOBAL: CARM95 0x514fc0
 br_pixelmap* gPanel_buffer[2];
+
 // GLOBAL: CARM95 0x514fc8
 tU32 gSound_time;
+
 // GLOBAL: CARM95 0x514fd0
 tFlic_spec gMain_flic_list[372] = {
     { "MAINSTIL.FLI", 1, 0, 0, 0, 0, 25, NULL, 0u }, // only used by the demo (set to "xxxxxxxx.FLI" by the full version)
@@ -378,6 +388,7 @@ tFlic_spec gMain_flic_list[372] = {
     { "MAI2OPFL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u },
     { "MAI2OPGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u }
 };
+
 // GLOBAL: CARM95 0x518420
 int gFlic_bunch0[29] = {
     10,
@@ -410,6 +421,7 @@ int gFlic_bunch0[29] = {
     135,
     45
 };
+
 // GLOBAL: CARM95 0x518498
 int gFlic_bunch1[31] = {
     140,
@@ -444,10 +456,13 @@ int gFlic_bunch1[31] = {
     43,
     154
 };
+
 // GLOBAL: CARM95 0x518518
 int gFlic_bunch2[8] = { 70, 71, 72, 73, 74, 56, 57, 59 };
+
 // GLOBAL: CARM95 0x518538
 int gFlic_bunch3[13] = { 40, 41, 42, 43, 44, 45, 50, 51, 73, 74, 56, 57, 59 };
+
 // GLOBAL: CARM95 0x518570
 int gFlic_bunch4[22] = {
     80,
@@ -473,8 +488,10 @@ int gFlic_bunch4[22] = {
     120,
     121
 };
+
 // GLOBAL: CARM95 0x5185c8
 int gFlic_bunch5[5] = { 100, 101, 42, 43, 45 };
+
 // GLOBAL: CARM95 0x5185e0
 int gFlic_bunch6[51] = {
     190,
@@ -529,10 +546,13 @@ int gFlic_bunch6[51] = {
     43,
     284
 };
+
 // GLOBAL: CARM95 0x5186b0
 int gFlic_bunch7[7] = { 130, 131, 132, 42, 43, 135, 45 };
+
 // GLOBAL: CARM95 0x5186d0
 int gFlic_bunch8[16] = { 290, 291, 292, 293, 294, 295, 296, 297, 42, 43, 154, 301, 42, 43, 304, 305 };
+
 // GLOBAL: CARM95 0x518710
 tFlic_bunch gFlic_bunch[9] = {
     { COUNT_OF(gFlic_bunch0), gFlic_bunch0 },
@@ -545,34 +565,49 @@ tFlic_bunch gFlic_bunch[9] = {
     { COUNT_OF(gFlic_bunch7), gFlic_bunch7 },
     { COUNT_OF(gFlic_bunch8), gFlic_bunch8 },
 };
+
 // GLOBAL: CARM95 0x518758
 char gLast_flic_name[14];
+
 // GLOBAL: CARM95 0x53d060
 tU32 gPanel_flic_data_length[2];
+
 // GLOBAL: CARM95 0x53d1b8
 tU32 gLast_panel_frame_time[2];
+
 // GLOBAL: CARM95 0x53d0b8
 tU8* gPanel_flic_data[2];
+
 // GLOBAL: CARM95 0x53d0c0
 int gPanel_flic_top[2];
+
 // GLOBAL: CARM95 0x53d0d8
 tFlic_descriptor gPanel_flic[2];
+
 // GLOBAL: CARM95 0x53d0b0
 int gPanel_flic_left[2];
+
 // GLOBAL: CARM95 0x53d0cc
 int gPending_pending_flic = -1;
+
 // GLOBAL: CARM95 0x53d1c0
 int gSound_ID;
+
 // GLOBAL: CARM95 0x53d06c
 int gTranslation_count;
+
 // GLOBAL: CARM95 0x53d070
 tDR_font* gTrans_fonts[15];
+
 // GLOBAL: CARM95 0x53d0d0
 tTranslation_record* gTranslations;
+
 // GLOBAL: CARM95 0x53d0c8
 br_pixelmap* gPalette;
+
 // GLOBAL: CARM95 0x53d068
 void* gPalette_pixels;
+
 // GLOBAL: CARM95 0x53d0ac
 tFlic_descriptor* gFirst_flic;
 

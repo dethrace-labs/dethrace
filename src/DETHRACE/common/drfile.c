@@ -4,6 +4,7 @@
 #include "loading.h"
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x0050f020
 br_filesystem gFilesystem = {
     "Carmageddon",
     NULL,
@@ -19,6 +20,7 @@ br_filesystem gFilesystem = {
     NULL,
     NULL
 };
+
 // GLOBAL: CARM95 0x536298
 br_filesystem* gOld_file_system;
 

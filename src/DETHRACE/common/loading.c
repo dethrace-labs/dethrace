@@ -81,6 +81,7 @@ tHeadup_info gHeadup_image_info[32] = {
 };
 char* gYour_car_names[2][6];
 char* gDrivable_car_names[6];
+
 // GLOBAL: CARM95 0x50a530
 char* gDamage_names[] = {
     "engine",
@@ -96,6 +97,7 @@ char* gDamage_names[] = {
     "lr_wheel",
     "rr_wheel"
 };
+
 // GLOBAL: CARM95 0x50a560
 char* gWheel_actor_names[] = {
     "FLWHEEL.ACT",
@@ -105,6 +107,7 @@ char* gWheel_actor_names[] = {
     "IFLWHEEL.ACT",
     "IFRWHEEL.ACT"
 };
+
 // GLOBAL: CARM95 0x50a578
 char* gRaces_file_names[] = {
     "RACES.TXT",
@@ -117,36 +120,52 @@ char* gRaces_file_names[] = {
     "NETRACES.TXT",
     "NETRACES.TXT"
 };
+
 // GLOBAL: CARM95 0x50a5a0
 char* gNet_avail_names[] = { "never", "eagle", "hawk", "all" };
+
 // GLOBAL: CARM95 0x50a5b0
 char* gFloorpan_names[] = { "GBUNDER.MAT", "BGLUNDER.MAT", "GRIMBOT.MAT", "DDBASE.MAT", "HFUNDER.MAT" };
+
 // GLOBAL: CARM95 0x50a5c4
 int gAllow_open_to_fail = 1;
+
 // GLOBAL: CARM95 0x50a5c8
 int gDecode_thing = '@';
+
 // GLOBAL: CARM95 0x50a5d0
 char gDecode_string[] = { 0x9B, 0x52, 0x93, 0x9F, 0x52, 0x98, 0x9B, 0x96, 0x96, 0x9E, 0x9B, 0xA0, 0x99, 0x0 };
+
 // GLOBAL: CARM95 0x531f00
 int gFunk_groove_flags[30];
+
 // GLOBAL: CARM95 0x531f80
 char gDef_def_water_screen_name[32];
+
 // GLOBAL: CARM95 0x531dfc
 br_material* gDestn_screen_mat;
+
 // GLOBAL: CARM95 0x531f78
 br_material* gSource_screen_mat;
+
 // GLOBAL: CARM95 0x531f7c
 int gCurrent_race_file_index;
+
 // GLOBAL: CARM95 0x531df8
 int gGroove_funk_offset;
+
 // GLOBAL: CARM95 0x551da8
 int gDemo_armour;
+
 // GLOBAL: CARM95 0x551db0
 int gDemo_rank;
+
 // GLOBAL: CARM95 0x551d90
 int gDemo_opponents[5];
+
 // GLOBAL: CARM95 0x551da4
 int gDemo_power;
+
 // GLOBAL: CARM95 0x551dac
 int gDemo_offensive;
 

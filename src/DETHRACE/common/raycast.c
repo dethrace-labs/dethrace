@@ -11,26 +11,36 @@
 
 // GLOBAL: CARM95 0x53d028
 br_matrix34 gPick_model_to_view__raycast; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x53d010
 int gBelow_face_index;
+
 // GLOBAL: CARM95 0x53d018
 br_scalar gCurrent_y;
+
 // GLOBAL: CARM95 0x53d020
 int gAbove_face_index;
+
 // GLOBAL: CARM95 0x53d01c
 br_model* gAbove_model;
+
 // GLOBAL: CARM95 0x53d00c
 br_model* gBelow_model;
+
 // GLOBAL: CARM95 0x53d058
 br_scalar gHighest_y_below;
+
 // GLOBAL: CARM95 0x53d008
 br_actor* gY_picking_camera;
+
 // GLOBAL: CARM95 0x53d014
 br_scalar gLowest_y_above;
 
 // Added, probably can be replaced with NULL
+
 // GLOBAL: CARM95 0x553aa4
 br_model* model_unk1;
+
 // GLOBAL: CARM95 0x553aa8
 br_material* material_unk1;
 

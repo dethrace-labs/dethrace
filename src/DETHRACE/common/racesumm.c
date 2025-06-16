@@ -26,62 +26,91 @@
 
 // GLOBAL: CARM95 0x530e38
 int gPlayer_lookup[6];
+
 // GLOBAL: CARM95 0x530e58
 tMouse_area gOld_back_button;
+
 // GLOBAL: CARM95 0x530ec0
 tWreck_info gWreck_array[30];
+
 // GLOBAL: CARM95 0x530e94
 br_actor* gWreck_root;
+
 // GLOBAL: CARM95 0x530e2c
 br_actor* gWreck_camera;
+
 // GLOBAL: CARM95 0x530eac
 tU32 gWreck_start_zoom;
+
 // GLOBAL: CARM95 0x530ea4
 tU32 gWreck_gallery_start;
+
 // GLOBAL: CARM95 0x530e28
 float gTemp_rank_increase;
+
 // GLOBAL: CARM95 0x530eb8
 float gRank_per_ms;
+
 // GLOBAL: CARM95 0x530eb0
 tU32 gLast_wreck_draw;
+
 // GLOBAL: CARM95 0x530ea0
 tS3_sound_tag gSumm_sound;
+
 // GLOBAL: CARM95 0x530e8c
 float gCredits_per_ms;
+
 // GLOBAL: CARM95 0x530e10
 tMouse_area* gBack_button_ptr;
+
 // GLOBAL: CARM95 0x530e18
 tU32 gSummary_start;
+
 // GLOBAL: CARM95 0x530e98
 br_pixelmap* gWreck_z_buffer;
+
 // GLOBAL: CARM95 0x530e08
 br_pixelmap* gWreck_render_area;
+
 // GLOBAL: CARM95 0x531d48
 int gWreck_selected;
+
 // GLOBAL: CARM95 0x531d4c
 int gWreck_zoom_out;
+
 // GLOBAL: CARM95 0x530e90
 br_pixelmap* gChrome_font;
+
 // GLOBAL: CARM95 0x530eb4
 int gWreck_zoom_in;
+
 // GLOBAL: CARM95 0x530ea8
 int gTemp_credits;
+
 // GLOBAL: CARM95 0x530e50
 int gUser_interacted;
+
 // GLOBAL: CARM95 0x530e00
 int gWreck_count;
+
 // GLOBAL: CARM95 0x530e88
 int gRank_etc_munged;
+
 // GLOBAL: CARM95 0x530e0c
 int gRank_increase;
+
 // GLOBAL: CARM95 0x530e14
 int gTemp_earned;
+
 // GLOBAL: CARM95 0x530e30
 int gTemp_rank;
+
 // GLOBAL: CARM95 0x530e24
 int gWreck_zoomed_in;
+
 // GLOBAL: CARM95 0x530e04
 int gDone_initial;
+
 // GLOBAL: CARM95 0x530e20
 int gTemp_lost;
 

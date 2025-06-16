@@ -25,74 +25,107 @@
 
 // GLOBAL: CARM95 0x5149e8
 int gNext_spark;
+
 // GLOBAL: CARM95 0x5149ec
 int gSpark_flags;
+
 // GLOBAL: CARM95 0x5149f0
 int gNext_shrapnel;
+
 // GLOBAL: CARM95 0x5149f4
 int gShrapnel_flags;
+
 // GLOBAL: CARM95 0x5149f8
 br_model* gShrapnel_model[2];
+
 // GLOBAL: CARM95 0x514a00
 int gSmoke_flags;
+
 // GLOBAL: CARM95 0x514a04
 int gSmoke_num;
+
 // GLOBAL: CARM95 0x514a08
 int gOffset = 0;
+
 // GLOBAL: CARM95 0x514a0c
 int gColumn_flags;
+
 // GLOBAL: CARM95 0x514a10
 int gNext_column;
+
 // GLOBAL: CARM95 0x514a14
 br_pixelmap* gBlack_smoke_shade_table;
+
 // GLOBAL: CARM95 0x514a18
 br_pixelmap* gDark_smoke_shade_table;
+
 // GLOBAL: CARM95 0x514a1c
 br_pixelmap* gGrey_smoke_shade_table;
+
 // GLOBAL: CARM95 0x514a20
 int gSmoke_on = 1;
+
 // GLOBAL: CARM95 0x514a24
 int gNum_splash_types;
 int gIt_type;
+
 // GLOBAL: CARM95 0x514a2c
 br_pixelmap* gIt_shade_table;
+
 // GLOBAL: CARM95 0x514a30
 br_pixelmap** gDust_table = &gShade_list[8];
+
 // GLOBAL: CARM95 0x538618
 br_pixelmap* gFlame_map[20];
 tBRender_smoke* gBR_smoke_pointers[30];
+
 // GLOBAL: CARM95 0x538298
 tSplash gSplash[32];
+
 // GLOBAL: CARM95 0x538b00
 br_material* gSplash_material[20];
 tBRender_smoke gBR_smoke_structs[30];
+
 // GLOBAL: CARM95 0x538de8
 tSmoke_column gSmoke_column[25];
+
 // GLOBAL: CARM95 0x538668
 br_matrix4 gCameraToScreen;
+
 // GLOBAL: CARM95 0x5398d8
 tSpark gSparks[32];
+
 // GLOBAL: CARM95 0x5509c0
 br_pixelmap* gShade_list[16];
 int gN_BR_smoke_structs;
+
 // GLOBAL: CARM95 0x5386b0
 tSmoke gSmoke[25];
+
 // GLOBAL: CARM95 0x53a0e0
 tU32 gSplash_flags;
+
 // GLOBAL: CARM95 0x53828c
 tU32 gNext_splash;
+
 // GLOBAL: CARM95 0x53a0d8
 br_model* gLollipop_model;
+
 // GLOBAL: CARM95 0x538294
 int gNum_dust_tables;
+
 // GLOBAL: CARM95 0x5386a8
 br_model* gSplash_model;
+
 // GLOBAL: CARM95 0x53a0dc
 int gDust_rotate;
+
 // GLOBAL: CARM95 0x538290
 br_camera* gSpark_cam;
+
 // GLOBAL: CARM95 0x538288
 br_material* gBlack_material;
+
 // GLOBAL: CARM95 0x538b50
 tShrapnel gShrapnel[15];
 
