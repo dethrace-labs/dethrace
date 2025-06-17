@@ -28,6 +28,7 @@
 
 #define MOUSE_SPEED_MULTIPLIER 1
 
+int gDOSGfx_initialized;
 int gExtra_mem;
 int gReplay_override;
 tGraf_spec gGraf_specs[2] = {
@@ -54,17 +55,19 @@ int gNo_voodoo;
 
 // GLOBAL: CARM95 0x51d5d0
 int gSwitched_resolution;
+
 br_pixelmap* gReal_back_screen;
+
 tS32 gJoystick_min1x;
 
 // GLOBAL: CARM95 0x51d59c
 br_pixelmap* gTemp_screen;
-tU32 gUpper_loop_limit;
+
 int gReal_back_screen_locked;
-void (*gPrev_keyboard_handler)(void);
+
 tU8 gScan_code[123][2];
 
-// Added from retail executable
+// Added from VOODOO2C executable
 int gForce_voodoo_rush_mode;
 int gForce_voodoo_mode;
 
@@ -466,6 +469,7 @@ void PDAllocateScreenAndBack(void) {
             BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
             BRT_VIRTUALFB_CALLBACKS_P, &virtualfb_callbacks,
             BR_NULL_TOKEN);
+        gDOSGfx_initialized = 1;
     }
     gScreen->origin_x = 0;
     gScreen->origin_y = 0;
@@ -797,7 +801,8 @@ void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
     tU32 required;
     LOG_TRACE("(%p, %p)", pBuffer, pBuffer_size);
 
-    lba = LargestBlockAvail();
+    // TODO: tidy up
+    lba = 15000000;
     if (gReplay_override) {
         *pBuffer = 0;
         *pBuffer_size = 0;
@@ -964,7 +969,6 @@ int InitJoysticks(void) {
     LOG_TRACE("()");
 
     gJoystick_deadzone = 8000;
-    gUpper_loop_limit = UpperLoopLimit() / 2;
     return 0;
 }
 
