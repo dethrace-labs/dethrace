@@ -321,9 +321,9 @@ void PDInitialiseSystem(void) {
         fread(gASCII_shift_table, len / 2, 1, f);
         fclose(f);
 #if BR_ENDIAN_BIG
-        for (int i = 0; i < 128; i++) {
-            gASCII_table[i] = BrSwap32(gASCII_table[i]);
-            gASCII_shift_table[i] = BrSwap32(gASCII_shift_table[i]);
+        for (len = 0; len < BR_ASIZE(gASCII_table); len++) {
+            gASCII_table[len] = BrSwap32(gASCII_table[len]);
+            gASCII_shift_table[len] = BrSwap32(gASCII_shift_table[len]);
         }
 #endif
     } else {

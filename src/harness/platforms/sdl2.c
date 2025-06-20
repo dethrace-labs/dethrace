@@ -323,18 +323,20 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
 }
 
 static void SDL2_Harness_Swap(br_pixelmap* back_buffer) {
+    int i;
+    int dest_pitch;
+    uint8_t* src_pixels;
+    uint32_t* dest_pixels;
 
     SDL2_Harness_ProcessWindowMessages();
 
     if (gl_context != NULL) {
         SDL2_GL_SwapWindow(window);
     } else {
-        uint8_t* src_pixels = back_buffer->pixels;
-        uint32_t* dest_pixels;
-        int dest_pitch;
+        src_pixels = back_buffer->pixels;
 
         SDL2_LockTexture(screen_texture, NULL, (void**)&dest_pixels, &dest_pitch);
-        for (int i = 0; i < back_buffer->height * back_buffer->width; i++) {
+        for (i = 0; i < back_buffer->height * back_buffer->width; i++) {
             *dest_pixels = converted_palette[*src_pixels];
             dest_pixels++;
             src_pixels++;
@@ -352,7 +354,8 @@ static void SDL2_Harness_Swap(br_pixelmap* back_buffer) {
 }
 
 static void SDL2_Harness_PaletteChanged(br_colour entries[256]) {
-    for (int i = 0; i < 256; i++) {
+    int i;
+    for (i = 0; i < 256; i++) {
         converted_palette[i] = (0xff << 24 | BR_RED(entries[i]) << 16 | BR_GRN(entries[i]) << 8 | BR_BLU(entries[i]));
     }
     if (last_screen_src != NULL) {

@@ -944,8 +944,11 @@ void DisposeRace(void) {
     // when exiting a race, skid mark materials are unloaded, but material_modifiers is not changed.
     // In 3dfx mode, `FrobFog` is called during loading the next track, which iterates over the material_modifiers
     // causing a use-after-free
-    for (int i = 0; i < COUNT_OF(gCurrent_race.material_modifiers); i++) {
-        gCurrent_race.material_modifiers[i].skid_mark_material = NULL;
+    if (1) {
+        int i;
+        for (i = 0; i < COUNT_OF(gCurrent_race.material_modifiers); i++) {
+            gCurrent_race.material_modifiers[i].skid_mark_material = NULL;
+        }
     }
 #endif
 }

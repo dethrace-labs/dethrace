@@ -225,13 +225,14 @@ static void limit_fps(void) {
 }
 
 static void SDL1_Renderer_Present(br_pixelmap* src) {
+    int i;
     // fastest way to convert 8 bit indexed to 32 bit
     uint8_t* src_pixels = src->pixels;
     uint32_t* dest_pixels;
 
     SDL1_LockSurface(screen);
     dest_pixels = screen->pixels;
-    for (int i = 0; i < src->height * src->width; i++) {
+    for (i = 0; i < src->height * src->width; i++) {
         *dest_pixels = converted_palette[*src_pixels];
         dest_pixels++;
         src_pixels++;
@@ -263,7 +264,8 @@ static void SDL1_Harness_Swap(br_pixelmap* back_buffer) {
 }
 
 static void SDL1_Harness_PaletteChanged(br_colour entries[256]) {
-    for (int i = 0; i < 256; i++) {
+    int i;
+    for (i = 0; i < 256; i++) {
         converted_palette[i] = (0xff << 24 | BR_RED(entries[i]) << 16 | BR_GRN(entries[i]) << 8 | BR_BLU(entries[i]));
     }
     if (last_screen_src != NULL) {

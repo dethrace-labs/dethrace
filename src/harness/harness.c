@@ -19,7 +19,7 @@ extern void Harness_Platform_Init(tHarness_platform* platform);
 extern const tPlatform_bootstrap SDL1_bootstrap;
 extern const tPlatform_bootstrap SDL2_bootstrap;
 
-static const tPlatform_bootstrap *platform_bootstraps[] = {
+static const tPlatform_bootstrap* platform_bootstraps[] = {
 #ifdef DETHRACE_PLATFORM_SDL2
     &SDL2_bootstrap,
 #endif
@@ -40,7 +40,7 @@ tHarness_platform gHarness_platform;
 static int force_null_platform = 0;
 
 typedef struct {
-    const char *platform_name;
+    const char* platform_name;
     uint32_t platform_capabilityies;
     int install_signalhandler;
 } tArgument_config;
@@ -282,7 +282,8 @@ void Harness_ForceNullPlatform(void) {
 }
 
 int Harness_ProcessCommandLine(tArgument_config* config, int* argc, char* argv[]) {
-    for (int i = 1; i < *argc;) {
+    int i, j;
+    for (i = 1; i < *argc;) {
         int consumed = -1;
 
         if (strcasecmp(argv[i], "--cdcheck") == 0) {
@@ -367,7 +368,7 @@ int Harness_ProcessCommandLine(tArgument_config* config, int* argc, char* argv[]
 
         if (consumed > 0) {
             // shift args downwards
-            for (int j = i; j < *argc - consumed; j++) {
+            for (j = i; j < *argc - consumed; j++) {
                 argv[j] = argv[j + consumed];
             }
             *argc -= consumed;
@@ -386,10 +387,11 @@ FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
 
 // Localization
 int Harness_Hook_isalnum(int c) {
+    int i;
     if (harness_game_info.localization == eGameLocalization_polish) {
         // Polish diacritic letters in Windows-1250
         unsigned char letters[] = { 140, 143, 156, 159, 163, 165, 175, 179, 185, 191, 198, 202, 209, 211, 230, 234, 241, 243 };
-        for (int i = 0; i < (int)sizeof(letters); i++) {
+        for (i = 0; i < (int)sizeof(letters); i++) {
             if ((unsigned char)c == letters[i]) {
                 return 1;
             }
