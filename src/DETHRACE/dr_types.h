@@ -9,7 +9,6 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 
 // required for platform-specific network structs
@@ -18,13 +17,13 @@
 
 typedef unsigned char tU8;
 typedef signed char tS8;
-typedef uint16_t tU16;
-typedef int16_t tS16;
-typedef uint32_t tU32;
-typedef int32_t tS32;
+typedef unsigned short tU16;
+typedef signed short tS16;
+typedef unsigned int tU32;
+typedef signed int tS32;
 typedef double tF64;
-typedef int16_t tX88;
-typedef int32_t tX1616;
+typedef signed short tX88;
+typedef signed int tX1616;
 typedef tU8 tNet_message_type;
 typedef struct tCar_spec_struct tCar_spec;
 typedef struct tCar_spec_struct2 tCar_spec2;

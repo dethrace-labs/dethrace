@@ -12,7 +12,7 @@ SDL_COMPILE_TIME_ASSERT(sdl2_platform_requires_SDL2, SDL_MAJOR_VERSION == 2);
 static SDL_Window* window;
 static SDL_Renderer* renderer;
 static SDL_Texture* screen_texture;
-static uint32_t converted_palette[256];
+static br_uint_32 converted_palette[256];
 static br_pixelmap* last_screen_src;
 
 static SDL_GLContext* gl_context;
@@ -24,7 +24,7 @@ static Uint32 last_frame_time;
 void (*gKeyHandler_func)(void);
 
 // 32 bytes, 1 bit per key. Matches dos executable behavior
-static uint32_t key_state[8];
+static br_uint_32 key_state[8];
 
 static struct {
     int x, y;
@@ -173,7 +173,7 @@ static void SDL2_Harness_SetKeyHandler(void (*handler_func)(void)) {
     gKeyHandler_func = handler_func;
 }
 
-static void SDL2_Harness_GetKeyboardState(uint32_t* buffer) {
+static void SDL2_Harness_GetKeyboardState(br_uint_32* buffer) {
     memcpy(buffer, key_state, sizeof(key_state));
 }
 
@@ -326,7 +326,7 @@ static void SDL2_Harness_Swap(br_pixelmap* back_buffer) {
     int i;
     int dest_pitch;
     uint8_t* src_pixels;
-    uint32_t* dest_pixels;
+    br_uint_32* dest_pixels;
 
     SDL2_Harness_ProcessWindowMessages();
 

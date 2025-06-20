@@ -3,8 +3,6 @@
 
 #include "s3/s3.h"
 
-#include <stdint.h>
-
 // extern int PDGetTotalTime();
 // extern void dr_dprintf(char* fmt_string, ...);
 
@@ -185,13 +183,13 @@ typedef struct tS3_soundbank_read_ctx {
 
 #pragma pack(push, 1)
 typedef struct tWAVEFORMATEX_ {
-    int16_t wFormatTag;
-    int16_t nChannels;
-    int32_t nSamplesPerSec;
-    int32_t nAvgBytesPerSec;
-    int16_t nBlockAlign;
-    int16_t wBitsPerSample;
-    int16_t cbSize;
+    short wFormatTag;
+    short nChannels;
+    int nSamplesPerSec;
+    int nAvgBytesPerSec;
+    short nBlockAlign;
+    short wBitsPerSample;
+    short cbSize;
 } tWAVEFORMATEX_;
 #pragma pack(pop)
 
@@ -199,22 +197,22 @@ typedef struct tWAVEFORMATEX_ {
 typedef struct wav_header {
     // RIFF Header
     char riff_header[4]; // Contains "RIFF"
-    int32_t wav_size;    // Size of the wav portion of the file, which follows the first 8 bytes. File size - 8
+    int wav_size;        // Size of the wav portion of the file, which follows the first 8 bytes. File size - 8
     char wave_header[4]; // Contains "WAVE"
 
     // Format Header
-    char fmt_header[4];     // Contains "fmt " (includes trailing space)
-    int32_t fmt_chunk_size; // Should be 16 for PCM
-    int16_t audio_format;   // Should be 1 for PCM. 3 for IEEE Float
-    int16_t num_channels;
-    int32_t sample_rate;
-    int32_t byte_rate;        // Number of bytes per second. sample_rate * num_channels * Bytes Per Sample
-    int16_t sample_alignment; // num_channels * Bytes Per Sample
-    int16_t bit_depth;        // Number of bits per sample
+    char fmt_header[4]; // Contains "fmt " (includes trailing space)
+    int fmt_chunk_size; // Should be 16 for PCM
+    short audio_format; // Should be 1 for PCM. 3 for IEEE Float
+    short num_channels;
+    int sample_rate;
+    int byte_rate;          // Number of bytes per second. sample_rate * num_channels * Bytes Per Sample
+    short sample_alignment; // num_channels * Bytes Per Sample
+    short bit_depth;        // Number of bits per sample
 
     // Data
     char data_header[4]; // Contains "data"
-    int32_t data_bytes;  // Number of bytes in data. Number of samples * num_channels * sample byte size
+    int data_bytes;      // Number of bytes in data. Number of samples * num_channels * sample byte size
 } wav_header;
 #pragma pack(pop)
 

@@ -1,7 +1,6 @@
 #ifndef HARNESS_OS_H
 #define HARNESS_OS_H
 
-#include <stdint.h>
 #include <stdio.h>
 
 #if defined(_WIN32) || defined(_WIN64)

@@ -1,7 +1,7 @@
 #ifndef PC_ALL_NET_TYPES_H
 #define PC_ALL_NET_TYPES_H
 
-#include <stdint.h>
+#include <dr_types.h>
 
 // This file added dethrace
 //  - have switched out IPX implementation for IP
@@ -9,8 +9,14 @@
 
 // cannot be a regular sockaddr_in because it is transmitted between OS's
 typedef struct tCopyable_sockaddr_in {
+#if _MSC_VER == 1020
+    long address;
+    long port;
+#else
     uint64_t address;
     uint32_t port;
+#endif
+
 } tCopyable_sockaddr_in;
 
 typedef struct tPD_net_player_info {

@@ -30,12 +30,12 @@ typedef struct tHarness_platform {
     // invoked when key is set up or down
     void (*SetKeyHandler)(void (*handler_func)(void));
     // Get keyboard state. Argument expected to point to 32 byte buffer - 1 bit per key
-    void (*GetKeyboardState)(uint32_t* buffer);
+    void (*GetKeyboardState)(br_uint_32* buffer);
 
     // Sleep
-    void (*Sleep)(uint32_t dwMilliseconds);
+    void (*Sleep)(br_uint_32 dwMilliseconds);
     // Get ticks
-    uint32_t (*GetTicks)(void);
+    br_uint_32 (*GetTicks)(void);
     // Show error message
     int (*ShowErrorMessage)(char* title, char* message);
 
@@ -58,7 +58,7 @@ enum {
 typedef struct tPlatform_bootstrap {
     const char* name;
     const char* description;
-    uint32_t capabilities;
+    int capabilities;
     int (*init)(tHarness_platform* platform);
 } tPlatform_bootstrap;
 

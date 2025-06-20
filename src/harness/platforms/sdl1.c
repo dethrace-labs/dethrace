@@ -10,7 +10,7 @@
 SDL_COMPILE_TIME_ASSERT(sdl1_platform_requires_SDL1, SDL_MAJOR_VERSION == 1);
 
 static SDL_Surface* screen;
-static uint32_t converted_palette[256];
+static br_uint_32 converted_palette[256];
 static br_pixelmap* last_screen_src;
 
 static Uint32 last_frame_time;
@@ -18,7 +18,7 @@ static Uint32 last_frame_time;
 static void (*gKeyHandler_func)(void);
 
 // 32 bytes, 1 bit per key. Matches dos executable behavior
-static uint32_t key_state[8];
+static br_uint_32 key_state[8];
 
 static struct {
     int x, y;
@@ -193,7 +193,7 @@ static void SDL1_Harness_SetKeyHandler(void (*handler_func)(void)) {
     gKeyHandler_func = handler_func;
 }
 
-static void SDL1_Harness_GetKeyboardState(uint32_t* buffer) {
+static void SDL1_Harness_GetKeyboardState(br_uint_32* buffer) {
     memcpy(buffer, key_state, sizeof(key_state));
 }
 
@@ -228,7 +228,7 @@ static void SDL1_Renderer_Present(br_pixelmap* src) {
     int i;
     // fastest way to convert 8 bit indexed to 32 bit
     uint8_t* src_pixels = src->pixels;
-    uint32_t* dest_pixels;
+    br_uint_32* dest_pixels;
 
     SDL1_LockSurface(screen);
     dest_pixels = screen->pixels;

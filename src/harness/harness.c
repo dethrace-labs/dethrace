@@ -12,7 +12,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-extern uint32_t gI_am_cheating;
+extern br_uint_32 gI_am_cheating;
 
 extern void Harness_Platform_Init(tHarness_platform* platform);
 
@@ -41,7 +41,7 @@ static int force_null_platform = 0;
 
 typedef struct {
     const char* platform_name;
-    uint32_t platform_capabilityies;
+    int platform_capabilityies;
     int install_signalhandler;
 } tArgument_config;
 

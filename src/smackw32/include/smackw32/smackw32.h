@@ -1,6 +1,5 @@
 #include "harness/audio.h"
 #include <stddef.h>
-#include <stdint.h>
 
 #define SMACKTRACK1 0x02000 // Play audio track 1
 #define SMACKTRACK2 0x04000 // Play audio track 2
@@ -45,14 +44,14 @@ typedef struct SmackTag {
 
     // added by dethrace
     void* smk_handle; // opaque pointer to the libsmacker instance
-    void *f; // opaque file pointer
+    void* f;          // opaque file pointer
     tAudioBackend_stream* audio_stream;
 } Smack;
 
-Smack* SmackOpen(const char* name, uint32_t flags, uint32_t extrabuf);
+Smack* SmackOpen(const char* name, unsigned int flags, unsigned int extrabuf);
 int SmackSoundUseDirectSound(void* dd); // NULL mean create instance (apparently)
-void SmackToBuffer(Smack* smack, uint32_t left, uint32_t top, uint32_t pitch, uint32_t destheight, void* buf, uint32_t flags);
-uint32_t SmackDoFrame(Smack* smack);
+void SmackToBuffer(Smack* smack, unsigned int left, unsigned int top, unsigned int pitch, unsigned int destheight, void* buf, unsigned int flags);
+int SmackDoFrame(Smack* smack);
 void SmackNextFrame(Smack* smack);
-uint32_t SmackWait(Smack* smack);
+int SmackWait(Smack* smack);
 void SmackClose(Smack* smack);
