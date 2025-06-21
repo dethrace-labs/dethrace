@@ -87,7 +87,6 @@ void SetJoystickArrays(int* pKeys, int pMark) {
 // IDA: void __cdecl PollKeys()
 // FUNCTION: CARM95 0x471bbf
 void PollKeys(void) {
-
     gKey_poll_counter++;
     PDSetKeyArray(gKey_array, gKey_poll_counter);
     SetJoystickArrays(gKey_array, gKey_poll_counter);
@@ -124,8 +123,6 @@ void ResetPollKeys(void) {
 // IDA: void __cdecl CheckKeysForMouldiness()
 // FUNCTION: CARM95 0x471cdb
 void CheckKeysForMouldiness(void) {
-    LOG_TRACE9("()");
-
     if (PDGetTotalTime() - gLast_poll_keys > 500) {
         ResetPollKeys();
         CyclePollKeys();
@@ -191,7 +188,6 @@ int PDKeyDown3(int pKey_index) {
     int last_key_down_time;
     int last_key_down;
     tKey_down_result result;
-    LOG_TRACE("(%d)", pKey_index);
 
     last_key_down = gLast_key_down;
     last_key_down_time = gLast_key_down_time;
@@ -306,7 +302,6 @@ tU32* KevKeyService(void) {
 // IDA: int __usercall OldKeyIsDown@<EAX>(int pKey_index@<EAX>)
 int OldKeyIsDown(int pKey_index) {
     int i;
-    LOG_TRACE("(%d)", pKey_index);
 
     switch (pKey_index) {
     case -2:
@@ -347,8 +342,6 @@ int KeyIsDown(int pKey_index) {
 // IDA: void __cdecl WaitForNoKeys()
 // FUNCTION: CARM95 0x47232b
 void WaitForNoKeys(void) {
-    LOG_TRACE("()");
-
     while (AnyKeyDown() || EitherMouseButtonDown()) {
         CheckQuit();
     }
@@ -358,8 +351,6 @@ void WaitForNoKeys(void) {
 // IDA: void __cdecl WaitForAKey()
 // FUNCTION: CARM95 0x47235a
 void WaitForAKey(void) {
-    LOG_TRACE("()");
-
     while (1) {
         CheckQuit();
         if (AnyKeyDown()) {
@@ -386,7 +377,6 @@ void GetMousePosition(int* pX_coord, int* pY_coord) {
     int x_right_margin;
     int y_top_margin;
     int y_bottom_margin;
-    LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
 
     PDGetMousePosition(pX_coord, pY_coord);
     if (*pX_coord < 0) {
@@ -405,7 +395,6 @@ void GetMousePosition(int* pX_coord, int* pY_coord) {
 // FUNCTION: CARM95 0x4724d1
 void InitRollingLetters(void) {
     int i;
-    LOG_TRACE("()");
 
     gLast_roll = 0;
     gCurrent_cursor = -1;
@@ -418,8 +407,6 @@ void InitRollingLetters(void) {
 // IDA: void __cdecl EndRollingLetters()
 // FUNCTION: CARM95 0x472543
 void EndRollingLetters(void) {
-    LOG_TRACE("()");
-
     BrMemFree(gRolling_letters);
 }
 
@@ -429,7 +416,6 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
     tRolling_letter* let;
     int i;
     int number_of_letters;
-    LOG_TRACE("(%d, %d, %d, %d)", pChar, pX, pY, rolling_type);
 
     let = &gRolling_letters[0];
     for (i = 0; i < NBR_ROLLING_LETTERS; i++) {
@@ -478,7 +464,6 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
 // FUNCTION: CARM95 0x4726c3
 void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
     int i;
-    LOG_TRACE("(\"%s\", %d, %d, %d)", pStr, pX, pY, rolling_type);
 
     for (i = 0; i < strlen(pStr); i++) {
         AddRollingLetter(pStr[i], pX, pY, rolling_type);
@@ -490,7 +475,6 @@ void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
 // FUNCTION: CARM95 0x472729
 void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
     char the_string[32];
-    LOG_TRACE("(%d, %d, %d, %d)", pNumber, pWidth, pX, pY);
 
     sprintf(the_string, VARLZEROINT, pWidth, pNumber);
     AddRollingString(the_string, pX, pY, eRT_numeric);
@@ -515,7 +499,6 @@ void RollLettersIn(void) {
     tU8* saved_char_ptr;
     tU8* source_ptr;
     tU8 the_byte;
-    LOG_TRACE9("()");
 
     new_time = PDGetTotalTime();
     if (gLast_roll) {
@@ -548,7 +531,6 @@ void RollLettersIn(void) {
                 letter_offset = offset % gCurrent_graf_data->save_slot_letter_height - (gCurrent_graf_data->save_slot_letter_height - font_height) / 2;
                 saved_char_ptr = char_ptr;
                 if (which_letter < let->number_of_letters && which_letter >= 0 && letter_offset >= 0 && letter_offset < font_height) {
-
                     // LOG_DEBUG("chars %d, %d, %d, %d", let->letters[0], let->letters[1], let->letters[2], let->letters[3]);
                     source_ptr = (tU8*)gFonts[FONT_TYPEABLE].images->pixels + (font_height * (let->letters[which_letter] - ' ') + letter_offset) * the_row_bytes;
                     for (k = 0; k < font_width; k++) {
@@ -576,7 +558,6 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
     int j;
     tRolling_letter* let;
     tRolling_type new_type;
-    LOG_TRACE("(%d, %d, %d)", pSlot_index, pChar_index, pNew_char);
 
     if (pChar_index >= gVisible_length || pChar_index < 0) {
         return -1;
@@ -624,7 +605,6 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
     tRolling_letter* let;
     tRolling_type new_type;
     char new_char;
-    LOG_TRACE("(%d, %d, \"%s\", \"%s\")", pXcoord, pYcoord, pNew_str, pOld_str);
 
     len = strlen(pOld_str);
     len2 = strlen(pNew_str);
@@ -667,8 +647,6 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
 // IDA: void __usercall SetRollingCursor(int pSlot_index@<EAX>)
 // FUNCTION: CARM95 0x472ea8
 void SetRollingCursor(int pSlot_index) {
-    LOG_TRACE("(%d)", pSlot_index);
-
     gCurrent_cursor = ChangeCharTo(pSlot_index, gCurrent_position, ROLLING_LETTER_LOOP_RANDOM);
 }
 
@@ -676,7 +654,6 @@ void SetRollingCursor(int pSlot_index) {
 // FUNCTION: CARM95 0x472ba0
 void BlankSlot(int pIndex, int pName_length, int pVisible_length) {
     int i;
-    LOG_TRACE("(%d, %d, %d)", pIndex, pName_length, pVisible_length);
 
     gVisible_length = pVisible_length;
     for (i = 0; i < pName_length; i++) {
@@ -689,7 +666,6 @@ void BlankSlot(int pIndex, int pName_length, int pVisible_length) {
 void DoRLBackspace(int pSlot_index) {
     int i;
     int new_len;
-    LOG_TRACE("(%d)", pSlot_index);
 
     if (gCurrent_position != 0) {
         if (strlen(gCurrent_typing) == gCurrent_position) {
@@ -714,7 +690,6 @@ void DoRLBackspace(int pSlot_index) {
 void DoRLDelete(int pSlot_index) {
     int i;
     int new_len;
-    LOG_TRACE("(%d)", pSlot_index);
 
     if (gCurrent_position <= ((int)strlen(gCurrent_typing) - 1)) {
         new_len = strlen(gCurrent_typing) - 1;
@@ -731,15 +706,12 @@ void DoRLDelete(int pSlot_index) {
 // IDA: void __usercall DoRLInsert(int pSlot_index@<EAX>)
 // FUNCTION: CARM95 0x473189
 void DoRLInsert(int pSlot_index) {
-    LOG_TRACE("(%d)", pSlot_index);
-
     gInsert_mode = !gInsert_mode;
 }
 
 // IDA: void __usercall DoRLCursorLeft(int pSlot_index@<EAX>)
 // FUNCTION: CARM95 0x4731ba
 void DoRLCursorLeft(int pSlot_index) {
-    LOG_TRACE("(%d)", pSlot_index);
     if (gCurrent_position != 0) {
         if (strlen(gCurrent_typing) == gCurrent_position) {
             ChangeCharTo(pSlot_index, strlen(gCurrent_typing), ' ');
@@ -755,8 +727,6 @@ void DoRLCursorLeft(int pSlot_index) {
 // IDA: void __usercall DoRLCursorRight(int pSlot_index@<EAX>)
 // FUNCTION: CARM95 0x473248
 void DoRLCursorRight(int pSlot_index) {
-    LOG_TRACE("(%d)", pSlot_index);
-
     if (gCurrent_position < strlen(gCurrent_typing)) {
         ChangeCharTo(pSlot_index, gCurrent_position, gCurrent_typing[gCurrent_position]);
         gCurrent_position++;
@@ -769,7 +739,6 @@ void DoRLCursorRight(int pSlot_index) {
 void DoRLTypeLetter(int pChar, int pSlot_index) {
     int i;
     int new_len;
-    LOG_TRACE("(%d, %d)", pChar, pSlot_index);
 
     // v2 = pSlot_index;
     if (pChar >= 32) {
@@ -808,7 +777,6 @@ void DoRLTypeLetter(int pChar, int pSlot_index) {
 // FUNCTION: CARM95 0x472d51
 void StopTyping(int pSlot_index) {
     int i;
-    LOG_TRACE("(%d)", pSlot_index);
 
     for (i = 0; i < gThe_length; i++) {
         if (i < (strlen(gCurrent_typing) - 1)) {
@@ -823,7 +791,6 @@ void StopTyping(int pSlot_index) {
 // FUNCTION: CARM95 0x472dca
 void RevertTyping(int pSlot_index, char* pRevert_str) {
     int i;
-    LOG_TRACE("(%d, \"%s\")", pSlot_index, pRevert_str);
 
     for (i = 0; i < gThe_length; i++) {
         ChangeCharTo(pSlot_index, i, i >= strlen(pRevert_str) ? ' ' : pRevert_str[i]);
@@ -833,8 +800,6 @@ void RevertTyping(int pSlot_index, char* pRevert_str) {
 // IDA: void __usercall StartTyping(int pSlot_index@<EAX>, char *pText@<EDX>, int pVisible_length@<EBX>)
 // FUNCTION: CARM95 0x472e42
 void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
-    LOG_TRACE("(%d, \"%s\", %d)", pSlot_index, pText, pVisible_length);
-
     gThe_length = pVisible_length;
     strcpy(gCurrent_typing, pText);
     gVisible_length = pVisible_length;
@@ -845,8 +810,6 @@ void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
 // IDA: void __usercall TypeKey(int pSlot_index@<EAX>, char pKey@<EDX>)
 // FUNCTION: CARM95 0x472ecc
 void TypeKey(int pSlot_index, char pKey) {
-    LOG_TRACE("(%d, %d)", pSlot_index, pKey);
-
     switch (pKey) {
     case KEY_GRAVE:
         break;
@@ -874,8 +837,6 @@ void TypeKey(int pSlot_index, char pKey) {
 // IDA: void __usercall SetSlotXY(int pSlot_index@<EAX>, int pX_coord@<EDX>, int pY_coord@<EBX>)
 // FUNCTION: CARM95 0x47340f
 void SetSlotXY(int pSlot_index, int pX_coord, int pY_coord) {
-    LOG_TRACE("(%d, %d, %d)", pSlot_index, pX_coord, pY_coord);
-
     gLetter_x_coords[pSlot_index] = pX_coord;
     gLetter_y_coords[pSlot_index] = pY_coord;
 }
@@ -883,8 +844,6 @@ void SetSlotXY(int pSlot_index, int pX_coord, int pY_coord) {
 // IDA: void __usercall GetTypedName(char *pDestn@<EAX>, int pMax_length@<EDX>)
 // FUNCTION: CARM95 0x473434
 void GetTypedName(char* pDestn, int pMax_length) {
-    LOG_TRACE("(\"%s\", %d)", pDestn, pMax_length);
-
     if (strlen(gCurrent_typing) <= pMax_length) {
         strcpy(pDestn, gCurrent_typing);
     } else {
@@ -902,7 +861,6 @@ void KillCursor(int pSlot_index) {
     int j;
     tRolling_letter* let;
     tRolling_type new_type;
-    LOG_TRACE("(%d)", pSlot_index);
 
     if (gCurrent_position < gVisible_length && gCurrent_position >= 0) {
         y_coord = gLetter_y_coords[pSlot_index];

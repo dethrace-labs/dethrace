@@ -24,8 +24,6 @@
 // IDA: void __cdecl QuitGame()
 // FUNCTION: CARM95 0x4a9ea0
 void QuitGame(void) {
-    LOG_TRACE("()");
-
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         DoDemoGoodbye();
     }
@@ -73,21 +71,18 @@ tU32 TrackCount(br_actor* pActor, tU32* pCount) {
     unsigned int z;
     int ad;
     float e;
-    LOG_TRACE("(%p, %p)", pActor, pCount);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl CheckNumberOfTracks()
 void CheckNumberOfTracks(void) {
     tU32 track_count;
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall ServiceTheGame(int pRacing@<EAX>)
 // FUNCTION: CARM95 0x4a9f29
 void ServiceTheGame(int pRacing) {
-
     CheckMemory();
     if (!pRacing) {
         CyclePollKeys();
@@ -119,8 +114,6 @@ void ServiceGame(void) {
 // IDA: void __cdecl ServiceGameInRace()
 // FUNCTION: CARM95 0x4a9ff9
 void ServiceGameInRace(void) {
-    LOG_TRACE("()");
-
     ServiceTheGame(1);
     CheckKevKeys();
 }

@@ -630,7 +630,6 @@ void mem_write_u16(void* memory, tU16 u16) {
 // IDA: void __cdecl EnableTranslationText()
 // FUNCTION: CARM95 0x495990
 void EnableTranslationText(void) {
-    LOG_TRACE("()");
 
     gTrans_enabled = 1;
 }
@@ -638,7 +637,6 @@ void EnableTranslationText(void) {
 // IDA: void __cdecl DisableTranslationText()
 // FUNCTION: CARM95 0x4959a5
 void DisableTranslationText(void) {
-    LOG_TRACE("()");
 
     gTrans_enabled = 0;
 }
@@ -646,7 +644,6 @@ void DisableTranslationText(void) {
 // IDA: void __usercall SetFlicSound(int pSound_ID@<EAX>, tU32 pSound_time@<EDX>)
 // FUNCTION: CARM95 0x4959ba
 void SetFlicSound(int pSound_ID, tU32 pSound_time) {
-    LOG_TRACE("(%d, %d)", pSound_ID, pSound_time);
 
     gSound_time = pSound_time;
     gSound_ID = pSound_ID;
@@ -655,39 +652,30 @@ void SetFlicSound(int pSound_ID, tU32 pSound_time) {
 // IDA: int __cdecl TranslationMode()
 // FUNCTION: CARM95 0x4959d5
 int TranslationMode(void) {
-
     return gTranslation_count;
 }
 
 // IDA: void __cdecl DontLetFlicFuckWithPalettes()
 // FUNCTION: CARM95 0x4959ea
 void DontLetFlicFuckWithPalettes(void) {
-    LOG_TRACE8("()");
-
     gPalette_fuck_prevention = 1;
 }
 
 // IDA: void __cdecl LetFlicFuckWithPalettes()
 // FUNCTION: CARM95 0x4959ff
 void LetFlicFuckWithPalettes(void) {
-    LOG_TRACE8("()");
-
     gPalette_fuck_prevention = 0;
 }
 
 // IDA: void __cdecl PlayFlicsInDarkness()
 // FUNCTION: CARM95 0x495a14
 void PlayFlicsInDarkness(void) {
-    LOG_TRACE("()");
-
     gDark_mode = 1;
 }
 
 // IDA: void __cdecl ReilluminateFlics()
 // FUNCTION: CARM95 0x495a29
 void ReilluminateFlics(void) {
-    LOG_TRACE("()");
-
     gDark_mode = 0;
     FadePaletteUp();
 }
@@ -695,15 +683,12 @@ void ReilluminateFlics(void) {
 // IDA: void __cdecl TurnFlicTransparencyOn()
 // FUNCTION: CARM95 0x495a43
 void TurnFlicTransparencyOn(void) {
-    LOG_TRACE8("()");
-
     gTransparency_on = 1;
 }
 
 // IDA: void __cdecl TurnFlicTransparencyOff()
 // FUNCTION: CARM95 0x495a58
 void TurnFlicTransparencyOff(void) {
-    LOG_TRACE8("()");
     gTransparency_on = 0;
 }
 
@@ -740,7 +725,6 @@ void TurnOnPanelFlics(void) {
 // IDA: int __usercall GetPanelFlicFrameIndex@<EAX>(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x495ad6
 int GetPanelFlicFrameIndex(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     return gPanel_flic[pIndex].current_frame;
 }
@@ -748,7 +732,6 @@ int GetPanelFlicFrameIndex(int pIndex) {
 // IDA: void __cdecl FlicPaletteAllocate()
 // FUNCTION: CARM95 0x495af9
 void FlicPaletteAllocate(void) {
-    LOG_TRACE("()");
 
     gPalette_pixels = BrMemAllocate(0x400u, kMem_flic_pal);
     gPalette = DRPixelmapAllocate(BR_PMT_RGBX_888, 1, 256, gPalette_pixels, 0);
@@ -757,7 +740,6 @@ void FlicPaletteAllocate(void) {
 // IDA: void __usercall AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info@<EAX>, br_pixelmap *pDest_pixelmap@<EDX>)
 // FUNCTION: CARM95 0x495b39
 void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap* pDest_pixelmap) {
-    LOG_TRACE("(%d, %p)", pFlic_info, pDest_pixelmap);
 
     if (pDest_pixelmap != NULL) {
         pFlic_info->first_pixel = (tU8*)pDest_pixelmap->pixels
@@ -774,7 +756,6 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     tU16 magic_number;
     tPath_name the_path;
     int total_size;
-    LOG_TRACE("(\"%s\", %d, %p, %u, %p, %p, %d, %d, %d)", pFile_name, pIndex, pFlic_info, pSize, pData_ptr, pDest_pixelmap, pX_offset, pY_offset, pFrame_rate);
 
     if (gPlay_from_disk) {
         PathCat(the_path, gApplication_path, "ANIM");
@@ -861,7 +842,6 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
 // IDA: void __cdecl FreeFlicPaletteAllocate()
 // FUNCTION: CARM95 0x495f27
 void FreeFlicPaletteAllocate(void) {
-    LOG_TRACE("()");
 
     if (gPalette_allocate_count == 0) {
         FatalError(kFatalError_FlicPaletteDisposeBeforeAllocation);
@@ -876,7 +856,6 @@ void FreeFlicPaletteAllocate(void) {
 // IDA: int __usercall EndFlic@<EAX>(tFlic_descriptor_ptr pFlic_info@<EAX>)
 // FUNCTION: CARM95 0x495f71
 int EndFlic(tFlic_descriptor_ptr pFlic_info) {
-    LOG_TRACE("(%p)", pFlic_info);
 
     if (pFlic_info->f != NULL) {
         BrMemFree(pFlic_info->data_start);
@@ -954,7 +933,6 @@ void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
-    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     first_line = MemReadU16(&pFlic_info->data);
     line_count = MemReadU16(&pFlic_info->data);
@@ -1001,7 +979,6 @@ void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
-    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     first_line = MemReadU16(&pFlic_info->data);
     line_count = MemReadU16(&pFlic_info->data);
@@ -1107,7 +1084,6 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU16* line_pixel_ptr;
     tU16 the_word;
-    LOG_TRACE8("(%p, %d)", pFlic_info, chunk_length);
 
     line_count = MemReadU16(&pFlic_info->data);
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
@@ -1177,7 +1153,6 @@ void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU16* line_pixel_ptr;
     tU16 the_word;
-    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     line_count = MemReadU16(&pFlic_info->data);
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
@@ -1225,7 +1200,6 @@ void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* pixel_ptr;
     tU32 the_row_bytes;
     tU32* line_pixel_ptr;
-    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     pixel_ptr = pFlic_info->first_pixel;
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
@@ -1252,7 +1226,6 @@ void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
-    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
     pixel_ptr = pFlic_info->first_pixel;
@@ -1292,7 +1265,6 @@ void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
-    LOG_TRACE8("(%p, %d)", pFlic_info, chunk_length);
 
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
     pixel_ptr = pFlic_info->first_pixel;
@@ -1334,7 +1306,6 @@ void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* pixel_ptr;
     tU32 the_row_bytes;
     tU32* line_pixel_ptr;
-    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     pixel_ptr = pFlic_info->first_pixel;
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
@@ -1359,7 +1330,6 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
-    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     pixel_ptr = pFlic_info->first_pixel;
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
@@ -1384,7 +1354,6 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 // IDA: void __usercall DoMini(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
 // FUNCTION: CARM95 0x4970dc
 void DoMini(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
-    LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
     MemSkipBytes(&pFlic_info->data, chunk_length - 6);
 }
@@ -1397,7 +1366,6 @@ void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
     int x;
     int width;
     int right_edge;
-    LOG_TRACE("(%p, %d)", pFlic_info, pLast_frame);
 
     for (i = 0; i < gTranslation_count; i++) {
         trans = &gTranslations[i];
@@ -1537,7 +1505,6 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
 // IDA: int __usercall PlayNextFlicFrame@<EAX>(tFlic_descriptor *pFlic_info@<EAX>)
 // FUNCTION: CARM95 0x495fd7
 int PlayNextFlicFrame(tFlic_descriptor* pFlic_info) {
-    LOG_TRACE("(%p)", pFlic_info);
 
     return PlayNextFlicFrame2(pFlic_info, 0);
 }
@@ -1550,7 +1517,6 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
     tU32 last_frame;
     tU32 new_time;
     tU32 frame_period;
-    LOG_TRACE("(%d, %u, %p, %p, %d, %d, %p, %d, %d)", pIndex, pSize, pData_ptr, pDest_pixelmap, pX_offset, pY_offset, DoPerFrame, pInterruptable, pFrame_rate);
 
     finished_playing = 0;
     the_flic.data_start = NULL;
@@ -1611,7 +1577,6 @@ void ShowFlic(int pIndex) {
 // FUNCTION: CARM95 0x497459
 void InitFlics(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gMain_flic_list); i++) {
         gMain_flic_list[i].data_ptr = NULL;
@@ -1624,7 +1589,6 @@ int LoadFlic(int pIndex) {
     tPath_name the_path;
     FILE* f;
     char* the_buffer;
-    LOG_TRACE("(%d)", pIndex);
 
     if (pIndex < 0) {
         return 0;
@@ -1680,7 +1644,6 @@ void UnlockFlic(int pIndex) {
 int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
     FILE* f;
     tPath_name the_path;
-    LOG_TRACE("(\"%s\", %p, %p)", pName, pData, pData_length);
 
     if (*pData != NULL) {
         MAMSLock((void**)pData);
@@ -1710,7 +1673,6 @@ int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
 // IDA: void __usercall FreeFlic(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x4977de
 void FreeFlic(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     PossibleService();
     if (gMain_flic_list[pIndex].data_ptr != NULL) {
@@ -1722,7 +1684,6 @@ void FreeFlic(int pIndex) {
 // IDA: void __usercall ForceRunFlic(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x497908
 void ForceRunFlic(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     LoadFlic(pIndex);
     ShowFlic(pIndex);
@@ -1732,7 +1693,6 @@ void ForceRunFlic(int pIndex) {
 // IDA: void __usercall RunFlicAt(int pIndex@<EAX>, int pX@<EDX>, int pY@<EBX>)
 // FUNCTION: CARM95 0x497829
 void RunFlicAt(int pIndex, int pX, int pY) {
-    LOG_TRACE("(%d, %d, %d)", pIndex, pX, pY);
 
     LoadFlic(pIndex);
     PlayFlic(
@@ -1751,7 +1711,6 @@ void RunFlicAt(int pIndex, int pX, int pY) {
 // IDA: void __usercall RunFlic(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x49788b
 void RunFlic(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     if (gPending_flic >= 0) {
         ForceRunFlic(gPending_flic);
@@ -1771,7 +1730,6 @@ void RunFlic(int pIndex) {
 // FUNCTION: CARM95 0x497937
 void PreloadBunchOfFlics(int pBunch_index) {
     int i;
-    LOG_TRACE("(%d)", pBunch_index);
 
     for (i = 0; i < gFlic_bunch[pBunch_index].count; i++) {
         LoadFlic(gFlic_bunch[pBunch_index].indexes[i]);
@@ -1782,7 +1740,6 @@ void PreloadBunchOfFlics(int pBunch_index) {
 // FUNCTION: CARM95 0x497986
 void UnlockBunchOfFlics(int pBunch_index) {
     int i;
-    LOG_TRACE("(%d)", pBunch_index);
 
     for (i = 0; i < gFlic_bunch[pBunch_index].count; i++) {
         UnlockFlic(gFlic_bunch[pBunch_index].indexes[i]);
@@ -1793,7 +1750,6 @@ void UnlockBunchOfFlics(int pBunch_index) {
 // FUNCTION: CARM95 0x4979d5
 void FlushAllFlics(int pBunch_index) {
     int i;
-    LOG_TRACE("(%d)", pBunch_index);
 
     for (i = 0; i < COUNT_OF(gMain_flic_list); i++) {
         FreeFlic(i);
@@ -1810,7 +1766,6 @@ void InitFlicQueue(void) {
 // FUNCTION: CARM95 0x497a25
 int FlicQueueFinished(void) {
     tFlic_descriptor* the_flic;
-    LOG_TRACE("()");
 
     the_flic = gFirst_flic;
     while (the_flic != NULL) {
@@ -1830,7 +1785,6 @@ void ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* doomed_flic;
     tU32 new_time;
     int finished_playing;
-    LOG_TRACE8("(%d)", pInterval);
 
     DontLetFlicFuckWithPalettes();
     TurnFlicTransparencyOn();
@@ -1868,7 +1822,6 @@ void ProcessFlicQueue(tU32 pInterval) {
 void FlushFlicQueue(void) {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* old_flic;
-    LOG_TRACE("()");
 
     // Jeff: loop through pending flics until we reach the end or we find one that is `must_finish`.
     // If `must_finish`, we process the queue then check again.
@@ -1897,7 +1850,6 @@ void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
     tFlic_descriptor* new_flic = NULL;
     tFlic_descriptor* last_flic = NULL;
     tFlic_descriptor* doomed_flic = NULL;
-    LOG_TRACE("(%d, %d, %d, %d)", pIndex, pX, pY, pMust_finish);
 
     the_flic = gFirst_flic;
     while (the_flic != NULL) {
@@ -1952,7 +1904,6 @@ void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
 // FUNCTION: CARM95 0x497dcd
 void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeight) {
     void* the_pixels;
-    LOG_TRACE("(%d, %d, %d, %d, %d)", pIndex, pLeft, pTop, pWidth, pHeight);
 
     gPanel_flic[pIndex].data = NULL;
     gPanel_flic_left[pIndex] = pLeft;
@@ -1980,7 +1931,6 @@ void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeigh
 // IDA: void __usercall DisposeFlicPanel(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x497e80
 void DisposeFlicPanel(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     EndFlic(&gPanel_flic[pIndex]);
     BrMemFree(gPanel_buffer[pIndex]->pixels);
@@ -2052,7 +2002,6 @@ void ServicePanelFlics(int pCopy_to_buffer) {
 // IDA: void __usercall ChangePanelFlic(int pIndex@<EAX>, tU8 *pData@<EDX>, tU32 pData_length@<EBX>)
 // FUNCTION: CARM95 0x4980ec
 void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
-    LOG_TRACE("(%d, %p, %d)", pIndex, pData, pData_length);
 
     EndFlic(&gPanel_flic[pIndex]);
     gPanel_flic_data[pIndex] = pData;
@@ -2075,7 +2024,6 @@ void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
 // IDA: br_pixelmap* __usercall GetPanelPixelmap@<EAX>(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x4981b5
 br_pixelmap* GetPanelPixelmap(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     return gPanel_buffer[pIndex];
 }
@@ -2199,7 +2147,6 @@ void LoadInterfaceStrings(void) {
 // IDA: void __cdecl FlushInterfaceFonts()
 // FUNCTION: CARM95 0x498961
 void FlushInterfaceFonts(void) {
-    LOG_TRACE("()");
 
     DisposeFont(19);
     DisposeFont(18);
@@ -2214,7 +2161,6 @@ void FlushInterfaceFonts(void) {
 // IDA: void __cdecl SuspendPendingFlic()
 // FUNCTION: CARM95 0x4989bc
 void SuspendPendingFlic(void) {
-    LOG_TRACE("()");
 
     gPending_pending_flic = gPending_flic;
     gPending_flic = -1;
@@ -2223,7 +2169,6 @@ void SuspendPendingFlic(void) {
 // IDA: void __cdecl ResumePendingFlic()
 // FUNCTION: CARM95 0x4989db
 void ResumePendingFlic(void) {
-    LOG_TRACE("()");
 
     gPending_flic = gPending_pending_flic;
 }

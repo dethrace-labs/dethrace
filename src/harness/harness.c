@@ -48,6 +48,11 @@ typedef struct {
 static int Harness_ProcessCommandLine(tArgument_config* argument_config, int* argc, char* argv[]);
 
 static void Harness_DetectGameMode(void) {
+    FILE* f;
+    int filesize;
+    char* buffer;
+    int nb;
+
     if (access("DATA/RACES/CASTLE.TXT", F_OK) != -1) {
         // All splatpack edition have the castle track
         if (access("DATA/RACES/CASTLE2.TXT", F_OK) != -1) {
@@ -94,12 +99,12 @@ static void Harness_DetectGameMode(void) {
 
     harness_game_info.localization = eGameLocalization_none;
     if (access("DATA/TRNSLATE.TXT", F_OK) != -1) {
-        FILE* f = fopen("DATA/TRNSLATE.TXT", "rb");
+        f = fopen("DATA/TRNSLATE.TXT", "rb");
         fseek(f, 0, SEEK_END);
-        int filesize = ftell(f);
+        filesize = ftell(f);
         fseek(f, 0, SEEK_SET);
-        char* buffer = malloc(filesize + 1);
-        int nb = fread(buffer, 1, filesize, f);
+        buffer = malloc(filesize + 1);
+        nb = fread(buffer, 1, filesize, f);
         if (nb != filesize) {
             LOG_PANIC("Unable to read DATA/TRNSLATE.TXT");
         }
@@ -107,10 +112,10 @@ static void Harness_DetectGameMode(void) {
         fclose(f);
         if (strstr(buffer, "NEUES SPIEL") != NULL) {
             harness_game_info.localization = eGameLocalization_german;
-            LOG_INFO("Language: \"%s\"", "German");
+            LOG_INFO2("Language: \"%s\"", "German");
         } else if (strstr(buffer, "NOWA GRA") != NULL) {
             harness_game_info.localization = eGameLocalization_polish;
-            LOG_INFO("Language: \"%s\"", "Polish");
+            LOG_INFO2("Language: \"%s\"", "Polish");
         } else {
             LOG_INFO("Language: unrecognized");
         }
@@ -152,6 +157,7 @@ static void Harness_DetectGameMode(void) {
 
 int Harness_Init(int* argc, char* argv[]) {
     int result;
+    tArgument_config argument_config;
 
     printf("Dethrace version: %s\n", DETHRACE_VERSION);
 
@@ -182,7 +188,6 @@ int Harness_Init(int* argc, char* argv[]) {
     // Disable verbose logging
     harness_game_config.verbose = 0;
 
-    tArgument_config argument_config;
     // don't require a particular platform
     argument_config.platform_name = NULL;
     // request software renderer capability
@@ -201,7 +206,7 @@ int Harness_Init(int* argc, char* argv[]) {
 
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
     if (root_dir != NULL) {
-        LOG_INFO("DETHRACE_ROOT_DIR is set to '%s'", root_dir);
+        LOG_INFO2("DETHRACE_ROOT_DIR is set to '%s'", root_dir);
     } else {
         root_dir = OS_GetWorkingDirectory(argv[0]);
     }
@@ -210,7 +215,7 @@ int Harness_Init(int* argc, char* argv[]) {
         printf("Using root directory: %s\n", root_dir);
         result = chdir(root_dir);
         if (result != 0) {
-            LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
+            LOG_PANIC2("Failed to chdir. Error is %s", strerror(errno));
         }
     }
 
@@ -251,12 +256,12 @@ int Harness_Init(int* argc, char* argv[]) {
         } else {
             size_t i;
             for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
-                LOG_TRACE10("Attempting video driver \"%s\"", platform_bootstraps[i]->name);
+                LOG_DEBUG2("Attempting video driver \"%s\"", platform_bootstraps[i]->name);
                 if ((platform_bootstraps[i]->capabilities & argument_config.platform_capabilityies) != argument_config.platform_capabilityies) {
                     fprintf(stderr, "Skipping platform \"%s\". Does not support required capabilities.\n", platform_bootstraps[i]->name);
                     continue;
                 }
-                LOG_TRACE10("Try platform \"%s\"...");
+                LOG_DEBUG2("Try platform \"%s\"...", platform_bootstraps[i]->name);
                 if (platform_bootstraps[i]->init(&gHarness_platform) == 0) {
                     selected_bootstrap = platform_bootstraps[i];
                     break;
@@ -271,7 +276,7 @@ int Harness_Init(int* argc, char* argv[]) {
             fprintf(stderr, "Could not find a supported platform\n");
             return 1;
         }
-        LOG_INFO("Platform: %s (%s)", selected_bootstrap->name, selected_bootstrap->description);
+        LOG_INFO3("Platform: %s (%s)", selected_bootstrap->name, selected_bootstrap->description);
     }
     return 0;
 }
@@ -292,17 +297,17 @@ int Harness_ProcessCommandLine(tArgument_config* config, int* argc, char* argv[]
         } else if (strstr(argv[i], "--debug=") != NULL) {
             char* s = strstr(argv[i], "=");
             harness_debug_level = atoi(s + 1);
-            LOG_INFO("debug level set to %d", harness_debug_level);
+            LOG_INFO2("debug level set to %d", harness_debug_level);
             consumed = 1;
         } else if (strstr(argv[i], "--physics-step-time=") != NULL) {
             char* s = strstr(argv[i], "=");
             harness_game_config.physics_step_time = atoi(s + 1);
-            LOG_INFO("Physics step time set to %d", harness_game_config.physics_step_time);
+            LOG_INFO2("Physics step time set to %d", harness_game_config.physics_step_time);
             consumed = 1;
         } else if (strstr(argv[i], "--fps=") != NULL) {
             char* s = strstr(argv[i], "=");
             harness_game_config.fps = atoi(s + 1);
-            LOG_INFO("FPS limiter set to %f", harness_game_config.fps);
+            LOG_INFO2("FPS limiter set to %f", harness_game_config.fps);
             consumed = 1;
         } else if (strcasecmp(argv[i], "--freeze-timer") == 0) {
             LOG_INFO("Timer frozen");
@@ -315,7 +320,7 @@ int Harness_ProcessCommandLine(tArgument_config* config, int* argc, char* argv[]
         } else if (strstr(argv[i], "--demo-timeout=") != NULL) {
             char* s = strstr(argv[i], "=");
             harness_game_config.demo_timeout = atoi(s + 1) * 1000;
-            LOG_INFO("Demo timeout set to %d milliseconds", harness_game_config.demo_timeout);
+            LOG_INFO2("Demo timeout set to %d milliseconds", harness_game_config.demo_timeout);
             consumed = 1;
         } else if (strcasecmp(argv[i], "--i-am-cheating") == 0) {
             gI_am_cheating = 0xa11ee75d;
@@ -326,7 +331,7 @@ int Harness_ProcessCommandLine(tArgument_config* config, int* argc, char* argv[]
         } else if (strstr(argv[i], "--volume-multiplier=") != NULL) {
             char* s = strstr(argv[i], "=");
             harness_game_config.volume_multiplier = atof(s + 1);
-            LOG_INFO("Volume multiplier set to %f", harness_game_config.volume_multiplier);
+            LOG_INFO2("Volume multiplier set to %f", harness_game_config.volume_multiplier);
             consumed = 1;
         } else if (strcasecmp(argv[i], "--full-screen") == 0) {
             // option left for backwards compatibility

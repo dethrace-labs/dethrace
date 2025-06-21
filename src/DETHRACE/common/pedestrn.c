@@ -246,8 +246,6 @@ int gCurrent_ped_multiplier;
 // IDA: void __usercall PedModelUpdate(br_model *pModel@<EAX>, br_scalar x0, br_scalar y0, br_scalar x1, br_scalar y1, br_scalar x2, br_scalar y2, br_scalar x3, br_scalar y3)
 // FUNCTION: CARM95 0x455fcd
 void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, br_scalar y1, br_scalar x2, br_scalar y2, br_scalar x3, br_scalar y3) {
-    LOG_TRACE("(%p, %f, %f, %f, %f, %f, %f, %f, %f)", pModel, x0, y0, x1, y1, x2, y2, x3, y3);
-
     BrVector2Set(&pModel->vertices[0].p, x0, y0);
     BrVector2Set(&pModel->vertices[1].p, x1, y1);
     BrVector2Set(&pModel->vertices[2].p, x2, y2);
@@ -258,8 +256,6 @@ void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, 
 // IDA: int __usercall ActorIsPedestrian@<EAX>(br_actor *pActor@<EAX>)
 // FUNCTION: CARM95 0x455870
 int ActorIsPedestrian(br_actor* pActor) {
-    LOG_TRACE("(%p)", pActor);
-
     if (pActor->model == NULL) {
         return 0;
     }
@@ -272,7 +268,6 @@ int ActorIsPedestrian(br_actor* pActor) {
 // IDA: br_scalar __usercall PedHeightFromActor@<ST0>(br_actor *pActor@<EAX>)
 // FUNCTION: CARM95 0x4558b8
 br_scalar PedHeightFromActor(br_actor* pActor) {
-    LOG_TRACE("(%p)", pActor);
     if (!ActorIsPedestrian(pActor)) {
         return 0.f;
     }
@@ -282,24 +277,18 @@ br_scalar PedHeightFromActor(br_actor* pActor) {
 // IDA: int __usercall GetPedestrianValue@<EAX>(br_actor *pActor@<EAX>)
 // FUNCTION: CARM95 0x4558fa
 int GetPedestrianValue(br_actor* pActor) {
-    LOG_TRACE("(%p)", pActor);
-
     return ActorToPedestrianData(pActor)->credits_value;
 }
 
 // IDA: int __usercall PedestrianActorIsPerson@<EAX>(br_actor *pActor@<EAX>)
 // FUNCTION: CARM95 0x455913
 int PedestrianActorIsPerson(br_actor* pActor) {
-    LOG_TRACE("(%p)", pActor);
-
     return ActorToPedestrianData(pActor)->ref_number < 100 && ActorToPedestrianData(pActor)->hit_points != -100;
 }
 
 // IDA: br_actor* __usercall GetPedestrianActor@<EAX>(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x455953
 br_actor* GetPedestrianActor(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
-
     if (pIndex >= 0 && pIndex < gPed_count) {
         return gPedestrian_array[pIndex].actor;
     } else {
@@ -310,8 +299,6 @@ br_actor* GetPedestrianActor(int pIndex) {
 // IDA: br_pixelmap* __usercall GetPedestrianTexture@<EAX>(br_actor *pActor@<EAX>, int *pFlipped@<EDX>)
 // FUNCTION: CARM95 0x45599e
 br_pixelmap* GetPedestrianTexture(br_actor* pActor, int* pFlipped) {
-    LOG_TRACE("(%p, %p)", pActor, pFlipped);
-
     if (!ActorIsPedestrian(pActor)) {
         return NULL;
     }
@@ -322,8 +309,6 @@ br_pixelmap* GetPedestrianTexture(br_actor* pActor, int* pFlipped) {
 // IDA: void __cdecl TogglePedestrians()
 // FUNCTION: CARM95 0x4559ea
 void TogglePedestrians(void) {
-    LOG_TRACE("()");
-
     if (!gProgram_state.sausage_eater_mode) {
         gPedestrians_on = !gPedestrians_on;
         if (gPedestrians_on) {
@@ -342,7 +327,6 @@ void InitPedGibs(void) {
     br_model* the_model;
     br_pixelmap* the_pix;
     br_material* the_material;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gPed_gibs); i++) {
         PossibleService();
@@ -406,7 +390,6 @@ void InitPedGibs(void) {
 void SetPedMaterialForRender(br_actor* pActor) {
     tPedestrian_data* ped;
     int changed;
-    LOG_TRACE("(%p)", pActor);
 
     ped = ActorToPedestrianData(pActor);
     pActor->material->colour_map = ped->colour_map;
@@ -431,7 +414,6 @@ void SetPedMaterialForRender(br_actor* pActor) {
 // FUNCTION: CARM95 0x455b6f
 void PedCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pRender_data, br_uint_8 pStyle, int pOn_screen) {
     tPedestrian_data* ped;
-    LOG_TRACE("(%p, %p, %p, %p, %d, %d)", pActor, pModel, pMaterial, pRender_data, pStyle, pOn_screen);
 
     ped = ActorToPedestrianData(pActor);
     pActor->material->colour_map = ped->colour_map;
@@ -447,8 +429,6 @@ void PedCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, voi
 // IDA: void __cdecl InitPeds()
 // FUNCTION: CARM95 0x455c05
 void InitPeds(void) {
-    LOG_TRACE("()");
-
     gPed_model = BrModelAllocate(NULL, 4, 2);
     gPed_model->faces[0].vertices[0] = 0;
     gPed_model->faces[0].vertices[1] = 2;
@@ -477,7 +457,6 @@ void MungeModelSize(br_actor* pActor, br_scalar pScaling_factor) {
     br_pixelmap* the_pix;
     br_scalar half_width;
     br_scalar half_height;
-    LOG_TRACE("(%p, %f)", pActor, pScaling_factor);
 
     the_pix = pActor->material->colour_map;
     half_width = (the_pix->width / 2) * pScaling_factor * gPed_scale_factor;
@@ -505,7 +484,6 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
     br_scalar min_speed;
     br_scalar max_speed;
     tU32 the_time;
-    LOG_TRACE("(%p, %f, %d)", pPedestrian, pSplattitudinalitude, pAllow_explosion);
 
 #if defined(DETHRACE_FIX_BUGS)
     min_speed = 0;
@@ -637,7 +615,6 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
 void ResetAllPedGibs(void) {
     int i;
     tPed_gib* the_ped_gib;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gPed_gibs); i++) {
         the_ped_gib = &gPed_gibs[i];
@@ -656,7 +633,6 @@ void ResetAllPedGibs(void) {
 // FUNCTION: CARM95 0x455e72
 void AdjustPedGib(int pIndex, int pSize, int pGib_index, int pPed_index, br_matrix34* pTrans) {
     tPed_gib* the_ped_gib;
-    LOG_TRACE("(%d, %d, %d, %d, %p)", pIndex, pSize, pGib_index, pPed_index, pTrans);
 
     the_ped_gib = &gPed_gibs[pIndex];
     the_ped_gib->size = pSize;
@@ -680,7 +656,6 @@ void MungePedGibs(tU32 pFrame_period) {
     br_scalar s_frame_period;
     tU32 the_time;
     tPedestrian_data* pedestrian;
-    LOG_TRACE("(%d)", pFrame_period);
 
     StartPipingSession(ePipe_chunk_ped_gib);
     the_time = GetTotalTime();
@@ -741,8 +716,6 @@ void MungePedGibs(tU32 pFrame_period) {
 // IDA: void __usercall KillPedestrian(tPedestrian_data *pPedestrian@<EAX>)
 // FUNCTION: CARM95 0x456e92
 void KillPedestrian(tPedestrian_data* pPedestrian) {
-    LOG_TRACE("(%p)", pPedestrian);
-
     if (pPedestrian->hit_points != -100) {
         if (pPedestrian->ref_number < 100) {
             gProgram_state.peds_killed++;
@@ -772,7 +745,6 @@ void KillPedestrian(tPedestrian_data* pPedestrian) {
 void CalcPedWidthNHeight(tPedestrian_data* pPedestrian, br_pixelmap* pPixelmap, br_scalar* pHeight, br_scalar* pWidth) {
     br_pixelmap* reference_pixel_bastard;
     br_scalar scale_to_use;
-    LOG_TRACE("(%p, %p, %p, %p)", pPedestrian, pPixelmap, pHeight, pWidth);
 
     if (pPedestrian->ref_number < 100) {
         scale_to_use = gPed_scale_factor;
@@ -800,7 +772,6 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
     int j;
     int choice;
     int the_marker_ref;
-    LOG_TRACE("(%p, %f, %d, %d)", pPedestrian, pDanger_level, pPosition_explicitly, pMove_pc);
 
     if (pPedestrian->number_of_instructions <= 1) {
         pPedestrian->current_instruction = 0;
@@ -960,7 +931,6 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
     br_scalar ped_movement_angle;
     float heading_difference;
     tPedestrian_sequence* sequence_ptr;
-    LOG_TRACE("(%p, %d)", pPedestrian, pAction_changed);
 
     if (pPedestrian->ref_number < 100) {
         ped_movement_angle = FastScalarArcTan2(pPedestrian->direction.v[X], pPedestrian->direction.v[Z]);
@@ -1000,8 +970,6 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
 // IDA: void __usercall DetachPedFromCar(tPedestrian_data *pPedestrian@<EAX>)
 // FUNCTION: CARM95 0x4563dc
 void DetachPedFromCar(tPedestrian_data* pPedestrian) {
-    LOG_TRACE("(%p)", pPedestrian);
-
     if (pPedestrian->actor->parent != gDont_render_actor) {
         BrActorRelink(gDont_render_actor, pPedestrian->actor);
         pPedestrian->actor->render_style = BR_RSTYLE_NONE;
@@ -1017,7 +985,6 @@ void DetachPedFromCar(tPedestrian_data* pPedestrian) {
 // FUNCTION: CARM95 0x45647b
 void SetPedPos(tPedestrian_data* pPedestrian) {
     br_vector3 temp_v;
-    LOG_TRACE("(%p)", pPedestrian);
 
     if (pPedestrian->actor->parent == gDont_render_actor) {
         pPedestrian->pos = pPedestrian->actor->t.t.translate.t;
@@ -1031,8 +998,6 @@ void SetPedPos(tPedestrian_data* pPedestrian) {
 // IDA: void __usercall DetachPedActorFromCar(br_actor *pActor@<EAX>)
 // FUNCTION: CARM95 0x4563b3
 void DetachPedActorFromCar(br_actor* pActor) {
-    LOG_TRACE("(%p)", pActor);
-
     DetachPedFromCar(ActorToPedestrianData(pActor));
     SetPedPos(ActorToPedestrianData(pActor));
 }
@@ -1047,7 +1012,6 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
     int number_of_frames;
     int new_frame;
     tU32 the_time;
-    LOG_TRACE("(%p)", pPedestrian);
 
     the_time = GetTotalTime();
     f_the_time = the_time;
@@ -1182,7 +1146,6 @@ void MungePedModel(tPedestrian_data* pPedestrian) {
     tPed_frame_info* the_frame;
     tCar_spec* murderer;
     br_actor* old_parent;
-    LOG_TRACE("(%p)", pPedestrian);
 
     old_parent = NULL;
     CalcPedWidthNHeight(pPedestrian, pPedestrian->colour_map, &pPedestrian->height2, &pPedestrian->width);
@@ -1252,7 +1215,6 @@ void ChangeActionTo(tPedestrian_data* pPedestrian, int pAction_index, int pRedo_
     tPedestrian_action* the_action;
     int the_sound;
     tU32 the_pitch;
-    LOG_TRACE("(%p, %d, %d)", pPedestrian, pAction_index, pRedo_frames_etc);
 
     if (pAction_index == pPedestrian->current_action || pAction_index >= pPedestrian->number_of_actions) {
         return;
@@ -1293,7 +1255,6 @@ int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
     int end_index;
     float chance_value;
     float most_dangerous;
-    LOG_TRACE("(%p, %f)", pPedestrian, pDanger_level);
 
     if (pPedestrian->current_action == pPedestrian->fatal_car_impact_action
         || pPedestrian->current_action == pPedestrian->non_fatal_car_impact_action
@@ -1346,8 +1307,6 @@ int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
 // IDA: void __cdecl MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo()
 // FUNCTION: CARM95 0x4564ed
 void MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo(void) {
-    LOG_TRACE("()");
-
     if (gFlag_waving_bastard != NULL
         && gFlag_waving_bastard->current_action != gFlag_waving_bastard->fatal_car_impact_action
         && gFlag_waving_bastard->current_action != gFlag_waving_bastard->fatal_ground_impact_action) {
@@ -1370,7 +1329,6 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
     br_scalar new_y;
     int damage;
     tU32 the_pitch;
-    LOG_TRACE("(%p, %f, %p)", pPedestrian, pDanger_level, pDanger_direction);
 
     if (gAttracted_pedestrians) {
         BrVector3Scale(pDanger_direction, pDanger_direction, -1.f);
@@ -1537,7 +1495,6 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
     br_scalar heading_difference;
     br_scalar camera_view_angle;
     tCar_spec* car;
-    LOG_TRACE("(%p, %p)", pPedestrian, pDanger_direction);
 
     most_dangerous = 0.f;
     ped_pos = &pPedestrian->actor->t.t.translate.t;
@@ -1672,8 +1629,6 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
 // IDA: void __cdecl CheckLastPed()
 // FUNCTION: CARM95 0x45c0db
 void CheckLastPed(void) {
-    LOG_TRACE("()");
-
     if (gNet_mode == eNet_mode_none && gProgram_state.peds_killed >= gTotal_peds) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -4, GetMiscString(kMiscString_EveryPedestrianWasted));
         RaceCompleted(eRace_over_peds);
@@ -1689,7 +1644,6 @@ int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vect
     br_scalar ped_m_x;
     br_scalar dist_sqr;
     br_scalar size_sqr;
-    LOG_TRACE("(%p, %p, %f, %p)", pCar, pPed_car, pSize, pPed_glob);
 
     size_sqr = pSize + .05f;
     dist_sqr = size_sqr * WORLD_SCALE * size_sqr * WORLD_SCALE;
@@ -1709,8 +1663,6 @@ int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vect
 // IDA: int __usercall FancyATossOffMate@<EAX>(tPedestrian_data *pPedestrian@<EAX>, tCollision_info *pCar@<EDX>, float pImpact_speed)
 // FUNCTION: CARM95 0x45c273
 int FancyATossOffMate(tPedestrian_data* pPedestrian, tCollision_info* pCar, float pImpact_speed) {
-    LOG_TRACE("(%p, %p, %f)", pPedestrian, pCar, pImpact_speed);
-
     return !gPedestrian_harvest
         && pPedestrian->ref_number < 100
         && (pCar->driver > 1 || ((tCar_spec*)pCar)->number_of_wheels_on_ground >= 4)
@@ -1761,7 +1713,6 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
     float volume_damage;
     tU32 the_time;
     tPed_hit_position hit_pos;
-    LOG_TRACE("(%p)", pPedestrian);
 
     tossing = 0;
     billiards_shot = 0;
@@ -2125,7 +2076,6 @@ void SendPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
     tNet_contents* the_contents;
     tNet_message* the_message;
     int size_decider;
-    LOG_TRACE("(%p, %d)", pPedestrian, pIndex);
 
     if (!gSend_peds) {
         return;
@@ -2209,7 +2159,6 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
     int start_ins_dir;
     br_vector3 danger_direction;
     br_vector3 old_pos;
-    LOG_TRACE("(%p, %d)", pPedestrian, pIndex);
 
     pPedestrian->active = 1;
     pPedestrian->munged = 1;
@@ -2291,7 +2240,6 @@ void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_
     tPedestrian_data* pedestrian;
     br_actor* parent;
     br_vector3 old_pos;
-    LOG_TRACE("(%d, %d, %d, %d, %d, %d, %p, %f, %f, %p, %p)", pIndex, pAction_index, pFrame_index, pHit_points, pDone_initial, pParent, pParent_actor, pSpin_period, pJump_magnitude, pOffset, pTrans);
 
     pedestrian = &gPedestrian_array[pIndex];
     if (pAction_index < 0 || pAction_index >= pedestrian->number_of_actions) {
@@ -2342,8 +2290,6 @@ void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_
 // IDA: void __usercall SquirtPathVertex(br_vertex *pFirst_vertex@<EAX>, br_vector3 *pPoint@<EDX>)
 // FUNCTION: CARM95 0x45c66a
 void SquirtPathVertex(br_vertex* pFirst_vertex, br_vector3* pPoint) {
-    LOG_TRACE("(%p, %p)", pFirst_vertex, pPoint);
-
     pFirst_vertex[0].p = *pPoint;
     pFirst_vertex[1].p = *pPoint;
     pFirst_vertex[1].p.v[Y] += .1f;
@@ -2362,7 +2308,6 @@ void SquirtPathVertex(br_vertex* pFirst_vertex, br_vector3* pPoint) {
 void ResetAllPedestrians(void) {
     int i;
     tPedestrian_data* the_pedestrian;
-    LOG_TRACE("()");
 
     for (i = 0; i < gPed_count; i++) {
         the_pedestrian = &gPedestrian_array[i];
@@ -2376,7 +2321,6 @@ void GroundPedestrian(tPedestrian_data* pPedestrian) {
     br_scalar new_y;
     br_vector3 cast_point;
     tPedestrian_sequence* sequence;
-    LOG_TRACE("(%p)", pPedestrian);
 
     if (pPedestrian->actor->parent != gDont_render_actor) {
         pPedestrian->actor->render_style = BR_RSTYLE_NONE;
@@ -2416,8 +2360,6 @@ void GroundPedestrian(tPedestrian_data* pPedestrian) {
 // IDA: void __usercall RevivePedestrian(tPedestrian_data *pPedestrian@<EAX>, int pAnimate@<EDX>)
 // FUNCTION: CARM95 0x459282
 void RevivePedestrian(tPedestrian_data* pPedestrian, int pAnimate) {
-    LOG_TRACE("(%p, %d)", pPedestrian, pAnimate);
-
     pPedestrian->sent_dead_message = 0;
     pPedestrian->respawn_time = 0;
     pPedestrian->current_sequence = 0;
@@ -2477,7 +2419,6 @@ void MungePedestrians(tU32 pFrame_period) {
     br_scalar y_delta;
     br_scalar z_delta;
     tS32 diff;
-    LOG_TRACE("(%d)", pFrame_period);
 
     gVesuvians_this_time = 0;
     // dword_550A9C = 32;
@@ -2559,7 +2500,6 @@ void MungePedestrians(tU32 pFrame_period) {
 void RespawnPedestrians(void) {
     int i;
     tPedestrian_data* the_pedestrian;
-    LOG_TRACE("()");
 
     for (i = 0; i < gPed_count; i++) {
         the_pedestrian = &gPedestrian_array[i];
@@ -2590,8 +2530,6 @@ void RespawnPedestrians(void) {
 // IDA: int __cdecl GetPedCount()
 // FUNCTION: CARM95 0x45c9f6
 int GetPedCount(void) {
-    LOG_TRACE("()");
-
     return gPed_count;
 }
 
@@ -2599,11 +2537,9 @@ int GetPedCount(void) {
 // FUNCTION: CARM95 0x45ca0b
 int GetPedPosition(int pIndex, br_vector3* pPos) {
     tPedestrian_data* pedestrian;
-    LOG_TRACE("(%d, %p)", pIndex, pPos);
 
     pedestrian = &gPedestrian_array[pIndex];
     if (pedestrian->ref_number < 100) {
-
         // Item is a human
         if (pedestrian->hit_points == -100
             || pedestrian->current_action == pedestrian->fatal_car_impact_action
@@ -2653,7 +2589,6 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
     br_scalar maxest_min;
     br_scalar minnest_max;
     br_scalar maxest_max;
-    LOG_TRACE("(%p, %p, %d, %d, %d, %d)", pG, pInstructions, pInstruc_count, pInit_instruc, pRef_num, pForce_read);
 
     PossibleService();
     the_pedestrian = &gPedestrian_array[gPed_count];
@@ -2879,7 +2814,6 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
 // FUNCTION: CARM95 0x45da5c
 void ResetProxRay(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gProximity_rays); i++) {
         gProximity_rays[i].start_time = 0;
@@ -2889,7 +2823,6 @@ void ResetProxRay(void) {
 // IDA: void __cdecl PedMaterialFromHell()
 // FUNCTION: CARM95 0x45da99
 void PedMaterialFromHell(void) {
-    LOG_TRACE("()");
 }
 
 // IDA: void __cdecl ResetPedMaterial()
@@ -2897,7 +2830,6 @@ void PedMaterialFromHell(void) {
 void ResetPedMaterial(void) {
     int i;
     int j;
-    LOG_TRACE("()");
 }
 
 // IDA: void __usercall LoadInPedestrians(FILE *pF@<EAX>, int pSubs_count@<EDX>, tPed_subs *pSubs_array@<EBX>)
@@ -2927,7 +2859,6 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
     tPedestrian_instruction* instructions;
     tPedestrian_instruction* the_instruction;
     tPed_choice* the_choice;
-    LOG_TRACE("(%p, %d, %p)", pF, pSubs_count, pSubs_array);
 
     knock_out = 0;
     check_for_duplicates = 0;
@@ -3105,7 +3036,6 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
     br_material* the_mat;
     br_model* the_model;
     br_actor* the_actor;
-    LOG_TRACE("(%p, %d, %d)", pInstructions, pInstruc_count, pInit_instruc);
 
     vertex_count = 4;
     face_count = 2;
@@ -3224,7 +3154,6 @@ void WriteOutPeds(void) {
     tPed_choice* the_choice;
     FILE* f;
     tPath_name the_path;
-    LOG_TRACE("()");
 
     PathCat(the_path, gApplication_path, "PEDPATHS.TXT");
     f = DRfopen(the_path, "wt");
@@ -3302,7 +3231,6 @@ void AddPed(void) {
     tPedestrian_instruction* instructions;
     FILE* g;
     tPath_name the_path;
-    LOG_TRACE("()");
 
     PathCat(the_path, gApplication_path, "PEDESTRN.TXT");
     g = DRfopen(the_path, "rt");
@@ -3323,7 +3251,6 @@ void AddPed(void) {
 // FUNCTION: CARM95 0x45f4f1
 void NewPed(int pRef_num) {
     char s[255];
-    LOG_TRACE("(%d)", pRef_num);
 
     if (pRef_num >= 0) {
         if (PDKeyDown(0)) {
@@ -3363,8 +3290,6 @@ void NewPed(int pRef_num) {
 // IDA: void __cdecl RemoveCurrentPedPath()
 // FUNCTION: CARM95 0x45f409
 void RemoveCurrentPedPath(void) {
-    LOG_TRACE("()");
-
     if (gCurrent_ped_path_actor != NULL) {
         BrModelRemove(gCurrent_ped_path_actor->model);
         BrModelFree(gCurrent_ped_path_actor->model);
@@ -3377,8 +3302,6 @@ void RemoveCurrentPedPath(void) {
 // IDA: void __cdecl ScrubPedestrian()
 // FUNCTION: CARM95 0x45f3cb
 void ScrubPedestrian(void) {
-    LOG_TRACE("()");
-
     gPed_instruc_count = 0;
     gNumber_of_pedestrians--;
     gTotal_peds--;
@@ -3389,8 +3312,6 @@ void ScrubPedestrian(void) {
 // IDA: void __cdecl TogglePedDetect()
 // FUNCTION: CARM95 0x45f469
 void TogglePedDetect(void) {
-    LOG_TRACE("()");
-
     gDetect_peds = !gDetect_peds;
     if (gDetect_peds) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Pedestrian are meat again");
@@ -3402,168 +3323,126 @@ void TogglePedDetect(void) {
 // IDA: void __cdecl NewPed0()
 // FUNCTION: CARM95 0x45f4dc
 void NewPed0(void) {
-    LOG_TRACE("()");
-
     NewPed(0);
 }
 
 // IDA: void __cdecl NewPed1()
 // FUNCTION: CARM95 0x45f72e
 void NewPed1(void) {
-    LOG_TRACE("()");
-
     NewPed(1);
 }
 
 // IDA: void __cdecl NewPed2()
 // FUNCTION: CARM95 0x45f743
 void NewPed2(void) {
-    LOG_TRACE("()");
-
     NewPed(2);
 }
 
 // IDA: void __cdecl NewPed3()
 // FUNCTION: CARM95 0x45f758
 void NewPed3(void) {
-    LOG_TRACE("()");
-
     NewPed(3);
 }
 
 // IDA: void __cdecl NewPed4()
 // FUNCTION: CARM95 0x45f76d
 void NewPed4(void) {
-    LOG_TRACE("()");
-
     NewPed(4);
 }
 
 // IDA: void __cdecl NewPed5()
 // FUNCTION: CARM95 0x45f782
 void NewPed5(void) {
-    LOG_TRACE("()");
-
     NewPed(5);
 }
 
 // IDA: void __cdecl NewPed6()
 // FUNCTION: CARM95 0x45f797
 void NewPed6(void) {
-    LOG_TRACE("()");
-
     NewPed(6);
 }
 
 // IDA: void __cdecl NewPed7()
 // FUNCTION: CARM95 0x45f7ac
 void NewPed7(void) {
-    LOG_TRACE("()");
-
     NewPed(7);
 }
 
 // IDA: void __cdecl NewPed8()
 // FUNCTION: CARM95 0x45f7c1
 void NewPed8(void) {
-    LOG_TRACE("()");
-
     NewPed(8);
 }
 
 // IDA: void __cdecl NewPed9()
 // FUNCTION: CARM95 0x45f7d6
 void NewPed9(void) {
-    LOG_TRACE("()");
-
     NewPed(9);
 }
 
 // IDA: void __cdecl NewPed0B()
 // FUNCTION: CARM95 0x45f7eb
 void NewPed0B(void) {
-    LOG_TRACE("()");
-
     NewPed(61);
 }
 
 // IDA: void __cdecl NewPed1B()
 // FUNCTION: CARM95 0x45f800
 void NewPed1B(void) {
-    LOG_TRACE("()");
-
     NewPed(51);
 }
 
 // IDA: void __cdecl NewPed2B()
 // FUNCTION: CARM95 0x45f815
 void NewPed2B(void) {
-    LOG_TRACE("()");
-
     NewPed(52);
 }
 
 // IDA: void __cdecl NewPed3B()
 // FUNCTION: CARM95 0x45f82a
 void NewPed3B(void) {
-    LOG_TRACE("()");
-
     NewPed(53);
 }
 
 // IDA: void __cdecl NewPed4B()
 // FUNCTION: CARM95 0x45f83f
 void NewPed4B(void) {
-    LOG_TRACE("()");
-
     NewPed(54);
 }
 
 // IDA: void __cdecl NewPed5B()
 // FUNCTION: CARM95 0x45f854
 void NewPed5B(void) {
-    LOG_TRACE("()");
-
     NewPed(55);
 }
 
 // IDA: void __cdecl NewPed6B()
 // FUNCTION: CARM95 0x45f869
 void NewPed6B(void) {
-    LOG_TRACE("()");
-
     NewPed(56);
 }
 
 // IDA: void __cdecl NewPed7B()
 // FUNCTION: CARM95 0x45f87e
 void NewPed7B(void) {
-    LOG_TRACE("()");
-
     NewPed(57);
 }
 
 // IDA: void __cdecl NewPed8B()
 // FUNCTION: CARM95 0x45f893
 void NewPed8B(void) {
-    LOG_TRACE("()");
-
     NewPed(58);
 }
 
 // IDA: void __cdecl NewPed9B()
 // FUNCTION: CARM95 0x45f8a8
 void NewPed9B(void) {
-    LOG_TRACE("()");
-
     NewPed(59);
 }
 
 // IDA: void __cdecl MungeShowPedPath()
 // FUNCTION: CARM95 0x45f94b
 void MungeShowPedPath(void) {
-    LOG_TRACE("()");
-
     RemoveCurrentPedPath();
     gPed_instrucs[gPed_instruc_count] = gPed_instrucs[gPed_instruc_count - 1];
     gCurrent_ped_path_actor = BuildPedPaths(gPed_instrucs, gPed_instruc_count + 1, gInit_ped_instruc);
@@ -3572,8 +3451,6 @@ void MungeShowPedPath(void) {
 // IDA: void __cdecl DropPedPoint2()
 // FUNCTION: CARM95 0x45f8e5
 void DropPedPoint2(void) {
-    LOG_TRACE("()");
-
     gPed_instrucs[gPed_instruc_count].type = ePed_instruc_point;
     gPed_instrucs[gPed_instruc_count].data.point_data.irreversable = 0;
     gPed_instrucs[gPed_instruc_count].data.point_data.position = *gOur_pos;
@@ -3584,8 +3461,6 @@ void DropPedPoint2(void) {
 // IDA: void __cdecl DropPedPoint()
 // FUNCTION: CARM95 0x45f8bd
 void DropPedPoint(void) {
-    LOG_TRACE("()");
-
 #if defined(DETHRACE_FIX_BUGS)
     if (gPath_actor == NULL) {
         return;
@@ -3598,8 +3473,6 @@ void DropPedPoint(void) {
 // IDA: void __cdecl DropInitPedPoint()
 // FUNCTION: CARM95 0x45f9a4
 void DropInitPedPoint(void) {
-    LOG_TRACE("()");
-
 #if defined(DETHRACE_FIX_BUGS)
     if (gPath_actor == NULL) {
         return;
@@ -3613,8 +3486,6 @@ void DropInitPedPoint(void) {
 // IDA: void __cdecl DropPedPointAir2()
 // FUNCTION: CARM95 0x45f9fe
 void DropPedPointAir2(void) {
-    LOG_TRACE("()");
-
     gPed_instrucs[gPed_instruc_count].type = ePed_instruc_point;
     gPed_instrucs[gPed_instruc_count].data.point_data.irreversable = 0;
     gPed_instrucs[gPed_instruc_count].data.point_data.position = *gOur_pos;
@@ -3626,8 +3497,6 @@ void DropPedPointAir2(void) {
 // IDA: void __cdecl DropPedPointAir()
 // FUNCTION: CARM95 0x45f9d6
 void DropPedPointAir(void) {
-    LOG_TRACE("()");
-
 #if defined(DETHRACE_FIX_BUGS)
     if (gPath_actor == NULL) {
         return;
@@ -3640,8 +3509,6 @@ void DropPedPointAir(void) {
 // IDA: void __cdecl DropInitPedPointAir()
 // FUNCTION: CARM95 0x45fa88
 void DropInitPedPointAir(void) {
-    LOG_TRACE("()");
-
 #if defined(DETHRACE_FIX_BUGS)
     if (gPath_actor == NULL) {
         return;
@@ -3655,8 +3522,6 @@ void DropInitPedPointAir(void) {
 // IDA: br_uint_32 __cdecl KillActorsModel(br_actor *pActor, void *pArg)
 // FUNCTION: CARM95 0x45ff83
 br_uintptr_t KillActorsModel(br_actor* pActor, void* pArg) {
-    LOG_TRACE("(%p, %p)", pActor, pArg);
-
     if (pActor->model != NULL) {
         BrModelRemove(pActor->model);
         BrModelFree(pActor->model);
@@ -3667,8 +3532,6 @@ br_uintptr_t KillActorsModel(br_actor* pActor, void* pArg) {
 // IDA: void __cdecl DisposePedPaths()
 // FUNCTION: CARM95 0x45fef8
 void DisposePedPaths(void) {
-    LOG_TRACE("()");
-
     if (gPath_actor != NULL) {
         DRActorEnumRecurse(gPath_actor, KillActorsModel, NULL);
         BrActorRemove(gPath_actor);
@@ -3691,7 +3554,6 @@ void GetPedPos(int* pPed_index, int* pPoint_index) {
     br_vector3 last_point;
     br_scalar min_distance;
     br_scalar the_distance;
-    LOG_TRACE("(%p, %p)", pPed_index, pPoint_index);
 
     min_distance = BR_SCALAR_MAX;
     for (i = 0; i < gPed_count; i++) {
@@ -3724,7 +3586,6 @@ void ShowPedPos(void) {
     int min_ped;
     int min_point;
     char s[255];
-    LOG_TRACE("()");
 
     GetPedPos(&min_ped, &min_point);
     sprintf(s, "Nearest pedestrian is #%d, point #%d", min_ped + 1, min_point + 1);
@@ -3736,7 +3597,6 @@ void ShowPedPos(void) {
 void ShowPedPaths(void) {
     int i;
     br_model* the_model;
-    LOG_TRACE("()");
 
     if (gPath_actor == NULL) {
         gPath_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
@@ -3778,7 +3638,6 @@ void ShowPedPaths(void) {
 void PullPedPoint(void) {
     int the_ped;
     int the_point;
-    LOG_TRACE("()");
 
     if (gPed_instruc_count == 0) {
         GetPedPos(&the_ped, &the_point);
@@ -3794,7 +3653,6 @@ void PullPedPoint(void) {
 void PullPedPointAir(void) {
     int the_ped;
     int the_point;
-    LOG_TRACE("()");
 
     if (gPed_instruc_count == 0) {
         GetPedPos(&the_ped, &the_point);
@@ -3812,7 +3670,6 @@ void DeletePedPath(void) {
     int the_ped;
     int the_point;
     int i;
-    LOG_TRACE("()");
 
     GetPedPos(&the_ped, &the_point);
     for (i = the_ped; i < gPed_count - 1; i++) {
@@ -3827,8 +3684,6 @@ void DeletePedPath(void) {
 // IDA: void __cdecl DeletePedPoint()
 // FUNCTION: CARM95 0x46010f
 void DeletePedPoint(void) {
-    LOG_TRACE("()");
-
     if (gPed_instruc_count == 0) {
         return;
     }
@@ -3849,7 +3704,6 @@ void DisposePedestrians(void) {
     int i;
     int j;
     tPedestrian_data* the_pedestrian;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gPed_gibs); i++) {
         PossibleService();
@@ -3907,7 +3761,6 @@ void DoPedReport(void) {
     int ped_count;     // added by dethrace
     int powerup_count; // added by dethrace
     char s[256];       // added by dethrace
-    LOG_TRACE("()");
 
     powerup_count = 0;
     ped_count = 0;
@@ -3970,7 +3823,6 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
     br_model* car_model;
     br_scalar distance;
     br_scalar t;
-    LOG_TRACE("(%p, %p, %p, %p, %d)", pRender_screen, pDepth_buffer, pCamera, pCamera_to_world, pTime);
 
     the_time = GetTotalTime();
     StartPipingSession(ePipe_chunk_prox_ray);
@@ -4025,8 +3877,6 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
 // IDA: void __usercall AdjustProxRay(int pRay_index@<EAX>, tU16 pCar_ID@<EDX>, tU16 pPed_index@<EBX>, tU32 pTime@<ECX>)
 // FUNCTION: CARM95 0x460ac5
 void AdjustProxRay(int pRay_index, tU16 pCar_ID, tU16 pPed_index, tU32 pTime) {
-    LOG_TRACE("(%d, %d, %d, %d)", pRay_index, pCar_ID, pPed_index, pTime);
-
     if ((pCar_ID & 0xff00) == 0) {
         gProximity_rays[pRay_index].car = &gProgram_state.current_car;
     } else {
@@ -4048,7 +3898,6 @@ void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 p
     int instruction;
     int dead;
     tPedestrian_sequence* the_sequence;
-    LOG_TRACE("(%p, %p, %d)", pContents, pMessage, pReceive_time);
 
     if (pContents->data.pedestrian.index >= 0 && pContents->data.pedestrian.index < gPed_count) {
         the_pedestrian = &gPedestrian_array[pContents->data.pedestrian.index];
@@ -4161,7 +4010,6 @@ void SendAllPedestrianPositions(tPlayer_ID pPlayer) {
     int i;
     tPedestrian_data* the_pedestrian;
     tNet_contents* the_contents;
-    LOG_TRACE("(%d)", pPlayer);
 
     gSend_peds = 1;
     for (i = 0; i < gPed_count; i++) {

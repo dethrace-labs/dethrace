@@ -73,8 +73,6 @@ int gCurrent_key;
 // IDA: void __usercall DrawDial(int pWhich_one@<EAX>, int pWhich_stage@<EDX>)
 // FUNCTION: CARM95 0x49990d
 void DrawDial(int pWhich_one, int pWhich_stage) {
-    LOG_TRACE("(%d, %d)", pWhich_one, pWhich_stage);
-
     RemoveTransientBitmaps(1);
     DRPixelmapRectangleMaskedCopy(gBack_screen,
         gCurrent_graf_data->dial__x[pWhich_one],
@@ -94,7 +92,6 @@ void DrawDial(int pWhich_one, int pWhich_stage) {
 void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
     tS32 time_diff;
     tU32 start_time;
-    LOG_TRACE("(%d, %d, %d)", pWhich_one, pOld_stage, pNew_stage);
 
     DrawDial(pWhich_one, pOld_stage);
     start_time = PDGetTotalTime();
@@ -133,8 +130,6 @@ void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
 // IDA: void __cdecl SoundOptionsStart()
 // FUNCTION: CARM95 0x4998c0
 void SoundOptionsStart(void) {
-    LOG_TRACE("()");
-
     DrawDial(0, 0);
     DrawDial(1, 0);
     MoveDialFromTo(0, 0, 4 * gProgram_state.music_volume);
@@ -144,8 +139,6 @@ void SoundOptionsStart(void) {
 // IDA: int __usercall SoundOptionsDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 // FUNCTION: CARM95 0x499b6c
 int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
-    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
-
     MoveDialFromTo(0, 4 * gProgram_state.music_volume, 0);
     MoveDialFromTo(0, 4 * gProgram_state.effects_volume, 0);
     return pCurrent_choice;
@@ -156,7 +149,6 @@ int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int 
 int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (*pCurrent_choice == 2) {
         return 0;
@@ -178,7 +170,6 @@ int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
 int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (*pCurrent_choice == 2) {
         return 0;
@@ -203,7 +194,6 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
     float angle;
     int old_value;
     int* the_value;
-    LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
 #define ANGLE_RANGE_START (20 * PI / 360)
 #define ANGLE_RANGE_END (340 * PI / 360)
@@ -315,7 +305,6 @@ void DoSoundOptions(void) {
         NULL,
     };
     int result;
-    LOG_TRACE("()");
 
     DoInterfaceScreen(&interface_spec, 0, 0);
     if (!gProgram_state.racing) {
@@ -330,7 +319,6 @@ void DoSoundOptions(void) {
 void GetGraphicsOptions(void) {
     int value;
     br_scalar br_value;
-    LOG_TRACE("()");
 
     value = GetCarSimplificationLevel();
     if (value > 1) {
@@ -434,8 +422,6 @@ void GetGraphicsOptions(void) {
 // IDA: void __cdecl SetGraphicsOptions()
 // FUNCTION: CARM95 0x49bb74
 void SetGraphicsOptions(void) {
-    LOG_TRACE("()");
-
     if (gRadio_bastards__options[0].current_value < 2) {
         SetCarSimplificationLevel(gRadio_bastards__options[0].current_value);
     } else {
@@ -515,8 +501,6 @@ void SetGraphicsOptions(void) {
 // IDA: void __usercall PlayRadioOn2(int pIndex@<EAX>, int pValue@<EDX>)
 // FUNCTION: CARM95 0x499efe
 void PlayRadioOn2(int pIndex, int pValue) {
-    LOG_TRACE("(%d, %d)", pIndex, pValue);
-
     RunFlicAt(288,
         gRadio_bastards__options[pIndex].left[pValue],
         gRadio_bastards__options[pIndex].top);
@@ -525,8 +509,6 @@ void PlayRadioOn2(int pIndex, int pValue) {
 // IDA: void __usercall PlayRadioOff2(int pIndex@<EAX>, int pValue@<EDX>)
 // FUNCTION: CARM95 0x49a05d
 void PlayRadioOff2(int pIndex, int pValue) {
-    LOG_TRACE("(%d, %d)", pIndex, pValue);
-
     RunFlicAt(287,
         gRadio_bastards__options[pIndex].left[pValue],
         gRadio_bastards__options[pIndex].top);
@@ -535,8 +517,6 @@ void PlayRadioOff2(int pIndex, int pValue) {
 // IDA: void __usercall PlayRadioOn(int pIndex@<EAX>, int pValue@<EDX>)
 // FUNCTION: CARM95 0x499feb
 void PlayRadioOn__options(int pIndex, int pValue) {
-    LOG_TRACE("(%d, %d)", pIndex, pValue);
-
     RemoveTransientBitmaps(1);
     DontLetFlicFuckWithPalettes();
     TurnFlicTransparencyOn();
@@ -548,8 +528,6 @@ void PlayRadioOn__options(int pIndex, int pValue) {
 // IDA: void __usercall PlayRadioOff(int pIndex@<EAX>, int pValue@<EDX>)
 // FUNCTION: CARM95 0x49a024
 void PlayRadioOff__options(int pIndex, int pValue) {
-    LOG_TRACE("(%d, %d)", pIndex, pValue);
-
     RemoveTransientBitmaps(1);
     DontLetFlicFuckWithPalettes();
     TurnFlicTransparencyOn();
@@ -562,7 +540,6 @@ void PlayRadioOff__options(int pIndex, int pValue) {
 // FUNCTION: CARM95 0x499e9b
 void DrawInitialRadios(void) {
     int i;
-    LOG_TRACE("()");
 
     RemoveTransientBitmaps(1);
     DontLetFlicFuckWithPalettes();
@@ -578,8 +555,6 @@ void DrawInitialRadios(void) {
 // IDA: void __usercall RadioChanged(int pIndex@<EAX>, int pNew_value@<EDX>)
 // FUNCTION: CARM95 0x499fa8
 void RadioChanged(int pIndex, int pNew_value) {
-    LOG_TRACE("(%d, %d)", pIndex, pNew_value);
-
     PlayRadioOff__options(pIndex, gRadio_bastards__options[pIndex].current_value);
     PlayRadioOn__options(pIndex, pNew_value);
     gRadio_bastards__options[pIndex].current_value = pNew_value;
@@ -589,7 +564,6 @@ void RadioChanged(int pIndex, int pNew_value) {
 // FUNCTION: CARM95 0x499f34
 int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     DRS3StartSound(gEffects_outlet, 3000);
     new_value = gRadio_bastards__options[*pCurrent_choice - 2].current_value - 1;
@@ -604,7 +578,6 @@ int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
 // FUNCTION: CARM95 0x49a093
 int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     DRS3StartSound(gEffects_outlet, 3000);
     new_value = gRadio_bastards__options[*pCurrent_choice + -2].current_value + 1;
@@ -618,8 +591,6 @@ int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall GraphOptUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x49a109
 int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-
     if (*pCurrent_mode == 0) {
         *pCurrent_mode = 1;
         *pCurrent_choice = 13;
@@ -638,8 +609,6 @@ int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall GraphOptDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x49a19b
 int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-
     if (*pCurrent_mode == 0) {
         *pCurrent_mode = 1;
         *pCurrent_choice = 2;
@@ -659,7 +628,6 @@ int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
 // FUNCTION: CARM95 0x49a22d
 int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
-    LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
     for (i = gRadio_bastards__options[*pCurrent_choice - 2].count - 1; i >= 0; i--) {
         if (gThe_interface_spec__options->mouse_areas[2].left[gGraf_data_index] + pX_offset + 3 >= gRadio_bastards__options[*pCurrent_choice - 2].left[i]) {
@@ -674,8 +642,6 @@ int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 // IDA: int __usercall GraphOptGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x49a2d1
 int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-
     GraphOptRight(pCurrent_choice, pCurrent_mode);
     return 0;
 }
@@ -684,8 +650,6 @@ int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 //  Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x49a34d
 void PlotAGraphBox__options(int pIndex, int pColour_value) {
-    LOG_TRACE("(%d, %d)", pIndex, pColour_value);
-
     if (pIndex < 0) {
         return;
     }
@@ -700,8 +664,6 @@ void PlotAGraphBox__options(int pIndex, int pColour_value) {
 //  Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x49a334
 void DrawAGraphBox__options(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
-
     PlotAGraphBox__options(pIndex, 45);
 }
 
@@ -709,16 +671,12 @@ void DrawAGraphBox__options(int pIndex) {
 //  Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x49a3e1
 void EraseAGraphBox__options(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
-
     PlotAGraphBox__options(pIndex, 0);
 }
 
 // IDA: void __usercall DrawGraphBox(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x49a2f3
 void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
-    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
-
     if (pCurrent_choice != gLast_graph_sel__options) {
         EraseAGraphBox__options(gLast_graph_sel__options - 2);
         DrawAGraphBox__options(pCurrent_choice - 2);
@@ -845,7 +803,6 @@ void DoGraphicsOptions(void) {
         0,
         NULL,
     };
-    LOG_TRACE("()");
 
     gThe_interface_spec__options = &interface_spec;
     gLast_graph_sel__options = -1;
@@ -882,7 +839,6 @@ void CalibrateJoysticks(void) {
     int saved_2y;
     int max;
     char s[256];
-    LOG_TRACE("()");
 
 #ifdef __DOS__
     NOT_IMPLEMENTED();
@@ -896,7 +852,6 @@ void CalibrateJoysticks(void) {
 void StripControls(unsigned char* pStr) {
     int i;
     int len;
-    LOG_TRACE("(%p)", pStr);
 
     len = strlen((char*)pStr);
     for (i = 0; i < len; i++) {
@@ -918,7 +873,6 @@ void LoadKeyNames(void) {
     FILE* f;
     tPath_name the_path;
     unsigned char s[256];
-    LOG_TRACE("()");
 
     PathCat(the_path, gApplication_path, "KEYNAMES.TXT");
     f = DRfopen(the_path, "rt");
@@ -938,7 +892,6 @@ void LoadKeyNames(void) {
 // FUNCTION: CARM95 0x49c133
 void DisposeKeyNames(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gKey_names); i++) {
         BrMemFree(gKey_names[i]);
@@ -948,8 +901,6 @@ void DisposeKeyNames(void) {
 // IDA: void __cdecl SaveOrigKeyMapping()
 // FUNCTION: CARM95 0x49ab5e
 void SaveOrigKeyMapping(void) {
-    LOG_TRACE("()");
-
     memcpy(gOrig_key_mapping, gKey_mapping, sizeof(gKey_mapping));
 }
 
@@ -957,7 +908,6 @@ void SaveOrigKeyMapping(void) {
 // FUNCTION: CARM95 0x49a8e2
 void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box) {
     int col;
-    LOG_TRACE("(%d, %p, %p, %p, %p)", pIndex, pY, pName_x, pKey_x, pEnd_box);
 
     if (pIndex >= 0) {
         col = gKey_count + 1;
@@ -985,7 +935,6 @@ void SetKeysToDefault(void) {
     FILE* f;
     tPath_name the_path;
     int i;
-    LOG_TRACE("()");
 
     PathCat(the_path, gApplication_path, "DKEYMAPX.TXT");
     the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
@@ -1005,7 +954,6 @@ void SaveKeyMapping(void) {
     FILE* f;
     tPath_name the_path;
     int i;
-    LOG_TRACE("()");
 
     PathCat(the_path, gApplication_path, "KEYMAP_X.TXT");
     the_path[strlen(the_path) - 5] = '0' + gKey_map_index;
@@ -1025,8 +973,6 @@ void SaveKeyMapping(void) {
 // IDA: void __usercall ChangeKeyMapIndex(int pNew_one@<EAX>)
 // FUNCTION: CARM95 0x49ab3c
 void ChangeKeyMapIndex(int pNew_one) {
-    LOG_TRACE("(%d)", pNew_one);
-
     SaveKeyMapping();
     gKey_map_index = pNew_one;
     LoadKeyMapping();
@@ -1047,7 +993,6 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     tDR_font* font_n;
     tDR_font* font_k;
     static int on_radios_last_time;
-    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
 #if defined(DETHRACE_FIX_BUGS)
     font_k = &gFonts[kFont_GRYDK];
@@ -1121,7 +1066,6 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
 // FUNCTION: CARM95 0x49aa3a
 int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (gCurrent_key < 0) {
         if (gKey_map_index == 0) {
@@ -1150,7 +1094,6 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
 // FUNCTION: CARM95 0x49ac6f
 int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (gCurrent_key < 0) {
         if (gKey_map_index < 3) {
@@ -1178,8 +1121,6 @@ int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall KeyAssignUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x49ad71
 int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-
     if (*pCurrent_mode == 0) {
         gCurrent_key = -1;
         *pCurrent_choice = 4;
@@ -1208,8 +1149,6 @@ int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall KeyAssignDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x49ae9b
 int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
-
     if (*pCurrent_mode == 0) {
         if (*pCurrent_choice >= 2) {
             gCurrent_key = (gKey_count + 1) / 2;
@@ -1249,7 +1188,6 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     int key_x;
     int end_box;
     tDR_font* font;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     RemoveTransientBitmaps(1);
     if (*pCurrent_mode == 0) {
@@ -1370,7 +1308,6 @@ int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, 
     int i;
     int x_coord;
     int y_coord;
-    LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
     if (gCurrent_key < 0) {
         GetMousePosition(&x_coord, &y_coord);
@@ -1393,7 +1330,6 @@ int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, 
 // FUNCTION: CARM95 0x49b56c
 void DrawInitialKMRadios(void) {
     int i;
-    LOG_TRACE("()");
 
     RemoveTransientBitmaps(1);
     DontLetFlicFuckWithPalettes();
@@ -1451,7 +1387,6 @@ void DoControlOptions(void) {
     int swap_font_3;
     int second_time_around;
     int orig_key_map_index;
-    LOG_TRACE("()");
 
     orig_key_map_index = gKey_map_index;
     second_time_around = 0;
@@ -1492,8 +1427,6 @@ void DoControlOptions(void) {
 // IDA: void __cdecl LoadSoundOptionsData()
 // FUNCTION: CARM95 0x49b5b2
 void LoadSoundOptionsData(void) {
-    LOG_TRACE("()");
-
     gDials_pix = LoadPixelmap("DIALSTCK.PIX");
     if (gDials_pix == NULL) {
         FatalError(kFatalError_LoadDialsPix);
@@ -1503,8 +1436,6 @@ void LoadSoundOptionsData(void) {
 // IDA: void __cdecl FreeSoundOptionsData()
 // FUNCTION: CARM95 0x49b5e6
 void FreeSoundOptionsData(void) {
-    LOG_TRACE("()");
-
     BrPixelmapFree(gDials_pix);
 }
 
@@ -1512,7 +1443,6 @@ void FreeSoundOptionsData(void) {
 // FUNCTION: CARM95 0x49b5ff
 void DrawDisabledOptions(void) {
     br_pixelmap* image;
-    LOG_TRACE("()");
 
     PrintMemoryDump(0, "INSIDE OPTIONS");
 
@@ -1619,7 +1549,6 @@ void DoOptions(void) {
         NULL,
     };
     int result;
-    LOG_TRACE("()");
 
     PrintMemoryDump(0, "BEFORE ENTERING OPTIONS");
     PreloadBunchOfFlics(1);

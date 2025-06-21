@@ -14,19 +14,26 @@ void debug_print_matrix4(const char* fmt, const char* fn, char* name, br_matrix4
 
 #define BLUE
 
-#if _MSC_VER == 1020
+#if 1 // _MSC_VER == 1020
 
 #define LOG_TRACE()
 #define LOG_TRACE8()
 #define LOG_TRACE9()
 #define LOG_TRACE10()
-#define LOG_DEBUG()
-#define LOG_INFO()
-#define LOG_WARN()
-#define LOG_PANIC()
+#define LOG_DEBUG(a)
+#define LOG_DEBUG2(a, b)
+#define LOG_DEBUG3(a, b, c)
+#define LOG_INFO(a)
+#define LOG_INFO2(a, b)
+#define LOG_INFO3(a, b, c)
+#define LOG_WARN(a)
+#define LOG_WARN2(a, b)
+#define LOG_WARN3(a, b, c)
+#define LOG_PANIC(a) abort()
+#define LOG_PANIC2(a, b)
 #define LOG_WARN_ONCE()
-#define NOT_IMPLEMENTED()
-#define TELL_ME_IF_WE_PASS_THIS_WAY()
+#define NOT_IMPLEMENTED() abort()
+#define TELL_ME_IF_WE_PASS_THIS_WAY() abort()
 #define STUB_ONCE()
 
 #else

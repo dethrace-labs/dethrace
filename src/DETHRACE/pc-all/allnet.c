@@ -80,13 +80,11 @@ void PDNetCopyToNative(struct sockaddr_in* sock, tCopyable_sockaddr_in* pAddress
 
 // IDA: void __cdecl ClearupPDNetworkStuff()
 void ClearupPDNetworkStuff(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall MATTMessageCheck(char *pFunction_name@<EAX>, tNet_message *pMessage@<EDX>, int pAlleged_size@<EBX>)
 void MATTMessageCheck(char* pFunction_name, tNet_message* pMessage, int pAlleged_size) {
-    LOG_TRACE("(\"%s\", %p, %d)", pFunction_name, pMessage, pAlleged_size);
     NOT_IMPLEMENTED();
 }
 
@@ -97,7 +95,6 @@ int GetProfileText(char* pDest, int pDest_len, char* pFname, char* pKeyname) {
     int i;
     int j;
     int len;
-    LOG_TRACE("(\"%s\", %d, \"%s\", \"%s\")", pDest, pDest_len, pFname, pKeyname);
     NOT_IMPLEMENTED();
 }
 
@@ -106,14 +103,11 @@ int GetSocketNumberFromProfileFile(void) {
     char str[256];
     int sscanf_res;
     tU32 socknum;
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // in dossys, this is called `NetNowIPXLocalTarget2String`
 void SockAddrToString(char* pString, struct sockaddr_in* pSock_addr) {
-    LOG_TRACE("(\"%s\", %p)", pString, pSock_addr);
-
     char portbuf[10];
 
     inet_ntop(AF_INET, &pSock_addr->sin_addr, pString, 32);
@@ -123,8 +117,6 @@ void SockAddrToString(char* pString, struct sockaddr_in* pSock_addr) {
 
 // added by dethrace
 void CopyableSockAddrToString(char* pString, tCopyable_sockaddr_in* pSock_addr) {
-    LOG_TRACE("(\"%s\", %p)", pString, pSock_addr);
-
     char portbuf[10];
 
     inet_ntop(AF_INET, &pSock_addr->address, pString, 32);
@@ -136,7 +128,6 @@ void CopyableSockAddrToString(char* pString, tCopyable_sockaddr_in* pSock_addr) 
 int GetMessageTypeFromMessage(char* pMessage_str) {
     char* real_msg;
     int msg_type_int;
-    LOG_TRACE("(\"%s\")", pMessage_str);
 
     real_msg = &pMessage_str[4];
     msg_type_int = 0;
@@ -154,15 +145,11 @@ int GetMessageTypeFromMessage(char* pMessage_str) {
 }
 
 int SameEthernetAddress(struct sockaddr_in* pAddr_1, struct sockaddr_in* pAddr_2) {
-    LOG_TRACE("(%p, %p)", pAddr_1, pAddr_2);
-
     return memcmp(pAddr_1, pAddr_2, sizeof(struct sockaddr_in)) == 0;
 }
 
 // added by dethrace
 int SameEthernetAddress2(tCopyable_sockaddr_in* pAddr_1, struct sockaddr_in* pAddr_2) {
-    LOG_TRACE("(%p, %p)", pAddr_1, pAddr_2);
-
     return pAddr_1->port == pAddr_2->sin_port && pAddr_1->address == pAddr_2->sin_addr.s_addr;
 }
 
@@ -174,8 +161,6 @@ int SameEthernetAddress2(tCopyable_sockaddr_in* pAddr_1, struct sockaddr_in* pAd
 
 // IDA: void __usercall MakeMessageToSend(int pMessage_type@<EAX>)
 void MakeMessageToSend(int pMessage_type) {
-    LOG_TRACE("(%d)", pMessage_type);
-
 #ifdef DETHRACE_FIX_BUGS
     sprintf(gSend_buffer, "XXXX%s%1d", MESSAGE_HEADER_STR, pMessage_type);
 #else
@@ -188,7 +173,6 @@ int ReceiveHostResponses(void) {
     char str[256];
     int i;
     int already_registered;
-    LOG_TRACE("()");
 
     char addr_string[32];
     unsigned int sa_len;
@@ -251,7 +235,6 @@ int BroadcastMessage(void) {
     int errors;
     char broadcast_addr_string[32];
     char* real_msg;
-    LOG_TRACE("()");
 
     errors = 0;
     for (i = 0; i < gNumber_of_networks; i++) {
@@ -279,8 +262,6 @@ int PDNetInitialise(void) {
     struct linger so_linger;
     unsigned int sa_len;
 
-    LOG_TRACE("()");
-
     gPlayer_id = PDGetTotalTime();
     gNumber_of_networks = 1;
     sa_len = sizeof(struct sockaddr_in);
@@ -307,13 +288,13 @@ int PDNetInitialise(void) {
     PDNetCopyFromNative(&gLocal_addr_copyable, &gLocal_addr);
 
     SockAddrToString(str, &gLocal_addr);
-    LOG_INFO("Advertising on %s", str);
+    LOG_INFO2("Advertising on %s", str);
 
     // actually listen on any address
     gLocal_addr.sin_addr.s_addr = INADDR_ANY;
 
     SockAddrToString(str, &gLocal_addr);
-    LOG_INFO("Listening on %s", str);
+    LOG_INFO2("Listening on %s", str);
 
     gRemote_addr.sin_family = AF_INET;
     gRemote_addr.sin_port = htons(PORT);
@@ -367,8 +348,6 @@ int PDNetInitialise(void) {
 
 // IDA: int __cdecl PDNetShutdown()
 int PDNetShutdown(void) {
-    LOG_TRACE("()");
-
     dr_dprintf("PDNetShutdown()");
     if (gSocket != -1) {
         OS_CloseSocket(gSocket);
@@ -379,8 +358,6 @@ int PDNetShutdown(void) {
 
 // IDA: void __cdecl PDNetStartProducingJoinList()
 void PDNetStartProducingJoinList(void) {
-    LOG_TRACE("()");
-
     dr_dprintf("PDNetStartProducingJoinList()");
     gNumber_of_hosts = 0;
     gJoinable_games = BrMemAllocate(sizeof(tPD_net_game_info) * JOINABLE_GAMES_CAPACITY, 0x80u);
@@ -391,8 +368,6 @@ void PDNetStartProducingJoinList(void) {
 
 // IDA: void __cdecl PDNetEndJoinList()
 void PDNetEndJoinList(void) {
-    LOG_TRACE("()");
-
     dr_dprintf("PDNetEndJoinList()");
     if (gJoinable_games) {
         BrMemFree(gJoinable_games);
@@ -407,7 +382,6 @@ int PDNetGetNextJoinGame(tNet_game_details* pGame, int pIndex) {
     int j;
     int number_of_hosts_has_changed;
     char str[256];
-    LOG_TRACE9("(%p, %d)", pGame, pIndex);
 
     dr_dprintf("PDNetGetNextJoinGame(): pIndex is %d", pIndex);
     if (pIndex == 0) {
@@ -445,14 +419,11 @@ int PDNetGetNextJoinGame(tNet_game_details* pGame, int pIndex) {
 
 // IDA: void __usercall PDNetDisposeGameDetails(tNet_game_details *pDetails@<EAX>)
 void PDNetDisposeGameDetails(tNet_game_details* pDetails) {
-    LOG_TRACE("(%p)", pDetails);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall PDNetHostGame@<EAX>(tNet_game_details *pDetails@<EAX>, char *pHost_name@<EDX>, void **pHost_address@<EBX>)
 int PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_address) {
-    LOG_TRACE("(%p, \"%s\", %p)", pDetails, pHost_name, pHost_address);
-
     dr_dprintf("PDNetHostGame()");
     //*pHost_address = &gLocal_addr;
     *pHost_address = &gLocal_addr_copyable;
@@ -461,30 +432,22 @@ int PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_ad
 
 // IDA: int __usercall PDNetJoinGame@<EAX>(tNet_game_details *pDetails@<EAX>, char *pPlayer_name@<EDX>)
 int PDNetJoinGame(tNet_game_details* pDetails, char* pPlayer_name) {
-    LOG_TRACE("(%p, \"%s\")", pDetails, pPlayer_name);
-
     dr_dprintf("PDNetJoinGame()");
     return 0;
 }
 
 // IDA: void __usercall PDNetLeaveGame(tNet_game_details *pDetails@<EAX>)
 void PDNetLeaveGame(tNet_game_details* pDetails) {
-    LOG_TRACE("(%p)", pDetails);
-
     dr_dprintf("PDNetLeaveGame()");
 }
 
 // IDA: void __usercall PDNetHostFinishGame(tNet_game_details *pDetails@<EAX>)
 void PDNetHostFinishGame(tNet_game_details* pDetails) {
-    LOG_TRACE("(%p)", pDetails);
-
     dr_dprintf("PDNetHostFinishGame()");
 }
 
 // IDA: tU32 __usercall PDNetExtractGameID@<EAX>(tNet_game_details *pDetails@<EAX>)
 tU32 PDNetExtractGameID(tNet_game_details* pDetails) {
-    LOG_TRACE("(%p)", pDetails);
-
     dr_dprintf("PDNetExtractGameID()");
     // dethrace changed
     // return ntohs(gLocal_addr.sin_addr.s_addr);
@@ -493,8 +456,6 @@ tU32 PDNetExtractGameID(tNet_game_details* pDetails) {
 
 // IDA: tPlayer_ID __usercall PDNetExtractPlayerID@<EAX>(tNet_game_details *pDetails@<EAX>)
 tPlayer_ID PDNetExtractPlayerID(tNet_game_details* pDetails) {
-    LOG_TRACE("(%p)", pDetails);
-
     dr_dprintf("PDNetExtractPlayerID()");
     // dethrace changed
     // return ntohs(gLocal_addr.sin_addr.s_addr);
@@ -523,7 +484,6 @@ void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 // IDA: int __usercall PDNetSendMessageToPlayer@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, tPlayer_ID pPlayer@<EBX>)
 int PDNetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
     char str[256];
-    LOG_TRACE("(%p, %p, %d)", pDetails, pMessage, pPlayer);
     NOT_IMPLEMENTED();
 }
 
@@ -531,7 +491,6 @@ int PDNetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage
 int PDNetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessage) {
     char str[256];
     int i;
-    LOG_TRACE("(%p, %p)", pDetails, pMessage);
 
     struct sockaddr_in someaddr;
 
@@ -558,7 +517,6 @@ tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_ad
     char* receive_buffer;
     char str[256];
     int msg_type;
-    LOG_TRACE("(%p, %p)", pDetails, pSender_address);
 
     char addr_str[32];
     unsigned int sa_len;
@@ -612,34 +570,28 @@ tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_ad
 
 // IDA: tNet_message* __usercall PDNetAllocateMessage@<EAX>(tU32 pSize@<EAX>, tS32 pSize_decider@<EDX>)
 tNet_message* PDNetAllocateMessage(tU32 pSize, tS32 pSize_decider) {
-    LOG_TRACE("(%d, %d)", pSize, pSize_decider);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall PDNetDisposeMessage(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>)
 void PDNetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage) {
-    LOG_TRACE("(%p, %p)", pDetails, pMessage);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall PDNetSetPlayerSystemInfo(tNet_game_player_info *pPlayer@<EAX>, void *pSender_address@<EDX>)
 void PDNetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_address) {
-    LOG_TRACE("(%p, %p)", pPlayer, pSender_address);
-
     dr_dprintf("PDNetSetPlayerSystemInfo()");
     memcpy(&pPlayer->pd_net_info, pSender_address, sizeof(pPlayer->pd_net_info));
 }
 
 // IDA: void __usercall PDNetDisposePlayer(tNet_game_player_info *pPlayer@<EAX>)
 void PDNetDisposePlayer(tNet_game_player_info* pPlayer) {
-    LOG_TRACE("(%p)", pPlayer);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall PDNetSendMessageToAddress@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, void *pAddress@<EBX>)
 int PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress) {
     char str[256];
-    LOG_TRACE("(%p, %p, %p)", pDetails, pMessage, pAddress);
     struct sockaddr_in someaddr;
 
     PDNetCopyToNative(&someaddr, pAddress);
@@ -658,14 +610,11 @@ int PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessag
 
 // IDA: int __usercall PDNetInitClient@<EAX>(tNet_game_details *pDetails@<EAX>)
 int PDNetInitClient(tNet_game_details* pDetails) {
-    LOG_TRACE("(%p)", pDetails);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDNetGetHeaderSize()
 int PDNetGetHeaderSize(void) {
-    LOG_TRACE("()");
-
     return 0;
 }
 

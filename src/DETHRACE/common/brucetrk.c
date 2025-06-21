@@ -24,7 +24,6 @@ int gDefault_blend_pc;
 // FUNCTION: CARM95 0x4a8a26
 void AllocateActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pDst) {
     tU16 z;
-    LOG_TRACE("(%p, %p)", pTrack_spec, pDst);
 
     *pDst = BrMemAllocate(sizeof(br_actor***) * pTrack_spec->ncolumns_z, kMem_columns_z);
     for (z = 0; z < pTrack_spec->ncolumns_z; z++) {
@@ -38,7 +37,6 @@ void AllocateActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pDst) {
 void DisposeActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pVictim, int pRemove_act_mod) {
     tU16 z;
     tU16 x;
-    LOG_TRACE("(%p, %p, %d)", pTrack_spec, pVictim, pRemove_act_mod);
 
     if (*pVictim != NULL) {
         for (z = 0; z != pTrack_spec->ncolumns_z; z++) {
@@ -59,8 +57,6 @@ void DisposeActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pVictim, int pRem
 // IDA: void __usercall DisposeColumns(tTrack_spec *pTrack_spec@<EAX>)
 // FUNCTION: CARM95 0x4a8590
 void DisposeColumns(tTrack_spec* pTrack_spec) {
-    LOG_TRACE("(%p)", pTrack_spec);
-
     DisposeActorMatrix(pTrack_spec, &pTrack_spec->columns, 0);
     DisposeActorMatrix(pTrack_spec, &pTrack_spec->lollipops, 0);
     if (gAusterity_mode == 0) {
@@ -76,7 +72,6 @@ void DisposeColumns(tTrack_spec* pTrack_spec) {
 void XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tTrack_spec* pTrack_spec) {
     br_scalar x;
     br_scalar z;
-    LOG_TRACE("(%p, %p, %f, %f, %p)", pColumn_x, pColumn_z, pX, pZ, pTrack_spec);
 
     x = (pX - pTrack_spec->origin_x) / pTrack_spec->column_size_x;
     z = (pZ - pTrack_spec->origin_z) / pTrack_spec->column_size_z;
@@ -104,7 +99,6 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
     int changed_one;
     char s[256];
     static tU16 nfaces_allocated;
-    LOG_TRACE("(%p, %p)", pActor, pModel);
 
     changed_one = 0;
 
@@ -164,7 +158,6 @@ br_uintptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     br_scalar r1;
     br_scalar r2;
     br_scalar r3;
-    LOG_TRACE("(%p, %p)", pActor, pTrack_spec);
 
     if (pActor->identifier != NULL && pActor->identifier[0] == '&' && pActor->identifier[1] >= '0' && pActor->identifier[1] <= '9') {
         i = (pActor->identifier[4] - '0') * 1000 + (pActor->identifier[5] - '0') * 100 + (pActor->identifier[6] - '0') * 10 + (pActor->identifier[7] - '0');
@@ -210,7 +203,6 @@ br_uintptr_t ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     unsigned int x;
     unsigned int z;
     int group;
-    LOG_TRACE("(%p, %p)", pActor, pTrack_spec);
 
     if (sscanf(pActor->identifier, "%u%u", &x, &z) == 2 && pTrack_spec->ncolumns_x > x && pTrack_spec->ncolumns_z > z) {
         pActor->material = gDefault_track_material;
@@ -241,8 +233,6 @@ br_uintptr_t ProcessModelsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
 // IDA: void __usercall ProcessModels(tTrack_spec *pTrack_spec@<EAX>)
 // FUNCTION: CARM95 0x4a8ad9
 void ProcessModels(tTrack_spec* pTrack_spec) {
-    LOG_TRACE("(%p)", pTrack_spec);
-
     BrActorEnum(pTrack_spec->the_actor, (br_actor_enum_cbfn*)ProcessModelsCB, pTrack_spec);
 }
 
@@ -256,7 +246,6 @@ void ExtractColumns(tTrack_spec* pTrack_spec) {
     float e;
     br_scalar extra_room;
     br_bounds bounds;
-    LOG_TRACE("(%p)", pTrack_spec);
 
     unsplit = 0;
     switch (sscanf(pTrack_spec->the_actor->identifier, "%u%u%f%d", &x, &z, &extra_room, &ad)) {
@@ -304,8 +293,6 @@ void ExtractColumns(tTrack_spec* pTrack_spec) {
 // IDA: void __usercall LollipopizeActor4(br_actor *pActor@<EAX>, br_matrix34 *pRef_to_world@<EDX>, br_actor *pCamera@<EBX>)
 // FUNCTION: CARM95 0x4a9dc1
 void LollipopizeActor4(br_actor* pActor, br_matrix34* pRef_to_world, br_actor* pCamera) {
-    LOG_TRACE("(%p, %p, %p)", pActor, pRef_to_world, pCamera);
-
     pActor->t.t.mat.m[1][0] = 0.0;
     pActor->t.t.mat.m[1][1] = 1.0;
     pActor->t.t.mat.m[1][2] = 0.0;
@@ -324,7 +311,6 @@ void LollipopizeActor4(br_actor* pActor, br_matrix34* pRef_to_world, br_actor* p
 // FUNCTION: CARM95 0x4a9d8d
 br_uintptr_t LollipopizeChildren(br_actor* pActor, void* pArg) {
     tMatrix_and_actor* maa;
-    LOG_TRACE("(%p, %p)", pActor, pArg);
 
     maa = pArg;
     LollipopizeActor4(pActor, maa->m, maa->a);
@@ -340,7 +326,6 @@ void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMa
     tU8 column_z2;
     tMatrix_and_actor maa;
     br_actor* blended_polys;
-    LOG_TRACE("(%d, %p, %d, %d, %d, %d, %p)", pDraw_blends, pTrack_spec, pMin_x, pMax_x, pMin_z, pMax_z, pCamera_to_world);
 
     maa.m = pCamera_to_world;
     if (fabs(pCamera_to_world->m[2][2]) >= fabs(pCamera_to_world->m[2][0])) {
@@ -424,7 +409,6 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
     static br_camera* camera;
     static br_scalar tan_fov_ish;
     static br_actor* result;
-    LOG_TRACE("(%p, %p, %p, %p, %d)", pWorld, pTrack_spec, pCamera, pCamera_to_world, pRender_blends);
 
     if (pTrack_spec->columns != NULL) {
         if (pRender_blends) {
@@ -518,13 +502,11 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
 // IDA: br_scalar __cdecl GetYonFactor()
 // FUNCTION: CARM95 0x4a9e6e
 br_scalar GetYonFactor(void) {
-
     return gYon_factor;
 }
 
 // IDA: void __cdecl SetYonFactor(br_scalar pNew)
 // FUNCTION: CARM95 0x4a9e84
 void SetYonFactor(br_scalar pNew) {
-
     gYon_factor = pNew;
 }

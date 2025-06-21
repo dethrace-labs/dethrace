@@ -145,7 +145,7 @@ static void SDL2_Harness_ProcessWindowMessages(void) {
             // Map incoming SDL scancode to PC scan code as used by game code
             int dethrace_scancode = sdl_scancode_map[event.key.keysym.scancode];
             if (dethrace_scancode == 0) {
-                LOG_WARN("unexpected scan code %s (%d)", SDL2_GetScancodeName(event.key.keysym.scancode), event.key.keysym.scancode);
+                LOG_WARN3("unexpected scan code %s (%d)", SDL2_GetScancodeName(event.key.keysym.scancode), event.key.keysym.scancode);
                 return;
             }
 
@@ -250,7 +250,7 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
     }
 
     if (SDL2_Init(SDL_INIT_VIDEO) != 0) {
-        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL2_GetError());
+        LOG_PANIC2("SDL_INIT_VIDEO error: %s", SDL2_GetError());
     }
 
     if (window_type == eWindow_type_opengl) {
@@ -262,7 +262,7 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
             SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
         if (window == NULL) {
-            LOG_PANIC("Failed to create window: %s", SDL2_GetError());
+            LOG_PANIC2("Failed to create window: %s", SDL2_GetError());
         }
 
         SDL2_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -271,14 +271,14 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
         gl_context = SDL2_GL_CreateContext(window);
 
         if (gl_context == NULL) {
-            LOG_WARN("Failed to create OpenGL core profile: %s. Trying OpenGLES...", SDL2_GetError());
+            LOG_WARN2("Failed to create OpenGL core profile: %s. Trying OpenGLES...", SDL2_GetError());
             SDL2_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
             SDL2_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
             SDL2_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
             gl_context = SDL2_GL_CreateContext(window);
         }
         if (gl_context == NULL) {
-            LOG_PANIC("Failed to create OpenGL context: %s", SDL2_GetError());
+            LOG_PANIC2("Failed to create OpenGL context: %s", SDL2_GetError());
         }
         SDL2_GL_SetSwapInterval(1);
 
@@ -289,12 +289,12 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
             window_width, window_height,
             SDL_WINDOW_RESIZABLE);
         if (window == NULL) {
-            LOG_PANIC("Failed to create window: %s", SDL2_GetError());
+            LOG_PANIC2("Failed to create window: %s", SDL2_GetError());
         }
 
         renderer = SDL2_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
         if (renderer == NULL) {
-            LOG_PANIC("Failed to create renderer: %s", SDL2_GetError());
+            LOG_PANIC2("Failed to create renderer: %s", SDL2_GetError());
         }
         SDL2_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
         SDL2_RenderSetLogicalSize(renderer, render_width, render_height);
@@ -304,9 +304,9 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
             SDL_RendererInfo info;
             SDL2_GetRendererInfo(renderer, &info);
             for (Uint32 i = 0; i < info.num_texture_formats; i++) {
-                LOG_INFO("%s\n", SDL2_GetPixelFormatName(info.texture_formats[i]));
+                LOG_INFO2("%s\n", SDL2_GetPixelFormatName(info.texture_formats[i]));
             }
-            LOG_PANIC("Failed to create screen_texture: %s", SDL2_GetError());
+            LOG_PANIC2("Failed to create screen_texture: %s", SDL2_GetError());
         }
     }
 

@@ -174,7 +174,6 @@ void create_temp_file(char buffer[PATH_MAX + 1], const char* prefix) {
 
     attributes = GetFileAttributesA(temp_folder);
     if ((attributes == INVALID_FILE_ATTRIBUTES) || ((attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)) {
-        LOG_TRACE("Temporary folder does not exist => creating");
         success = CreateDirectoryA(temp_folder, NULL);
         if (success == 0) {
             abort();

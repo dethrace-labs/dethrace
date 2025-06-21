@@ -35,7 +35,6 @@ void InitOilSpills(void) {
     int i;
     br_model* the_model;
     br_material* the_material;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gOil_pixie_names); i++) {
         gOil_pixies[i] = LoadPixelmap(gOil_pixie_names[i]);
@@ -94,7 +93,6 @@ void InitOilSpills(void) {
 // FUNCTION: CARM95 0x412859
 void ResetOilSpills(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gOily_spills); i++) {
         gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
@@ -111,7 +109,6 @@ void QueueOilSpill(tCar_spec* pCar) {
     int oldest_one;
     tU32 the_time;
     tU32 oldest_time;
-    LOG_TRACE("(%p)", pCar);
 
     oldest_one = 0;
     oily_index = -1;
@@ -165,7 +162,6 @@ int OKToSpillOil(tOil_spill_info* pOil) {
     tBounds kev_bounds;
     tFace_ref the_list[10];
     tFace_ref* face_ref;
-    LOG_TRACE("(%p)", pOil);
 
     car = pOil->car;
     if (car->driver >= eDriver_net_human && car->damage_units[eDamage_engine].damage_level <= 98 && car->damage_units[eDamage_transmission].damage_level <= 98) {
@@ -221,8 +217,6 @@ int OKToSpillOil(tOil_spill_info* pOil) {
 // IDA: void __usercall Vector3Interpolate(br_vector3 *pDst@<EAX>, br_vector3 *pFrom@<EDX>, br_vector3 *pTo@<EBX>, br_scalar pP)
 // FUNCTION: CARM95 0x412b76
 void Vector3Interpolate(br_vector3* pDst, br_vector3* pFrom, br_vector3* pTo, br_scalar pP) {
-    LOG_TRACE("(%p, %p, %p, %f)", pDst, pFrom, pTo, pP);
-
     pDst->v[0] = (pTo->v[0] - pFrom->v[0]) * pP + pFrom->v[0];
     pDst->v[1] = (pTo->v[1] - pFrom->v[1]) * pP + pFrom->v[1];
     pDst->v[2] = (pTo->v[2] - pFrom->v[2]) * pP + pFrom->v[2];
@@ -235,7 +229,6 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
     br_scalar s;
     br_scalar dist;
     br_vector3 to_camera;
-    LOG_TRACE("(%p, %p, %p)", pNew_pos, pGround_normal, pOld_pos);
 
     to_camera.v[0] = gCamera_to_world.m[3][0] - pOld_pos->v[0];
     to_camera.v[1] = gCamera_to_world.m[3][1] - pOld_pos->v[1];
@@ -258,24 +251,18 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
 // IDA: void __usercall MungeOilsHeightAboveGround(tOil_spill_info *pOil@<EAX>)
 // FUNCTION: CARM95 0x412bf4
 void MungeOilsHeightAboveGround(tOil_spill_info* pOil) {
-    LOG_TRACE("(%p)", pOil);
-
     EnsureGroundDetailVisible(&pOil->actor->t.t.look_up.t, &pOil->actor->t.t.look_up.up, &pOil->pos);
 }
 
 // IDA: void __usercall MungeIndexedOilsHeightAboveGround(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x412bce
 void MungeIndexedOilsHeightAboveGround(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
-
     MungeOilsHeightAboveGround(&gOily_spills[pIndex]);
 }
 
 // IDA: void __usercall SetInitialOilStuff(tOil_spill_info *pOil@<EAX>, br_model *pModel@<EDX>)
 // FUNCTION: CARM95 0x4137ad
 void SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel) {
-    LOG_TRACE("(%p, %p)", pOil, pModel);
-
     pModel->vertices[0].p.v[0] = -0.1f;
     pModel->vertices[0].p.v[2] = -0.1f;
     pModel->vertices[1].p.v[0] = 0.1f;
@@ -300,7 +287,6 @@ void ProcessOilSpills(tU32 pFrame_period) {
     br_scalar this_size;
     br_vector3 v;
     tNet_message* message;
-    LOG_TRACE("(%d)", pFrame_period);
 
     time = GetTotalTime();
     for (i = 0; i < COUNT_OF(gOily_spills); i++) {
@@ -392,16 +378,13 @@ void ProcessOilSpills(tU32 pFrame_period) {
 // IDA: int __cdecl GetOilSpillCount()
 // FUNCTION: CARM95 0x413852
 int GetOilSpillCount(void) {
-    // LOG_TRACE("()");
-
+    //
     return COUNT_OF(gOily_spills);
 }
 
 // IDA: void __usercall GetOilSpillDetails(int pIndex@<EAX>, br_actor **pActor@<EDX>, br_scalar *pSize@<EBX>)
 // FUNCTION: CARM95 0x413867
 void GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize) {
-    LOG_TRACE("(%d, %p, %p)", pIndex, pActor, pSize);
-
     if (gOily_spills[pIndex].car != NULL) {
         *pActor = gOily_spills[pIndex].actor;
         *pSize = gOily_spills[pIndex].full_size;
@@ -415,8 +398,6 @@ void GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize) {
 // IDA: int __usercall PointInSpill@<EAX>(br_vector3 *pV@<EAX>, int pSpill@<EDX>)
 // FUNCTION: CARM95 0x413b72
 int PointInSpill(br_vector3* pV, int pSpill) {
-    LOG_TRACE("(%p, %d)", pV, pSpill);
-
     return gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.8f > SQR(pV->v[0] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.translate.t.v[0])
         && gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.8f > SQR(pV->v[2] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.translate.t.v[2])
         && fabsf(pV->v[1] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.translate.t.v[1]) < 0.1f;
@@ -427,7 +408,6 @@ int PointInSpill(br_vector3* pV, int pSpill) {
 void GetOilFrictionFactors(tCar_spec* pCar, br_scalar* pFl_factor, br_scalar* pFr_factor, br_scalar* pRl_factor, br_scalar* pRr_factor) {
     int i;
     br_vector3 wheel_world;
-    LOG_TRACE("(%p, %p, %p, %p, %p)", pCar, pFl_factor, pFr_factor, pRl_factor, pRr_factor);
 
     *pFl_factor = 1.0f;
     *pFr_factor = 1.0f;
@@ -479,8 +459,6 @@ void GetOilFrictionFactors(tCar_spec* pCar, br_scalar* pFl_factor, br_scalar* pF
 // IDA: void __usercall AdjustOilSpill(int pIndex@<EAX>, br_matrix34 *pMat@<EDX>, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap)
 // FUNCTION: CARM95 0x413cb6
 void AdjustOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap) {
-    LOG_TRACE("(%d, %p, %f, %f, %d, %d, %p, %p, %p)", pIndex, pMat, pFull_size, pGrow_rate, pSpill_time, pStop_time, pCar, pOriginal_pos, pPixelmap);
-
     BrMatrix34Copy(&gOily_spills[pIndex].actor->t.t.mat, pMat);
     gOily_spills[pIndex].full_size = pFull_size;
     gOily_spills[pIndex].grow_rate = pGrow_rate;
@@ -501,7 +479,6 @@ void ReceivedOilSpill(tNet_contents* pContents) {
     tU32 the_time;
     tU32 oldest_time;
     tCar_spec* car;
-    LOG_TRACE("(%p)", pContents);
 
     oldest_one = 0;
     car = NetCarFromPlayerID(pContents->data.oil_spill.player);

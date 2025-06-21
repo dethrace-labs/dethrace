@@ -47,7 +47,6 @@ int gSave_allowed;
 // FUNCTION: CARM95 0x44bb57
 void CorrectLoadByteOrdering(int pIndex) {
     int i;
-    LOG_TRACE("(%d)", pIndex);
 
     SWAP32_BE(gSaved_games[pIndex]->version);
     SWAP32_BE(gSaved_games[pIndex]->rank);
@@ -97,7 +96,6 @@ tU32 CalcLSChecksum(tSave_game* pSaved_game) {
     tU32 checksum2;
     int i;
     tU8* ptr;
-    LOG_TRACE("(%p)", pSaved_game);
 
 #ifdef DETHRACE_FIX_BUGS
     if (sizeof(tSave_game) - sizeof(tU32) != offsetof(tSave_game, checksum)) {
@@ -128,7 +126,6 @@ void LoadSavedGames(void) {
     int i;
     FILE* f;
     tU32 the_size;
-    LOG_TRACE("()");
 
 #ifdef DETHRACE_FIX_BUGS
     if (sizeof(tSave_game) != 948) {
@@ -164,7 +161,6 @@ void LoadSavedGames(void) {
 // FUNCTION: CARM95 0x44c111
 void DisposeSavedGames(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gSaved_games); i++) {
         if (gSaved_games[i] != NULL) {
@@ -178,7 +174,6 @@ void DisposeSavedGames(void) {
 void LoadTheGame(int pSlot_index) {
     int i;
     char the_car_name[14];
-    LOG_TRACE("(%d)", pSlot_index);
 
     if (gProgram_state.car_name[0] != '\0') {
         DisposeCar(&gProgram_state.current_car, gProgram_state.current_car.index);
@@ -225,7 +220,6 @@ void LoadTheGame(int pSlot_index) {
 void StartRollingSaveNamesIn(void) {
     int i;
     int save_slot_height;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gSaved_games); i++) {
         save_slot_height = gCurrent_graf_data->save_slot_y_offset + i * gCurrent_graf_data->rolling_letter_y_pitch;
@@ -243,8 +237,6 @@ void StartRollingSaveNamesIn(void) {
 // IDA: void __cdecl LoadStart()
 // FUNCTION: CARM95 0x44be09
 void LoadStart(void) {
-    LOG_TRACE("()");
-
     StartRollingSaveNamesIn();
 }
 
@@ -494,7 +486,6 @@ int DoLoadGame(void) {
         recopy_areas,
     };
     int result;
-    LOG_TRACE("()");
 
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         DoFeatureUnavailableInDemo();
@@ -555,7 +546,6 @@ int DoLoadGame(void) {
 // FUNCTION: CARM95 0x44c8e7
 void CorrectSaveByteOrdering(int pIndex) {
     int i;
-    LOG_TRACE("(%d)", pIndex);
 
     SWAP32_BE(gSaved_games[pIndex]->version);
     SWAP32_BE(gSaved_games[pIndex]->rank);
@@ -580,7 +570,6 @@ void CorrectSaveByteOrdering(int pIndex) {
 void SaveTheGame(int pSlot_number) {
     tPath_name the_path;
     FILE* f;
-    LOG_TRACE("(%d)", pSlot_number);
 
     gSaved_games[pSlot_number]->checksum = CalcLSChecksum(gSaved_games[pSlot_number]);
     PathCat(the_path, gApplication_path, "SAVEGAME");
@@ -628,7 +617,6 @@ int ConfirmMidGameSave(void) {
         COUNT_OF(mouse_areas), mouse_areas,
         0, NULL
     };
-    LOG_TRACE("()");
 
     return DoInterfaceScreen(&interface_spec, 0, 0) == 0;
 }
@@ -637,7 +625,6 @@ int ConfirmMidGameSave(void) {
 // FUNCTION: CARM95 0x44c443
 void MakeSavedGame(tSave_game** pSave_record) {
     int i;
-    LOG_TRACE("(%p)", pSave_record);
 
     if (*pSave_record == NULL) {
         *pSave_record = BrMemCalloc(1, sizeof(tSave_game), kMem_new_save_game);
@@ -673,16 +660,12 @@ void MakeSavedGame(tSave_game** pSave_record) {
 // IDA: void __cdecl SaveStart()
 // FUNCTION: CARM95 0x44c66c
 void SaveStart(void) {
-    LOG_TRACE("()");
-
     StartRollingSaveNamesIn();
 }
 
 // IDA: void __usercall GetSaveName(int pStarting_to_type@<EAX>, int pCurrent_choice@<EDX>, char *pString@<EBX>, int *pMax_length@<ECX>)
 // FUNCTION: CARM95 0x44c67c
 void GetSaveName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length) {
-    LOG_TRACE("(%d, %d, \"%s\", %p)", pStarting_to_type, pCurrent_choice, pString, pMax_length);
-
     if (gSaved_games[pCurrent_choice] != NULL) {
         strcpy(pString, gSaved_games[pCurrent_choice]->slot_name);
     } else {
@@ -699,8 +682,6 @@ void GetSaveName(int pStarting_to_type, int pCurrent_choice, char* pString, int*
 // IDA: int __usercall SaveDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 // FUNCTION: CARM95 0x44c73e
 int SaveDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
-    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
-
     if (!pEscaped && pCurrent_choice < 8) {
         gProgram_state.last_slot = pCurrent_choice;
         MakeSavedGame(&gSaved_games[pCurrent_choice]);
@@ -719,7 +700,6 @@ int SaveDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped
 int SaveGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     char s1[256];
     char s2[256];
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (gTyping_slot != 0) {
         sprintf(s1, VARLZEROINT, 2, gProgram_state.rank);
@@ -750,7 +730,6 @@ int SaveGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 int SaveEscape(int* pCurrent_choice, int* pCurrent_mode) {
     char s1[256];
     char s2[256];
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (gStarted_typing != 0) {
         sprintf(s1, VARLZEROINT, 2, gProgram_state.rank);
@@ -983,7 +962,6 @@ int SaveGameInterface(int pDefault_choice) {
         COUNT_OF(mouse_areas), mouse_areas,
         COUNT_OF(recopy_areas), recopy_areas
     };
-    LOG_TRACE("(%d)", pDefault_choice);
 
     gStarted_typing = 0;
     return DoInterfaceScreen(&interface_spec, 0, pDefault_choice) < 8;
@@ -992,8 +970,6 @@ int SaveGameInterface(int pDefault_choice) {
 // IDA: void __usercall DoSaveGame(int pSave_allowed@<EAX>)
 // FUNCTION: CARM95 0x44cdfd
 void DoSaveGame(int pSave_allowed) {
-    LOG_TRACE("()");
-
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         DoFeatureUnavailableInDemo();
         return;

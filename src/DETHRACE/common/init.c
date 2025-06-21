@@ -77,8 +77,6 @@ br_material* gDefault_track_material;
 // IDA: void __cdecl AllocateSelf()
 // FUNCTION: CARM95 0x4bbebf
 void AllocateSelf(void) {
-    LOG_TRACE("()");
-
     gSelf = BrActorAllocate(BR_ACTOR_NONE, NULL);
     if (gSelf == NULL) {
         FatalError(kFatalError_AllocateSelf);
@@ -94,7 +92,6 @@ void AllocateSelf(void) {
 void AllocateCamera(void) {
     br_camera* camera_ptr;
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gCamera_list); i++) {
         gCamera_list[i] = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
@@ -145,7 +142,6 @@ void ReinitialiseForwardCamera(void) {
     float the_angle;
     float d;
     float w;
-    LOG_TRACE("()");
 
     camera_ptr = (br_camera*)gCamera->type_data;
     if (gProgram_state.cockpit_on) {
@@ -190,7 +186,6 @@ void ReinitialiseForwardCamera(void) {
 // FUNCTION: CARM95 0x4bb741
 void AllocateRearviewPixelmap(void) {
     char* rear_screen_pixels;
-    LOG_TRACE("()");
 
 #ifdef DETHRACE_3DFX_PATCH
     if (gRearview_screen != NULL) {
@@ -242,7 +237,6 @@ void AllocateRearviewPixelmap(void) {
 // FUNCTION: CARM95 0x4bb887
 void ReinitialiseRearviewCamera(void) {
     br_camera* camera_ptr;
-    LOG_TRACE("()");
 
     camera_ptr = gRearview_camera->type_data;
     camera_ptr->field_of_view = BrDegreeToAngle(gProgram_state.current_car.rearview_camera_angle);
@@ -259,7 +253,6 @@ void ReinitialiseRearviewCamera(void) {
 void ReinitialiseRenderStuff(void) {
     int x_diff;
     int y_diff;
-    LOG_TRACE("()");
 
     if (gProgram_state.cockpit_on) {
         gProgram_state.current_render_left = gProgram_state.current_car.render_left[gProgram_state.cockpit_image_index];
@@ -287,7 +280,6 @@ void ReinitialiseRenderStuff(void) {
 
 // IDA: void __cdecl InstallFindFailedHooks()
 void InstallFindFailedHooks(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
@@ -313,7 +305,6 @@ void AllocateStandardLamp(void) {
 // FUNCTION: CARM95 0x4bbd6c
 void InitializeBRenderEnvironment(void) {
     br_model* arrow_model;
-    LOG_TRACE("()");
 
     gBr_initialized = 1;
     InstallDRMemCalls();
@@ -347,7 +338,6 @@ void InitializeBRenderEnvironment(void) {
 // IDA: void __cdecl InitBRFonts()
 // FUNCTION: CARM95 0x4bc12c
 void InitBRFonts(void) {
-    LOG_TRACE("()");
     gBig_font = LoadBRFont("BIGFONT.FNT");
     gFont_7 = LoadBRFont("FONT7.FNT");
     gHeadup_font = LoadBRFont("HEADUP.FNT");
@@ -356,8 +346,6 @@ void InitBRFonts(void) {
 // IDA: void __cdecl AustereWarning()
 // FUNCTION: CARM95 0x4bc16d
 void AustereWarning(void) {
-    LOG_TRACE("()");
-
     ClearEntireScreen();
 
     if (gAusterity_mode) {
@@ -378,8 +366,6 @@ void AustereWarning(void) {
 
 // IDA: void __cdecl InitLineStuff()
 void InitLineStuff(void) {
-    LOG_TRACE("()");
-
     // HACK: originally 2 vertices
     gLine_model = BrModelAllocate("gLine_model", 3 /*2*/, 1);
     gLine_material = BrMaterialAllocate("gLine_material");
@@ -412,7 +398,6 @@ void InitLineStuff(void) {
 void InitSmokeStuff(void) {
     static br_token_value fadealpha[3] = { { BRT_BLEND_B, { .u32 = 1 } }, { BRT_OPACITY_X, { .x = 0x4B0000 } }, { 0 } };
     tPath_name path;
-    LOG_TRACE("()");
 
     gBlend_model = BrModelAllocate("gBlend_model", 4, 2);
     gBlend_material = BrMaterialAllocate("gBlend_material");
@@ -473,7 +458,6 @@ void Init2DStuff(void) {
     tPath_name path;
     br_scalar prat_u;
     br_scalar prat_v;
-    LOG_TRACE("()");
 
     g2d_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
     gDim_model = BrModelAllocate("gDim_model", 4, 2);
@@ -565,7 +549,6 @@ void Init2DStuff(void) {
 // IDA: void __usercall InitialiseApplication(int pArgc@<EAX>, char **pArgv@<EDX>)
 // FUNCTION: CARM95 0x4bba54
 void InitialiseApplication(int pArgc, char** pArgv) {
-
     if (harness_game_config.gore_check) {
         gProgram_state.sausage_eater_mode = gSausage_override ? 1 : (PDGetGorePassword() ? 0 : 1);
         PDDisplayGoreworthiness(!gProgram_state.sausage_eater_mode);
@@ -675,7 +658,6 @@ void InitialiseDeathRace(int pArgc, char** pArgv) {
 // FUNCTION: CARM95 0x4bc22c
 void InitGame(int pStart_race) {
     int i;
-    LOG_TRACE("(%d)", pStart_race);
 
     gWaiting_for_unpause = 1;
     gWait_for_it = 1;
@@ -727,7 +709,6 @@ void InitGame(int pStart_race) {
 // FUNCTION: CARM95 0x4bc3d0
 void DisposeGameIfNecessary(void) {
     int i;
-    LOG_TRACE("()");
 
     if (gNet_mode != eNet_mode_none) {
         NetLeaveGame(gCurrent_net_game);
@@ -750,30 +731,23 @@ void DisposeGameIfNecessary(void) {
 // IDA: void __cdecl LoadInTrack()
 // FUNCTION: CARM95 0x4bc93a
 void LoadInTrack(void) {
-    LOG_TRACE("()");
-
     LoadTrack(gProgram_state.track_file_name, &gProgram_state.track_spec, &gCurrent_race);
 }
 
 // IDA: void __cdecl DisposeTrack()
 // FUNCTION: CARM95 0x4bc493
 void DisposeTrack(void) {
-    LOG_TRACE("()");
-
     FreeTrack(&gProgram_state.track_spec);
 }
 
 // IDA: void __usercall CopyMaterialColourFromIndex(br_material *pMaterial@<EAX>)
 void CopyMaterialColourFromIndex(br_material* pMaterial) {
-    LOG_TRACE("(%p)", pMaterial);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl InitRace()
 // FUNCTION: CARM95 0x4bc4b1
 void InitRace(void) {
-    LOG_TRACE("()");
-
     SwitchToRealResolution();
     // TODO: dword_5454C4 = 0;
     ClearConcussion();
@@ -910,8 +884,6 @@ void InitRace(void) {
 // IDA: void __cdecl DisposeRace()
 // FUNCTION: CARM95 0x4bc968
 void DisposeRace(void) {
-    LOG_TRACE("()");
-
     PossibleService();
     DisposePiping();
     PossibleService();
@@ -956,15 +928,11 @@ void DisposeRace(void) {
 // IDA: int __cdecl GetScreenSize()
 // FUNCTION: CARM95 0x4bca25
 int GetScreenSize(void) {
-    LOG_TRACE("()");
-
     return gRender_indent;
 }
 
 // IDA: void __usercall SetScreenSize(int pNew_size@<EAX>)
 // FUNCTION: CARM95 0x4bca3a
 void SetScreenSize(int pNew_size) {
-    LOG_TRACE("(%d)", pNew_size);
-
     gRender_indent = pNew_size;
 }

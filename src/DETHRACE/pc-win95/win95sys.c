@@ -140,8 +140,7 @@ void KeyboardHandler(void) {
     tU8 scan_code;
     tU8 up;
     static tU8 extended;
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int KeyDown(tU8 pScan_code) {
@@ -149,8 +148,7 @@ int KeyDown(tU8 pScan_code) {
 }
 
 void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
-    LOG_TRACE("(%d, %d, %d)", pKey_index, pScan_code_1, pScan_code_2);
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void KeyBegin(void) {
@@ -264,19 +262,16 @@ void KeyBegin(void) {
 }
 
 void KeyEnd(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int KeyDown22(int pKey_index) {
-    LOG_TRACE("(%d)", pKey_index);
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void PDSetKeyArray(int* pKeys, int pMark) {
     int i;
     uint8_t keystate[256];
-    LOG_TRACE10("(%p, %d)", pKeys, pMark);
 
     gKeys_pressed = 0;
     Win32PumpMessages();
@@ -336,8 +331,6 @@ void Win32ReleaseInputDevice(void) {
 }
 
 int PDGetASCIIFromKey(int pKey) {
-    LOG_TRACE("(%d)", pKey);
-
     /* The Windows Carmageddon executable uses PDKeyDown here. The German DOS executable uses PDKeyDown3. */
     if (PDKeyDown3(KEY_SHIFT_ANY)) {
         return gASCII_shift_table[pKey];
@@ -368,8 +361,6 @@ void Win32PumpMessages(void) {
 }
 
 void PDFatalError(char* pThe_str) {
-    LOG_TRACE("(\"%s\")", pThe_str);
-
     dr_dprintf("FATAL ERROR: %s", pThe_str);
     Win32FatalError(pThe_str, "");
 }
@@ -382,8 +373,7 @@ void Win32FatalError(char* pStr_1, char* pStr_2) {
 }
 
 void PDNonFatalError(char* pThe_str) {
-    LOG_TRACE("(\"%s\")", pThe_str);
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void PDInitialiseSystem(void) {
@@ -463,7 +453,6 @@ void Win32CreateWindow(void) {
 
 void PDShutdownSystem(void) {
     static int been_here = 0;
-    LOG_TRACE("()");
 
     if (!been_here) {
         been_here = 1;
@@ -496,13 +485,10 @@ void PDShutdownSystem(void) {
 }
 
 void PDSaveOriginalPalette(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void PDRevertPalette(void) {
-    LOG_TRACE("()");
-
     // empty function
 }
 
@@ -525,14 +511,10 @@ void Win32InitScreen(void) {
 }
 
 void PDLockRealBackScreen(void) {
-    LOG_TRACE("()");
-
     // no-op
 }
 
 void PDUnlockRealBackScreen(void) {
-    LOG_TRACE("()");
-
     // no-op
 }
 
@@ -624,8 +606,7 @@ void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* 
     tU8 blue;
     tU16* dst;
     tU16* palette_entry;
-    LOG_TRACE("(%p, %p, %p)", pDst, pSrc, pPalette);
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette, tU16 pOff, tU16 pSrc_width, tU16 pSrc_height) {
@@ -640,28 +621,23 @@ void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap
     tU16* dst1;
     tU16 sixteen;
     tU16* palette_entry;
-    LOG_TRACE("(%p, %p, %p, %d, %d, %d)", pDst, pSrc, pPalette, pOff, pSrc_width, pSrc_height);
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 br_pixelmap* PDInterfacePixelmap(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void SwapBackScreen(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom) {
-    LOG_TRACE("(%d, %d)", pRendering_area_only, pClear_top_and_bottom);
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void CopyBackScreen(int pRendering_area_only) {
-    LOG_TRACE("(%d)", pRendering_area_only);
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void PDScreenBufferSwap(int pRendering_area_only) {
@@ -682,23 +658,18 @@ void PDScreenBufferSwap(int pRendering_area_only) {
 }
 
 void PDPixelmapToScreenRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
-    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", dst, dx, dy, src, sx, sy, w, h);
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void PDPixelmapHLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
-    LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x1, y1, x2, y2, colour);
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
-    LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x1, y1, x2, y2, colour);
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void PDInstallErrorHandlers(void) {
-    LOG_TRACE("()");
-
     gWin32_br_diaghandler.identifier = "LlantisilioBlahBlahBlahOgOgOch";
     gWin32_br_diaghandler.warning = Win32BRenderWarningFunc;
     gWin32_br_diaghandler.failure = Win32BRenderFailureFunc;
@@ -706,7 +677,6 @@ void PDInstallErrorHandlers(void) {
 }
 
 void PDSetFileVariables(void) {
-
     // Changed by dethrace for cross-platform
     // strcpy(gDir_separator, "\\");
     strcpy(gDir_separator, "/");
@@ -773,18 +743,15 @@ void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 }
 
 void PDSwitchToRealResolution(void) {
-    LOG_TRACE("()");
-}
+    }
 
 void PDSwitchToLoresMode(void) {
-    LOG_TRACE("()");
-}
+    }
 
 void PDMouseButtons(int* pButton_1, int* pButton_2) {
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x;
     br_int_32 mouse_y;
-    LOG_TRACE("(%p, %p)", pButton_1, pButton_2);
 
     // added by dethrace
     gHarness_platform.GetMouseButtons(pButton_1, pButton_2);
@@ -792,7 +759,6 @@ void PDMouseButtons(int* pButton_1, int* pButton_2) {
 
 void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     POINT_ p;
-    LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
 
     GetCursorPos_(&p);
     ScreenToClient_(gWin32_hwnd, &p);
@@ -906,8 +872,6 @@ void Win32AllocateActionReplayBuffer(void) {
 }
 
 void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
-    LOG_TRACE("(%p, %p)", pBuffer, pBuffer_size);
-
     if (gReplay_override) {
         *pBuffer = NULL;
         *pBuffer_size = 0;
@@ -919,8 +883,7 @@ void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
 }
 
 void PDDisposeActionReplayBuffer(char* pBuffer) {
-    LOG_TRACE("(\"%s\")", pBuffer);
-}
+    }
 
 // this function is taken from dossys
 void Usage(char* pProgpath) {
@@ -1002,13 +965,11 @@ int original_main(int pArgc, char** pArgv) {
 
 int OurGetChar(void) {
     int key;
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void PDEnterDebugger(char* pStr) {
     static unsigned char* save_it;
-    LOG_TRACE("(\"%s\")", pStr);
 
     dr_dprintf("PDEnterDebugger(): %s", pStr);
     ShowCursor_(1);
@@ -1018,7 +979,6 @@ void PDEnterDebugger(char* pStr) {
     if (pStr != "Bet you weren't expecting this"
 #endif
         && _CrtDbgReport_(_CRT_ASSERT, "C:\\Msdev\\Projects\\DethRace\\Win95sys.c", 437, 0, 0) == 1) {
-
         abort(); // original: __debugbreak();
     }
     ShowCursor_(0);
@@ -1026,8 +986,6 @@ void PDEnterDebugger(char* pStr) {
 
 // Added function
 br_material* PDMissingMaterial(char* name) {
-    LOG_TRACE("(\"%s\")", name);
-
     // FIXME: call functiont in harness
     dr_dprintf("SOMETHING MISSING WARNING - Can't find material '%s'", name);
     return NULL;
@@ -1035,8 +993,6 @@ br_material* PDMissingMaterial(char* name) {
 
 // Added function
 br_pixelmap* PDMissingTable(char* name) {
-    LOG_TRACE("(\"%s\")", name);
-
     // FIXME: call function in harness
     dr_dprintf("SOMETHING MISSING WARNING - Can't find shade table '%s'", name);
     return NULL;
@@ -1044,8 +1000,6 @@ br_pixelmap* PDMissingTable(char* name) {
 
 // Added function
 br_model* PDMissingModel(char* name) {
-    LOG_TRACE("(\"%s\")", name);
-
     // FIXME: call function in harness
     dr_dprintf("SOMETHING MISSING WARNING - Can't find model '%s'", name);
     return NULL;
@@ -1053,28 +1007,23 @@ br_model* PDMissingModel(char* name) {
 
 // Added function
 br_pixelmap* PDMissingMap(char* name) {
-    LOG_TRACE("(\"%s\")", name);
-
     // FIXME: call function in harness
     dr_dprintf("SOMETHING MISSING WARNING - Can't find pixelmap '%s'", name);
     return NULL;
 }
 
 void PDEndItAllAndReRunTheBastard(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int InitJoysticks(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 tU32 ReadJoystickAxis(int pBit) {
     tU32 val;
     tU32 count;
-    LOG_TRACE("(%d)", pBit);
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 void PDReadJoySticks(void) {
@@ -1082,88 +1031,72 @@ void PDReadJoySticks(void) {
     tU32 temp1y;
     tU32 temp2x;
     tU32 temp2y;
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 tS32 PDGetJoy1X(void) {
     tS32 joy;
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 tS32 PDGetJoy1Y(void) {
     tS32 joy;
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 tS32 PDGetJoy2X(void) {
     tS32 joy;
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 tS32 PDGetJoy2Y(void) {
     tS32 joy;
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int PDGetJoy1Button1(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int PDGetJoy1Button2(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int PDGetJoy1Button3(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int PDGetJoy1Button4(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int PDGetJoy2Button1(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int PDGetJoy2Button2(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int PDGetJoy2Button3(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int PDGetJoy2Button4(void) {
-    LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+        NOT_IMPLEMENTED();
 }
 
 int PDFileUnlock(char* pThe_path) {
     uint32_t dwFileAttributes; // [esp+Ch] [ebp-4h]
-    LOG_TRACE("(\"%s\")", pThe_path);
 
     dwFileAttributes = GetFileAttributesA_(pThe_path);
     return dwFileAttributes != INVALID_FILE_ATTRIBUTES && SetFileAttributesA_(pThe_path, dwFileAttributes & ~FILE_ATTRIBUTE_READONLY);
 }
 
 int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
-
     char the_path[256]; // [esp+Ch] [ebp-108h] BYREF
     tU32 file_size;     // [esp+10Ch] [ebp-8h]
     HANDLE_ hFile;      // [esp+110h] [ebp-4h]
-    LOG_TRACE("(\"%s\", \"%s\", %d)", pThe_path, pFile_name, pMin_size);
 
     file_size = 0;
     if (pFile_name) {
