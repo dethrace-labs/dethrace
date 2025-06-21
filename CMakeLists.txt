@@ -23,6 +23,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
 else()
     include(GetGitRevisionDescription)
     git_describe(DETHRACE_VERSION)
+
     if(NOT DETHRACE_VERSION)
         set(DETHRACE_VERSION "unknown")
     endif()
@@ -39,15 +40,19 @@ option(DETHRACE_INSTALL "Add install target" OFF)
 option(DETHRACE_WERROR "Treat warnings as errors")
 option(DETHRACE_FIX_BUGS "Fix Dethrace bugs" ON)
 option(DETHRACE_3DFX_PATCH "Include changes from VOODOO2C.EXE" ON)
+option(DETHRACE_SOUND_ENABLED "Include audio support" ON)
 
 function(add_compile_flag_if_supported TARGET FLAG)
     cmake_parse_arguments(ARGS "" "" "LANGUAGES" ${ARGN})
+
     if(NOT ARGS_LANGUAGES)
         set(ARGS_LANGUAGES C CXX)
     endif()
+
     string(MAKE_C_IDENTIFIER "${FLAG}" FLAG_TO_IDENTIFIER)
     set(HAVE_FLAG_VARIABLE_NAME "HAVE_${FLAG_TO_IDENTIFIER}")
     check_c_compiler_flag("${FLAG}" "${HAVE_FLAG_VARIABLE_NAME}")
+
     if(${HAVE_FLAG_VARIABLE_NAME})
         string(REPLACE ";" "," ARGS_LANGUAGES "${ARGS_LANGUAGES}")
         target_compile_options("${TARGET}" PRIVATE "$<$<COMPILE_LANGUAGE:${ARGS_LANGUAGES}>:${FLAG}>")
@@ -63,20 +68,24 @@ endfunction()
 test_big_endian(IS_BIGENDIAN)
 
 option(DETHRACE_PLATFORM_SDL1 "Support SDL 1.2 platform driver" OFF)
-option(DETHRACE_PLATFORM_SDL2 "Support SDL 2 platform driver"   ON)
+option(DETHRACE_PLATFORM_SDL2 "Support SDL 2 platform driver" ON)
 set(count_sdl_platforms 0)
 
-set(DETHRACE_PLATFORMS )
+set(DETHRACE_PLATFORMS)
+
 if(DETHRACE_PLATFORM_SDL1)
     find_package(SDL REQUIRED)
     list(APPEND DETHRACE_PLATFORMS SDL1)
     math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
 endif()
+
 if(DETHRACE_PLATFORM_SDL2)
     find_package(SDL2 CONFIG)
+
     if(NOT SDL2_FOUND)
         find_package(SDL2 MODULE REQUIRED)
     endif()
+
     list(APPEND DETHRACE_PLATFORMS SDL2)
     math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
 endif()
@@ -98,8 +107,11 @@ endif()
 
 add_subdirectory(lib/BRender-v1.3.2)
 add_subdirectory(lib/libsmacker)
-add_subdirectory(lib/miniaudio)
-add_subdirectory(lib/stb)
+
+if(DETHRACE_SOUND_ENABLED)
+    add_subdirectory(lib/miniaudio2)
+    add_subdirectory(lib/stb2)
+endif()
 
 add_library(compile_with_werror INTERFACE)
 
@@ -140,6 +152,7 @@ if(DETHRACE_INSTALL)
     set(CPACK_SYSTEM_NAME "${DETHRACE_PACKAGE_PLATFORM}")
 
     set(CPACK_PACKAGE_FILE_NAME "dethrace-${DETHRACE_VERSION}-${DETHRACE_PACKAGE_PLATFORM}")
+
     if(DETHRACE_PACKAGE_ARCH)
         string(APPEND CPACK_PACKAGE_FILE_NAME "-${DETHRACE_PACKAGE_ARCH}")
     endif()
