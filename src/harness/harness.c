@@ -157,6 +157,7 @@ static void Harness_DetectGameMode(void) {
 
 int Harness_Init(int* argc, char* argv[]) {
     int result;
+    char* root_dir;
     tArgument_config argument_config;
 
     printf("Dethrace version: %s\n", DETHRACE_VERSION);
@@ -204,7 +205,7 @@ int Harness_Init(int* argc, char* argv[]) {
         OS_InstallSignalHandler(argv[0]);
     }
 
-    char* root_dir = getenv("DETHRACE_ROOT_DIR");
+    root_dir = getenv("DETHRACE_ROOT_DIR");
     if (root_dir != NULL) {
         LOG_INFO2("DETHRACE_ROOT_DIR is set to '%s'", root_dir);
     } else {
