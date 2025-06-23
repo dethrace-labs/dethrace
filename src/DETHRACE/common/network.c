@@ -5,6 +5,7 @@
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/hooks.h"
@@ -185,7 +186,7 @@ void NetSendHeadupToEverybody(char* pMessage) {
         return;
     }
     if (gProgram_state.racing) {
-        NewTextHeadupSlot(4, 0, 3000, -4, pMessage);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pMessage);
     }
     the_contents = NetGetBroadcastContents(NETMSGID_HEADUP, 0);
     strcpy(the_contents->data.headup.text, pMessage);
@@ -201,7 +202,7 @@ void NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) {
     }
     if (gLocal_net_ID == pPlayer) {
         if (gProgram_state.racing) {
-            NewTextHeadupSlot(4, 0, 3000, -4, pMessage);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pMessage);
         }
     } else {
         message = NetBuildMessage(NETMSGID_HEADUP, 0);
@@ -1296,6 +1297,9 @@ void NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
         if (restore_screen) {
             memcpy(gBack_screen->pixels, gPixels_copy_, gPixel_buffer_size_);
             memcpy(gCurrent_palette_pixels, gPalette_copy_, 0x400u);
+#ifdef DETHRACE_3DFX_PATCH
+            g16bit_palette_valid = 0;
+#endif
             BrMemFree(gPixels_copy_);
             BrMemFree(gPalette_copy_);
             PDScreenBufferSwap(0);
@@ -1487,7 +1491,7 @@ void ReceivedHeadup(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
 
     if (gProgram_state.racing) {
-        NewTextHeadupSlot(4, 0, 3000, -4, pContents->data.headup.text);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pContents->data.headup.text);
     }
 }
 
@@ -1577,13 +1581,11 @@ void ReceivedConfirm(tNet_contents* pContents) {
 // IDA: void __usercall ReceivedDisableCar(tNet_contents *pContents@<EAX>)
 void ReceivedDisableCar(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
-
 }
 
 // IDA: void __usercall ReceivedEnableCar(tNet_contents *pContents@<EAX>)
 void ReceivedEnableCar(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
-
 }
 
 // IDA: void __usercall ReceivedScores(tNet_contents *pContents@<EAX>)
@@ -1651,7 +1653,7 @@ void ReceivedWasted(tNet_contents* pContents) {
         } else {
             sprintf(s, "%s %s %s", victim->player_name, GetMiscString(kMiscString_WastedBy), culprit ? culprit->player_name : GetMiscString(kMiscString_COP));
         }
-        NewTextHeadupSlot2(4, 0, 3000, -4, s, 0);
+        NewTextHeadupSlot2(eHeadupSlot_misc, 0, 3000, -4, s, 0);
         last_wasty_message_time = PDGetTotalTime();
         last_culprit = culprit;
         last_victim = victim;
@@ -1891,7 +1893,7 @@ void CheckForDisappearees(void) {
                 NetSendHeadupToAllPlayers(s);
                 KickPlayerOut(gNet_players[i].ID);
                 if (gProgram_state.racing) {
-                    NewTextHeadupSlot(4, 0, 3000, -4, s);
+                    NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, s);
                 }
             }
         }
@@ -2062,7 +2064,7 @@ int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message*
     pMessage->senders_time_stamp = PDGetTotalTime();
     if (gNext_guarantee >= COUNT_OF(gGuarantee_list)) {
         sprintf(buffer, "Guarantee list full %d", pMessage->contents.header.type);
-        NewTextHeadupSlot(4, 0, 500, -1, buffer);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, buffer);
         pMessage->guarantee_number = 0;
         return 0;
     }

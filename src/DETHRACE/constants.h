@@ -3,6 +3,25 @@
 
 // These names are not part of the symbol dump, so the names in this file are not original, except as noted.
 
+// Names derived from DATA/64X48X8/HEADUP.TXT (and context)
+typedef enum dr_headup_slot {
+    eHeadupSlot_development = 0,
+    eHeadupSlot_credits = 1,
+    eHeadupSlot_ped_kills = 2,
+    eHeadupSlot_ped_warning = 3,
+    eHeadupSlot_misc = 4,
+    eHeadupSlot_countdown = 5,
+    eHeadupSlot_fancies = 6,
+    eHeadupSlot_timer = 7,
+    eHeadupSlot_lap_count = 8,
+    eHeadupSlot_race_bonus = 9,
+    eHeadupSlot_time_bonus = 10,
+    eHeadupSlot_time_award = 11,
+    eHeadupSlot_cars_out_count = 12,
+    eHeadupSlot_cash_network = 13,
+    eHeadupSlot_ped_network = 14,
+} dr_headup_slot;
+
 // Names from `gMem_names`. See also: `CreateStainlessClasses`
 typedef enum dr_memory_classes {
     kMem_intf_pix_copy = 129,                                            //  0x81
@@ -451,6 +470,17 @@ enum {
     kFatalError_NetContentsTooBig_S = 114,
     kFatalError_FileCorrupt_S = 115,
     kFatalError_RandomNumberOutOfRange_S = 116,
+#ifdef DETHRACE_3DFX_PATCH
+    kFatalError_CouldntLockPixelmap_S = 117,
+    kFatalError_ShouldBeLockedButIsnt_S = 118,
+    kFatalError_CannotPurifyPixelmap_S = 119,
+    kFatalError_FileMustStartWith_S = 120,
+    kFatalError_CantCopeWithVersionFor_S = 121,
+    kFatalError_CannotTilePixelmap_S = 122,
+    kFatalError_Mysterious_S_S = 123,
+    kFatalError_CanOnlyDimRectanglesOfgBack_screen = 124,
+    kFatalError_InvalidMaterialAlpha = 125
+#endif
 };
 
 enum {
@@ -770,6 +800,14 @@ enum {
     NETMSGID_NONE = 0x20,
 };
 
+// Introduced with 3DFX patch
+enum ExceptionFlags {
+    ExceptionFlag_NoBilinear = 1,
+    ExceptionFlag_Double = 2,
+    ExceptionFlag_Quadruple = 4,
+    ExceptionFlag_Mipmap = 4,
+};
+
 #define FONT_TYPEABLE 0
 #define FONT_ORANGHED 1
 #define FONT_BLUEHEAD 2
@@ -818,5 +856,7 @@ enum {
 
 // average frame time in carm95
 #define MUNGE_ENGINE_INTERVAL 50
+
+#define HIRES_Y_OFFSET 40
 
 #endif

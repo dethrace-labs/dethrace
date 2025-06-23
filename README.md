@@ -1,4 +1,4 @@
-# Dethrace  
+# Dethrace
 
 [![Workflow](https://github.com/dethrace-labs/dethrace/actions/workflows/workflow.yaml/badge.svg)](https://github.com/dethrace-labs/dethrace/actions/workflows/workflow.yml)
 [![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/dethrace_labs)
@@ -9,8 +9,8 @@ Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](h
 ## Progress
 (Follow us on Discord or Twitter to get notified of updates!)
 
-#### Last updated June 17 2024
-- 92% of functions implemented
+#### Last updated March 2025
+- 94% of functions implemented
 - Latest screenshot:
 
 <img width="752" alt="Screenshot 2024-05-27 at 8 44 10 AM" src="https://github.com/dethrace-labs/dethrace/assets/1063652/10b3b579-1eb1-4242-8b56-ff062cfff810">
@@ -32,21 +32,19 @@ No, well, I don't think so at least. The original files according to the symbol 
 
 ## Game content
 
-Dethrace does not ship with any game content. You'll need access to the data from the original game. If you don't have an original CD then you can [buy Carmageddon from GoG.com](https://www.gog.com/game/carmageddon_max_pack).
+Dethrace does not ship with any content. You'll need access to the data from the original game. If you don't have an original CD then you can [buy Carmageddon from GoG.com](https://www.gog.com/game/carmageddon_max_pack).
 
 `dethrace` also supports the various freeware demos:
 - [Original Carmageddon demo](https://rr2000.cwaboard.co.uk/R4/PC/carmdemo.zip)
 - [Splat Pack demo](https://rr2000.cwaboard.co.uk/R4/PC/splatdem.zip)
 - [Splat Pack Xmas demo](https://rr2000.cwaboard.co.uk/R4/PC/Splatpack_christmas_demo.zip)
 
-Lots of other fun things are available from the [Road Reaction site](https://rr2000.cwaboard.co.uk/pc-files#c1)
 
+## Building
 
-## Dependencies
+### Dependencies
 
-### SDL2
-
-The easiest way to install SDL is via your favorite package manager.
+Dethrace has a dependency on SDL2. The easiest way to install SDL is via your favorite package manager.
 
 OSX:
 ```sh
@@ -58,16 +56,15 @@ Linux:
 apt-get install libsdl2-dev
 ```
 
- 
 
 Point Dethrace at the Carmageddon install directory:
 ```sh
 export DETHRACE_ROOT_DIR=/path/to/carmageddon
 ```
 
-## Build
+### Clone
 
-Dethrace uses git submodules, so we must pull them after the inital clone:
+Dethrace uses [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), so we must pull them after the inital clone:
 ```sh
 git clone https://github.com/dethrace-labs/dethrace
 cd dethrace
@@ -88,7 +85,7 @@ Once cmake has generated the build files for your platform, run the build. For e
 make
 ```
 
-### Running the game
+## Running the game
 
 Firstly, you need a copy of the [Carmageddon game content](https://github.com/dethrace-labs/dethrace?tab=readme-ov-file#game-content). Extract the zip file if necessary.
 
@@ -96,29 +93,13 @@ Dethrace expects to be placed into the top level Carmageddon folder. You know yo
 
 <img width="638" alt="Screenshot 2024-09-20 at 12 25 05 PM" src="https://github.com/user-attachments/assets/fda77818-9007-44fa-9d8d-c311396fd435">
 
+### CD audio
 
-## Run tests
+Dethrace supports the GOG cd audio convention. If there is a `MUSIC` folder in the Carmageddon folder containing files `Track02.ogg`, `Track03.ogg` etc, then Dethrace will use those files in place of the original CD audio functions.
 
-A subset of tests do not require `DETHRACE_ROOT_DIR`. They run via Github actions when code is committed to this repo. This allows us to keep nice and clean and avoid storing any potentially legally problematic resouces in our repo.
+<img width="571" alt="Screenshot 2024-09-30 at 8 31 59 AM" src="https://github.com/user-attachments/assets/cec72203-9156-4c2a-a15a-328609e65c68">
 
-The majority of tests _do_ require `DETHRACE_ROOT_DIR`. 
 
-To run the full test suite, you must have a copy of the original *Splat Pack* data.
-
-```sh
-export DETHRACE_ROOT_DIR=/path/to/carmageddon_splat_pack
-```
-
-To run 
-
-```sh
-./dethrace_test
-```
-
-To run a single test
-```sh
-DETHRACE_TEST_ARGS="-n test_name" make test
-```
 
 ## Changelog
 [From the beginning until release](docs/CHANGELOG.md)

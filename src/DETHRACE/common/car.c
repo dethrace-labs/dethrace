@@ -994,6 +994,7 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
                 BrVector3SetFloat(&minus_k, 0.f, 0.f, -1.f);
             }
             BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
+
         } else if (gLast_mechanics_time > pLast_frame_time && gCar_to_view == car) {
             BrVector3Sub(&car->old_v, &car->old_v, &car->v);
             BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / harness_game_config.physics_step_time);
@@ -1491,19 +1492,19 @@ void ToggleControls(void) {
     }
     switch (gControl__car) {
     case 0:
-        NewTextHeadupSlot(4, 0, 500, -1, "Original Controls");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "Original Controls");
         break;
     case 1:
-        NewTextHeadupSlot(4, 0, 500, -1, "Accelerated steering");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "Accelerated steering");
         break;
     case 2:
-        NewTextHeadupSlot(4, 0, 500, -1, "0.75 Accelerated");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "0.75 Accelerated");
         break;
     case 3:
-        NewTextHeadupSlot(4, 0, 500, -1, "0.5 Accelerated");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "0.5 Accelerated");
         break;
     default:
-        NewTextHeadupSlot(4, 0, 500, -1, "New controls");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "New controls");
         break;
     }
 }
@@ -2591,7 +2592,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     ApplyTorque(c, &rightplane);
     BrVector3Scale(&rightplane, &b, dt / c->M);
     BrVector3Accumulate(&c->v, &rightplane);
-    if (c->speed < 0.000099999997
+    if (c->speed < 0.0001f
         && ((!c->keys.acc && c->joystick.acc <= 0) || !c->gear)
         && !c->keys.dec
         && c->joystick.dec <= 0
@@ -3498,7 +3499,7 @@ int ExpandBoundingBox(tCar_spec* c) {
     c->bounds[1].min.v[2] = min_z;
     c->bounds[1].max.v[2] = max_z;
     if (c->driver == eDriver_local_human) {
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_RepairObstructed));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_RepairObstructed));
     }
     return 0;
 }
@@ -4626,7 +4627,7 @@ void AmIGettingBoredWatchingCameraSpin(void) {
                     strcat(s, GetMiscString(kMiscString_RACE_LEADER));
                 }
                 headup_timer = GetRaceTime();
-                NewTextHeadupSlot(6, 0, 500, -4, s);
+                NewTextHeadupSlot(eHeadupSlot_fancies, 0, 500, -4, s);
             }
         }
     }
@@ -4666,13 +4667,13 @@ void ViewOpponent(void) {
             n = 0;
         }
         gCar_to_view = gNet_players[n].car;
-        NewTextHeadupSlot(4, 0, 2000, -3, gNet_players[n].player_name);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -3, gNet_players[n].player_name);
     } else {
         if (n >= gNum_viewable_cars) {
             n = 0;
         }
         gCar_to_view = gViewable_car_list[n];
-        NewTextHeadupSlot(4, 0, 2000, -3, gViewable_car_list[n]->driver_name);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -3, gViewable_car_list[n]->driver_name);
     }
     gCamera_yaw = 0;
     InitialiseExternalCamera();
@@ -4685,9 +4686,9 @@ void ToggleCarToCarCollisions(void) {
 
     gCar_car_collisions = !gCar_car_collisions;
     if (gCar_car_collisions) {
-        NewTextHeadupSlot(4, 0, 3000, -4, "Car Car Collisions");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Car Car Collisions");
     } else {
-        NewTextHeadupSlot(4, 0, 3000, -4, "Ghost Cars");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Ghost Cars");
     }
 }
 
@@ -4711,7 +4712,7 @@ void AdjustDownForce(void) {
         c->down_force_speed = 2000.0;
     }
     sprintf(s, "DownForceSpeed %f", c->down_force_speed);
-    NewTextHeadupSlot(4, 0, 1500, -4, s);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -4, s);
 }
 
 // IDA: void __cdecl FreezeMechanics()
@@ -4720,9 +4721,9 @@ void FreezeMechanics(void) {
 
     gFreeze_mechanics = !gFreeze_mechanics;
     if (gFreeze_mechanics) {
-        NewTextHeadupSlot(4, 0, 3000, -4, "Mechanics Frozen");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Mechanics Frozen");
     } else {
-        NewTextHeadupSlot(4, 0, 3000, -4, "Thawed Mechanics");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Thawed Mechanics");
     }
 }
 
@@ -4732,9 +4733,9 @@ void PutOpponentsInNeutral(void) {
 
     gStop_opponents_moving = !gStop_opponents_moving;
     if (gStop_opponents_moving == 0) {
-        NewTextHeadupSlot(4, 0, 3000, -4, "Opponents in neutral");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Opponents in neutral");
     } else {
-        NewTextHeadupSlot(4, 0, 3000, -4, "Back in gear");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Back in gear");
     }
 }
 
@@ -5243,6 +5244,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
     manual_swing = gOld_yaw__car != gCamera_yaw || swoop;
     manual_zoom = (double)gOld_zoom != gCamera_zoom;
     BrVector3Copy(&old_camera_pos, &gCamera->t.t.translate.t);
+
     if (!gProgram_state.cockpit_on) {
         if (swoop) {
             gCamera_yaw = 0;
@@ -6295,8 +6297,8 @@ int CollideTwoCarsRepeatedly(tCollision_info* car1, tCollision_info* car2, br_sc
         car1->frame_collision_flag += 256;
         car2->frame_collision_flag += 256;
         if (gNet_mode == eNet_mode_host) {
-            car1->last_car_car_collision = gLast_mechanics_time + 40;
-            car2->last_car_car_collision = gLast_mechanics_time + 40;
+            car1->last_car_car_collision = gLast_mechanics_time + harness_game_config.physics_step_time;
+            car2->last_car_car_collision = gLast_mechanics_time + harness_game_config.physics_step_time;
         }
     }
     ResetCarsMass(car1, car2);
@@ -6340,11 +6342,6 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     static int is_old_point_available;
     LOG_TRACE("(%p, %p, %d)", car1, car2, pPass);
 
-#ifdef DETHRACE_FIX_BUGS
-    // this variable is used uninitialized
-    add_point = 0;
-#endif
-
     if (!gCar_car_collisions) {
         return 0;
     }
@@ -6352,6 +6349,7 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
         return 0;
     }
 
+    add_point = pPass;
     mat1 = &car1->car_master_actor->t.t.mat;
     mat2 = &car2->car_master_actor->t.t.mat;
     oldmat1 = &car1->oldmat;
@@ -7517,5 +7515,6 @@ int GetPrecalculatedFacesUnderCar(tCar_spec* pCar, tFace_ref** pFace_refs) {
 // IDA: br_material* __cdecl SomeNearbyMaterial()
 br_material* SomeNearbyMaterial(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    return gFace_list__car[gProgram_state.current_car.box_face_start].material;
 }

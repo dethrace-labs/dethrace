@@ -544,20 +544,42 @@ void BuildWrecks(void) {
             position += 1;
         }
     }
-    gWreck_render_area = BrPixelmapAllocateSub(
-        gBack_screen,
-        gCurrent_graf_data->wreck_render_x,
-        gCurrent_graf_data->wreck_render_y,
-        gCurrent_graf_data->wreck_render_w,
-        gCurrent_graf_data->wreck_render_h);
+#ifdef DETHRACE_3DFX_PATCH
+    if (gScreen->type == BR_PMT_INDEX_8) {
+#endif
+        gWreck_render_area = BrPixelmapAllocateSub(
+            gBack_screen,
+            gCurrent_graf_data->wreck_render_x,
+            gCurrent_graf_data->wreck_render_y,
+            gCurrent_graf_data->wreck_render_w,
+            gCurrent_graf_data->wreck_render_h);
+#ifdef DETHRACE_3DFX_PATCH
+    } else {
+        gWreck_render_area = BrPixelmapAllocateSub(
+            gReal_back_screen,
+            gCurrent_graf_data->wreck_render_x * 2,
+            gCurrent_graf_data->wreck_render_y * 2 + HIRES_Y_OFFSET,
+            gCurrent_graf_data->wreck_render_w * 2,
+            gCurrent_graf_data->wreck_render_h * 2);
+    }
+#endif
     gWreck_render_area->origin_x = gWreck_render_area->width / 2;
     gWreck_render_area->origin_y = gWreck_render_area->height / 2;
-    gWreck_z_buffer = BrPixelmapAllocateSub(
-        gDepth_buffer,
-        gCurrent_graf_data->wreck_render_x,
-        gCurrent_graf_data->wreck_render_y,
-        gCurrent_graf_data->wreck_render_w,
-        gCurrent_graf_data->wreck_render_h);
+
+#ifdef DETHRACE_3DFX_PATCH
+    if (gScreen->type == BR_PMT_INDEX_8) {
+#endif
+        gWreck_z_buffer = BrPixelmapAllocateSub(
+            gDepth_buffer,
+            gCurrent_graf_data->wreck_render_x,
+            gCurrent_graf_data->wreck_render_y,
+            gCurrent_graf_data->wreck_render_w,
+            gCurrent_graf_data->wreck_render_h);
+#ifdef DETHRACE_3DFX_PATCH
+    } else {
+        gWreck_z_buffer = gDepth_buffer;
+    }
+#endif
 }
 
 // IDA: void __cdecl DisposeWrecks()
@@ -595,9 +617,14 @@ void DisposeWrecks(void) {
     BrActorFree(gWreck_root);
     BrActorFree(gWreck_camera);
     gWreck_render_area->pixels = NULL;
-    gWreck_z_buffer->pixels = NULL;
     BrPixelmapFree(gWreck_render_area);
-    BrPixelmapFree(gWreck_z_buffer);
+
+#ifdef DETHRACE_3DFX_PATCH
+    if (gScreen->type == BR_PMT_INDEX_8) {
+        gWreck_z_buffer->pixels = NULL;
+        BrPixelmapFree(gWreck_z_buffer);
+    }
+#endif
 }
 
 // IDA: int __usercall MatrixIsIdentity@<EAX>(br_matrix34 *pMat@<EAX>)
@@ -715,7 +742,7 @@ int CastSelectionRay(int* pCurrent_choice, int* pCurrent_mode) {
     GetMousePosition(&mouse_x, &mouse_y);
     if (gReal_graf_data_index != 0) {
         mouse_x = 2 * mouse_x;
-        mouse_y = 2 * mouse_y + 40;
+        mouse_y = 2 * mouse_y + HIRES_Y_OFFSET;
     }
     for (i = 0; i < gWreck_count; i++) {
         BrMatrix34PreScale(&gWreck_array[i].actor->t.t.mat, 2.f, 2.f, 2.f);
@@ -808,51 +835,115 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
     }
     EnsureRenderPalette();
     EnsurePaletteUp();
-    BrPixelmapFill(gWreck_z_buffer, 0xffffffff);
-    BrPixelmapFill(gWreck_render_area, BR_COLOUR_RGBA(0xb0, 0xb0, 0xb0, 0xb0));
+#ifdef DETHRACE_3DFX_PATCH
+    if (gScreen->type == BR_PMT_INDEX_8) {
+#endif
+        BrPixelmapFill(gWreck_z_buffer, 0xffffffff);
+        BrPixelmapFill(gWreck_render_area, BR_COLOUR_RGBA(0xb0, 0xb0, 0xb0, 0xb0));
 
-    rows = gWreck_render_area->height / 15.f;
-    columns = gWreck_render_area->width / 15.f;
-    for (v = 0; v <= rows; v++) {
-        BrPixelmapLine(gWreck_render_area,
-            -gWreck_render_area->origin_x,
-            gWreck_render_area->height / 2.f - 15.f * (rows / 2.f - v) - gWreck_render_area->origin_y,
-            gWreck_render_area->width - gWreck_render_area->origin_x,
-            gWreck_render_area->height / 2.f - 15.f * (rows / 2.f - v) - gWreck_render_area->origin_y,
-            8);
+        rows = gWreck_render_area->height / 15.f;
+        columns = gWreck_render_area->width / 15.f;
+        for (v = 0; v <= rows; v++) {
+            BrPixelmapLine(gWreck_render_area,
+                -gWreck_render_area->origin_x,
+                gWreck_render_area->height / 2.f - 15.f * (rows / 2.f - v) - gWreck_render_area->origin_y,
+                gWreck_render_area->width - gWreck_render_area->origin_x,
+                gWreck_render_area->height / 2.f - 15.f * (rows / 2.f - v) - gWreck_render_area->origin_y,
+                8);
+        }
+        for (h = 0; h <= columns; h++) {
+            BrPixelmapLine(gWreck_render_area,
+                gWreck_render_area->width / 2.f - 15.f * (columns / 2.f - h) - gWreck_render_area->origin_x,
+                -gWreck_render_area->origin_y,
+                gWreck_render_area->width / 2.f - 15.f * (columns / 2.f - h) - gWreck_render_area->origin_x,
+                gWreck_render_area->height - gWreck_render_area->origin_y,
+                8);
+        }
+        BrZbSceneRenderBegin(gUniverse_actor, gWreck_camera, gWreck_render_area, gWreck_z_buffer);
+        BrZbSceneRenderAdd(gWreck_root);
+        BrZbSceneRenderEnd();
+        if (sel_actor != NULL) {
+            BrActorRemove(sel_actor);
+            sel_actor->model = NULL;
+            BrActorFree(sel_actor);
+        }
+        BrPixelmapRectangleFill(gBack_screen,
+            gCurrent_graf_data->wreck_name_left,
+            gCurrent_graf_data->wreck_name_top,
+            gCurrent_graf_data->wreck_name_right - gCurrent_graf_data->wreck_name_left,
+            gCurrent_graf_data->wreck_name_bottom - gCurrent_graf_data->wreck_name_top,
+            0);
+        if (gWreck_selected >= 0 && (gWreck_zoomed_in >= 0 || pCurrent_mode == 0)) {
+            name = GetDriverName(gWreck_array[gWreck_selected].car_type,
+                gWreck_array[gWreck_selected].car_index);
+            TransBrPixelmapText(gBack_screen,
+                (gCurrent_graf_data->wreck_name_left + gCurrent_graf_data->wreck_name_right - BrPixelmapTextWidth(gBack_screen, gFont_7, name)) / 2,
+                gCurrent_graf_data->wreck_name_base_line,
+                84,
+                gFont_7,
+                name);
+        }
+#ifdef DETHRACE_3DFX_PATCH
+    } else {
+        rows = gCurrent_graf_data->wreck_render_h * 0.0666666f;
+        columns = (double)gCurrent_graf_data->wreck_render_w * 0.0666666f;
+
+        BrPixelmapRectangleFill(gBack_screen, gCurrent_graf_data->wreck_render_x, gCurrent_graf_data->wreck_render_y, gCurrent_graf_data->wreck_render_w, gCurrent_graf_data->wreck_render_h, 0xB0B0B0B0);
+
+        for (v = 0; v <= rows; v++) {
+            BrPixelmapLine(
+                gBack_screen,
+                gCurrent_graf_data->wreck_render_x,
+                gCurrent_graf_data->wreck_render_h / 2.0f + gCurrent_graf_data->wreck_render_y - (rows / 2.0f - v) * 15.0f,
+                gCurrent_graf_data->wreck_render_w + gCurrent_graf_data->wreck_render_x,
+                gCurrent_graf_data->wreck_render_h / 2.0f + gCurrent_graf_data->wreck_render_y - (rows / 2.0f - v) * 15.0f,
+                8);
+        }
+        for (h = 0; h <= columns; h++) {
+            BrPixelmapLine(gBack_screen,
+                gCurrent_graf_data->wreck_render_w / 2.0f + gCurrent_graf_data->wreck_render_x - (columns / 2.0f - h) * 15.0,
+                gCurrent_graf_data->wreck_render_y,
+                gCurrent_graf_data->wreck_render_w / 2.0f + gCurrent_graf_data->wreck_render_x - (columns / 2.0f - h) * 15.0,
+                gCurrent_graf_data->wreck_render_h + gCurrent_graf_data->wreck_render_y,
+                8);
+        }
+        if (sel_actor) {
+            BrActorRemove(sel_actor);
+            sel_actor->model = NULL;
+            BrActorFree(sel_actor);
+        }
+        BrPixelmapRectangleFill(
+            gBack_screen,
+            gCurrent_graf_data->wreck_name_left,
+            gCurrent_graf_data->wreck_name_top,
+            gCurrent_graf_data->wreck_name_right - gCurrent_graf_data->wreck_name_left,
+            gCurrent_graf_data->wreck_name_bottom - gCurrent_graf_data->wreck_name_top,
+            0);
+        if (gWreck_selected >= 0 && (gWreck_zoomed_in >= 0 || pCurrent_mode == 0)) {
+            name = GetDriverName(gWreck_array[gWreck_selected].car_type, gWreck_array[gWreck_selected].car_index);
+            TransBrPixelmapText(gBack_screen,
+                (gCurrent_graf_data->wreck_name_left + gCurrent_graf_data->wreck_name_right - BrPixelmapTextWidth(gBack_screen, gFont_7, name)) / 2,
+                gCurrent_graf_data->wreck_name_base_line,
+                84,
+                gFont_7,
+                name);
+        }
+        CopyBackScreen(0);
+        BrPixelmapFill(gWreck_z_buffer, 0xFFFFFFFF);
+        PDUnlockRealBackScreen(1);
+
+        // Added by dethrace
+        // 3d scene is drawn on top of the 2d hud, so we must ensure that all the 2d pixel
+        // writes have been flushed to the framebuffer first
+        BrPixelmapFlush(gReal_back_screen);
+        // -
+
+        BrZbSceneRenderBegin(gUniverse_actor, gWreck_camera, gWreck_render_area, gWreck_z_buffer);
+        BrZbSceneRenderAdd(gWreck_root);
+        BrZbSceneRenderEnd();
+        PDLockRealBackScreen(1);
     }
-    for (h = 0; h <= columns; h++) {
-        BrPixelmapLine(gWreck_render_area,
-            gWreck_render_area->width / 2.f - 15.f * (columns / 2.f - h) - gWreck_render_area->origin_x,
-            -gWreck_render_area->origin_y,
-            gWreck_render_area->width / 2.f - 15.f * (columns / 2.f - h) - gWreck_render_area->origin_x,
-            gWreck_render_area->height - gWreck_render_area->origin_y,
-            8);
-    }
-    BrZbSceneRenderBegin(gUniverse_actor, gWreck_camera, gWreck_render_area, gWreck_z_buffer);
-    BrZbSceneRenderAdd(gWreck_root);
-    BrZbSceneRenderEnd();
-    if (sel_actor != NULL) {
-        BrActorRemove(sel_actor);
-        sel_actor->model = NULL;
-        BrActorFree(sel_actor);
-    }
-    BrPixelmapRectangleFill(gBack_screen,
-        gCurrent_graf_data->wreck_name_left,
-        gCurrent_graf_data->wreck_name_top,
-        gCurrent_graf_data->wreck_name_right - gCurrent_graf_data->wreck_name_left,
-        gCurrent_graf_data->wreck_name_bottom - gCurrent_graf_data->wreck_name_top,
-        0);
-    if (gWreck_selected >= 0 && (gWreck_zoomed_in >= 0 || pCurrent_mode == 0)) {
-        name = GetDriverName(gWreck_array[gWreck_selected].car_type,
-            gWreck_array[gWreck_selected].car_index);
-        TransBrPixelmapText(gBack_screen,
-            (gCurrent_graf_data->wreck_name_left + gCurrent_graf_data->wreck_name_right - BrPixelmapTextWidth(gBack_screen, gFont_7, name)) / 2,
-            gCurrent_graf_data->wreck_name_base_line,
-            84,
-            gFont_7,
-            name);
-    }
+#endif
 }
 
 // IDA: int __usercall DamageScrnLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -1045,7 +1136,7 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
     old_mouse_x = 0; // Fixes warning caused by -Wsometimes-uninitialized
     old_mouse_y = 0; // Fixes warning caused by -Wsometimes-uninitialized
 #endif
-    GetMousePosition(&old_mouse_y, &old_mouse_y);
+    GetMousePosition(&old_mouse_x, &old_mouse_y);
     if (gWreck_zoomed_in < 0) {
         if (CastSelectionRay(pCurrent_choice, pCurrent_mode)) {
             gUser_interacted = 1;
@@ -1222,10 +1313,10 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
         DRPixelmapRectangleMaskedCopy(gBack_screen,
             gCurrent_graf_data->net_sum_x_1,
             gCurrent_graf_data->net_sum_headings_y + 1 + i * gCurrent_graf_data->net_sum_y_pitch,
-            gIcons_pix_low_res,  /* DOS version uses low res, Windows version uses normal res */
+            gIcons_pix_low_res, /* DOS version uses low res, Windows version uses normal res */
             0,
             gCurrent_graf_data->net_head_icon_height * player->car_index,
-            gIcons_pix_low_res->width,  /* DOS version uses low res, Windows version uses normal res */
+            gIcons_pix_low_res->width, /* DOS version uses low res, Windows version uses normal res */
             gCurrent_graf_data->net_head_icon_height);
         TurnOnPaletteConversion();
         DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_2, i, 83, s);

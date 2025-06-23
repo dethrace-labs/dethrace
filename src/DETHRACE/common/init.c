@@ -12,6 +12,7 @@
 #include "errors.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
@@ -166,6 +167,23 @@ void AllocateRearviewPixelmap(void) {
     char* rear_screen_pixels;
     LOG_TRACE("()");
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (gRearview_screen != NULL) {
+        BrPixelmapFree(gRearview_screen);
+        gRearview_screen = NULL;
+    }
+    if (gProgram_state.mirror_on) {
+        gRearview_screen = BrPixelmapAllocateSub(
+            gBack_screen,
+            gProgram_state.current_car.mirror_left,
+            gProgram_state.current_car.mirror_top,
+            gProgram_state.current_car.mirror_right - gProgram_state.current_car.mirror_left,
+            gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top);
+        gRearview_depth_buffer = gDepth_buffer;
+        gRearview_screen->origin_x = gRearview_screen->width / 2;
+        gRearview_screen->origin_y = gRearview_screen->height / 2;
+    }
+#else
     if (gRearview_screen) {
         BrMemFree(gRearview_screen->pixels);
         BrPixelmapFree(gRearview_screen);
@@ -192,6 +210,7 @@ void AllocateRearviewPixelmap(void) {
         gRearview_screen->origin_y = gRearview_screen->height / 2;
         gRearview_depth_buffer = BrPixelmapMatch(gRearview_screen, BR_PMMATCH_DEPTH_16);
     }
+#endif
 }
 
 // IDA: void __cdecl ReinitialiseRearviewCamera()
@@ -221,6 +240,15 @@ void ReinitialiseRenderStuff(void) {
         gProgram_state.current_render_right = gProgram_state.current_car.render_right[gProgram_state.cockpit_image_index];
         gProgram_state.current_render_bottom = gProgram_state.current_car.render_bottom[gProgram_state.cockpit_image_index];
     } else {
+#ifdef DETHRACE_3DFX_PATCH
+        if (gSmall_frames_are_slow) {
+            gProgram_state.current_render_top = 0;
+            gProgram_state.current_render_right = gGraf_specs[gGraf_spec_index].total_width;
+            gProgram_state.current_render_left = 0;
+            gProgram_state.current_render_bottom = gGraf_specs[gGraf_spec_index].total_height;
+            return;
+        }
+#endif
         gProgram_state.current_render_top = (gGraf_specs[gGraf_spec_index].total_height / 18 & ~1) * gRender_indent;
         gProgram_state.current_render_left = (gGraf_specs[gGraf_spec_index].total_width / 18 & ~3) * gRender_indent;
         x_diff = gGraf_specs[gGraf_spec_index].total_width - gProgram_state.current_render_left;
@@ -320,26 +348,187 @@ void AustereWarning(void) {
 // IDA: void __cdecl InitLineStuff()
 void InitLineStuff(void) {
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    // HACK: originally 2 vertices
+    gLine_model = BrModelAllocate("gLine_model", 3 /*2*/, 1);
+    gLine_material = BrMaterialAllocate("gLine_material");
+    gLine_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    if (!gLine_model || !gLine_material || !gLine_actor) {
+        FatalError(kFatalError_OOMCarmageddon_S);
+    }
+    gLine_actor->identifier = "gLine_actor";
+    gLine_actor->render_style = BR_RSTYLE_EDGES;
+    gLine_actor->model = gLine_model;
+    gLine_actor->material = gLine_material;
+    gLine_model->flags = BR_MODF_QUICK_UPDATE | BR_MODF_KEEP_ORIGINAL;
+    gLine_model->faces->vertices[0] = 0;
+    gLine_model->faces->vertices[1] = 0;
+    gLine_model->faces->vertices[2] = 1;
+
+    // HACK: override the 2 vertices + EDGES with 3 vertices + FACES
+    gLine_model->faces->vertices[1] = 2;
+    gLine_actor->render_style = BR_RSTYLE_FACES;
+    // HACK end
+
+    gLine_material->flags = BR_MATF_TWO_SIDED | BR_MATF_SMOOTH | BR_MATF_PRELIT | BR_MATF_LIGHT;
+    gLine_model->faces[0].flags = BR_FACEF_COPLANAR_0 | BR_FACEF_COPLANAR_2;
+    BrModelAdd(gLine_model);
+    BrMaterialAdd(gLine_material);
+    BrActorAdd(gDont_render_actor, gLine_actor);
 }
 
 // IDA: void __cdecl InitSmokeStuff()
 void InitSmokeStuff(void) {
-    static br_token_value fadealpha[3];
+    static br_token_value fadealpha[3] = { { BRT_BLEND_B, { .u32 = 1 } }, { BRT_OPACITY_X, { .x = 0x4B0000 } }, { 0 } };
     tPath_name path;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    gBlend_model = BrModelAllocate("gBlend_model", 4, 2);
+    gBlend_material = BrMaterialAllocate("gBlend_material");
+    gBlend_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    if (!gBlend_model || !gBlend_material || !gBlend_actor) {
+        FatalError(kFatalError_OOMCarmageddon_S);
+    }
+    gBlend_actor->identifier = "gBlend_actor";
+    gBlend_actor->model = gBlend_model;
+    gBlend_actor->material = gBlend_material;
+    gBlend_model->faces[0].vertices[0] = 0;
+    gBlend_model->faces[0].vertices[1] = 1;
+    gBlend_model->faces[0].vertices[2] = 2;
+    gBlend_model->faces[1].vertices[0] = 2;
+    gBlend_model->faces[1].vertices[1] = 3;
+    gBlend_model->faces[1].vertices[2] = 0;
+    gBlend_model->vertices[0].p.v[0] = -1.0f;
+    gBlend_model->vertices[0].p.v[1] = 1.0f;
+    gBlend_model->vertices[0].p.v[2] = 0.0f;
+    gBlend_model->vertices[1].p.v[0] = -1.0f;
+    gBlend_model->vertices[1].p.v[1] = -1.0f;
+    gBlend_model->vertices[1].p.v[2] = 0.0f;
+    gBlend_model->vertices[2].p.v[0] = 1.0f;
+    gBlend_model->vertices[2].p.v[1] = -1.0f;
+    gBlend_model->vertices[2].p.v[2] = 0.0f;
+    gBlend_model->vertices[3].p.v[0] = 1.0f;
+    gBlend_model->vertices[3].p.v[1] = 1.0f;
+    gBlend_model->vertices[3].p.v[2] = 0.0f;
+    gBlend_material->flags = BR_MATF_PERSPECTIVE | BR_MATF_SMOOTH;
+    gBlend_material->flags |= (BR_MATF_LIGHT | BR_MATF_PRELIT);
+    gBlend_model->flags |= BR_MODF_KEEP_ORIGINAL;
+    gBlend_material->extra_prim = fadealpha;
+    PathCat(path, gApplication_path, "PIXELMAP");
+    PathCat(path, path, "SMOKE.PIX");
+    gBlend_material->colour_map = DRPixelmapLoad(path);
+    if (!gBlend_material->colour_map) {
+        FatalError(kFatalError_LoadPixelmapFile_S, path);
+    }
+    gBlend_material->colour_map->map = gRender_palette;
+    BrMapAdd(gBlend_material->colour_map);
+    gBlend_model->vertices[0].map.v[0] = 0.0f;
+    gBlend_model->vertices[0].map.v[1] = 1.0f - 1.0f / (float)gBlend_material->colour_map->height;
+    gBlend_model->vertices[1].map.v[0] = 0.0f;
+    gBlend_model->vertices[1].map.v[1] = 0.0f;
+    gBlend_model->vertices[2].map.v[0] = 1.0f - 1.0f / (float)gBlend_material->colour_map->width;
+    gBlend_model->vertices[2].map.v[1] = 0.0f;
+    gBlend_model->vertices[3].map.v[0] = 1.0f - 1.0f / (float)gBlend_material->colour_map->width;
+    gBlend_model->vertices[3].map.v[1] = 1.0f - 1.0f / (float)gBlend_material->colour_map->height;
+    BrModelAdd(gBlend_model);
+    BrMaterialAdd(gBlend_material);
+    BrActorAdd(gDont_render_actor, gBlend_actor);
 }
 
 // IDA: void __cdecl Init2DStuff()
 void Init2DStuff(void) {
     br_camera* camera;
-    static br_token_value fadealpha[3];
+    static br_token_value fadealpha[3] = { { BRT_BLEND_B, { .u32 = 1u } }, { BRT_OPACITY_X, { .x = 0x800000 } }, { 0 } };
     tPath_name path;
     br_scalar prat_u;
     br_scalar prat_v;
     LOG_TRACE("()");
-    NOT_IMPLEMENTED();
+
+    g2d_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
+    gDim_model = BrModelAllocate("gDim_model", 4, 2);
+    gDim_material = BrMaterialAllocate("gDim_material");
+    gDim_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    gPrat_model = BrModelAllocate("gPrat_model", 4, 2);
+    gPrat_material = BrMaterialAllocate("gPrat_material");
+    gPrat_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+    if (!gDim_model || !gDim_material || !gDim_actor || !gPrat_model || !gPrat_material || !gPrat_actor || !g2d_camera) {
+        FatalError(kFatalError_OOMCarmageddon_S);
+    }
+    g2d_camera->identifier = "g2d_camera";
+    camera = g2d_camera->type_data;
+    camera->type = BR_CAMERA_PARALLEL;
+    camera->hither_z = 1.0f;
+    camera->yon_z = 3.0f;
+    camera->width = gScreen->width;
+    camera->height = gScreen->height;
+    gDim_actor->identifier = "gDim_actor";
+    gDim_actor->model = gDim_model;
+    gDim_actor->material = gDim_material;
+
+    gDim_model->faces->vertices[0] = 0;
+    gDim_model->faces->vertices[1] = 1;
+    gDim_model->faces->vertices[2] = 2;
+    gDim_model->faces[1].vertices[0] = 2;
+    gDim_model->faces[1].vertices[1] = 3;
+    gDim_model->faces[1].vertices[2] = 0;
+    gDim_model->vertices->p.v[0] = 150.0f;
+    gDim_model->vertices->p.v[1] = -20.0f;
+    gDim_model->vertices->p.v[2] = -2.0f;
+    gDim_model->vertices[1].p.v[0] = 150.0f;
+    gDim_model->vertices[1].p.v[1] = -100.0f;
+    gDim_model->vertices[1].p.v[2] = -2.0f;
+    gDim_model->vertices[2].p.v[0] = 200.0f;
+    gDim_model->vertices[2].p.v[1] = -100.0f;
+    gDim_model->vertices[2].p.v[2] = -2.0f;
+    gDim_model->vertices[3].p.v[0] = 200.0f;
+    gDim_model->vertices[3].p.v[1] = -20.0f;
+    gDim_model->vertices[3].p.v[2] = -2.0f;
+    gDim_material->colour = 0;
+    gDim_material->flags = BR_MATF_FORCE_FRONT;
+    gDim_model->flags |= BR_MODF_KEEP_ORIGINAL;
+    gDim_material->extra_prim = fadealpha;
+    BrModelAdd(gDim_model);
+    BrMaterialAdd(gDim_material);
+    BrActorAdd(g2d_camera, gDim_actor);
+    gDim_actor->render_style = BR_RSTYLE_NONE;
+    gPrat_actor->identifier = "gPrat_actor";
+    gPrat_actor->model = gPrat_model;
+    gPrat_actor->material = gPrat_material;
+    gPrat_model->faces->vertices[0] = 0;
+    gPrat_model->faces->vertices[1] = 1;
+    gPrat_model->faces->vertices[2] = 2;
+    gPrat_model->faces[1].vertices[0] = 2;
+    gPrat_model->faces[1].vertices[1] = 3;
+    gPrat_model->faces[1].vertices[2] = 0;
+    gPrat_model->vertices->p.v[0] = 150.0f;
+    gPrat_model->vertices->p.v[1] = -20.0f;
+    gPrat_model->vertices->p.v[2] = -2.0f;
+    gPrat_model->vertices[1].p.v[0] = 150.0f;
+    gPrat_model->vertices[1].p.v[1] = -100.0f;
+    gPrat_model->vertices[1].p.v[2] = -2.0f;
+    gPrat_model->vertices[2].p.v[0] = 200.0f;
+    gPrat_model->vertices[2].p.v[1] = -100.0f;
+    gPrat_model->vertices[2].p.v[2] = -2.0f;
+    gPrat_model->vertices[3].p.v[0] = 200.0f;
+    gPrat_model->vertices[3].p.v[1] = -20.0f;
+    gPrat_model->vertices[3].p.v[2] = -2.0f;
+    gPrat_material->colour = 0xFFFFFF;
+    gPrat_material->flags = BR_MATF_FORCE_FRONT;
+    gPrat_model->flags |= BR_MODF_KEEP_ORIGINAL;
+    prat_u = 104.0f / (float)HighResPratBufferWidth();
+    prat_v = 110.0f / (float)HighResPratBufferHeight();
+    gPrat_model->vertices->map.v[0] = 0.0f;
+    gPrat_model->vertices->map.v[1] = 0.0f;
+    gPrat_model->vertices[1].map.v[0] = 0.0f;
+    gPrat_model->vertices[1].map.v[1] = prat_v;
+    gPrat_model->vertices[2].map.v[0] = prat_u;
+    gPrat_model->vertices[2].map.v[1] = prat_v;
+    gPrat_model->vertices[3].map.v[0] = prat_u;
+    gPrat_model->vertices[3].map.v[1] = 0.0f;
+    BrModelAdd(gPrat_model);
+    BrMaterialAdd(gPrat_material);
+    BrActorAdd(g2d_camera, gPrat_actor);
+    gPrat_actor->render_style = BR_RSTYLE_NONE;
 }
 
 // IDA: void __usercall InitialiseApplication(int pArgc@<EAX>, char **pArgv@<EDX>)
@@ -378,8 +567,22 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     InitBRFonts();
     LoadMiscStrings();
     LoadInRegistees();
+
+#ifdef DETHRACE_3DFX_PATCH
+
+    // dethrace: if statement added to support all types of games
+    if (harness_game_config.opengl_3dfx_mode) {
+        InitLineStuff();
+        InitSmokeStuff();
+        Init2DStuff();
+    }
+#endif
+
     FinishLoadingGeneral();
+#ifndef DETHRACE_3DFX_PATCH
+    // 3dfx patch calls this earlier
     InitializePalettes();
+#endif
     AustereWarning();
     LoadInterfaceStrings();
     InitializeActionReplay();
@@ -391,6 +594,14 @@ void InitialiseApplication(int pArgc, char** pArgv) {
     gDefault_track_material = BrMaterialAllocate("gDefault_track_material");
     gDefault_track_material->index_base = 227;
     gDefault_track_material->index_range = 1;
+
+#ifdef DETHRACE_3DFX_PATCH
+    gDefault_track_material->ka = 1.0;
+    gDefault_track_material->kd = 0.0;
+    gDefault_track_material->ks = 0.0;
+    gDefault_track_material->colour = ((br_colour*)gRender_palette->pixels)[227];
+#endif
+
     BrMaterialAdd(gDefault_track_material);
     InitShadow();
     InitFlics();
@@ -423,9 +634,8 @@ void InitialiseApplication(int pArgc, char** pArgv) {
 // IDA: void __usercall InitialiseDeathRace(int pArgc@<EAX>, char **pArgv@<EDX>)
 void InitialiseDeathRace(int pArgc, char** pArgv) {
     PDInitialiseSystem();
-
     InitialiseApplication(pArgc, pArgv);
-    // dword_112DF8 = 1;  // never checked by game
+    gInitialisation_finished = 1;
 }
 
 // IDA: void __usercall InitGame(int pStart_race@<EAX>)
@@ -473,6 +683,10 @@ void InitGame(int pStart_race) {
     gProgram_state.redo_race_index = -1;
     gWait_for_it = 0;
     SwitchToLoresMode();
+
+    // added by dethrace to support --game-completed arg
+    gProgram_state.game_completed = harness_game_config.game_completed;
+    // -
 }
 
 // IDA: void __cdecl DisposeGameIfNecessary()
@@ -534,7 +748,7 @@ void InitRace(void) {
     PossibleService();
     // TODO: dword_55142C = 0;
     gStart_race_sent = 0;
-    gProgram_state.frame_rate_headup = NewTextHeadupSlot(0, 0, 0, -1, "");
+    gProgram_state.frame_rate_headup = NewTextHeadupSlot(eHeadupSlot_development, 0, 0, -1, "");
     if (TranslationMode()) {
         if (gAusterity_mode) {
             FlushInterfaceFonts();
@@ -555,15 +769,15 @@ void InitRace(void) {
     gMap_mode = 0;
     gProgram_state.cockpit_image_index = 0;
     if (gNet_mode != eNet_mode_none) {
-        gNet_cash_headup = NewTextHeadupSlot(13, 0, 0, -6, "");
-        gNet_ped_headup = NewTextHeadupSlot(14, 0, 0, -6, "");
+        gNet_cash_headup = NewTextHeadupSlot(eHeadupSlot_cash_network, 0, 0, -6, "");
+        gNet_ped_headup = NewTextHeadupSlot(eHeadupSlot_ped_network, 0, 0, -6, "");
     } else {
-        gCredits_won_headup = NewTextHeadupSlot(1, 0, 0, -6, "");
-        gPed_kill_count_headup = NewTextHeadupSlot(2, 0, 0, -6, "");
-        gCar_kill_count_headup = NewTextHeadupSlot(12, 0, 0, -6, "");
-        gTimer_headup = NewTextHeadupSlot(7, 0, 0, -5, "");
-        gTime_awarded_headup = NewTextHeadupSlot(11, 0, 0, -2, "");
-        gLaps_headup = NewTextHeadupSlot(8, 0, 0, -6, "");
+        gCredits_won_headup = NewTextHeadupSlot(eHeadupSlot_credits, 0, 0, -6, "");
+        gPed_kill_count_headup = NewTextHeadupSlot(eHeadupSlot_ped_kills, 0, 0, -6, "");
+        gCar_kill_count_headup = NewTextHeadupSlot(eHeadupSlot_cars_out_count, 0, 0, -6, "");
+        gTimer_headup = NewTextHeadupSlot(eHeadupSlot_timer, 0, 0, -5, "");
+        gTime_awarded_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 0, -2, "");
+        gLaps_headup = NewTextHeadupSlot(eHeadupSlot_lap_count, 0, 0, -6, "");
     }
     PossibleService();
     gProgram_state.which_view = eView_forward;
@@ -594,6 +808,23 @@ void InitRace(void) {
     }
     PrintMemoryDump(0, "DIRECTLY AFTER LOADING IN TRACK");
     LoadCopCars();
+#ifdef DETHRACE_3DFX_PATCH
+    // In the 3dfx patch this code was moved from `LoadTrack` so that the pedestrian material would be
+    // fogged correctly
+    InstantDepthChange(
+        gProgram_state.default_depth_effect.type,
+        gProgram_state.default_depth_effect.sky_texture,
+        gProgram_state.default_depth_effect.start,
+        gProgram_state.default_depth_effect.end);
+    gSwap_sky_texture = 0;
+    if (!GetSkyTextureOn()) {
+        ToggleSkyQuietly();
+    }
+    gSwap_depth_effect_type = -1;
+    if (!GetDepthCueingOn()) {
+        ToggleDepthCueingQuietly();
+    }
+#endif
     PrintMemoryDump(0, "AFTER LOADING IN COPS");
     SaveShadeTables();
     gCountdown = 7;
@@ -669,6 +900,15 @@ void DisposeRace(void) {
     PossibleService();
     DisposePratcam();
     PossibleService();
+
+#ifdef DETHRACE_FIX_BUGS
+    // when exiting a race, skid mark materials are unloaded, but material_modifiers is not changed.
+    // In 3dfx mode, `FrobFog` is called during loading the next track, which iterates over the material_modifiers
+    // causing a use-after-free
+    for (int i = 0; i < COUNT_OF(gCurrent_race.material_modifiers); i++) {
+        gCurrent_race.material_modifiers[i].skid_mark_material = NULL;
+    }
+#endif
 }
 
 // IDA: int __cdecl GetScreenSize()

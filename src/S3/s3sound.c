@@ -55,10 +55,17 @@ int S3LoadSample(tS3_sound_id id) {
     if (memcmp(buf, "RIFF", 4) == 0) {
         wav_header* hdr = (wav_header*)buf;
         sample->dataptr = &buf[sizeof(wav_header)];
+#if BR_ENDIAN_BIG
+        sample->size = BrSwap32(hdr->data_bytes);
+        sample->rate = BrSwap32(hdr->sample_rate);
+        sample->resolution = BrSwap16(hdr->bit_depth);
+        sample->channels = BrSwap16(hdr->num_channels);
+#else
         sample->size = hdr->data_bytes;
         sample->rate = hdr->sample_rate;
         sample->resolution = hdr->bit_depth;
         sample->channels = hdr->num_channels;
+#endif
     } else {
         sample->rate = 16000;
         sample->resolution = 8;
@@ -355,6 +362,11 @@ int S3SyncSampleVolumeAndPan(tS3_channel* chan) {
     if (chan->type != eS3_ST_sample) {
         return 1;
     }
+
+    if (AudioBackend_SetVolumeSeparate(chan->type_struct_sample, chan->left_volume, chan->right_volume) == eAB_success) {
+        return 1;
+    }
+
     total_vol = chan->left_volume + chan->right_volume;
     if (total_vol == 0.0f) {
         total_vol = 1.0f;

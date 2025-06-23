@@ -6,20 +6,27 @@
 #include "platforms/null.h"
 #include "version.h"
 
+#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 
-br_pixelmap* palette;
-uint32_t* screen_buffer;
-
-br_pixelmap* last_dst = NULL;
-br_pixelmap* last_src = NULL;
-
-int force_null_platform = 0;
-
 extern uint32_t gI_am_cheating;
+
+extern void Harness_Platform_Init(tHarness_platform* platform);
+
+extern const tPlatform_bootstrap SDL1_bootstrap;
+extern const tPlatform_bootstrap SDL2_bootstrap;
+
+static const tPlatform_bootstrap *platform_bootstraps[] = {
+#ifdef DETHRACE_PLATFORM_SDL2
+    &SDL2_bootstrap,
+#endif
+#ifdef DETHRACE_PLATFORM_SDL1
+    &SDL1_bootstrap,
+#endif
+};
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
 tHarness_game_info harness_game_info;
@@ -30,9 +37,15 @@ tHarness_game_config harness_game_config;
 // Platform hooks
 tHarness_platform gHarness_platform;
 
-extern void Harness_Platform_Init(tHarness_platform* platform);
+static int force_null_platform = 0;
 
-int Harness_ProcessCommandLine(int* argc, char* argv[]);
+typedef struct {
+    const char *platform_name;
+    uint32_t platform_capabilityies;
+    int install_signalhandler;
+} tArgument_config;
+
+static int Harness_ProcessCommandLine(tArgument_config* argument_config, int* argc, char* argv[]);
 
 static void Harness_DetectGameMode(void) {
     if (access("DATA/RACES/CASTLE.TXT", F_OK) != -1) {
@@ -95,6 +108,9 @@ static void Harness_DetectGameMode(void) {
         if (strstr(buffer, "NEUES SPIEL") != NULL) {
             harness_game_info.localization = eGameLocalization_german;
             LOG_INFO("Language: \"%s\"", "German");
+        } else if (strstr(buffer, "NOWA GRA") != NULL) {
+            harness_game_info.localization = eGameLocalization_polish;
+            LOG_INFO("Language: \"%s\"", "Polish");
         } else {
             LOG_INFO("Language: unrecognized");
         }
@@ -127,9 +143,14 @@ static void Harness_DetectGameMode(void) {
     default:
         break;
     }
+
+    // 3dfx code paths require at least smoke.pix which is used instead of writing smoke directly to framebuffer
+    if (access("DATA/PIXELMAP/SMOKE.PIX", F_OK) != -1) {
+        harness_game_info.data_dir_has_3dfx_assets = 1;
+    }
 }
 
-void Harness_Init(int* argc, char* argv[]) {
+int Harness_Init(int* argc, char* argv[]) {
     int result;
 
     printf("Dethrace version: %s\n", DETHRACE_VERSION);
@@ -140,8 +161,8 @@ void Harness_Init(int* argc, char* argv[]) {
     harness_game_config.enable_cd_check = 0;
     // original physics time step. Lower values seem to work better at 30+ fps
     harness_game_config.physics_step_time = 40;
-    // do not limit fps by default
-    harness_game_config.fps = 0;
+    // limit to 60 fps by default
+    harness_game_config.fps = 60;
     // do not freeze timer
     harness_game_config.freeze_timer = 0;
     // default demo time out is 240s
@@ -161,12 +182,20 @@ void Harness_Init(int* argc, char* argv[]) {
     // Disable verbose logging
     harness_game_config.verbose = 0;
 
-    // install signal handler by default
-    harness_game_config.install_signalhandler = 1;
+    tArgument_config argument_config;
+    // don't require a particular platform
+    argument_config.platform_name = NULL;
+    // request software renderer capability
+    argument_config.platform_capabilityies = ePlatform_cap_software;
+    // install signal handler
+    argument_config.install_signalhandler = 1;
 
-    Harness_ProcessCommandLine(argc, argv);
+    if (Harness_ProcessCommandLine(&argument_config, argc, argv) != 0) {
+        fprintf(stderr, "Failed to parse harness command line\n");
+        return 1;
+    }
 
-    if (harness_game_config.install_signalhandler) {
+    if (argument_config.install_signalhandler) {
         OS_InstallSignalHandler(argv[0]);
     }
 
@@ -189,11 +218,62 @@ void Harness_Init(int* argc, char* argv[]) {
         Harness_DetectGameMode();
     }
 
+    if (harness_game_config.opengl_3dfx_mode && !harness_game_info.data_dir_has_3dfx_assets) {
+        printf("Error: data directory does not contain 3dfx assets so opengl mode cannot be used\n");
+        exit(1);
+    }
+
     if (force_null_platform) {
         Null_Platform_Init(&gHarness_platform);
     } else {
-        Harness_Platform_Init(&gHarness_platform);
+        const tPlatform_bootstrap* selected_bootstrap = NULL;
+
+        if (argument_config.platform_name != NULL) {
+            size_t i;
+            for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
+                if (strcasecmp(platform_bootstraps[i]->name, argument_config.platform_name) == 0) {
+                    if ((platform_bootstraps[i]->capabilities & argument_config.platform_capabilityies) != argument_config.platform_capabilityies) {
+                        fprintf(stderr, "Platform \"%s\" does not support requested capabilities. Try another video driver and/or add/remove --opengl\n", selected_bootstrap->name);
+                        return 1;
+                    }
+                    selected_bootstrap = platform_bootstraps[i];
+                    break;
+                }
+            }
+            if (selected_bootstrap == NULL) {
+                fprintf(stderr, "Could not find a platform named \"%s\"\n", argument_config.platform_name);
+                return 1;
+            }
+            if (selected_bootstrap->init(&gHarness_platform) != 0) {
+                fprintf(stderr, "%s initialization failed\n", selected_bootstrap->name);
+                return 1;
+            }
+        } else {
+            size_t i;
+            for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
+                LOG_TRACE10("Attempting video driver \"%s\"", platform_bootstraps[i]->name);
+                if ((platform_bootstraps[i]->capabilities & argument_config.platform_capabilityies) != argument_config.platform_capabilityies) {
+                    fprintf(stderr, "Skipping platform \"%s\". Does not support required capabilities.\n", platform_bootstraps[i]->name);
+                    continue;
+                }
+                LOG_TRACE10("Try platform \"%s\"...");
+                if (platform_bootstraps[i]->init(&gHarness_platform) == 0) {
+                    selected_bootstrap = platform_bootstraps[i];
+                    break;
+                }
+            }
+            if (selected_bootstrap == NULL) {
+                fprintf(stderr, "Could not find a supported platform\n");
+                return 1;
+            }
+        }
+        if (selected_bootstrap == NULL) {
+            fprintf(stderr, "Could not find a supported platform\n");
+            return 1;
+        }
+        LOG_INFO("Platform: %s (%s)", selected_bootstrap->name, selected_bootstrap->description);
     }
+    return 0;
 }
 
 // used by unit tests
@@ -201,77 +281,98 @@ void Harness_ForceNullPlatform(void) {
     force_null_platform = 1;
 }
 
-int Harness_ProcessCommandLine(int* argc, char* argv[]) {
-    for (int i = 1; i < *argc; i++) {
-        int handled = 0;
+int Harness_ProcessCommandLine(tArgument_config* config, int* argc, char* argv[]) {
+    for (int i = 1; i < *argc;) {
+        int consumed = -1;
 
         if (strcasecmp(argv[i], "--cdcheck") == 0) {
             harness_game_config.enable_cd_check = 1;
-            handled = 1;
+            consumed = 1;
         } else if (strstr(argv[i], "--debug=") != NULL) {
             char* s = strstr(argv[i], "=");
             harness_debug_level = atoi(s + 1);
             LOG_INFO("debug level set to %d", harness_debug_level);
-            handled = 1;
+            consumed = 1;
         } else if (strstr(argv[i], "--physics-step-time=") != NULL) {
             char* s = strstr(argv[i], "=");
             harness_game_config.physics_step_time = atoi(s + 1);
             LOG_INFO("Physics step time set to %d", harness_game_config.physics_step_time);
-            handled = 1;
+            consumed = 1;
         } else if (strstr(argv[i], "--fps=") != NULL) {
             char* s = strstr(argv[i], "=");
             harness_game_config.fps = atoi(s + 1);
             LOG_INFO("FPS limiter set to %f", harness_game_config.fps);
-            handled = 1;
+            consumed = 1;
         } else if (strcasecmp(argv[i], "--freeze-timer") == 0) {
             LOG_INFO("Timer frozen");
             harness_game_config.freeze_timer = 1;
-            handled = 1;
+            consumed = 1;
         } else if (strcasecmp(argv[i], "--no-signal-handler") == 0) {
             LOG_INFO("Don't install the signal handler");
-            harness_game_config.install_signalhandler = 0;
-            handled = 1;
+            config->install_signalhandler = 0;
+            consumed = 1;
         } else if (strstr(argv[i], "--demo-timeout=") != NULL) {
             char* s = strstr(argv[i], "=");
             harness_game_config.demo_timeout = atoi(s + 1) * 1000;
             LOG_INFO("Demo timeout set to %d milliseconds", harness_game_config.demo_timeout);
-            handled = 1;
+            consumed = 1;
         } else if (strcasecmp(argv[i], "--i-am-cheating") == 0) {
             gI_am_cheating = 0xa11ee75d;
-            handled = 1;
+            consumed = 1;
         } else if (strcasecmp(argv[i], "--enable-diagnostics") == 0) {
             harness_game_config.enable_diagnostics = 1;
-            handled = 1;
+            consumed = 1;
         } else if (strstr(argv[i], "--volume-multiplier=") != NULL) {
             char* s = strstr(argv[i], "=");
             harness_game_config.volume_multiplier = atof(s + 1);
             LOG_INFO("Volume multiplier set to %f", harness_game_config.volume_multiplier);
-            handled = 1;
+            consumed = 1;
         } else if (strcasecmp(argv[i], "--full-screen") == 0) {
             // option left for backwards compatibility
             harness_game_config.start_full_screen = 1;
-            handled = 1;
+            consumed = 1;
         } else if (strcasecmp(argv[i], "--window") == 0) {
             harness_game_config.start_full_screen = 0;
-            handled = 1;
+            consumed = 1;
         } else if (strcasecmp(argv[i], "--gore-check") == 0) {
             harness_game_config.gore_check = 1;
-            handled = 1;
+            consumed = 1;
         } else if (strcasecmp(argv[i], "--sound-options") == 0) {
             harness_game_config.sound_options = 1;
-            handled = 1;
+            consumed = 1;
+        } else if (strcasecmp(argv[i], "--opengl") == 0) {
+            config->platform_capabilityies &= ~ePlatform_cap_video_mask;
+            config->platform_capabilityies |= ePlatform_cap_opengl;
+            harness_game_config.opengl_3dfx_mode = 1;
+            consumed = 1;
+        } else if (strcasecmp(argv[i], "--no-music") == 0) {
+            harness_game_config.no_music = 1;
+            consumed = 1;
+        } else if (strcasecmp(argv[i], "--game-completed") == 0) {
+            harness_game_config.game_completed = 1;
+            consumed = 1;
         } else if (strcasecmp(argv[i], "--no-bind") == 0) {
             harness_game_config.no_bind = 1;
-            handled = 1;
+            consumed = 1;
+        } else if (strstr(argv[i], "--network-adapter-name=") != NULL) {
+            char* s = strstr(argv[i], "=");
+            strcpy(harness_game_config.network_adapter_name, s + 1);
+            consumed = 1;
+        } else if (strcmp(argv[i], "--platform") == 0) {
+            if (i < *argc + 1) {
+                config->platform_name = argv[i + 1];
+                consumed = 2;
+            }
         }
 
-        if (handled) {
+        if (consumed > 0) {
             // shift args downwards
-            for (int j = i; j < *argc - 1; j++) {
-                argv[j] = argv[j + 1];
+            for (int j = i; j < *argc - consumed; j++) {
+                argv[j] = argv[j + consumed];
             }
-            (*argc)--;
-            i--;
+            *argc -= consumed;
+        } else {
+            i += 1;
         }
     }
 
@@ -281,4 +382,19 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
 // Filesystem hooks
 FILE* Harness_Hook_fopen(const char* pathname, const char* mode) {
     return OS_fopen(pathname, mode);
+}
+
+// Localization
+int Harness_Hook_isalnum(int c) {
+    if (harness_game_info.localization == eGameLocalization_polish) {
+        // Polish diacritic letters in Windows-1250
+        unsigned char letters[] = { 140, 143, 156, 159, 163, 165, 175, 179, 185, 191, 198, 202, 209, 211, 230, 234, 241, 243 };
+        for (int i = 0; i < (int)sizeof(letters); i++) {
+            if ((unsigned char)c == letters[i]) {
+                return 1;
+            }
+        }
+    }
+
+    return isalnum(c);
 }

@@ -13,6 +13,7 @@ typedef enum tHarness_game_type {
 typedef enum {
     eGameLocalization_none,
     eGameLocalization_german,
+    eGameLocalization_polish,
 } tHarness_game_localization;
 
 typedef struct tHarness_game_info {
@@ -30,6 +31,7 @@ typedef struct tHarness_game_info {
         // built-in shifted keyboard look-up table for certain localized Carmageddon releases
         int* ascii_shift_table;
     } defines;
+    int data_dir_has_3dfx_assets;
 } tHarness_game_info;
 
 typedef struct tHarness_game_config {
@@ -43,10 +45,15 @@ typedef struct tHarness_game_config {
     int start_full_screen;
     int gore_check;
     int sound_options;
-    int no_bind;
+
+    int no_music;
     int verbose;
+    int opengl_3dfx_mode;
+    int game_completed;
 
     int install_signalhandler;
+    int no_bind;
+    char network_adapter_name[256];
 } tHarness_game_config;
 
 extern tHarness_game_info harness_game_info;

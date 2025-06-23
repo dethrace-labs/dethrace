@@ -1,7 +1,18 @@
 // Based on https://gist.github.com/jvranish/4441299
 
-// this has to be first
-#include <windows.h>
+#define _WIN32_WINNT 0x0600 // or higher (e.g., 0x0A00 for Windows 10)
+
+#include <winsock2.h>
+
+#include <ws2tcpip.h> // for getaddrinfo, inet_pton, etc.
+
+#include <iphlpapi.h> // for GetAdaptersAddresses
+
+#include <ipifcons.h>
+
+//
+#include <windows.h> // only after winsock2.h
+
 #include <dbghelp.h>
 
 #include "harness/config.h"
@@ -9,11 +20,16 @@
 #include "harness/trace.h"
 
 #include <errno.h> /* errno, strerror */
-#include <io.h> /* _access_s, F_OK */
+#include <io.h>    /* _access_s, F_OK */
+#include <locale.h>
 #include <stddef.h>
-#include <stdio.h> /* errno_t, FILE, fgets, fopen_s, fprintf*/
+#include <stdio.h>  /* errno_t, FILE, fgets, fopen_s, fprintf*/
 #include <stdlib.h> /* _splitpath */
 #include <string.h> /* strcpy, strerror, strlen, strrchr */
+#include <wchar.h>
+
+#pragma comment(lib, "iphlpapi.lib")
+#pragma comment(lib, "ws2_32.lib")
 
 #ifndef F_OK
 #define F_OK 0
@@ -28,7 +44,10 @@ static char path_addr2line[1024];
 static char dirname_buf[_MAX_DIR];
 static char fname_buf[_MAX_FNAME];
 
-#if defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__) ||defined( __i386) || defined(_M_IX86)
+HANDLE directory_handle = NULL;
+char last_found_file[260];
+
+#if defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__) || defined(__i386) || defined(_M_IX86)
 #define DETHRACE_CPU_X86 1
 #elif defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)
 #define DETHRACE_CPU_X64 1
@@ -44,7 +63,7 @@ static char fname_buf[_MAX_FNAME];
 
 static BOOL print_addr2line_address_location(HANDLE const hProcess, const DWORD64 address) {
     char addr2line_cmd[1024] = { 0 };
-    const char *program_name = windows_program_name;
+    const char* program_name = windows_program_name;
     IMAGEHLP_MODULE64 module_info;
 
     if (path_addr2line[0] == '\0') {
@@ -63,7 +82,7 @@ static BOOL print_addr2line_address_location(HANDLE const hProcess, const DWORD6
     return TRUE;
 }
 
-static void printf_windows_message(const char *format, ...) {
+static void printf_windows_message(const char* format, ...) {
     va_list ap;
     char win_msg[512];
     FormatMessageA(
@@ -71,11 +90,11 @@ static void printf_windows_message(const char *format, ...) {
         NULL,
         GetLastError(),
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        win_msg, sizeof(win_msg)/sizeof(*win_msg),
+        win_msg, sizeof(win_msg) / sizeof(*win_msg),
         NULL);
     size_t win_msg_len = strlen(win_msg);
-    while (win_msg[win_msg_len-1] == '\r' || win_msg[win_msg_len-1] == '\n' || win_msg[win_msg_len-1] == ' ') {
-        win_msg[win_msg_len-1] = '\0';
+    while (win_msg[win_msg_len - 1] == '\r' || win_msg[win_msg_len - 1] == '\n' || win_msg[win_msg_len - 1] == ' ') {
+        win_msg[win_msg_len - 1] = '\0';
         win_msg_len--;
     }
     va_start(ap, format);
@@ -109,9 +128,9 @@ static BOOL print_dbghelp_address_location(HANDLE const hProcess, const DWORD64 
     DWORD64 dwDisplacement;
     DWORD lineColumn = 0;
     IMAGEHLP_LINE64 line;
-    const char *image_file_name;
-    const char *symbol_name;
-    const char *file_name;
+    const char* image_file_name;
+    const char* symbol_name;
+    const char* file_name;
     char line_number[16];
 
     memset(&module_info, 0, sizeof(module_info));
@@ -198,14 +217,14 @@ static void print_stacktrace(CONTEXT* context) {
 #endif
 
     while (StackWalk(machine_type,
-                     GetCurrentProcess(),
-                     GetCurrentThread(),
-                     &frame,
-                     context,
-                     0,
-                     SymFunctionTableAccess,
-                     SymGetModuleBase,
-                     0)) {
+        GetCurrentProcess(),
+        GetCurrentThread(),
+        &frame,
+        context,
+        0,
+        SymFunctionTableAccess,
+        SymGetModuleBase,
+        0)) {
 
         if (frame.AddrPC.Offset == frame.AddrReturn.Offset) {
             fprintf(stderr, "PC == Return Address => Possible endless callstack\n");
@@ -306,7 +325,7 @@ static LONG WINAPI windows_exception_handler(EXCEPTION_POINTERS* ExceptionInfo) 
 }
 
 void OS_InstallSignalHandler(char* program_name) {
-    const char *env_addr2line;
+    const char* env_addr2line;
 
     path_addr2line[0] = '\0';
     env_addr2line = getenv("ADDR2LINE");
@@ -320,6 +339,35 @@ void OS_InstallSignalHandler(char* program_name) {
     }
     strcpy(windows_program_name, program_name);
     SetUnhandledExceptionFilter(windows_exception_handler);
+}
+
+char* OS_GetFirstFileInDirectory(char* path) {
+    char with_extension[256];
+    WIN32_FIND_DATA find_data;
+
+    strcpy(with_extension, path);
+    strcat(with_extension, "\\*.???");
+    directory_handle = FindFirstFile(with_extension, &find_data);
+    if (directory_handle == INVALID_HANDLE_VALUE) {
+        return NULL;
+    }
+    strcpy(last_found_file, find_data.cFileName);
+    return last_found_file;
+}
+
+// Required: continue directory iteration. If no more files, return NULL
+char* OS_GetNextFileInDirectory(void) {
+    WIN32_FIND_DATA find_data;
+    if (directory_handle == NULL) {
+        return NULL;
+    }
+
+    while (FindNextFile(directory_handle, &find_data)) {
+        strcpy(last_found_file, find_data.cFileName);
+        return last_found_file;
+    }
+    FindClose(directory_handle);
+    return NULL;
 }
 
 FILE* OS_fopen(const char* pathname, const char* mode) {
@@ -356,4 +404,76 @@ char* OS_Basename(const char* path) {
 
 char* OS_GetWorkingDirectory(char* argv0) {
     return OS_Dirname(argv0);
+}
+
+int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
+    DWORD ret, bufLen = 15000;
+    IP_ADAPTER_ADDRESSES* adapter_addrs = (IP_ADAPTER_ADDRESSES*)malloc(bufLen);
+    int found = 0;
+
+    if (!adapter_addrs) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        return 0;
+    }
+
+    // Convert input name to wide char
+    wchar_t wideName[256] = { 0 };
+    if (name && strlen(name) > 0) {
+        mbstowcs(wideName, name, sizeof(wideName) / sizeof(wideName[0]) - 1);
+    }
+
+    ret = GetAdaptersAddresses(AF_INET, GAA_FLAG_INCLUDE_PREFIX, NULL, adapter_addrs, &bufLen);
+    if (ret == ERROR_BUFFER_OVERFLOW) {
+        free(adapter_addrs);
+        adapter_addrs = (IP_ADAPTER_ADDRESSES*)malloc(bufLen);
+        if (!adapter_addrs)
+            return 0;
+        ret = GetAdaptersAddresses(AF_INET, GAA_FLAG_INCLUDE_PREFIX, NULL, adapter_addrs, &bufLen);
+    }
+
+    if (ret != NO_ERROR) {
+        free(adapter_addrs);
+        return 0;
+    }
+
+    for (IP_ADAPTER_ADDRESSES* aa = adapter_addrs; aa != NULL; aa = aa->Next) {
+        LOG_DEBUG("name: %s", aa->FriendlyName); // Skip if name is provided and doesn't match FriendlyName
+        if (wcslen(wideName) > 0 && wcscmp(aa->FriendlyName, wideName) != 0)
+            continue;
+
+        for (IP_ADAPTER_UNICAST_ADDRESS* ua = aa->FirstUnicastAddress; ua != NULL; ua = ua->Next) {
+            if (ua->Address.lpSockaddr->sa_family == AF_INET) {
+                struct sockaddr_in* sa_in = (struct sockaddr_in*)ua->Address.lpSockaddr;
+                *((struct sockaddr_in*)pSockaddr_in) = *sa_in;
+                found = 1;
+                goto cleanup;
+            }
+        }
+    }
+
+cleanup:
+    free(adapter_addrs);
+    return found;
+}
+
+int OS_InitSockets(void) {
+    WSADATA wsadata;
+    return WSAStartup(MAKEWORD(2, 2), &wsadata);
+}
+
+int OS_GetLastSocketError(void) {
+    return WSAGetLastError();
+}
+
+void OS_CleanupSockets(void) {
+    WSACleanup();
+}
+
+int OS_SetSocketNonBlocking(int socket) {
+    unsigned long nobio = 1;
+    return ioctlsocket(socket, FIONBIO, &nobio);
+}
+
+int OS_CloseSocket(int socket) {
+    return closesocket(socket);
 }

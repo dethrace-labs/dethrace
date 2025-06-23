@@ -699,6 +699,10 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
                     }
                     gLast_tune = pCDA_id;
                     gCDA_is_playing = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
+#if defined(DETHRACE_FIX_BUGS)
+                    // Initial CD music volume was not set correctly
+                    DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);                    
+#endif
                     gCDA_tag = gCDA_is_playing;
                     if (!gCDA_is_playing) {
                         gCD_is_disabled = 1;

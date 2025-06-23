@@ -2,24 +2,32 @@
 
 #include "harness/config.h"
 #include "harness/os.h"
+#include <arpa/inet.h>
 #include <assert.h>
 #include <dirent.h>
 #include <err.h>
 #include <errno.h>
 #include <execinfo.h>
+#include <fcntl.h>
+#include <ifaddrs.h>
 #include <inttypes.h>
 #include <libgen.h>
 #include <limits.h>
 #include <mach-o/dyld.h>
+#include <netdb.h> // for getaddrinfo() and freeaddrinfo()
+#include <netinet/in.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
 #include <time.h>
+#include <unistd.h> // for close()
 #include <unistd.h>
 #include <SDL.h>
 
@@ -30,6 +38,7 @@ static char _program_name[1024];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
 static char name_buf[4096];
+static DIR* directory_iterator;
 
 // Resolve symbol name and source location given the path to the executable and an address
 int addr2line(char const* const program_name, intptr_t slide, void const* const addr) {
@@ -221,6 +230,30 @@ void OS_InstallSignalHandler(char* program_name) {
     }
 }
 
+char* OS_GetFirstFileInDirectory(char* path) {
+    directory_iterator = opendir(path);
+    if (directory_iterator == NULL) {
+        return NULL;
+    }
+    return OS_GetNextFileInDirectory();
+}
+
+char* OS_GetNextFileInDirectory(void) {
+    struct dirent* entry;
+
+    if (directory_iterator == NULL) {
+        return NULL;
+    }
+    while ((entry = readdir(directory_iterator)) != NULL) {
+        if (entry->d_type == DT_REG) {
+            return entry->d_name;
+        }
+    }
+    closedir(directory_iterator);
+    directory_iterator = NULL;
+    return NULL;
+}
+
 FILE* OS_fopen(const char* pathname, const char* mode) {
     FILE* f;
 
@@ -254,4 +287,55 @@ char* OS_Basename(const char* path) {
 char* OS_GetWorkingDirectory(char* argv0) {
     // Looks for the data in "~/Library/Application Support/dethrace"
     return SDL_GetPrefPath(NULL, "dethrace");
+}
+
+int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
+    struct ifaddrs *ifaddr, *ifa;
+    int found = 0;
+
+    // Get the list of network interfaces
+    if (getifaddrs(&ifaddr) == -1) {
+        perror("getifaddrs");
+        return 0;
+    }
+
+    // Loop through all interfaces
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr == NULL)
+            continue;
+
+        if (strlen(name) == 0 || strcmp(name, ifa->ifa_name) == 0) {
+            if (ifa->ifa_addr->sa_family == AF_INET) {
+                *((struct sockaddr_in*)pSockaddr_in) = *(struct sockaddr_in*)ifa->ifa_addr;
+                found = 1;
+                break;
+            }
+        }
+    }
+
+    // Free the memory allocated by getifaddrs
+    freeifaddrs(ifaddr);
+    return found;
+}
+
+int OS_InitSockets(void) {
+    return 0;
+}
+
+int OS_GetLastSocketError(void) {
+    return errno;
+}
+
+void OS_CleanupSockets(void) {
+    // no-op
+}
+
+int OS_SetSocketNonBlocking(int socket) {
+    int flags = fcntl(socket, F_GETFL);
+    flags |= O_NONBLOCK;
+    return fcntl(socket, F_SETFL, flags);
+}
+
+int OS_CloseSocket(int socket) {
+    return close(socket);
 }

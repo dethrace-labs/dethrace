@@ -131,6 +131,18 @@ char* gError_messages[126] = {
     "Net contents too big %",
     "File % is corrupted",
     "Random number out of range (%)",
+
+#ifdef DETHRACE_3DFX_PATCH
+    "Couldn't lock pixelmap %",
+    "% should be locked but isn't",
+    "Cannot purify pixelmap %",
+    "File % must start with \"%\"",
+    "Can't cope with version % for %",
+    "Cannot tile pixelmap %",
+    "Mysterious \"%\" in %",
+    "Can only dim rectangles of gBack_screen",
+    "Invalid material alpha"
+#endif
 };
 int gError_code;
 char* gPalette_copy__errors;    // suffix added to avoid duplicate symbol
@@ -260,10 +272,10 @@ void dr_dprintf(char* fmt_string, ...) {
     fflush(gDiagnostic_file);
 
     // Added by dethrace for debugging
-    // va_start(args, fmt_string);
-    // vprintf(fmt_string, args);
-    // va_end(args);
-    // printf("\n");
+    va_start(args, fmt_string);
+    vprintf(fmt_string, args);
+    va_end(args);
+    printf("\n");
 }
 
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)

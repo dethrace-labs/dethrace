@@ -67,7 +67,13 @@ void ToggleInfo(void) {
         } else {
             gInfo_on = !gInfo_on;
             if (gInfo_on) {
+#ifdef DETHRACE_3DFX_PATCH
+                if (PDKeyDown(KEY_SHIFT_ANY)) {
+                    gInfo_mode = (gInfo_mode + 1) % 3;
+                }
+#else
                 gInfo_mode = PDKeyDown(KEY_SHIFT_ANY);
+#endif
             }
         }
     }
@@ -146,17 +152,8 @@ void MungeHeadups(void) {
     gMr_odo = (double)gFrame_period * gProgram_state.current_car.speedo_speed * WORLD_SCALE / 1600.0 + gMr_odo;
     if (gInfo_on) {
         bearing = 360.0 - FastScalarArcTan2(gCamera_to_world.m[0][2], gCamera_to_world.m[2][2]);
-        if (gInfo_mode) {
-            sprintf(
-                the_text,
-                "P'cam: curr=%d, ambi=%d, pend=%d Car: c=%+.3f, a=%+.3f, b=%+.3f",
-                PratcamGetCurrent(),
-                PratcamGetAmbient(),
-                PratcamGetPending(),
-                gCar_to_view->curvature,
-                gCar_to_view->acc_force,
-                gCar_to_view->brake_force);
-        } else {
+        switch (gInfo_mode) {
+        case 0:
             sprintf(
                 the_text,
                 "%d.%d (%.3f, %.3f, %.3f) %.0f, %.0f, MILES=%.2f",
@@ -168,6 +165,45 @@ void MungeHeadups(void) {
                 gCamera_to_horiz_angle,
                 bearing,
                 gMr_odo);
+            break;
+        case 1:
+            sprintf(
+                the_text,
+                "P'cam: curr=%d, ambi=%d, pend=%d Car: c=%+.3f, a=%+.3f, b=%+.3f",
+                PratcamGetCurrent(),
+                PratcamGetAmbient(),
+                PratcamGetPending(),
+                gCar_to_view->curvature,
+                gCar_to_view->acc_force,
+                gCar_to_view->brake_force);
+            break;
+#ifdef DETHRACE_3DFX_PATCH
+        case 2:
+            nearby = SomeNearbyMaterial();
+            strcpy(the_text, nearby->identifier);
+            if (nearby->colour_map != NULL) {
+                sprintf(&the_text[strlen(the_text)], " %s", nearby->colour_map->identifier);
+                user = (tPixelmap_user_data*)nearby->colour_map->user;
+                if (user != NULL) {
+                    sprintf(&the_text[strlen(the_text)], " %dx%d to", user->orig_width, user->orig_height);
+                } else {
+                    sprintf(&the_text[strlen(the_text)], " %dx%d", nearby->colour_map->width, nearby->colour_map->height);
+                }
+                if ((nearby->flags & BR_MATF_MAP_INTERPOLATION)) {
+                    strcat(the_text, " bilinear");
+                } else {
+                    strcat(the_text, " nobilinear");
+                }
+                if ((nearby->flags & BR_MATF_MAP_ANTIALIASING) && nearby->colour_map != NULL && nearby->colour_map->mip_offset != 0) {
+                    strcat(the_text, " mipmap");
+                } else {
+                    strcat(the_text, " nomipmap");
+                }
+                break;
+            }
+#endif
+        default:
+            break;
         }
         ChangeHeadupText(gProgram_state.frame_rate_headup, the_text);
     } else {
@@ -194,7 +230,7 @@ void MungeHeadups(void) {
         }
         if (gCountdown != new_countdown && new_countdown <= 5) {
             gCountdown = new_countdown;
-            NewImageHeadupSlot(5, 0, 800, new_countdown + 4);
+            NewImageHeadupSlot(eHeadupSlot_countdown, 0, 800, new_countdown + 4);
             DRS3StartSound(gPedestrians_outlet, gCountdown + 8000);
             if (!new_countdown) {
                 MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo();
@@ -468,8 +504,8 @@ int MungeRaceFinished(void) {
             return 1;
         }
         gRace_finished = 15 * gTimer + 4500;
-        gRace_bonus_headup = NewTextHeadupSlot(9, 0, 0, -4, "");
-        gTime_bonus_headup = NewTextHeadupSlot(10, 0, 0, -4, "");
+        gRace_bonus_headup = NewTextHeadupSlot(eHeadupSlot_race_bonus, 0, 0, -4, "");
+        gTime_bonus_headup = NewTextHeadupSlot(eHeadupSlot_time_bonus, 0, 0, -4, "");
         gTime_bonus = 0;
         gTime_bonus_start = GetTotalTime();
         gTime_bonus_state = eTime_bonus_initial_pause;
@@ -590,6 +626,16 @@ tRace_result MainGameLoop(void) {
         EnterUserMessage();
         SkidsPerFrame();
         if (!gWait_for_it) {
+#if defined(DETHRACE_FIX_BUGS)
+            // Fixes issue where returning to race mode from the UI shows 2d elements in the wrong colors for half a second.
+            // In 3dfx mode, 2d elements are rendered using `Copy8BitTo16BitRectangleWithTransparency` which uses
+            // `gCurrent_palette` to convert 8 bit to 16 bit pixels. `gCurrent_palette` is still set to the interface palette here
+            // I couldn't confirm why this does not happen in the original 3dfx executable (or does it?)
+            if (harness_game_config.opengl_3dfx_mode) {
+                EnsureRenderPalette();
+                EnsurePaletteUp();
+            }
+#endif
             RenderAFrame(1);
         }
         CheckReplayTurnOn();

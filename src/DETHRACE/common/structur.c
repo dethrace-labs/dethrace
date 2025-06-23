@@ -155,7 +155,7 @@ void IncrementCheckpoint(void) {
         gLap++;
         if (gLap == gTotal_laps) {
             PratcamEvent(33); // FIXME: or PratcamEventNow
-            NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_FinalLap));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_FinalLap));
             DRS3StartSound(gPedestrians_outlet, 8014);
             done_voice = 1;
         } else if (gLap > gTotal_laps) {
@@ -207,7 +207,7 @@ void WrongCheckpoint(int pCheckpoint_index) {
                 return;
             }
         }
-        NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_WrongCheckpoint));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_WrongCheckpoint));
         DRS3StartSound(gPedestrians_outlet, 8013);
         gLast_checkpoint_time = GetTotalTime();
         gLast_wrong_checkpoint = pCheckpoint_index;
@@ -299,7 +299,7 @@ void TotalRepair(void) {
     LOG_TRACE("()");
 
     TotallyRepairCar();
-    NewTextHeadupSlot(4, 0, 1000, -4, GetMiscString(kMiscString_InstantRepair));
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_InstantRepair));
 }
 
 // IDA: void __cdecl DoLogos()
@@ -308,6 +308,14 @@ void DoLogos(void) {
     DoSCILogo();
     DoOpeningAnimation();
     DoStainlessLogo();
+#ifdef DETHRACE_FIX_BUGS
+    /* StartMusic is only called in PlaySmackerFile when sound and cutscenes are enabled */
+    if (!gSound_override && gCut_scene_override) {
+        if (!harness_game_config.no_music) {
+            StartMusic();
+        }
+    }
+#endif
     gProgram_state.prog_status = eProg_opening;
 }
 
@@ -651,7 +659,9 @@ void InitialiseProgramState(void) {
     gProgram_state.cockpit_on = gCockpit_on;
     gProgram_state.car_name[0] = 0;
     SetSoundVolumes();
+#if !defined(DETHRACE_3DFX_PATCH)
     AllocateRearviewPixelmap();
+#endif
 }
 
 // IDA: void __cdecl DoProgram()
@@ -700,7 +710,7 @@ void JumpTheStart(void) {
         DRS3StartSound(gPedestrians_outlet, 8016);
         SpendCredits(gJump_start_fine[gProgram_state.skill_level]);
         sprintf(s, "%s %d %s", GetMiscString(gProgram_state.frank_or_anniness == eFrankie ? kMiscString_BadBoy : kMiscString_BadGirl), gJump_start_fine[gProgram_state.skill_level], GetMiscString(kMiscString_CreditFine));
-        NewTextHeadupSlot(4, 0, 1000, -4, s);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, s);
     }
 }
 

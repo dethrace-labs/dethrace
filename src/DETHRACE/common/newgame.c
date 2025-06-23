@@ -1598,7 +1598,7 @@ void RequestCarDetails(tNet_game_details* pNet_game) {
         gNet_mode = eNet_mode_thinking_about_it;
     }
     message = NetBuildMessage(NETMSGID_CARDETAILSREQ, 0);
-    NetGuaranteedSendMessageToAddress(pNet_game, message, &pNet_game->pd_net_info.addr_in, NULL);
+    NetGuaranteedSendMessageToAddress(pNet_game, message, &pNet_game->pd_net_info, NULL);
 }
 
 // IDA: int __cdecl PickARandomCar()

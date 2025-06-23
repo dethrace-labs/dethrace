@@ -5,9 +5,11 @@
 #include "constants.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include "input.h"
 #include "loading.h"
@@ -292,7 +294,7 @@ char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
         if (ch != -1) {
             ungetc(ch, pF);
         }
-    } while (!isalnum(s[0])
+    } while (!Harness_Hook_isalnum(s[0])
         && s[0] != '-'
         && s[0] != '.'
         && s[0] != '!'
@@ -415,7 +417,27 @@ void CopyDoubled8BitTo16BitRectangle(br_pixelmap* pDst, br_pixelmap* pSrc, int p
     tU16* dst_start1;
     tU16* palette_entry;
     LOG_TRACE("(%p, %p, %d, %d, %d, %d, %p)", pDst, pSrc, pSrc_width, pSrc_height, pDst_x, pDst_y, pPalette);
-    NOT_IMPLEMENTED();
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+
+    for (y = 0; y < pSrc_height; y++) {
+        src_start = ((tU8*)pSrc->pixels) + pSrc->row_bytes * y;
+        dst_start0 = (tU16*)(((tU8*)pDst->pixels) + pDst->row_bytes * pDst_y);
+        dst_start0 += pDst_x;
+        dst_start1 = (tU16*)(((tU8*)pDst->pixels) + pDst->row_bytes * (pDst_y + 1));
+        dst_start1 += pDst_x;
+
+        for (x = 0; x < pSrc_width; x++) {
+            dst_start0[0] = palette_entry[*src_start];
+            dst_start0[1] = palette_entry[*src_start];
+            dst_start1[0] = palette_entry[*src_start];
+            dst_start1[1] = palette_entry[*src_start];
+            src_start++;
+            dst_start0 += 2;
+            dst_start1 += 2;
+        }
+        pDst_y += 2;
+    }
 }
 
 // IDA: br_pixelmap* __usercall Scale8BitPixelmap@<EAX>(br_pixelmap *pSrc@<EAX>, int pWidth@<EDX>, int pHeight@<EBX>)
@@ -446,7 +468,14 @@ br_pixelmap* Tile8BitPixelmap(br_pixelmap* pSrc, int pN) {
 // IDA: tException_list __usercall FindExceptionInList@<EAX>(char *pName@<EAX>, tException_list pList@<EDX>)
 tException_list FindExceptionInList(char* pName, tException_list pList) {
     LOG_TRACE("(\"%s\", %d)", pName, pList);
-    NOT_IMPLEMENTED();
+
+    while (pList) {
+        if (DRStricmp(pName, pList->name) == 0) {
+            return pList;
+        }
+        pList = pList->next;
+    }
+    return NULL;
 }
 
 // IDA: br_pixelmap* __usercall PurifiedPixelmap@<EAX>(br_pixelmap *pSrc@<EAX>)
@@ -457,7 +486,14 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
     int new_height;
     tException_list e;
     LOG_TRACE("(%p)", pSrc);
-    NOT_IMPLEMENTED();
+
+    // dethrace: added conditional to allow both software and 3dfx modes
+    if (!harness_game_config.opengl_3dfx_mode) {
+        return pSrc;
+    }
+
+    LOG_INFO("PurifiedPixelmap not implemented");
+    return pSrc;
 }
 
 // IDA: br_pixelmap* __usercall DRPixelmapLoad@<EAX>(char *pFile_name@<EAX>)
@@ -678,9 +714,15 @@ void PrintScreenFile(FILE* pF) {
     // 3. Color table (=palette)
     for (i = 0; i < 256; i++) {
         // red, green, blue, unused
+#if BR_ENDIAN_BIG
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 3]);
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 2]);
+        WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 1]);
+#else
         WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i]);
         WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 1]);
         WriteU8L(pF, ((tU8*)gCurrent_palette->pixels)[4 * i + 2]);
+#endif
         WriteU8L(pF, 0);
     }
 
@@ -714,10 +756,18 @@ void PrintScreen(void) {
     LOG_TRACE("()");
 
     f = OpenUniqueFileB("DUMP", "BMP");
-    if (f != NULL) {
-        PrintScreenFile(f);
-        fclose(f);
+    if (f == NULL) {
+        return;
     }
+#ifdef DETHRACE_3DFX_PATCH
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        PrintScreenFile16(f);
+    } else
+#endif
+    {
+        PrintScreenFile(f);
+    }
+    fclose(f);
 }
 
 // IDA: tU32 __cdecl GetTotalTime()
@@ -999,7 +1049,9 @@ tU16 PaletteEntry16Bit(br_pixelmap* pPal, int pEntry) {
     int green;
     int blue;
     LOG_TRACE("(%p, %d)", pPal, pEntry);
-    NOT_IMPLEMENTED();
+
+    src_entry = pPal->pixels;
+    return ((tU8)src_entry[pEntry] >> 3) | (((src_entry[pEntry] >> 19) & 0x1F) << 11) | (32 * ((tU16)src_entry[pEntry] >> 10));
 }
 
 // IDA: br_pixelmap* __usercall PaletteOf16Bits@<EAX>(br_pixelmap *pSrc@<EAX>)
@@ -1007,7 +1059,24 @@ br_pixelmap* PaletteOf16Bits(br_pixelmap* pSrc) {
     tU16* dst_entry;
     int value;
     LOG_TRACE("(%p)", pSrc);
-    NOT_IMPLEMENTED();
+
+    if (g16bit_palette == NULL) {
+        g16bit_palette = BrPixelmapAllocate(BR_PMT_RGB_565, 1, 256, g16bit_palette, 0);
+        if (g16bit_palette == NULL) {
+            FatalError(kFatalError_OOMCarmageddon_S, "16-bit palette");
+        }
+    }
+    if (!g16bit_palette_valid || pSrc != gSource_for_16bit_palette) {
+        value = 0;
+        dst_entry = g16bit_palette->pixels;
+        for (value = 0; value < 256; value++) {
+            *dst_entry = PaletteEntry16Bit(pSrc, value);
+            dst_entry++;
+        }
+        gSource_for_16bit_palette = pSrc;
+        g16bit_palette_valid = 1;
+    }
+    return g16bit_palette;
 }
 
 // IDA: void __usercall Copy8BitTo16Bit(br_pixelmap *pDst@<EAX>, br_pixelmap *pSrc@<EDX>, br_pixelmap *pPalette@<EBX>)
@@ -1018,7 +1087,17 @@ void Copy8BitTo16Bit(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* pPalette
     tU16* dst_start;
     tU16* palette_entry;
     LOG_TRACE("(%p, %p, %p)", pDst, pSrc, pPalette);
-    NOT_IMPLEMENTED();
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    for (y = 0; y < pDst->height; y++) {
+        src_start = (tU8*)pSrc->pixels + pSrc->row_bytes * y;
+        dst_start = (tU16*)((tU8*)pDst->pixels + pDst->row_bytes * y);
+        for (x = 0; x < pDst->width; x++) {
+            *dst_start = palette_entry[*src_start];
+            src_start++;
+            dst_start++;
+        }
+    }
 }
 
 // IDA: void __usercall Copy8BitTo16BitRectangle(br_pixelmap *pDst@<EAX>, tS16 pDst_x@<EDX>, tS16 pDst_y@<EBX>, br_pixelmap *pSrc@<ECX>, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap *pPalette)
@@ -1029,7 +1108,57 @@ void Copy8BitTo16BitRectangle(br_pixelmap* pDst, tS16 pDst_x, tS16 pDst_y, br_pi
     tU16* dst_start;
     tU16* palette_entry;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %p)", pDst, pDst_x, pDst_y, pSrc, pSrc_x, pSrc_y, pWidth, pHeight, pPalette);
-    NOT_IMPLEMENTED();
+
+    if (pSrc_x < 0) {
+        pWidth = pSrc_x + pWidth;
+        pDst_x = pDst_x - pSrc_x;
+        pSrc_x = 0;
+    }
+    if (pDst_x < 0) {
+        pWidth += pDst_x;
+        pSrc_x -= pDst_x;
+        pDst_x = 0;
+    }
+    if (pSrc_y < 0) {
+        pHeight = pSrc_y + pHeight;
+        pDst_y = pDst_y - pSrc_y;
+        pSrc_y = 0;
+    }
+    if (pDst_y < 0) {
+        pHeight += pDst_y;
+        pSrc_y -= pDst_y;
+        pDst_y = 0;
+    }
+
+    if (pSrc_x + pWidth > pSrc->width) {
+        pWidth = pSrc->width - pSrc_x;
+    }
+    if (pSrc_y + pHeight > pSrc->height) {
+        pHeight = pSrc->height - pSrc_y;
+    }
+
+    if (pDst_x + pWidth > pDst->width) {
+        pWidth = pDst->width - pDst_x;
+    }
+    if (pDst_y + pHeight > pDst->height) {
+        pHeight = pDst->height - pDst_y;
+    }
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    for (y = 0; y < pHeight; y++) {
+        src_start = (tU8*)pSrc->pixels + (pSrc->row_bytes * (pSrc_y + y));
+        src_start += pSrc_x;
+        dst_start = (tU16*)((tU8*)pDst->pixels + (pDst->row_bytes * (pDst_y + y)));
+        dst_start += pDst_x;
+        for (x = 0; x < pWidth; x++) {
+            // even though we have a specific `WithTransparency` version of this function, this one also handles transparency!
+            if (*src_start != 0) {
+                *dst_start = palette_entry[*src_start];
+            }
+            src_start++;
+            dst_start++;
+        }
+    }
 }
 
 // IDA: void __usercall Copy8BitTo16BitRectangleWithTransparency(br_pixelmap *pDst@<EAX>, tS16 pDst_x@<EDX>, tS16 pDst_y@<EBX>, br_pixelmap *pSrc@<ECX>, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap *pPalette)
@@ -1040,7 +1169,55 @@ void Copy8BitTo16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pDst_x, tS
     tU16* dst_start;
     tU16* palette_entry;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %p)", pDst, pDst_x, pDst_y, pSrc, pSrc_x, pSrc_y, pWidth, pHeight, pPalette);
-    NOT_IMPLEMENTED();
+
+    if (pSrc_x < 0) {
+        pWidth = pSrc_x + pWidth;
+        pDst_x = pDst_x - pSrc_x;
+        pSrc_x = 0;
+    }
+    if (pDst_x < 0) {
+        pWidth += pDst_x;
+        pSrc_x -= pDst_x;
+        pDst_x = 0;
+    }
+    if (pSrc_y < 0) {
+        pHeight = pSrc_y + pHeight;
+        pDst_y = pDst_y - pSrc_y;
+        pSrc_y = 0;
+    }
+    if (pDst_y < 0) {
+        pHeight += pDst_y;
+        pSrc_y -= pDst_y;
+        pDst_y = 0;
+    }
+
+    if (pSrc_x + pWidth > pSrc->width) {
+        pWidth = pSrc->width - pSrc_x;
+    }
+    if (pSrc_y + pHeight > pSrc->height) {
+        pHeight = pSrc->height - pSrc_y;
+    }
+
+    if (pDst_x + pWidth > pDst->width) {
+        pWidth = pDst->width - pDst_x;
+    }
+    if (pDst_y + pHeight > pDst->height) {
+        pHeight = pDst->height - pDst_y;
+    }
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    for (y = 0; y < pHeight; y++) {
+        src_start = (tU8*)pSrc->pixels + (pSrc->row_bytes * (pSrc_y + y)) + pSrc_x;
+        dst_start = (tU16*)((tU8*)pDst->pixels + (pDst->row_bytes * (pDst_y + y)));
+        dst_start += pDst_x;
+        for (x = 0; x < pWidth; x++) {
+            if (*src_start != 0) {
+                *dst_start = palette_entry[*src_start];
+            }
+            src_start++;
+            dst_start++;
+        }
+    }
 }
 
 // IDA: void __usercall Copy8BitToOnscreen16BitRectangleWithTransparency(br_pixelmap *pDst@<EAX>, tS16 pDst_x@<EDX>, tS16 pDst_y@<EBX>, br_pixelmap *pSrc@<ECX>, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, br_pixelmap *pPalette)
@@ -1051,7 +1228,20 @@ void Copy8BitToOnscreen16BitRectangleWithTransparency(br_pixelmap* pDst, tS16 pD
     tU16* dst_start;
     tU16* palette_entry;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %p)", pDst, pDst_x, pDst_y, pSrc, pSrc_x, pSrc_y, pWidth, pHeight, pPalette);
-    NOT_IMPLEMENTED();
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    for (y = 0; y < pHeight; y++) {
+        src_start = (tU8*)pSrc->pixels + (pSrc->row_bytes * (pSrc_y + y)) + pSrc_x;
+        dst_start = (tU16*)((tU8*)pDst->pixels + (pDst->row_bytes * (pDst_y + y)));
+        dst_start += pDst_x;
+        for (x = 0; x < pWidth; x++) {
+            if (*src_start != 0) {
+                *dst_start = palette_entry[*src_start];
+            }
+            src_start++;
+            dst_start++;
+        }
+    }
 }
 
 // IDA: void __usercall Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap *pDst@<EAX>, tS16 pDst_x@<EDX>, tS16 pDst_y@<EBX>, br_pixelmap *pSrc@<ECX>, tS16 pSrc_x, tS16 pSrc_y, tS16 pWidth, tS16 pHeight, tX1616 pShear, br_pixelmap *pPalette)
@@ -1066,21 +1256,95 @@ void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDs
     tS16 clipped_src_x;
     tS16 clipped_width;
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %d, %p)", pDst, pDst_x, pDst_y, pSrc, pSrc_x, pSrc_y, pWidth, pHeight, pShear, pPalette);
-    NOT_IMPLEMENTED();
+
+    palette_entry = PaletteOf16Bits(pPalette)->pixels;
+    total_shear = 0;
+    if (pSrc_y + pSrc->origin_y < 0) {
+        pHeight += pSrc_y + pSrc->origin_y;
+        pDst_y -= (pSrc_y + pSrc->origin_y);
+        pSrc_y = 0;
+    }
+    if (pDst_y + pDst->origin_y < 0) {
+        pHeight += pDst_y + pDst->origin_y;
+        pSrc_y -= (pDst_y + pDst->origin_y);
+        pDst_y = 0;
+    }
+
+    if (pSrc_y + pSrc->origin_y + pHeight > pSrc->height) {
+        pHeight = pSrc->height - (pSrc_y + pSrc->origin_y);
+    }
+
+    if (pDst_y + pDst->origin_y + pHeight > pDst->height) {
+        pHeight = pDst->height - pDst_y + pDst->origin_y;
+    }
+    if (pHeight > 0) {
+        if (pSrc_x + pSrc->origin_x < 0) {
+            pWidth += pSrc_x + pSrc->origin_x;
+            pDst_x -= (pSrc_x + pSrc->origin_x);
+            pSrc_x = 0;
+        }
+
+        if (pSrc_x + pSrc->origin_x + pWidth > pSrc->width) {
+            pWidth = pSrc->width - (pSrc_x + pSrc->origin_x);
+        }
+        for (y = 0; y < pHeight; y++) {
+            clipped_src_x = pSrc_x + pSrc->origin_x;
+            sheared_x = pDst_x + pDst->origin_x + (total_shear >> 16);
+            clipped_width = pWidth;
+            if ((sheared_x & 0x8000u) != 0) {
+                clipped_width = pWidth + sheared_x;
+                clipped_src_x = (pSrc_x + pSrc->origin_x) - sheared_x;
+                sheared_x = 0;
+            }
+
+            if (sheared_x + clipped_width > pDst->width) {
+                clipped_width = pDst->width - sheared_x;
+            }
+            if (clipped_width > 0) {
+                src_start = ((tU8*)pSrc->pixels) + (y + pSrc_y + pSrc->origin_y) * pSrc->row_bytes + clipped_src_x;
+                dst_start = (tU16*)((tU8*)pDst->pixels + 2 * sheared_x + (y + pDst_y + pDst->origin_y) * pDst->row_bytes);
+
+                for (x = clipped_width; x > 0; x--) {
+                    if (*src_start) {
+                        *dst_start = palette_entry[*src_start];
+                    }
+                    src_start++;
+                    dst_start++;
+                }
+            }
+            total_shear += pShear;
+        }
+    }
 }
 
 // IDA: void __usercall DRPixelmapRectangleCopy(br_pixelmap *dst@<EAX>, br_int_16 dx@<EDX>, br_int_16 dy@<EBX>, br_pixelmap *src@<ECX>, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h)
 void DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", dst, dx, dy, src, sx, sy, w, h);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (dst->type == src->type) {
+        BrPixelmapRectangleCopy(dst, dx, dy, src, sx, sy, w, h);
+    } else if (dst->type == BR_PMT_RGB_565 && src->type == BR_PMT_INDEX_8) {
+        Copy8BitTo16BitRectangle(dst, dx, dy, src, sx, sy, w, h, gCurrent_palette);
+    }
+#else
     BrPixelmapRectangleCopy(dst, dx, dy, src, sx, sy, w, h);
+#endif
 }
 
 // IDA: void __usercall DRPixelmapCopy(br_pixelmap *dst@<EAX>, br_pixelmap *src@<EDX>)
 void DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
     LOG_TRACE("(%p, %p)", dst, src);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (dst->type == src->type) {
+        BrPixelmapCopy(dst, src);
+    } else if (dst->type == BR_PMT_RGB_565 && src->type == BR_PMT_INDEX_8) {
+        Copy8BitTo16Bit(dst, src, gCurrent_palette);
+    }
+#else
     BrPixelmapCopy(dst, src);
+#endif
 }
 
 // IDA: void __usercall DRPixelmapRectangleFill(br_pixelmap *dst@<EAX>, br_int_16 x@<EDX>, br_int_16 y@<EBX>, br_uint_16 w@<ECX>, br_uint_16 h, br_uint_32 colour)
@@ -1156,7 +1420,7 @@ void SubsStringJob(char* pStr, ...) {
             va_end(ap);
             return;
         }
-        sub_str = va_arg(ap, char *);
+        sub_str = va_arg(ap, char*);
         StripCR(sub_str);
         strcpy(temp_str, &sub_pt[1]);
         strcpy(sub_pt, sub_str);
@@ -1455,7 +1719,49 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
     br_pixelmap* big_tile;
     tException_list e;
     LOG_TRACE("(%p, %d)", pArray, pCount);
-    NOT_IMPLEMENTED();
+
+    // Added by dethrace.
+    // `GlorifyMaterial` is only present in the 3dfx patch.
+    // If software mode, don't glorify, otherwise it puts the software renderer into lit mode
+    // See `WhitenVertexRGB` for a similar check that is present in the original code
+    if (!harness_game_config.opengl_3dfx_mode) {
+        return;
+    }
+    // <<<
+
+    for (i = 0; i < pCount; i++) {
+        if (pArray[i]->colour_map != NULL) {
+            e = FindExceptionInList(pArray[i]->colour_map->identifier, gExceptions);
+
+            if (gInterpolate_textures) {
+                // use linear texture filtering unless we have a "nobilinear" flag or the texture has transparent parts
+                if ((e == NULL || (e->flags & ExceptionFlag_NoBilinear) == 0) && !DRPixelmapHasZeros(pArray[i]->colour_map)) {
+                    pArray[i]->flags |= BR_MATF_MAP_INTERPOLATION;
+                }
+            }
+            if (gUse_mip_maps) {
+                pArray[i]->flags |= BR_MATF_MAP_ANTIALIASING;
+            }
+            if (gPerspective_is_fast) {
+                pArray[i]->flags |= BR_MATF_PERSPECTIVE;
+            }
+            if (e && (e->flags & ExceptionFlag_Double)) {
+                pArray[i]->map_transform.m[0][0] = 0.5f;
+                pArray[i]->map_transform.m[1][1] = 0.5f;
+            } else if (e && (e->flags & ExceptionFlag_Quadruple)) {
+                pArray[i]->map_transform.m[0][0] = 0.25f;
+                pArray[i]->map_transform.m[1][1] = 0.25f;
+            }
+        } else {
+            c = pArray[i]->index_base + pArray[i]->index_range / 2;
+            pArray[i]->colour = ((br_colour*)gRender_palette->pixels)[c];
+        }
+        pArray[i]->ka = 1.0f;
+        pArray[i]->kd = 0.0f;
+        pArray[i]->ks = 0.0f;
+        pArray[i]->flags &= ~BR_MATF_PRELIT;
+        pArray[i]->flags |= BR_MATF_LIGHT;
+    }
 }
 
 // IDA: void __usercall WhitenVertexRGB(br_model **pArray@<EAX>, int pN@<EDX>)
@@ -1464,7 +1770,17 @@ void WhitenVertexRGB(br_model** pArray, int pN) {
     int v;
     br_vertex* vertex;
     LOG_TRACE("(%p, %d)", pArray, pN);
-    NOT_IMPLEMENTED();
+
+    if (gScreen && gScreen->type != BR_PMT_INDEX_8 && pN > 0) {
+        for (m = 0; m < pN; m++) {
+            vertex = pArray[m]->vertices;
+            for (v = 0; v < pArray[m]->nvertices; v++, vertex++) {
+                vertex->red = 255;
+                vertex->grn = 255;
+                vertex->blu = 255;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall NobbleNonzeroBlacks(br_pixelmap *pPalette@<EAX>)
@@ -1476,7 +1792,29 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
     tU32* palette_entry;
     tU32 frobbed;
     LOG_TRACE("(%p)", pPalette);
-    NOT_IMPLEMENTED();
+
+    int i;
+
+    palette_entry = pPalette->pixels;
+    frobbed = 0;
+    if (*palette_entry != 0) {
+        *palette_entry = 0;
+        frobbed = 1;
+    }
+    palette_entry++;
+    for (i = 1; i < 256; i++) {
+        blue = (*palette_entry >> 16) & 0xff;
+        green = (*palette_entry >> 8) & 0xff;
+        red = (*palette_entry) & 0xff;
+        if (blue == 0 && green == 0 && red == 0) {
+            frobbed = 1;
+            *palette_entry = 0x010101;
+        }
+        palette_entry++;
+    }
+    if (frobbed) {
+        BrMapUpdate(pPalette, BR_MAPU_ALL);
+    }
 }
 
 // IDA: int __usercall PDCheckDriveExists@<EAX>(char *pThe_path@<EAX>)

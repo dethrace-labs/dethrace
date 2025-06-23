@@ -3,8 +3,10 @@
 #include "constants.h"
 #include "controls.h"
 #include "depth.h"
+#include "errors.h"
 #include "flicplay.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
@@ -230,7 +232,25 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
 // IDA: void __usercall DeviouslyDimRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pKnock_out_corners)
 void DeviouslyDimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
-    NOT_IMPLEMENTED();
+
+    if (pPixelmap != gBack_screen) {
+        FatalError(kFatalError_CanOnlyDimRectanglesOfgBack_screen);
+    }
+
+    gDim_model->vertices[1].p.v[0] = pLeft;
+    gDim_model->vertices[0].p.v[0] = pLeft;
+    gDim_model->vertices[3].p.v[0] = pRight;
+    gDim_model->vertices[2].p.v[0] = pRight;
+    gDim_model->vertices[3].p.v[1] = -pTop;
+    gDim_model->vertices[0].p.v[1] = -pTop;
+    gDim_model->vertices[2].p.v[1] = -pBottom;
+    gDim_model->vertices[1].p.v[1] = -pBottom;
+    BrModelUpdate(gDim_model, BR_MODU_VERTEX_POSITIONS);
+    gDim_actor->render_style = BR_RSTYLE_FACES;
+    PDUnlockRealBackScreen(1);
+    BrZbSceneRender(g2d_camera, g2d_camera, gBack_screen, gDepth_buffer);
+    PDLockRealBackScreen(1);
+    gDim_actor->render_style = BR_RSTYLE_NONE;
 }
 
 // IDA: void __cdecl DimRectangle(br_pixelmap *pPixelmap, int pLeft, int pTop, int pRight, int pBottom, int pKnock_out_corners)
@@ -243,6 +263,11 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
     int line_skip;
     int width;
     LOG_TRACE9("(%p, %d, %d, %d, %d, %d)", pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
+
+    if (gDevious_2d) {
+        DeviouslyDimRectangle(pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
+        return;
+    }
 
     ptr = (tU8*)pPixelmap->pixels + pLeft + pPixelmap->row_bytes * pTop;
     line_skip = pPixelmap->row_bytes - pRight + pLeft;
@@ -316,6 +341,12 @@ void DoPSPowerHeadup(int pY, int pLevel, char* pName, int pBar_colour) {
     int i;
     LOG_TRACE("(%d, %d, \"%s\", %d)", pY, pLevel, pName, pBar_colour);
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        pBar_colour = PaletteEntry16Bit(gRender_palette, pBar_colour);
+    }
+#endif
+
     DimRectangle(gBack_screen, gCurrent_graf_data->ps_dim_left, pY, gCurrent_graf_data->ps_dim_right, gCurrent_graf_data->ps_dim_height + pY, 1);
     TransDRPixelmapText(gBack_screen, gCurrent_graf_data->ps_name_left, gCurrent_graf_data->ps_name_top_border + pY, gFonts + 6, pName, gBack_screen->width);
 
@@ -349,7 +380,7 @@ void DoHeadups(tU32 pThe_time) {
         DoNetScores();
     }
     if (gQueued_headup_count && PDGetTotalTime() - gLast_centre_headup >= 1000) {
-        NewTextHeadupSlot(4, gQueued_headups[0].flash_rate,
+        NewTextHeadupSlot(eHeadupSlot_misc, gQueued_headups[0].flash_rate,
             gQueued_headups[0].lifetime,
             gQueued_headups[0].font_index,
             gQueued_headups[0].text);
@@ -476,7 +507,7 @@ void DoHeadups(tU32 pThe_time) {
                                 0,
                                 the_headup->data.fancy_info.image->width,
                                 the_headup->data.fancy_info.image->height,
-                                -65536);
+                                -BrIntToFixed(1));
                             break;
                         case eFancy_stage_halting:
                             time_factor = 1000 * (pThe_time - the_headup->data.fancy_info.start_time) / 100;
@@ -495,7 +526,7 @@ void DoHeadups(tU32 pThe_time) {
                                     0,
                                     the_headup->data.image_info.image->width,
                                     the_headup->data.image_info.image->height,
-                                    (((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500) << 16)
+                                    BrIntToFixed((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500)
                                         / the_headup->data.image_info.image->height);
                             } else {
 #if DETHRACE_FIX_BUGS
@@ -510,7 +541,7 @@ void DoHeadups(tU32 pThe_time) {
                                     0,
                                     the_headup->data.image_info.image->width,
                                     the_headup->data.image_info.image->height,
-                                    ((the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500) << 16)
+                                    BrIntToFixed(the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500)
                                         / the_headup->data.image_info.image->height);
                             }
                             break;
@@ -546,8 +577,8 @@ void DoHeadups(tU32 pThe_time) {
                                 0,
                                 the_headup->data.image_info.image->width,
                                 the_headup->data.image_info.image->height,
-                                -(((time_factor * the_headup->data.fancy_info.shear_amount / 1000) << 16)
-                                    / the_headup->data.image_info.image->height));
+                                -BrIntToFixed(time_factor * the_headup->data.fancy_info.shear_amount / 1000)
+                                    / the_headup->data.image_info.image->height);
                             break;
                         case eFancy_stage_leaving:
                             the_headup->data.fancy_info.offset -= 500 * gFrame_period / 1000;
@@ -563,7 +594,7 @@ void DoHeadups(tU32 pThe_time) {
                                     0,
                                     the_headup->data.image_info.image->width,
                                     the_headup->data.image_info.image->height,
-                                    -65536);
+                                    -BrIntToFixed(1));
                             }
                             break;
                         default:
@@ -878,7 +909,7 @@ void DoFancyHeadup(int pIndex) {
 
     the_time = GetTotalTime();
     if (!gMap_mode && (gLast_fancy_index < 0 || the_time - gLast_fancy_time > 2000 || gLast_fancy_index <= pIndex)) {
-        temp_ref = NewImageHeadupSlot(6, 0, 2000, pIndex + 10);
+        temp_ref = NewImageHeadupSlot(eHeadupSlot_fancies, 0, 2000, pIndex + 10);
         if (temp_ref >= 0) {
             gLast_fancy_headup = temp_ref;
             gLast_fancy_index = pIndex;
@@ -1158,7 +1189,11 @@ void DoInstruments(tU32 pThe_time) {
                     + (double)the_wobble_y),
                 gProgram_state.current_car.tacho_needle_colour[gProgram_state.cockpit_on]);
         } else if (tacho_image != NULL) {
+#ifdef DETHRACE_3DFX_PATCH
+            DRPixelmapRectangleCopy(
+#else
             BrPixelmapRectangleCopy(
+#endif
                 gBack_screen,
                 the_wobble_x + gProgram_state.current_car.tacho_x[gProgram_state.cockpit_on],
                 the_wobble_y + gProgram_state.current_car.tacho_y[gProgram_state.cockpit_on],
@@ -1418,7 +1453,7 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
         sprintf(s, "%s%s %d %s", GetMiscString(kMiscString_Lost), pPrefix_text, -pAmount, GetMiscString(kMiscString_Credits));
         gProgram_state.credits_lost -= original_amount;
     }
-    gLast_credit_headup__displays = NewTextHeadupSlot(4, 0, 2000, -4, s);
+    gLast_credit_headup__displays = NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, s);
     gLast_earn_time = the_time;
 }
 
@@ -1471,7 +1506,7 @@ void AwardTime(tU32 pTime) {
     gTimer += original_amount * 1000;
     s[0] = '+';
     TimerString(1000 * pTime, &s[1], 0, 0);
-    gLast_time_credit_headup = NewTextHeadupSlot(11, 0, 2000, -2, s);
+    gLast_time_credit_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 2000, -2, s);
     gLast_time_earn_time = the_time;
 }
 

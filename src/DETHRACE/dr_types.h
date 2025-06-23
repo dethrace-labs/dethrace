@@ -12,6 +12,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
+// required for platform-specific network structs
+// if needed for a different platform, make this conditional
+#include "pc-all/net_types.h"
+
 typedef unsigned char tU8;
 typedef signed char tS8;
 typedef uint16_t tU16;
@@ -29,9 +33,6 @@ typedef struct tPath_section_struct tPath_section;
 typedef tU32 tPlayer_ID;
 typedef void tPipe_reset_proc(void);
 typedef struct tPowerup tPowerup;
-
-// FIXME? hardcoding pc-win95 here
-#include "pc-win95/win95net_types.h"
 
 #ifdef DETHRACE_FIX_BUGS
 typedef int tGot_proc(tPowerup*, tCar_spec*);
@@ -1383,6 +1384,7 @@ typedef union tNet_contents {                           // size: 0x160
     } data;                                             // @0x0
 } tNet_contents;
 
+#pragma pack(push, 4)
 typedef struct tNet_message {    // size: 0x17c
     tU32 pd_stuff_so_DO_NOT_USE; // @0x0
     tU32 magic_number;           // @0x4
@@ -1394,6 +1396,7 @@ typedef struct tNet_message {    // size: 0x17c
     tU16 overall_size;           // @0x1a
     tNet_contents contents;      // @0x1c
 } tNet_message;
+#pragma pack(pop)
 
 typedef struct tCar_detail_info {
     tCar_detail_ownership ownership;

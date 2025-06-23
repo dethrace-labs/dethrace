@@ -26,6 +26,10 @@
 // Optional: install a handler to print stack trace during a crash
 void OS_InstallSignalHandler(char* program_name);
 
+char* OS_GetFirstFileInDirectory(char* path);
+
+char* OS_GetNextFileInDirectory(void);
+
 FILE* OS_fopen(const char* pathname, const char* mode);
 
 size_t OS_ConsoleReadPassword(char* pBuffer, size_t pBufferLen);
@@ -35,5 +39,17 @@ char* OS_Dirname(const char* path);
 char* OS_Basename(const char* path);
 
 char* OS_GetWorkingDirectory(char* argv0);
+
+int OS_GetAdapterAddress(char* name, void* pSockaddr_in);
+
+int OS_InitSockets(void);
+
+void OS_CleanupSockets(void);
+
+int OS_GetLastSocketError(void);
+
+int OS_SetSocketNonBlocking(int socket);
+
+int OS_CloseSocket(int socket);
 
 #endif
