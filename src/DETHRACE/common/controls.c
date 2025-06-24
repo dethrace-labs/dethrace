@@ -37,7 +37,7 @@
 #include "world.h"
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x51b1c0
+// GLOBAL: CARM95 0x0051b1c0
 tToggle_element gToggle_array[] = {
     { KEYMAP_MIRROR, -2, 1, 1, 0, ToggleMirror },
     { KEYMAP_MAP, -2, 1, 1, 0, ToggleMap },
@@ -84,18 +84,18 @@ tToggle_element gToggle_array[] = {
     { KEYMAP_INFO, KEYMAP_CONTROL_ANY, 1, 1, 0, ToggleInfo }
 };
 
-// GLOBAL: CARM95 0x51b5c8
+// GLOBAL: CARM95 0x0051b5c8
 int gRepair_last_time;
 
-// GLOBAL: CARM95 0x51b5cc
+// GLOBAL: CARM95 0x0051b5cc
 int gHad_auto_recover;
 
-// GLOBAL: CARM95 0x51b5d0
+// GLOBAL: CARM95 0x0051b5d0
 tU32 gLast_repair_time;
 
-// GLOBAL: CARM95 0x51b5d4
+// GLOBAL: CARM95 0x0051b5d4
 tEdit_mode gWhich_edit_mode = eEdit_mode_options;
-// GLOBAL: CARM95 0x51b5d8
+// GLOBAL: CARM95 0x0051b5d8
 char* gEdit_mode_names[10] = {
     "Cheat",
     "Accessories",
@@ -111,7 +111,7 @@ char* gEdit_mode_names[10] = {
 
 // order is: { None, CTRL, ALT, CTRL+ALT, SHIFT, CTRL+SHIFT, ALT+SHIFT, CTRL+ALT+SHIFT }
 
-// GLOBAL: CARM95 0x51b600
+// GLOBAL: CARM95 0x0051b600
 tEdit_func* gEdit_funcs[10][18][8] = {
     { // CHEAT EDIT MODE
 
@@ -496,7 +496,7 @@ tEdit_func* gEdit_funcs[10][18][8] = {
     }
 };
 
-// GLOBAL: CARM95 0x51cc80
+// GLOBAL: CARM95 0x0051cc80
 tCheat gKev_keys[44] = {
     { .code = 0xa11ee75d, .code2 = 0xf805eddd, .action_proc = SetFlag, .num = 0x0a11ee75d },
     { .code = 0x564e78b9, .code2 = 0x99155115, .action_proc = SetFlag, .num = 0x0564e78b9 },
@@ -543,40 +543,40 @@ tCheat gKev_keys[44] = {
     { .code = 0x0, .code2 = 0x0, .action_proc = 0x0, .num = 0x0 }
 };
 
-// GLOBAL: CARM95 0x51cf30
+// GLOBAL: CARM95 0x0051cf30
 int gAllow_car_flying;
 
-// GLOBAL: CARM95 0x51cf34
+// GLOBAL: CARM95 0x0051cf34
 int gEntering_message;
 
-// GLOBAL: CARM95 0x51cf38
+// GLOBAL: CARM95 0x0051cf38
 tU32 gPalette_fade_time; // was gRecover_timer
 
-// GLOBAL: CARM95 0x53d608
+// GLOBAL: CARM95 0x0053d608
 char* gAbuse_text[10];
 
-// GLOBAL: CARM95 0x53d648
+// GLOBAL: CARM95 0x0053d648
 char gString[84];
 
-// GLOBAL: CARM95 0x53d5f8
+// GLOBAL: CARM95 0x0053d5f8
 int gToo_late;
 
-// GLOBAL: CARM95 0x53d5fc
+// GLOBAL: CARM95 0x0053d5fc
 int gRecover_timer;
 
-// GLOBAL: CARM95 0x53d63c
+// GLOBAL: CARM95 0x0053d63c
 int gRecovery_voucher_count;
 
-// GLOBAL: CARM95 0x550550
+// GLOBAL: CARM95 0x00550550
 int gInstant_handbrake;
 
-// GLOBAL: CARM95 0x550554
+// GLOBAL: CARM95 0x00550554
 int gAuto_repair;
 
 int _unittest_controls_lastGetPowerup = 0;
 
 // IDA: void __cdecl AbortRace()
-// FUNCTION: CARM95 0x4a0c70
+// FUNCTION: CARM95 0x004a0c70
 void AbortRace(void) {
     LOG_TRACE("()");
 
@@ -586,7 +586,7 @@ void AbortRace(void) {
 }
 
 // IDA: void __cdecl F4Key()
-// FUNCTION: CARM95 0x4a0c92
+// FUNCTION: CARM95 0x004a0c92
 void F4Key(void) {
     char s[256];
     tEdit_mode old_edit_mode;
@@ -618,7 +618,7 @@ void F4Key(void) {
 }
 
 // IDA: void __usercall SetFlag(int i@<EAX>)
-// FUNCTION: CARM95 0x4a0db7
+// FUNCTION: CARM95 0x004a0db7
 void SetFlag(int i) {
     LOG_TRACE("(%d)", i);
 
@@ -630,7 +630,7 @@ void SetFlag(int i) {
 }
 
 // IDA: void __usercall FinishLap(int i@<EAX>)
-// FUNCTION: CARM95 0x4a0df4
+// FUNCTION: CARM95 0x004a0df4
 void FinishLap(int i) {
     LOG_TRACE("(%d)", i);
 
@@ -638,7 +638,7 @@ void FinishLap(int i) {
 }
 
 // IDA: void __cdecl EnsureSpecialVolumesHidden()
-// FUNCTION: CARM95 0x4a0e04
+// FUNCTION: CARM95 0x004a0e04
 void EnsureSpecialVolumesHidden(void) {
     LOG_TRACE("()");
 
@@ -648,7 +648,7 @@ void EnsureSpecialVolumesHidden(void) {
 }
 
 // IDA: void __cdecl ShowSpecialVolumesIfRequ()
-// FUNCTION: CARM95 0x4a0e21
+// FUNCTION: CARM95 0x004a0e21
 void ShowSpecialVolumesIfRequ(void) {
     LOG_TRACE("()");
 
@@ -658,7 +658,7 @@ void ShowSpecialVolumesIfRequ(void) {
 }
 
 // IDA: void __usercall DoEditModeKey(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x4a0e53
+// FUNCTION: CARM95 0x004a0e53
 void DoEditModeKey(int pIndex) {
     int modifiers;
     LOG_TRACE("(%d)", pIndex);
@@ -683,7 +683,7 @@ void DoEditModeKey(int pIndex) {
 }
 
 // IDA: void __cdecl F5Key()
-// FUNCTION: CARM95 0x4a0e3e
+// FUNCTION: CARM95 0x004a0e3e
 void F5Key(void) {
     LOG_TRACE("()");
 
@@ -691,7 +691,7 @@ void F5Key(void) {
 }
 
 // IDA: void __cdecl F6Key()
-// FUNCTION: CARM95 0x4a0f3d
+// FUNCTION: CARM95 0x004a0f3d
 void F6Key(void) {
     LOG_TRACE("()");
 
@@ -699,7 +699,7 @@ void F6Key(void) {
 }
 
 // IDA: void __cdecl F7Key()
-// FUNCTION: CARM95 0x4a0f52
+// FUNCTION: CARM95 0x004a0f52
 void F7Key(void) {
     LOG_TRACE("()");
 
@@ -707,7 +707,7 @@ void F7Key(void) {
 }
 
 // IDA: void __cdecl F8Key()
-// FUNCTION: CARM95 0x4a0f67
+// FUNCTION: CARM95 0x004a0f67
 void F8Key(void) {
     LOG_TRACE("()");
 
@@ -715,7 +715,7 @@ void F8Key(void) {
 }
 
 // IDA: void __cdecl F10Key()
-// FUNCTION: CARM95 0x4a0f7c
+// FUNCTION: CARM95 0x004a0f7c
 void F10Key(void) {
     LOG_TRACE("()");
 
@@ -723,7 +723,7 @@ void F10Key(void) {
 }
 
 // IDA: void __cdecl F11Key()
-// FUNCTION: CARM95 0x4a0f91
+// FUNCTION: CARM95 0x004a0f91
 void F11Key(void) {
     LOG_TRACE("()");
 
@@ -731,7 +731,7 @@ void F11Key(void) {
 }
 
 // IDA: void __cdecl F12Key()
-// FUNCTION: CARM95 0x4a0fa6
+// FUNCTION: CARM95 0x004a0fa6
 void F12Key(void) {
     LOG_TRACE("()");
 
@@ -739,7 +739,7 @@ void F12Key(void) {
 }
 
 // IDA: void __cdecl NumberKey0()
-// FUNCTION: CARM95 0x4a0fbb
+// FUNCTION: CARM95 0x004a0fbb
 void NumberKey0(void) {
     LOG_TRACE("()");
 
@@ -747,7 +747,7 @@ void NumberKey0(void) {
 }
 
 // IDA: void __cdecl NumberKey1()
-// FUNCTION: CARM95 0x4a0fd0
+// FUNCTION: CARM95 0x004a0fd0
 void NumberKey1(void) {
     LOG_TRACE("()");
 
@@ -755,7 +755,7 @@ void NumberKey1(void) {
 }
 
 // IDA: void __cdecl NumberKey2()
-// FUNCTION: CARM95 0x4a0fe5
+// FUNCTION: CARM95 0x004a0fe5
 void NumberKey2(void) {
     LOG_TRACE("()");
 
@@ -763,7 +763,7 @@ void NumberKey2(void) {
 }
 
 // IDA: void __cdecl NumberKey3()
-// FUNCTION: CARM95 0x4a0ffa
+// FUNCTION: CARM95 0x004a0ffa
 void NumberKey3(void) {
     LOG_TRACE("()");
 
@@ -771,7 +771,7 @@ void NumberKey3(void) {
 }
 
 // IDA: void __cdecl NumberKey4()
-// FUNCTION: CARM95 0x4a100f
+// FUNCTION: CARM95 0x004a100f
 void NumberKey4(void) {
     LOG_TRACE("()");
 
@@ -779,7 +779,7 @@ void NumberKey4(void) {
 }
 
 // IDA: void __cdecl NumberKey5()
-// FUNCTION: CARM95 0x4a1024
+// FUNCTION: CARM95 0x004a1024
 void NumberKey5(void) {
     LOG_TRACE("()");
 
@@ -787,7 +787,7 @@ void NumberKey5(void) {
 }
 
 // IDA: void __cdecl NumberKey6()
-// FUNCTION: CARM95 0x4a1039
+// FUNCTION: CARM95 0x004a1039
 void NumberKey6(void) {
     LOG_TRACE("()");
 
@@ -795,7 +795,7 @@ void NumberKey6(void) {
 }
 
 // IDA: void __cdecl NumberKey7()
-// FUNCTION: CARM95 0x4a104e
+// FUNCTION: CARM95 0x004a104e
 void NumberKey7(void) {
     LOG_TRACE("()");
 
@@ -803,7 +803,7 @@ void NumberKey7(void) {
 }
 
 // IDA: void __cdecl NumberKey8()
-// FUNCTION: CARM95 0x4a1063
+// FUNCTION: CARM95 0x004a1063
 void NumberKey8(void) {
     LOG_TRACE("()");
 
@@ -811,7 +811,7 @@ void NumberKey8(void) {
 }
 
 // IDA: void __cdecl NumberKey9()
-// FUNCTION: CARM95 0x4a1078
+// FUNCTION: CARM95 0x004a1078
 void NumberKey9(void) {
     LOG_TRACE("()");
 
@@ -819,7 +819,7 @@ void NumberKey9(void) {
 }
 
 // IDA: void __cdecl LookLeft()
-// FUNCTION: CARM95 0x4a108d
+// FUNCTION: CARM95 0x004a108d
 void LookLeft(void) {
     LOG_TRACE("()");
 
@@ -843,7 +843,7 @@ void LookLeft(void) {
 }
 
 // IDA: void __cdecl LookForward()
-// FUNCTION: CARM95 0x4a113a
+// FUNCTION: CARM95 0x004a113a
 void LookForward(void) {
     LOG_TRACE("()");
 
@@ -862,7 +862,7 @@ void LookForward(void) {
 }
 
 // IDA: void __cdecl LookRight()
-// FUNCTION: CARM95 0x4a11b2
+// FUNCTION: CARM95 0x004a11b2
 void LookRight(void) {
     LOG_TRACE("()");
 
@@ -886,13 +886,13 @@ void LookRight(void) {
 }
 
 // IDA: void __cdecl DamageTest()
-// FUNCTION: CARM95 0x4a125f
+// FUNCTION: CARM95 0x004a125f
 void DamageTest(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl TDamageEngine()
-// FUNCTION: CARM95 0x4a126a
+// FUNCTION: CARM95 0x004a126a
 void TDamageEngine(void) {
     LOG_TRACE("()");
 
@@ -900,7 +900,7 @@ void TDamageEngine(void) {
 }
 
 // IDA: void __cdecl TDamageDriver()
-// FUNCTION: CARM95 0x4a127f
+// FUNCTION: CARM95 0x004a127f
 void TDamageDriver(void) {
     LOG_TRACE("()");
 
@@ -912,7 +912,7 @@ void TDamageDriver(void) {
 }
 
 // IDA: void __cdecl TDamageTrans()
-// FUNCTION: CARM95 0x4a12d4
+// FUNCTION: CARM95 0x004a12d4
 void TDamageTrans(void) {
     LOG_TRACE("()");
 
@@ -920,7 +920,7 @@ void TDamageTrans(void) {
 }
 
 // IDA: void __cdecl TDamageSteering()
-// FUNCTION: CARM95 0x4a12e9
+// FUNCTION: CARM95 0x004a12e9
 void TDamageSteering(void) {
     LOG_TRACE("()");
 
@@ -928,7 +928,7 @@ void TDamageSteering(void) {
 }
 
 // IDA: void __cdecl TDamageLFWheel()
-// FUNCTION: CARM95 0x4a12fe
+// FUNCTION: CARM95 0x004a12fe
 void TDamageLFWheel(void) {
     LOG_TRACE("()");
 
@@ -936,7 +936,7 @@ void TDamageLFWheel(void) {
 }
 
 // IDA: void __cdecl TDamageLFBrake()
-// FUNCTION: CARM95 0x4a1313
+// FUNCTION: CARM95 0x004a1313
 void TDamageLFBrake(void) {
     LOG_TRACE("()");
 
@@ -944,7 +944,7 @@ void TDamageLFBrake(void) {
 }
 
 // IDA: void __cdecl TDamageLRBrake()
-// FUNCTION: CARM95 0x4a1328
+// FUNCTION: CARM95 0x004a1328
 void TDamageLRBrake(void) {
     LOG_TRACE("()");
 
@@ -952,7 +952,7 @@ void TDamageLRBrake(void) {
 }
 
 // IDA: void __cdecl TDamageLRWheel()
-// FUNCTION: CARM95 0x4a133d
+// FUNCTION: CARM95 0x004a133d
 void TDamageLRWheel(void) {
     LOG_TRACE("()");
 
@@ -960,7 +960,7 @@ void TDamageLRWheel(void) {
 }
 
 // IDA: void __cdecl TDamageRFWheel()
-// FUNCTION: CARM95 0x4a1352
+// FUNCTION: CARM95 0x004a1352
 void TDamageRFWheel(void) {
     LOG_TRACE("()");
 
@@ -968,7 +968,7 @@ void TDamageRFWheel(void) {
 }
 
 // IDA: void __cdecl TDamageRFBrake()
-// FUNCTION: CARM95 0x4a1367
+// FUNCTION: CARM95 0x004a1367
 void TDamageRFBrake(void) {
     LOG_TRACE("()");
 
@@ -976,7 +976,7 @@ void TDamageRFBrake(void) {
 }
 
 // IDA: void __cdecl TDamageRRBrake()
-// FUNCTION: CARM95 0x4a137c
+// FUNCTION: CARM95 0x004a137c
 void TDamageRRBrake(void) {
     LOG_TRACE("()");
 
@@ -984,7 +984,7 @@ void TDamageRRBrake(void) {
 }
 
 // IDA: void __cdecl TDamageRRWheel()
-// FUNCTION: CARM95 0x4a1391
+// FUNCTION: CARM95 0x004a1391
 void TDamageRRWheel(void) {
     LOG_TRACE("()");
 
@@ -992,7 +992,7 @@ void TDamageRRWheel(void) {
 }
 
 // IDA: void __cdecl MoveBonnetForward()
-// FUNCTION: CARM95 0x4a13a6
+// FUNCTION: CARM95 0x004a13a6
 void MoveBonnetForward(void) {
     LOG_TRACE("()");
 
@@ -1000,7 +1000,7 @@ void MoveBonnetForward(void) {
 }
 
 // IDA: void __cdecl SaveBonnet()
-// FUNCTION: CARM95 0x4a13dd
+// FUNCTION: CARM95 0x004a13dd
 void SaveBonnet(void) {
     br_actor* bonny;
     tPath_name the_path;
@@ -1012,7 +1012,7 @@ void SaveBonnet(void) {
 }
 
 // IDA: void __cdecl MoveBonnetBackward()
-// FUNCTION: CARM95 0x4a142f
+// FUNCTION: CARM95 0x004a142f
 void MoveBonnetBackward(void) {
     LOG_TRACE("()");
 
@@ -1020,7 +1020,7 @@ void MoveBonnetBackward(void) {
 }
 
 // IDA: void __cdecl MoveBonnetLeft()
-// FUNCTION: CARM95 0x4a1466
+// FUNCTION: CARM95 0x004a1466
 void MoveBonnetLeft(void) {
     LOG_TRACE("()");
 
@@ -1028,7 +1028,7 @@ void MoveBonnetLeft(void) {
 }
 
 // IDA: void __cdecl ShrinkBonnetX()
-// FUNCTION: CARM95 0x4a149d
+// FUNCTION: CARM95 0x004a149d
 void ShrinkBonnetX(void) {
     LOG_TRACE("()");
 
@@ -1036,7 +1036,7 @@ void ShrinkBonnetX(void) {
 }
 
 // IDA: void __cdecl SwellBonnetX()
-// FUNCTION: CARM95 0x4a14d4
+// FUNCTION: CARM95 0x004a14d4
 void SwellBonnetX(void) {
     LOG_TRACE("()");
 
@@ -1044,7 +1044,7 @@ void SwellBonnetX(void) {
 }
 
 // IDA: void __cdecl ShrinkBonnetY()
-// FUNCTION: CARM95 0x4a150b
+// FUNCTION: CARM95 0x004a150b
 void ShrinkBonnetY(void) {
     LOG_TRACE("()");
 
@@ -1052,7 +1052,7 @@ void ShrinkBonnetY(void) {
 }
 
 // IDA: void __cdecl SwellBonnetY()
-// FUNCTION: CARM95 0x4a1542
+// FUNCTION: CARM95 0x004a1542
 void SwellBonnetY(void) {
     LOG_TRACE("()");
 
@@ -1060,7 +1060,7 @@ void SwellBonnetY(void) {
 }
 
 // IDA: void __cdecl ShrinkBonnetZ()
-// FUNCTION: CARM95 0x4a1579
+// FUNCTION: CARM95 0x004a1579
 void ShrinkBonnetZ(void) {
     LOG_TRACE("()");
 
@@ -1068,7 +1068,7 @@ void ShrinkBonnetZ(void) {
 }
 
 // IDA: void __cdecl SwellBonnetZ()
-// FUNCTION: CARM95 0x4a15b0
+// FUNCTION: CARM95 0x004a15b0
 void SwellBonnetZ(void) {
     LOG_TRACE("()");
 
@@ -1076,7 +1076,7 @@ void SwellBonnetZ(void) {
 }
 
 // IDA: void __cdecl MoveBonnetDown()
-// FUNCTION: CARM95 0x4a15e7
+// FUNCTION: CARM95 0x004a15e7
 void MoveBonnetDown(void) {
     LOG_TRACE("()");
 
@@ -1084,7 +1084,7 @@ void MoveBonnetDown(void) {
 }
 
 // IDA: void __cdecl MoveBonnetRight()
-// FUNCTION: CARM95 0x4a161e
+// FUNCTION: CARM95 0x004a161e
 void MoveBonnetRight(void) {
     LOG_TRACE("()");
 
@@ -1092,7 +1092,7 @@ void MoveBonnetRight(void) {
 }
 
 // IDA: void __cdecl MoveBonnetUp()
-// FUNCTION: CARM95 0x4a1655
+// FUNCTION: CARM95 0x004a1655
 void MoveBonnetUp(void) {
     LOG_TRACE("()");
 
@@ -1100,7 +1100,7 @@ void MoveBonnetUp(void) {
 }
 
 // IDA: void __cdecl TiltBonnetDownX()
-// FUNCTION: CARM95 0x4a168c
+// FUNCTION: CARM95 0x004a168c
 void TiltBonnetDownX(void) {
     LOG_TRACE("()");
 
@@ -1108,7 +1108,7 @@ void TiltBonnetDownX(void) {
 }
 
 // IDA: void __cdecl TiltBonnetUpX()
-// FUNCTION: CARM95 0x4a16b5
+// FUNCTION: CARM95 0x004a16b5
 void TiltBonnetUpX(void) {
     LOG_TRACE("()");
 
@@ -1116,7 +1116,7 @@ void TiltBonnetUpX(void) {
 }
 
 // IDA: void __cdecl TiltBonnetDownY()
-// FUNCTION: CARM95 0x4a16e1
+// FUNCTION: CARM95 0x004a16e1
 void TiltBonnetDownY(void) {
     LOG_TRACE("()");
 
@@ -1124,7 +1124,7 @@ void TiltBonnetDownY(void) {
 }
 
 // IDA: void __cdecl TiltBonnetUpY()
-// FUNCTION: CARM95 0x4a170a
+// FUNCTION: CARM95 0x004a170a
 void TiltBonnetUpY(void) {
     LOG_TRACE("()");
 
@@ -1132,7 +1132,7 @@ void TiltBonnetUpY(void) {
 }
 
 // IDA: void __cdecl TiltBonnetDownZ()
-// FUNCTION: CARM95 0x4a1736
+// FUNCTION: CARM95 0x004a1736
 void TiltBonnetDownZ(void) {
     LOG_TRACE("()");
 
@@ -1140,7 +1140,7 @@ void TiltBonnetDownZ(void) {
 }
 
 // IDA: void __cdecl TiltBonnetUpZ()
-// FUNCTION: CARM95 0x4a175f
+// FUNCTION: CARM95 0x004a175f
 void TiltBonnetUpZ(void) {
     LOG_TRACE("()");
 
@@ -1148,7 +1148,7 @@ void TiltBonnetUpZ(void) {
 }
 
 // IDA: void __cdecl ToggleCockpit()
-// FUNCTION: CARM95 0x4a178b
+// FUNCTION: CARM95 0x004a178b
 void ToggleCockpit(void) {
     br_scalar ts;
     LOG_TRACE("()");
@@ -1173,7 +1173,7 @@ void ToggleCockpit(void) {
 }
 
 // IDA: void __cdecl ToggleMirror()
-// FUNCTION: CARM95 0x4a1895
+// FUNCTION: CARM95 0x004a1895
 void ToggleMirror(void) {
     LOG_TRACE("()");
 
@@ -1188,7 +1188,7 @@ void ToggleMirror(void) {
 
 // IDA: void __cdecl ConcussMe()
 // dethrace: this is not referenced in the retail executables. Left over debug code.
-// FUNCTION: CARM95 0x4a1919
+// FUNCTION: CARM95 0x004a1919
 void ConcussMe(void) {
     LOG_TRACE("()");
 
@@ -1203,7 +1203,7 @@ void CheckHelp(void) {
 }
 
 // IDA: void __cdecl CheckLoadSave()
-// FUNCTION: CARM95 0x4a29b5
+// FUNCTION: CARM95 0x004a29b5
 void CheckLoadSave(void) {
     int save_load_allowed;
     int switched_res;
@@ -1245,7 +1245,7 @@ void CheckLoadSave(void) {
 }
 
 // IDA: void __usercall CheckToggles(int pRacing@<EAX>)
-// FUNCTION: CARM95 0x4a198a
+// FUNCTION: CARM95 0x004a198a
 void CheckToggles(int pRacing) {
     int i;
     int new_state;
@@ -1276,7 +1276,7 @@ void CheckToggles(int pRacing) {
 }
 
 // IDA: int __usercall CarWorldOffFallenCheckThingy@<EAX>(tCar_spec *pCar@<EAX>, int pCheck_around@<EDX>)
-// FUNCTION: CARM95 0x4a1b4d
+// FUNCTION: CARM95 0x004a1b4d
 int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around) {
     br_vector3 car_pos;
     br_vector3 offset_c;
@@ -1322,7 +1322,7 @@ int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around) {
 }
 
 // IDA: int __usercall HasCarFallenOffWorld@<EAX>(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4a1b2f
+// FUNCTION: CARM95 0x004a1b2f
 int HasCarFallenOffWorld(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
@@ -1330,7 +1330,7 @@ int HasCarFallenOffWorld(tCar_spec* pCar) {
 }
 
 // IDA: void __cdecl CheckForBeingOutOfThisWorld()
-// FUNCTION: CARM95 0x4a3328
+// FUNCTION: CARM95 0x004a3328
 void CheckForBeingOutOfThisWorld(void) {
     static tU32 the_time;
     static tU32 sLast_check;
@@ -1363,7 +1363,7 @@ void CheckForBeingOutOfThisWorld(void) {
 }
 
 // IDA: void __usercall CheckHornLocal(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4a34a8
+// FUNCTION: CARM95 0x004a34a8
 void CheckHornLocal(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
@@ -1381,7 +1381,7 @@ void CheckHornLocal(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall CheckHorn3D(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4a3582
+// FUNCTION: CARM95 0x004a3582
 void CheckHorn3D(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
@@ -1408,7 +1408,7 @@ void CheckHorn3D(tCar_spec* pCar) {
 }
 
 // IDA: void __cdecl CheckHorns()
-// FUNCTION: CARM95 0x4a343d
+// FUNCTION: CARM95 0x004a343d
 void CheckHorns(void) {
     int i;
     LOG_TRACE("()");
@@ -1423,7 +1423,7 @@ void CheckHorns(void) {
 }
 
 // IDA: void __cdecl SetRecovery()
-// FUNCTION: CARM95 0x4a1d13
+// FUNCTION: CARM95 0x004a1d13
 void SetRecovery(void) {
     LOG_TRACE("()");
 
@@ -1480,7 +1480,7 @@ void SetRecovery(void) {
 }
 
 // IDA: void __cdecl RecoverCar()
-// FUNCTION: CARM95 0x4a20b0
+// FUNCTION: CARM95 0x004a20b0
 void RecoverCar(void) {
     LOG_TRACE("()");
 
@@ -1491,7 +1491,7 @@ void RecoverCar(void) {
 }
 
 // IDA: void __cdecl CheckMapRenderMove()
-// FUNCTION: CARM95 0x4a3694
+// FUNCTION: CARM95 0x004a3694
 void CheckMapRenderMove(void) {
     int shift_down;
     int amount;
@@ -1550,7 +1550,7 @@ void CheckMapRenderMove(void) {
 }
 
 // IDA: void __usercall ExplodeCar(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4a20e9
+// FUNCTION: CARM95 0x004a20e9
 void ExplodeCar(tCar_spec* pCar) {
     br_vector3 tv;
     br_vector3 pos;
@@ -1571,7 +1571,7 @@ void ExplodeCar(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall CheckRecoveryOfCars(tU32 pEndFrameTime@<EAX>)
-// FUNCTION: CARM95 0x4a1ec9
+// FUNCTION: CARM95 0x004a1ec9
 void CheckRecoveryOfCars(tU32 pEndFrameTime) {
     int i;
     int time;
@@ -1606,7 +1606,7 @@ void CheckRecoveryOfCars(tU32 pEndFrameTime) {
 }
 
 // IDA: void __usercall LoseSomePSPowerups(int pNumber@<EAX>)
-// FUNCTION: CARM95 0x4a39cc
+// FUNCTION: CARM95 0x004a39cc
 void LoseSomePSPowerups(int pNumber) {
     int index;
     LOG_TRACE("(%d)", pNumber);
@@ -1622,7 +1622,7 @@ void LoseSomePSPowerups(int pNumber) {
 }
 
 // IDA: void __cdecl CheckOtherRacingKeys()
-// FUNCTION: CARM95 0x4a2af6
+// FUNCTION: CARM95 0x004a2af6
 void CheckOtherRacingKeys(void) {
     int i;
     int j;
@@ -1777,7 +1777,7 @@ void CheckOtherRacingKeys(void) {
 }
 
 // IDA: int __cdecl CheckRecoverCost()
-// FUNCTION: CARM95 0x4a2208
+// FUNCTION: CARM95 0x004a2208
 int CheckRecoverCost(void) {
     LOG_TRACE("()");
 
@@ -1797,7 +1797,7 @@ int CheckRecoverCost(void) {
 }
 
 // IDA: void __usercall SortOutRecover(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4a3a33
+// FUNCTION: CARM95 0x004a3a33
 void SortOutRecover(tCar_spec* pCar) {
     int the_time;
     int val;
@@ -1833,7 +1833,7 @@ void SortOutRecover(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall SetFlipUpCar(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4a22f4
+// FUNCTION: CARM95 0x004a22f4
 void SetFlipUpCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
@@ -1847,7 +1847,7 @@ void SetFlipUpCar(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall FlipUpCar(tCar_spec *car@<EAX>)
-// FUNCTION: CARM95 0x4a234a
+// FUNCTION: CARM95 0x004a234a
 void FlipUpCar(tCar_spec* car) {
     br_vector3 tv;
     br_vector3 dir;
@@ -1954,7 +1954,7 @@ void FlipUpCar(tCar_spec* car) {
 }
 
 // IDA: void __usercall GetPowerup(int pNum@<EAX>)
-// FUNCTION: CARM95 0x4a291d
+// FUNCTION: CARM95 0x004a291d
 void GetPowerup(int pNum) {
     LOG_TRACE("()");
 
@@ -1965,7 +1965,7 @@ void GetPowerup(int pNum) {
 }
 
 // IDA: void __usercall CheckSystemKeys(int pRacing@<EAX>)
-// FUNCTION: CARM95 0x4a293f
+// FUNCTION: CARM95 0x004a293f
 void CheckSystemKeys(int pRacing) {
     tU32 start_menu_time;
     int i;
@@ -1983,7 +1983,7 @@ void CheckSystemKeys(int pRacing) {
 }
 
 // IDA: void __cdecl CheckKevKeys()
-// FUNCTION: CARM95 0x4a3b39
+// FUNCTION: CARM95 0x004a3b39
 void CheckKevKeys(void) {
     int i;
     tU32* value;
@@ -2021,7 +2021,7 @@ void CheckKevKeys(void) {
 }
 
 // IDA: void __cdecl BrakeInstantly()
-// FUNCTION: CARM95 0x4a4159
+// FUNCTION: CARM95 0x004a4159
 void BrakeInstantly(void) {
     int i;
     LOG_TRACE("()");
@@ -2037,7 +2037,7 @@ void BrakeInstantly(void) {
 }
 
 // IDA: void __usercall PollCarControls(tU32 pTime_difference@<EAX>)
-// FUNCTION: CARM95 0x4a3d80
+// FUNCTION: CARM95 0x004a3d80
 void PollCarControls(tU32 pTime_difference) {
     int decay_steering;
     int decay_speed;
@@ -2138,7 +2138,7 @@ void PollCarControls(tU32 pTime_difference) {
 }
 
 // IDA: void __usercall PollCameraControls(tU32 pTime_difference@<EAX>)
-// FUNCTION: CARM95 0x4a4214
+// FUNCTION: CARM95 0x004a4214
 void PollCameraControls(tU32 pTime_difference) {
     int flag;
     int left;
@@ -2211,7 +2211,7 @@ void PollCameraControls(tU32 pTime_difference) {
 }
 
 // IDA: void __usercall SetFlag2(int i@<EAX>)
-// FUNCTION: CARM95 0x4a45e8
+// FUNCTION: CARM95 0x004a45e8
 void SetFlag2(int i) {
     LOG_TRACE("(%d)", i);
 
@@ -2221,7 +2221,7 @@ void SetFlag2(int i) {
 }
 
 // IDA: void __cdecl ToggleFlying()
-// FUNCTION: CARM95 0x4a460c
+// FUNCTION: CARM95 0x004a460c
 void ToggleFlying(void) {
     LOG_TRACE("()");
 
@@ -2238,7 +2238,7 @@ void ToggleFlying(void) {
 }
 
 // IDA: void __cdecl ToggleInvulnerability()
-// FUNCTION: CARM95 0x4a46a8
+// FUNCTION: CARM95 0x004a46a8
 void ToggleInvulnerability(void) {
     LOG_TRACE("()");
 
@@ -2251,7 +2251,7 @@ void ToggleInvulnerability(void) {
 }
 
 // IDA: void __cdecl MoreTime()
-// FUNCTION: CARM95 0x4a4721
+// FUNCTION: CARM95 0x004a4721
 void MoreTime(void) {
     LOG_TRACE("()");
 
@@ -2259,7 +2259,7 @@ void MoreTime(void) {
 }
 
 // IDA: void __cdecl MuchMoreTime()
-// FUNCTION: CARM95 0x4a4736
+// FUNCTION: CARM95 0x004a4736
 void MuchMoreTime(void) {
     LOG_TRACE("()");
 
@@ -2267,7 +2267,7 @@ void MuchMoreTime(void) {
 }
 
 // IDA: void __cdecl ToggleTimerFreeze()
-// FUNCTION: CARM95 0x4a474e
+// FUNCTION: CARM95 0x004a474e
 void ToggleTimerFreeze(void) {
     LOG_TRACE("()");
 
@@ -2280,7 +2280,7 @@ void ToggleTimerFreeze(void) {
 }
 
 // IDA: void __cdecl EarnDosh()
-// FUNCTION: CARM95 0x4a47c7
+// FUNCTION: CARM95 0x004a47c7
 void EarnDosh(void) {
     LOG_TRACE("()");
 
@@ -2288,7 +2288,7 @@ void EarnDosh(void) {
 }
 
 // IDA: void __cdecl LoseDosh()
-// FUNCTION: CARM95 0x4a47df
+// FUNCTION: CARM95 0x004a47df
 void LoseDosh(void) {
     LOG_TRACE("()");
 
@@ -2296,7 +2296,7 @@ void LoseDosh(void) {
 }
 
 // IDA: void __cdecl ToggleMap()
-// FUNCTION: CARM95 0x4a47f7
+// FUNCTION: CARM95 0x004a47f7
 void ToggleMap(void) {
     static int old_indent;
     static int was_in_cockpit;
@@ -2329,7 +2329,7 @@ void ToggleMap(void) {
 }
 
 // IDA: int __cdecl HornBlowing()
-// FUNCTION: CARM95 0x4a492c
+// FUNCTION: CARM95 0x004a492c
 int HornBlowing(void) {
     LOG_TRACE("()");
 
@@ -2337,7 +2337,7 @@ int HornBlowing(void) {
 }
 
 // IDA: void __cdecl ToggleArrow()
-// FUNCTION: CARM95 0x4a4947
+// FUNCTION: CARM95 0x004a4947
 void ToggleArrow(void) {
     static br_actor* old_actor;
     LOG_TRACE("()");
@@ -2365,7 +2365,7 @@ void ToggleArrow(void) {
 }
 
 // IDA: int __cdecl GetRecoverVoucherCount()
-// FUNCTION: CARM95 0x4a4a23
+// FUNCTION: CARM95 0x004a4a23
 int GetRecoverVoucherCount(void) {
     LOG_TRACE("()");
 
@@ -2373,7 +2373,7 @@ int GetRecoverVoucherCount(void) {
 }
 
 // IDA: void __usercall AddVouchers(int pCount@<EAX>)
-// FUNCTION: CARM95 0x4a4a38
+// FUNCTION: CARM95 0x004a4a38
 void AddVouchers(int pCount) {
     LOG_TRACE("(%d)", pCount);
 
@@ -2381,7 +2381,7 @@ void AddVouchers(int pCount) {
 }
 
 // IDA: void __cdecl ResetRecoveryVouchers()
-// FUNCTION: CARM95 0x4a4a4c
+// FUNCTION: CARM95 0x004a4a4c
 void ResetRecoveryVouchers(void) {
     LOG_TRACE("()");
 
@@ -2389,7 +2389,7 @@ void ResetRecoveryVouchers(void) {
 }
 
 // IDA: void __cdecl CycleCarTexturingLevel()
-// FUNCTION: CARM95 0x4a4a61
+// FUNCTION: CARM95 0x004a4a61
 void CycleCarTexturingLevel(void) {
     tCar_texturing_level new_level;
     LOG_TRACE("()");
@@ -2412,7 +2412,7 @@ void CycleCarTexturingLevel(void) {
 }
 
 // IDA: void __cdecl CycleWallTexturingLevel()
-// FUNCTION: CARM95 0x4a4b28
+// FUNCTION: CARM95 0x004a4b28
 void CycleWallTexturingLevel(void) {
     tWall_texturing_level new_level;
     LOG_TRACE("()");
@@ -2436,7 +2436,7 @@ void CycleWallTexturingLevel(void) {
 }
 
 // IDA: void __cdecl CycleRoadTexturingLevel()
-// FUNCTION: CARM95 0x4a4bfb
+// FUNCTION: CARM95 0x004a4bfb
 void CycleRoadTexturingLevel(void) {
     tRoad_texturing_level new_level;
     LOG_TRACE("()");
@@ -2452,7 +2452,7 @@ void CycleRoadTexturingLevel(void) {
 }
 
 // IDA: void __cdecl CycleYonFactor()
-// FUNCTION: CARM95 0x4a4ca1
+// FUNCTION: CARM95 0x004a4ca1
 void CycleYonFactor(void) {
     br_scalar new_factor;
     char factor_str[5];
@@ -2475,7 +2475,7 @@ void CycleYonFactor(void) {
 }
 
 // IDA: void __usercall SetSoundDetailLevel(int pLevel@<EAX>)
-// FUNCTION: CARM95 0x4a4da4
+// FUNCTION: CARM95 0x004a4da4
 void SetSoundDetailLevel(int pLevel) {
     LOG_TRACE("(%d)", pLevel);
 
@@ -2483,7 +2483,7 @@ void SetSoundDetailLevel(int pLevel) {
 }
 
 // IDA: void __usercall ReallySetSoundDetailLevel(int pLevel@<EAX>)
-// FUNCTION: CARM95 0x4a4db7
+// FUNCTION: CARM95 0x004a4db7
 void ReallySetSoundDetailLevel(int pLevel) {
     LOG_TRACE("(%d)", pLevel);
 
@@ -2495,7 +2495,7 @@ void ReallySetSoundDetailLevel(int pLevel) {
 }
 
 // IDA: int __cdecl GetSoundDetailLevel()
-// FUNCTION: CARM95 0x4a4dde
+// FUNCTION: CARM95 0x004a4dde
 int GetSoundDetailLevel(void) {
     LOG_TRACE("()");
 
@@ -2503,7 +2503,7 @@ int GetSoundDetailLevel(void) {
 }
 
 // IDA: void __cdecl CycleSoundDetailLevel()
-// FUNCTION: CARM95 0x4a4df3
+// FUNCTION: CARM95 0x004a4df3
 void CycleSoundDetailLevel(void) {
     int new_level;
     LOG_TRACE("()");
@@ -2525,7 +2525,7 @@ void CycleSoundDetailLevel(void) {
 }
 
 // IDA: void __cdecl CycleCarSimplificationLevel()
-// FUNCTION: CARM95 0x4a4ec8
+// FUNCTION: CARM95 0x004a4ec8
 void CycleCarSimplificationLevel(void) {
     char* src;
     char* dst;
@@ -2540,7 +2540,7 @@ void CycleCarSimplificationLevel(void) {
 }
 
 // IDA: void __cdecl ToggleAccessoryRendering()
-// FUNCTION: CARM95 0x4a4f58
+// FUNCTION: CARM95 0x004a4f58
 void ToggleAccessoryRendering(void) {
     int on;
     LOG_TRACE("()");
@@ -2559,7 +2559,7 @@ void ToggleAccessoryRendering(void) {
 }
 
 // IDA: void __cdecl ToggleSmoke()
-// FUNCTION: CARM95 0x4a500d
+// FUNCTION: CARM95 0x004a500d
 void ToggleSmoke(void) {
     int on;
     LOG_TRACE("()");
@@ -2608,7 +2608,7 @@ void DrawSomeText2(tDR_font* pFont) {
 }
 
 // IDA: void __cdecl DrawSomeText()
-// FUNCTION: CARM95 0x485d80
+// FUNCTION: CARM95 0x00485d80
 void DrawSomeText(void) {
     DrawSomeText2(&gFonts[kFont_ORANGHED]);
     DrawSomeText2(&gFonts[kFont_BLUEHEAD]);
@@ -2626,7 +2626,7 @@ void SaySorryYouLittleBastard(void) {
 }
 
 // IDA: void __cdecl UserSendMessage()
-// FUNCTION: CARM95 0x4a509e
+// FUNCTION: CARM95 0x004a509e
 void UserSendMessage(void) {
     LOG_TRACE("()");
 
@@ -2636,7 +2636,7 @@ void UserSendMessage(void) {
 }
 
 // IDA: void __cdecl EnterUserMessage()
-// FUNCTION: CARM95 0x4a50cf
+// FUNCTION: CARM95 0x004a50cf
 void EnterUserMessage(void) {
     static int last_key;
     static int about_to_die;
@@ -2743,7 +2743,7 @@ void EnterUserMessage(void) {
 }
 
 // IDA: void __cdecl DisplayUserMessage()
-// FUNCTION: CARM95 0x4a54a9
+// FUNCTION: CARM95 0x004a54a9
 void DisplayUserMessage(void) {
     char* the_message;
     int len;
@@ -2782,7 +2782,7 @@ void DisplayUserMessage(void) {
 }
 
 // IDA: void __cdecl InitAbuseomatic()
-// FUNCTION: CARM95 0x4a567a
+// FUNCTION: CARM95 0x004a567a
 void InitAbuseomatic(void) {
     char path[256];
     char s[256];
@@ -2821,7 +2821,7 @@ void InitAbuseomatic(void) {
 }
 
 // IDA: void __cdecl DisposeAbuseomatic()
-// FUNCTION: CARM95 0x4a5868
+// FUNCTION: CARM95 0x004a5868
 void DisposeAbuseomatic(void) {
     int i;
     LOG_TRACE("()");

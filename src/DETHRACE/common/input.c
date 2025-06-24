@@ -11,69 +11,69 @@
 #include "utility.h"
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x514c70
+// GLOBAL: CARM95 0x00514c70
 int gEdge_trigger_mode;
 
-// GLOBAL: CARM95 0x514c74
+// GLOBAL: CARM95 0x00514c74
 tU32 gLast_poll_keys;
 
-// GLOBAL: CARM95 0x514c78
+// GLOBAL: CARM95 0x00514c78
 int gInsert_mode;
 
-// GLOBAL: CARM95 0x514c80
+// GLOBAL: CARM95 0x00514c80
 int gGo_ahead_keys[3] = { 51, 52, 106 }; // enter, return, space
 
-// GLOBAL: CARM95 0x5507c0
+// GLOBAL: CARM95 0x005507c0
 tJoy_array gJoy_array;
 
-// GLOBAL: CARM95 0x53a250
+// GLOBAL: CARM95 0x0053a250
 tKey_array gKey_array;
 
-// GLOBAL: CARM95 0x53a248
+// GLOBAL: CARM95 0x0053a248
 int gKey_poll_counter;
 
-// GLOBAL: CARM95 0x53a1f8
+// GLOBAL: CARM95 0x0053a1f8
 tRolling_letter* gRolling_letters;
 
-// GLOBAL: CARM95 0x53a440
+// GLOBAL: CARM95 0x0053a440
 int gCurrent_cursor;
 
-// GLOBAL: CARM95 0x53a4c0
+// GLOBAL: CARM95 0x0053a4c0
 int gCurrent_position;
 
-// GLOBAL: CARM95 0x53a200
+// GLOBAL: CARM95 0x0053a200
 int gLetter_x_coords[15];
 
-// GLOBAL: CARM95 0x53a240
+// GLOBAL: CARM95 0x0053a240
 int gVisible_length;
 
-// GLOBAL: CARM95 0x53a1b8
+// GLOBAL: CARM95 0x0053a1b8
 int gLetter_y_coords[15];
 
 int gThe_key;
 
-// GLOBAL: CARM95 0x53a444
+// GLOBAL: CARM95 0x0053a444
 tU32 gLast_key_down_time;
 
-// GLOBAL: CARM95 0x53a1f4
+// GLOBAL: CARM95 0x0053a1f4
 int gThe_length;
 
-// GLOBAL: CARM95 0x53a448
+// GLOBAL: CARM95 0x0053a448
 tU32 gLast_roll;
 
-// GLOBAL: CARM95 0x53a244
+// GLOBAL: CARM95 0x0053a244
 int gLast_key_down;
 
-// GLOBAL: CARM95 0x5507e0
+// GLOBAL: CARM95 0x005507e0
 int gKey_mapping[67];
 
-// GLOBAL: CARM95 0x53a450
+// GLOBAL: CARM95 0x0053a450
 char gCurrent_typing[110];
 
 #define NBR_ROLLING_LETTERS 500
 
 // IDA: void __usercall SetJoystickArrays(int *pKeys@<EAX>, int pMark@<EDX>)
-// FUNCTION: CARM95 0x471750
+// FUNCTION: CARM95 0x00471750
 void SetJoystickArrays(int* pKeys, int pMark) {
     int i;
     tS32 joyX;
@@ -85,7 +85,7 @@ void SetJoystickArrays(int* pKeys, int pMark) {
 }
 
 // IDA: void __cdecl PollKeys()
-// FUNCTION: CARM95 0x471bbf
+// FUNCTION: CARM95 0x00471bbf
 void PollKeys(void) {
 
     gKey_poll_counter++;
@@ -95,7 +95,7 @@ void PollKeys(void) {
 }
 
 // IDA: void __cdecl CyclePollKeys()
-// FUNCTION: CARM95 0x471c03
+// FUNCTION: CARM95 0x00471c03
 void CyclePollKeys(void) {
     int i;
     for (i = 0; i < COUNT_OF(gKey_array); i++) {
@@ -110,7 +110,7 @@ void CyclePollKeys(void) {
 }
 
 // IDA: void __cdecl ResetPollKeys()
-// FUNCTION: CARM95 0x471c75
+// FUNCTION: CARM95 0x00471c75
 void ResetPollKeys(void) {
     int i;
     for (i = 0; i < COUNT_OF(gKey_array); i++) {
@@ -122,7 +122,7 @@ void ResetPollKeys(void) {
 }
 
 // IDA: void __cdecl CheckKeysForMouldiness()
-// FUNCTION: CARM95 0x471cdb
+// FUNCTION: CARM95 0x00471cdb
 void CheckKeysForMouldiness(void) {
     LOG_TRACE9("()");
 
@@ -134,7 +134,7 @@ void CheckKeysForMouldiness(void) {
 }
 
 // IDA: int __cdecl EitherMouseButtonDown()
-// FUNCTION: CARM95 0x471d0b
+// FUNCTION: CARM95 0x00471d0b
 int EitherMouseButtonDown(void) {
     int but_1;
     int but_2;
@@ -144,7 +144,7 @@ int EitherMouseButtonDown(void) {
 }
 
 // IDA: tKey_down_result __usercall PDKeyDown2@<EAX>(int pKey_index@<EAX>)
-// FUNCTION: CARM95 0x471d4e
+// FUNCTION: CARM95 0x00471d4e
 tKey_down_result PDKeyDown2(int pKey_index) {
     tU32 the_time;
 
@@ -175,7 +175,7 @@ tKey_down_result PDKeyDown2(int pKey_index) {
 }
 
 // IDA: int __usercall PDKeyDown@<EAX>(int pKey_index@<EAX>)
-// FUNCTION: CARM95 0x471e2d
+// FUNCTION: CARM95 0x00471e2d
 int PDKeyDown(int pKey_index) {
     tKey_down_result result;
 
@@ -202,7 +202,7 @@ int PDKeyDown3(int pKey_index) {
 }
 
 // IDA: int __cdecl PDAnyKeyDown()
-// FUNCTION: CARM95 0x471f08
+// FUNCTION: CARM95 0x00471f08
 int PDAnyKeyDown(void) {
     int i;
     tKey_down_result result;
@@ -232,7 +232,7 @@ int PDAnyKeyDown(void) {
 }
 
 // IDA: int __cdecl AnyKeyDown()
-// FUNCTION: CARM95 0x471fe4
+// FUNCTION: CARM95 0x00471fe4
 int AnyKeyDown(void) {
     int the_key;
 
@@ -244,7 +244,7 @@ int AnyKeyDown(void) {
 }
 
 // IDA: tU32* __cdecl KevKeyService()
-// FUNCTION: CARM95 0x47202c
+// FUNCTION: CARM95 0x0047202c
 tU32* KevKeyService(void) {
     static tU32 sum = 0;
     static tU32 code = 0;
@@ -324,7 +324,7 @@ int OldKeyIsDown(int pKey_index) {
 }
 
 // IDA: int __usercall KeyIsDown@<EAX>(int pKey_index@<EAX>)
-// FUNCTION: CARM95 0x472293
+// FUNCTION: CARM95 0x00472293
 int KeyIsDown(int pKey_index) {
     int i;
 
@@ -345,7 +345,7 @@ int KeyIsDown(int pKey_index) {
 }
 
 // IDA: void __cdecl WaitForNoKeys()
-// FUNCTION: CARM95 0x47232b
+// FUNCTION: CARM95 0x0047232b
 void WaitForNoKeys(void) {
     LOG_TRACE("()");
 
@@ -356,7 +356,7 @@ void WaitForNoKeys(void) {
 }
 
 // IDA: void __cdecl WaitForAKey()
-// FUNCTION: CARM95 0x47235a
+// FUNCTION: CARM95 0x0047235a
 void WaitForAKey(void) {
     LOG_TRACE("()");
 
@@ -374,13 +374,13 @@ void WaitForAKey(void) {
 }
 
 // IDA: int __usercall CmdKeyDown@<EAX>(int pFKey_ID@<EAX>, int pCmd_key_ID@<EDX>)
-// FUNCTION: CARM95 0x47238e
+// FUNCTION: CARM95 0x0047238e
 int CmdKeyDown(int pFKey_ID, int pCmd_key_ID) {
     return KeyIsDown(pFKey_ID) || (KeyIsDown(KEYMAP_CONTROL_ANY) && KeyIsDown(pCmd_key_ID));
 }
 
 // IDA: void __usercall GetMousePosition(int *pX_coord@<EAX>, int *pY_coord@<EDX>)
-// FUNCTION: CARM95 0x4723e4
+// FUNCTION: CARM95 0x004723e4
 void GetMousePosition(int* pX_coord, int* pY_coord) {
     int x_left_margin;
     int x_right_margin;
@@ -402,7 +402,7 @@ void GetMousePosition(int* pX_coord, int* pY_coord) {
 }
 
 // IDA: void __cdecl InitRollingLetters()
-// FUNCTION: CARM95 0x4724d1
+// FUNCTION: CARM95 0x004724d1
 void InitRollingLetters(void) {
     int i;
     LOG_TRACE("()");
@@ -416,7 +416,7 @@ void InitRollingLetters(void) {
 }
 
 // IDA: void __cdecl EndRollingLetters()
-// FUNCTION: CARM95 0x472543
+// FUNCTION: CARM95 0x00472543
 void EndRollingLetters(void) {
     LOG_TRACE("()");
 
@@ -424,7 +424,7 @@ void EndRollingLetters(void) {
 }
 
 // IDA: int __usercall AddRollingLetter@<EAX>(char pChar@<EAX>, int pX@<EDX>, int pY@<EBX>, tRolling_type rolling_type@<ECX>)
-// FUNCTION: CARM95 0x47255c
+// FUNCTION: CARM95 0x0047255c
 int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
     tRolling_letter* let;
     int i;
@@ -475,7 +475,7 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
 }
 
 // IDA: void __usercall AddRollingString(char *pStr@<EAX>, int pX@<EDX>, int pY@<EBX>, tRolling_type rolling_type@<ECX>)
-// FUNCTION: CARM95 0x4726c3
+// FUNCTION: CARM95 0x004726c3
 void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
     int i;
     LOG_TRACE("(\"%s\", %d, %d, %d)", pStr, pX, pY, rolling_type);
@@ -487,7 +487,7 @@ void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
 }
 
 // IDA: void __usercall AddRollingNumber(tU32 pNumber@<EAX>, int pWidth@<EDX>, int pX@<EBX>, int pY@<ECX>)
-// FUNCTION: CARM95 0x472729
+// FUNCTION: CARM95 0x00472729
 void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
     char the_string[32];
     LOG_TRACE("(%d, %d, %d, %d)", pNumber, pWidth, pX, pY);
@@ -497,7 +497,7 @@ void AddRollingNumber(tU32 pNumber, int pWidth, int pX, int pY) {
 }
 
 // IDA: void __cdecl RollLettersIn()
-// FUNCTION: CARM95 0x472766
+// FUNCTION: CARM95 0x00472766
 void RollLettersIn(void) {
     tU32 new_time;
     tU32 period;
@@ -568,7 +568,7 @@ void RollLettersIn(void) {
 }
 
 // IDA: int __usercall ChangeCharTo@<EAX>(int pSlot_index@<EAX>, int pChar_index@<EDX>, char pNew_char@<EBX>)
-// FUNCTION: CARM95 0x472be8
+// FUNCTION: CARM95 0x00472be8
 int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
     int x_coord;
     int y_coord;
@@ -614,7 +614,7 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
 }
 
 // IDA: void __usercall ChangeTextTo(int pXcoord@<EAX>, int pYcoord@<EDX>, char *pNew_str@<EBX>, char *pOld_str@<ECX>)
-// FUNCTION: CARM95 0x4729df
+// FUNCTION: CARM95 0x004729df
 void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
     int x_coord;
     int i;
@@ -665,7 +665,7 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
 }
 
 // IDA: void __usercall SetRollingCursor(int pSlot_index@<EAX>)
-// FUNCTION: CARM95 0x472ea8
+// FUNCTION: CARM95 0x00472ea8
 void SetRollingCursor(int pSlot_index) {
     LOG_TRACE("(%d)", pSlot_index);
 
@@ -673,7 +673,7 @@ void SetRollingCursor(int pSlot_index) {
 }
 
 // IDA: void __usercall BlankSlot(int pIndex@<EAX>, int pName_length@<EDX>, int pVisible_length@<EBX>)
-// FUNCTION: CARM95 0x472ba0
+// FUNCTION: CARM95 0x00472ba0
 void BlankSlot(int pIndex, int pName_length, int pVisible_length) {
     int i;
     LOG_TRACE("(%d, %d, %d)", pIndex, pName_length, pVisible_length);
@@ -685,7 +685,7 @@ void BlankSlot(int pIndex, int pName_length, int pVisible_length) {
 }
 
 // IDA: void __usercall DoRLBackspace(int pSlot_index@<EAX>)
-// FUNCTION: CARM95 0x472fb9
+// FUNCTION: CARM95 0x00472fb9
 void DoRLBackspace(int pSlot_index) {
     int i;
     int new_len;
@@ -710,7 +710,7 @@ void DoRLBackspace(int pSlot_index) {
 }
 
 // IDA: void __usercall DoRLDelete(int pSlot_index@<EAX>)
-// FUNCTION: CARM95 0x4730be
+// FUNCTION: CARM95 0x004730be
 void DoRLDelete(int pSlot_index) {
     int i;
     int new_len;
@@ -729,7 +729,7 @@ void DoRLDelete(int pSlot_index) {
 }
 
 // IDA: void __usercall DoRLInsert(int pSlot_index@<EAX>)
-// FUNCTION: CARM95 0x473189
+// FUNCTION: CARM95 0x00473189
 void DoRLInsert(int pSlot_index) {
     LOG_TRACE("(%d)", pSlot_index);
 
@@ -737,7 +737,7 @@ void DoRLInsert(int pSlot_index) {
 }
 
 // IDA: void __usercall DoRLCursorLeft(int pSlot_index@<EAX>)
-// FUNCTION: CARM95 0x4731ba
+// FUNCTION: CARM95 0x004731ba
 void DoRLCursorLeft(int pSlot_index) {
     LOG_TRACE("(%d)", pSlot_index);
     if (gCurrent_position != 0) {
@@ -753,7 +753,7 @@ void DoRLCursorLeft(int pSlot_index) {
 }
 
 // IDA: void __usercall DoRLCursorRight(int pSlot_index@<EAX>)
-// FUNCTION: CARM95 0x473248
+// FUNCTION: CARM95 0x00473248
 void DoRLCursorRight(int pSlot_index) {
     LOG_TRACE("(%d)", pSlot_index);
 
@@ -765,7 +765,7 @@ void DoRLCursorRight(int pSlot_index) {
 }
 
 // IDA: void __usercall DoRLTypeLetter(int pChar@<EAX>, int pSlot_index@<EDX>)
-// FUNCTION: CARM95 0x4732a2
+// FUNCTION: CARM95 0x004732a2
 void DoRLTypeLetter(int pChar, int pSlot_index) {
     int i;
     int new_len;
@@ -805,7 +805,7 @@ void DoRLTypeLetter(int pChar, int pSlot_index) {
 }
 
 // IDA: void __usercall StopTyping(int pSlot_index@<EAX>)
-// FUNCTION: CARM95 0x472d51
+// FUNCTION: CARM95 0x00472d51
 void StopTyping(int pSlot_index) {
     int i;
     LOG_TRACE("(%d)", pSlot_index);
@@ -820,7 +820,7 @@ void StopTyping(int pSlot_index) {
 }
 
 // IDA: void __usercall RevertTyping(int pSlot_index@<EAX>, char *pRevert_str@<EDX>)
-// FUNCTION: CARM95 0x472dca
+// FUNCTION: CARM95 0x00472dca
 void RevertTyping(int pSlot_index, char* pRevert_str) {
     int i;
     LOG_TRACE("(%d, \"%s\")", pSlot_index, pRevert_str);
@@ -831,7 +831,7 @@ void RevertTyping(int pSlot_index, char* pRevert_str) {
 }
 
 // IDA: void __usercall StartTyping(int pSlot_index@<EAX>, char *pText@<EDX>, int pVisible_length@<EBX>)
-// FUNCTION: CARM95 0x472e42
+// FUNCTION: CARM95 0x00472e42
 void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
     LOG_TRACE("(%d, \"%s\", %d)", pSlot_index, pText, pVisible_length);
 
@@ -843,7 +843,7 @@ void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
 }
 
 // IDA: void __usercall TypeKey(int pSlot_index@<EAX>, char pKey@<EDX>)
-// FUNCTION: CARM95 0x472ecc
+// FUNCTION: CARM95 0x00472ecc
 void TypeKey(int pSlot_index, char pKey) {
     LOG_TRACE("(%d, %d)", pSlot_index, pKey);
 
@@ -872,7 +872,7 @@ void TypeKey(int pSlot_index, char pKey) {
 }
 
 // IDA: void __usercall SetSlotXY(int pSlot_index@<EAX>, int pX_coord@<EDX>, int pY_coord@<EBX>)
-// FUNCTION: CARM95 0x47340f
+// FUNCTION: CARM95 0x0047340f
 void SetSlotXY(int pSlot_index, int pX_coord, int pY_coord) {
     LOG_TRACE("(%d, %d, %d)", pSlot_index, pX_coord, pY_coord);
 
@@ -881,7 +881,7 @@ void SetSlotXY(int pSlot_index, int pX_coord, int pY_coord) {
 }
 
 // IDA: void __usercall GetTypedName(char *pDestn@<EAX>, int pMax_length@<EDX>)
-// FUNCTION: CARM95 0x473434
+// FUNCTION: CARM95 0x00473434
 void GetTypedName(char* pDestn, int pMax_length) {
     LOG_TRACE("(\"%s\", %d)", pDestn, pMax_length);
 
@@ -894,7 +894,7 @@ void GetTypedName(char* pDestn, int pMax_length) {
 }
 
 // IDA: void __usercall KillCursor(int pSlot_index@<EAX>)
-// FUNCTION: CARM95 0x4734aa
+// FUNCTION: CARM95 0x004734aa
 void KillCursor(int pSlot_index) {
     int x_coord;
     int y_coord;
@@ -918,13 +918,13 @@ void KillCursor(int pSlot_index) {
 }
 
 // IDA: void __cdecl EdgeTriggerModeOn()
-// FUNCTION: CARM95 0x473577
+// FUNCTION: CARM95 0x00473577
 void EdgeTriggerModeOn(void) {
     gEdge_trigger_mode = 1;
 }
 
 // IDA: void __cdecl EdgeTriggerModeOff()
-// FUNCTION: CARM95 0x47358c
+// FUNCTION: CARM95 0x0047358c
 void EdgeTriggerModeOff(void) {
     gEdge_trigger_mode = 0;
 }

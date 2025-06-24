@@ -22,97 +22,97 @@
 
 tDepth_effect gDistance_depth_effects[4];
 
-// GLOBAL: CARM95 0x513430
+// GLOBAL: CARM95 0x00513430
 int gSky_on;
 
-// GLOBAL: CARM95 0x513434
+// GLOBAL: CARM95 0x00513434
 int gDepth_cueing_on;
 
-// GLOBAL: CARM95 0x513438
+// GLOBAL: CARM95 0x00513438
 tDepth_effect_type gSwap_depth_effect_type;
 
-// GLOBAL: CARM95 0x537930
+// GLOBAL: CARM95 0x00537930
 br_scalar gSky_height;
 
-// GLOBAL: CARM95 0x53794c
+// GLOBAL: CARM95 0x0053794c
 br_scalar gSky_x_multiplier;
 
-// GLOBAL: CARM95 0x537944
+// GLOBAL: CARM95 0x00537944
 br_scalar gSky_width;
 
-// GLOBAL: CARM95 0x537950
+// GLOBAL: CARM95 0x00537950
 br_scalar gSky_y_multiplier;
 
 tU32 gLast_depth_change;
 
-// GLOBAL: CARM95 0x537934
+// GLOBAL: CARM95 0x00537934
 br_scalar gOld_yon;
 
-// GLOBAL: CARM95 0x550a68
+// GLOBAL: CARM95 0x00550a68
 br_pixelmap* gWater_shade_table;
 
-// GLOBAL: CARM95 0x53795c
+// GLOBAL: CARM95 0x0053795c
 br_material* gHorizon_material;
 
-// GLOBAL: CARM95 0x53792c
+// GLOBAL: CARM95 0x0053792c
 br_model* gRearview_sky_model;
 
-// GLOBAL: CARM95 0x537924
+// GLOBAL: CARM95 0x00537924
 int gFog_shade_table_power;
 
-// GLOBAL: CARM95 0x53793c
+// GLOBAL: CARM95 0x0053793c
 br_actor* gRearview_sky_actor;
 
-// GLOBAL: CARM95 0x537958
+// GLOBAL: CARM95 0x00537958
 int gAcid_shade_table_power;
 
-// GLOBAL: CARM95 0x537948
+// GLOBAL: CARM95 0x00537948
 int gWater_shade_table_power;
 
-// GLOBAL: CARM95 0x537920
+// GLOBAL: CARM95 0x00537920
 br_model* gForward_sky_model;
 
-// GLOBAL: CARM95 0x537954
+// GLOBAL: CARM95 0x00537954
 br_actor* gForward_sky_actor;
 
-// GLOBAL: CARM95 0x537938
+// GLOBAL: CARM95 0x00537938
 int gDepth_shade_table_power;
 
-// GLOBAL: CARM95 0x550a74
+// GLOBAL: CARM95 0x00550a74
 br_pixelmap* gFog_shade_table;
 
-// GLOBAL: CARM95 0x550a80
+// GLOBAL: CARM95 0x00550a80
 int gSwap_depth_effect_start;
 
-// GLOBAL: CARM95 0x550a60
+// GLOBAL: CARM95 0x00550a60
 br_pixelmap* gDepth_shade_table;
 
-// GLOBAL: CARM95 0x550a78
+// GLOBAL: CARM95 0x00550a78
 tSpecial_volume* gLast_camera_special_volume;
 
-// GLOBAL: CARM95 0x550a64
+// GLOBAL: CARM95 0x00550a64
 br_pixelmap* gAcid_shade_table;
 
-// GLOBAL: CARM95 0x550a7c
+// GLOBAL: CARM95 0x00550a7c
 int gSwap_depth_effect_end;
 
-// GLOBAL: CARM95 0x550a5c
+// GLOBAL: CARM95 0x00550a5c
 br_pixelmap* gSwap_sky_texture;
 
-// GLOBAL: CARM95 0x537928
+// GLOBAL: CARM95 0x00537928
 br_angle gOld_fov;
 
-// GLOBAL: CARM95 0x550a6e
+// GLOBAL: CARM95 0x00550a6e
 br_angle gSky_image_width;
 
-// GLOBAL: CARM95 0x550a6c
+// GLOBAL: CARM95 0x00550a6c
 br_angle gSky_image_height;
 
-// GLOBAL: CARM95 0x550a70
+// GLOBAL: CARM95 0x00550a70
 br_angle gSky_image_underground;
 
 // IDA: int __usercall Log2@<EAX>(int pNumber@<EAX>)
-// FUNCTION: CARM95 0x461e02
+// FUNCTION: CARM95 0x00461e02
 int Log2(int pNumber) {
     int i;
     int bits[16];
@@ -143,7 +143,7 @@ int Log2(int pNumber) {
 }
 
 // IDA: br_scalar __cdecl CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon)
-// FUNCTION: CARM95 0x462ebc
+// FUNCTION: CARM95 0x00462ebc
 br_scalar CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon) {
     br_scalar k;
     br_scalar trunc_k;
@@ -226,7 +226,7 @@ void FrobFog(void) {
 }
 
 // IDA: void __usercall InstantDepthChange(tDepth_effect_type pType@<EAX>, br_pixelmap *pSky_texture@<EDX>, int pStart@<EBX>, int pEnd@<ECX>)
-// FUNCTION: CARM95 0x461670
+// FUNCTION: CARM95 0x00461670
 void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int pStart, int pEnd) {
     LOG_TRACE("(%d, %p, %d, %d)", pType, pSky_texture, pStart, pEnd);
 
@@ -253,7 +253,7 @@ void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int
 }
 
 // IDA: br_scalar __cdecl Tan(br_scalar pAngle)
-// FUNCTION: CARM95 0x462226
+// FUNCTION: CARM95 0x00462226
 br_scalar Tan(br_scalar pAngle) {
     LOG_TRACE("(%f)", pAngle);
 
@@ -261,7 +261,7 @@ br_scalar Tan(br_scalar pAngle) {
 }
 
 // IDA: br_scalar __usercall EdgeU@<ST0>(br_angle pSky@<EAX>, br_angle pView@<EDX>, br_angle pPerfect@<EBX>)
-// FUNCTION: CARM95 0x462f34
+// FUNCTION: CARM95 0x00462f34
 br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect) {
     br_scalar a;
     br_scalar b;
@@ -275,7 +275,7 @@ br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect) {
 }
 
 // IDA: void __usercall MungeSkyModel(br_actor *pCamera@<EAX>, br_model *pModel@<EDX>)
-// FUNCTION: CARM95 0x46280d
+// FUNCTION: CARM95 0x0046280d
 void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     br_camera* camera_data;
     br_scalar horizon_half_height;
@@ -371,7 +371,7 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
 }
 
 // IDA: br_model* __usercall CreateHorizonModel@<EAX>(br_actor *pCamera@<EAX>)
-// FUNCTION: CARM95 0x46194b
+// FUNCTION: CARM95 0x0046194b
 br_model* CreateHorizonModel(br_actor* pCamera) {
     tU8 nbands;
     tU8 band;
@@ -412,7 +412,7 @@ br_model* CreateHorizonModel(br_actor* pCamera) {
 }
 
 // IDA: void __usercall LoadDepthTable(char *pName@<EAX>, br_pixelmap **pTable@<EDX>, int *pPower@<EBX>)
-// FUNCTION: CARM95 0x461c9b
+// FUNCTION: CARM95 0x00461c9b
 void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     tPath_name the_path;
     int i;
@@ -441,7 +441,7 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
 }
 
 // IDA: void __cdecl InitDepthEffects()
-// FUNCTION: CARM95 0x4616f2
+// FUNCTION: CARM95 0x004616f2
 void InitDepthEffects(void) {
     tPath_name the_path;
     int i;
@@ -490,7 +490,7 @@ void InitDepthEffects(void) {
 }
 
 // IDA: void __usercall DoDepthByShadeTable(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_pixelmap *pShade_table@<EBX>, int pShade_table_power@<ECX>, int pStart, int pEnd)
-// FUNCTION: CARM95 0x4622cc
+// FUNCTION: CARM95 0x004622cc
 void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_pixelmap* pShade_table, int pShade_table_power, int pStart, int pEnd) {
     tU8* render_ptr;
     tU8* shade_table_pixels;
@@ -564,7 +564,7 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
 }
 
 // IDA: void __usercall ExternalSky(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
-// FUNCTION: CARM95 0x461ebd
+// FUNCTION: CARM95 0x00461ebd
 void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     int dst_x;
     int src_x;
@@ -641,7 +641,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
 #define ACTOR_CAMERA(ACTOR) ((br_camera*)((ACTOR)->type_data))
 
 // IDA: void __usercall DoHorizon(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
-// FUNCTION: CARM95 0x462658
+// FUNCTION: CARM95 0x00462658
 void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     br_angle yaw;
     br_actor* actor;
@@ -682,7 +682,7 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
 }
 
 // IDA: void __usercall DoDepthCue(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>)
-// FUNCTION: CARM95 0x462299
+// FUNCTION: CARM95 0x00462299
 void DoDepthCue(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
     LOG_TRACE("(%p, %p)", pRender_buffer, pDepth_buffer);
 
@@ -696,7 +696,7 @@ void DoDepthCue(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
 }
 
 // IDA: void __usercall DoFog(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>)
-// FUNCTION: CARM95 0x4625d6
+// FUNCTION: CARM95 0x004625d6
 void DoFog(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
     LOG_TRACE("(%p, %p)", pRender_buffer, pDepth_buffer);
 
@@ -710,7 +710,7 @@ void DoFog(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer) {
 }
 
 // IDA: void __usercall DepthEffect(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
-// FUNCTION: CARM95 0x462254
+// FUNCTION: CARM95 0x00462254
 void DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
@@ -728,7 +728,7 @@ void DepthEffect(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
 }
 
 // IDA: void __usercall DepthEffectSky(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>)
-// FUNCTION: CARM95 0x462609
+// FUNCTION: CARM95 0x00462609
 void DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world);
 
@@ -739,7 +739,7 @@ void DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_
 }
 
 // IDA: void __usercall DoWobbleCamera(br_actor *pCamera@<EAX>)
-// FUNCTION: CARM95 0x463066
+// FUNCTION: CARM95 0x00463066
 void DoWobbleCamera(br_actor* pCamera) {
     float f_time;
     static br_scalar mag00 = 0.02f;
@@ -775,7 +775,7 @@ void DoWobbleCamera(br_actor* pCamera) {
 }
 
 // IDA: void __usercall DoDrugWobbleCamera(br_actor *pCamera@<EAX>)
-// FUNCTION: CARM95 0x463289
+// FUNCTION: CARM95 0x00463289
 void DoDrugWobbleCamera(br_actor* pCamera) {
     float f_time;
     static br_scalar mag00 = 0.03f;
@@ -811,7 +811,7 @@ void DoDrugWobbleCamera(br_actor* pCamera) {
 }
 
 // IDA: void __usercall DoSpecialCameraEffect(br_actor *pCamera@<EAX>, br_matrix34 *pCamera_to_world@<EDX>)
-// FUNCTION: CARM95 0x462fdb
+// FUNCTION: CARM95 0x00462fdb
 void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
     LOG_TRACE("(%p, %p)", pCamera, pCamera_to_world);
 
@@ -828,7 +828,7 @@ void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
 }
 
 // IDA: void __cdecl LessDepthFactor()
-// FUNCTION: CARM95 0x4634ac
+// FUNCTION: CARM95 0x004634ac
 void LessDepthFactor(void) {
     char s[256];
     LOG_TRACE("()");
@@ -842,7 +842,7 @@ void LessDepthFactor(void) {
 }
 
 // IDA: void __cdecl MoreDepthFactor()
-// FUNCTION: CARM95 0x46350e
+// FUNCTION: CARM95 0x0046350e
 void MoreDepthFactor(void) {
     char s[256];
     LOG_TRACE("()");
@@ -856,7 +856,7 @@ void MoreDepthFactor(void) {
 }
 
 // IDA: void __cdecl LessDepthFactor2()
-// FUNCTION: CARM95 0x463570
+// FUNCTION: CARM95 0x00463570
 void LessDepthFactor2(void) {
     char s[256];
     LOG_TRACE("()");
@@ -870,7 +870,7 @@ void LessDepthFactor2(void) {
 }
 
 // IDA: void __cdecl MoreDepthFactor2()
-// FUNCTION: CARM95 0x4635d2
+// FUNCTION: CARM95 0x004635d2
 void MoreDepthFactor2(void) {
     char s[256];
     LOG_TRACE("()");
@@ -884,7 +884,7 @@ void MoreDepthFactor2(void) {
 }
 
 // IDA: void __cdecl AssertYons()
-// FUNCTION: CARM95 0x463634
+// FUNCTION: CARM95 0x00463634
 void AssertYons(void) {
     br_camera* camera_ptr;
     int i;
@@ -897,7 +897,7 @@ void AssertYons(void) {
 }
 
 // IDA: void __cdecl IncreaseYon()
-// FUNCTION: CARM95 0x463682
+// FUNCTION: CARM95 0x00463682
 void IncreaseYon(void) {
     br_camera* camera_ptr;
     int i;
@@ -913,7 +913,7 @@ void IncreaseYon(void) {
 }
 
 // IDA: void __cdecl DecreaseYon()
-// FUNCTION: CARM95 0x4636ef
+// FUNCTION: CARM95 0x004636ef
 void DecreaseYon(void) {
     br_camera* camera_ptr;
     int i;
@@ -932,7 +932,7 @@ void DecreaseYon(void) {
 }
 
 // IDA: void __cdecl SetYon(br_scalar pYon)
-// FUNCTION: CARM95 0x463777
+// FUNCTION: CARM95 0x00463777
 void SetYon(br_scalar pYon) {
     int i;
     br_camera* camera_ptr;
@@ -952,7 +952,7 @@ void SetYon(br_scalar pYon) {
 }
 
 // IDA: br_scalar __cdecl GetYon()
-// FUNCTION: CARM95 0x4637f0
+// FUNCTION: CARM95 0x004637f0
 br_scalar GetYon(void) {
     LOG_TRACE("()");
 
@@ -960,7 +960,7 @@ br_scalar GetYon(void) {
 }
 
 // IDA: void __cdecl IncreaseAngle()
-// FUNCTION: CARM95 0x463806
+// FUNCTION: CARM95 0x00463806
 void IncreaseAngle(void) {
     br_camera* camera_ptr;
     int i;
@@ -983,7 +983,7 @@ void IncreaseAngle(void) {
 }
 
 // IDA: void __cdecl DecreaseAngle()
-// FUNCTION: CARM95 0x4638c8
+// FUNCTION: CARM95 0x004638c8
 void DecreaseAngle(void) {
     br_camera* camera_ptr;
     int i;
@@ -1006,7 +1006,7 @@ void DecreaseAngle(void) {
 }
 
 // IDA: void __cdecl ToggleDepthMode()
-// FUNCTION: CARM95 0x46398a
+// FUNCTION: CARM95 0x0046398a
 void ToggleDepthMode(void) {
     LOG_TRACE("()");
 
@@ -1029,7 +1029,7 @@ void ToggleDepthMode(void) {
 }
 
 // IDA: int __cdecl GetSkyTextureOn()
-// FUNCTION: CARM95 0x463a7e
+// FUNCTION: CARM95 0x00463a7e
 int GetSkyTextureOn(void) {
     LOG_TRACE("()");
 
@@ -1037,7 +1037,7 @@ int GetSkyTextureOn(void) {
 }
 
 // IDA: void __usercall SetSkyTextureOn(int pOn@<EAX>)
-// FUNCTION: CARM95 0x463a93
+// FUNCTION: CARM95 0x00463a93
 void SetSkyTextureOn(int pOn) {
     br_pixelmap* tmp;
     LOG_TRACE("(%d)", pOn);
@@ -1059,7 +1059,7 @@ void SetSkyTextureOn(int pOn) {
 }
 
 // IDA: void __cdecl ToggleSkyQuietly()
-// FUNCTION: CARM95 0x463aba
+// FUNCTION: CARM95 0x00463aba
 void ToggleSkyQuietly(void) {
     br_pixelmap* temp;
     LOG_TRACE("()");
@@ -1077,7 +1077,7 @@ void ToggleSkyQuietly(void) {
 }
 
 // IDA: void __cdecl ToggleSky()
-// FUNCTION: CARM95 0x463b27
+// FUNCTION: CARM95 0x00463b27
 void ToggleSky(void) {
     LOG_TRACE("()");
 
@@ -1092,14 +1092,14 @@ void ToggleSky(void) {
 }
 
 // IDA: int __cdecl GetDepthCueingOn()
-// FUNCTION: CARM95 0x463bc5
+// FUNCTION: CARM95 0x00463bc5
 int GetDepthCueingOn(void) {
     LOG_TRACE("()");
     return gDepth_cueing_on;
 }
 
 // IDA: void __usercall SetDepthCueingOn(int pOn@<EAX>)
-// FUNCTION: CARM95 0x463bda
+// FUNCTION: CARM95 0x00463bda
 void SetDepthCueingOn(int pOn) {
     LOG_TRACE("(%d)", pOn);
     if (pOn != gDepth_cueing_on && gHorizon_material) {
@@ -1112,7 +1112,7 @@ void SetDepthCueingOn(int pOn) {
 }
 
 // IDA: void __cdecl ToggleDepthCueingQuietly()
-// FUNCTION: CARM95 0x463c0d
+// FUNCTION: CARM95 0x00463c0d
 void ToggleDepthCueingQuietly(void) {
     tDepth_effect_type temp_type;
     int temp_start;
@@ -1133,7 +1133,7 @@ void ToggleDepthCueingQuietly(void) {
 }
 
 // IDA: void __cdecl ToggleDepthCueing()
-// FUNCTION: CARM95 0x463c6b
+// FUNCTION: CARM95 0x00463c6b
 void ToggleDepthCueing(void) {
     LOG_TRACE("()");
 
@@ -1148,7 +1148,7 @@ void ToggleDepthCueing(void) {
 }
 
 // IDA: void __cdecl ChangeDepthEffect()
-// FUNCTION: CARM95 0x463d09
+// FUNCTION: CARM95 0x00463d09
 void ChangeDepthEffect(void) {
     br_scalar x1;
     br_scalar x2;
@@ -1167,13 +1167,13 @@ void ChangeDepthEffect(void) {
 }
 
 // IDA: void __cdecl MungeForwardSky()
-// FUNCTION: CARM95 0x463d3f
+// FUNCTION: CARM95 0x00463d3f
 void MungeForwardSky(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl MungeRearviewSky()
-// FUNCTION: CARM95 0x463d4a
+// FUNCTION: CARM95 0x00463d4a
 void MungeRearviewSky(void) {
     LOG_TRACE("()");
 

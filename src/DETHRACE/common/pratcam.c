@@ -16,50 +16,50 @@
 #include "utility.h"
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x50f064
+// GLOBAL: CARM95 0x0050f064
 tS3_sound_tag gWhirr_noise = 0;
 
-// GLOBAL: CARM95 0x5362b0
+// GLOBAL: CARM95 0x005362b0
 tFlic_descriptor gPrat_flic;
 
-// GLOBAL: CARM95 0x536334
+// GLOBAL: CARM95 0x00536334
 tPrat_sequence* gPratcam_sequences;
 
-// GLOBAL: CARM95 0x536324
+// GLOBAL: CARM95 0x00536324
 tPrat_flic_spec* gPratcam_flics;
 
-// GLOBAL: CARM95 0x536320
+// GLOBAL: CARM95 0x00536320
 int gCurrent_pratcam_chunk;
 
-// GLOBAL: CARM95 0x53632c
+// GLOBAL: CARM95 0x0053632c
 int gPending_ambient_prat;
 
-// GLOBAL: CARM95 0x5362a0
+// GLOBAL: CARM95 0x005362a0
 int gCurrent_pratcam_index;
 
-// GLOBAL: CARM95 0x536340
+// GLOBAL: CARM95 0x00536340
 br_pixelmap* gPrat_buffer;
 
-// GLOBAL: CARM95 0x536330
+// GLOBAL: CARM95 0x00536330
 int gNumber_of_prat_sequences;
 
-// GLOBAL: CARM95 0x5362a4
+// GLOBAL: CARM95 0x005362a4
 int gNumber_of_prat_flics;
 
-// GLOBAL: CARM95 0x53633c
+// GLOBAL: CARM95 0x0053633c
 tU32 gLast_pratcam_frame_time;
 
-// GLOBAL: CARM95 0x536328
+// GLOBAL: CARM95 0x00536328
 int gCurrent_pratcam_precedence;
 
-// GLOBAL: CARM95 0x536338
+// GLOBAL: CARM95 0x00536338
 int gCurrent_ambient_prat_sequence;
 
-// GLOBAL: CARM95 0x5362a8
+// GLOBAL: CARM95 0x005362a8
 int gCurrent_pratcam_alternative;
 
 // IDA: int __cdecl PratcamGetCurrent()
-// FUNCTION: CARM95 0x44d0b0
+// FUNCTION: CARM95 0x0044d0b0
 int PratcamGetCurrent(void) {
     LOG_TRACE("()");
 
@@ -67,7 +67,7 @@ int PratcamGetCurrent(void) {
 }
 
 // IDA: int __cdecl PratcamGetAmbient()
-// FUNCTION: CARM95 0x44d0c5
+// FUNCTION: CARM95 0x0044d0c5
 int PratcamGetAmbient(void) {
     LOG_TRACE("()");
 
@@ -75,7 +75,7 @@ int PratcamGetAmbient(void) {
 }
 
 // IDA: int __cdecl PratcamGetPending()
-// FUNCTION: CARM95 0x44d0da
+// FUNCTION: CARM95 0x0044d0da
 int PratcamGetPending(void) {
     LOG_TRACE("()");
 
@@ -83,7 +83,7 @@ int PratcamGetPending(void) {
 }
 
 // IDA: void __cdecl TogglePratcam()
-// FUNCTION: CARM95 0x44d0ef
+// FUNCTION: CARM95 0x0044d0ef
 void TogglePratcam(void) {
     tU32 the_time;
     tU32 time_diff;
@@ -108,7 +108,7 @@ void TogglePratcam(void) {
 }
 
 // IDA: void __usercall LoadPratcam(char *pFolder_name@<EAX>)
-// FUNCTION: CARM95 0x44d745
+// FUNCTION: CARM95 0x0044d745
 void LoadPratcam(char* pFolder_name) {
     FILE* f;
     FILE* g;
@@ -218,7 +218,7 @@ void LoadPratcam(char* pFolder_name) {
 }
 
 // IDA: void __cdecl NextPratcamChunk()
-// FUNCTION: CARM95 0x44d2d8
+// FUNCTION: CARM95 0x0044d2d8
 void NextPratcamChunk(void) {
     int i;
     int random_number;
@@ -268,7 +268,7 @@ void NextPratcamChunk(void) {
 }
 
 // IDA: void __usercall NewPratcamSequence(int pSequence_index@<EAX>, int pStart_chunk@<EDX>)
-// FUNCTION: CARM95 0x44d297
+// FUNCTION: CARM95 0x0044d297
 void NewPratcamSequence(int pSequence_index, int pStart_chunk) {
     LOG_TRACE("(%d, %d)", pSequence_index, pStart_chunk);
 
@@ -279,7 +279,7 @@ void NewPratcamSequence(int pSequence_index, int pStart_chunk) {
 }
 
 // IDA: void __usercall ChangeAmbientPratcamNow(int pIndex@<EAX>, int pStart_chunk@<EDX>)
-// FUNCTION: CARM95 0x44d26a
+// FUNCTION: CARM95 0x0044d26a
 void ChangeAmbientPratcamNow(int pIndex, int pStart_chunk) {
     LOG_TRACE("(%d, %d)", pIndex, pStart_chunk);
 
@@ -289,7 +289,7 @@ void ChangeAmbientPratcamNow(int pIndex, int pStart_chunk) {
 }
 
 // IDA: void __usercall ChangeAmbientPratcam(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x44d1f0
+// FUNCTION: CARM95 0x0044d1f0
 void ChangeAmbientPratcam(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -314,7 +314,7 @@ void ChangeAmbientPratcam(int pIndex) {
 }
 
 // IDA: void __usercall PratcamEventNow(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x44d58e
+// FUNCTION: CARM95 0x0044d58e
 void PratcamEventNow(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -323,7 +323,7 @@ void PratcamEventNow(int pIndex) {
 }
 
 // IDA: void __usercall PratcamEvent(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x44d517
+// FUNCTION: CARM95 0x0044d517
 void PratcamEvent(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -377,7 +377,7 @@ int HighResPratBufferHeight(void) {
 }
 
 // IDA: void __cdecl InitPratcam()
-// FUNCTION: CARM95 0x44d5b1
+// FUNCTION: CARM95 0x0044d5b1
 void InitPratcam(void) {
     void* the_pixels;
     LOG_TRACE("()");
@@ -436,7 +436,7 @@ void InitPratcam(void) {
 }
 
 // IDA: void __cdecl DisposePratcam()
-// FUNCTION: CARM95 0x44e0dd
+// FUNCTION: CARM95 0x0044e0dd
 void DisposePratcam(void) {
     int i;
     int j;
@@ -473,7 +473,7 @@ void DisposePratcam(void) {
 }
 
 // IDA: void __usercall DoPratcam(tU32 pThe_time@<EAX>)
-// FUNCTION: CARM95 0x44e2e6
+// FUNCTION: CARM95 0x0044e2e6
 void DoPratcam(tU32 pThe_time) {
     int i;
     int offset;
@@ -623,7 +623,7 @@ void DoPratcam(tU32 pThe_time) {
 }
 
 // IDA: void __usercall TestPratCam(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x44e6d5
+// FUNCTION: CARM95 0x0044e6d5
 void TestPratCam(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -640,7 +640,7 @@ void TestPratCam(int pIndex) {
 }
 
 // IDA: void __cdecl PratCam0()
-// FUNCTION: CARM95 0x44e6c0
+// FUNCTION: CARM95 0x0044e6c0
 void PratCam0(void) {
     LOG_TRACE("()");
 
@@ -648,7 +648,7 @@ void PratCam0(void) {
 }
 
 // IDA: void __cdecl PratCam1()
-// FUNCTION: CARM95 0x44e72e
+// FUNCTION: CARM95 0x0044e72e
 void PratCam1(void) {
     LOG_TRACE("()");
 
@@ -656,7 +656,7 @@ void PratCam1(void) {
 }
 
 // IDA: void __cdecl PratCam2()
-// FUNCTION: CARM95 0x44e743
+// FUNCTION: CARM95 0x0044e743
 void PratCam2(void) {
     LOG_TRACE("()");
 
@@ -664,7 +664,7 @@ void PratCam2(void) {
 }
 
 // IDA: void __cdecl PratCam3()
-// FUNCTION: CARM95 0x44e758
+// FUNCTION: CARM95 0x0044e758
 void PratCam3(void) {
     LOG_TRACE("()");
 
@@ -672,7 +672,7 @@ void PratCam3(void) {
 }
 
 // IDA: void __cdecl PratCam4()
-// FUNCTION: CARM95 0x44e76d
+// FUNCTION: CARM95 0x0044e76d
 void PratCam4(void) {
     LOG_TRACE("()");
 
@@ -680,7 +680,7 @@ void PratCam4(void) {
 }
 
 // IDA: void __cdecl PratCam5()
-// FUNCTION: CARM95 0x44e782
+// FUNCTION: CARM95 0x0044e782
 void PratCam5(void) {
     LOG_TRACE("()");
 
@@ -688,7 +688,7 @@ void PratCam5(void) {
 }
 
 // IDA: void __cdecl PratCam6()
-// FUNCTION: CARM95 0x44e797
+// FUNCTION: CARM95 0x0044e797
 void PratCam6(void) {
     LOG_TRACE("()");
 
@@ -696,7 +696,7 @@ void PratCam6(void) {
 }
 
 // IDA: void __cdecl PratCam7()
-// FUNCTION: CARM95 0x44e7ac
+// FUNCTION: CARM95 0x0044e7ac
 void PratCam7(void) {
     LOG_TRACE("()");
 
@@ -704,7 +704,7 @@ void PratCam7(void) {
 }
 
 // IDA: void __cdecl PratCam8()
-// FUNCTION: CARM95 0x44e7c1
+// FUNCTION: CARM95 0x0044e7c1
 void PratCam8(void) {
     LOG_TRACE("()");
 
@@ -712,7 +712,7 @@ void PratCam8(void) {
 }
 
 // IDA: void __cdecl PratCam9()
-// FUNCTION: CARM95 0x44e7d6
+// FUNCTION: CARM95 0x0044e7d6
 void PratCam9(void) {
     LOG_TRACE("()");
 

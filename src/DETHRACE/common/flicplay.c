@@ -15,37 +15,37 @@
 #include <stdlib.h>
 #include <string.h>
 
-// GLOBAL: CARM95 0x514fa0
+// GLOBAL: CARM95 0x00514fa0
 int gPalette_allocate_count;
 
-// GLOBAL: CARM95 0x514fa4
+// GLOBAL: CARM95 0x00514fa4
 int gPalette_fuck_prevention;
 
-// GLOBAL: CARM95 0x514fa8
+// GLOBAL: CARM95 0x00514fa8
 int gDark_mode;
 
-// GLOBAL: CARM95 0x514fac
+// GLOBAL: CARM95 0x00514fac
 int gTransparency_on;
 
-// GLOBAL: CARM95 0x514fb0
+// GLOBAL: CARM95 0x00514fb0
 int gPanel_flic_disable;
 
-// GLOBAL: CARM95 0x514fb4
+// GLOBAL: CARM95 0x00514fb4
 int gPending_flic = -1;
 
-// GLOBAL: CARM95 0x514fb8
+// GLOBAL: CARM95 0x00514fb8
 int gPlay_from_disk;
 
-// GLOBAL: CARM95 0x514fbc
+// GLOBAL: CARM95 0x00514fbc
 int gTrans_enabled = 1;
 
-// GLOBAL: CARM95 0x514fc0
+// GLOBAL: CARM95 0x00514fc0
 br_pixelmap* gPanel_buffer[2];
 
-// GLOBAL: CARM95 0x514fc8
+// GLOBAL: CARM95 0x00514fc8
 tU32 gSound_time;
 
-// GLOBAL: CARM95 0x514fd0
+// GLOBAL: CARM95 0x00514fd0
 tFlic_spec gMain_flic_list[372] = {
     { "MAINSTIL.FLI", 1, 0, 0, 0, 0, 25, NULL, 0u }, // only used by the demo (set to "xxxxxxxx.FLI" by the full version)
     { "DEMSTRT2.FLI", 1, 0, 0, 0, 0, 0, NULL, 0u },
@@ -389,7 +389,7 @@ tFlic_spec gMain_flic_list[372] = {
     { "MAI2OPGL.FLI", 0, 0, 0, 0, 0, 0, NULL, 0u }
 };
 
-// GLOBAL: CARM95 0x518420
+// GLOBAL: CARM95 0x00518420
 int gFlic_bunch0[29] = {
     10,
     11,
@@ -422,7 +422,7 @@ int gFlic_bunch0[29] = {
     45
 };
 
-// GLOBAL: CARM95 0x518498
+// GLOBAL: CARM95 0x00518498
 int gFlic_bunch1[31] = {
     140,
     141,
@@ -457,13 +457,13 @@ int gFlic_bunch1[31] = {
     154
 };
 
-// GLOBAL: CARM95 0x518518
+// GLOBAL: CARM95 0x00518518
 int gFlic_bunch2[8] = { 70, 71, 72, 73, 74, 56, 57, 59 };
 
-// GLOBAL: CARM95 0x518538
+// GLOBAL: CARM95 0x00518538
 int gFlic_bunch3[13] = { 40, 41, 42, 43, 44, 45, 50, 51, 73, 74, 56, 57, 59 };
 
-// GLOBAL: CARM95 0x518570
+// GLOBAL: CARM95 0x00518570
 int gFlic_bunch4[22] = {
     80,
     81,
@@ -489,10 +489,10 @@ int gFlic_bunch4[22] = {
     121
 };
 
-// GLOBAL: CARM95 0x5185c8
+// GLOBAL: CARM95 0x005185c8
 int gFlic_bunch5[5] = { 100, 101, 42, 43, 45 };
 
-// GLOBAL: CARM95 0x5185e0
+// GLOBAL: CARM95 0x005185e0
 int gFlic_bunch6[51] = {
     190,
     191,
@@ -547,13 +547,13 @@ int gFlic_bunch6[51] = {
     284
 };
 
-// GLOBAL: CARM95 0x5186b0
+// GLOBAL: CARM95 0x005186b0
 int gFlic_bunch7[7] = { 130, 131, 132, 42, 43, 135, 45 };
 
-// GLOBAL: CARM95 0x5186d0
+// GLOBAL: CARM95 0x005186d0
 int gFlic_bunch8[16] = { 290, 291, 292, 293, 294, 295, 296, 297, 42, 43, 154, 301, 42, 43, 304, 305 };
 
-// GLOBAL: CARM95 0x518710
+// GLOBAL: CARM95 0x00518710
 tFlic_bunch gFlic_bunch[9] = {
     { COUNT_OF(gFlic_bunch0), gFlic_bunch0 },
     { COUNT_OF(gFlic_bunch1), gFlic_bunch1 },
@@ -566,49 +566,49 @@ tFlic_bunch gFlic_bunch[9] = {
     { COUNT_OF(gFlic_bunch8), gFlic_bunch8 },
 };
 
-// GLOBAL: CARM95 0x518758
+// GLOBAL: CARM95 0x00518758
 char gLast_flic_name[14];
 
-// GLOBAL: CARM95 0x53d060
+// GLOBAL: CARM95 0x0053d060
 tU32 gPanel_flic_data_length[2];
 
-// GLOBAL: CARM95 0x53d1b8
+// GLOBAL: CARM95 0x0053d1b8
 tU32 gLast_panel_frame_time[2];
 
-// GLOBAL: CARM95 0x53d0b8
+// GLOBAL: CARM95 0x0053d0b8
 tU8* gPanel_flic_data[2];
 
-// GLOBAL: CARM95 0x53d0c0
+// GLOBAL: CARM95 0x0053d0c0
 int gPanel_flic_top[2];
 
-// GLOBAL: CARM95 0x53d0d8
+// GLOBAL: CARM95 0x0053d0d8
 tFlic_descriptor gPanel_flic[2];
 
-// GLOBAL: CARM95 0x53d0b0
+// GLOBAL: CARM95 0x0053d0b0
 int gPanel_flic_left[2];
 
-// GLOBAL: CARM95 0x53d0cc
+// GLOBAL: CARM95 0x0053d0cc
 int gPending_pending_flic = -1;
 
-// GLOBAL: CARM95 0x53d1c0
+// GLOBAL: CARM95 0x0053d1c0
 int gSound_ID;
 
-// GLOBAL: CARM95 0x53d06c
+// GLOBAL: CARM95 0x0053d06c
 int gTranslation_count;
 
-// GLOBAL: CARM95 0x53d070
+// GLOBAL: CARM95 0x0053d070
 tDR_font* gTrans_fonts[15];
 
-// GLOBAL: CARM95 0x53d0d0
+// GLOBAL: CARM95 0x0053d0d0
 tTranslation_record* gTranslations;
 
-// GLOBAL: CARM95 0x53d0c8
+// GLOBAL: CARM95 0x0053d0c8
 br_pixelmap* gPalette;
 
-// GLOBAL: CARM95 0x53d068
+// GLOBAL: CARM95 0x0053d068
 void* gPalette_pixels;
 
-// GLOBAL: CARM95 0x53d0ac
+// GLOBAL: CARM95 0x0053d0ac
 tFlic_descriptor* gFirst_flic;
 
 // Use this function to avoid unaligned memory access.
@@ -628,7 +628,7 @@ void mem_write_u16(void* memory, tU16 u16) {
 }
 
 // IDA: void __cdecl EnableTranslationText()
-// FUNCTION: CARM95 0x495990
+// FUNCTION: CARM95 0x00495990
 void EnableTranslationText(void) {
     LOG_TRACE("()");
 
@@ -636,7 +636,7 @@ void EnableTranslationText(void) {
 }
 
 // IDA: void __cdecl DisableTranslationText()
-// FUNCTION: CARM95 0x4959a5
+// FUNCTION: CARM95 0x004959a5
 void DisableTranslationText(void) {
     LOG_TRACE("()");
 
@@ -644,7 +644,7 @@ void DisableTranslationText(void) {
 }
 
 // IDA: void __usercall SetFlicSound(int pSound_ID@<EAX>, tU32 pSound_time@<EDX>)
-// FUNCTION: CARM95 0x4959ba
+// FUNCTION: CARM95 0x004959ba
 void SetFlicSound(int pSound_ID, tU32 pSound_time) {
     LOG_TRACE("(%d, %d)", pSound_ID, pSound_time);
 
@@ -653,14 +653,14 @@ void SetFlicSound(int pSound_ID, tU32 pSound_time) {
 }
 
 // IDA: int __cdecl TranslationMode()
-// FUNCTION: CARM95 0x4959d5
+// FUNCTION: CARM95 0x004959d5
 int TranslationMode(void) {
 
     return gTranslation_count;
 }
 
 // IDA: void __cdecl DontLetFlicFuckWithPalettes()
-// FUNCTION: CARM95 0x4959ea
+// FUNCTION: CARM95 0x004959ea
 void DontLetFlicFuckWithPalettes(void) {
     LOG_TRACE8("()");
 
@@ -668,7 +668,7 @@ void DontLetFlicFuckWithPalettes(void) {
 }
 
 // IDA: void __cdecl LetFlicFuckWithPalettes()
-// FUNCTION: CARM95 0x4959ff
+// FUNCTION: CARM95 0x004959ff
 void LetFlicFuckWithPalettes(void) {
     LOG_TRACE8("()");
 
@@ -676,7 +676,7 @@ void LetFlicFuckWithPalettes(void) {
 }
 
 // IDA: void __cdecl PlayFlicsInDarkness()
-// FUNCTION: CARM95 0x495a14
+// FUNCTION: CARM95 0x00495a14
 void PlayFlicsInDarkness(void) {
     LOG_TRACE("()");
 
@@ -684,7 +684,7 @@ void PlayFlicsInDarkness(void) {
 }
 
 // IDA: void __cdecl ReilluminateFlics()
-// FUNCTION: CARM95 0x495a29
+// FUNCTION: CARM95 0x00495a29
 void ReilluminateFlics(void) {
     LOG_TRACE("()");
 
@@ -693,7 +693,7 @@ void ReilluminateFlics(void) {
 }
 
 // IDA: void __cdecl TurnFlicTransparencyOn()
-// FUNCTION: CARM95 0x495a43
+// FUNCTION: CARM95 0x00495a43
 void TurnFlicTransparencyOn(void) {
     LOG_TRACE8("()");
 
@@ -701,44 +701,44 @@ void TurnFlicTransparencyOn(void) {
 }
 
 // IDA: void __cdecl TurnFlicTransparencyOff()
-// FUNCTION: CARM95 0x495a58
+// FUNCTION: CARM95 0x00495a58
 void TurnFlicTransparencyOff(void) {
     LOG_TRACE8("()");
     gTransparency_on = 0;
 }
 
 // IDA: void __cdecl PlayFlicsFromDisk()
-// FUNCTION: CARM95 0x495a6d
+// FUNCTION: CARM95 0x00495a6d
 void PlayFlicsFromDisk(void) {
     gPlay_from_disk = 1;
 }
 
 // IDA: void __cdecl PlayFlicsFromMemory()
-// FUNCTION: CARM95 0x495a82
+// FUNCTION: CARM95 0x00495a82
 void PlayFlicsFromMemory(void) {
     gPlay_from_disk = 0;
 }
 
 // IDA: int __cdecl FlicsPlayedFromDisk()
-// FUNCTION: CARM95 0x495a97
+// FUNCTION: CARM95 0x00495a97
 int FlicsPlayedFromDisk(void) {
     return gPlay_from_disk;
 }
 
 // IDA: void __cdecl TurnOffPanelFlics()
-// FUNCTION: CARM95 0x495aac
+// FUNCTION: CARM95 0x00495aac
 void TurnOffPanelFlics(void) {
     gPanel_flic_disable = 1;
 }
 
 // IDA: void __cdecl TurnOnPanelFlics()
-// FUNCTION: CARM95 0x495ac1
+// FUNCTION: CARM95 0x00495ac1
 void TurnOnPanelFlics(void) {
     gPanel_flic_disable = 0;
 }
 
 // IDA: int __usercall GetPanelFlicFrameIndex@<EAX>(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x495ad6
+// FUNCTION: CARM95 0x00495ad6
 int GetPanelFlicFrameIndex(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -746,7 +746,7 @@ int GetPanelFlicFrameIndex(int pIndex) {
 }
 
 // IDA: void __cdecl FlicPaletteAllocate()
-// FUNCTION: CARM95 0x495af9
+// FUNCTION: CARM95 0x00495af9
 void FlicPaletteAllocate(void) {
     LOG_TRACE("()");
 
@@ -755,7 +755,7 @@ void FlicPaletteAllocate(void) {
 }
 
 // IDA: void __usercall AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info@<EAX>, br_pixelmap *pDest_pixelmap@<EDX>)
-// FUNCTION: CARM95 0x495b39
+// FUNCTION: CARM95 0x00495b39
 void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap* pDest_pixelmap) {
     LOG_TRACE("(%d, %p)", pFlic_info, pDest_pixelmap);
 
@@ -768,7 +768,7 @@ void AssertFlicPixelmap(tFlic_descriptor_ptr pFlic_info, br_pixelmap* pDest_pixe
 }
 
 // IDA: int __usercall StartFlic@<EAX>(char *pFile_name@<EAX>, int pIndex@<EDX>, tFlic_descriptor_ptr pFlic_info@<EBX>, tU32 pSize@<ECX>, tS8 *pData_ptr, br_pixelmap *pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate)
-// FUNCTION: CARM95 0x495b77
+// FUNCTION: CARM95 0x00495b77
 int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, int pFrame_rate) {
     tU16 claimed_speed;
     tU16 magic_number;
@@ -859,7 +859,7 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
 }
 
 // IDA: void __cdecl FreeFlicPaletteAllocate()
-// FUNCTION: CARM95 0x495f27
+// FUNCTION: CARM95 0x00495f27
 void FreeFlicPaletteAllocate(void) {
     LOG_TRACE("()");
 
@@ -874,7 +874,7 @@ void FreeFlicPaletteAllocate(void) {
 }
 
 // IDA: int __usercall EndFlic@<EAX>(tFlic_descriptor_ptr pFlic_info@<EAX>)
-// FUNCTION: CARM95 0x495f71
+// FUNCTION: CARM95 0x00495f71
 int EndFlic(tFlic_descriptor_ptr pFlic_info) {
     LOG_TRACE("(%p)", pFlic_info);
 
@@ -891,7 +891,7 @@ int EndFlic(tFlic_descriptor_ptr pFlic_info) {
 }
 
 // IDA: void __usercall DoColourMap(tFlic_descriptor_ptr pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x49639a
+// FUNCTION: CARM95 0x0049639a
 void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -940,7 +940,7 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DoDifferenceX(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x4964e3
+// FUNCTION: CARM95 0x004964e3
 void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -987,7 +987,7 @@ void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DoDifferenceTrans(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x49663f
+// FUNCTION: CARM95 0x0049663f
 void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1041,7 +1041,7 @@ void DoDifferenceTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DoColour256(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x4967ce
+// FUNCTION: CARM95 0x004967ce
 void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1092,7 +1092,7 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DoDeltaTrans(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x496902
+// FUNCTION: CARM95 0x00496902
 void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1164,7 +1164,7 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DoDeltaX(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x496b49
+// FUNCTION: CARM95 0x00496b49
 void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1217,7 +1217,7 @@ void DoDeltaX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DoBlack(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x496cb0
+// FUNCTION: CARM95 0x00496cb0
 void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1241,7 +1241,7 @@ void DoBlack(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DoRunLengthX(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x496d3c
+// FUNCTION: CARM95 0x00496d3c
 void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1281,7 +1281,7 @@ void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DoRunLengthTrans(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x496e53
+// FUNCTION: CARM95 0x00496e53
 void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1326,7 +1326,7 @@ void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DoUncompressed(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x496f9d
+// FUNCTION: CARM95 0x00496f9d
 void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1350,7 +1350,7 @@ void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DoUncompressedTrans(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x497031
+// FUNCTION: CARM95 0x00497031
 void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     int i;
     int j;
@@ -1382,7 +1382,7 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DoMini(tFlic_descriptor *pFlic_info@<EAX>, tU32 chunk_length@<EDX>)
-// FUNCTION: CARM95 0x4970dc
+// FUNCTION: CARM95 0x004970dc
 void DoMini(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     LOG_TRACE("(%p, %d)", pFlic_info, chunk_length);
 
@@ -1390,7 +1390,7 @@ void DoMini(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 }
 
 // IDA: void __usercall DrawTranslations(tFlic_descriptor *pFlic_info@<EAX>, int pLast_frame@<EDX>)
-// FUNCTION: CARM95 0x4970fa
+// FUNCTION: CARM95 0x004970fa
 void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
     tTranslation_record* trans;
     int i;
@@ -1431,7 +1431,7 @@ void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
 }
 
 // IDA: int __usercall PlayNextFlicFrame2@<EAX>(tFlic_descriptor *pFlic_info@<EAX>, int pPanel_flic@<EDX>)
-// FUNCTION: CARM95 0x495ff5
+// FUNCTION: CARM95 0x00495ff5
 int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     tU32 frame_length;
     tU32 chunk_length;
@@ -1535,7 +1535,7 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
 }
 
 // IDA: int __usercall PlayNextFlicFrame@<EAX>(tFlic_descriptor *pFlic_info@<EAX>)
-// FUNCTION: CARM95 0x495fd7
+// FUNCTION: CARM95 0x00495fd7
 int PlayNextFlicFrame(tFlic_descriptor* pFlic_info) {
     LOG_TRACE("(%p)", pFlic_info);
 
@@ -1543,7 +1543,7 @@ int PlayNextFlicFrame(tFlic_descriptor* pFlic_info) {
 }
 
 // IDA: int __usercall PlayFlic@<EAX>(int pIndex@<EAX>, tU32 pSize@<EDX>, tS8 *pData_ptr@<EBX>, br_pixelmap *pDest_pixelmap@<ECX>, int pX_offset, int pY_offset, void (*DoPerFrame)(), int pInterruptable, int pFrame_rate)
-// FUNCTION: CARM95 0x497278
+// FUNCTION: CARM95 0x00497278
 int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap, int pX_offset, int pY_offset, void (*DoPerFrame)(void), int pInterruptable, int pFrame_rate) {
     int finished_playing;
     tFlic_descriptor the_flic;
@@ -1584,13 +1584,13 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
 }
 
 // IDA: void __cdecl SwapScreen()
-// FUNCTION: CARM95 0x497444
+// FUNCTION: CARM95 0x00497444
 void SwapScreen(void) {
     PDScreenBufferSwap(0);
 }
 
 // IDA: void __usercall ShowFlic(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x4973a3
+// FUNCTION: CARM95 0x004973a3
 void ShowFlic(int pIndex) {
     do {
         PlayFlic(
@@ -1608,7 +1608,7 @@ void ShowFlic(int pIndex) {
 }
 
 // IDA: void __cdecl InitFlics()
-// FUNCTION: CARM95 0x497459
+// FUNCTION: CARM95 0x00497459
 void InitFlics(void) {
     int i;
     LOG_TRACE("()");
@@ -1619,7 +1619,7 @@ void InitFlics(void) {
 }
 
 // IDA: int __usercall LoadFlic@<EAX>(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x497499
+// FUNCTION: CARM95 0x00497499
 int LoadFlic(int pIndex) {
     tPath_name the_path;
     FILE* f;
@@ -1666,7 +1666,7 @@ int LoadFlic(int pIndex) {
 }
 
 // IDA: void __usercall UnlockFlic(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x497683
+// FUNCTION: CARM95 0x00497683
 void UnlockFlic(int pIndex) {
     if (pIndex >= 0) {
         if (gMain_flic_list[pIndex].data_ptr != NULL) {
@@ -1676,7 +1676,7 @@ void UnlockFlic(int pIndex) {
 }
 
 // IDA: int __usercall LoadFlicData@<EAX>(char *pName@<EAX>, tU8 **pData@<EDX>, tU32 *pData_length@<EBX>)
-// FUNCTION: CARM95 0x4976cb
+// FUNCTION: CARM95 0x004976cb
 int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
     FILE* f;
     tPath_name the_path;
@@ -1708,7 +1708,7 @@ int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
 }
 
 // IDA: void __usercall FreeFlic(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x4977de
+// FUNCTION: CARM95 0x004977de
 void FreeFlic(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -1720,7 +1720,7 @@ void FreeFlic(int pIndex) {
 }
 
 // IDA: void __usercall ForceRunFlic(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x497908
+// FUNCTION: CARM95 0x00497908
 void ForceRunFlic(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -1730,7 +1730,7 @@ void ForceRunFlic(int pIndex) {
 }
 
 // IDA: void __usercall RunFlicAt(int pIndex@<EAX>, int pX@<EDX>, int pY@<EBX>)
-// FUNCTION: CARM95 0x497829
+// FUNCTION: CARM95 0x00497829
 void RunFlicAt(int pIndex, int pX, int pY) {
     LOG_TRACE("(%d, %d, %d)", pIndex, pX, pY);
 
@@ -1749,7 +1749,7 @@ void RunFlicAt(int pIndex, int pX, int pY) {
 }
 
 // IDA: void __usercall RunFlic(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x49788b
+// FUNCTION: CARM95 0x0049788b
 void RunFlic(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -1768,7 +1768,7 @@ void RunFlic(int pIndex) {
 }
 
 // IDA: void __usercall PreloadBunchOfFlics(int pBunch_index@<EAX>)
-// FUNCTION: CARM95 0x497937
+// FUNCTION: CARM95 0x00497937
 void PreloadBunchOfFlics(int pBunch_index) {
     int i;
     LOG_TRACE("(%d)", pBunch_index);
@@ -1779,7 +1779,7 @@ void PreloadBunchOfFlics(int pBunch_index) {
 }
 
 // IDA: void __usercall UnlockBunchOfFlics(int pBunch_index@<EAX>)
-// FUNCTION: CARM95 0x497986
+// FUNCTION: CARM95 0x00497986
 void UnlockBunchOfFlics(int pBunch_index) {
     int i;
     LOG_TRACE("(%d)", pBunch_index);
@@ -1790,7 +1790,7 @@ void UnlockBunchOfFlics(int pBunch_index) {
 }
 
 // IDA: void __usercall FlushAllFlics(int pBunch_index@<EAX>)
-// FUNCTION: CARM95 0x4979d5
+// FUNCTION: CARM95 0x004979d5
 void FlushAllFlics(int pBunch_index) {
     int i;
     LOG_TRACE("(%d)", pBunch_index);
@@ -1801,13 +1801,13 @@ void FlushAllFlics(int pBunch_index) {
 }
 
 // IDA: void __cdecl InitFlicQueue()
-// FUNCTION: CARM95 0x497a10
+// FUNCTION: CARM95 0x00497a10
 void InitFlicQueue(void) {
     gFirst_flic = NULL;
 }
 
 // IDA: int __cdecl FlicQueueFinished()
-// FUNCTION: CARM95 0x497a25
+// FUNCTION: CARM95 0x00497a25
 int FlicQueueFinished(void) {
     tFlic_descriptor* the_flic;
     LOG_TRACE("()");
@@ -1823,7 +1823,7 @@ int FlicQueueFinished(void) {
 }
 
 // IDA: void __usercall ProcessFlicQueue(tU32 pInterval@<EAX>)
-// FUNCTION: CARM95 0x497a71
+// FUNCTION: CARM95 0x00497a71
 void ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* last_flic;
@@ -1864,7 +1864,7 @@ void ProcessFlicQueue(tU32 pInterval) {
 }
 
 // IDA: void __cdecl FlushFlicQueue()
-// FUNCTION: CARM95 0x497b5d
+// FUNCTION: CARM95 0x00497b5d
 void FlushFlicQueue(void) {
     tFlic_descriptor* the_flic;
     tFlic_descriptor* old_flic;
@@ -1891,7 +1891,7 @@ void FlushFlicQueue(void) {
 }
 
 // IDA: void __usercall AddToFlicQueue(int pIndex@<EAX>, int pX@<EDX>, int pY@<EBX>, int pMust_finish@<ECX>)
-// FUNCTION: CARM95 0x497bec
+// FUNCTION: CARM95 0x00497bec
 void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
     tFlic_descriptor* the_flic = NULL;
     tFlic_descriptor* new_flic = NULL;
@@ -1949,7 +1949,7 @@ void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
 }
 
 // IDA: void __usercall InitialiseFlicPanel(int pIndex@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pWidth@<ECX>, int pHeight)
-// FUNCTION: CARM95 0x497dcd
+// FUNCTION: CARM95 0x00497dcd
 void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeight) {
     void* the_pixels;
     LOG_TRACE("(%d, %d, %d, %d, %d)", pIndex, pLeft, pTop, pWidth, pHeight);
@@ -1978,7 +1978,7 @@ void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeigh
 }
 
 // IDA: void __usercall DisposeFlicPanel(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x497e80
+// FUNCTION: CARM95 0x00497e80
 void DisposeFlicPanel(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -1989,7 +1989,7 @@ void DisposeFlicPanel(int pIndex) {
 }
 
 // IDA: void __usercall ServicePanelFlics(int pCopy_to_buffer@<EAX>)
-// FUNCTION: CARM95 0x497edd
+// FUNCTION: CARM95 0x00497edd
 void ServicePanelFlics(int pCopy_to_buffer) {
     tU32 time_diff;
     tU32 the_time;
@@ -2050,7 +2050,7 @@ void ServicePanelFlics(int pCopy_to_buffer) {
 }
 
 // IDA: void __usercall ChangePanelFlic(int pIndex@<EAX>, tU8 *pData@<EDX>, tU32 pData_length@<EBX>)
-// FUNCTION: CARM95 0x4980ec
+// FUNCTION: CARM95 0x004980ec
 void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
     LOG_TRACE("(%d, %p, %d)", pIndex, pData, pData_length);
 
@@ -2073,7 +2073,7 @@ void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
 }
 
 // IDA: br_pixelmap* __usercall GetPanelPixelmap@<EAX>(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x4981b5
+// FUNCTION: CARM95 0x004981b5
 br_pixelmap* GetPanelPixelmap(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -2081,7 +2081,7 @@ br_pixelmap* GetPanelPixelmap(int pIndex) {
 }
 
 // IDA: void __cdecl LoadInterfaceStrings()
-// FUNCTION: CARM95 0x4981cf
+// FUNCTION: CARM95 0x004981cf
 void LoadInterfaceStrings(void) {
     FILE* f; // Added by DethRace
     char s[256];
@@ -2197,7 +2197,7 @@ void LoadInterfaceStrings(void) {
 }
 
 // IDA: void __cdecl FlushInterfaceFonts()
-// FUNCTION: CARM95 0x498961
+// FUNCTION: CARM95 0x00498961
 void FlushInterfaceFonts(void) {
     LOG_TRACE("()");
 
@@ -2212,7 +2212,7 @@ void FlushInterfaceFonts(void) {
 }
 
 // IDA: void __cdecl SuspendPendingFlic()
-// FUNCTION: CARM95 0x4989bc
+// FUNCTION: CARM95 0x004989bc
 void SuspendPendingFlic(void) {
     LOG_TRACE("()");
 
@@ -2221,7 +2221,7 @@ void SuspendPendingFlic(void) {
 }
 
 // IDA: void __cdecl ResumePendingFlic()
-// FUNCTION: CARM95 0x4989db
+// FUNCTION: CARM95 0x004989db
 void ResumePendingFlic(void) {
     LOG_TRACE("()");
 

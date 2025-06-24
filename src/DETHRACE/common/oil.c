@@ -11,26 +11,26 @@
 #include <math.h>
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x509a38
+// GLOBAL: CARM95 0x00509a38
 char* gOil_pixie_names[1] = { "OIL.PIX" };
 
-// GLOBAL: CARM95 0x509a3c
+// GLOBAL: CARM95 0x00509a3c
 int gNext_oil_pixie = 0;
 
-// GLOBAL: CARM95 0x509a40
+// GLOBAL: CARM95 0x00509a40
 br_scalar gZ_buffer_diff;
 
-// GLOBAL: CARM95 0x509a44
+// GLOBAL: CARM95 0x00509a44
 br_scalar gMin_z_diff;
 
-// GLOBAL: CARM95 0x551dc0
+// GLOBAL: CARM95 0x00551dc0
 br_pixelmap* gOil_pixies[1];
 
-// GLOBAL: CARM95 0x551dd0
+// GLOBAL: CARM95 0x00551dd0
 tOil_spill_info gOily_spills[15];
 
 // IDA: void __cdecl InitOilSpills()
-// FUNCTION: CARM95 0x412510
+// FUNCTION: CARM95 0x00412510
 void InitOilSpills(void) {
     int i;
     br_model* the_model;
@@ -91,7 +91,7 @@ void InitOilSpills(void) {
 }
 
 // IDA: void __cdecl ResetOilSpills()
-// FUNCTION: CARM95 0x412859
+// FUNCTION: CARM95 0x00412859
 void ResetOilSpills(void) {
     int i;
     LOG_TRACE("()");
@@ -104,7 +104,7 @@ void ResetOilSpills(void) {
 }
 
 // IDA: void __usercall QueueOilSpill(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4128c7
+// FUNCTION: CARM95 0x004128c7
 void QueueOilSpill(tCar_spec* pCar) {
     int i;
     int oily_index;
@@ -147,7 +147,7 @@ void QueueOilSpill(tCar_spec* pCar) {
 }
 
 // IDA: int __usercall OKToSpillOil@<EAX>(tOil_spill_info *pOil@<EAX>)
-// FUNCTION: CARM95 0x41337d
+// FUNCTION: CARM95 0x0041337d
 int OKToSpillOil(tOil_spill_info* pOil) {
     br_scalar temp;
     br_scalar size_with_margin;
@@ -219,7 +219,7 @@ int OKToSpillOil(tOil_spill_info* pOil) {
 }
 
 // IDA: void __usercall Vector3Interpolate(br_vector3 *pDst@<EAX>, br_vector3 *pFrom@<EDX>, br_vector3 *pTo@<EBX>, br_scalar pP)
-// FUNCTION: CARM95 0x412b76
+// FUNCTION: CARM95 0x00412b76
 void Vector3Interpolate(br_vector3* pDst, br_vector3* pFrom, br_vector3* pTo, br_scalar pP) {
     LOG_TRACE("(%p, %p, %p, %f)", pDst, pFrom, pTo, pP);
 
@@ -229,7 +229,7 @@ void Vector3Interpolate(br_vector3* pDst, br_vector3* pFrom, br_vector3* pTo, br
 }
 
 // IDA: void __usercall EnsureGroundDetailVisible(br_vector3 *pNew_pos@<EAX>, br_vector3 *pGround_normal@<EDX>, br_vector3 *pOld_pos@<EBX>)
-// FUNCTION: CARM95 0x412a81
+// FUNCTION: CARM95 0x00412a81
 void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal, br_vector3* pOld_pos) {
     br_scalar factor;
     br_scalar s;
@@ -256,7 +256,7 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
 }
 
 // IDA: void __usercall MungeOilsHeightAboveGround(tOil_spill_info *pOil@<EAX>)
-// FUNCTION: CARM95 0x412bf4
+// FUNCTION: CARM95 0x00412bf4
 void MungeOilsHeightAboveGround(tOil_spill_info* pOil) {
     LOG_TRACE("(%p)", pOil);
 
@@ -264,7 +264,7 @@ void MungeOilsHeightAboveGround(tOil_spill_info* pOil) {
 }
 
 // IDA: void __usercall MungeIndexedOilsHeightAboveGround(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x412bce
+// FUNCTION: CARM95 0x00412bce
 void MungeIndexedOilsHeightAboveGround(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -272,7 +272,7 @@ void MungeIndexedOilsHeightAboveGround(int pIndex) {
 }
 
 // IDA: void __usercall SetInitialOilStuff(tOil_spill_info *pOil@<EAX>, br_model *pModel@<EDX>)
-// FUNCTION: CARM95 0x4137ad
+// FUNCTION: CARM95 0x004137ad
 void SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel) {
     LOG_TRACE("(%p, %p)", pOil, pModel);
 
@@ -290,7 +290,7 @@ void SetInitialOilStuff(tOil_spill_info* pOil, br_model* pModel) {
 }
 
 // IDA: void __usercall ProcessOilSpills(tU32 pFrame_period@<EAX>)
-// FUNCTION: CARM95 0x412c20
+// FUNCTION: CARM95 0x00412c20
 void ProcessOilSpills(tU32 pFrame_period) {
     int i;
     tU32 time;
@@ -390,7 +390,7 @@ void ProcessOilSpills(tU32 pFrame_period) {
 }
 
 // IDA: int __cdecl GetOilSpillCount()
-// FUNCTION: CARM95 0x413852
+// FUNCTION: CARM95 0x00413852
 int GetOilSpillCount(void) {
     // LOG_TRACE("()");
 
@@ -398,7 +398,7 @@ int GetOilSpillCount(void) {
 }
 
 // IDA: void __usercall GetOilSpillDetails(int pIndex@<EAX>, br_actor **pActor@<EDX>, br_scalar *pSize@<EBX>)
-// FUNCTION: CARM95 0x413867
+// FUNCTION: CARM95 0x00413867
 void GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize) {
     LOG_TRACE("(%d, %p, %p)", pIndex, pActor, pSize);
 
@@ -413,7 +413,7 @@ void GetOilSpillDetails(int pIndex, br_actor** pActor, br_scalar* pSize) {
 #define SQR(V) ((V) * (V))
 
 // IDA: int __usercall PointInSpill@<EAX>(br_vector3 *pV@<EAX>, int pSpill@<EDX>)
-// FUNCTION: CARM95 0x413b72
+// FUNCTION: CARM95 0x00413b72
 int PointInSpill(br_vector3* pV, int pSpill) {
     LOG_TRACE("(%p, %d)", pV, pSpill);
 
@@ -423,7 +423,7 @@ int PointInSpill(br_vector3* pV, int pSpill) {
 }
 
 // IDA: void __usercall GetOilFrictionFactors(tCar_spec *pCar@<EAX>, br_scalar *pFl_factor@<EDX>, br_scalar *pFr_factor@<EBX>, br_scalar *pRl_factor@<ECX>, br_scalar *pRr_factor)
-// FUNCTION: CARM95 0x4138c7
+// FUNCTION: CARM95 0x004138c7
 void GetOilFrictionFactors(tCar_spec* pCar, br_scalar* pFl_factor, br_scalar* pFr_factor, br_scalar* pRl_factor, br_scalar* pRr_factor) {
     int i;
     br_vector3 wheel_world;
@@ -477,7 +477,7 @@ void GetOilFrictionFactors(tCar_spec* pCar, br_scalar* pFl_factor, br_scalar* pF
 }
 
 // IDA: void __usercall AdjustOilSpill(int pIndex@<EAX>, br_matrix34 *pMat@<EDX>, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap)
-// FUNCTION: CARM95 0x413cb6
+// FUNCTION: CARM95 0x00413cb6
 void AdjustOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap) {
     LOG_TRACE("(%d, %p, %f, %f, %d, %d, %p, %p, %p)", pIndex, pMat, pFull_size, pGrow_rate, pSpill_time, pStop_time, pCar, pOriginal_pos, pPixelmap);
 
@@ -493,7 +493,7 @@ void AdjustOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scal
 }
 
 // IDA: void __usercall ReceivedOilSpill(tNet_contents *pContents@<EAX>)
-// FUNCTION: CARM95 0x413dc4
+// FUNCTION: CARM95 0x00413dc4
 void ReceivedOilSpill(tNet_contents* pContents) {
     int i;
     int oily_index;

@@ -29,39 +29,39 @@
 #define MIN_SERVICE_INTERVAL 200
 // <<
 
-// GLOBAL: CARM95 0x521488
+// GLOBAL: CARM95 0x00521488
 int gIn_check_quit = 0;
 
-// GLOBAL: CARM95 0x52148c
+// GLOBAL: CARM95 0x0052148c
 tU32 gLost_time = 0;
 
 #if BR_ENDIAN_BIG
-// GLOBAL: CARM95 0x521490
+// GLOBAL: CARM95 0x00521490
 tU32 gLong_key[4] = { 0x6c1b995f, 0xb9cd5f13, 0xcb04200e, 0x5e1ca10e };
 
-// GLOBAL: CARM95 0x5214a0
+// GLOBAL: CARM95 0x005214a0
 tU32 gOther_long_key[4] = { 0x67a8d626, 0xb6dd451b, 0x327e2213, 0x15c29437 };
 
 #else
 
-// GLOBAL: CARM95 0x521490
+// GLOBAL: CARM95 0x00521490
 tU32 gLong_key[4] = { 0x5f991b6c, 0x135fcdb9, 0x0e2004cb, 0x0ea11c5e };
 
-// GLOBAL: CARM95 0x5214a0
+// GLOBAL: CARM95 0x005214a0
 tU32 gOther_long_key[4] = { 0x26d6a867, 0x1b45ddb6, 0x13227e32, 0x3794c215 };
 #endif
 
-// GLOBAL: CARM95 0x5214b0
+// GLOBAL: CARM95 0x005214b0
 int gEncryption_method = 0;
 
-// GLOBAL: CARM95 0x544ef0
+// GLOBAL: CARM95 0x00544ef0
 char* gMisc_strings[250];
 
 br_pixelmap* g16bit_palette;
 br_pixelmap* gSource_for_16bit_palette;
 
 // IDA: int __cdecl CheckQuit()
-// FUNCTION: CARM95 0x4c1590
+// FUNCTION: CARM95 0x004c1590
 int CheckQuit(void) {
     LOG_TRACE8("()");
 
@@ -84,7 +84,7 @@ int CheckQuit(void) {
 }
 
 // IDA: double __cdecl sqr(double pN)
-// FUNCTION: CARM95 0x4c161d
+// FUNCTION: CARM95 0x004c161d
 double sqr(double pN) {
 
     return pN * pN;
@@ -128,7 +128,7 @@ void EncodeLine_DEMO(char* pS) {
 }
 
 // IDA: void __usercall EncodeLine(char *pS@<EAX>)
-// FUNCTION: CARM95 0x4c1ab1
+// FUNCTION: CARM95 0x004c1ab1
 void EncodeLine(char* pS) {
     int len;
     int seed;
@@ -224,7 +224,7 @@ void EncodeLine(char* pS) {
 }
 
 // IDA: int __usercall IRandomBetween@<EAX>(int pA@<EAX>, int pB@<EDX>)
-// FUNCTION: CARM95 0x4c1633
+// FUNCTION: CARM95 0x004c1633
 int IRandomBetween(int pA, int pB) {
     int num;
     char s[32];
@@ -240,7 +240,7 @@ int IRandomBetween(int pA, int pB) {
 }
 
 // IDA: int __usercall PercentageChance@<EAX>(int pC@<EAX>)
-// FUNCTION: CARM95 0x4c166c
+// FUNCTION: CARM95 0x004c166c
 int PercentageChance(int pC) {
     LOG_TRACE("(%d)", pC);
 
@@ -248,7 +248,7 @@ int PercentageChance(int pC) {
 }
 
 // IDA: int __usercall IRandomPosNeg@<EAX>(int pN@<EAX>)
-// FUNCTION: CARM95 0x4c169d
+// FUNCTION: CARM95 0x004c169d
 int IRandomPosNeg(int pN) {
     LOG_TRACE("(%d)", pN);
 
@@ -256,14 +256,14 @@ int IRandomPosNeg(int pN) {
 }
 
 // IDA: float __cdecl FRandomBetween(float pA, float pB)
-// FUNCTION: CARM95 0x4c16bf
+// FUNCTION: CARM95 0x004c16bf
 float FRandomBetween(float pA, float pB) {
     LOG_TRACE8("(%f, %f)", pA, pB);
     return (double)rand() * (pB - pA) / (double)RAND_MAX + pA;
 }
 
 // IDA: float __cdecl FRandomPosNeg(float pN)
-// FUNCTION: CARM95 0x4c16ee
+// FUNCTION: CARM95 0x004c16ee
 float FRandomPosNeg(float pN) {
     LOG_TRACE("(%f)", pN);
 
@@ -271,7 +271,7 @@ float FRandomPosNeg(float pN) {
 }
 
 // IDA: br_scalar __cdecl SRandomBetween(br_scalar pA, br_scalar pB)
-// FUNCTION: CARM95 0x4c1715
+// FUNCTION: CARM95 0x004c1715
 br_scalar SRandomBetween(br_scalar pA, br_scalar pB) {
     LOG_TRACE8("(%f, %f)", pA, pB);
 
@@ -279,7 +279,7 @@ br_scalar SRandomBetween(br_scalar pA, br_scalar pB) {
 }
 
 // IDA: br_scalar __cdecl SRandomPosNeg(br_scalar pN)
-// FUNCTION: CARM95 0x4c1735
+// FUNCTION: CARM95 0x004c1735
 br_scalar SRandomPosNeg(br_scalar pN) {
     LOG_TRACE("(%f)", pN);
 
@@ -287,7 +287,7 @@ br_scalar SRandomPosNeg(br_scalar pN) {
 }
 
 // IDA: char* __usercall GetALineWithNoPossibleService@<EAX>(FILE *pF@<EAX>, unsigned char *pS@<EDX>)
-// FUNCTION: CARM95 0x4c175c
+// FUNCTION: CARM95 0x004c175c
 char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
     // Jeff removed "signed' to avoid compiler warnings..
     /*signed*/ char* result;
@@ -353,7 +353,7 @@ char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
 }
 
 // IDA: char* __usercall GetALineAndDontArgue@<EAX>(FILE *pF@<EAX>, char *pS@<EDX>)
-// FUNCTION: CARM95 0x4c1d44
+// FUNCTION: CARM95 0x004c1d44
 char* GetALineAndDontArgue(FILE* pF, char* pS) {
     // LOG_TRACE10("(%p, \"%s\")", pF, pS);
 
@@ -362,7 +362,7 @@ char* GetALineAndDontArgue(FILE* pF, char* pS) {
 }
 
 // IDA: void __usercall PathCat(char *pDestn_str@<EAX>, char *pStr_1@<EDX>, char *pStr_2@<EBX>)
-// FUNCTION: CARM95 0x4c1d69
+// FUNCTION: CARM95 0x004c1d69
 void PathCat(char* pDestn_str, char* pStr_1, char* pStr_2) {
 
     if (pDestn_str != pStr_1) { // Added to avoid strcpy overlap checks
@@ -375,7 +375,7 @@ void PathCat(char* pDestn_str, char* pStr_1, char* pStr_2) {
 }
 
 // IDA: int __cdecl Chance(float pChance_per_second, int pPeriod)
-// FUNCTION: CARM95 0x4c1e16
+// FUNCTION: CARM95 0x004c1e16
 int Chance(float pChance_per_second, int pPeriod) {
     LOG_TRACE("(%f, %d)", pChance_per_second, pPeriod);
 
@@ -383,7 +383,7 @@ int Chance(float pChance_per_second, int pPeriod) {
 }
 
 // IDA: float __cdecl tandeg(float pAngle)
-// FUNCTION: CARM95 0x4c1e63
+// FUNCTION: CARM95 0x004c1e63
 float tandeg(float pAngle) {
     LOG_TRACE("(%f)", pAngle);
 
@@ -392,7 +392,7 @@ float tandeg(float pAngle) {
 }
 
 // IDA: tU32 __usercall GetFileLength@<EAX>(FILE *pF@<EAX>)
-// FUNCTION: CARM95 0x4c1e94
+// FUNCTION: CARM95 0x004c1e94
 tU32 GetFileLength(FILE* pF) {
     tU32 the_size;
 
@@ -403,7 +403,7 @@ tU32 GetFileLength(FILE* pF) {
 }
 
 // IDA: int __usercall BooleanTo1Or0@<EAX>(int pB@<EAX>)
-// FUNCTION: CARM95 0x4c1ed5
+// FUNCTION: CARM95 0x004c1ed5
 int BooleanTo1Or0(int pB) {
     LOG_TRACE("(%d)", pB);
 
@@ -411,7 +411,7 @@ int BooleanTo1Or0(int pB) {
 }
 
 // IDA: br_pixelmap* __usercall DRPixelmapAllocate@<EAX>(br_uint_8 pType@<EAX>, br_uint_16 pW@<EDX>, br_uint_16 pH@<EBX>, void *pPixels@<ECX>, int pFlags)
-// FUNCTION: CARM95 0x4c1efb
+// FUNCTION: CARM95 0x004c1efb
 br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, void* pPixels, int pFlags) {
     br_pixelmap* the_map;
 
@@ -424,7 +424,7 @@ br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, v
 }
 
 // IDA: br_pixelmap* __usercall DRPixelmapAllocateSub@<EAX>(br_pixelmap *pPm@<EAX>, br_uint_16 pX@<EDX>, br_uint_16 pY@<EBX>, br_uint_16 pW@<ECX>, br_uint_16 pH)
-// FUNCTION: CARM95 0x4c1f56
+// FUNCTION: CARM95 0x004c1f56
 br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 pY, br_uint_16 pW, br_uint_16 pH) {
     br_pixelmap* the_map;
     LOG_TRACE("(%p, %d, %d, %d, %d)", pPm, pX, pY, pW, pH);
@@ -533,7 +533,7 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
 }
 
 // IDA: br_pixelmap* __usercall DRPixelmapLoad@<EAX>(char *pFile_name@<EAX>)
-// FUNCTION: CARM95 0x4c1fbb
+// FUNCTION: CARM95 0x004c1fbb
 br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     br_pixelmap* the_map;
     br_int_8 lobyte;
@@ -549,7 +549,7 @@ br_pixelmap* DRPixelmapLoad(char* pFile_name) {
 }
 
 // IDA: br_uint_32 __usercall DRPixelmapLoadMany@<EAX>(char *pFile_name@<EAX>, br_pixelmap **pPixelmaps@<EDX>, br_uint_16 pNum@<EBX>)
-// FUNCTION: CARM95 0x4c2010
+// FUNCTION: CARM95 0x004c2010
 br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 pNum) {
     br_pixelmap* the_map;
     int number_loaded;
@@ -567,7 +567,7 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
 }
 
 // IDA: void __usercall WaitFor(tU32 pDelay@<EAX>)
-// FUNCTION: CARM95 0x4c209b
+// FUNCTION: CARM95 0x004c209b
 void WaitFor(tU32 pDelay) {
     tU32 start_time;
     LOG_TRACE("(%d)", pDelay);
@@ -579,7 +579,7 @@ void WaitFor(tU32 pDelay) {
 }
 
 // IDA: br_uint_32 __usercall DRActorEnumRecurse@<EAX>(br_actor *pActor@<EAX>, br_actor_enum_cbfn *callback@<EDX>, void *arg@<EBX>)
-// FUNCTION: CARM95 0x4c20ce
+// FUNCTION: CARM95 0x004c20ce
 br_uintptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, void* arg) {
     br_uintptr_t result;
 
@@ -597,7 +597,7 @@ br_uintptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, 
 }
 
 // IDA: br_uint_32 __cdecl CompareActorID(br_actor *pActor, void *pArg)
-// FUNCTION: CARM95 0x4c2174
+// FUNCTION: CARM95 0x004c2174
 br_uintptr_t CompareActorID(br_actor* pActor, void* pArg) {
     LOG_TRACE("(%p, %p)", pActor, pArg);
 
@@ -609,7 +609,7 @@ br_uintptr_t CompareActorID(br_actor* pActor, void* pArg) {
 }
 
 // IDA: br_actor* __usercall DRActorFindRecurse@<EAX>(br_actor *pSearch_root@<EAX>, char *pName@<EDX>)
-// FUNCTION: CARM95 0x4c214f
+// FUNCTION: CARM95 0x004c214f
 br_actor* DRActorFindRecurse(br_actor* pSearch_root, char* pName) {
     LOG_TRACE("(%p, \"%s\")", pSearch_root, pName);
 
@@ -617,7 +617,7 @@ br_actor* DRActorFindRecurse(br_actor* pSearch_root, char* pName) {
 }
 
 // IDA: br_uint_32 __usercall DRActorEnumRecurseWithMat@<EAX>(br_actor *pActor@<EAX>, br_material *pMat@<EDX>, br_uint_32 (*pCall_back)(br_actor*, br_material*, void*)@<EBX>, void *pArg@<ECX>)
-// FUNCTION: CARM95 0x4c21e9
+// FUNCTION: CARM95 0x004c21e9
 br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, recurse_with_mat_cbfn* pCall_back, void* pArg) {
     br_uint_32 result;
     LOG_TRACE("(%p, %p, %p, %p)", pActor, pMat, pCall_back, pArg);
@@ -639,7 +639,7 @@ br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, recurs
 }
 
 // IDA: br_uint_32 __usercall DRActorEnumRecurseWithTrans@<EAX>(br_actor *pActor@<EAX>, br_matrix34 *pMatrix@<EDX>, br_uint_32 (*pCall_back)(br_actor*, br_matrix34*, void*)@<EBX>, void *pArg@<ECX>)
-// FUNCTION: CARM95 0x4c2288
+// FUNCTION: CARM95 0x004c2288
 br_uint_32 DRActorEnumRecurseWithTrans(br_actor* pActor, br_matrix34* pMatrix, br_uint_32 (*pCall_back)(br_actor*, br_matrix34*, void*), void* pArg) {
     br_uint_32 result;
     br_matrix34 combined_transform;
@@ -689,7 +689,7 @@ float fsign(float pNumber) {
 }
 
 // IDA: FILE* __usercall OpenUniqueFileB@<EAX>(char *pPrefix@<EAX>, char *pExtension@<EDX>)
-// FUNCTION: CARM95 0x4c23e7
+// FUNCTION: CARM95 0x004c23e7
 FILE* OpenUniqueFileB(char* pPrefix, char* pExtension) {
     int index;
     FILE* f;
@@ -709,7 +709,7 @@ FILE* OpenUniqueFileB(char* pPrefix, char* pExtension) {
 }
 
 // IDA: void __usercall PrintScreenFile(FILE *pF@<EAX>)
-// FUNCTION: CARM95 0x4c24c8
+// FUNCTION: CARM95 0x004c24c8
 void PrintScreenFile(FILE* pF) {
     int i;
     int j;
@@ -797,7 +797,7 @@ void PrintScreenFile16(FILE* pF) {
 }
 
 // IDA: void __cdecl PrintScreen()
-// FUNCTION: CARM95 0x4c272c
+// FUNCTION: CARM95 0x004c272c
 void PrintScreen(void) {
     FILE* f;
     LOG_TRACE("()");
@@ -818,7 +818,7 @@ void PrintScreen(void) {
 }
 
 // IDA: tU32 __cdecl GetTotalTime()
-// FUNCTION: CARM95 0x4c2771
+// FUNCTION: CARM95 0x004c2771
 tU32 GetTotalTime(void) {
     LOG_TRACE9("()");
 
@@ -832,7 +832,7 @@ tU32 GetTotalTime(void) {
 }
 
 // IDA: tU32 __cdecl GetRaceTime()
-// FUNCTION: CARM95 0x4c27bf
+// FUNCTION: CARM95 0x004c27bf
 tU32 GetRaceTime(void) {
     LOG_TRACE("()");
 
@@ -840,14 +840,14 @@ tU32 GetRaceTime(void) {
 }
 
 // IDA: void __usercall AddLostTime(tU32 pLost_time@<EAX>)
-// FUNCTION: CARM95 0x4c27da
+// FUNCTION: CARM95 0x004c27da
 void AddLostTime(tU32 pLost_time) {
 
     gLost_time += pLost_time;
 }
 
 // IDA: void __usercall TimerString(tU32 pTime@<EAX>, char *pStr@<EDX>, int pFudge_colon@<EBX>, int pForce_colon@<ECX>)
-// FUNCTION: CARM95 0x4c27ee
+// FUNCTION: CARM95 0x004c27ee
 void TimerString(tU32 pTime, char* pStr, int pFudge_colon, int pForce_colon) {
     int seconds;
     LOG_TRACE("(%d, \"%s\", %d, %d)", pTime, pStr, pFudge_colon, pForce_colon);
@@ -865,7 +865,7 @@ void TimerString(tU32 pTime, char* pStr, int pFudge_colon, int pForce_colon) {
 }
 
 // IDA: char* __usercall GetMiscString@<EAX>(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x4c289f
+// FUNCTION: CARM95 0x004c289f
 char* GetMiscString(int pIndex) {
 
     return gMisc_strings[pIndex];
@@ -879,7 +879,7 @@ void GetCopyOfMiscString(int pIndex, char* pStr) {
 }
 
 // IDA: int __usercall Flash@<EAX>(tU32 pPeriod@<EAX>, tU32 *pLast_change@<EDX>, int *pCurrent_state@<EBX>)
-// FUNCTION: CARM95 0x4c28f0
+// FUNCTION: CARM95 0x004c28f0
 int Flash(tU32 pPeriod, tU32* pLast_change, int* pCurrent_state) {
     tU32 the_time;
     LOG_TRACE("(%d, %p, %p)", pPeriod, pLast_change, pCurrent_state);
@@ -893,7 +893,7 @@ int Flash(tU32 pPeriod, tU32* pLast_change, int* pCurrent_state) {
 }
 
 // IDA: void __usercall MaterialCopy(br_material *pDst@<EAX>, br_material *pSrc@<EDX>)
-// FUNCTION: CARM95 0x4c294c
+// FUNCTION: CARM95 0x004c294c
 void MaterialCopy(br_material* pDst, br_material* pSrc) {
     LOG_TRACE("(%p, %p)", pDst, pSrc);
 
@@ -912,7 +912,7 @@ void MaterialCopy(br_material* pDst, br_material* pSrc) {
 }
 
 // IDA: double __usercall RGBDifferenceSqr@<ST0>(tRGB_colour *pColour_1@<EAX>, tRGB_colour *pColour_2@<EDX>)
-// FUNCTION: CARM95 0x4c2f71
+// FUNCTION: CARM95 0x004c2f71
 double RGBDifferenceSqr(tRGB_colour* pColour_1, tRGB_colour* pColour_2) {
     LOG_TRACE("(%p, %p)", pColour_1, pColour_2);
 
@@ -922,7 +922,7 @@ double RGBDifferenceSqr(tRGB_colour* pColour_1, tRGB_colour* pColour_2) {
 }
 
 // IDA: int __usercall FindBestMatch@<EAX>(tRGB_colour *pRGB_colour@<EAX>, br_pixelmap *pPalette@<EDX>)
-// FUNCTION: CARM95 0x4c2eb8
+// FUNCTION: CARM95 0x004c2eb8
 int FindBestMatch(tRGB_colour* pRGB_colour, br_pixelmap* pPalette) {
     int n;
     int near_c;
@@ -949,7 +949,7 @@ int FindBestMatch(tRGB_colour* pRGB_colour, br_pixelmap* pPalette) {
 }
 
 // IDA: void __usercall BuildShadeTablePath(char *pThe_path@<EAX>, int pR@<EDX>, int pG@<EBX>, int pB@<ECX>)
-// FUNCTION: CARM95 0x4c2a2e
+// FUNCTION: CARM95 0x004c2a2e
 void BuildShadeTablePath(char* pThe_path, int pR, int pG, int pB) {
     char s[32];
     LOG_TRACE("(\"%s\", %d, %d, %d)", pThe_path, pR, pG, pB);
@@ -969,7 +969,7 @@ void BuildShadeTablePath(char* pThe_path, int pR, int pG, int pB) {
 }
 
 // IDA: br_pixelmap* __usercall LoadGeneratedShadeTable@<EAX>(int pR@<EAX>, int pG@<EDX>, int pB@<EBX>)
-// FUNCTION: CARM95 0x4c29ee
+// FUNCTION: CARM95 0x004c29ee
 br_pixelmap* LoadGeneratedShadeTable(int pR, int pG, int pB) {
     char the_path[256];
     LOG_TRACE("(%d, %d, %d)", pR, pG, pB);
@@ -979,7 +979,7 @@ br_pixelmap* LoadGeneratedShadeTable(int pR, int pG, int pB) {
 }
 
 // IDA: void __usercall SaveGeneratedShadeTable(br_pixelmap *pThe_table@<EAX>, int pR@<EDX>, int pG@<EBX>, int pB@<ECX>)
-// FUNCTION: CARM95 0x4c2b03
+// FUNCTION: CARM95 0x004c2b03
 void SaveGeneratedShadeTable(br_pixelmap* pThe_table, int pR, int pG, int pB) {
     char the_path[256];
     LOG_TRACE("(%p, %d, %d, %d)", pThe_table, pR, pG, pB);
@@ -989,7 +989,7 @@ void SaveGeneratedShadeTable(br_pixelmap* pThe_table, int pR, int pG, int pB) {
 }
 
 // IDA: br_pixelmap* __usercall GenerateShadeTable@<EAX>(int pHeight@<EAX>, br_pixelmap *pPalette@<EDX>, int pRed_mix@<EBX>, int pGreen_mix@<ECX>, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter)
-// FUNCTION: CARM95 0x4c2b42
+// FUNCTION: CARM95 0x004c2b42
 br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap* pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter) {
     LOG_TRACE("(%d, %p, %d, %d, %d, %f, %f, %f)", pHeight, pPalette, pRed_mix, pGreen_mix, pBlue_mix, pQuarter, pHalf, pThree_quarter);
 
@@ -1007,7 +1007,7 @@ br_pixelmap* GenerateShadeTable(int pHeight, br_pixelmap* pPalette, int pRed_mix
 }
 
 // IDA: br_pixelmap* __usercall GenerateDarkenedShadeTable@<EAX>(int pHeight@<EAX>, br_pixelmap *pPalette@<EDX>, int pRed_mix@<EBX>, int pGreen_mix@<ECX>, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter, br_scalar pDarken)
-// FUNCTION: CARM95 0x4c2b84
+// FUNCTION: CARM95 0x004c2b84
 br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int pRed_mix, int pGreen_mix, int pBlue_mix, float pQuarter, float pHalf, float pThree_quarter, br_scalar pDarken) {
     br_pixelmap* the_table;
     tRGB_colour the_RGB;
@@ -1076,7 +1076,7 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
 }
 
 // IDA: void __cdecl PossibleService()
-// FUNCTION: CARM95 0x4c2fdb
+// FUNCTION: CARM95 0x004c2fdb
 void PossibleService(void) {
     tU32 time;
     static tU32 last_service = 0;
@@ -1090,7 +1090,7 @@ void PossibleService(void) {
 }
 
 // IDA: void __usercall DRMatrix34TApplyP(br_vector3 *pA@<EAX>, br_vector3 *pB@<EDX>, br_matrix34 *pC@<EBX>)
-// FUNCTION: CARM95 0x4c302d
+// FUNCTION: CARM95 0x004c302d
 void DRMatrix34TApplyP(br_vector3* pA, br_vector3* pB, br_matrix34* pC) {
     br_scalar t1;
     br_scalar t2;
@@ -1381,7 +1381,7 @@ void Copy8BitRectangleTo16BitRhombusWithTransparency(br_pixelmap* pDst, tS16 pDs
 }
 
 // IDA: void __usercall DRPixelmapRectangleCopy(br_pixelmap *dst@<EAX>, br_int_16 dx@<EDX>, br_int_16 dy@<EBX>, br_pixelmap *src@<ECX>, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h)
-// FUNCTION: CARM95 0x4c30d1
+// FUNCTION: CARM95 0x004c30d1
 void DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
     LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", dst, dx, dy, src, sx, sy, w, h);
 
@@ -1397,7 +1397,7 @@ void DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pi
 }
 
 // IDA: void __usercall DRPixelmapCopy(br_pixelmap *dst@<EAX>, br_pixelmap *src@<EDX>)
-// FUNCTION: CARM95 0x4ca180
+// FUNCTION: CARM95 0x004ca180
 void DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
     LOG_TRACE("(%p, %p)", dst, src);
 
@@ -1413,7 +1413,7 @@ void DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
 }
 
 // IDA: void __usercall DRPixelmapRectangleFill(br_pixelmap *dst@<EAX>, br_int_16 x@<EDX>, br_int_16 y@<EBX>, br_uint_16 w@<ECX>, br_uint_16 h, br_uint_32 colour)
-// FUNCTION: CARM95 0x4c3112
+// FUNCTION: CARM95 0x004c3112
 void DRPixelmapRectangleFill(br_pixelmap* dst, br_int_16 x, br_int_16 y, br_uint_16 w, br_uint_16 h, br_uint_32 colour) {
     LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x, y, w, h, colour);
 
@@ -1421,7 +1421,7 @@ void DRPixelmapRectangleFill(br_pixelmap* dst, br_int_16 x, br_int_16 y, br_uint
 }
 
 // IDA: int __usercall NormalSideOfPlane@<EAX>(br_vector3 *pPoint@<EAX>, br_vector3 *pNormal@<EDX>, br_scalar pD)
-// FUNCTION: CARM95 0x4c3149
+// FUNCTION: CARM95 0x004c3149
 int NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD) {
     br_scalar numer;
     br_scalar denom;
@@ -1431,7 +1431,7 @@ int NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD) {
 }
 
 // IDA: br_material* __usercall DRMaterialClone@<EAX>(br_material *pMaterial@<EAX>)
-// FUNCTION: CARM95 0x4c31d1
+// FUNCTION: CARM95 0x004c31d1
 br_material* DRMaterialClone(br_material* pMaterial) {
     br_material* the_material;
     char s[256];
@@ -1460,7 +1460,7 @@ br_material* DRMaterialClone(br_material* pMaterial) {
 }
 
 // IDA: void __usercall StripCR(char *s@<EAX>)
-// FUNCTION: CARM95 0x4c331e
+// FUNCTION: CARM95 0x004c331e
 void StripCR(char* s) {
     char* pos;
 
@@ -1475,7 +1475,7 @@ void StripCR(char* s) {
 }
 
 // IDA: void __cdecl SubsStringJob(char *pStr, ...)
-// FUNCTION: CARM95 0x4c336e
+// FUNCTION: CARM95 0x004c336e
 void SubsStringJob(char* pStr, ...) {
     char* sub_str;
     char temp_str[256];
@@ -1499,7 +1499,7 @@ void SubsStringJob(char* pStr, ...) {
 }
 
 // IDA: void __usercall DecodeLine2(char *pS@<EAX>)
-// FUNCTION: CARM95 0x4c3468
+// FUNCTION: CARM95 0x004c3468
 void DecodeLine2(char* pS) {
     int len;
     int seed;
@@ -1559,7 +1559,7 @@ void DecodeLine2(char* pS) {
 }
 
 // IDA: void __usercall EncodeLine2(char *pS@<EAX>)
-// FUNCTION: CARM95 0x4c368f
+// FUNCTION: CARM95 0x004c368f
 void EncodeLine2(char* pS) {
     int len;
     int seed;
@@ -1608,7 +1608,7 @@ void EncodeLine2(char* pS) {
 }
 
 // IDA: void __usercall EncodeFile(char *pThe_path@<EAX>)
-// FUNCTION: CARM95 0x4c37f5
+// FUNCTION: CARM95 0x004c37f5
 void EncodeFile(char* pThe_path) {
     FILE* f;
     FILE* d;
@@ -1699,7 +1699,7 @@ void EncodeFile(char* pThe_path) {
 }
 
 // IDA: void __usercall EncodeFileWrapper(char *pThe_path@<EAX>)
-// FUNCTION: CARM95 0x4c3b44
+// FUNCTION: CARM95 0x004c3b44
 void EncodeFileWrapper(char* pThe_path) {
     int len;
     LOG_TRACE("(\"%s\")", pThe_path);
@@ -1751,7 +1751,7 @@ void EncodeFileWrapper(char* pThe_path) {
 }
 
 // IDA: void __usercall EncodeAllFilesInDirectory(char *pThe_path@<EAX>)
-// FUNCTION: CARM95 0x4c3cf5
+// FUNCTION: CARM95 0x004c3cf5
 void EncodeAllFilesInDirectory(char* pThe_path) {
     char s[256];
     LOG_TRACE("(\"%s\")", pThe_path);
@@ -1761,7 +1761,7 @@ void EncodeAllFilesInDirectory(char* pThe_path) {
 }
 
 // IDA: void __usercall SkipNLines(FILE *pF@<EAX>)
-// FUNCTION: CARM95 0x4c3d32
+// FUNCTION: CARM95 0x004c3d32
 void SkipNLines(FILE* pF) {
     int i;
     int count;
@@ -1775,7 +1775,7 @@ void SkipNLines(FILE* pF) {
 }
 
 // IDA: int __usercall DRStricmp@<EAX>(char *p1@<EAX>, char *p2@<EDX>)
-// FUNCTION: CARM95 0x4c3d94
+// FUNCTION: CARM95 0x004c3d94
 int DRStricmp(char* p1, char* p2) {
     int val;
     while (p1) {
@@ -1895,7 +1895,7 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
 }
 
 // IDA: int __usercall PDCheckDriveExists@<EAX>(char *pThe_path@<EAX>)
-// FUNCTION: CARM95 0x4c3e0c
+// FUNCTION: CARM95 0x004c3e0c
 int PDCheckDriveExists(char* pThe_path) {
     LOG_TRACE9("(\"%s\")", pThe_path);
 
@@ -1903,7 +1903,7 @@ int PDCheckDriveExists(char* pThe_path) {
 }
 
 // IDA: int __usercall OpacityInPrims@<EAX>(br_token_value *pPrims@<EAX>)
-// FUNCTION: CARM95 0x4c3e79
+// FUNCTION: CARM95 0x004c3e79
 int OpacityInPrims(br_token_value* pPrims) {
     LOG_TRACE("(%p)", pPrims);
 
@@ -1913,7 +1913,7 @@ int OpacityInPrims(br_token_value* pPrims) {
 }
 
 // IDA: int __usercall AlreadyBlended@<EAX>(br_material *pMaterial@<EAX>)
-// FUNCTION: CARM95 0x4c3e2c
+// FUNCTION: CARM95 0x004c3e2c
 int AlreadyBlended(br_material* pMaterial) {
     LOG_TRACE("(%p)", pMaterial);
 
@@ -1927,7 +1927,7 @@ int AlreadyBlended(br_material* pMaterial) {
 }
 
 // IDA: void __usercall BlendifyMaterialTablishly(br_material *pMaterial@<EAX>, int pPercent@<EDX>)
-// FUNCTION: CARM95 0x4c3f0d
+// FUNCTION: CARM95 0x004c3f0d
 void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
     char* s = NULL;
     LOG_TRACE("(%p, %d)", pMaterial, pPercent);
@@ -1953,7 +1953,7 @@ void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
 }
 
 // IDA: void __usercall BlendifyMaterialPrimitively(br_material *pMaterial@<EAX>, int pPercent@<EDX>)
-// FUNCTION: CARM95 0x4c3fb5
+// FUNCTION: CARM95 0x004c3fb5
 void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
 
     static br_token_value alpha25[3] = {
@@ -1989,7 +1989,7 @@ void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
 }
 
 // IDA: void __usercall BlendifyMaterial(br_material *pMaterial@<EAX>, int pPercent@<EDX>)
-// FUNCTION: CARM95 0x4c3eca
+// FUNCTION: CARM95 0x004c3eca
 void BlendifyMaterial(br_material* pMaterial, int pPercent) {
     LOG_TRACE("(%p, %d)", pMaterial, pPercent);
 

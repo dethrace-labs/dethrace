@@ -25,25 +25,25 @@
 #include "world.h"
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x521370
+// GLOBAL: CARM95 0x00521370
 float gWobble_spam_y[8] = { 0.0f, -0.15f, 0.4f, 0.15f, -0.4f, 0.25f, 0.0f, -0.25f };
 
-// GLOBAL: CARM95 0x521390
+// GLOBAL: CARM95 0x00521390
 float gWobble_spam_z[8] = { 0.4f, -0.25f, 0.0f, 0.25f, 0.0f, 0.15f, -0.4f, -0.15f };
 
-// GLOBAL: CARM95 0x5213b0
+// GLOBAL: CARM95 0x005213b0
 br_scalar gWheel_circ_to_width = 0.16f;
 
-// GLOBAL: CARM95 0x5213b8
+// GLOBAL: CARM95 0x005213b8
 tU8 gSmoke_damage_step[12] = { 20u, 20u, 0u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u, 10u };
 
-// GLOBAL: CARM95 0x5213c4
+// GLOBAL: CARM95 0x005213c4
 int gSteal_ranks[5] = { 89, 72, 55, 38, 21 };
 
 #define BIGAPC_OPPONENT_INDEX 4
 
 // IDA: int __usercall ReadCrushData@<EAX>(FILE *pF@<EAX>, tCrush_data *pCrush_data@<EDX>)
-// FUNCTION: CARM95 0x4bca50
+// FUNCTION: CARM95 0x004bca50
 int ReadCrushData(FILE* pF, tCrush_data* pCrush_data) {
     char s[256];
     char* str;
@@ -81,7 +81,7 @@ int ReadCrushData(FILE* pF, tCrush_data* pCrush_data) {
 }
 
 // IDA: float __usercall SkipCrushData@<ST0>(FILE *pF@<EAX>)
-// FUNCTION: CARM95 0x4bcd40
+// FUNCTION: CARM95 0x004bcd40
 float SkipCrushData(FILE* pF) {
     int i;
     int j;
@@ -109,7 +109,7 @@ float SkipCrushData(FILE* pF) {
 }
 
 // IDA: int __usercall WriteCrushData@<EAX>(FILE *pF@<EAX>, tCrush_data *pCrush_data@<EDX>)
-// FUNCTION: CARM95 0x4bce73
+// FUNCTION: CARM95 0x004bce73
 int WriteCrushData(FILE* pF, tCrush_data* pCrush_data) {
     int i;
     int j;
@@ -141,7 +141,7 @@ int WriteCrushData(FILE* pF, tCrush_data* pCrush_data) {
 }
 
 // IDA: void __usercall DisposeCrushData(tCrush_data *pCrush_data@<EAX>)
-// FUNCTION: CARM95 0x4bd0f7
+// FUNCTION: CARM95 0x004bd0f7
 void DisposeCrushData(tCrush_data* pCrush_data) {
     int i;
     LOG_TRACE("(%p)", pCrush_data);
@@ -157,7 +157,7 @@ void DisposeCrushData(tCrush_data* pCrush_data) {
 }
 
 // IDA: void __usercall CrushModelPoint(tCar_spec *pCar@<EAX>, int pModel_index@<EDX>, br_model *pModel@<EBX>, int pCrush_point_index@<ECX>, br_vector3 *pEnergy_vector, br_scalar total_energy, tCrush_data *pCrush_data)
-// FUNCTION: CARM95 0x4bd17b
+// FUNCTION: CARM95 0x004bd17b
 void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pCrush_point_index, br_vector3* pEnergy_vector, br_scalar total_energy, tCrush_data* pCrush_data) {
     int i;
     int j;
@@ -276,7 +276,7 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
 }
 
 // IDA: void __usercall CrushModel(tCar_spec *pCar@<EAX>, int pModel_index@<EDX>, br_actor *pActor@<EBX>, br_vector3 *pImpact_point@<ECX>, br_vector3 *pEnergy_vector, tCrush_data *pCrush_data)
-// FUNCTION: CARM95 0x4bd8da
+// FUNCTION: CARM95 0x004bd8da
 void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3* pImpact_point, br_vector3* pEnergy_vector, tCrush_data* pCrush_data) {
     br_scalar this_distance;
     br_scalar total_energy;
@@ -322,7 +322,7 @@ void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3*
 }
 
 // IDA: void __cdecl JitModelUpdate(br_actor *actor, br_model *model, br_material *material, void *render_data, br_uint_8 style, int on_screen)
-// FUNCTION: CARM95 0x4bdad9
+// FUNCTION: CARM95 0x004bdad9
 void JitModelUpdate(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
     LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
 
@@ -332,7 +332,7 @@ void JitModelUpdate(br_actor* actor, br_model* model, br_material* material, voi
 }
 
 // IDA: void __usercall SetModelForUpdate(br_model *pModel@<EAX>, tCar_spec *pCar@<EDX>, int crush_only@<EBX>)
-// FUNCTION: CARM95 0x4bdb2f
+// FUNCTION: CARM95 0x004bdb2f
 void SetModelForUpdate(br_model* pModel, tCar_spec* pCar, int crush_only) {
     LOG_TRACE("(%p, %p, %d)", pModel, pCar, crush_only);
 
@@ -348,7 +348,7 @@ void SetModelForUpdate(br_model* pModel, tCar_spec* pCar, int crush_only) {
 }
 
 // IDA: void __usercall TotallySpamTheModel(tCar_spec *pCar@<EAX>, int pModel_index@<EDX>, br_actor *pActor@<EBX>, tCrush_data *pCrush_data@<ECX>, br_scalar pMagnitude)
-// FUNCTION: CARM95 0x4bdbc1
+// FUNCTION: CARM95 0x004bdbc1
 void TotallySpamTheModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, tCrush_data* pCrush_data, br_scalar pMagnitude) {
     br_scalar total_energy;
     br_vector3 energy_vector_model;
@@ -373,7 +373,7 @@ void TotallySpamTheModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, tC
 }
 
 // IDA: br_scalar __usercall RepairModel@<ST0>(tCar_spec *pCar@<EAX>, int pModel_index@<EDX>, br_actor *pActor@<EBX>, br_vertex *pUndamaged_vertices@<ECX>, br_scalar pAmount, br_scalar *pTotal_deflection)
-// FUNCTION: CARM95 0x4bde6c
+// FUNCTION: CARM95 0x004bde6c
 br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vertex* pUndamaged_vertices, br_scalar pAmount, br_scalar* pTotal_deflection) {
     int i;
     int j;
@@ -425,7 +425,7 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
 }
 
 // IDA: float __usercall RepairCar2@<ST0>(tCar_spec *pCar@<EAX>, tU32 pFrame_period@<EDX>, br_scalar *pTotal_deflection@<EBX>)
-// FUNCTION: CARM95 0x4bdd3b
+// FUNCTION: CARM95 0x004bdd3b
 float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflection) {
     int i;
     tCar_actor* the_car_actor;
@@ -454,7 +454,7 @@ float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflecti
 }
 
 // IDA: float __usercall RepairCar@<ST0>(tU16 pCar_ID@<EAX>, tU32 pFrame_period@<EDX>, br_scalar *pTotal_deflection@<EBX>)
-// FUNCTION: CARM95 0x4be159
+// FUNCTION: CARM95 0x004be159
 float RepairCar(tU16 pCar_ID, tU32 pFrame_period, br_scalar* pTotal_deflection) {
     LOG_TRACE("(%d, %d, %p)", pCar_ID, pFrame_period, pTotal_deflection);
 
@@ -466,7 +466,7 @@ float RepairCar(tU16 pCar_ID, tU32 pFrame_period, br_scalar* pTotal_deflection) 
 }
 
 // IDA: void __usercall TotallyRepairACar(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4be1ca
+// FUNCTION: CARM95 0x004be1ca
 void TotallyRepairACar(tCar_spec* pCar) {
     int i;
     int j;
@@ -519,7 +519,7 @@ void TotallyRepairACar(tCar_spec* pCar) {
 }
 
 // IDA: void __cdecl TotallyRepairCar()
-// FUNCTION: CARM95 0x4be52a
+// FUNCTION: CARM95 0x004be52a
 void TotallyRepairCar(void) {
     LOG_TRACE("()");
 
@@ -529,7 +529,7 @@ void TotallyRepairCar(void) {
 }
 
 // IDA: void __cdecl CheckLastCar()
-// FUNCTION: CARM95 0x4be5b5
+// FUNCTION: CARM95 0x004be5b5
 void CheckLastCar(void) {
     LOG_TRACE("()");
 
@@ -540,7 +540,7 @@ void CheckLastCar(void) {
 }
 
 // IDA: void __usercall KnackerThisCar(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4be555
+// FUNCTION: CARM95 0x004be555
 void KnackerThisCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
@@ -555,7 +555,7 @@ void KnackerThisCar(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall SetKnackeredFlag(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4be619
+// FUNCTION: CARM95 0x004be619
 void SetKnackeredFlag(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
@@ -582,7 +582,7 @@ void SetKnackeredFlag(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall DamageUnit2(tCar_spec *pCar@<EAX>, int pUnit_type@<EDX>, int pDamage_amount@<EBX>)
-// FUNCTION: CARM95 0x4be737
+// FUNCTION: CARM95 0x004be737
 void DamageUnit2(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
     tDamage_unit* the_damage;
     int last_level;
@@ -609,7 +609,7 @@ void DamageUnit2(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
 }
 
 // IDA: void __usercall RecordLastDamage(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4be86b
+// FUNCTION: CARM95 0x004be86b
 void RecordLastDamage(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
@@ -628,7 +628,7 @@ void RecordLastDamage(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall DoDamage(tCar_spec *pCar@<EAX>, tDamage_type pDamage_type@<EDX>, float pMagnitude, float pNastiness)
-// FUNCTION: CARM95 0x4bf3b9
+// FUNCTION: CARM95 0x004bf3b9
 void DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, float pNastiness) {
     LOG_TRACE("(%p, %d, %f, %f)", pCar, pDamage_type, pMagnitude, pNastiness);
 
@@ -642,7 +642,7 @@ void DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, floa
 }
 
 // IDA: void __usercall CheckPiledriverBonus(tCar_spec *pCar@<EAX>, br_vector3 *pImpact_point@<EDX>, br_vector3 *pEnergy@<EBX>)
-// FUNCTION: CARM95 0x4bf4b2
+// FUNCTION: CARM95 0x004bf4b2
 void CheckPiledriverBonus(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEnergy) {
     br_actor* child;
     br_vector3 norm_impact;
@@ -673,7 +673,7 @@ void CheckPiledriverBonus(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3
 }
 
 // IDA: tImpact_location __usercall CalcModifiedLocation@<EAX>(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4c13e0
+// FUNCTION: CARM95 0x004c13e0
 tImpact_location CalcModifiedLocation(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
@@ -691,7 +691,7 @@ tImpact_location CalcModifiedLocation(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall DoPratcamHit(br_vector3 *pHit_vector@<EAX>)
-// FUNCTION: CARM95 0x4be97b
+// FUNCTION: CARM95 0x004be97b
 void DoPratcamHit(br_vector3* pHit_vector) {
     int strength_modifier;
     br_scalar strength;
@@ -723,7 +723,7 @@ void DoPratcamHit(br_vector3* pHit_vector) {
 }
 
 // IDA: void __usercall DamageSystems(tCar_spec *pCar@<EAX>, br_vector3 *pImpact_point@<EDX>, br_vector3 *pEnergy_vector@<EBX>, int pWas_hitting_a_car@<ECX>)
-// FUNCTION: CARM95 0x4beaa3
+// FUNCTION: CARM95 0x004beaa3
 void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEnergy_vector, int pWas_hitting_a_car) {
     int i;
     int j;
@@ -909,7 +909,7 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
 }
 
 // IDA: tImpact_location __usercall GetDirection@<EAX>(br_vector3 *pVelocity@<EAX>)
-// FUNCTION: CARM95 0x4c1486
+// FUNCTION: CARM95 0x004c1486
 tImpact_location GetDirection(br_vector3* pVelocity) {
     br_scalar mag_x;
     br_scalar mag_y;
@@ -937,7 +937,7 @@ tImpact_location GetDirection(br_vector3* pVelocity) {
 }
 
 // IDA: void __usercall SetSmokeLastDamageLevel(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4bf768
+// FUNCTION: CARM95 0x004bf768
 void SetSmokeLastDamageLevel(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
@@ -948,7 +948,7 @@ void SetSmokeLastDamageLevel(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall SortOutSmoke(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4bf7c2
+// FUNCTION: CARM95 0x004bf7c2
 void SortOutSmoke(tCar_spec* pCar) {
     int i;
     int colour;
@@ -979,7 +979,7 @@ void SortOutSmoke(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall StealCar(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x4bf923
+// FUNCTION: CARM95 0x004bf923
 void StealCar(tCar_spec* pCar) {
     LOG_TRACE("(%p)", pCar);
 
@@ -990,7 +990,7 @@ void StealCar(tCar_spec* pCar) {
 }
 
 // IDA: int __usercall DoCrashEarnings@<EAX>(tCar_spec *pCar1@<EAX>, tCar_spec *pCar2@<EDX>)
-// FUNCTION: CARM95 0x4bfdb3
+// FUNCTION: CARM95 0x004bfdb3
 int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     tCar_spec* culprit;
     tCar_spec* victim;
@@ -1309,7 +1309,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
 }
 
 // IDA: void __usercall DoWheelDamage(tU32 pFrame_period@<EAX>)
-// FUNCTION: CARM95 0x4bf96c
+// FUNCTION: CARM95 0x004bf96c
 void DoWheelDamage(tU32 pFrame_period) {
     int i;
     int j;
@@ -1394,7 +1394,7 @@ void DoWheelDamage(tU32 pFrame_period) {
 }
 
 // IDA: void __usercall CrashEarnings(tCar_spec *pCar1@<EAX>, tCar_spec *pCar2@<EDX>)
-// FUNCTION: CARM95 0x4bfd78
+// FUNCTION: CARM95 0x004bfd78
 void CrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     LOG_TRACE("(%p, %p)", pCar1, pCar2);
 

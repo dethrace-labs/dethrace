@@ -30,145 +30,145 @@
 #include <float.h>
 #include <string.h>
 
-// GLOBAL: CARM95 0x50c710
+// GLOBAL: CARM95 0x0050c710
 int gFunkotronics_array_size;
 
-// GLOBAL: CARM95 0x50c714
+// GLOBAL: CARM95 0x0050c714
 int gGroovidelics_array_size;
 
-// GLOBAL: CARM95 0x50c718
+// GLOBAL: CARM95 0x0050c718
 int gSpec_vol_mode;
 
-// GLOBAL: CARM95 0x50c71c
+// GLOBAL: CARM95 0x0050c71c
 tFunkotronic_spec* gFunkotronics_array;
 
-// GLOBAL: CARM95 0x50c720
+// GLOBAL: CARM95 0x0050c720
 tGroovidelic_spec* gGroovidelics_array;
 
-// GLOBAL: CARM95 0x50c728
+// GLOBAL: CARM95 0x0050c728
 char* gFunk_type_names[] = { "spin", "rock", "throb", "slither", "roll" };
 
-// GLOBAL: CARM95 0x50c740
+// GLOBAL: CARM95 0x0050c740
 char* gFunk_anim_names[] = { "frames", "flic" };
 
-// GLOBAL: CARM95 0x50c748
+// GLOBAL: CARM95 0x0050c748
 char* gTime_mode_names[] = { "approximate", "accurate" };
 
-// GLOBAL: CARM95 0x50c750
+// GLOBAL: CARM95 0x0050c750
 char* gFunk_move_names[] = { "linear", "harmonic", "flash", "controlled", "absolute", "continuous" };
 
-// GLOBAL: CARM95 0x50c768
+// GLOBAL: CARM95 0x0050c768
 char* gFunk_nature_names[] = { "constant", "distance", "lastlap", "otherlaps" };
 
-// GLOBAL: CARM95 0x50c778
+// GLOBAL: CARM95 0x0050c778
 char* gGroove_nature_names[] = { "constant", "distance" };
 
-// GLOBAL: CARM95 0x50c780
+// GLOBAL: CARM95 0x0050c780
 char* gAxis_names[] = { "x", "y", "z" };
 
-// GLOBAL: CARM95 0x50c790
+// GLOBAL: CARM95 0x0050c790
 char* gLollipop_names[] = { "xlollipop", "ylollipop", "zlollipop" };
 
-// GLOBAL: CARM95 0x50c7a0
+// GLOBAL: CARM95 0x0050c7a0
 char* gGroove_path_names[] = { "straight", "circular" };
 
-// GLOBAL: CARM95 0x50c7a8
+// GLOBAL: CARM95 0x0050c7a8
 char* gGroove_object_names[] = { "spin", "rock", "throb", "shear" };
 
-// GLOBAL: CARM95 0x50c7b8
+// GLOBAL: CARM95 0x0050c7b8
 char* gDepth_effect_names[] = { "dark", "fog" };
 
-// GLOBAL: CARM95 0x50c7c0
+// GLOBAL: CARM95 0x0050c7c0
 br_actor* gGroove_by_proxy_actor;
 
-// GLOBAL: CARM95 0x50c7c4
+// GLOBAL: CARM95 0x0050c7c4
 tRotate_mode gCurrent_rotate_mode = eRotate_mode_y;
 
-// GLOBAL: CARM95 0x50c7c8
+// GLOBAL: CARM95 0x0050c7c8
 tScale_mode gCurrent_scale_mode = eScale_mode_all;
 
-// GLOBAL: CARM95 0x50c7cc
+// GLOBAL: CARM95 0x0050c7cc
 int gNumber_of_additional_models;
 
-// GLOBAL: CARM95 0x50c7d0
+// GLOBAL: CARM95 0x0050c7d0
 tRoad_texturing_level gRoad_texturing_level = eRTL_full;
 
-// GLOBAL: CARM95 0x50c7d4
+// GLOBAL: CARM95 0x0050c7d4
 tWall_texturing_level gWall_texturing_level = eWTL_full;
 
-// GLOBAL: CARM95 0x50c7d8
+// GLOBAL: CARM95 0x0050c7d8
 tCar_texturing_level gCar_texturing_level = eCTL_full;
 
-// GLOBAL: CARM95 0x50c7dc
+// GLOBAL: CARM95 0x0050c7dc
 int gRendering_accessories;
 
-// GLOBAL: CARM95 0x50c7e0
+// GLOBAL: CARM95 0x0050c7e0
 int gNumber_of_actors;
 
-// GLOBAL: CARM95 0x50c7e4
+// GLOBAL: CARM95 0x0050c7e4
 int gNumber_of_lights;
 
-// GLOBAL: CARM95 0x5514e0
+// GLOBAL: CARM95 0x005514e0
 br_actor* gActor_array[500];
 
-// GLOBAL: CARM95 0x532af0
+// GLOBAL: CARM95 0x00532af0
 float* gGroove_funk_bindings[960];
 
-// GLOBAL: CARM95 0x532220
+// GLOBAL: CARM95 0x00532220
 br_actor* gDelete_list[500];
 
-// GLOBAL: CARM95 0x551cb0
+// GLOBAL: CARM95 0x00551cb0
 br_actor* gLight_array[50];
 
-// GLOBAL: CARM95 0x533b18
+// GLOBAL: CARM95 0x00533b18
 br_model* gAdditional_models[1000];
 
-// GLOBAL: CARM95 0x534ac0
+// GLOBAL: CARM95 0x00534ac0
 br_actor* gSpec_vol_actors[100];
 
-// GLOBAL: CARM95 0x533a00
+// GLOBAL: CARM95 0x00533a00
 tPath_name gAdditional_actor_path;
 
-// GLOBAL: CARM95 0x5329f0
+// GLOBAL: CARM95 0x005329f0
 tPath_name gAdditional_model_path;
 
-// GLOBAL: CARM95 0x533b00
+// GLOBAL: CARM95 0x00533b00
 tU32 gPrevious_groove_times[2];
 
-// GLOBAL: CARM95 0x551d78
+// GLOBAL: CARM95 0x00551d78
 int gRace_file_version;
 
-// GLOBAL: CARM95 0x5339f0
+// GLOBAL: CARM95 0x005339f0
 br_vector3 gActor_centre;
 
-// GLOBAL: CARM95 0x532218
+// GLOBAL: CARM95 0x00532218
 float gTemp;
 
-// GLOBAL: CARM95 0x533b0c
+// GLOBAL: CARM95 0x00533b0c
 br_actor* gLast_actor;
 
-// GLOBAL: CARM95 0x533b08
+// GLOBAL: CARM95 0x00533b08
 br_actor* gKnown_actor;
 
-// GLOBAL: CARM95 0x534ab8
+// GLOBAL: CARM95 0x00534ab8
 br_actor* gAdditional_actors;
 
-// GLOBAL: CARM95 0x533b10
+// GLOBAL: CARM95 0x00533b10
 int gDelete_count;
 
-// GLOBAL: CARM95 0x5339fc
+// GLOBAL: CARM95 0x005339fc
 br_scalar gNearest_distance;
 
-// GLOBAL: CARM95 0x534c50
+// GLOBAL: CARM95 0x00534c50
 br_actor* gNearest_actor;
 
 br_actor* gStandard_lamp;
 
-// GLOBAL: CARM95 0x534abc
+// GLOBAL: CARM95 0x00534abc
 br_scalar gSight_distance_squared;
 
 // IDA: float __cdecl MapSawToTriangle(float pNumber)
-// FUNCTION: CARM95 0x43f377
+// FUNCTION: CARM95 0x0043f377
 float MapSawToTriangle(float pNumber) {
     LOG_TRACE("(%f)", pNumber);
 
@@ -180,7 +180,7 @@ float MapSawToTriangle(float pNumber) {
 }
 
 // IDA: void __cdecl SetSightDistance(br_scalar pYon)
-// FUNCTION: CARM95 0x434b10
+// FUNCTION: CARM95 0x00434b10
 void SetSightDistance(br_scalar pYon) {
     gSight_distance_squared = pYon * 1.02f * (pYon * 1.02f);
 }
@@ -236,7 +236,7 @@ br_actor* CloneActor(br_actor* pSource_actor) {
 }
 
 // IDA: void __usercall InitialiseStorageSpace(tBrender_storage *pStorage_space@<EAX>, int pMax_pixelmaps@<EDX>, int pMax_shade_tables@<EBX>, int pMax_materials@<ECX>, int pMax_models)
-// FUNCTION: CARM95 0x434d37
+// FUNCTION: CARM95 0x00434d37
 void InitialiseStorageSpace(tBrender_storage* pStorage_space, int pMax_pixelmaps, int pMax_shade_tables, int pMax_materials, int pMax_models) {
     LOG_TRACE("(%p, %d, %d, %d, %d)", pStorage_space, pMax_pixelmaps, pMax_shade_tables, pMax_materials, pMax_models);
 
@@ -256,7 +256,7 @@ void InitialiseStorageSpace(tBrender_storage* pStorage_space, int pMax_pixelmaps
 }
 
 // IDA: void __usercall DisposeStorageSpace(tBrender_storage *pStorage_space@<EAX>)
-// FUNCTION: CARM95 0x434e0a
+// FUNCTION: CARM95 0x00434e0a
 void DisposeStorageSpace(tBrender_storage* pStorage_space) {
     BrMemFree(pStorage_space->pixelmaps);
     BrMemFree(pStorage_space->shade_tables);
@@ -266,7 +266,7 @@ void DisposeStorageSpace(tBrender_storage* pStorage_space) {
 }
 
 // IDA: void __usercall ClearOutStorageSpace(tBrender_storage *pStorage_space@<EAX>)
-// FUNCTION: CARM95 0x434e60
+// FUNCTION: CARM95 0x00434e60
 void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     int i;
     LOG_TRACE("(%p)", pStorage_space);
@@ -303,7 +303,7 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
 
 // IDA: tAdd_to_storage_result __usercall AddPixelmapToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_pixelmap **pThe_pm@<EDX>)
 // This seems like the signature should be `br_pixelmap* pThe_pm`
-// FUNCTION: CARM95 0x435014
+// FUNCTION: CARM95 0x00435014
 tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm) {
     int i;
     LOG_TRACE("(%p, %p)", pStorage_space, pThe_pm);
@@ -325,7 +325,7 @@ tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br
 }
 
 // IDA: tAdd_to_storage_result __usercall AddShadeTableToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_pixelmap *pThe_st@<EDX>)
-// FUNCTION: CARM95 0x435107
+// FUNCTION: CARM95 0x00435107
 tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_st) {
     int i;
     LOG_TRACE("(%p, %p)", pStorage_space, pThe_st);
@@ -346,7 +346,7 @@ tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, 
 }
 
 // IDA: tAdd_to_storage_result __usercall AddMaterialToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_material *pThe_mat@<EDX>)
-// FUNCTION: CARM95 0x4351fa
+// FUNCTION: CARM95 0x004351fa
 tAdd_to_storage_result AddMaterialToStorage(tBrender_storage* pStorage_space, br_material* pThe_mat) {
     int i;
     LOG_TRACE("(%p, %p)", pStorage_space, pThe_mat);
@@ -367,7 +367,7 @@ tAdd_to_storage_result AddMaterialToStorage(tBrender_storage* pStorage_space, br
 }
 
 // IDA: tAdd_to_storage_result __usercall AddModelToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_model *pThe_mod@<EDX>)
-// FUNCTION: CARM95 0x435300
+// FUNCTION: CARM95 0x00435300
 tAdd_to_storage_result AddModelToStorage(tBrender_storage* pStorage_space, br_model* pThe_mod) {
     int i;
     LOG_TRACE("(%p, %p)", pStorage_space, pThe_mod);
@@ -389,7 +389,7 @@ tAdd_to_storage_result AddModelToStorage(tBrender_storage* pStorage_space, br_mo
 }
 
 // IDA: int __usercall LoadNPixelmaps@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
-// FUNCTION: CARM95 0x435402
+// FUNCTION: CARM95 0x00435402
 int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
@@ -440,7 +440,7 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
 }
 
 // IDA: br_pixelmap* __usercall LoadSinglePixelmap@<EAX>(tBrender_storage *pStorage_space@<EAX>, char *pName@<EDX>)
-// FUNCTION: CARM95 0x435666
+// FUNCTION: CARM95 0x00435666
 br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
     br_pixelmap* temp;
     LOG_TRACE("(%p, \"%s\")", pStorage_space, pName);
@@ -468,7 +468,7 @@ br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
 }
 
 // IDA: br_material* __usercall LoadSingleMaterial@<EAX>(tBrender_storage *pStorage_space@<EAX>, char *pName@<EDX>)
-// FUNCTION: CARM95 0x435731
+// FUNCTION: CARM95 0x00435731
 br_material* LoadSingleMaterial(tBrender_storage* pStorage_space, char* pName) {
     br_material* temp;
     LOG_TRACE("(%p, \"%s\")", pStorage_space, pName);
@@ -496,7 +496,7 @@ br_material* LoadSingleMaterial(tBrender_storage* pStorage_space, char* pName) {
 }
 
 // IDA: int __usercall LoadNShadeTables@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
-// FUNCTION: CARM95 0x4357fc
+// FUNCTION: CARM95 0x004357fc
 int LoadNShadeTables(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
@@ -541,7 +541,7 @@ int LoadNShadeTables(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
 }
 
 // IDA: br_pixelmap* __usercall LoadSingleShadeTable@<EAX>(tBrender_storage *pStorage_space@<EAX>, char *pName@<EDX>)
-// FUNCTION: CARM95 0x4359c7
+// FUNCTION: CARM95 0x004359c7
 br_pixelmap* LoadSingleShadeTable(tBrender_storage* pStorage_space, char* pName) {
     br_pixelmap* temp;
     LOG_TRACE("(%p, \"%s\")", pStorage_space, pName);
@@ -569,7 +569,7 @@ br_pixelmap* LoadSingleShadeTable(tBrender_storage* pStorage_space, char* pName)
 }
 
 // IDA: int __usercall LoadNMaterials@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
-// FUNCTION: CARM95 0x435a92
+// FUNCTION: CARM95 0x00435a92
 int LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
@@ -615,7 +615,7 @@ int LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
 }
 
 // IDA: int __usercall LoadNModels@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
-// FUNCTION: CARM95 0x435c60
+// FUNCTION: CARM95 0x00435c60
 int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
@@ -667,7 +667,7 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
 }
 
 // IDA: void __usercall DodgyModelUpdate(br_model *pM@<EAX>)
-// FUNCTION: CARM95 0x435e72
+// FUNCTION: CARM95 0x00435e72
 void DodgyModelUpdate(br_model* pM) {
     LOG_TRACE("(%p)", pM);
 
@@ -680,7 +680,7 @@ void DodgyModelUpdate(br_model* pM) {
 }
 
 // IDA: br_material* __usercall SuffixedMaterial@<EAX>(br_material *pOld@<EAX>, char *pSuffix@<EDX>)
-// FUNCTION: CARM95 0x435f61
+// FUNCTION: CARM95 0x00435f61
 br_material* SuffixedMaterial(br_material* pOld, char* pSuffix) {
     br_material* new_mat;
     char* new_id;
@@ -701,7 +701,7 @@ br_material* SuffixedMaterial(br_material* pOld, char* pSuffix) {
 }
 
 // IDA: int __usercall FaceIsRoad@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
-// FUNCTION: CARM95 0x436027
+// FUNCTION: CARM95 0x00436027
 int FaceIsRoad(br_model* pModel, tU16 pFace) {
     br_vector3 v0;
     br_vector3 v1;
@@ -715,7 +715,7 @@ int FaceIsRoad(br_model* pModel, tU16 pFace) {
 }
 
 // IDA: br_material* __usercall RoadPerspToUntex@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
-// FUNCTION: CARM95 0x4365aa
+// FUNCTION: CARM95 0x004365aa
 br_material* RoadPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
@@ -734,7 +734,7 @@ br_material* RoadPerspToUntex(br_model* pModel, tU16 pFace) {
 }
 
 // IDA: br_material* __usercall WallPerspToLinear@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
-// FUNCTION: CARM95 0x435ec1
+// FUNCTION: CARM95 0x00435ec1
 br_material* WallPerspToLinear(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
@@ -753,7 +753,7 @@ br_material* WallPerspToLinear(br_model* pModel, tU16 pFace) {
 }
 
 // IDA: br_material* __usercall WallPerspToUntex@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
-// FUNCTION: CARM95 0x436269
+// FUNCTION: CARM95 0x00436269
 br_material* WallPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
@@ -805,7 +805,7 @@ void ProcessModelFaceMaterials2(br_model* pModel, tPMFM2CB pCallback) {
 }
 
 // IDA: void __usercall ProcessModelFaceMaterials(br_model *pModel@<EAX>, tPMFMCB pCallback@<EDX>)
-// FUNCTION: CARM95 0x436640
+// FUNCTION: CARM95 0x00436640
 void ProcessModelFaceMaterials(br_model* pModel, tPMFMCB pCallback) {
     tU16 f;
     br_material* possible_mat;
@@ -828,7 +828,7 @@ void ProcessModelFaceMaterials(br_model* pModel, tPMFMCB pCallback) {
 }
 
 // IDA: int __usercall LoadNTrackModels@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
-// FUNCTION: CARM95 0x436325
+// FUNCTION: CARM95 0x00436325
 int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     tPath_name the_path;
     int i;
@@ -890,7 +890,7 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
 }
 
 // IDA: void __usercall LoadSomePixelmaps(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>)
-// FUNCTION: CARM95 0x4366f3
+// FUNCTION: CARM95 0x004366f3
 void LoadSomePixelmaps(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
@@ -909,7 +909,7 @@ void LoadSomePixelmaps(tBrender_storage* pStorage_space, FILE* pF) {
 }
 
 // IDA: void __usercall LoadSomeShadeTables(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>)
-// FUNCTION: CARM95 0x43675d
+// FUNCTION: CARM95 0x0043675d
 void LoadSomeShadeTables(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
@@ -928,7 +928,7 @@ void LoadSomeShadeTables(tBrender_storage* pStorage_space, FILE* pF) {
 }
 
 // IDA: void __usercall LoadSomeMaterials(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>)
-// FUNCTION: CARM95 0x4367c7
+// FUNCTION: CARM95 0x004367c7
 void LoadSomeMaterials(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
@@ -947,7 +947,7 @@ void LoadSomeMaterials(tBrender_storage* pStorage_space, FILE* pF) {
 }
 
 // IDA: void __usercall LoadSomeModels(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>)
-// FUNCTION: CARM95 0x436831
+// FUNCTION: CARM95 0x00436831
 void LoadSomeModels(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
@@ -966,7 +966,7 @@ void LoadSomeModels(tBrender_storage* pStorage_space, FILE* pF) {
 }
 
 // IDA: void __usercall LoadSomeTrackModels(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>)
-// FUNCTION: CARM95 0x43689f
+// FUNCTION: CARM95 0x0043689f
 void LoadSomeTrackModels(tBrender_storage* pStorage_space, FILE* pF) {
     tPath_name the_path;
     int i;
@@ -985,7 +985,7 @@ void LoadSomeTrackModels(tBrender_storage* pStorage_space, FILE* pF) {
 }
 
 // IDA: void __usercall AddFunkGrooveBinding(int pSlot_number@<EAX>, float *pPeriod_address@<EDX>)
-// FUNCTION: CARM95 0x43690d
+// FUNCTION: CARM95 0x0043690d
 void AddFunkGrooveBinding(int pSlot_number, float* pPeriod_address) {
     LOG_TRACE("(%d, %p)", pSlot_number, pPeriod_address);
 
@@ -998,7 +998,7 @@ void AddFunkGrooveBinding(int pSlot_number, float* pPeriod_address) {
 }
 
 // IDA: void __usercall ControlBoundFunkGroove(int pSlot_number@<EAX>, float pValue)
-// FUNCTION: CARM95 0x43694f
+// FUNCTION: CARM95 0x0043694f
 void ControlBoundFunkGroove(int pSlot_number, float pValue) {
     LOG_TRACE("(%d, %f)", pSlot_number, pValue);
 
@@ -1012,7 +1012,7 @@ void ControlBoundFunkGroove(int pSlot_number, float pValue) {
 }
 
 // IDA: float __usercall ControlBoundFunkGroovePlus@<ST0>(int pSlot_number@<EAX>, float pValue)
-// FUNCTION: CARM95 0x43698f
+// FUNCTION: CARM95 0x0043698f
 float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
     LOG_TRACE("(%d, %f)", pSlot_number, pValue);
 
@@ -1027,7 +1027,7 @@ float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
 }
 
 // IDA: void __usercall ShiftBoundGrooveFunks(char *pStart@<EAX>, char *pEnd@<EDX>, int pDelta@<EBX>)
-// FUNCTION: CARM95 0x437dca
+// FUNCTION: CARM95 0x00437dca
 void ShiftBoundGrooveFunks(char* pStart, char* pEnd, ptrdiff_t pDelta) {
     int i;
     LOG_TRACE("(\"%s\", \"%s\", %d)", pStart, pEnd, pDelta);
@@ -1040,7 +1040,7 @@ void ShiftBoundGrooveFunks(char* pStart, char* pEnd, ptrdiff_t pDelta) {
 }
 
 // IDA: tFunkotronic_spec* __cdecl AddNewFunkotronic()
-// FUNCTION: CARM95 0x437c4c
+// FUNCTION: CARM95 0x00437c4c
 tFunkotronic_spec* AddNewFunkotronic(void) {
     void* new_array;
     int i;
@@ -1070,7 +1070,7 @@ tFunkotronic_spec* AddNewFunkotronic(void) {
 }
 
 // IDA: void __usercall DisposeFunkotronics(int pOwner@<EAX>)
-// FUNCTION: CARM95 0x4369fd
+// FUNCTION: CARM95 0x004369fd
 void DisposeFunkotronics(int pOwner) {
     int i;
     tFunkotronic_spec* the_funk;
@@ -1100,7 +1100,7 @@ void DisposeFunkotronics(int pOwner) {
 }
 
 // IDA: void __usercall AddProximityVertex(br_vector3 *pV@<EAX>, tFunkotronic_spec *pThe_funk@<EDX>)
-// FUNCTION: CARM95 0x43806e
+// FUNCTION: CARM95 0x0043806e
 void AddProximityVertex(br_vector3* pV, tFunkotronic_spec* pThe_funk) {
     LOG_TRACE("(%p, %p)", pV, pThe_funk);
 
@@ -1109,7 +1109,7 @@ void AddProximityVertex(br_vector3* pV, tFunkotronic_spec* pThe_funk) {
 }
 
 // IDA: void __cdecl AddProximityVertexXYZ(br_scalar pX, br_scalar pY, br_scalar pZ, tFunkotronic_spec *pThe_funk)
-// FUNCTION: CARM95 0x4380ad
+// FUNCTION: CARM95 0x004380ad
 void AddProximityVertexXYZ(br_scalar pX, br_scalar pY, br_scalar pZ, tFunkotronic_spec* pThe_funk) {
     br_vector3 v;
     LOG_TRACE("(%f, %f, %f, %p)", pX, pY, pZ, pThe_funk);
@@ -1121,7 +1121,7 @@ void AddProximityVertexXYZ(br_scalar pX, br_scalar pY, br_scalar pZ, tFunkotroni
 }
 
 // IDA: br_uint_32 __usercall CalcProximities@<EAX>(br_actor *pActor@<EAX>, br_material *pMat@<EDX>, tFunkotronic_spec *pThe_funk@<EBX>)
-// FUNCTION: CARM95 0x436af6
+// FUNCTION: CARM95 0x00436af6
 br_uint_32 CalcProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec* pThe_funk) {
     br_face* the_face;
     int i;
@@ -1143,7 +1143,7 @@ br_uint_32 CalcProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spe
 }
 
 // IDA: br_uint_32 __usercall AddProximities@<EAX>(br_actor *pActor@<EAX>, br_material *pMat@<EDX>, tFunkotronic_spec *pThe_funk@<EBX>)
-// FUNCTION: CARM95 0x437e2f
+// FUNCTION: CARM95 0x00437e2f
 br_uint_32 AddProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec* pThe_funk) {
     br_face* the_face;
     int i;
@@ -1226,7 +1226,7 @@ void Adjust2FloatsForExceptions(float* pVictim1, float* pVictim2, br_pixelmap* p
 }
 
 // IDA: void __usercall AddFunkotronics(FILE *pF@<EAX>, int pOwner@<EDX>, int pRef_offset@<EBX>)
-// FUNCTION: CARM95 0x436b8b
+// FUNCTION: CARM95 0x00436b8b
 void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
     char s[256];
     char* str;
@@ -1509,7 +1509,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
 }
 
 // IDA: void __usercall DisposeGroovidelics(int pOwner@<EAX>)
-// FUNCTION: CARM95 0x4380dd
+// FUNCTION: CARM95 0x004380dd
 void DisposeGroovidelics(int pOwner) {
     int i;
     tGroovidelic_spec* the_groove;
@@ -1528,7 +1528,7 @@ void DisposeGroovidelics(int pOwner) {
 }
 
 // IDA: tGroovidelic_spec* __cdecl AddNewGroovidelic()
-// FUNCTION: CARM95 0x438eb1
+// FUNCTION: CARM95 0x00438eb1
 tGroovidelic_spec* AddNewGroovidelic(void) {
     void* new_array;
     int i;
@@ -1558,7 +1558,7 @@ tGroovidelic_spec* AddNewGroovidelic(void) {
 }
 
 // IDA: void __usercall AddGroovidelics(FILE *pF@<EAX>, int pOwner@<EDX>, br_actor *pParent_actor@<EBX>, int pRef_offset@<ECX>, int pAllowed_to_be_absent)
-// FUNCTION: CARM95 0x438146
+// FUNCTION: CARM95 0x00438146
 void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_offset, int pAllowed_to_be_absent) {
     char s[256];
     char* str;
@@ -1770,7 +1770,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
 }
 
 // IDA: void __usercall KillGroovadelic(int pOwner@<EAX>)
-// FUNCTION: CARM95 0x439009
+// FUNCTION: CARM95 0x00439009
 void KillGroovadelic(int pOwner) {
     int i;
     tGroovidelic_spec* the_groove;
@@ -1801,7 +1801,7 @@ void KillGroovadelic(int pOwner) {
 }
 
 // IDA: void __usercall KillFunkotronic(int pOwner@<EAX>)
-// FUNCTION: CARM95 0x4390a0
+// FUNCTION: CARM95 0x004390a0
 void KillFunkotronic(int pOwner) {
     int i;
     tFunkotronic_spec* the_funk;
@@ -1835,7 +1835,7 @@ void KillFunkotronic(int pOwner) {
 }
 
 // IDA: br_uint_32 __usercall DeleteBastards@<EAX>(br_actor *pActor@<EAX>, br_matrix34 *pMatrix@<EDX>, void *pArg@<EBX>)
-// FUNCTION: CARM95 0x43c666
+// FUNCTION: CARM95 0x0043c666
 br_uint_32 DeleteBastards(br_actor* pActor, br_matrix34* pMatrix, void* pArg) {
     int i;
     int parent_already_doomed;
@@ -1858,7 +1858,7 @@ br_uint_32 DeleteBastards(br_actor* pActor, br_matrix34* pMatrix, void* pArg) {
 }
 
 // IDA: void __cdecl DeleteAnyZeroBastards()
-// FUNCTION: CARM95 0x43c604
+// FUNCTION: CARM95 0x0043c604
 void DeleteAnyZeroBastards(void) {
     int i;
     LOG_TRACE("()");
@@ -1871,7 +1871,7 @@ void DeleteAnyZeroBastards(void) {
 }
 
 // IDA: br_uint_32 __usercall ApplyTransToModels@<EAX>(br_actor *pActor@<EAX>, br_matrix34 *pMatrix@<EDX>, void *pArg@<EBX>)
-// FUNCTION: CARM95 0x43c775
+// FUNCTION: CARM95 0x0043c775
 br_uint_32 ApplyTransToModels(br_actor* pActor, br_matrix34* pMatrix, void* pArg) {
     int i;
     br_vector3 temp_point;
@@ -1893,7 +1893,7 @@ br_uint_32 ApplyTransToModels(br_actor* pActor, br_matrix34* pMatrix, void* pArg
 }
 
 // IDA: int __usercall FindSpecVolIndex@<EAX>(br_actor *pActor@<EAX>)
-// FUNCTION: CARM95 0x439152
+// FUNCTION: CARM95 0x00439152
 int FindSpecVolIndex(br_actor* pActor) {
     int i;
     tSpecial_volume* v;
@@ -1908,7 +1908,7 @@ int FindSpecVolIndex(br_actor* pActor) {
 }
 
 // IDA: void __usercall MungeMaterial(br_matrix34 *pMat@<EAX>, br_material *pMat_1@<EDX>, br_material *pMat_2@<EBX>, int pAxis_0@<ECX>, int pAxis_1)
-// FUNCTION: CARM95 0x4392c4
+// FUNCTION: CARM95 0x004392c4
 void MungeMaterial(br_matrix34* pMat, br_material* pMat_1, br_material* pMat_2, int pAxis_0, int pAxis_1) {
     LOG_TRACE("(%p, %p, %p, %d, %d)", pMat, pMat_1, pMat_2, pAxis_0, pAxis_1);
 
@@ -1918,7 +1918,7 @@ void MungeMaterial(br_matrix34* pMat, br_material* pMat_1, br_material* pMat_2, 
 }
 
 // IDA: void __usercall SetSpecVolMatSize(br_actor *pActor@<EAX>)
-// FUNCTION: CARM95 0x439226
+// FUNCTION: CARM95 0x00439226
 void SetSpecVolMatSize(br_actor* pActor) {
     br_model* model;
     LOG_TRACE("(%p)", pActor);
@@ -1930,7 +1930,7 @@ void SetSpecVolMatSize(br_actor* pActor) {
 }
 
 // IDA: void __usercall FindInverseAndWorldBox(tSpecial_volume *pSpec@<EAX>)
-// FUNCTION: CARM95 0x4393a7
+// FUNCTION: CARM95 0x004393a7
 void FindInverseAndWorldBox(tSpecial_volume* pSpec) {
     br_bounds bnds;
     LOG_TRACE("(%p)", pSpec);
@@ -1946,7 +1946,7 @@ void FindInverseAndWorldBox(tSpecial_volume* pSpec) {
 }
 
 // IDA: void __cdecl UpdateSpecVol()
-// FUNCTION: CARM95 0x4391b7
+// FUNCTION: CARM95 0x004391b7
 void UpdateSpecVol(void) {
     int index;
     tSpecial_volume* v;
@@ -1962,7 +1962,7 @@ void UpdateSpecVol(void) {
 }
 
 // IDA: void __cdecl SaveSpecialVolumes()
-// FUNCTION: CARM95 0x43c853
+// FUNCTION: CARM95 0x0043c853
 void SaveSpecialVolumes(void) {
     tPath_name the_path;
     FILE* f;
@@ -2005,7 +2005,7 @@ void SaveSpecialVolumes(void) {
 }
 
 // IDA: void __cdecl SaveAdditionalStuff()
-// FUNCTION: CARM95 0x43c589
+// FUNCTION: CARM95 0x0043c589
 void SaveAdditionalStuff(void) {
     LOG_TRACE("()");
 
@@ -2067,7 +2067,7 @@ void ChangeSubdivToPersp(void) {
 }
 
 // IDA: br_uint_32 __cdecl ProcessFaceMaterials(br_actor *pActor, tPMFMCB pCallback)
-// FUNCTION: CARM95 0x439ddd
+// FUNCTION: CARM95 0x00439ddd
 br_uintptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
     LOG_TRACE("(%p, %d)", pActor, pCallback);
 
@@ -2082,7 +2082,7 @@ br_uintptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
 }
 
 // IDA: int __usercall DRPixelmapHasZeros@<EAX>(br_pixelmap *pm@<EAX>)
-// FUNCTION: CARM95 0x439597
+// FUNCTION: CARM95 0x00439597
 int DRPixelmapHasZeros(br_pixelmap* pm) {
     int x;
     int y;
@@ -2109,7 +2109,7 @@ int DRPixelmapHasZeros(br_pixelmap* pm) {
 }
 
 // IDA: int __usercall StorageContainsPixelmap@<EAX>(tBrender_storage *pStorage@<EAX>, br_pixelmap *pMap@<EDX>)
-// FUNCTION: CARM95 0x439668
+// FUNCTION: CARM95 0x00439668
 int StorageContainsPixelmap(tBrender_storage* pStorage, br_pixelmap* pMap) {
     int i;
 
@@ -2122,7 +2122,7 @@ int StorageContainsPixelmap(tBrender_storage* pStorage, br_pixelmap* pMap) {
 }
 
 // IDA: void __usercall HideStoredOpaqueTextures(tBrender_storage *pStorage@<EAX>)
-// FUNCTION: CARM95 0x4394b4
+// FUNCTION: CARM95 0x004394b4
 void HideStoredOpaqueTextures(tBrender_storage* pStorage) {
     int i;
 
@@ -2139,7 +2139,7 @@ void HideStoredOpaqueTextures(tBrender_storage* pStorage) {
 }
 
 // IDA: void __usercall RevealStoredTransparentTextures(tBrender_storage *pStorage@<EAX>)
-// FUNCTION: CARM95 0x4396ce
+// FUNCTION: CARM95 0x004396ce
 void RevealStoredTransparentTextures(tBrender_storage* pStorage) {
     int i;
 
@@ -2156,7 +2156,7 @@ void RevealStoredTransparentTextures(tBrender_storage* pStorage) {
 }
 
 // IDA: void __usercall HideStoredTextures(tBrender_storage *pStorage@<EAX>)
-// FUNCTION: CARM95 0x439784
+// FUNCTION: CARM95 0x00439784
 void HideStoredTextures(tBrender_storage* pStorage) {
     int i;
 
@@ -2173,7 +2173,7 @@ void HideStoredTextures(tBrender_storage* pStorage) {
 }
 
 // IDA: void __usercall RevealStoredTextures(tBrender_storage *pStorage@<EAX>)
-// FUNCTION: CARM95 0x439847
+// FUNCTION: CARM95 0x00439847
 void RevealStoredTextures(tBrender_storage* pStorage) {
     int i;
 
@@ -2188,7 +2188,7 @@ void RevealStoredTextures(tBrender_storage* pStorage) {
 }
 
 // IDA: void __usercall SetCarStorageTexturingLevel(tBrender_storage *pStorage@<EAX>, tCar_texturing_level pNew@<EDX>, tCar_texturing_level pOld@<EBX>)
-// FUNCTION: CARM95 0x43940b
+// FUNCTION: CARM95 0x0043940b
 void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_level pNew, tCar_texturing_level pOld) {
     LOG_TRACE("(%p, %d, %d)", pStorage, pNew, pOld);
 
@@ -2217,7 +2217,7 @@ void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_leve
 }
 
 // IDA: tCar_texturing_level __cdecl GetCarTexturingLevel()
-// FUNCTION: CARM95 0x4398e0
+// FUNCTION: CARM95 0x004398e0
 tCar_texturing_level GetCarTexturingLevel(void) {
     LOG_TRACE("()");
 
@@ -2225,7 +2225,7 @@ tCar_texturing_level GetCarTexturingLevel(void) {
 }
 
 // IDA: void __usercall SetCarTexturingLevel(tCar_texturing_level pLevel@<EAX>)
-// FUNCTION: CARM95 0x4398f5
+// FUNCTION: CARM95 0x004398f5
 void SetCarTexturingLevel(tCar_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
 
@@ -2244,7 +2244,7 @@ void SetCarTexturingLevel(tCar_texturing_level pLevel) {
 }
 
 // IDA: int __usercall HasThisSuffix@<EAX>(char *pIdent@<EAX>, char *pSuffix@<EDX>)
-// FUNCTION: CARM95 0x439a77
+// FUNCTION: CARM95 0x00439a77
 int HasThisSuffix(char* pIdent, char* pSuffix) {
     size_t len_ident;
     size_t len_suffix;
@@ -2262,7 +2262,7 @@ int HasThisSuffix(char* pIdent, char* pSuffix) {
 }
 
 // IDA: br_material* __usercall UnsuffixedMaterial@<EAX>(char *pOld_ident@<EAX>, char *pSuffix@<EDX>)
-// FUNCTION: CARM95 0x439bf4
+// FUNCTION: CARM95 0x00439bf4
 br_material* UnsuffixedMaterial(char* pOld_ident, char* pSuffix) {
     br_material* result;
     int unsuffixed_len;
@@ -2278,7 +2278,7 @@ br_material* UnsuffixedMaterial(char* pOld_ident, char* pSuffix) {
 }
 
 // IDA: br_material* __usercall RoadUntexToPersp@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
-// FUNCTION: CARM95 0x439e59
+// FUNCTION: CARM95 0x00439e59
 br_material* RoadUntexToPersp(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
@@ -2294,7 +2294,7 @@ br_material* RoadUntexToPersp(br_model* pModel, tU16 pFace) {
 }
 
 // IDA: br_material* __usercall WallLinearToUntex@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
-// FUNCTION: CARM95 0x439983
+// FUNCTION: CARM95 0x00439983
 br_material* WallLinearToUntex(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
@@ -2321,7 +2321,7 @@ br_material* WallLinearToUntex(br_model* pModel, tU16 pFace) {
 }
 
 // IDA: br_material* __usercall WallUntexToLinear@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
-// FUNCTION: CARM95 0x439b2e
+// FUNCTION: CARM95 0x00439b2e
 br_material* WallUntexToLinear(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
@@ -2342,7 +2342,7 @@ br_material* WallUntexToLinear(br_model* pModel, tU16 pFace) {
 }
 
 // IDA: br_material* __usercall WallUntexToPersp@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
-// FUNCTION: CARM95 0x439c7a
+// FUNCTION: CARM95 0x00439c7a
 br_material* WallUntexToPersp(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
@@ -2360,7 +2360,7 @@ br_material* WallUntexToPersp(br_model* pModel, tU16 pFace) {
 }
 
 // IDA: br_material* __usercall WallLinearToPersp@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
-// FUNCTION: CARM95 0x439d11
+// FUNCTION: CARM95 0x00439d11
 br_material* WallLinearToPersp(br_model* pModel, tU16 pFace) {
     br_material* old_mat;
     br_material* new_mat;
@@ -2376,20 +2376,20 @@ br_material* WallLinearToPersp(br_model* pModel, tU16 pFace) {
 }
 
 // IDA: tRoad_texturing_level __cdecl GetRoadTexturingLevel()
-// FUNCTION: CARM95 0x439d73
+// FUNCTION: CARM95 0x00439d73
 tRoad_texturing_level GetRoadTexturingLevel(void) {
     return gRoad_texturing_level;
 }
 
 // IDA: void __usercall SetRoadTexturingLevel(tRoad_texturing_level pLevel@<EAX>)
-// FUNCTION: CARM95 0x439d88
+// FUNCTION: CARM95 0x00439d88
 void SetRoadTexturingLevel(tRoad_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
     gRoad_texturing_level = pLevel;
 }
 
 // IDA: void __usercall ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel@<EAX>)
-// FUNCTION: CARM95 0x439d9b
+// FUNCTION: CARM95 0x00439d9b
 void ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
 
@@ -2399,7 +2399,7 @@ void ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel) {
 }
 
 // IDA: tWall_texturing_level __cdecl GetWallTexturingLevel()
-// FUNCTION: CARM95 0x439ec1
+// FUNCTION: CARM95 0x00439ec1
 tWall_texturing_level GetWallTexturingLevel(void) {
     LOG_TRACE("()");
 
@@ -2407,7 +2407,7 @@ tWall_texturing_level GetWallTexturingLevel(void) {
 }
 
 // IDA: void __usercall SetWallTexturingLevel(tWall_texturing_level pLevel@<EAX>)
-// FUNCTION: CARM95 0x439ed6
+// FUNCTION: CARM95 0x00439ed6
 void SetWallTexturingLevel(tWall_texturing_level pLevel) {
     LOG_TRACE("(%d)", pLevel);
 
@@ -2415,7 +2415,7 @@ void SetWallTexturingLevel(tWall_texturing_level pLevel) {
 }
 
 // IDA: void __usercall ReallySetWallTexturingLevel(tWall_texturing_level pLevel@<EAX>)
-// FUNCTION: CARM95 0x439ee9
+// FUNCTION: CARM95 0x00439ee9
 void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
     static tPMFMCB* tweaker[3][3] = {
         {
@@ -2442,7 +2442,7 @@ void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
 }
 
 // IDA: br_material* __usercall DisposeSuffixedMaterials@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
-// FUNCTION: CARM95 0x43cdec
+// FUNCTION: CARM95 0x0043cdec
 br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
     size_t max_suffix_len;
     br_material* mat;
@@ -2475,7 +2475,7 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
 }
 
 // IDA: void __cdecl DisposeTexturingMaterials()
-// FUNCTION: CARM95 0x43cd4f
+// FUNCTION: CARM95 0x0043cd4f
 void DisposeTexturingMaterials(void) {
     LOG_TRACE("()");
 
@@ -2504,7 +2504,7 @@ void DisposeTexturingMaterials(void) {
 }
 
 // IDA: br_uint_32 __cdecl SetAccessoryRenderingCB(br_actor *pActor, void *pFlag)
-// FUNCTION: CARM95 0x439f27
+// FUNCTION: CARM95 0x00439f27
 br_uintptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
     if (pActor->identifier && *pActor->identifier == '&') {
         pActor->render_style = *(br_uint_8*)pFlag;
@@ -2513,7 +2513,7 @@ br_uintptr_t SetAccessoryRenderingCB(br_actor* pActor, void* pFlag) {
 }
 
 // IDA: void __usercall SetAccessoryRendering(int pOn@<EAX>)
-// FUNCTION: CARM95 0x439f63
+// FUNCTION: CARM95 0x00439f63
 void SetAccessoryRendering(int pOn) {
     int style;
 
@@ -2531,7 +2531,7 @@ void SetAccessoryRendering(int pOn) {
 }
 
 // IDA: int __cdecl GetAccessoryRendering()
-// FUNCTION: CARM95 0x439fba
+// FUNCTION: CARM95 0x00439fba
 int GetAccessoryRendering(void) {
     LOG_TRACE("()");
 
@@ -2539,7 +2539,7 @@ int GetAccessoryRendering(void) {
 }
 
 // IDA: void __usercall SetCarSimplificationLevel(int pLevel@<EAX>)
-// FUNCTION: CARM95 0x439fcf
+// FUNCTION: CARM95 0x00439fcf
 void SetCarSimplificationLevel(int pLevel) {
     LOG_TRACE("(%d)", pLevel);
 
@@ -2547,7 +2547,7 @@ void SetCarSimplificationLevel(int pLevel) {
 }
 
 // IDA: int __cdecl GetCarSimplificationLevel()
-// FUNCTION: CARM95 0x439fe2
+// FUNCTION: CARM95 0x00439fe2
 int GetCarSimplificationLevel(void) {
     LOG_TRACE("()");
 
@@ -2555,7 +2555,7 @@ int GetCarSimplificationLevel(void) {
 }
 
 // IDA: void __usercall ParseSpecialVolume(FILE *pF@<EAX>, tSpecial_volume *pSpec@<EDX>, char *pScreen_name_str@<EBX>)
-// FUNCTION: CARM95 0x439ff7
+// FUNCTION: CARM95 0x00439ff7
 void ParseSpecialVolume(FILE* pF, tSpecial_volume* pSpec, char* pScreen_name_str) {
     char s[256];
     pSpec->gravity_multiplier = GetAScalar(pF);
@@ -2675,7 +2675,7 @@ void FreeExceptions(void) {
 }
 
 // IDA: void __usercall LoadTrack(char *pFile_name@<EAX>, tTrack_spec *pTrack_spec@<EDX>, tRace_info *pRace_info@<EBX>)
-// FUNCTION: CARM95 0x43a136
+// FUNCTION: CARM95 0x0043a136
 void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_info) {
     char temp_name[14];
     FILE* f;
@@ -3234,7 +3234,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
 }
 
 // IDA: br_uint_32 __cdecl RemoveBounds(br_actor *pActor, void *pArg)
-// FUNCTION: CARM95 0x43cf3f
+// FUNCTION: CARM95 0x0043cf3f
 br_uintptr_t RemoveBounds(br_actor* pActor, void* pArg) {
     LOG_TRACE("(%p, %p)", pActor, pArg);
 
@@ -3246,7 +3246,7 @@ br_uintptr_t RemoveBounds(br_actor* pActor, void* pArg) {
 }
 
 // IDA: void __usercall RemoveBoundsStructures(br_actor *pActor@<EAX>)
-// FUNCTION: CARM95 0x43cf21
+// FUNCTION: CARM95 0x0043cf21
 void RemoveBoundsStructures(br_actor* pActor) {
     LOG_TRACE("(%p)", pActor);
 
@@ -3254,7 +3254,7 @@ void RemoveBoundsStructures(br_actor* pActor) {
 }
 
 // IDA: void __usercall FreeTrack(tTrack_spec *pTrack_spec@<EAX>)
-// FUNCTION: CARM95 0x43cb89
+// FUNCTION: CARM95 0x0043cb89
 void FreeTrack(tTrack_spec* pTrack_spec) {
     int i;
     tNon_car_spec* non_car;
@@ -3306,7 +3306,7 @@ void FreeTrack(tTrack_spec* pTrack_spec) {
 }
 
 // IDA: void __usercall ProcessTrack(br_actor *pWorld@<EAX>, tTrack_spec *pTrack_spec@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world_transform@<ECX>, int pRender_blends)
-// FUNCTION: CARM95 0x43cf8c
+// FUNCTION: CARM95 0x0043cf8c
 void ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world_transform, int pRender_blends) {
     LOG_TRACE("(%p, %p, %p, %p, %d)", pWorld, pTrack_spec, pCamera, pCamera_to_world_transform, pRender_blends);
 
@@ -3319,7 +3319,7 @@ void ProcessTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera,
 }
 
 // IDA: br_scalar __cdecl NormaliseDegreeAngle(br_scalar pAngle)
-// FUNCTION: CARM95 0x43cfd8
+// FUNCTION: CARM95 0x0043cfd8
 br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
     LOG_TRACE("(%f)", pAngle);
 
@@ -3374,7 +3374,7 @@ br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
     } while (0)
 
 // IDA: void __cdecl FunkThoseTronics()
-// FUNCTION: CARM95 0x43d010
+// FUNCTION: CARM95 0x0043d010
 void FunkThoseTronics(void) {
     int i;
     int j;
@@ -3546,7 +3546,7 @@ void FunkThoseTronics(void) {
 }
 
 // IDA: void __usercall LollipopizeActor(br_actor *pSubject_actor@<EAX>, br_matrix34 *ref_to_world@<EDX>, tLollipop_mode pWhich_axis@<EBX>)
-// FUNCTION: CARM95 0x43f3c3
+// FUNCTION: CARM95 0x0043f3c3
 void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLollipop_mode pWhich_axis) {
     br_vector3 ref_to_subject;
     br_vector3 fixed_axis;
@@ -3627,7 +3627,7 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
 }
 
 // IDA: void __usercall CalcActorGlobalPos(br_vector3 *pResult@<EAX>, br_actor *pActor@<EDX>)
-// FUNCTION: CARM95 0x43f6c2
+// FUNCTION: CARM95 0x0043f6c2
 void CalcActorGlobalPos(br_vector3* pResult, br_actor* pActor) {
     LOG_TRACE("(%p, %p)", pResult, pActor);
 
@@ -3643,7 +3643,7 @@ void CalcActorGlobalPos(br_vector3* pResult, br_actor* pActor) {
 }
 
 // IDA: int __usercall PointOutOfSight@<EAX>(br_vector3 *pPoint@<EAX>, br_scalar pMax_distance)
-// FUNCTION: CARM95 0x43f744
+// FUNCTION: CARM95 0x0043f744
 int PointOutOfSight(br_vector3* pPoint, br_scalar pMax_distance) {
     br_vector3 distance_vector;
     LOG_TRACE("(%p, %f)", pPoint, pMax_distance);
@@ -3671,7 +3671,7 @@ int PointOutOfSight(br_vector3* pPoint, br_scalar pMax_distance) {
 }
 
 // IDA: void __usercall PathGrooveBastard(tGroovidelic_spec *pGroove@<EAX>, tU32 pTime@<EDX>, br_matrix34 *pMat@<EBX>, int pInterrupt_it@<ECX>)
-// FUNCTION: CARM95 0x43fb08
+// FUNCTION: CARM95 0x0043fb08
 void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat, int pInterrupt_it) {
     br_scalar pos;
     LOG_TRACE("(%p, %d, %p, %d)", pGroove, pTime, pMat, pInterrupt_it);
@@ -3932,7 +3932,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
 }
 
 // IDA: void __usercall ObjectGrooveBastard(tGroovidelic_spec *pGroove@<EAX>, tU32 pTime@<EDX>, br_matrix34 *pMat@<EBX>, int pInterrupt_it@<ECX>)
-// FUNCTION: CARM95 0x440abe
+// FUNCTION: CARM95 0x00440abe
 void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat, int pInterrupt_it) {
     int rock_it;
     br_scalar x_size;
@@ -4383,7 +4383,7 @@ void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pM
 }
 
 // IDA: void __usercall GrooveThisDelic(tGroovidelic_spec *pGroove@<EAX>, tU32 pTime@<EDX>, int pInterrupt_it@<EBX>)
-// FUNCTION: CARM95 0x43f886
+// FUNCTION: CARM95 0x0043f886
 void GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it) {
     br_actor* the_actor;
     br_vector3 actor_pos;
@@ -4445,7 +4445,7 @@ void GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it) 
 }
 
 // IDA: void __cdecl GrooveThoseDelics()
-// FUNCTION: CARM95 0x4430dd
+// FUNCTION: CARM95 0x004430dd
 void GrooveThoseDelics(void) {
     int i;
     tGroovidelic_spec* the_groove;
@@ -4467,7 +4467,7 @@ void GrooveThoseDelics(void) {
 }
 
 // IDA: void __usercall StopGroovidelic(br_actor *pActor@<EAX>)
-// FUNCTION: CARM95 0x443186
+// FUNCTION: CARM95 0x00443186
 void StopGroovidelic(br_actor* pActor) {
     int i;
     tGroovidelic_spec* the_groove;
@@ -4485,7 +4485,7 @@ void StopGroovidelic(br_actor* pActor) {
 }
 
 // IDA: void __usercall SetGrooveInterrupt(int pGroove_index@<EAX>, br_matrix34 *pMatrix@<EDX>, int pPath_interrupt@<EBX>, int pObject_interrupt@<ECX>, float pPath_resumption, float pObject_resumption)
-// FUNCTION: CARM95 0x443208
+// FUNCTION: CARM95 0x00443208
 void SetGrooveInterrupt(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
     tGroovidelic_spec* the_groove;
     LOG_TRACE("(%d, %p, %d, %d, %f, %f)", pGroove_index, pMatrix, pPath_interrupt, pObject_interrupt, pPath_resumption, pObject_resumption);
@@ -4499,7 +4499,7 @@ void SetGrooveInterrupt(int pGroove_index, br_matrix34* pMatrix, int pPath_inter
 }
 
 // IDA: void __cdecl ResetGrooveFlags()
-// FUNCTION: CARM95 0x44325f
+// FUNCTION: CARM95 0x0044325f
 void ResetGrooveFlags(void) {
     int i;
     tGroovidelic_spec* the_groove;
@@ -4513,7 +4513,7 @@ void ResetGrooveFlags(void) {
 }
 
 // IDA: tSpecial_volume* __cdecl GetDefaultSpecialVolumeForWater()
-// FUNCTION: CARM95 0x4432a9
+// FUNCTION: CARM95 0x004432a9
 tSpecial_volume* GetDefaultSpecialVolumeForWater(void) {
     LOG_TRACE("()");
 
@@ -4521,7 +4521,7 @@ tSpecial_volume* GetDefaultSpecialVolumeForWater(void) {
 }
 
 // IDA: tSpecial_volume* __usercall FindSpecialVolume@<EAX>(br_vector3 *pP@<EAX>, tSpecial_volume *pLast_vol@<EDX>)
-// FUNCTION: CARM95 0x4432be
+// FUNCTION: CARM95 0x004432be
 tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
     int i;
     tSpecial_volume* v;
@@ -4540,7 +4540,7 @@ tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
 }
 
 // IDA: void __cdecl SaveAdditionalActors()
-// FUNCTION: CARM95 0x443448
+// FUNCTION: CARM95 0x00443448
 void SaveAdditionalActors(void) {
     LOG_TRACE("()");
 
@@ -4550,7 +4550,7 @@ void SaveAdditionalActors(void) {
 }
 
 // IDA: br_scalar __usercall DistanceFromFace@<ST0>(br_vector3 *pPos@<EAX>, tFace_ref *pFace@<EDX>)
-// FUNCTION: CARM95 0x443465
+// FUNCTION: CARM95 0x00443465
 br_scalar DistanceFromFace(br_vector3* pPos, tFace_ref* pFace) {
     br_vector3 normal;
     LOG_TRACE("(%p, %p)", pPos, pFace);
@@ -4559,7 +4559,7 @@ br_scalar DistanceFromFace(br_vector3* pPos, tFace_ref* pFace) {
 }
 
 // IDA: br_uint_32 __cdecl CalcHighestID(br_actor *pActor, int *pHighest)
-// FUNCTION: CARM95 0x443e52
+// FUNCTION: CARM95 0x00443e52
 br_uint_32 CalcHighestID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
@@ -4578,7 +4578,7 @@ br_uint_32 CalcHighestID(br_actor* pActor, int* pHighest) {
 }
 
 // IDA: br_uint_32 __cdecl SetID(br_actor *pActor, void *pArg)
-// FUNCTION: CARM95 0x4435e0
+// FUNCTION: CARM95 0x004435e0
 br_uint_32 SetID(br_actor* pActor, void* pArg) {
     char s[256];
     LOG_TRACE("(%p, %p)", pActor, pArg);
@@ -4597,7 +4597,7 @@ br_uint_32 SetID(br_actor* pActor, void* pArg) {
 }
 
 // IDA: void __usercall UniquificateActorsName(br_actor *pUniverse_actor@<EAX>, br_actor *pActor@<EDX>)
-// FUNCTION: CARM95 0x4434a5
+// FUNCTION: CARM95 0x004434a5
 void UniquificateActorsName(br_actor* pUniverse_actor, br_actor* pActor) {
     int highest;
     LOG_TRACE("(%p, %p)", pUniverse_actor, pActor);
@@ -4611,7 +4611,7 @@ void UniquificateActorsName(br_actor* pUniverse_actor, br_actor* pActor) {
 }
 
 // IDA: void __usercall AccessoryHeadup(br_actor *pActor@<EAX>, char *pPrefix@<EDX>)
-// FUNCTION: CARM95 0x443d5b
+// FUNCTION: CARM95 0x00443d5b
 void AccessoryHeadup(br_actor* pActor, char* pPrefix) {
     char s[256];
     int i;
@@ -4626,7 +4626,7 @@ void AccessoryHeadup(br_actor* pActor, char* pPrefix) {
 }
 
 // IDA: br_uint_32 __cdecl CalcHighestNonAmID(br_actor *pActor, int *pHighest)
-// FUNCTION: CARM95 0x443504
+// FUNCTION: CARM95 0x00443504
 br_uint_32 CalcHighestNonAmID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
@@ -4649,7 +4649,7 @@ br_uint_32 CalcHighestNonAmID(br_actor* pActor, int* pHighest) {
 }
 
 // IDA: br_uint_32 __cdecl SetIDAndDupModel(br_actor *pActor, void *pArg)
-// FUNCTION: CARM95 0x443ef5
+// FUNCTION: CARM95 0x00443ef5
 br_uint_32 SetIDAndDupModel(br_actor* pActor, void* pArg) {
     char s[256];
     char s2[256];
@@ -4685,7 +4685,7 @@ br_uint_32 SetIDAndDupModel(br_actor* pActor, void* pArg) {
 }
 
 // IDA: void __usercall DuplicateIfNotAmpersand(br_actor *pActor@<EAX>)
-// FUNCTION: CARM95 0x443df2
+// FUNCTION: CARM95 0x00443df2
 void DuplicateIfNotAmpersand(br_actor* pActor) {
     int highest;
     LOG_TRACE("(%p)", pActor);
@@ -4698,7 +4698,7 @@ void DuplicateIfNotAmpersand(br_actor* pActor) {
 }
 
 // IDA: void __usercall DropActor(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x4436c2
+// FUNCTION: CARM95 0x004436c2
 void DropActor(int pIndex) {
     FILE* f;
     tPath_name the_path;
@@ -4800,7 +4800,7 @@ void DropActor(int pIndex) {
 }
 
 // IDA: void __cdecl DropActor0()
-// FUNCTION: CARM95 0x444145
+// FUNCTION: CARM95 0x00444145
 void DropActor0(void) {
     LOG_TRACE("()");
 
@@ -4808,7 +4808,7 @@ void DropActor0(void) {
 }
 
 // IDA: void __cdecl DropActor1()
-// FUNCTION: CARM95 0x44415a
+// FUNCTION: CARM95 0x0044415a
 void DropActor1(void) {
     LOG_TRACE("()");
 
@@ -4816,7 +4816,7 @@ void DropActor1(void) {
 }
 
 // IDA: void __cdecl DropActor2()
-// FUNCTION: CARM95 0x44416f
+// FUNCTION: CARM95 0x0044416f
 void DropActor2(void) {
     LOG_TRACE("()");
 
@@ -4824,7 +4824,7 @@ void DropActor2(void) {
 }
 
 // IDA: void __cdecl DropActor3()
-// FUNCTION: CARM95 0x444184
+// FUNCTION: CARM95 0x00444184
 void DropActor3(void) {
     LOG_TRACE("()");
 
@@ -4832,7 +4832,7 @@ void DropActor3(void) {
 }
 
 // IDA: void __cdecl DropActor4()
-// FUNCTION: CARM95 0x444199
+// FUNCTION: CARM95 0x00444199
 void DropActor4(void) {
     LOG_TRACE("()");
 
@@ -4840,7 +4840,7 @@ void DropActor4(void) {
 }
 
 // IDA: void __cdecl DropActor5()
-// FUNCTION: CARM95 0x4441ae
+// FUNCTION: CARM95 0x004441ae
 void DropActor5(void) {
     LOG_TRACE("()");
 
@@ -4848,7 +4848,7 @@ void DropActor5(void) {
 }
 
 // IDA: void __cdecl DropActor6()
-// FUNCTION: CARM95 0x4441c3
+// FUNCTION: CARM95 0x004441c3
 void DropActor6(void) {
     LOG_TRACE("()");
 
@@ -4856,7 +4856,7 @@ void DropActor6(void) {
 }
 
 // IDA: void __cdecl DropActor7()
-// FUNCTION: CARM95 0x4441d8
+// FUNCTION: CARM95 0x004441d8
 void DropActor7(void) {
     LOG_TRACE("()");
 
@@ -4864,7 +4864,7 @@ void DropActor7(void) {
 }
 
 // IDA: void __cdecl DropActor8()
-// FUNCTION: CARM95 0x4441ed
+// FUNCTION: CARM95 0x004441ed
 void DropActor8(void) {
     LOG_TRACE("()");
 
@@ -4872,7 +4872,7 @@ void DropActor8(void) {
 }
 
 // IDA: void __cdecl DropActor9()
-// FUNCTION: CARM95 0x444202
+// FUNCTION: CARM95 0x00444202
 void DropActor9(void) {
     LOG_TRACE("()");
 
@@ -4880,7 +4880,7 @@ void DropActor9(void) {
 }
 
 // IDA: br_uint_32 __cdecl IdentifyAccCB(br_actor *pActor, void *pArg)
-// FUNCTION: CARM95 0x444275
+// FUNCTION: CARM95 0x00444275
 br_uint_32 IdentifyAccCB(br_actor* pActor, void* pArg) {
     br_scalar distance;
     char s[256];
@@ -4903,7 +4903,7 @@ br_uint_32 IdentifyAccCB(br_actor* pActor, void* pArg) {
 }
 
 // IDA: void __cdecl IdentifyAcc()
-// FUNCTION: CARM95 0x444217
+// FUNCTION: CARM95 0x00444217
 void IdentifyAcc(void) {
     LOG_TRACE("()");
 
@@ -4917,7 +4917,7 @@ void IdentifyAcc(void) {
 }
 
 // IDA: br_uint_32 __cdecl DelGrooveRef(br_actor *pActor, void *pArg)
-// FUNCTION: CARM95 0x44443b
+// FUNCTION: CARM95 0x0044443b
 br_uint_32 DelGrooveRef(br_actor* pActor, void* pArg) {
     tGroovidelic_spec* the_groove;
     int i;
@@ -4933,7 +4933,7 @@ br_uint_32 DelGrooveRef(br_actor* pActor, void* pArg) {
 }
 
 // IDA: br_uint_32 __cdecl DelReferencedModels(br_actor *pActor, void *pArg)
-// FUNCTION: CARM95 0x44449a
+// FUNCTION: CARM95 0x0044449a
 br_uint_32 DelReferencedModels(br_actor* pActor, void* pArg) {
     tGroovidelic_spec* the_groove;
     int i;
@@ -4951,7 +4951,7 @@ br_uint_32 DelReferencedModels(br_actor* pActor, void* pArg) {
 }
 
 // IDA: void __cdecl DeleteAcc()
-// FUNCTION: CARM95 0x4443bb
+// FUNCTION: CARM95 0x004443bb
 void DeleteAcc(void) {
     LOG_TRACE("()");
 
@@ -4968,7 +4968,7 @@ void DeleteAcc(void) {
 }
 
 // IDA: br_uint_32 __cdecl OffsetModel(br_actor *pActor, void *pArg)
-// FUNCTION: CARM95 0x444737
+// FUNCTION: CARM95 0x00444737
 br_uint_32 OffsetModel(br_actor* pActor, void* pArg) {
     int i;
     LOG_TRACE("(%p, %p)", pActor, pArg);
@@ -4983,7 +4983,7 @@ br_uint_32 OffsetModel(br_actor* pActor, void* pArg) {
 }
 
 // IDA: void __usercall OffsetActor(br_actor *pActor@<EAX>, br_vector3 *pOffset@<EDX>)
-// FUNCTION: CARM95 0x444717
+// FUNCTION: CARM95 0x00444717
 void OffsetActor(br_actor* pActor, br_vector3* pOffset) {
     LOG_TRACE("(%p, %p)", pActor, pOffset);
 
@@ -4991,7 +4991,7 @@ void OffsetActor(br_actor* pActor, br_vector3* pOffset) {
 }
 
 // IDA: void __usercall CentreActor(br_actor *pActor@<EAX>, br_vector3 *pOffset@<EDX>)
-// FUNCTION: CARM95 0x444803
+// FUNCTION: CARM95 0x00444803
 void CentreActor(br_actor* pActor, br_vector3* pOffset) {
     LOG_TRACE("(%p, %p)", pActor, pOffset);
 
@@ -5008,7 +5008,7 @@ void CentreActor(br_actor* pActor, br_vector3* pOffset) {
 }
 
 // IDA: void __cdecl SnapAccToVertical()
-// FUNCTION: CARM95 0x444538
+// FUNCTION: CARM95 0x00444538
 void SnapAccToVertical(void) {
     LOG_TRACE("()");
 
@@ -5022,7 +5022,7 @@ void SnapAccToVertical(void) {
 }
 
 // IDA: void __usercall RotateAccessory(br_angle pAngle@<EAX>)
-// FUNCTION: CARM95 0x4445d9
+// FUNCTION: CARM95 0x004445d9
 void RotateAccessory(br_angle pAngle) {
     br_vector3 mr_offset;
     LOG_TRACE("(%d)", pAngle);
@@ -5052,7 +5052,7 @@ void RotateAccessory(br_angle pAngle) {
 }
 
 // IDA: void __cdecl ScaleAccessory(float pScaling_factor)
-// FUNCTION: CARM95 0x444b74
+// FUNCTION: CARM95 0x00444b74
 void ScaleAccessory(float pScaling_factor) {
     br_vector3 mr_offset;
     LOG_TRACE("(%f)", pScaling_factor);
@@ -5085,7 +5085,7 @@ void ScaleAccessory(float pScaling_factor) {
 }
 
 // IDA: void __cdecl MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift)
-// FUNCTION: CARM95 0x444d87
+// FUNCTION: CARM95 0x00444d87
 void MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift) {
     br_vector3 v;
     LOG_TRACE("(%f, %f, %f)", pX_shift, pY_shift, pZ_shift);
@@ -5099,7 +5099,7 @@ void MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift) {
 }
 
 // IDA: void __cdecl RotateAccL()
-// FUNCTION: CARM95 0x4445c1
+// FUNCTION: CARM95 0x004445c1
 void RotateAccL(void) {
     LOG_TRACE("()");
 
@@ -5107,7 +5107,7 @@ void RotateAccL(void) {
 }
 
 // IDA: void __cdecl RotateAccL2()
-// FUNCTION: CARM95 0x44491e
+// FUNCTION: CARM95 0x0044491e
 void RotateAccL2(void) {
     LOG_TRACE("()");
 
@@ -5115,7 +5115,7 @@ void RotateAccL2(void) {
 }
 
 // IDA: void __cdecl RotateAccL3()
-// FUNCTION: CARM95 0x444936
+// FUNCTION: CARM95 0x00444936
 void RotateAccL3(void) {
     LOG_TRACE("()");
 
@@ -5123,7 +5123,7 @@ void RotateAccL3(void) {
 }
 
 // IDA: void __cdecl RotateAccL4()
-// FUNCTION: CARM95 0x44494e
+// FUNCTION: CARM95 0x0044494e
 void RotateAccL4(void) {
     LOG_TRACE("()");
 
@@ -5131,7 +5131,7 @@ void RotateAccL4(void) {
 }
 
 // IDA: void __cdecl RotateAccR()
-// FUNCTION: CARM95 0x444966
+// FUNCTION: CARM95 0x00444966
 void RotateAccR(void) {
     LOG_TRACE("()");
 
@@ -5139,7 +5139,7 @@ void RotateAccR(void) {
 }
 
 // IDA: void __cdecl RotateAccR2()
-// FUNCTION: CARM95 0x44497e
+// FUNCTION: CARM95 0x0044497e
 void RotateAccR2(void) {
     LOG_TRACE("()");
 
@@ -5147,7 +5147,7 @@ void RotateAccR2(void) {
 }
 
 // IDA: void __cdecl RotateAccR3()
-// FUNCTION: CARM95 0x444996
+// FUNCTION: CARM95 0x00444996
 void RotateAccR3(void) {
     LOG_TRACE("()");
 
@@ -5155,7 +5155,7 @@ void RotateAccR3(void) {
 }
 
 // IDA: void __cdecl RotateAccR4()
-// FUNCTION: CARM95 0x4449ae
+// FUNCTION: CARM95 0x004449ae
 void RotateAccR4(void) {
     LOG_TRACE("()");
 
@@ -5163,7 +5163,7 @@ void RotateAccR4(void) {
 }
 
 // IDA: void __cdecl CycleAccRotate()
-// FUNCTION: CARM95 0x4449c6
+// FUNCTION: CARM95 0x004449c6
 void CycleAccRotate(void) {
     LOG_TRACE("()");
 
@@ -5182,7 +5182,7 @@ void CycleAccRotate(void) {
 }
 
 // IDA: void __cdecl CycleAccScale()
-// FUNCTION: CARM95 0x444a82
+// FUNCTION: CARM95 0x00444a82
 void CycleAccScale(void) {
     LOG_TRACE("()");
 
@@ -5204,7 +5204,7 @@ void CycleAccScale(void) {
 }
 
 // IDA: void __cdecl ScaleAccUp2()
-// FUNCTION: CARM95 0x444b5c
+// FUNCTION: CARM95 0x00444b5c
 void ScaleAccUp2(void) {
     LOG_TRACE("()");
 
@@ -5212,7 +5212,7 @@ void ScaleAccUp2(void) {
 }
 
 // IDA: void __cdecl ScaleAccUp3()
-// FUNCTION: CARM95 0x444cf3
+// FUNCTION: CARM95 0x00444cf3
 void ScaleAccUp3(void) {
     LOG_TRACE("()");
 
@@ -5220,7 +5220,7 @@ void ScaleAccUp3(void) {
 }
 
 // IDA: void __cdecl ScaleAccUp4()
-// FUNCTION: CARM95 0x444d0b
+// FUNCTION: CARM95 0x00444d0b
 void ScaleAccUp4(void) {
     LOG_TRACE("()");
 
@@ -5228,7 +5228,7 @@ void ScaleAccUp4(void) {
 }
 
 // IDA: void __cdecl ScaleAccDown2()
-// FUNCTION: CARM95 0x444d23
+// FUNCTION: CARM95 0x00444d23
 void ScaleAccDown2(void) {
     LOG_TRACE("()");
 
@@ -5236,7 +5236,7 @@ void ScaleAccDown2(void) {
 }
 
 // IDA: void __cdecl ScaleAccDown3()
-// FUNCTION: CARM95 0x444d3b
+// FUNCTION: CARM95 0x00444d3b
 void ScaleAccDown3(void) {
     LOG_TRACE("()");
 
@@ -5244,7 +5244,7 @@ void ScaleAccDown3(void) {
 }
 
 // IDA: void __cdecl ScaleAccDown4()
-// FUNCTION: CARM95 0x444d53
+// FUNCTION: CARM95 0x00444d53
 void ScaleAccDown4(void) {
     LOG_TRACE("()");
 
@@ -5252,7 +5252,7 @@ void ScaleAccDown4(void) {
 }
 
 // IDA: void __cdecl MoveXAccL()
-// FUNCTION: CARM95 0x444d6b
+// FUNCTION: CARM95 0x00444d6b
 void MoveXAccL(void) {
     LOG_TRACE("()");
 
@@ -5260,7 +5260,7 @@ void MoveXAccL(void) {
 }
 
 // IDA: void __cdecl MoveXAccL2()
-// FUNCTION: CARM95 0x444df2
+// FUNCTION: CARM95 0x00444df2
 void MoveXAccL2(void) {
     LOG_TRACE("()");
 
@@ -5268,7 +5268,7 @@ void MoveXAccL2(void) {
 }
 
 // IDA: void __cdecl MoveXAccL3()
-// FUNCTION: CARM95 0x444e0e
+// FUNCTION: CARM95 0x00444e0e
 void MoveXAccL3(void) {
     LOG_TRACE("()");
 
@@ -5276,7 +5276,7 @@ void MoveXAccL3(void) {
 }
 
 // IDA: void __cdecl MoveXAccL4()
-// FUNCTION: CARM95 0x444e2a
+// FUNCTION: CARM95 0x00444e2a
 void MoveXAccL4(void) {
     LOG_TRACE("()");
 
@@ -5284,7 +5284,7 @@ void MoveXAccL4(void) {
 }
 
 // IDA: void __cdecl MoveXAccR()
-// FUNCTION: CARM95 0x444e46
+// FUNCTION: CARM95 0x00444e46
 void MoveXAccR(void) {
     LOG_TRACE("()");
 
@@ -5292,7 +5292,7 @@ void MoveXAccR(void) {
 }
 
 // IDA: void __cdecl MoveXAccR2()
-// FUNCTION: CARM95 0x444e62
+// FUNCTION: CARM95 0x00444e62
 void MoveXAccR2(void) {
     LOG_TRACE("()");
 
@@ -5300,7 +5300,7 @@ void MoveXAccR2(void) {
 }
 
 // IDA: void __cdecl MoveXAccR3()
-// FUNCTION: CARM95 0x444e7e
+// FUNCTION: CARM95 0x00444e7e
 void MoveXAccR3(void) {
     LOG_TRACE("()");
 
@@ -5308,7 +5308,7 @@ void MoveXAccR3(void) {
 }
 
 // IDA: void __cdecl MoveXAccR4()
-// FUNCTION: CARM95 0x444e9a
+// FUNCTION: CARM95 0x00444e9a
 void MoveXAccR4(void) {
     LOG_TRACE("()");
 
@@ -5316,7 +5316,7 @@ void MoveXAccR4(void) {
 }
 
 // IDA: void __cdecl MoveYAccL()
-// FUNCTION: CARM95 0x444eb6
+// FUNCTION: CARM95 0x00444eb6
 void MoveYAccL(void) {
     LOG_TRACE("()");
 
@@ -5324,7 +5324,7 @@ void MoveYAccL(void) {
 }
 
 // IDA: void __cdecl MoveYAccL2()
-// FUNCTION: CARM95 0x444ed2
+// FUNCTION: CARM95 0x00444ed2
 void MoveYAccL2(void) {
     LOG_TRACE("()");
 
@@ -5332,7 +5332,7 @@ void MoveYAccL2(void) {
 }
 
 // IDA: void __cdecl MoveYAccL3()
-// FUNCTION: CARM95 0x444eee
+// FUNCTION: CARM95 0x00444eee
 void MoveYAccL3(void) {
     LOG_TRACE("()");
 
@@ -5340,7 +5340,7 @@ void MoveYAccL3(void) {
 }
 
 // IDA: void __cdecl MoveYAccL4()
-// FUNCTION: CARM95 0x444f0a
+// FUNCTION: CARM95 0x00444f0a
 void MoveYAccL4(void) {
     LOG_TRACE("()");
 
@@ -5348,7 +5348,7 @@ void MoveYAccL4(void) {
 }
 
 // IDA: void __cdecl MoveYAccR()
-// FUNCTION: CARM95 0x444f26
+// FUNCTION: CARM95 0x00444f26
 void MoveYAccR(void) {
     LOG_TRACE("()");
 
@@ -5356,7 +5356,7 @@ void MoveYAccR(void) {
 }
 
 // IDA: void __cdecl MoveYAccR2()
-// FUNCTION: CARM95 0x444f42
+// FUNCTION: CARM95 0x00444f42
 void MoveYAccR2(void) {
     LOG_TRACE("()");
 
@@ -5364,7 +5364,7 @@ void MoveYAccR2(void) {
 }
 
 // IDA: void __cdecl MoveYAccR3()
-// FUNCTION: CARM95 0x444f5e
+// FUNCTION: CARM95 0x00444f5e
 void MoveYAccR3(void) {
     LOG_TRACE("()");
 
@@ -5372,7 +5372,7 @@ void MoveYAccR3(void) {
 }
 
 // IDA: void __cdecl MoveYAccR4()
-// FUNCTION: CARM95 0x444f7a
+// FUNCTION: CARM95 0x00444f7a
 void MoveYAccR4(void) {
     LOG_TRACE("()");
 
@@ -5380,7 +5380,7 @@ void MoveYAccR4(void) {
 }
 
 // IDA: void __cdecl MoveZAccL()
-// FUNCTION: CARM95 0x444f96
+// FUNCTION: CARM95 0x00444f96
 void MoveZAccL(void) {
     LOG_TRACE("()");
 
@@ -5388,7 +5388,7 @@ void MoveZAccL(void) {
 }
 
 // IDA: void __cdecl MoveZAccL2()
-// FUNCTION: CARM95 0x444fb2
+// FUNCTION: CARM95 0x00444fb2
 void MoveZAccL2(void) {
     LOG_TRACE("()");
 
@@ -5396,7 +5396,7 @@ void MoveZAccL2(void) {
 }
 
 // IDA: void __cdecl MoveZAccL3()
-// FUNCTION: CARM95 0x444fce
+// FUNCTION: CARM95 0x00444fce
 void MoveZAccL3(void) {
     LOG_TRACE("()");
 
@@ -5404,7 +5404,7 @@ void MoveZAccL3(void) {
 }
 
 // IDA: void __cdecl MoveZAccL4()
-// FUNCTION: CARM95 0x444fea
+// FUNCTION: CARM95 0x00444fea
 void MoveZAccL4(void) {
     LOG_TRACE("()");
 
@@ -5412,7 +5412,7 @@ void MoveZAccL4(void) {
 }
 
 // IDA: void __cdecl MoveZAccR()
-// FUNCTION: CARM95 0x445006
+// FUNCTION: CARM95 0x00445006
 void MoveZAccR(void) {
     LOG_TRACE("()");
 
@@ -5420,7 +5420,7 @@ void MoveZAccR(void) {
 }
 
 // IDA: void __cdecl MoveZAccR2()
-// FUNCTION: CARM95 0x445022
+// FUNCTION: CARM95 0x00445022
 void MoveZAccR2(void) {
     LOG_TRACE("()");
 
@@ -5428,7 +5428,7 @@ void MoveZAccR2(void) {
 }
 
 // IDA: void __cdecl MoveZAccR3()
-// FUNCTION: CARM95 0x44503e
+// FUNCTION: CARM95 0x0044503e
 void MoveZAccR3(void) {
     LOG_TRACE("()");
 
@@ -5436,7 +5436,7 @@ void MoveZAccR3(void) {
 }
 
 // IDA: void __cdecl MoveZAccR4()
-// FUNCTION: CARM95 0x44505a
+// FUNCTION: CARM95 0x0044505a
 void MoveZAccR4(void) {
     LOG_TRACE("()");
 
@@ -5444,7 +5444,7 @@ void MoveZAccR4(void) {
 }
 
 // IDA: br_material* __cdecl GetInternalMat()
-// FUNCTION: CARM95 0x445076
+// FUNCTION: CARM95 0x00445076
 br_material* GetInternalMat(void) {
     LOG_TRACE("()");
 
@@ -5452,7 +5452,7 @@ br_material* GetInternalMat(void) {
 }
 
 // IDA: br_material* __cdecl GetExternalMat()
-// FUNCTION: CARM95 0x445093
+// FUNCTION: CARM95 0x00445093
 br_material* GetExternalMat(void) {
     LOG_TRACE("()");
 
@@ -5467,7 +5467,7 @@ br_material* GetExternalMat(void) {
     } while (0)
 
 // IDA: void __usercall BuildSpecVolModel(tSpecial_volume *pSpec@<EAX>, int pIndex@<EDX>, br_material *pInt_mat@<EBX>, br_material *pExt_mat@<ECX>)
-// FUNCTION: CARM95 0x4452b1
+// FUNCTION: CARM95 0x004452b1
 void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat, br_material* pExt_mat) {
     int i;
     int j;
@@ -5542,7 +5542,7 @@ void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat
 #undef DrVertexSet
 
 // IDA: void __usercall DropSpecVol(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x4450d0
+// FUNCTION: CARM95 0x004450d0
 void DropSpecVol(int pIndex) {
     FILE* f;
     tPath_name the_path;
@@ -5585,13 +5585,13 @@ void DropSpecVol(int pIndex) {
 }
 
 // IDA: void __cdecl DropSpecVol0()
-// FUNCTION: CARM95 0x4450b0
+// FUNCTION: CARM95 0x004450b0
 void DropSpecVol0(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl DropSpecVol1()
-// FUNCTION: CARM95 0x4450bb
+// FUNCTION: CARM95 0x004450bb
 void DropSpecVol1(void) {
     LOG_TRACE("()");
 
@@ -5599,7 +5599,7 @@ void DropSpecVol1(void) {
 }
 
 // IDA: void __cdecl DropSpecVol2()
-// FUNCTION: CARM95 0x445b86
+// FUNCTION: CARM95 0x00445b86
 void DropSpecVol2(void) {
     LOG_TRACE("()");
 
@@ -5607,7 +5607,7 @@ void DropSpecVol2(void) {
 }
 
 // IDA: void __cdecl DropSpecVol3()
-// FUNCTION: CARM95 0x445b9b
+// FUNCTION: CARM95 0x00445b9b
 void DropSpecVol3(void) {
     LOG_TRACE("()");
 
@@ -5615,7 +5615,7 @@ void DropSpecVol3(void) {
 }
 
 // IDA: void __cdecl DropSpecVol4()
-// FUNCTION: CARM95 0x445bb0
+// FUNCTION: CARM95 0x00445bb0
 void DropSpecVol4(void) {
     LOG_TRACE("()");
 
@@ -5623,7 +5623,7 @@ void DropSpecVol4(void) {
 }
 
 // IDA: void __cdecl DropSpecVol5()
-// FUNCTION: CARM95 0x445bc5
+// FUNCTION: CARM95 0x00445bc5
 void DropSpecVol5(void) {
     LOG_TRACE("()");
 
@@ -5631,7 +5631,7 @@ void DropSpecVol5(void) {
 }
 
 // IDA: void __cdecl DropSpecVol6()
-// FUNCTION: CARM95 0x445bda
+// FUNCTION: CARM95 0x00445bda
 void DropSpecVol6(void) {
     LOG_TRACE("()");
 
@@ -5639,7 +5639,7 @@ void DropSpecVol6(void) {
 }
 
 // IDA: void __cdecl DropSpecVol7()
-// FUNCTION: CARM95 0x445bef
+// FUNCTION: CARM95 0x00445bef
 void DropSpecVol7(void) {
     LOG_TRACE("()");
 
@@ -5647,7 +5647,7 @@ void DropSpecVol7(void) {
 }
 
 // IDA: void __cdecl DropSpecVol8()
-// FUNCTION: CARM95 0x445c04
+// FUNCTION: CARM95 0x00445c04
 void DropSpecVol8(void) {
     LOG_TRACE("()");
 
@@ -5655,7 +5655,7 @@ void DropSpecVol8(void) {
 }
 
 // IDA: void __cdecl DropSpecVol9()
-// FUNCTION: CARM95 0x445c19
+// FUNCTION: CARM95 0x00445c19
 void DropSpecVol9(void) {
     LOG_TRACE("()");
 
@@ -5663,7 +5663,7 @@ void DropSpecVol9(void) {
 }
 
 // IDA: void __cdecl IdentifySpecVol()
-// FUNCTION: CARM95 0x445c2e
+// FUNCTION: CARM95 0x00445c2e
 void IdentifySpecVol(void) {
     int i;
     int min_index;
@@ -5696,7 +5696,7 @@ void IdentifySpecVol(void) {
 }
 
 // IDA: void __usercall DelSpecVolumeGraph(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x445ed2
+// FUNCTION: CARM95 0x00445ed2
 void DelSpecVolumeGraph(int pIndex) {
     br_actor* actor;
     br_model* model;
@@ -5724,7 +5724,7 @@ void DelSpecVolumeGraph(int pIndex) {
 }
 
 // IDA: void __cdecl DeleteSpecVol()
-// FUNCTION: CARM95 0x445dc5
+// FUNCTION: CARM95 0x00445dc5
 void DeleteSpecVol(void) {
     int index;
     LOG_TRACE("()");
@@ -5746,7 +5746,7 @@ void DeleteSpecVol(void) {
 }
 
 // IDA: void __cdecl RotateSpecVolL()
-// FUNCTION: CARM95 0x446022
+// FUNCTION: CARM95 0x00446022
 void RotateSpecVolL(void) {
     LOG_TRACE("()");
 
@@ -5754,7 +5754,7 @@ void RotateSpecVolL(void) {
 }
 
 // IDA: void __cdecl RotateSpecVolL2()
-// FUNCTION: CARM95 0x446032
+// FUNCTION: CARM95 0x00446032
 void RotateSpecVolL2(void) {
     LOG_TRACE("()");
 
@@ -5762,7 +5762,7 @@ void RotateSpecVolL2(void) {
 }
 
 // IDA: void __cdecl RotateSpecVolL3()
-// FUNCTION: CARM95 0x446042
+// FUNCTION: CARM95 0x00446042
 void RotateSpecVolL3(void) {
     LOG_TRACE("()");
 
@@ -5770,7 +5770,7 @@ void RotateSpecVolL3(void) {
 }
 
 // IDA: void __cdecl RotateSpecVolL4()
-// FUNCTION: CARM95 0x446052
+// FUNCTION: CARM95 0x00446052
 void RotateSpecVolL4(void) {
     LOG_TRACE("()");
 
@@ -5778,7 +5778,7 @@ void RotateSpecVolL4(void) {
 }
 
 // IDA: void __cdecl RotateSpecVolR()
-// FUNCTION: CARM95 0x446062
+// FUNCTION: CARM95 0x00446062
 void RotateSpecVolR(void) {
     LOG_TRACE("()");
 
@@ -5786,7 +5786,7 @@ void RotateSpecVolR(void) {
 }
 
 // IDA: void __cdecl RotateSpecVolR2()
-// FUNCTION: CARM95 0x446072
+// FUNCTION: CARM95 0x00446072
 void RotateSpecVolR2(void) {
     LOG_TRACE("()");
 
@@ -5794,7 +5794,7 @@ void RotateSpecVolR2(void) {
 }
 
 // IDA: void __cdecl RotateSpecVolR3()
-// FUNCTION: CARM95 0x446082
+// FUNCTION: CARM95 0x00446082
 void RotateSpecVolR3(void) {
     LOG_TRACE("()");
 
@@ -5802,7 +5802,7 @@ void RotateSpecVolR3(void) {
 }
 
 // IDA: void __cdecl RotateSpecVolR4()
-// FUNCTION: CARM95 0x446092
+// FUNCTION: CARM95 0x00446092
 void RotateSpecVolR4(void) {
     LOG_TRACE("()");
 
@@ -5810,7 +5810,7 @@ void RotateSpecVolR4(void) {
 }
 
 // IDA: void __cdecl CycleSpecVolRotate()
-// FUNCTION: CARM95 0x4460a2
+// FUNCTION: CARM95 0x004460a2
 void CycleSpecVolRotate(void) {
     LOG_TRACE("()");
 
@@ -5818,7 +5818,7 @@ void CycleSpecVolRotate(void) {
 }
 
 // IDA: void __cdecl CycleSpecVolScale()
-// FUNCTION: CARM95 0x4460b2
+// FUNCTION: CARM95 0x004460b2
 void CycleSpecVolScale(void) {
     LOG_TRACE("()");
 
@@ -5826,7 +5826,7 @@ void CycleSpecVolScale(void) {
 }
 
 // IDA: void __cdecl ScaleSpecVolUp2()
-// FUNCTION: CARM95 0x4460c2
+// FUNCTION: CARM95 0x004460c2
 void ScaleSpecVolUp2(void) {
     LOG_TRACE("()");
 
@@ -5834,7 +5834,7 @@ void ScaleSpecVolUp2(void) {
 }
 
 // IDA: void __cdecl ScaleSpecVolUp3()
-// FUNCTION: CARM95 0x4460d2
+// FUNCTION: CARM95 0x004460d2
 void ScaleSpecVolUp3(void) {
     LOG_TRACE("()");
 
@@ -5842,7 +5842,7 @@ void ScaleSpecVolUp3(void) {
 }
 
 // IDA: void __cdecl ScaleSpecVolUp4()
-// FUNCTION: CARM95 0x4460e2
+// FUNCTION: CARM95 0x004460e2
 void ScaleSpecVolUp4(void) {
     LOG_TRACE("()");
 
@@ -5850,7 +5850,7 @@ void ScaleSpecVolUp4(void) {
 }
 
 // IDA: void __cdecl ScaleSpecVolDown2()
-// FUNCTION: CARM95 0x4460f2
+// FUNCTION: CARM95 0x004460f2
 void ScaleSpecVolDown2(void) {
     LOG_TRACE("()");
 
@@ -5858,7 +5858,7 @@ void ScaleSpecVolDown2(void) {
 }
 
 // IDA: void __cdecl ScaleSpecVolDown3()
-// FUNCTION: CARM95 0x446102
+// FUNCTION: CARM95 0x00446102
 void ScaleSpecVolDown3(void) {
     LOG_TRACE("()");
 
@@ -5866,7 +5866,7 @@ void ScaleSpecVolDown3(void) {
 }
 
 // IDA: void __cdecl ScaleSpecVolDown4()
-// FUNCTION: CARM95 0x446112
+// FUNCTION: CARM95 0x00446112
 void ScaleSpecVolDown4(void) {
     LOG_TRACE("()");
 
@@ -5874,7 +5874,7 @@ void ScaleSpecVolDown4(void) {
 }
 
 // IDA: void __cdecl MoveXSpecVolL()
-// FUNCTION: CARM95 0x446122
+// FUNCTION: CARM95 0x00446122
 void MoveXSpecVolL(void) {
     LOG_TRACE("()");
 
@@ -5882,7 +5882,7 @@ void MoveXSpecVolL(void) {
 }
 
 // IDA: void __cdecl MoveXSpecVolL2()
-// FUNCTION: CARM95 0x446132
+// FUNCTION: CARM95 0x00446132
 void MoveXSpecVolL2(void) {
     LOG_TRACE("()");
 
@@ -5890,7 +5890,7 @@ void MoveXSpecVolL2(void) {
 }
 
 // IDA: void __cdecl MoveXSpecVolL3()
-// FUNCTION: CARM95 0x446142
+// FUNCTION: CARM95 0x00446142
 void MoveXSpecVolL3(void) {
     LOG_TRACE("()");
 
@@ -5898,7 +5898,7 @@ void MoveXSpecVolL3(void) {
 }
 
 // IDA: void __cdecl MoveXSpecVolL4()
-// FUNCTION: CARM95 0x446152
+// FUNCTION: CARM95 0x00446152
 void MoveXSpecVolL4(void) {
     LOG_TRACE("()");
 
@@ -5906,7 +5906,7 @@ void MoveXSpecVolL4(void) {
 }
 
 // IDA: void __cdecl MoveXSpecVolR()
-// FUNCTION: CARM95 0x446162
+// FUNCTION: CARM95 0x00446162
 void MoveXSpecVolR(void) {
     LOG_TRACE("()");
 
@@ -5914,7 +5914,7 @@ void MoveXSpecVolR(void) {
 }
 
 // IDA: void __cdecl MoveXSpecVolR2()
-// FUNCTION: CARM95 0x446172
+// FUNCTION: CARM95 0x00446172
 void MoveXSpecVolR2(void) {
     LOG_TRACE("()");
 
@@ -5922,7 +5922,7 @@ void MoveXSpecVolR2(void) {
 }
 
 // IDA: void __cdecl MoveXSpecVolR3()
-// FUNCTION: CARM95 0x446182
+// FUNCTION: CARM95 0x00446182
 void MoveXSpecVolR3(void) {
     LOG_TRACE("()");
 
@@ -5930,7 +5930,7 @@ void MoveXSpecVolR3(void) {
 }
 
 // IDA: void __cdecl MoveXSpecVolR4()
-// FUNCTION: CARM95 0x446192
+// FUNCTION: CARM95 0x00446192
 void MoveXSpecVolR4(void) {
     LOG_TRACE("()");
 
@@ -5938,7 +5938,7 @@ void MoveXSpecVolR4(void) {
 }
 
 // IDA: void __cdecl MoveYSpecVolL()
-// FUNCTION: CARM95 0x4461a2
+// FUNCTION: CARM95 0x004461a2
 void MoveYSpecVolL(void) {
     LOG_TRACE("()");
 
@@ -5946,7 +5946,7 @@ void MoveYSpecVolL(void) {
 }
 
 // IDA: void __cdecl MoveYSpecVolL2()
-// FUNCTION: CARM95 0x4461b2
+// FUNCTION: CARM95 0x004461b2
 void MoveYSpecVolL2(void) {
     LOG_TRACE("()");
 
@@ -5958,7 +5958,7 @@ void MoveYSpecVolL2(void) {
 }
 
 // IDA: void __cdecl MoveYSpecVolL3()
-// FUNCTION: CARM95 0x4461c2
+// FUNCTION: CARM95 0x004461c2
 void MoveYSpecVolL3(void) {
     LOG_TRACE("()");
 
@@ -5966,7 +5966,7 @@ void MoveYSpecVolL3(void) {
 }
 
 // IDA: void __cdecl MoveYSpecVolL4()
-// FUNCTION: CARM95 0x4461d2
+// FUNCTION: CARM95 0x004461d2
 void MoveYSpecVolL4(void) {
     LOG_TRACE("()");
 
@@ -5974,7 +5974,7 @@ void MoveYSpecVolL4(void) {
 }
 
 // IDA: void __cdecl MoveYSpecVolR()
-// FUNCTION: CARM95 0x4461e2
+// FUNCTION: CARM95 0x004461e2
 void MoveYSpecVolR(void) {
     LOG_TRACE("()");
 
@@ -5982,7 +5982,7 @@ void MoveYSpecVolR(void) {
 }
 
 // IDA: void __cdecl MoveYSpecVolR2()
-// FUNCTION: CARM95 0x4461f2
+// FUNCTION: CARM95 0x004461f2
 void MoveYSpecVolR2(void) {
     LOG_TRACE("()");
 
@@ -5990,7 +5990,7 @@ void MoveYSpecVolR2(void) {
 }
 
 // IDA: void __cdecl MoveYSpecVolR3()
-// FUNCTION: CARM95 0x446202
+// FUNCTION: CARM95 0x00446202
 void MoveYSpecVolR3(void) {
     LOG_TRACE("()");
 
@@ -5998,7 +5998,7 @@ void MoveYSpecVolR3(void) {
 }
 
 // IDA: void __cdecl MoveYSpecVolR4()
-// FUNCTION: CARM95 0x446212
+// FUNCTION: CARM95 0x00446212
 void MoveYSpecVolR4(void) {
     LOG_TRACE("()");
 
@@ -6006,7 +6006,7 @@ void MoveYSpecVolR4(void) {
 }
 
 // IDA: void __cdecl MoveZSpecVolL()
-// FUNCTION: CARM95 0x446222
+// FUNCTION: CARM95 0x00446222
 void MoveZSpecVolL(void) {
     LOG_TRACE("()");
 
@@ -6014,7 +6014,7 @@ void MoveZSpecVolL(void) {
 }
 
 // IDA: void __cdecl MoveZSpecVolL2()
-// FUNCTION: CARM95 0x446232
+// FUNCTION: CARM95 0x00446232
 void MoveZSpecVolL2(void) {
     LOG_TRACE("()");
 
@@ -6022,7 +6022,7 @@ void MoveZSpecVolL2(void) {
 }
 
 // IDA: void __cdecl MoveZSpecVolL3()
-// FUNCTION: CARM95 0x446242
+// FUNCTION: CARM95 0x00446242
 void MoveZSpecVolL3(void) {
     LOG_TRACE("()");
 
@@ -6030,7 +6030,7 @@ void MoveZSpecVolL3(void) {
 }
 
 // IDA: void __cdecl MoveZSpecVolL4()
-// FUNCTION: CARM95 0x446252
+// FUNCTION: CARM95 0x00446252
 void MoveZSpecVolL4(void) {
     LOG_TRACE("()");
 
@@ -6038,7 +6038,7 @@ void MoveZSpecVolL4(void) {
 }
 
 // IDA: void __cdecl MoveZSpecVolR()
-// FUNCTION: CARM95 0x446262
+// FUNCTION: CARM95 0x00446262
 void MoveZSpecVolR(void) {
     LOG_TRACE("()");
 
@@ -6046,7 +6046,7 @@ void MoveZSpecVolR(void) {
 }
 
 // IDA: void __cdecl MoveZSpecVolR2()
-// FUNCTION: CARM95 0x446272
+// FUNCTION: CARM95 0x00446272
 void MoveZSpecVolR2(void) {
     LOG_TRACE("()");
 
@@ -6054,7 +6054,7 @@ void MoveZSpecVolR2(void) {
 }
 
 // IDA: void __cdecl MoveZSpecVolR3()
-// FUNCTION: CARM95 0x446282
+// FUNCTION: CARM95 0x00446282
 void MoveZSpecVolR3(void) {
     LOG_TRACE("()");
 
@@ -6062,7 +6062,7 @@ void MoveZSpecVolR3(void) {
 }
 
 // IDA: void __cdecl MoveZSpecVolR4()
-// FUNCTION: CARM95 0x446292
+// FUNCTION: CARM95 0x00446292
 void MoveZSpecVolR4(void) {
     LOG_TRACE("()");
 
@@ -6070,7 +6070,7 @@ void MoveZSpecVolR4(void) {
 }
 
 // IDA: void __cdecl SnapSpecVolToVertical()
-// FUNCTION: CARM95 0x4462a2
+// FUNCTION: CARM95 0x004462a2
 void SnapSpecVolToVertical(void) {
     LOG_TRACE("()");
 
@@ -6078,7 +6078,7 @@ void SnapSpecVolToVertical(void) {
 }
 
 // IDA: void __cdecl ShowSpecialVolumes()
-// FUNCTION: CARM95 0x4462b2
+// FUNCTION: CARM95 0x004462b2
 void ShowSpecialVolumes(void) {
     int i;
     int j;
@@ -6105,7 +6105,7 @@ void ShowSpecialVolumes(void) {
 }
 
 // IDA: void __cdecl HideSpecialVolumes()
-// FUNCTION: CARM95 0x446351
+// FUNCTION: CARM95 0x00446351
 void HideSpecialVolumes(void) {
     int i;
     tSpecial_volume* v;

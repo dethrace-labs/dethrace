@@ -26,102 +26,102 @@
 #include "world.h"
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x50f198
+// GLOBAL: CARM95 0x0050f198
 int gGrid_number_colour[4] = { 49u, 201u, 1u, 201u };
 
-// GLOBAL: CARM95 0x50f1a8
+// GLOBAL: CARM95 0x0050f1a8
 int gJust_bought_part;
 
-// GLOBAL: CARM95 0x50f1ac
+// GLOBAL: CARM95 0x0050f1ac
 tU32 gLast_host_query;
 
-// GLOBAL: CARM95 0x550acc
+// GLOBAL: CARM95 0x00550acc
 br_pixelmap* gDead_car;
 
-// GLOBAL: CARM95 0x536408
+// GLOBAL: CARM95 0x00536408
 int gFade_away_parts_shop;
 
-// GLOBAL: CARM95 0x53635c
+// GLOBAL: CARM95 0x0053635c
 tU32 gDare_start_time;
 
-// GLOBAL: CARM95 0x536418
+// GLOBAL: CARM95 0x00536418
 int gRefund_rate;
 
-// GLOBAL: CARM95 0x53640c
+// GLOBAL: CARM95 0x0053640c
 int gSwap_grid_2;
 
-// GLOBAL: CARM95 0x536410
+// GLOBAL: CARM95 0x00536410
 int gSwap_grid_1;
 
-// GLOBAL: CARM95 0x5363f0
+// GLOBAL: CARM95 0x005363f0
 int gChange_race_net_mode;
 
-// GLOBAL: CARM95 0x53641c
+// GLOBAL: CARM95 0x0053641c
 tParts_category gPart_category;
 tU32 gNet_synch_start;
 
-// GLOBAL: CARM95 0x53634c
+// GLOBAL: CARM95 0x0053634c
 tNet_game_details* gChoose_car_net_game;
 
-// GLOBAL: CARM95 0x536404
+// GLOBAL: CARM95 0x00536404
 int gPart_index;
 
-// GLOBAL: CARM95 0x53636c
+// GLOBAL: CARM95 0x0053636c
 int gChallenger_index__racestrt; // suffix added to avoid duplicate symbol
 
-// GLOBAL: CARM95 0x536360
+// GLOBAL: CARM95 0x00536360
 tGrid_draw gDraw_grid_status;
 
-// GLOBAL: CARM95 0x5363ec
+// GLOBAL: CARM95 0x005363ec
 tNet_sequence_type gNet_race_sequence__racestrt; // suffix added to avoid duplicate symbol
 
-// GLOBAL: CARM95 0x53642c
+// GLOBAL: CARM95 0x0053642c
 br_pixelmap* gTaken_image;
 
-// GLOBAL: CARM95 0x536370
+// GLOBAL: CARM95 0x00536370
 int gGrid_number_x_coords[31];
 
-// GLOBAL: CARM95 0x5363f4
+// GLOBAL: CARM95 0x005363f4
 int gGrid_transition_stage;
 
-// GLOBAL: CARM95 0x536428
+// GLOBAL: CARM95 0x00536428
 int gGrid_y_adjust;
 
-// GLOBAL: CARM95 0x536400
+// GLOBAL: CARM95 0x00536400
 br_pixelmap* gBullet_image;
 
-// GLOBAL: CARM95 0x5363f8
+// GLOBAL: CARM95 0x005363f8
 br_pixelmap* gDeceased_image;
 
-// GLOBAL: CARM95 0x536364
+// GLOBAL: CARM95 0x00536364
 int gBest_pos_available;
 
-// GLOBAL: CARM95 0x536358
+// GLOBAL: CARM95 0x00536358
 int gChallenger_position;
 
-// GLOBAL: CARM95 0x536414
+// GLOBAL: CARM95 0x00536414
 int gOpponent_index;
 
-// GLOBAL: CARM95 0x5363fc
+// GLOBAL: CARM95 0x005363fc
 int gChallenge_time;
 
-// GLOBAL: CARM95 0x536354
+// GLOBAL: CARM95 0x00536354
 int gOriginal_position;
 
-// GLOBAL: CARM95 0x536420
+// GLOBAL: CARM95 0x00536420
 int gCurrent_race_index;
 
-// GLOBAL: CARM95 0x536350
+// GLOBAL: CARM95 0x00536350
 tInterface_spec* gStart_interface_spec;
 
-// GLOBAL: CARM95 0x536424
+// GLOBAL: CARM95 0x00536424
 int gCurrent_car_index;
 
-// GLOBAL: CARM95 0x536368
+// GLOBAL: CARM95 0x00536368
 int gOur_starting_position;
 
 // IDA: void __usercall DrawRaceList(int pOffset@<EAX>)
-// FUNCTION: CARM95 0x44e944
+// FUNCTION: CARM95 0x0044e944
 void DrawRaceList(int pOffset) {
     int i;
     int font_height;
@@ -232,7 +232,7 @@ void DrawRaceList(int pOffset) {
 }
 
 // IDA: void __usercall MoveRaceList(int pFrom@<EAX>, int pTo@<EDX>, tS32 pTime_to_move@<EBX>)
-// FUNCTION: CARM95 0x44e8c7
+// FUNCTION: CARM95 0x0044e8c7
 void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move) {
     tS32 start_time;
     tS32 the_time;
@@ -252,7 +252,7 @@ void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move) {
 }
 
 // IDA: int __usercall UpRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x44e7f0
+// FUNCTION: CARM95 0x0044e7f0
 int UpRace(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -270,7 +270,7 @@ int UpRace(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall DownRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x44ef24
+// FUNCTION: CARM95 0x0044ef24
 int DownRace(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -288,7 +288,7 @@ int DownRace(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall ClickOnRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x44f000
+// FUNCTION: CARM95 0x0044f000
 int ClickOnRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int x_coord;
     int y_coord;
@@ -312,7 +312,7 @@ int ClickOnRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
 }
 
 // IDA: int __usercall UpClickRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x44f0cd
+// FUNCTION: CARM95 0x0044f0cd
 int UpClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
@@ -321,7 +321,7 @@ int UpClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
 }
 
 // IDA: int __usercall DownClickRace@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x44f0ef
+// FUNCTION: CARM95 0x0044f0ef
 int DownClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
@@ -330,7 +330,7 @@ int DownClickRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int p
 }
 
 // IDA: void __cdecl StartChangeRace()
-// FUNCTION: CARM95 0x44f111
+// FUNCTION: CARM95 0x0044f111
 void StartChangeRace(void) {
     LOG_TRACE("()");
 
@@ -338,7 +338,7 @@ void StartChangeRace(void) {
 }
 
 // IDA: int __usercall ChangeRace@<EAX>(int *pRace_index@<EAX>, int pNet_mode@<EDX>, tNet_sequence_type pNet_race_sequence@<EBX>)
-// FUNCTION: CARM95 0x44f131
+// FUNCTION: CARM95 0x0044f131
 int ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence) {
     static tFlicette flicker_on[4] = {
         { 43, { 60, 120 }, { 154, 370 } },
@@ -399,7 +399,7 @@ int ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_seq
 }
 
 // IDA: void __cdecl DoChangeRace()
-// FUNCTION: CARM95 0x451fe5
+// FUNCTION: CARM95 0x00451fe5
 void DoChangeRace(void) {
     LOG_TRACE("()");
 
@@ -409,7 +409,7 @@ void DoChangeRace(void) {
 }
 
 // IDA: void __usercall DrawCar(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x44f1f2
+// FUNCTION: CARM95 0x0044f1f2
 void DrawCar(int pCurrent_choice, int pCurrent_mode) {
     char s[64];
     int text_x;
@@ -471,7 +471,7 @@ void DrawCar(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __cdecl SetCarFlic()
-// FUNCTION: CARM95 0x44f5de
+// FUNCTION: CARM95 0x0044f5de
 void SetCarFlic(void) {
     LOG_TRACE("()");
 
@@ -481,7 +481,7 @@ void SetCarFlic(void) {
 }
 
 // IDA: int __usercall UpCar@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x44f4cc
+// FUNCTION: CARM95 0x0044f4cc
 int UpCar(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -509,7 +509,7 @@ int UpCar(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall DownCar@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x44f62d
+// FUNCTION: CARM95 0x0044f62d
 int DownCar(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -537,7 +537,7 @@ int DownCar(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall UpClickCar@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x44f744
+// FUNCTION: CARM95 0x0044f744
 int UpClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
@@ -546,7 +546,7 @@ int UpClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 }
 
 // IDA: int __usercall DownClickCar@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x44f766
+// FUNCTION: CARM95 0x0044f766
 int DownClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
@@ -555,7 +555,7 @@ int DownClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY
 }
 
 // IDA: int __usercall ChangeCarGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x44f788
+// FUNCTION: CARM95 0x0044f788
 int ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -568,7 +568,7 @@ int ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall ChangeCar@<EAX>(int pNet_mode@<EAX>, int *pCar_index@<EDX>, tNet_game_details *pNet_game@<EBX>)
-// FUNCTION: CARM95 0x44f7e6
+// FUNCTION: CARM95 0x0044f7e6
 int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
     static tFlicette flicker_on[4] = {
         { 43, { 60, 120 }, { 154, 370 } },
@@ -728,7 +728,7 @@ int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
 }
 
 // IDA: void __cdecl DoChangeCar()
-// FUNCTION: CARM95 0x452017
+// FUNCTION: CARM95 0x00452017
 void DoChangeCar(void) {
     LOG_TRACE("()");
 
@@ -736,7 +736,7 @@ void DoChangeCar(void) {
 }
 
 // IDA: int __cdecl PartsShopRecommended()
-// FUNCTION: CARM95 0x450cf3
+// FUNCTION: CARM95 0x00450cf3
 int PartsShopRecommended(void) {
     int running_cost;
     int i;
@@ -757,7 +757,7 @@ int PartsShopRecommended(void) {
 }
 
 // IDA: void __usercall CalcPartPrice(int pCategory@<EAX>, int pIndex@<EDX>, int *pPrice@<EBX>, int *pCost@<ECX>)
-// FUNCTION: CARM95 0x4502ec
+// FUNCTION: CARM95 0x004502ec
 void CalcPartPrice(int pCategory, int pIndex, int* pPrice, int* pCost) {
     int current_value;
     LOG_TRACE("(%d, %d, %p, %p)", pCategory, pIndex, pPrice, pCost);
@@ -771,7 +771,7 @@ void CalcPartPrice(int pCategory, int pIndex, int* pPrice, int* pCost) {
 }
 
 // IDA: int __usercall BuyPart@<EAX>(int pCategory@<EAX>, int pIndex@<EDX>)
-// FUNCTION: CARM95 0x4504c4
+// FUNCTION: CARM95 0x004504c4
 int BuyPart(int pCategory, int pIndex) {
     int price;
     int cost;
@@ -793,7 +793,7 @@ int BuyPart(int pCategory, int pIndex) {
 }
 
 // IDA: void __cdecl DoAutoParts()
-// FUNCTION: CARM95 0x450bc8
+// FUNCTION: CARM95 0x00450bc8
 void DoAutoParts(void) {
     int i;
     int lowest_yet;
@@ -828,7 +828,7 @@ void DoAutoParts(void) {
 }
 
 // IDA: void __cdecl DrawPartsLabel()
-// FUNCTION: CARM95 0x44fdd1
+// FUNCTION: CARM95 0x0044fdd1
 void DrawPartsLabel(void) {
     LOG_TRACE("()");
 
@@ -848,7 +848,7 @@ void DrawPartsLabel(void) {
 }
 
 // IDA: void __usercall ErasePartsText(int pTotal_as_well@<EAX>)
-// FUNCTION: CARM95 0x44fe92
+// FUNCTION: CARM95 0x0044fe92
 void ErasePartsText(int pTotal_as_well) {
     LOG_TRACE("(%d)", pTotal_as_well);
 
@@ -869,7 +869,7 @@ void ErasePartsText(int pTotal_as_well) {
 }
 
 // IDA: void __cdecl DrawPartsText()
-// FUNCTION: CARM95 0x44fffc
+// FUNCTION: CARM95 0x0044fffc
 void DrawPartsText(void) {
     int price;
     int cost;
@@ -894,7 +894,7 @@ void DrawPartsText(void) {
 }
 
 // IDA: void __cdecl SetPartsImage()
-// FUNCTION: CARM95 0x44ff71
+// FUNCTION: CARM95 0x0044ff71
 void SetPartsImage(void) {
     LOG_TRACE("()");
 
@@ -906,7 +906,7 @@ void SetPartsImage(void) {
 }
 
 // IDA: int __cdecl GetPartsMax()
-// FUNCTION: CARM95 0x4506e4
+// FUNCTION: CARM95 0x004506e4
 int GetPartsMax(void) {
     int i;
     LOG_TRACE("()");
@@ -923,7 +923,7 @@ int GetPartsMax(void) {
 }
 
 // IDA: void __cdecl CalcPartsIndex()
-// FUNCTION: CARM95 0x45039b
+// FUNCTION: CARM95 0x0045039b
 void CalcPartsIndex(void) {
     int current_index;
     LOG_TRACE("()");
@@ -935,7 +935,7 @@ void CalcPartsIndex(void) {
 }
 
 // IDA: void __cdecl DoExchangePart()
-// FUNCTION: CARM95 0x450429
+// FUNCTION: CARM95 0x00450429
 void DoExchangePart(void) {
     int price;
     int cost;
@@ -954,7 +954,7 @@ void DoExchangePart(void) {
 }
 
 // IDA: int __usercall PartsShopGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x44fbb7
+// FUNCTION: CARM95 0x0044fbb7
 int PartsShopGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     int flic_index;
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
@@ -1000,7 +1000,7 @@ int PartsShopGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall UpPart@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x45055c
+// FUNCTION: CARM95 0x0045055c
 int UpPart(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -1036,7 +1036,7 @@ int UpPart(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall DownPart@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x45076c
+// FUNCTION: CARM95 0x0045076c
 int DownPart(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -1072,7 +1072,7 @@ int DownPart(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall UpClickPart@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x4508fb
+// FUNCTION: CARM95 0x004508fb
 int UpClickPart(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
@@ -1081,7 +1081,7 @@ int UpClickPart(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
 }
 
 // IDA: int __usercall DownClickPart@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x45091d
+// FUNCTION: CARM95 0x0045091d
 int DownClickPart(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
@@ -1090,7 +1090,7 @@ int DownClickPart(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int p
 }
 
 // IDA: int __usercall PartsArrowsOn@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x45093f
+// FUNCTION: CARM95 0x0045093f
 int PartsArrowsOn(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -1107,7 +1107,7 @@ int PartsArrowsOn(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall PartsArrowsOff@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x4509de
+// FUNCTION: CARM95 0x004509de
 int PartsArrowsOff(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -1123,7 +1123,7 @@ int PartsArrowsOff(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: void __cdecl StartPartsShop()
-// FUNCTION: CARM95 0x450a7d
+// FUNCTION: CARM95 0x00450a7d
 void StartPartsShop(void) {
     LOG_TRACE("()");
 
@@ -1132,7 +1132,7 @@ void StartPartsShop(void) {
 }
 
 // IDA: int __usercall DonePartsShop@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
-// FUNCTION: CARM95 0x450a92
+// FUNCTION: CARM95 0x00450a92
 int DonePartsShop(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -1145,7 +1145,7 @@ int DonePartsShop(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 }
 
 // IDA: void __usercall DrawPartsShop(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x450ac9
+// FUNCTION: CARM95 0x00450ac9
 void DrawPartsShop(int pCurrent_choice, int pCurrent_mode) {
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
@@ -1153,7 +1153,7 @@ void DrawPartsShop(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __usercall DoPartsShop(int pFade_away@<EAX>)
-// FUNCTION: CARM95 0x450e06
+// FUNCTION: CARM95 0x00450e06
 void DoPartsShop(int pFade_away) {
     static tFlicette flicker_on[7] = {
         { 43, { 225, 450 }, { 30, 72 } },
@@ -1232,7 +1232,7 @@ void DoPartsShop(int pFade_away) {
 }
 
 // IDA: int __usercall AutoPartsDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
-// FUNCTION: CARM95 0x450ad9
+// FUNCTION: CARM95 0x00450ad9
 int AutoPartsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -1243,7 +1243,7 @@ int AutoPartsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 }
 
 // IDA: tSO_result __cdecl DoAutoPartsShop()
-// FUNCTION: CARM95 0x450b05
+// FUNCTION: CARM95 0x00450b05
 tSO_result DoAutoPartsShop(void) {
     static tFlicette flicker_on[3] = {
         { 43, { 84, 168 }, { 67, 161 } },
@@ -1305,7 +1305,7 @@ tSO_result DoAutoPartsShop(void) {
 }
 
 // IDA: void __cdecl SetOpponentFlic()
-// FUNCTION: CARM95 0x4510ba
+// FUNCTION: CARM95 0x004510ba
 void SetOpponentFlic(void) {
     LOG_TRACE("()");
     ChangePanelFlic(0,
@@ -1314,7 +1314,7 @@ void SetOpponentFlic(void) {
 }
 
 // IDA: void __cdecl DrawSceneyMappyInfoVieweyThing()
-// FUNCTION: CARM95 0x451002
+// FUNCTION: CARM95 0x00451002
 void DrawSceneyMappyInfoVieweyThing(void) {
     LOG_TRACE("()");
 
@@ -1332,7 +1332,7 @@ void DrawSceneyMappyInfoVieweyThing(void) {
 }
 
 // IDA: void __cdecl DismissSceneyMappyInfoVieweyThing()
-// FUNCTION: CARM95 0x450eea
+// FUNCTION: CARM95 0x00450eea
 void DismissSceneyMappyInfoVieweyThing(void) {
     LOG_TRACE("()");
 
@@ -1341,7 +1341,7 @@ void DismissSceneyMappyInfoVieweyThing(void) {
 }
 
 // IDA: int __usercall SelectRaceDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
-// FUNCTION: CARM95 0x450eb9
+// FUNCTION: CARM95 0x00450eb9
 int SelectRaceDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -1353,7 +1353,7 @@ int SelectRaceDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 }
 
 // IDA: int __usercall StartRaceGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x450f2a
+// FUNCTION: CARM95 0x00450f2a
 int StartRaceGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -1380,7 +1380,7 @@ int StartRaceGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall TryToMoveToArrows@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x45110d
+// FUNCTION: CARM95 0x0045110d
 int TryToMoveToArrows(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -1394,7 +1394,7 @@ int TryToMoveToArrows(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall UpOpponent@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x451160
+// FUNCTION: CARM95 0x00451160
 int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -1429,7 +1429,7 @@ int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall DownOpponent@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x451285
+// FUNCTION: CARM95 0x00451285
 int DownOpponent(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -1464,7 +1464,7 @@ int DownOpponent(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall UpClickOpp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x4513a8
+// FUNCTION: CARM95 0x004513a8
 int UpClickOpp(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
@@ -1473,7 +1473,7 @@ int UpClickOpp(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 }
 
 // IDA: int __usercall DownClickOpp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x4513ca
+// FUNCTION: CARM95 0x004513ca
 int DownClickOpp(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
@@ -1482,7 +1482,7 @@ int DownClickOpp(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY
 }
 
 // IDA: void __cdecl SelectRaceStart()
-// FUNCTION: CARM95 0x4513ec
+// FUNCTION: CARM95 0x004513ec
 void SelectRaceStart(void) {
     LOG_TRACE("()");
 
@@ -1491,7 +1491,7 @@ void SelectRaceStart(void) {
 }
 
 // IDA: int __cdecl SuggestRace()
-// FUNCTION: CARM95 0x45140b
+// FUNCTION: CARM95 0x0045140b
 int SuggestRace(void) {
     int i;
     int least_done;
@@ -1549,7 +1549,7 @@ int SuggestRace(void) {
 }
 
 // IDA: void __usercall SelectRaceDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x451634
+// FUNCTION: CARM95 0x00451634
 void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
     tOpponent* the_opponent;
     tText_chunk* the_chunk;
@@ -1665,7 +1665,7 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: tSO_result __usercall DoSelectRace@<EAX>(int *pSecond_time_around@<EAX>)
-// FUNCTION: CARM95 0x451c8e
+// FUNCTION: CARM95 0x00451c8e
 tSO_result DoSelectRace(int* pSecond_time_around) {
     static tFlicette flicker_on[7] = {
         { 43, { 224, 448 }, { 28, 67 } },
@@ -1859,7 +1859,7 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
 }
 
 // IDA: void __usercall DrawGridCar(int pX@<EAX>, int pY@<EDX>, br_pixelmap *pImage@<EBX>)
-// FUNCTION: CARM95 0x452b89
+// FUNCTION: CARM95 0x00452b89
 void DrawGridCar(int pX, int pY, br_pixelmap* pImage) {
     LOG_TRACE("(%d, %d, %p)", pX, pY, pImage);
 
@@ -1869,7 +1869,7 @@ void DrawGridCar(int pX, int pY, br_pixelmap* pImage) {
 }
 
 // IDA: void __usercall DrawGrid(int pOffset@<EAX>, int pDraw_it@<EDX>)
-// FUNCTION: CARM95 0x452077
+// FUNCTION: CARM95 0x00452077
 void DrawGrid(int pOffset, int pDraw_it) {
     int i;
     int j;
@@ -2044,7 +2044,7 @@ void DrawGrid(int pOffset, int pDraw_it) {
 }
 
 // IDA: void __usercall MoveGrid(int pFrom@<EAX>, int pTo@<EDX>, tS32 pTime_to_move@<EBX>)
-// FUNCTION: CARM95 0x4531d4
+// FUNCTION: CARM95 0x004531d4
 void MoveGrid(int pFrom, int pTo, tS32 pTime_to_move) {
     tS32 start_time;
     tS32 the_time;
@@ -2065,7 +2065,7 @@ void MoveGrid(int pFrom, int pTo, tS32 pTime_to_move) {
 }
 
 // IDA: int __usercall CalcGridOffset@<EAX>(int pPosition@<EAX>)
-// FUNCTION: CARM95 0x452bf3
+// FUNCTION: CARM95 0x00452bf3
 int CalcGridOffset(int pPosition) {
     LOG_TRACE("(%d)", pPosition);
 
@@ -2073,7 +2073,7 @@ int CalcGridOffset(int pPosition) {
 }
 
 // IDA: void __usercall GridDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x452039
+// FUNCTION: CARM95 0x00452039
 void GridDraw(int pCurrent_choice, int pCurrent_mode) {
     LOG_TRACE8("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
@@ -2083,7 +2083,7 @@ void GridDraw(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __usercall ActuallySwapOrder(int pFirst_index@<EAX>, int pSecond_index@<EDX>)
-// FUNCTION: CARM95 0x453255
+// FUNCTION: CARM95 0x00453255
 void ActuallySwapOrder(int pFirst_index, int pSecond_index) {
     tOpp_spec temp_opp;
     LOG_TRACE("(%d, %d)", pFirst_index, pSecond_index);
@@ -2097,7 +2097,7 @@ void ActuallySwapOrder(int pFirst_index, int pSecond_index) {
 }
 
 // IDA: void __usercall DoGridTransition(int pFirst_index@<EAX>, int pSecond_index@<EDX>)
-// FUNCTION: CARM95 0x4530ca
+// FUNCTION: CARM95 0x004530ca
 void DoGridTransition(int pFirst_index, int pSecond_index) {
     tU32 start_time;
     tU32 the_time;
@@ -2127,7 +2127,7 @@ void DoGridTransition(int pFirst_index, int pSecond_index) {
 }
 
 // IDA: void __cdecl ChallengeStart()
-// FUNCTION: CARM95 0x452c0c
+// FUNCTION: CARM95 0x00452c0c
 void ChallengeStart(void) {
     br_pixelmap* the_map;
     int i;
@@ -2206,7 +2206,7 @@ void ChallengeStart(void) {
 }
 
 // IDA: int __usercall CheckNextStage@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x453021
+// FUNCTION: CARM95 0x00453021
 int CheckNextStage(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -2226,7 +2226,7 @@ int CheckNextStage(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall ChallengeDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
-// FUNCTION: CARM95 0x4532f7
+// FUNCTION: CARM95 0x004532f7
 int ChallengeDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -2249,7 +2249,7 @@ int ChallengeDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 }
 
 // IDA: void __cdecl DoChallengeScreen()
-// FUNCTION: CARM95 0x453952
+// FUNCTION: CARM95 0x00453952
 void DoChallengeScreen(void) {
     static tFlicette flicker_on[2] = { { 43, { 54, 108 }, { 157, 377 } }, { 43, { 218, 436 }, { 157, 377 } } };
     static tFlicette flicker_off[2] = { { 42, { 54, 108 }, { 157, 377 } }, { 42, { 218, 436 }, { 157, 377 } } };
@@ -2327,7 +2327,7 @@ void DoChallengeScreen(void) {
 }
 
 // IDA: int __usercall GridDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
-// FUNCTION: CARM95 0x4533c6
+// FUNCTION: CARM95 0x004533c6
 int GridDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -2341,7 +2341,7 @@ int GridDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped
 }
 
 // IDA: void __cdecl GridStart()
-// FUNCTION: CARM95 0x453408
+// FUNCTION: CARM95 0x00453408
 void GridStart(void) {
     LOG_TRACE("()");
 
@@ -2350,7 +2350,7 @@ void GridStart(void) {
 }
 
 // IDA: int __usercall GridMoveLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x453440
+// FUNCTION: CARM95 0x00453440
 int GridMoveLeft(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -2368,7 +2368,7 @@ int GridMoveLeft(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall GridMoveRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x4534e7
+// FUNCTION: CARM95 0x004534e7
 int GridMoveRight(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -2385,7 +2385,7 @@ int GridMoveRight(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall GridClickCar@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x453578
+// FUNCTION: CARM95 0x00453578
 int GridClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int rel_pos;
     int new_pos;
@@ -2410,7 +2410,7 @@ int GridClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY
 }
 
 // IDA: int __usercall GridClickNumbers@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x453671
+// FUNCTION: CARM95 0x00453671
 int GridClickNumbers(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int new_pos;
     int i;
@@ -2431,7 +2431,7 @@ int GridClickNumbers(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, in
 }
 
 // IDA: int __usercall GridClickLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x453746
+// FUNCTION: CARM95 0x00453746
 int GridClickLeft(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
@@ -2440,7 +2440,7 @@ int GridClickLeft(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int p
 }
 
 // IDA: int __usercall GridClickRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x453768
+// FUNCTION: CARM95 0x00453768
 int GridClickRight(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
@@ -2449,7 +2449,7 @@ int GridClickRight(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int 
 }
 
 // IDA: int __usercall CheckChallenge@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x45378a
+// FUNCTION: CARM95 0x0045378a
 int CheckChallenge(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE8("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -2461,7 +2461,7 @@ int CheckChallenge(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall FindBestPos@<EAX>(int pOur_rank@<EAX>)
-// FUNCTION: CARM95 0x453b41
+// FUNCTION: CARM95 0x00453b41
 int FindBestPos(int pOur_rank) {
     int i;
     LOG_TRACE("(%d)", pOur_rank);
@@ -2475,7 +2475,7 @@ int FindBestPos(int pOur_rank) {
 }
 
 // IDA: int __usercall SortGridFunction@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
-// FUNCTION: CARM95 0x4537d2
+// FUNCTION: CARM95 0x004537d2
 int SortGridFunction(const void* pFirst_one, const void* pSecond_one) {
     LOG_TRACE("(%p, %p)", pFirst_one, pSecond_one);
 
@@ -2483,7 +2483,7 @@ int SortGridFunction(const void* pFirst_one, const void* pSecond_one) {
 }
 
 // IDA: void __cdecl SortOpponents()
-// FUNCTION: CARM95 0x4539f6
+// FUNCTION: CARM95 0x004539f6
 void SortOpponents(void) {
     int i;
     LOG_TRACE("()");
@@ -2506,7 +2506,7 @@ void SortOpponents(void) {
 }
 
 // IDA: tSO_result __cdecl DoGridPosition()
-// FUNCTION: CARM95 0x4537ee
+// FUNCTION: CARM95 0x004537ee
 tSO_result DoGridPosition(void) {
     static tFlicette flicker_on[3] = {
         { 43, { 240, 480 }, { 158, 379 } },
@@ -2653,7 +2653,7 @@ tSO_result DoGridPosition(void) {
 }
 
 // IDA: void __cdecl CheckPlayersAreResponding()
-// FUNCTION: CARM95 0x453ba4
+// FUNCTION: CARM95 0x00453ba4
 void CheckPlayersAreResponding(void) {
     int i;
     tU32 time;
@@ -2674,7 +2674,7 @@ void CheckPlayersAreResponding(void) {
 }
 
 // IDA: void __cdecl NetSynchStartStart()
-// FUNCTION: CARM95 0x453b94
+// FUNCTION: CARM95 0x00453b94
 void NetSynchStartStart(void) {
     LOG_TRACE("()");
 
@@ -2683,7 +2683,7 @@ void NetSynchStartStart(void) {
 
 // IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
 //  Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x453fc0
+// FUNCTION: CARM95 0x00453fc0
 void DrawAnItem__racestrt(int pX, int pY_index, int pFont_index, char* pText) {
     LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
 
@@ -2696,7 +2696,7 @@ void DrawAnItem__racestrt(int pX, int pY_index, int pFont_index, char* pText) {
 }
 
 // IDA: void __usercall NetSynchStartDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x453c5b
+// FUNCTION: CARM95 0x00453c5b
 void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode) {
     int i;
     int number_ready;
@@ -2751,7 +2751,7 @@ void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: int __usercall NetSynchStartDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
-// FUNCTION: CARM95 0x454007
+// FUNCTION: CARM95 0x00454007
 int NetSynchStartDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
     LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
@@ -2764,7 +2764,7 @@ int NetSynchStartDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int
 }
 
 // IDA: int __usercall NetSynchStartGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x454047
+// FUNCTION: CARM95 0x00454047
 int NetSynchStartGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -2792,7 +2792,7 @@ int NetSynchStartGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall ExitWhenReady@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x45412d
+// FUNCTION: CARM95 0x0045412d
 int ExitWhenReady(int* pCurrent_choice, int* pCurrent_mode) {
     LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
@@ -2810,7 +2810,7 @@ int ExitWhenReady(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: tSO_result __usercall NetSynchRaceStart2@<EAX>(tNet_synch_mode pMode@<EAX>)
-// FUNCTION: CARM95 0x454196
+// FUNCTION: CARM95 0x00454196
 tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     static tFlicette flicker_on_hf[2] = {
         { 321, { 219, 112 }, { 172, 362 } },
@@ -2961,7 +2961,7 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
 }
 
 // IDA: tSO_result __cdecl NetSynchRaceStart()
-// FUNCTION: CARM95 0x4542c4
+// FUNCTION: CARM95 0x004542c4
 tSO_result NetSynchRaceStart(void) {
     LOG_TRACE("()");
 

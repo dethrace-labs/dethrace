@@ -10,11 +10,11 @@
 #include "utility.h"
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x512080
+// GLOBAL: CARM95 0x00512080
 int gLast_demo;
 
 // IDA: void __cdecl DoDemo()
-// FUNCTION: CARM95 0x461110
+// FUNCTION: CARM95 0x00461110
 void DoDemo(void) {
     tS32 start_time;
     tS32 frame_time;
