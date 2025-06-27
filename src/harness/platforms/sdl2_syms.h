@@ -10,7 +10,7 @@
     X(GetTicks, Uint32, (void))                                                         \
     X(GetError, const char*, (void))                                                    \
     X(PollEvent, int, (SDL_Event*))                                                     \
-    X(ShowSimpleMessageBox, int, (Uint32, const char*, const char *, SDL_Window*))      \
+    X(ShowSimpleMessageBox, int, (Uint32, const char*, const char*, SDL_Window*))       \
     X(CreateWindow, SDL_Window*, (const char*, int, int, int, int, Uint32))             \
     X(DestroyWindow, void, (SDL_Window*))                                               \
     X(GetWindowFlags, Uint32, (SDL_Window*))                                            \
@@ -20,7 +20,7 @@
     X(SetWindowSize, void, (SDL_Window*, int, int))                                     \
     X(CreateRenderer, SDL_Renderer*, (SDL_Window*, int, Uint32))                        \
     X(RenderClear, int, (SDL_Renderer*))                                                \
-    X(RenderCopy, int, (SDL_Renderer*,SDL_Texture*, const SDL_Rect*, const SDL_Rect*))  \
+    X(RenderCopy, int, (SDL_Renderer*, SDL_Texture*, const SDL_Rect*, const SDL_Rect*)) \
     X(RenderPresent, void, (SDL_Renderer*))                                             \
     X(RenderWindowToLogical, void, (SDL_Renderer*, int, int, float*, float*))           \
     X(GetRendererInfo, int, (SDL_Renderer*, SDL_RendererInfo*))                         \
@@ -33,12 +33,13 @@
     X(GetMouseState, Uint32, (int*, int*))                                              \
     X(ShowCursor, int, (int))                                                           \
     X(GetPixelFormatName, const char*, (Uint32))                                        \
-    X(GetScancodeName, const char *, (SDL_Scancode))                                    \
+    X(GetScancodeName, const char*, (SDL_Scancode))                                     \
     X(GL_CreateContext, SDL_GLContext, (SDL_Window*))                                   \
     X(GL_GetProcAddress, void*, (const char*))                                          \
     X(GL_SetAttribute, int, (SDL_GLattr, int))                                          \
     X(GL_SetSwapInterval, int, (int))                                                   \
-    X(GL_SwapWindow, void, (SDL_Window*))
+    X(GL_SwapWindow, void, (SDL_Window*))                                               \
+    X(GetPrefPath, char*, (const char* org, const char* app))
 
 #undef SDL2_SYM
 
