@@ -39,7 +39,8 @@
     X(GL_SetAttribute, int, (SDL_GLattr, int))                                          \
     X(GL_SetSwapInterval, int, (int))                                                   \
     X(GL_SwapWindow, void, (SDL_Window*))                                               \
-    X(GetPrefPath, char*, (const char* org, const char* app))
+    X(GetPrefPath, char*, (const char* org, const char* app))                           \
+    X(free, void, (void*))
 
 #undef SDL2_SYM
 

@@ -370,7 +370,7 @@ static void SDL2_Harness_GetViewport(int* x, int* y, float* width_multipler, flo
 static void SDL2_Harness_GetPrefPath(char* app_name, char* path) {
     char* sdl_path = SDL2_GetPrefPath(NULL, app_name);
     strcpy(path, sdl_path);
-    SDL_free(sdl_path);
+    SDL2_free(sdl_path);
 }
 
 static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
