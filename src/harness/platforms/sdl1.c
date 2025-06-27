@@ -286,7 +286,7 @@ static void SDL1_Harness_GetViewport(int* x, int* y, float* width_multipler, flo
     *height_multiplier = viewport.scale_y;
 }
 
-static void SDL1_Harness_GetPrefPath(char* app_name, char* path) {
+static void SDL1_Harness_GetPrefPath(char* path, char* app_name) {
     // SDL_GetPrefPath not in SDL1. We could implement it if we really needed to.
     // for now, just return the current path
     strcpy(path, ".");

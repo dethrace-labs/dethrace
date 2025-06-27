@@ -47,7 +47,7 @@ typedef struct tHarness_platform {
     void* (*GL_GetProcAddress)(const char* name);
     void (*GetViewport)(int* x, int* y, float* width_multiplier, float* height_multiplier);
 
-    void (*GetPrefPath)(char* app_name, char* path);
+    void (*GetPrefPath)(char* path, char* app_name);
 
 } tHarness_platform;
 

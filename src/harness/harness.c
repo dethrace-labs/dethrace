@@ -224,7 +224,7 @@ void Harness_DetectAndSetWorkingDirectory(char* argv0) {
         if (access("DATA/GENERAL.TXT", F_OK) == 0) {
             // good, found
         } else {
-            gHarness_platform.GetPrefPath("dethrace", pref_path);
+            gHarness_platform.GetPrefPath(pref_path, "dethrace");
             path = pref_path;
         }
     }
@@ -481,7 +481,7 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
 int Harness_ProcessIniFile(void) {
     int i;
     char path[1024];
-    gHarness_platform.GetPrefPath("dethrace", path);
+    gHarness_platform.GetPrefPath(path, "dethrace");
 
     strcat(path, "dethrace.ini");
 
