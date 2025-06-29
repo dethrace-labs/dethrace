@@ -4,7 +4,7 @@
 #include "loading.h"
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x0050f020
+// GLOBAL: CARM95 0x000050f020
 br_filesystem gFilesystem = {
     "Carmageddon",
     NULL,
@@ -21,11 +21,11 @@ br_filesystem gFilesystem = {
     NULL
 };
 
-// GLOBAL: CARM95 0x536298
+// GLOBAL: CARM95 0x00536298
 br_filesystem* gOld_file_system;
 
 // IDA: void* __cdecl DRStdioOpenRead(char *name, br_size_t n_magics, br_mode_test_cbfn *identify, int *mode_result)
-// FUNCTION: CARM95 0x44cf30
+// FUNCTION: CARM95 0x0044cf30
 void* DRStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identify, int* mode_result) {
     if (mode_result != NULL) {
         *mode_result = 0;
@@ -34,33 +34,33 @@ void* DRStdioOpenRead(char* name, br_size_t n_magics, br_mode_test_cbfn* identif
 }
 
 // IDA: void* __cdecl DRStdioOpenWrite(char *name, int mode)
-// FUNCTION: CARM95 0x44cf64
+// FUNCTION: CARM95 0x0044cf64
 void* DRStdioOpenWrite(char* name, int mode) {
     return gOld_file_system->open_write(name, mode);
 }
 
 // IDA: void __cdecl DRStdioClose(void *f)
-// FUNCTION: CARM95 0x44cf87
+// FUNCTION: CARM95 0x0044cf87
 void DRStdioClose(void* f) {
     gOld_file_system->close(f);
 }
 
 // IDA: br_size_t __cdecl DRStdioRead(void *buf, br_size_t size, unsigned int n, void *f)
-// FUNCTION: CARM95 0x44cfa1
+// FUNCTION: CARM95 0x0044cfa1
 br_size_t DRStdioRead(void* buf, br_size_t size, unsigned int n, void* f) {
     br_size_t result;
     return gOld_file_system->read(buf, size, n, f);
 }
 
 // IDA: br_size_t __cdecl DRStdioWrite(void *buf, br_size_t size, unsigned int n, void *f)
-// FUNCTION: CARM95 0x44cfd5
+// FUNCTION: CARM95 0x0044cfd5
 br_size_t DRStdioWrite(void* buf, br_size_t size, unsigned int n, void* f) {
     br_size_t result;
     return gOld_file_system->write(buf, size, n, f);
 }
 
 // IDA: void __cdecl InstallDRFileCalls()
-// FUNCTION: CARM95 0x44d009
+// FUNCTION: CARM95 0x0044d009
 void InstallDRFileCalls(void) {
     br_filesystem* temp_system;
     temp_system = BrMemAllocate(sizeof(br_filesystem), kMem_temp_fs);

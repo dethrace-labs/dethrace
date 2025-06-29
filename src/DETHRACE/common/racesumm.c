@@ -24,98 +24,98 @@
 #include "utility.h"
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x530e38
+// GLOBAL: CARM95 0x00530e38
 int gPlayer_lookup[6];
 
-// GLOBAL: CARM95 0x530e58
+// GLOBAL: CARM95 0x00530e58
 tMouse_area gOld_back_button;
 
-// GLOBAL: CARM95 0x530ec0
+// GLOBAL: CARM95 0x00530ec0
 tWreck_info gWreck_array[30];
 
-// GLOBAL: CARM95 0x530e94
+// GLOBAL: CARM95 0x00530e94
 br_actor* gWreck_root;
 
-// GLOBAL: CARM95 0x530e2c
+// GLOBAL: CARM95 0x00530e2c
 br_actor* gWreck_camera;
 
-// GLOBAL: CARM95 0x530eac
+// GLOBAL: CARM95 0x00530eac
 tU32 gWreck_start_zoom;
 
-// GLOBAL: CARM95 0x530ea4
+// GLOBAL: CARM95 0x00530ea4
 tU32 gWreck_gallery_start;
 
-// GLOBAL: CARM95 0x530e28
+// GLOBAL: CARM95 0x00530e28
 float gTemp_rank_increase;
 
-// GLOBAL: CARM95 0x530eb8
+// GLOBAL: CARM95 0x00530eb8
 float gRank_per_ms;
 
-// GLOBAL: CARM95 0x530eb0
+// GLOBAL: CARM95 0x00530eb0
 tU32 gLast_wreck_draw;
 
-// GLOBAL: CARM95 0x530ea0
+// GLOBAL: CARM95 0x00530ea0
 tS3_sound_tag gSumm_sound;
 
-// GLOBAL: CARM95 0x530e8c
+// GLOBAL: CARM95 0x00530e8c
 float gCredits_per_ms;
 
-// GLOBAL: CARM95 0x530e10
+// GLOBAL: CARM95 0x00530e10
 tMouse_area* gBack_button_ptr;
 
-// GLOBAL: CARM95 0x530e18
+// GLOBAL: CARM95 0x00530e18
 tU32 gSummary_start;
 
-// GLOBAL: CARM95 0x530e98
+// GLOBAL: CARM95 0x00530e98
 br_pixelmap* gWreck_z_buffer;
 
-// GLOBAL: CARM95 0x530e08
+// GLOBAL: CARM95 0x00530e08
 br_pixelmap* gWreck_render_area;
 
-// GLOBAL: CARM95 0x531d48
+// GLOBAL: CARM95 0x00531d48
 int gWreck_selected;
 
-// GLOBAL: CARM95 0x531d4c
+// GLOBAL: CARM95 0x00531d4c
 int gWreck_zoom_out;
 
-// GLOBAL: CARM95 0x530e90
+// GLOBAL: CARM95 0x00530e90
 br_pixelmap* gChrome_font;
 
-// GLOBAL: CARM95 0x530eb4
+// GLOBAL: CARM95 0x00530eb4
 int gWreck_zoom_in;
 
-// GLOBAL: CARM95 0x530ea8
+// GLOBAL: CARM95 0x00530ea8
 int gTemp_credits;
 
-// GLOBAL: CARM95 0x530e50
+// GLOBAL: CARM95 0x00530e50
 int gUser_interacted;
 
-// GLOBAL: CARM95 0x530e00
+// GLOBAL: CARM95 0x00530e00
 int gWreck_count;
 
-// GLOBAL: CARM95 0x530e88
+// GLOBAL: CARM95 0x00530e88
 int gRank_etc_munged;
 
-// GLOBAL: CARM95 0x530e0c
+// GLOBAL: CARM95 0x00530e0c
 int gRank_increase;
 
-// GLOBAL: CARM95 0x530e14
+// GLOBAL: CARM95 0x00530e14
 int gTemp_earned;
 
-// GLOBAL: CARM95 0x530e30
+// GLOBAL: CARM95 0x00530e30
 int gTemp_rank;
 
-// GLOBAL: CARM95 0x530e24
+// GLOBAL: CARM95 0x00530e24
 int gWreck_zoomed_in;
 
-// GLOBAL: CARM95 0x530e04
+// GLOBAL: CARM95 0x00530e04
 int gDone_initial;
 
-// GLOBAL: CARM95 0x530e20
+// GLOBAL: CARM95 0x00530e20
 int gTemp_lost;
 
 // IDA: void __usercall MungeRankEtc(tProgram_state *pThe_state@<EAX>)
-// FUNCTION: CARM95 0x415740
+// FUNCTION: CARM95 0x00415740
 void MungeRankEtc(tProgram_state* pThe_state) {
     int i;
     int not_done_yet;
@@ -150,8 +150,9 @@ void MungeRankEtc(tProgram_state* pThe_state) {
 }
 
 // IDA: void __cdecl CalcRankIncrease()
-// FUNCTION: CARM95 0x41631f
+// FUNCTION: CARM95 0x0041631f
 void CalcRankIncrease(void) {
+
     if (gNet_mode == eNet_mode_none) {
         gRank_increase = gProgram_state.credits_earned / gProgram_state.credits_per_rank;
         if (gRank_increase > 5) {
@@ -163,8 +164,9 @@ void CalcRankIncrease(void) {
 }
 
 // IDA: int __usercall RaceSummaryDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
-// FUNCTION: CARM95 0x41587e
+// FUNCTION: CARM95 0x0041587e
 int RaceSummaryDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+
     if (pTimed_out) {
         pCurrent_choice = 0;
     } else if (pEscaped) {
@@ -174,8 +176,9 @@ int RaceSummaryDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int p
 }
 
 // IDA: void __usercall DrawInBox(int pBox_left@<EAX>, int pText_left@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour, int pAmount)
-// FUNCTION: CARM95 0x415e44
+// FUNCTION: CARM95 0x00415e44
 void DrawInBox(int pBox_left, int pText_left, int pTop, int pRight, int pBottom, int pColour, int pAmount) {
+
     BrPixelmapRectangleFill(gBack_screen,
         pBox_left,
         pTop,
@@ -188,8 +191,9 @@ void DrawInBox(int pBox_left, int pText_left, int pTop, int pRight, int pBottom,
 }
 
 // IDA: void __usercall DrawChromeNumber(int pLeft_1@<EAX>, int pLeft_2@<EDX>, int pPitch@<EBX>, int pTop@<ECX>, int pAmount)
-// FUNCTION: CARM95 0x415ebd
+// FUNCTION: CARM95 0x00415ebd
 void DrawChromeNumber(int pLeft_1, int pLeft_2, int pPitch, int pTop, int pAmount) {
+
     if (pAmount < 10) {
         DRPixelmapRectangleMaskedCopy(gBack_screen,
             pLeft_1,
@@ -206,8 +210,9 @@ void DrawChromeNumber(int pLeft_1, int pLeft_2, int pPitch, int pTop, int pAmoun
 }
 
 // IDA: void __cdecl DrawSummaryItems()
-// FUNCTION: CARM95 0x415beb
+// FUNCTION: CARM95 0x00415beb
 void DrawSummaryItems(void) {
+
     DrawInBox(
         gCurrent_graf_data->summ1_credits_box_left,
         gCurrent_graf_data->summ1_credits_left,
@@ -261,8 +266,9 @@ void DrawSummaryItems(void) {
 }
 
 // IDA: void __usercall RampUpRate(float *pRate@<EAX>, tU32 pTime@<EDX>)
-// FUNCTION: CARM95 0x415f72
+// FUNCTION: CARM95 0x00415f72
 void RampUpRate(float* pRate, tU32 pTime) {
+
     if (pTime >= 6000) {
         *pRate = 10.f;
     } else if (pTime >= 4000) {
@@ -277,10 +283,12 @@ void RampUpRate(float* pRate, tU32 pTime) {
 }
 
 // IDA: void __usercall DrawSummary(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x4158c0
+// FUNCTION: CARM95 0x004158c0
 void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
     tU32 the_time;
+    // GLOBAL: CARM95 0x530e1c
     static tU32 last_time;
+    // GLOBAL: CARM95 0x530e9c
     static tU32 last_change_time;
     int credit_delta;
     float old_temp_increase;
@@ -354,15 +362,17 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __cdecl StartSummary()
-// FUNCTION: CARM95 0x415ff2
+// FUNCTION: CARM95 0x00415ff2
 void StartSummary(void) {
+
     DrawSummaryItems();
     gSummary_start = PDGetTotalTime();
 }
 
 // IDA: void __cdecl SetUpTemps()
-// FUNCTION: CARM95 0x416046
+// FUNCTION: CARM95 0x00416046
 void SetUpTemps(void) {
+
     gTemp_earned = gProgram_state.credits_earned;
     gTemp_lost = gProgram_state.credits_lost;
     gTemp_rank_increase = gRank_increase;
@@ -371,8 +381,9 @@ void SetUpTemps(void) {
 }
 
 // IDA: int __usercall Summ1GoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x41600c
+// FUNCTION: CARM95 0x0041600c
 int Summ1GoAhead(int* pCurrent_choice, int* pCurrent_mode) {
+
     S3StopOutletSound(gEffects_outlet);
     MungeRankEtc(&gProgram_state);
     SetUpTemps();
@@ -381,7 +392,7 @@ int Summ1GoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall SummCheckGameOver@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x41608d
+// FUNCTION: CARM95 0x0041608d
 int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     tS3_sound_tag sound_tag;
@@ -420,7 +431,7 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: tSO_result __cdecl DoEndRaceSummary1()
-// FUNCTION: CARM95 0x4161dd
+// FUNCTION: CARM95 0x004161dd
 tSO_result DoEndRaceSummary1(void) {
     static tFlicette flicker_on[1] = {
         { 43, { 218, 436 }, { 147, 353 } },
@@ -523,7 +534,7 @@ tSO_result DoEndRaceSummary1(void) {
 
 // IDA: void __usercall PrepareBoundingRadius(br_model *model@<EAX>)
 //  Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x417e27
+// FUNCTION: CARM95 0x00417e27
 void PrepareBoundingRadius__racesumm(br_model* model) {
     float d;
     float max;
@@ -543,7 +554,7 @@ void PrepareBoundingRadius__racesumm(br_model* model) {
 }
 
 // IDA: void __cdecl BuildWrecks()
-// FUNCTION: CARM95 0x417a91
+// FUNCTION: CARM95 0x00417a91
 void BuildWrecks(void) {
     int cat;
     int i;
@@ -633,7 +644,7 @@ void BuildWrecks(void) {
 }
 
 // IDA: void __cdecl DisposeWrecks()
-// FUNCTION: CARM95 0x417eba
+// FUNCTION: CARM95 0x00417eba
 void DisposeWrecks(void) {
     int cat;
     int i;
@@ -678,13 +689,14 @@ void DisposeWrecks(void) {
 }
 
 // IDA: int __usercall MatrixIsIdentity@<EAX>(br_matrix34 *pMat@<EAX>)
-// FUNCTION: CARM95 0x416f4e
+// FUNCTION: CARM95 0x00416f4e
 int MatrixIsIdentity(br_matrix34* pMat) {
+
     return (pMat->m[0][0] == 1.f && pMat->m[1][1] == 1.f && pMat->m[2][2] == 1.f && pMat->m[0][1] == 0.f && pMat->m[0][2] == 0.f && pMat->m[1][0] == 0.f && pMat->m[1][2] == 0.f && pMat->m[2][0] == 0.f && pMat->m[2][1] == 0.f);
 }
 
 // IDA: void __usercall SpinWrecks(tU32 pFrame_period@<EAX>)
-// FUNCTION: CARM95 0x416d47
+// FUNCTION: CARM95 0x00416d47
 void SpinWrecks(tU32 pFrame_period) {
     int i;
     br_vector3 translation;
@@ -708,8 +720,9 @@ void SpinWrecks(tU32 pFrame_period) {
 }
 
 // IDA: void __usercall ZoomInTo(int pIndex@<EAX>, int *pCurrent_choice@<EDX>, int *pCurrent_mode@<EBX>)
-// FUNCTION: CARM95 0x41778f
+// FUNCTION: CARM95 0x0041778f
 void ZoomInTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
+
     gWreck_zoom_in = pIndex;
     gWreck_zoom_out = -1;
     gWreck_start_zoom = PDGetTotalTime();
@@ -729,8 +742,9 @@ void ZoomInTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: void __usercall ZoomOutTo(int pIndex@<EAX>, int *pCurrent_choice@<EDX>, int *pCurrent_mode@<EBX>)
-// FUNCTION: CARM95 0x416413
+// FUNCTION: CARM95 0x00416413
 void ZoomOutTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
+
     gWreck_zoom_out = pIndex;
     gWreck_zoom_in = -1;
     gWreck_start_zoom = PDGetTotalTime();
@@ -744,7 +758,7 @@ void ZoomOutTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __cdecl WreckPick(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pNear, br_scalar pFar, void *pArg)
-// FUNCTION: CARM95 0x41660d
+// FUNCTION: CARM95 0x0041660d
 int WreckPick(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pNear, br_scalar pFar, void* pArg) {
     int i;
 
@@ -758,7 +772,7 @@ int WreckPick(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vec
 }
 
 // IDA: int __usercall CastSelectionRay@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x416486
+// FUNCTION: CARM95 0x00416486
 int CastSelectionRay(int* pCurrent_choice, int* pCurrent_mode) {
     int mouse_x;
     int mouse_y;
@@ -807,8 +821,9 @@ int CastSelectionRay(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall DamageScrnExit@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x41636e
+// FUNCTION: CARM95 0x0041636e
 int DamageScrnExit(int* pCurrent_choice, int* pCurrent_mode) {
+
     if (gProgram_state.prog_status == eProg_idling) {
         return 1;
     } else {
@@ -826,7 +841,7 @@ int DamageScrnExit(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: void __usercall DamageScrnDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x416671
+// FUNCTION: CARM95 0x00416671
 void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
     tU32 the_time;
     br_vector3 camera_movement;
@@ -993,7 +1008,7 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: int __usercall DamageScrnLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x417038
+// FUNCTION: CARM95 0x00417038
 int DamageScrnLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
 
@@ -1022,7 +1037,7 @@ int DamageScrnLeft(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall DamageScrnRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x417175
+// FUNCTION: CARM95 0x00417175
 int DamageScrnRight(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
 
@@ -1051,7 +1066,7 @@ int DamageScrnRight(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall DamageScrnUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x4172b9
+// FUNCTION: CARM95 0x004172b9
 int DamageScrnUp(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     int difference;
@@ -1100,7 +1115,7 @@ int DamageScrnUp(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall DamageScrnDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x4174a9
+// FUNCTION: CARM95 0x004174a9
 int DamageScrnDown(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     int difference;
@@ -1152,8 +1167,9 @@ int DamageScrnDown(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall DamageScrnGoHead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x4176dd
+// FUNCTION: CARM95 0x004176dd
 int DamageScrnGoHead(int* pCurrent_choice, int* pCurrent_mode) {
+
     gDone_initial = 1;
     if (*pCurrent_choice == 2) {
         return 1;
@@ -1170,7 +1186,7 @@ int DamageScrnGoHead(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall ClickDamage@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x417839
+// FUNCTION: CARM95 0x00417839
 int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int mouse_x;
     int mouse_y;
@@ -1211,8 +1227,9 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
 }
 
 // IDA: int __usercall DamageScrnDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
-// FUNCTION: CARM95 0x41794f
+// FUNCTION: CARM95 0x0041794f
 int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+
     if (pTimed_out) {
         pCurrent_choice = 2;
     }
@@ -1220,7 +1237,7 @@ int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 }
 
 // IDA: tSO_result __cdecl DoEndRaceSummary2()
-// FUNCTION: CARM95 0x41797b
+// FUNCTION: CARM95 0x0041797b
 tSO_result DoEndRaceSummary2(void) {
     static tFlicette flicker_on[3] = {
         { -1, { 0, 0 }, { 0, 0 } },
@@ -1290,8 +1307,9 @@ tSO_result DoEndRaceSummary2(void) {
 
 // IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
 //  Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x4183be
+// FUNCTION: CARM95 0x004183be
 void DrawAnItem__racesumm(int pX, int pY_index, int pFont_index, char* pText) {
+
     TransBrPixelmapText(gBack_screen,
         pX,
         gCurrent_graf_data->net_sum_headings_y + gCurrent_graf_data->net_sum_y_pitch * pY_index,
@@ -1302,8 +1320,9 @@ void DrawAnItem__racesumm(int pX, int pY_index, int pFont_index, char* pText) {
 
 // IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
 //  Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x418405
+// FUNCTION: CARM95 0x00418405
 void DrawColumnHeading__racesumm(int pStr_index, int pX) {
+
     TransBrPixelmapText(gBack_screen,
         pX,
         gCurrent_graf_data->net_sum_headings_y - gCurrent_graf_data->net_sum_y_pitch,
@@ -1313,19 +1332,20 @@ void DrawColumnHeading__racesumm(int pStr_index, int pX) {
 }
 
 // IDA: int __usercall SortScores@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
-// FUNCTION: CARM95 0x41853a
+// FUNCTION: CARM95 0x0041853a
 int SortScores(const void* pFirst_one, const void* pSecond_one) {
+
     return gNet_players[*(int*)pSecond_one].games_score - gNet_players[*(int*)pFirst_one].games_score;
 }
 
 // IDA: void __cdecl SortGameScores()
-// FUNCTION: CARM95 0x418515
+// FUNCTION: CARM95 0x00418515
 void SortGameScores(void) {
     qsort(gPlayer_lookup, gNumber_of_net_players, sizeof(gPlayer_lookup[0]), SortScores);
 }
 
 // IDA: void __usercall NetSumDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x41804b
+// FUNCTION: CARM95 0x0041804b
 void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     int i;
     char s[256];
@@ -1371,7 +1391,7 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __cdecl DoNetRaceSummary()
-// FUNCTION: CARM95 0x418452
+// FUNCTION: CARM95 0x00418452
 void DoNetRaceSummary(void) {
     static tFlicette flicker_on[1] = { { 321, { 219, 112 }, { 172, 362 } } };
     static tFlicette flicker_off[1] = { { 322, { 219, 112 }, { 172, 362 } } };
@@ -1452,7 +1472,7 @@ void DoNetRaceSummary(void) {
 }
 
 // IDA: tSO_result __usercall DoEndRaceSummary@<EAX>(int *pFirst_summary_done@<EAX>, tRace_result pRace_result@<EDX>)
-// FUNCTION: CARM95 0x418590
+// FUNCTION: CARM95 0x00418590
 tSO_result DoEndRaceSummary(int* pFirst_summary_done, tRace_result pRace_result) {
     tSO_result result;
 

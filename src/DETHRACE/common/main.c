@@ -22,8 +22,9 @@
 #include "utility.h"
 
 // IDA: void __cdecl QuitGame()
-// FUNCTION: CARM95 0x4a9ea0
+// FUNCTION: CARM95 0x004a9ea0
 void QuitGame(void) {
+
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         DoDemoGoodbye();
     }
@@ -81,8 +82,9 @@ void CheckNumberOfTracks(void) {
 }
 
 // IDA: void __usercall ServiceTheGame(int pRacing@<EAX>)
-// FUNCTION: CARM95 0x4a9f29
+// FUNCTION: CARM95 0x004a9f29
 void ServiceTheGame(int pRacing) {
+
     CheckMemory();
     if (!pRacing) {
         CyclePollKeys();
@@ -106,20 +108,21 @@ void ServiceTheGame(int pRacing) {
 }
 
 // IDA: void __cdecl ServiceGame()
-// FUNCTION: CARM95 0x4a9fe4
+// FUNCTION: CARM95 0x004a9fe4
 void ServiceGame(void) {
     ServiceTheGame(0);
 }
 
 // IDA: void __cdecl ServiceGameInRace()
-// FUNCTION: CARM95 0x4a9ff9
+// FUNCTION: CARM95 0x004a9ff9
 void ServiceGameInRace(void) {
+
     ServiceTheGame(1);
     CheckKevKeys();
 }
 
 // IDA: void __usercall GameMain(int pArgc@<EAX>, char **pArgv@<EDX>)
-// FUNCTION: CARM95 0x4aa013
+// FUNCTION: CARM95 0x004aa013
 void GameMain(int pArgc, char** pArgv) {
     tPath_name CD_dir;
 

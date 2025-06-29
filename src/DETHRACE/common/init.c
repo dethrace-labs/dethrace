@@ -41,42 +41,43 @@
 
 #include "brender.h"
 
-// GLOBAL: CARM95 0x52115c
+// GLOBAL: CARM95 0x0052115c
 int gGame_initialized;
 
-// GLOBAL: CARM95 0x521160
+// GLOBAL: CARM95 0x00521160
 int gBr_initialized;
 
-// GLOBAL: CARM95 0x521164
+// GLOBAL: CARM95 0x00521164
 int gBrZb_initialized;
 
-// GLOBAL: CARM95 0x521168
+// GLOBAL: CARM95 0x00521168
 int gInitialisation_finished;
 
-// GLOBAL: CARM95 0x52116c
+// GLOBAL: CARM95 0x0052116c
 int gRender_indent;
 
-// GLOBAL: CARM95 0x53fdd0
+// GLOBAL: CARM95 0x0053fdd0
 tU32 gAustere_time;
 
-// GLOBAL: CARM95 0x54b2bc
+// GLOBAL: CARM95 0x0054b2bc
 int gInitial_rank;
 
-// GLOBAL: CARM95 0x54b2b0
+// GLOBAL: CARM95 0x0054b2b0
 int gCredits_per_rank[3];
 
-// GLOBAL: CARM95 0x54b2c0
+// GLOBAL: CARM95 0x0054b2c0
 int gInitial_credits[3];
 
-// GLOBAL: CARM95 0x54b2a0
+// GLOBAL: CARM95 0x0054b2a0
 int gNet_mode_of_last_game;
 
-// GLOBAL: CARM95 0x54b29c
+// GLOBAL: CARM95 0x0054b29c
 br_material* gDefault_track_material;
 
 // IDA: void __cdecl AllocateSelf()
-// FUNCTION: CARM95 0x4bbebf
+// FUNCTION: CARM95 0x004bbebf
 void AllocateSelf(void) {
+
     gSelf = BrActorAllocate(BR_ACTOR_NONE, NULL);
     if (gSelf == NULL) {
         FatalError(kFatalError_AllocateSelf);
@@ -88,7 +89,7 @@ void AllocateSelf(void) {
 }
 
 // IDA: void __cdecl AllocateCamera()
-// FUNCTION: CARM95 0x4bbf22
+// FUNCTION: CARM95 0x004bbf22
 void AllocateCamera(void) {
     br_camera* camera_ptr;
     int i;
@@ -136,7 +137,7 @@ void AllocateCamera(void) {
 }
 
 // IDA: void __cdecl ReinitialiseForwardCamera()
-// FUNCTION: CARM95 0x4bb510
+// FUNCTION: CARM95 0x004bb510
 void ReinitialiseForwardCamera(void) {
     br_camera* camera_ptr;
     float the_angle;
@@ -183,7 +184,7 @@ void ReinitialiseForwardCamera(void) {
 }
 
 // IDA: void __cdecl AllocateRearviewPixelmap()
-// FUNCTION: CARM95 0x4bb741
+// FUNCTION: CARM95 0x004bb741
 void AllocateRearviewPixelmap(void) {
     char* rear_screen_pixels;
 
@@ -234,7 +235,7 @@ void AllocateRearviewPixelmap(void) {
 }
 
 // IDA: void __cdecl ReinitialiseRearviewCamera()
-// FUNCTION: CARM95 0x4bb887
+// FUNCTION: CARM95 0x004bb887
 void ReinitialiseRearviewCamera(void) {
     br_camera* camera_ptr;
 
@@ -249,7 +250,7 @@ void ReinitialiseRearviewCamera(void) {
 }
 
 // IDA: void __cdecl ReinitialiseRenderStuff()
-// FUNCTION: CARM95 0x4bb916
+// FUNCTION: CARM95 0x004bb916
 void ReinitialiseRenderStuff(void) {
     int x_diff;
     int y_diff;
@@ -284,7 +285,7 @@ void InstallFindFailedHooks(void) {
 }
 
 // IDA: void __cdecl AllocateStandardLamp()
-// FUNCTION: CARM95 0x4bbcdb
+// FUNCTION: CARM95 0x004bbcdb
 void AllocateStandardLamp(void) {
     br_actor* lamp;
     int i;
@@ -302,7 +303,7 @@ void AllocateStandardLamp(void) {
 }
 
 // IDA: void __cdecl InitializeBRenderEnvironment()
-// FUNCTION: CARM95 0x4bbd6c
+// FUNCTION: CARM95 0x004bbd6c
 void InitializeBRenderEnvironment(void) {
     br_model* arrow_model;
 
@@ -336,7 +337,7 @@ void InitializeBRenderEnvironment(void) {
 }
 
 // IDA: void __cdecl InitBRFonts()
-// FUNCTION: CARM95 0x4bc12c
+// FUNCTION: CARM95 0x004bc12c
 void InitBRFonts(void) {
     gBig_font = LoadBRFont("BIGFONT.FNT");
     gFont_7 = LoadBRFont("FONT7.FNT");
@@ -344,8 +345,9 @@ void InitBRFonts(void) {
 }
 
 // IDA: void __cdecl AustereWarning()
-// FUNCTION: CARM95 0x4bc16d
+// FUNCTION: CARM95 0x004bc16d
 void AustereWarning(void) {
+
     ClearEntireScreen();
 
     if (gAusterity_mode) {
@@ -366,6 +368,7 @@ void AustereWarning(void) {
 
 // IDA: void __cdecl InitLineStuff()
 void InitLineStuff(void) {
+
     // HACK: originally 2 vertices
     gLine_model = BrModelAllocate("gLine_model", 3 /*2*/, 1);
     gLine_material = BrMaterialAllocate("gLine_material");
@@ -547,8 +550,9 @@ void Init2DStuff(void) {
 }
 
 // IDA: void __usercall InitialiseApplication(int pArgc@<EAX>, char **pArgv@<EDX>)
-// FUNCTION: CARM95 0x4bba54
+// FUNCTION: CARM95 0x004bba54
 void InitialiseApplication(int pArgc, char** pArgv) {
+
     if (harness_game_config.gore_check) {
         gProgram_state.sausage_eater_mode = gSausage_override ? 1 : (PDGetGorePassword() ? 0 : 1);
         PDDisplayGoreworthiness(!gProgram_state.sausage_eater_mode);
@@ -647,7 +651,7 @@ void InitialiseApplication(int pArgc, char** pArgv) {
 }
 
 // IDA: void __usercall InitialiseDeathRace(int pArgc@<EAX>, char **pArgv@<EDX>)
-// FUNCTION: CARM95 0x4bba24
+// FUNCTION: CARM95 0x004bba24
 void InitialiseDeathRace(int pArgc, char** pArgv) {
     PDInitialiseSystem();
     InitialiseApplication(pArgc, pArgv);
@@ -655,7 +659,7 @@ void InitialiseDeathRace(int pArgc, char** pArgv) {
 }
 
 // IDA: void __usercall InitGame(int pStart_race@<EAX>)
-// FUNCTION: CARM95 0x4bc22c
+// FUNCTION: CARM95 0x004bc22c
 void InitGame(int pStart_race) {
     int i;
 
@@ -706,7 +710,7 @@ void InitGame(int pStart_race) {
 }
 
 // IDA: void __cdecl DisposeGameIfNecessary()
-// FUNCTION: CARM95 0x4bc3d0
+// FUNCTION: CARM95 0x004bc3d0
 void DisposeGameIfNecessary(void) {
     int i;
 
@@ -729,14 +733,16 @@ void DisposeGameIfNecessary(void) {
 }
 
 // IDA: void __cdecl LoadInTrack()
-// FUNCTION: CARM95 0x4bc93a
+// FUNCTION: CARM95 0x004bc93a
 void LoadInTrack(void) {
+
     LoadTrack(gProgram_state.track_file_name, &gProgram_state.track_spec, &gCurrent_race);
 }
 
 // IDA: void __cdecl DisposeTrack()
-// FUNCTION: CARM95 0x4bc493
+// FUNCTION: CARM95 0x004bc493
 void DisposeTrack(void) {
+
     FreeTrack(&gProgram_state.track_spec);
 }
 
@@ -746,8 +752,9 @@ void CopyMaterialColourFromIndex(br_material* pMaterial) {
 }
 
 // IDA: void __cdecl InitRace()
-// FUNCTION: CARM95 0x4bc4b1
+// FUNCTION: CARM95 0x004bc4b1
 void InitRace(void) {
+
     SwitchToRealResolution();
     // TODO: dword_5454C4 = 0;
     ClearConcussion();
@@ -882,8 +889,9 @@ void InitRace(void) {
 }
 
 // IDA: void __cdecl DisposeRace()
-// FUNCTION: CARM95 0x4bc968
+// FUNCTION: CARM95 0x004bc968
 void DisposeRace(void) {
+
     PossibleService();
     DisposePiping();
     PossibleService();
@@ -916,23 +924,22 @@ void DisposeRace(void) {
     // when exiting a race, skid mark materials are unloaded, but material_modifiers is not changed.
     // In 3dfx mode, `FrobFog` is called during loading the next track, which iterates over the material_modifiers
     // causing a use-after-free
-    if (1) {
-        int i;
-        for (i = 0; i < COUNT_OF(gCurrent_race.material_modifiers); i++) {
-            gCurrent_race.material_modifiers[i].skid_mark_material = NULL;
-        }
+    for (int i = 0; i < COUNT_OF(gCurrent_race.material_modifiers); i++) {
+        gCurrent_race.material_modifiers[i].skid_mark_material = NULL;
     }
 #endif
 }
 
 // IDA: int __cdecl GetScreenSize()
-// FUNCTION: CARM95 0x4bca25
+// FUNCTION: CARM95 0x004bca25
 int GetScreenSize(void) {
+
     return gRender_indent;
 }
 
 // IDA: void __usercall SetScreenSize(int pNew_size@<EAX>)
-// FUNCTION: CARM95 0x4bca3a
+// FUNCTION: CARM95 0x004bca3a
 void SetScreenSize(int pNew_size) {
+
     gRender_indent = pNew_size;
 }

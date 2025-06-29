@@ -21,196 +21,196 @@
 #include <float.h>
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x5070d0
+// GLOBAL: CARM95 0x005070d0
 br_actor* gOppo_path_actor;
 
-// GLOBAL: CARM95 0x5070d4
+// GLOBAL: CARM95 0x005070d4
 br_model* gOppo_path_model;
 
-// GLOBAL: CARM95 0x5070d8
+// GLOBAL: CARM95 0x005070d8
 br_material* gMat_dk_yel;
 
-// GLOBAL: CARM95 0x5070dc
+// GLOBAL: CARM95 0x005070dc
 br_material* gMat_md_yel;
 
-// GLOBAL: CARM95 0x5070e0
+// GLOBAL: CARM95 0x005070e0
 br_material* gMat_lt_yel;
 
-// GLOBAL: CARM95 0x5070e4
+// GLOBAL: CARM95 0x005070e4
 br_material* gMat_dk_red;
 
-// GLOBAL: CARM95 0x5070e8
+// GLOBAL: CARM95 0x005070e8
 br_material* gMat_lt_red;
 
-// GLOBAL: CARM95 0x5070ec
+// GLOBAL: CARM95 0x005070ec
 br_material* gMat_dk_grn;
 
-// GLOBAL: CARM95 0x5070f0
+// GLOBAL: CARM95 0x005070f0
 br_material* gMat_lt_grn;
 
-// GLOBAL: CARM95 0x5070f4
+// GLOBAL: CARM95 0x005070f4
 br_material* gMat_dk_blu;
 
-// GLOBAL: CARM95 0x5070f8
+// GLOBAL: CARM95 0x005070f8
 br_material* gMat_lt_blu;
 
-// GLOBAL: CARM95 0x5070fc
+// GLOBAL: CARM95 0x005070fc
 br_material* gMat_dk_turq;
 
-// GLOBAL: CARM95 0x507100
+// GLOBAL: CARM95 0x00507100
 br_material* gMat_lt_turq;
 
-// GLOBAL: CARM95 0x507104
+// GLOBAL: CARM95 0x00507104
 br_material* gMat_dk_gry;
 
-// GLOBAL: CARM95 0x507108
+// GLOBAL: CARM95 0x00507108
 br_material* gMat_md_gry;
 
-// GLOBAL: CARM95 0x50710c
+// GLOBAL: CARM95 0x0050710c
 br_material* gMat_lt_gry;
 
-// GLOBAL: CARM95 0x507110
+// GLOBAL: CARM95 0x00507110
 int gMellow_opponents;
 
-// GLOBAL: CARM95 0x507114
+// GLOBAL: CARM95 0x00507114
 int gTest_toggle;
 
-// GLOBAL: CARM95 0x507118
+// GLOBAL: CARM95 0x00507118
 int gAlready_elasticating;
 
-// GLOBAL: CARM95 0x50711c
+// GLOBAL: CARM95 0x0050711c
 int gVertices_used_in_non_edit_paths;
 
-// GLOBAL: CARM95 0x507120
+// GLOBAL: CARM95 0x00507120
 int gFaces_used_in_non_edit_paths;
 
-// GLOBAL: CARM95 0x507124
+// GLOBAL: CARM95 0x00507124
 int gMats_allocated;
 
-// GLOBAL: CARM95 0x507128
+// GLOBAL: CARM95 0x00507128
 int gOppo_paths_shown;
 
-// GLOBAL: CARM95 0x50712c
+// GLOBAL: CARM95 0x0050712c
 int gMade_path_filename;
 
-// GLOBAL: CARM95 0x507130
+// GLOBAL: CARM95 0x00507130
 int gBIG_APC_index = -1;
 
-// GLOBAL: CARM95 0x507138
+// GLOBAL: CARM95 0x00507138
 char* gPath_section_type_names[3];
 
-// GLOBAL: CARM95 0x507144
+// GLOBAL: CARM95 0x00507144
 int gMin_bangness = 100;
 
-// GLOBAL: CARM95 0x507148
+// GLOBAL: CARM95 0x00507148
 int gMax_bangness;
 
-// GLOBAL: CARM95 0x50714c
+// GLOBAL: CARM95 0x0050714c
 tU32 gNext_elastication;
 
-// GLOBAL: CARM95 0x507150
+// GLOBAL: CARM95 0x00507150
 tU32 gNext_write_during_elastication;
 char* gCop_name = "Faceless Cop";
 char* gDrone_name = "Innocent Civilian";
 
-// GLOBAL: CARM95 0x50715c
+// GLOBAL: CARM95 0x0050715c
 int gChallenger_index__opponent = -1; // suffix added to avoid duplicate symbol
 
-// GLOBAL: CARM95 0x507160
+// GLOBAL: CARM95 0x00507160
 int gSFS_count;
 
-// GLOBAL: CARM95 0x507164
+// GLOBAL: CARM95 0x00507164
 int gSFS_total_cycles;
 
-// GLOBAL: CARM95 0x507168
+// GLOBAL: CARM95 0x00507168
 int gSFS_max_cycles;
 
-// GLOBAL: CARM95 0x50716c
+// GLOBAL: CARM95 0x0050716c
 float gOpponent_nastyness_frigger = 1.f;
 
-// GLOBAL: CARM95 0x530ca8
+// GLOBAL: CARM95 0x00530ca8
 char gOppo_path_filename[256];
 
-// GLOBAL: CARM95 0x530df0
+// GLOBAL: CARM95 0x00530df0
 br_scalar gIn_view_distance;
 
-// GLOBAL: CARM95 0x530de8
+// GLOBAL: CARM95 0x00530de8
 tU8* gBit_per_node;
 
-// GLOBAL: CARM95 0x530da8
+// GLOBAL: CARM95 0x00530da8
 int gGrudge_reduction_per_period;
 
-// GLOBAL: CARM95 0x530df8
+// GLOBAL: CARM95 0x00530df8
 int gSFS_cycles_this_time;
 
-// GLOBAL: CARM95 0x530dec
+// GLOBAL: CARM95 0x00530dec
 br_scalar gMinimum_yness_before_knackerisation;
 
-// GLOBAL: CARM95 0x530dd4
+// GLOBAL: CARM95 0x00530dd4
 int gWanky_arse_tit_fuck;
 
-// GLOBAL: CARM95 0x530df4
+// GLOBAL: CARM95 0x00530df4
 br_scalar gHead_on_cos_value;
 
-// GLOBAL: CARM95 0x530de0
+// GLOBAL: CARM95 0x00530de0
 tU32 gNext_grudge_reduction;
 
-// GLOBAL: CARM95 0x530dd0
+// GLOBAL: CARM95 0x00530dd0
 br_scalar gCop_pursuit_speed_percentage_multiplier;
 
-// GLOBAL: CARM95 0x530db8
+// GLOBAL: CARM95 0x00530db8
 br_scalar gDefinite_cop_pursuit_speed;
 
-// GLOBAL: CARM95 0x530dd8
+// GLOBAL: CARM95 0x00530dd8
 int gAcknowledged_start;
 
-// GLOBAL: CARM95 0x530ca0
+// GLOBAL: CARM95 0x00530ca0
 int gStart_jumped;
 
-// GLOBAL: CARM95 0x530dc8
+// GLOBAL: CARM95 0x00530dc8
 int gNum_of_opponents_getting_near;
 
-// GLOBAL: CARM95 0x530dcc
+// GLOBAL: CARM95 0x00530dcc
 int gNumber_of_cops_before_faffage;
 
-// GLOBAL: CARM95 0x530dc0
+// GLOBAL: CARM95 0x00530dc0
 int gFirst_frame;
 
-// GLOBAL: CARM95 0x530dac
+// GLOBAL: CARM95 0x00530dac
 tU32 gAcme_frame_count;
 
-// GLOBAL: CARM95 0x530dbc
+// GLOBAL: CARM95 0x00530dbc
 br_scalar gDefinite_no_cop_pursuit_speed;
 
-// GLOBAL: CARM95 0x530de4
+// GLOBAL: CARM95 0x00530de4
 int gNum_of_opponents_completing_race;
 
-// GLOBAL: CARM95 0x530c98
+// GLOBAL: CARM95 0x00530c98
 int gNum_of_opponents_pursuing;
 
-// GLOBAL: CARM95 0x530dc4
+// GLOBAL: CARM95 0x00530dc4
 int gActive_car_list_rebuild_required;
 
-// GLOBAL: CARM95 0x530db4
+// GLOBAL: CARM95 0x00530db4
 br_scalar gFrame_period_for_this_munging_in_secs;
 
-// GLOBAL: CARM95 0x530c94
+// GLOBAL: CARM95 0x00530c94
 int gBig_bang;
 
-// GLOBAL: CARM95 0x530ddc
+// GLOBAL: CARM95 0x00530ddc
 int gProcessing_opponents;
 
-// GLOBAL: CARM95 0x5520e0
+// GLOBAL: CARM95 0x005520e0
 tU32 gFrame_period_for_this_munging;
 
-// GLOBAL: CARM95 0x5520e4
+// GLOBAL: CARM95 0x005520e4
 tU32 gTime_stamp_for_this_munging;
 
-// GLOBAL: CARM95 0x530c90
+// GLOBAL: CARM95 0x00530c90
 tS16 gMobile_section;
 
 // IDA: void __usercall PointActorAlongThisBloodyVector(br_actor *pThe_actor@<EAX>, br_vector3 *pThe_vector@<EDX>)
-// FUNCTION: CARM95 0x402390
+// FUNCTION: CARM95 0x00402390
 void PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vector) {
     br_transform trans;
 
@@ -222,8 +222,9 @@ void PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vect
 }
 
 // IDA: void __usercall ProcessCurrentObjective(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
-// FUNCTION: CARM95 0x4065e0
+// FUNCTION: CARM95 0x004065e0
 void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
+
     switch (pOpponent_spec->current_objective) {
     case eOOT_complete_race:
         ProcessCompleteRace(pOpponent_spec, pCommand);
@@ -264,7 +265,7 @@ void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_
 }
 
 // IDA: tS16 __usercall ReallocExtraPathNodes@<AX>(int pHow_many_then@<EAX>)
-// FUNCTION: CARM95 0x4057a1
+// FUNCTION: CARM95 0x004057a1
 tS16 ReallocExtraPathNodes(int pHow_many_then) {
     tPath_node* new_nodes;
     tS16 first_new_node;
@@ -288,7 +289,7 @@ tS16 ReallocExtraPathNodes(int pHow_many_then) {
 }
 
 // IDA: tS16 __usercall ReallocExtraPathSections@<AX>(int pHow_many_then@<EAX>)
-// FUNCTION: CARM95 0x405855
+// FUNCTION: CARM95 0x00405855
 tS16 ReallocExtraPathSections(int pHow_many_then) {
     tPath_section* new_sections;
     tS16 first_new_section;
@@ -312,7 +313,7 @@ tS16 ReallocExtraPathSections(int pHow_many_then) {
 }
 
 // IDA: int __usercall PointVisibleFromHere@<EAX>(br_vector3 *pFrom@<EAX>, br_vector3 *pTo@<EDX>)
-// FUNCTION: CARM95 0x4063ac
+// FUNCTION: CARM95 0x004063ac
 int PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
     br_vector3 from;
     br_vector3 dir;
@@ -329,7 +330,7 @@ int PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
 }
 
 // IDA: tS16 __usercall FindNearestPathNode@<AX>(br_vector3 *pActor_coords@<EAX>, br_scalar *pDistance@<EDX>)
-// FUNCTION: CARM95 0x40f331
+// FUNCTION: CARM95 0x0040f331
 tS16 FindNearestPathNode(br_vector3* pActor_coords, br_scalar* pDistance) {
     int i;
     tS16 nearest_node;
@@ -350,13 +351,14 @@ tS16 FindNearestPathNode(br_vector3* pActor_coords, br_scalar* pDistance) {
 }
 
 // IDA: tS16 __usercall FindNearestPathSection@<AX>(br_vector3 *pActor_coords@<EAX>, br_vector3 *pPath_direction@<EDX>, br_vector3 *pIntersect@<EBX>, br_scalar *pDistance@<ECX>)
-// FUNCTION: CARM95 0x40294b
+// FUNCTION: CARM95 0x0040294b
 tS16 FindNearestPathSection(br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance) {
+
     return FindNearestGeneralSection(NULL, pActor_coords, pPath_direction, pIntersect, pDistance);
 }
 
 // IDA: tS16 __usercall FindNearestGeneralSection@<AX>(tCar_spec *pPursuee@<EAX>, br_vector3 *pActor_coords@<EDX>, br_vector3 *pPath_direction@<EBX>, br_vector3 *pIntersect@<ECX>, br_scalar *pDistance)
-// FUNCTION: CARM95 0x402975
+// FUNCTION: CARM95 0x00402975
 tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance) {
     int section_no;
     int no_sections;
@@ -458,8 +460,9 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
 }
 
 // IDA: void __usercall DeadStopCar(tCar_spec *pCar_spec@<EAX>)
-// FUNCTION: CARM95 0x402481
+// FUNCTION: CARM95 0x00402481
 void DeadStopCar(tCar_spec* pCar_spec) {
+
     pCar_spec->acc_force = 0.f;
     pCar_spec->brake_force = 0.f;
     pCar_spec->curvature = 0.f;
@@ -470,8 +473,9 @@ void DeadStopCar(tCar_spec* pCar_spec) {
 }
 
 // IDA: void __usercall TurnOpponentPhysicsOn(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x402401
+// FUNCTION: CARM95 0x00402401
 void TurnOpponentPhysicsOn(tOpponent_spec* pOpponent_spec) {
+
     if (pOpponent_spec->physics_me == 0) {
         pOpponent_spec->physics_me = 1;
         gActive_car_list_rebuild_required = 1;
@@ -479,8 +483,9 @@ void TurnOpponentPhysicsOn(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: void __usercall TurnOpponentPhysicsOff(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x40243f
+// FUNCTION: CARM95 0x0040243f
 void TurnOpponentPhysicsOff(tOpponent_spec* pOpponent_spec) {
+
     DeadStopCar(pOpponent_spec->car_spec);
     if (pOpponent_spec->physics_me) {
         pOpponent_spec->physics_me = 0;
@@ -489,7 +494,7 @@ void TurnOpponentPhysicsOff(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: void __cdecl NewObjective(tOpponent_spec *pOpponent_spec, tOpponent_objective_type pObjective_type, ...)
-// FUNCTION: CARM95 0x40694d
+// FUNCTION: CARM95 0x0040694d
 void NewObjective(tOpponent_spec* pOpponent_spec, tOpponent_objective_type pObjective_type, ...) {
     va_list marker;
 
@@ -522,7 +527,7 @@ void NewObjective(tOpponent_spec* pOpponent_spec, tOpponent_objective_type pObje
 }
 
 // IDA: void __usercall CalcRaceRoute(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x402512
+// FUNCTION: CARM95 0x00402512
 void CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
     tS16 section_no;
     tS16 section_no_index;
@@ -591,7 +596,7 @@ void CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: void __usercall TopUpRandomRoute(tOpponent_spec *pOpponent_spec@<EAX>, int pSections_to_add@<EDX>)
-// FUNCTION: CARM95 0x402e11
+// FUNCTION: CARM95 0x00402e11
 void TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add) {
     tS16 section_no;
     tS16 node_no;
@@ -642,9 +647,11 @@ void TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add) {
 }
 
 // IDA: int __usercall SearchForSection@<EAX>(tRoute_section *pTemp_store@<EAX>, tRoute_section *pPerm_store@<EDX>, int *pNum_of_perm_store_sections@<EBX>, tS16 pTarget_section@<ECX>, int pDepth, br_scalar pDistance_so_far, tOpponent_spec *pOpponent_spec)
-// FUNCTION: CARM95 0x407f5d
+// FUNCTION: CARM95 0x00407f5d
 int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, int* pNum_of_perm_store_sections, tS16 pTarget_section, int pDepth, br_scalar pDistance_so_far, tOpponent_spec* pOpponent_spec) {
+    // GLOBAL: CARM95 0x530c9c
     static br_scalar shortest_dist;
+    // GLOBAL: CARM95 0x530db0
     static int routes_found;
     char depth_indent[32];
     int direction;
@@ -671,6 +678,7 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
     node_ptr = &gProgram_state.AI_vehicles.path_nodes[node_no];
     gBit_per_node[node_no / 8] |= 1 << (node_no % 8);
     for (section_no_index = 0; section_no_index < node_ptr->number_of_sections; section_no_index++) {
+
         section_no = node_ptr->sections[section_no_index];
         direction = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] != node_no;
         section_no_dir_index = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[direction];
@@ -715,7 +723,7 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
 }
 
 // IDA: void __usercall CalcGetNearPlayerRoute(tOpponent_spec *pOpponent_spec@<EAX>, tCar_spec *pPlayer@<EDX>)
-// FUNCTION: CARM95 0x4089bf
+// FUNCTION: CARM95 0x004089bf
 void CalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPlayer) {
     int i;
     int pass_2_depth;
@@ -787,7 +795,7 @@ void CalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPlayer) 
 }
 
 // IDA: void __usercall CalcReturnToStartPointRoute(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x407d1e
+// FUNCTION: CARM95 0x00407d1e
 void CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec) {
     int i;
     int pass_2_depth;
@@ -835,14 +843,16 @@ void CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: void __usercall ClearOpponentsProjectedRoute(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x404684
+// FUNCTION: CARM95 0x00404684
 void ClearOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec) {
+
     pOpponent_spec->nnext_sections = 0;
 }
 
 // IDA: int __usercall AddToOpponentsProjectedRoute@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection_no@<EDX>, int pDirection@<EBX>)
-// FUNCTION: CARM95 0x4030ef
+// FUNCTION: CARM95 0x004030ef
 int AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_no, int pDirection) {
+
     if (pOpponent_spec->nnext_sections >= COUNT_OF(pOpponent_spec->next_sections)) {
         return 0;
     }
@@ -853,7 +863,7 @@ int AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_n
 }
 
 // IDA: int __usercall ShiftOpponentsProjectedRoute@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, int pPlaces@<EDX>)
-// FUNCTION: CARM95 0x404699
+// FUNCTION: CARM95 0x00404699
 int ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces) {
     int i;
 
@@ -869,8 +879,9 @@ int ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces) {
 }
 
 // IDA: void __usercall StunTheBugger(tOpponent_spec *pOpponent_spec@<EAX>, int pMilliseconds@<EDX>)
-// FUNCTION: CARM95 0x40b12d
+// FUNCTION: CARM95 0x0040b12d
 void StunTheBugger(tOpponent_spec* pOpponent_spec, int pMilliseconds) {
+
     pOpponent_spec->car_spec->acc_force = 0.f;
     pOpponent_spec->car_spec->brake_force = 0.f;
     pOpponent_spec->car_spec->curvature = 0.f;
@@ -878,13 +889,14 @@ void StunTheBugger(tOpponent_spec* pOpponent_spec, int pMilliseconds) {
 }
 
 // IDA: void __usercall UnStunTheBugger(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x405e44
+// FUNCTION: CARM95 0x00405e44
 void UnStunTheBugger(tOpponent_spec* pOpponent_spec) {
+
     pOpponent_spec->stun_time_ends = 0;
 }
 
 // IDA: void __usercall ProcessCompleteRace(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
-// FUNCTION: CARM95 0x406732
+// FUNCTION: CARM95 0x00406732
 void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
     br_vector3* initial_pos;
     br_actor* car_actor;
@@ -931,7 +943,7 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
 }
 
 // IDA: void __usercall StartRecordingTrail(tCar_spec *pPursuee@<EAX>)
-// FUNCTION: CARM95 0x405e59
+// FUNCTION: CARM95 0x00405e59
 void StartRecordingTrail(tCar_spec* pPursuee) {
     int i;
 
@@ -953,7 +965,7 @@ void StartRecordingTrail(tCar_spec* pPursuee) {
 }
 
 // IDA: void __usercall RecordNextTrailNode(tCar_spec *pPursuee@<EAX>)
-// FUNCTION: CARM95 0x405f97
+// FUNCTION: CARM95 0x00405f97
 void RecordNextTrailNode(tCar_spec* pPursuee) {
     tPursuee_trail* trail;
     br_vector3 start1;
@@ -1004,13 +1016,14 @@ void RecordNextTrailNode(tCar_spec* pPursuee) {
 }
 
 // IDA: tS16 __usercall FindNearestTrailSection@<AX>(tOpponent_spec *pOpponent_spec@<EAX>, tCar_spec *pPursuee@<EDX>, br_vector3 *pSection_v@<EBX>, br_vector3 *pIntersect@<ECX>, br_scalar *pDistance)
-// FUNCTION: CARM95 0x40769d
+// FUNCTION: CARM95 0x0040769d
 tS16 FindNearestTrailSection(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee, br_vector3* pSection_v, br_vector3* pIntersect, br_scalar* pDistance) {
+
     return FindNearestGeneralSection(pPursuee, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, pSection_v, pIntersect, pDistance);
 }
 
 // IDA: tS16 __usercall CalcNextTrailSection@<AX>(tOpponent_spec *pOpponent_spec@<EAX>, int pSection@<EDX>)
-// FUNCTION: CARM95 0x403145
+// FUNCTION: CARM95 0x00403145
 tS16 CalcNextTrailSection(tOpponent_spec* pOpponent_spec, int pSection) {
     int section_no;
     tPursuee_trail* trail;
@@ -1025,7 +1038,7 @@ tS16 CalcNextTrailSection(tOpponent_spec* pOpponent_spec, int pSection) {
 }
 
 // IDA: void __usercall ProcessPursueAndTwat(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
-// FUNCTION: CARM95 0x406a69
+// FUNCTION: CARM95 0x00406a69
 void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
     tPursue_car_data* data;
     br_vector3 wank;
@@ -1200,7 +1213,7 @@ void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_com
 }
 
 // IDA: void __usercall ProcessRunAway(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
-// FUNCTION: CARM95 0x4076d2
+// FUNCTION: CARM95 0x004076d2
 void ProcessRunAway(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
     int res;
     tS16 section_no;
@@ -1257,8 +1270,9 @@ void ProcessRunAway(tOpponent_spec* pOpponent_spec, tProcess_objective_command p
 }
 
 // IDA: void __usercall ProcessWaitForSomeHaplessSod(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
-// FUNCTION: CARM95 0x4079da
+// FUNCTION: CARM95 0x004079da
 void ProcessWaitForSomeHaplessSod(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
+
     switch (pCommand) {
     case ePOC_start:
     case ePOC_run:
@@ -1270,7 +1284,7 @@ void ProcessWaitForSomeHaplessSod(tOpponent_spec* pOpponent_spec, tProcess_objec
 }
 
 // IDA: void __usercall ProcessReturnToStart(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
-// FUNCTION: CARM95 0x407a66
+// FUNCTION: CARM95 0x00407a66
 void ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
     br_vector3 section_v;
     br_vector3 our_pos_xz;
@@ -1328,7 +1342,7 @@ void ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProcess_objective_com
 }
 
 // IDA: void __usercall ProcessLevitate(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
-// FUNCTION: CARM95 0x408349
+// FUNCTION: CARM95 0x00408349
 void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
     float t;
     float terminal_time;
@@ -1373,7 +1387,7 @@ void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command 
 }
 
 // IDA: void __usercall ProcessGetNearPlayer(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
-// FUNCTION: CARM95 0x4086fe
+// FUNCTION: CARM95 0x004086fe
 void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
     br_vector3* initial_pos;
     br_actor* car_actor;
@@ -1420,8 +1434,9 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
 }
 
 // IDA: void __usercall ProcessFrozen(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
-// FUNCTION: CARM95 0x408d47
+// FUNCTION: CARM95 0x00408d47
 void ProcessFrozen(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
+
     switch (pCommand) {
     case ePOC_start:
         dr_dprintf("%d ProcessFrozen() - new task started", pOpponent_spec->index);
@@ -1440,7 +1455,7 @@ void ProcessFrozen(tOpponent_spec* pOpponent_spec, tProcess_objective_command pC
 }
 
 // IDA: int __usercall HeadOnWithPlayerPossible@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x409cd5
+// FUNCTION: CARM95 0x00409cd5
 int HeadOnWithPlayerPossible(tOpponent_spec* pOpponent_spec) {
     br_vector3 oppo_to_player_norm;
 
@@ -1461,26 +1476,30 @@ int HeadOnWithPlayerPossible(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: int __usercall AlreadyPursuingCar@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tCar_spec *pPursuee@<EDX>)
-// FUNCTION: CARM95 0x409e29
+// FUNCTION: CARM95 0x00409e29
 int AlreadyPursuingCar(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee) {
+
     return pOpponent_spec->current_objective == eOOT_pursue_and_twat && pOpponent_spec->pursue_car_data.pursuee == pPursuee;
 }
 
 // IDA: int __usercall LastTwatteeAPlayer@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x409e64
+// FUNCTION: CARM95 0x00409e64
 int LastTwatteeAPlayer(tOpponent_spec* pOpponent_spec) {
+
     return pOpponent_spec->car_spec->last_person_we_hit && pOpponent_spec->car_spec->last_person_we_hit->driver == eDriver_local_human;
 }
 
 // IDA: int __usercall LastTwatterAPlayer@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x409ea9
+// FUNCTION: CARM95 0x00409ea9
 int LastTwatterAPlayer(tOpponent_spec* pOpponent_spec) {
+
     return pOpponent_spec->car_spec->last_person_to_hit_us && pOpponent_spec->car_spec->last_person_to_hit_us->driver == eDriver_local_human;
 }
 
 // IDA: void __usercall ObjectiveComplete(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x408e2d
+// FUNCTION: CARM95 0x00408e2d
 void ObjectiveComplete(tOpponent_spec* pOpponent_spec) {
+
     dr_dprintf("%s: Objective Completed", pOpponent_spec->car_spec->driver_name);
     pOpponent_spec->new_objective_required = 1;
     switch (pOpponent_spec->current_objective) {
@@ -1499,7 +1518,7 @@ void ObjectiveComplete(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: void __usercall TeleportOpponentToNearestSafeLocation(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x404464
+// FUNCTION: CARM95 0x00404464
 void TeleportOpponentToNearestSafeLocation(tOpponent_spec* pOpponent_spec) {
     tS16 section_no;
     tU8 section_direction;
@@ -1537,7 +1556,7 @@ void TeleportOpponentToNearestSafeLocation(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: void __usercall ChooseNewObjective(tOpponent_spec *pOpponent_spec@<EAX>, int pMust_choose_one@<EDX>)
-// FUNCTION: CARM95 0x408ec5
+// FUNCTION: CARM95 0x00408ec5
 void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
     char str[255];
     tS16 players_section;
@@ -1746,7 +1765,7 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
 }
 
 // IDA: void __usercall ProcessThisOpponent(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x406458
+// FUNCTION: CARM95 0x00406458
 void ProcessThisOpponent(tOpponent_spec* pOpponent_spec) {
     int i;
 
@@ -1771,7 +1790,7 @@ void ProcessThisOpponent(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: int __usercall IsNetCarActive@<EAX>(br_vector3 *pPoint@<EAX>)
-// FUNCTION: CARM95 0x4034b7
+// FUNCTION: CARM95 0x004034b7
 int IsNetCarActive(br_vector3* pPoint) {
     br_vector3 tv;
 
@@ -1787,7 +1806,7 @@ int IsNetCarActive(br_vector3* pPoint) {
 }
 
 // IDA: void __cdecl RebuildActiveCarList()
-// FUNCTION: CARM95 0x4031c3
+// FUNCTION: CARM95 0x004031c3
 void RebuildActiveCarList(void) {
     int i;
     tCar_spec* car_spec;
@@ -1847,8 +1866,9 @@ void RebuildActiveCarList(void) {
 }
 
 // IDA: void __cdecl ForceRebuildActiveCarList()
-// FUNCTION: CARM95 0x40319c
+// FUNCTION: CARM95 0x0040319c
 void ForceRebuildActiveCarList(void) {
+
     gActive_car_list_rebuild_required = 1;
     if (gProgram_state.racing) {
         RebuildActiveCarList();
@@ -1856,8 +1876,9 @@ void ForceRebuildActiveCarList(void) {
 }
 
 // IDA: void __usercall StartToCheat(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x409eee
+// FUNCTION: CARM95 0x00409eee
 void StartToCheat(tOpponent_spec* pOpponent_spec) {
+
     dr_dprintf("%s: StartToCheat() - Starting to cheat", pOpponent_spec->car_spec->driver_name);
     pOpponent_spec->cheating = 1;
     if ((pOpponent_spec->car_spec->car_ID & 0xff00) == 0x300) {
@@ -1868,8 +1889,9 @@ void StartToCheat(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: void __usercall OiStopCheating(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x409f78
+// FUNCTION: CARM95 0x00409f78
 void OiStopCheating(tOpponent_spec* pOpponent_spec) {
+
     dr_dprintf("%s: OiStopCheating() - End of cheating sesh", pOpponent_spec->car_spec->driver_name);
     pOpponent_spec->cheating = 0;
     if ((pOpponent_spec->car_spec->car_ID & 0xff00) == 0x300) {
@@ -1880,7 +1902,7 @@ void OiStopCheating(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: int __usercall TeleportCopToStart@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x409ff7
+// FUNCTION: CARM95 0x00409ff7
 int TeleportCopToStart(tOpponent_spec* pOpponent_spec) {
     br_vector3 wank;
 
@@ -1902,7 +1924,7 @@ int TeleportCopToStart(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: void __usercall CalcDistanceFromHome(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x40a13d
+// FUNCTION: CARM95 0x0040a13d
 void CalcDistanceFromHome(tOpponent_spec* pOpponent_spec) {
     br_vector3 wank;
 
@@ -1911,7 +1933,7 @@ void CalcDistanceFromHome(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: int __usercall MassageOpponentPosition@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, int pMassage_count@<EDX>)
-// FUNCTION: CARM95 0x40472e
+// FUNCTION: CARM95 0x0040472e
 int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) {
     br_matrix34* mat;
     br_vector3* car_trans;
@@ -1948,7 +1970,7 @@ int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) 
 }
 
 // IDA: int __usercall RematerialiseOpponentOnThisSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed, tS16 pSection_no)
-// FUNCTION: CARM95 0x4035b1
+// FUNCTION: CARM95 0x004035b1
 int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar pSpeed, tS16 pSection_no) {
     br_vector3* start;
     br_vector3* finish;
@@ -2000,7 +2022,7 @@ int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar
 }
 
 // IDA: int __usercall RematerialiseOpponentOnNearestSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed)
-// FUNCTION: CARM95 0x4038fe
+// FUNCTION: CARM95 0x004038fe
 int RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
     br_vector3 intersect;
     br_vector3 direction_v;
@@ -2035,10 +2057,13 @@ int RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_sca
 }
 
 // IDA: int __usercall RematerialiseOpponent@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed)
-// FUNCTION: CARM95 0x403ad9
+// FUNCTION: CARM95 0x00403ad9
 int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
+    // GLOBAL: CARM95 0x507174
     static int count;
+    // GLOBAL: CARM95 0x507170
     static int total;
+    // GLOBAL: CARM95 0x507178
     static int highest;
     int this_total;
     br_matrix34* mat;
@@ -2162,7 +2187,7 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
 }
 
 // IDA: void __usercall CalcPlayerConspicuousness(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x40a1ab
+// FUNCTION: CARM95 0x0040a1ab
 void CalcPlayerConspicuousness(tOpponent_spec* pOpponent_spec) {
     br_vector3 pos_in_cop_space;
     br_matrix34 inverse_transform;
@@ -2192,8 +2217,9 @@ void CalcPlayerConspicuousness(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: void __usercall CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x404a0e
+// FUNCTION: CARM95 0x00404a0e
 void CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec* pOpponent_spec) {
+
     BrVector3Sub(&pOpponent_spec->player_to_oppo_v, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
     pOpponent_spec->player_to_oppo_d = BrVector3Length(&pOpponent_spec->player_to_oppo_v);
     if (pOpponent_spec->player_to_oppo_d < gIn_view_distance) {
@@ -2202,15 +2228,16 @@ void CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec* pOpp
 }
 
 // IDA: void __usercall ChallengeOccurred(int pChallenger_index@<EAX>, int pAccepted@<EDX>)
-// FUNCTION: CARM95 0x404abc
+// FUNCTION: CARM95 0x00404abc
 void ChallengeOccurred(int pChallenger_index, int pAccepted) {
+
     if (pAccepted) {
         gChallenger_index__opponent = pChallenger_index;
     }
 }
 
 // IDA: void __cdecl LoadCopCars()
-// FUNCTION: CARM95 0x404ad9
+// FUNCTION: CARM95 0x00404ad9
 void LoadCopCars(void) {
     int i;
 
@@ -2228,7 +2255,7 @@ void LoadCopCars(void) {
 }
 
 // IDA: void __usercall LoadInOppoPaths(FILE *pF@<EAX>)
-// FUNCTION: CARM95 0x404b9b
+// FUNCTION: CARM95 0x00404b9b
 void LoadInOppoPaths(FILE* pF) {
     char s[256];
     char* res;
@@ -2393,8 +2420,9 @@ void LoadInOppoPaths(FILE* pF) {
 }
 
 // IDA: void __cdecl DisposeOpponentPaths()
-// FUNCTION: CARM95 0x405912
+// FUNCTION: CARM95 0x00405912
 void DisposeOpponentPaths(void) {
+
     if (gProgram_state.AI_vehicles.path_nodes != NULL) {
         BrMemFree(gProgram_state.AI_vehicles.path_nodes);
     }
@@ -2412,7 +2440,7 @@ void DisposeOpponentPaths(void) {
 }
 
 // IDA: void __usercall MungeOpponents(tU32 pFrame_period@<EAX>)
-// FUNCTION: CARM95 0x4059a0
+// FUNCTION: CARM95 0x004059a0
 void MungeOpponents(tU32 pFrame_period) {
     int i;
     int un_stun_flag;
@@ -2501,7 +2529,7 @@ void MungeOpponents(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl SetInitialCopPositions()
-// FUNCTION: CARM95 0x40a3a5
+// FUNCTION: CARM95 0x0040a3a5
 void SetInitialCopPositions(void) {
     int i;
 
@@ -2516,7 +2544,7 @@ void SetInitialCopPositions(void) {
 }
 
 // IDA: void __usercall InitOpponents(tRace_info *pRace_info@<EAX>)
-// FUNCTION: CARM95 0x40a4ce
+// FUNCTION: CARM95 0x0040a4ce
 void InitOpponents(tRace_info* pRace_info) {
     int i;
     int opponent_number;
@@ -2661,7 +2689,7 @@ void InitOpponents(tRace_info* pRace_info) {
 }
 
 // IDA: void __cdecl DisposeOpponents()
-// FUNCTION: CARM95 0x40b186
+// FUNCTION: CARM95 0x0040b186
 void DisposeOpponents(void) {
     int i;
 
@@ -2672,7 +2700,7 @@ void DisposeOpponents(void) {
 }
 
 // IDA: void __usercall WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_was@<EAX>)
-// FUNCTION: CARM95 0x40b20f
+// FUNCTION: CARM95 0x0040b20f
 void WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_was) {
     int i;
 
@@ -2697,7 +2725,7 @@ void WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_w
 }
 
 // IDA: void __usercall ReportMurderToPoliceDepartment(tCar_spec *pCar_spec@<EAX>)
-// FUNCTION: CARM95 0x40b3a5
+// FUNCTION: CARM95 0x0040b3a5
 void ReportMurderToPoliceDepartment(tCar_spec* pCar_spec) {
     int i;
 
@@ -2709,8 +2737,9 @@ void ReportMurderToPoliceDepartment(tCar_spec* pCar_spec) {
 }
 
 // IDA: int __usercall GetCarCount@<EAX>(tVehicle_type pCategory@<EAX>)
-// FUNCTION: CARM95 0x40b412
+// FUNCTION: CARM95 0x0040b412
 int GetCarCount(tVehicle_type pCategory) {
+
     switch (pCategory) {
     case eVehicle_self:
         return 1;
@@ -2740,8 +2769,9 @@ int GetCarCount(tVehicle_type pCategory) {
 }
 
 // IDA: tCar_spec* __usercall GetCarSpec@<EAX>(tVehicle_type pCategory@<EAX>, int pIndex@<EDX>)
-// FUNCTION: CARM95 0x40b4b1
+// FUNCTION: CARM95 0x0040b4b1
 tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
+
     switch (pCategory) {
 
     case eVehicle_self:
@@ -2773,8 +2803,9 @@ tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
 }
 
 // IDA: char* __usercall GetDriverName@<EAX>(tVehicle_type pCategory@<EAX>, int pIndex@<EDX>)
-// FUNCTION: CARM95 0x40b592
+// FUNCTION: CARM95 0x0040b592
 char* GetDriverName(tVehicle_type pCategory, int pIndex) {
+
     switch (pCategory) {
     case eVehicle_self:
         return gProgram_state.player_name[gProgram_state.frank_or_anniness];
@@ -2791,7 +2822,7 @@ char* GetDriverName(tVehicle_type pCategory, int pIndex) {
 }
 
 // IDA: tOpponent_spec* __usercall GetOpponentSpecFromCarSpec@<EAX>(tCar_spec *pCar_spec@<EAX>)
-// FUNCTION: CARM95 0x40b639
+// FUNCTION: CARM95 0x0040b639
 tOpponent_spec* GetOpponentSpecFromCarSpec(tCar_spec* pCar_spec) {
     int i;
 
@@ -2812,7 +2843,7 @@ tOpponent_spec* GetOpponentSpecFromCarSpec(tCar_spec* pCar_spec) {
 }
 
 // IDA: tCar_spec* __usercall GetCarSpecFromGlobalOppoIndex@<EAX>(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x40b74d
+// FUNCTION: CARM95 0x0040b74d
 tCar_spec* GetCarSpecFromGlobalOppoIndex(int pIndex) {
     int i;
 
@@ -2825,8 +2856,9 @@ tCar_spec* GetCarSpecFromGlobalOppoIndex(int pIndex) {
 }
 
 // IDA: int __usercall GetOpponentsRealSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, int pSection_no@<EDX>)
-// FUNCTION: CARM95 0x40b7b7
+// FUNCTION: CARM95 0x0040b7b7
 int GetOpponentsRealSection(tOpponent_spec* pOpponent_spec, int pSection_no) {
+
     if (pSection_no >= 20000) {
         return pOpponent_spec->next_sections[pSection_no - 20000].section_no;
     } else if (pSection_no >= 10000) {
@@ -2837,8 +2869,9 @@ int GetOpponentsRealSection(tOpponent_spec* pOpponent_spec, int pSection_no) {
 }
 
 // IDA: int __usercall GetOpponentsFirstSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x40b806
+// FUNCTION: CARM95 0x0040b806
 int GetOpponentsFirstSection(tOpponent_spec* pOpponent_spec) {
+
     if (pOpponent_spec->current_objective != eOOT_pursue_and_twat) {
         return 20000;
     }
@@ -2852,8 +2885,9 @@ int GetOpponentsFirstSection(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: int __usercall GetOpponentsNextSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pCurrent_section@<EDX>)
-// FUNCTION: CARM95 0x40b86e
+// FUNCTION: CARM95 0x0040b86e
 int GetOpponentsNextSection(tOpponent_spec* pOpponent_spec, tS16 pCurrent_section) {
+
     if (pCurrent_section < 20000) {
         if (pCurrent_section < 15000) {
             return -1;
@@ -2868,7 +2902,7 @@ int GetOpponentsNextSection(tOpponent_spec* pOpponent_spec, tS16 pCurrent_sectio
 }
 
 // IDA: tS16 __usercall GetOpponentsSectionStartNode@<AX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>)
-// FUNCTION: CARM95 0x40b91f
+// FUNCTION: CARM95 0x0040b91f
 tS16 GetOpponentsSectionStartNode(tOpponent_spec* pOpponent_spec, tS16 pSection) {
     tS16 section_no;
     int node_index_index;
@@ -2889,7 +2923,7 @@ tS16 GetOpponentsSectionStartNode(tOpponent_spec* pOpponent_spec, tS16 pSection)
 }
 
 // IDA: tS16 __usercall GetOpponentsSectionFinishNode@<AX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>)
-// FUNCTION: CARM95 0x40b9fb
+// FUNCTION: CARM95 0x0040b9fb
 tS16 GetOpponentsSectionFinishNode(tOpponent_spec* pOpponent_spec, tS16 pSection) {
     tS16 section_no;
     int node_index_index;
@@ -2904,7 +2938,7 @@ tS16 GetOpponentsSectionFinishNode(tOpponent_spec* pOpponent_spec, tS16 pSection
 }
 
 // IDA: br_vector3* __usercall GetOpponentsSectionStartNodePoint@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>)
-// FUNCTION: CARM95 0x40baa1
+// FUNCTION: CARM95 0x0040baa1
 br_vector3* GetOpponentsSectionStartNodePoint(tOpponent_spec* pOpponent_spec, tS16 pSection) {
     tS16 section_no;
     tS16 node_no;
@@ -2929,7 +2963,7 @@ br_vector3* GetOpponentsSectionStartNodePoint(tOpponent_spec* pOpponent_spec, tS
 }
 
 // IDA: br_vector3* __usercall GetOpponentsSectionFinishNodePoint@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>)
-// FUNCTION: CARM95 0x40bbc3
+// FUNCTION: CARM95 0x0040bbc3
 br_vector3* GetOpponentsSectionFinishNodePoint(tOpponent_spec* pOpponent_spec, tS16 pSection) {
     tS16 section_no;
     tS16 node_no;
@@ -2953,8 +2987,9 @@ br_vector3* GetOpponentsSectionFinishNodePoint(tOpponent_spec* pOpponent_spec, t
 }
 
 // IDA: br_scalar __usercall GetOpponentsSectionWidth@<ST0>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>)
-// FUNCTION: CARM95 0x40bccd
+// FUNCTION: CARM95 0x0040bccd
 br_scalar GetOpponentsSectionWidth(tOpponent_spec* pOpponent_spec, tS16 pSection) {
+
     if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
         return gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pSection - 20000].section_no].width;
     }
@@ -2968,7 +3003,7 @@ br_scalar GetOpponentsSectionWidth(tOpponent_spec* pOpponent_spec, tS16 pSection
 }
 
 // IDA: int __usercall GetOpponentsSectionMinSpeed@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>, int pTowards_finish@<EBX>)
-// FUNCTION: CARM95 0x40bd7a
+// FUNCTION: CARM95 0x0040bd7a
 int GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish) {
     tS16 section_no;
     int direction;
@@ -2990,7 +3025,7 @@ int GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, i
 }
 
 // IDA: int __usercall GetOpponentsSectionMaxSpeed@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>, int pTowards_finish@<EBX>)
-// FUNCTION: CARM95 0x40be6e
+// FUNCTION: CARM95 0x0040be6e
 int GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish) {
     tS16 section_no;
     int direction;
@@ -3012,14 +3047,15 @@ int GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, i
 }
 
 // IDA: void __usercall InitOpponentPsyche(int pOpponent_index@<EAX>)
-// FUNCTION: CARM95 0x40bf68
+// FUNCTION: CARM95 0x0040bf68
 void InitOpponentPsyche(int pOpponent_index) {
     gOpponents[pOpponent_index].psyche.grudge_against_player = 0;
 }
 
 // IDA: void __usercall ClearTwattageOccurrenceVariables(tOpponent_spec *pOpponent_spec@<EAX>)
-// FUNCTION: CARM95 0x40bf8d
+// FUNCTION: CARM95 0x0040bf8d
 void ClearTwattageOccurrenceVariables(tOpponent_spec* pOpponent_spec) {
+
     pOpponent_spec->car_spec->big_bang = 0;
     pOpponent_spec->car_spec->scary_bang = 0;
     pOpponent_spec->car_spec->grudge_raised_recently = 0;
@@ -3028,8 +3064,9 @@ void ClearTwattageOccurrenceVariables(tOpponent_spec* pOpponent_spec) {
 }
 
 // IDA: void __usercall TwoCarsHitEachOther(tCar_spec *pA_car@<EAX>, tCar_spec *pAnother_car@<EDX>)
-// FUNCTION: CARM95 0x40bfdf
+// FUNCTION: CARM95 0x0040bfdf
 void TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* pAnother_car) {
+
     if (pA_car->driver == eDriver_local_human) {
         pAnother_car->last_time_we_touched_a_player = gTime_stamp_for_this_munging;
     }
@@ -3039,7 +3076,7 @@ void TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* pAnother_car) {
 }
 
 // IDA: void __usercall RecordOpponentTwattageOccurrence(tCar_spec *pTwatter@<EAX>, tCar_spec *pTwattee@<EDX>)
-// FUNCTION: CARM95 0x40c020
+// FUNCTION: CARM95 0x0040c020
 void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) {
     int bangness;
     int twatter_index;
@@ -3129,13 +3166,14 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
 }
 
 // IDA: void __cdecl ToggleOpponentTest()
-// FUNCTION: CARM95 0x40c537
+// FUNCTION: CARM95 0x0040c537
 void ToggleOpponentTest(void) {
+
     gTest_toggle = !gTest_toggle;
 }
 
 // IDA: void __cdecl ToggleOpponentProcessing()
-// FUNCTION: CARM95 0x40c568
+// FUNCTION: CARM95 0x0040c568
 void ToggleOpponentProcessing(void) {
     int i;
 
@@ -3162,7 +3200,7 @@ void ToggleOpponentProcessing(void) {
 }
 
 // IDA: void __cdecl ToggleMellowOpponents()
-// FUNCTION: CARM95 0x40c6dd
+// FUNCTION: CARM95 0x0040c6dd
 void ToggleMellowOpponents(void) {
     int i;
 
@@ -3178,7 +3216,7 @@ void ToggleMellowOpponents(void) {
 }
 
 // IDA: void __cdecl RepairOpponentsSystems()
-// FUNCTION: CARM95 0x40c795
+// FUNCTION: CARM95 0x0040c795
 void RepairOpponentsSystems(void) {
     int i;
 
@@ -3194,8 +3232,9 @@ void RepairOpponentsSystems(void) {
 
 // IDA: void __usercall CopyVertex(br_vertex *pDest_vertex@<EAX>, br_vertex *pSrc_vertex@<EDX>)
 //  Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x40e205
+// FUNCTION: CARM95 0x0040e205
 void CopyVertex__opponent(br_vertex* pDest_vertex, br_vertex* pSrc_vertex) {
+
     BrVector3Copy(&pDest_vertex->p, &pSrc_vertex->p);
     pDest_vertex->map.v[0] = pSrc_vertex->map.v[0];
     pDest_vertex->map.v[1] = pSrc_vertex->map.v[1];
@@ -3207,8 +3246,9 @@ void CopyVertex__opponent(br_vertex* pDest_vertex, br_vertex* pSrc_vertex) {
 
 // IDA: void __usercall CopyFace(br_face *pDest_face@<EAX>, br_face *pSrc_face@<EDX>)
 //  Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x40e27a
+// FUNCTION: CARM95 0x0040e27a
 void CopyFace__opponent(br_face* pDest_face, br_face* pSrc_face) {
+
     pDest_face->vertices[0] = pSrc_face->vertices[0];
     pDest_face->vertices[1] = pSrc_face->vertices[1];
     pDest_face->vertices[2] = pSrc_face->vertices[2];
@@ -3218,7 +3258,7 @@ void CopyFace__opponent(br_face* pDest_face, br_face* pSrc_face) {
 }
 
 // IDA: void __usercall DeleteSection(tS16 pSection_to_delete@<EAX>)
-// FUNCTION: CARM95 0x40c868
+// FUNCTION: CARM95 0x0040c868
 void DeleteSection(tS16 pSection_to_delete) {
     tS16 section_no;
     tS16 section_no_index;
@@ -3257,7 +3297,7 @@ void DeleteSection(tS16 pSection_to_delete) {
 }
 
 // IDA: void __usercall DeleteNode(tS16 pNode_to_delete@<EAX>, int pAnd_sections@<EDX>)
-// FUNCTION: CARM95 0x40caf4
+// FUNCTION: CARM95 0x0040caf4
 void DeleteNode(tS16 pNode_to_delete, int pAnd_sections) {
     tS16 node_no;
     tS16 section_no;
@@ -3313,7 +3353,7 @@ void DeleteNode(tS16 pNode_to_delete, int pAnd_sections) {
 }
 
 // IDA: void __cdecl DeleteOrphanNodes()
-// FUNCTION: CARM95 0x40ca84
+// FUNCTION: CARM95 0x0040ca84
 void DeleteOrphanNodes(void) {
     tS16 node_no;
 
@@ -3325,7 +3365,7 @@ void DeleteOrphanNodes(void) {
 }
 
 // IDA: void __usercall InsertThisNodeInThisSectionHere(tS16 pInserted_node@<EAX>, tS16 pSection_no@<EDX>, br_vector3 *pWhere@<EBX>)
-// FUNCTION: CARM95 0x40fb06
+// FUNCTION: CARM95 0x0040fb06
 void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_vector3* pWhere) {
     tS16 new_section;
     tS16 section_no_index;
@@ -3364,8 +3404,9 @@ void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_v
 }
 
 // IDA: void __cdecl TrackElasticateyPath()
-// FUNCTION: CARM95 0x40ce66
+// FUNCTION: CARM95 0x0040ce66
 void TrackElasticateyPath(void) {
+
     if (gAlready_elasticating && gNext_elastication < gTime_stamp_for_this_munging) {
         gNext_elastication = gTime_stamp_for_this_munging + 2000;
         BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]].p, &gSelf->t.t.translate.t);
@@ -3378,7 +3419,7 @@ void TrackElasticateyPath(void) {
 }
 
 // IDA: void __usercall RecalcNearestPathSectionSpeed(int pMax_not_min@<EAX>, int pAdjustment@<EDX>)
-// FUNCTION: CARM95 0x4105c6
+// FUNCTION: CARM95 0x004105c6
 void RecalcNearestPathSectionSpeed(int pMax_not_min, int pAdjustment) {
     tS16 section_no;
     br_vector3 direction_v;
@@ -3438,7 +3479,7 @@ void RecalcNearestPathSectionSpeed(int pMax_not_min, int pAdjustment) {
 }
 
 // IDA: void __cdecl RecalcNearestPathSectionWidth(br_scalar pAdjustment)
-// FUNCTION: CARM95 0x4103ef
+// FUNCTION: CARM95 0x004103ef
 void RecalcNearestPathSectionWidth(br_scalar pAdjustment) {
     tS16 section_no;
     br_vector3 direction_v;
@@ -3467,7 +3508,7 @@ void RecalcNearestPathSectionWidth(br_scalar pAdjustment) {
 }
 
 // IDA: void __usercall CalcNegativeXVector(br_vector3 *pNegative_x_vector@<EAX>, br_vector3 *pStart@<EDX>, br_vector3 *pFinish@<EBX>, br_scalar pLength)
-// FUNCTION: CARM95 0x40cf4e
+// FUNCTION: CARM95 0x0040cf4e
 void CalcNegativeXVector(br_vector3* pNegative_x_vector, br_vector3* pStart, br_vector3* pFinish, br_scalar pLength) {
     br_vector3 positive_y_vector;
     br_vector3 path_vector;
@@ -3484,15 +3525,17 @@ void CalcNegativeXVector(br_vector3* pNegative_x_vector, br_vector3* pStart, br_
 }
 
 // IDA: void __usercall MakeVertexAndOffsetIt(br_model *pModel@<EAX>, int pVertex_num@<EDX>, br_scalar pX, br_scalar pY, br_scalar pZ, br_vector3 *pOffset)
-// FUNCTION: CARM95 0x40d9d3
+// FUNCTION: CARM95 0x0040d9d3
 void MakeVertexAndOffsetIt(br_model* pModel, int pVertex_num, br_scalar pX, br_scalar pY, br_scalar pZ, br_vector3* pOffset) {
+
     BrVector3Set(&pModel->vertices[pVertex_num].p, pX, pY, pZ);
     BrVector3Accumulate(&pModel->vertices[pVertex_num].p, pOffset);
 }
 
 // IDA: void __usercall MakeFaceAndTextureIt(br_model *pModel@<EAX>, int pFace_num@<EDX>, int pV0@<EBX>, int pV1@<ECX>, int pV2, br_material *pMaterial)
-// FUNCTION: CARM95 0x40da85
+// FUNCTION: CARM95 0x0040da85
 void MakeFaceAndTextureIt(br_model* pModel, int pFace_num, int pV0, int pV1, int pV2, br_material* pMaterial) {
+
     pModel->faces[pFace_num].vertices[0] = pV0;
     pModel->faces[pFace_num].vertices[1] = pV1;
     pModel->faces[pFace_num].vertices[2] = pV2;
@@ -3501,7 +3544,7 @@ void MakeFaceAndTextureIt(br_model* pModel, int pFace_num, int pV0, int pV1, int
 }
 
 // IDA: void __usercall MakeSection(br_uint_16 pFirst_vertex@<EAX>, br_uint_16 pFirst_face@<EDX>, br_vector3 *pStart@<EBX>, br_vector3 *pFinish@<ECX>, br_scalar pWidth, br_material *pMaterial_centre_lt, br_material *pMaterial_centre_dk, br_material *pMaterial_edges_start_lt, br_material *pMaterial_edges_start_dk, br_material *pMaterial_edges_finish_lt, br_material *pMaterial_edges_finish_dk)
-// FUNCTION: CARM95 0x40d59f
+// FUNCTION: CARM95 0x0040d59f
 void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pStart, br_vector3* pFinish, br_scalar pWidth, br_material* pMaterial_centre_lt, br_material* pMaterial_centre_dk, br_material* pMaterial_edges_start_lt, br_material* pMaterial_edges_start_dk, br_material* pMaterial_edges_finish_lt, br_material* pMaterial_edges_finish_dk) {
     int i;
     br_vector3 offset_v;
@@ -3548,7 +3591,7 @@ void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* p
 }
 
 // IDA: void __usercall MakeCube(br_uint_16 pFirst_vertex@<EAX>, br_uint_16 pFirst_face@<EDX>, br_vector3 *pPoint@<EBX>, br_material *pMaterial_1@<ECX>, br_material *pMaterial_2, br_material *pMaterial_3)
-// FUNCTION: CARM95 0x40daf1
+// FUNCTION: CARM95 0x0040daf1
 void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoint, br_material* pMaterial_1, br_material* pMaterial_2, br_material* pMaterial_3) {
     br_vector3 offset_v;
     br_vector3 point;
@@ -3587,14 +3630,15 @@ void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoi
 }
 
 // IDA: void __usercall CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16 *pFace_index_ptr@<EAX>, br_uint_16 *pVertex_index_ptr@<EDX>)
-// FUNCTION: CARM95 0x40e016
+// FUNCTION: CARM95 0x0040e016
 void CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16* pFace_index_ptr, br_uint_16* pVertex_index_ptr) {
+
     *pFace_index_ptr = gProgram_state.AI_vehicles.number_of_path_sections * 12 + gProgram_state.AI_vehicles.number_of_cops * 12;
     *pVertex_index_ptr = gProgram_state.AI_vehicles.number_of_path_sections * 18 + gProgram_state.AI_vehicles.number_of_cops * 8;
 }
 
 // IDA: void __usercall ReallocModelFacesAndVertices(br_model *pModel@<EAX>, int pNum_faces@<EDX>, int pNum_vertices@<EBX>)
-// FUNCTION: CARM95 0x40e057
+// FUNCTION: CARM95 0x0040e057
 void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_vertices) {
     br_vertex* new_vertices;
     br_face* new_faces;
@@ -3626,7 +3670,7 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
 }
 
 // IDA: br_material* __usercall CreateSimpleMaterial@<EAX>(int pColour_index@<EAX>)
-// FUNCTION: CARM95 0x40e3cf
+// FUNCTION: CARM95 0x0040e3cf
 br_material* CreateSimpleMaterial(int pColour_index) {
     br_material* return_me;
 
@@ -3642,8 +3686,9 @@ br_material* CreateSimpleMaterial(int pColour_index) {
 }
 
 // IDA: void __cdecl AllocateMatsForOppoPathModel()
-// FUNCTION: CARM95 0x40e2d3
+// FUNCTION: CARM95 0x0040e2d3
 void AllocateMatsForOppoPathModel(void) {
+
     gMat_dk_yel = CreateSimpleMaterial(50);
     gMat_md_yel = CreateSimpleMaterial(51);
     gMat_lt_yel = CreateSimpleMaterial(52);
@@ -3663,9 +3708,11 @@ void AllocateMatsForOppoPathModel(void) {
 }
 
 // IDA: void __cdecl RebuildOppoPathModel()
-// FUNCTION: CARM95 0x40d097
+// FUNCTION: CARM95 0x0040d097
 void RebuildOppoPathModel(void) {
+    // GLOBAL: CARM95 0x50717c
     static int nvertices_last_time = 0;
+    // GLOBAL: CARM95 0x507180
     static int nfaces_last_time = 0;
     int i;
     int at_least_one;
@@ -3766,7 +3813,7 @@ void RebuildOppoPathModel(void) {
 }
 
 // IDA: int __cdecl ConsistencyCheck()
-// FUNCTION: CARM95 0x40e436
+// FUNCTION: CARM95 0x0040e436
 int ConsistencyCheck(void) {
     tS16 node_no;
     tS16 section_no;
@@ -3908,7 +3955,7 @@ int ConsistencyCheck(void) {
 }
 
 // IDA: void __cdecl ShowOppoPaths()
-// FUNCTION: CARM95 0x40ed8e
+// FUNCTION: CARM95 0x0040ed8e
 void ShowOppoPaths(void) {
     char str[256];
 
@@ -3933,7 +3980,7 @@ void ShowOppoPaths(void) {
 #include <string.h>
 
 // IDA: void __cdecl WriteOutOppoPaths()
-// FUNCTION: CARM95 0x40e9d4
+// FUNCTION: CARM95 0x0040e9d4
 void WriteOutOppoPaths(void) {
     char the_path[256];
     char str[13];
@@ -4008,7 +4055,7 @@ void WriteOutOppoPaths(void) {
 }
 
 // IDA: int __cdecl NewNodeOKHere()
-// FUNCTION: CARM95 0x40f42b
+// FUNCTION: CARM95 0x0040f42b
 int NewNodeOKHere(void) {
     br_vector3 last_node_to_this;
 
@@ -4022,8 +4069,9 @@ int NewNodeOKHere(void) {
 }
 
 // IDA: void __cdecl ShowHideOppoPaths()
-// FUNCTION: CARM95 0x40ed4b
+// FUNCTION: CARM95 0x0040ed4b
 void ShowHideOppoPaths(void) {
+
     if (!gAlready_elasticating) {
         gOppo_paths_shown = !gOppo_paths_shown;
         ShowOppoPaths();
@@ -4031,7 +4079,7 @@ void ShowHideOppoPaths(void) {
 }
 
 // IDA: void __cdecl DropElasticateyNode()
-// FUNCTION: CARM95 0x40ee30
+// FUNCTION: CARM95 0x0040ee30
 void DropElasticateyNode(void) {
     char str[256];
     tS16 old_node;
@@ -4109,7 +4157,7 @@ void DropElasticateyNode(void) {
 }
 
 // IDA: void __cdecl InsertAndElasticate()
-// FUNCTION: CARM95 0x40f565
+// FUNCTION: CARM95 0x0040f565
 void InsertAndElasticate(void) {
     tS16 inserted_node;
     tS16 elasticatey_node;
@@ -4183,7 +4231,7 @@ void InsertAndElasticate(void) {
 }
 
 // IDA: void __cdecl InsertAndDontElasticate()
-// FUNCTION: CARM95 0x40fdf3
+// FUNCTION: CARM95 0x0040fdf3
 void InsertAndDontElasticate(void) {
     tS16 inserted_node;
     tS16 section_no;
@@ -4224,7 +4272,7 @@ void InsertAndDontElasticate(void) {
 }
 
 // IDA: void __cdecl DropDeadEndNode()
-// FUNCTION: CARM95 0x4100f3
+// FUNCTION: CARM95 0x004100f3
 void DropDeadEndNode(void) {
     char str[256];
 
@@ -4242,7 +4290,7 @@ void DropDeadEndNode(void) {
 }
 
 // IDA: void __cdecl DropNodeOnNodeAndStopElasticating()
-// FUNCTION: CARM95 0x41020c
+// FUNCTION: CARM95 0x0041020c
 void DropNodeOnNodeAndStopElasticating(void) {
     int node_no;
     char str[256];
@@ -4271,55 +4319,61 @@ void DropNodeOnNodeAndStopElasticating(void) {
 }
 
 // IDA: void __cdecl WidenOppoPathSection()
-// FUNCTION: CARM95 0x4103c5
+// FUNCTION: CARM95 0x004103c5
 void WidenOppoPathSection(void) {
+
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionWidth(.05f);
     }
 }
 
 // IDA: void __cdecl NarrowOppoPathSection()
-// FUNCTION: CARM95 0x410573
+// FUNCTION: CARM95 0x00410573
 void NarrowOppoPathSection(void) {
+
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionWidth(-.05f);
     }
 }
 
 // IDA: void __cdecl IncreaseSectionMinSpeed()
-// FUNCTION: CARM95 0x41059d
+// FUNCTION: CARM95 0x0041059d
 void IncreaseSectionMinSpeed(void) {
+
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionSpeed(0, 1);
     }
 }
 
 // IDA: void __cdecl DecreaseSectionMinSpeed()
-// FUNCTION: CARM95 0x410a7f
+// FUNCTION: CARM95 0x00410a7f
 void DecreaseSectionMinSpeed(void) {
+
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionSpeed(0, -1);
     }
 }
 
 // IDA: void __cdecl IncreaseSectionMaxSpeed()
-// FUNCTION: CARM95 0x410aa8
+// FUNCTION: CARM95 0x00410aa8
 void IncreaseSectionMaxSpeed(void) {
+
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionSpeed(1, 1);
     }
 }
 
 // IDA: void __cdecl DecreaseSectionMaxSpeed()
-// FUNCTION: CARM95 0x410ad1
+// FUNCTION: CARM95 0x00410ad1
 void DecreaseSectionMaxSpeed(void) {
+
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionSpeed(1, -1);
     }
 }
 
 // IDA: void __cdecl PullOppoPoint()
-// FUNCTION: CARM95 0x410afa
+// FUNCTION: CARM95 0x00410afa
 void PullOppoPoint(void) {
     tS16 node_no;
     br_scalar distance;
@@ -4341,7 +4395,7 @@ void PullOppoPoint(void) {
 }
 
 // IDA: void __cdecl ShowNodeInfo()
-// FUNCTION: CARM95 0x410bfa
+// FUNCTION: CARM95 0x00410bfa
 void ShowNodeInfo(void) {
     tS16 node_no;
     char str[256];
@@ -4367,7 +4421,7 @@ void ShowNodeInfo(void) {
 }
 
 // IDA: void __cdecl ShowSectionInfo1()
-// FUNCTION: CARM95 0x410d28
+// FUNCTION: CARM95 0x00410d28
 void ShowSectionInfo1(void) {
     tS16 section_no;
     char str[256];
@@ -4398,7 +4452,7 @@ void ShowSectionInfo1(void) {
 }
 
 // IDA: void __cdecl ShowSectionInfo2()
-// FUNCTION: CARM95 0x410e9b
+// FUNCTION: CARM95 0x00410e9b
 void ShowSectionInfo2(void) {
     tS16 section_no;
     char str[256];
@@ -4431,7 +4485,7 @@ void ShowSectionInfo2(void) {
 }
 
 // IDA: void __cdecl DeleteOppoPathSection()
-// FUNCTION: CARM95 0x411124
+// FUNCTION: CARM95 0x00411124
 void DeleteOppoPathSection(void) {
     br_scalar distance;
     br_vector3 intersect;
@@ -4456,7 +4510,7 @@ void DeleteOppoPathSection(void) {
 }
 
 // IDA: void __cdecl DeleteOppoPathNodeAndSections()
-// FUNCTION: CARM95 0x411206
+// FUNCTION: CARM95 0x00411206
 void DeleteOppoPathNodeAndSections(void) {
     br_scalar distance;
     tS16 node_no;
@@ -4479,7 +4533,7 @@ void DeleteOppoPathNodeAndSections(void) {
 }
 
 // IDA: void __cdecl DeleteOppoPathNodeAndJoin()
-// FUNCTION: CARM95 0x4112e2
+// FUNCTION: CARM95 0x004112e2
 void DeleteOppoPathNodeAndJoin(void) {
     br_scalar distance;
     tS16 node_no;
@@ -4512,7 +4566,7 @@ void DeleteOppoPathNodeAndJoin(void) {
 }
 
 // IDA: void __cdecl ReverseSectionDirection()
-// FUNCTION: CARM95 0x4114dd
+// FUNCTION: CARM95 0x004114dd
 void ReverseSectionDirection(void) {
     tS16 temp;
     tU8 speed_temp;
@@ -4548,7 +4602,7 @@ void ReverseSectionDirection(void) {
 }
 
 // IDA: void __cdecl CycleSectionType()
-// FUNCTION: CARM95 0x41169c
+// FUNCTION: CARM95 0x0041169c
 void CycleSectionType(void) {
     br_scalar distance;
     br_vector3 intersect;
@@ -4574,7 +4628,7 @@ void CycleSectionType(void) {
 }
 
 // IDA: void __cdecl ToggleOneWayNess()
-// FUNCTION: CARM95 0x4117ee
+// FUNCTION: CARM95 0x004117ee
 void ToggleOneWayNess(void) {
     br_scalar distance;
     br_vector3 intersect;
@@ -4606,7 +4660,7 @@ void ToggleOneWayNess(void) {
 }
 
 // IDA: void __cdecl CopStartPointInfo()
-// FUNCTION: CARM95 0x411947
+// FUNCTION: CARM95 0x00411947
 void CopStartPointInfo(void) {
     char str[256];
     int i;
@@ -4638,7 +4692,7 @@ void CopStartPointInfo(void) {
 }
 
 // IDA: void __cdecl DropCopStartPoint()
-// FUNCTION: CARM95 0x411ae8
+// FUNCTION: CARM95 0x00411ae8
 void DropCopStartPoint(void) {
     char str[256];
 
@@ -4661,7 +4715,7 @@ void DropCopStartPoint(void) {
 }
 
 // IDA: void __cdecl DeleteCopStartPoint()
-// FUNCTION: CARM95 0x411c18
+// FUNCTION: CARM95 0x00411c18
 void DeleteCopStartPoint(void) {
     char str[256];
     int i;
@@ -4701,6 +4755,6 @@ void DeleteCopStartPoint(void) {
 }
 
 // IDA: void __cdecl CycleCopStartPointType()
-// FUNCTION: CARM95 0x411e7f
+// FUNCTION: CARM95 0x00411e7f
 void CycleCopStartPointType(void) {
 }

@@ -25,10 +25,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-// GLOBAL: CARM95 0x519ad8
+// GLOBAL: CARM95 0x00519ad8
 int gKey_defns[18] = { 48, 49, 46, 47, 53, 44, 59, 57, 55, 45, 50, 51, 52, 56, 62, 63, 64, 66 };
 
-// GLOBAL: CARM95 0x519b20
+// GLOBAL: CARM95 0x00519b20
 tRadio_bastards gRadio_bastards__options[13] = {
     // suffix added to avoid duplicate symbol
     { 4, 36, 0, { 132, 175, 221, 253, 0 } },
@@ -46,33 +46,34 @@ tRadio_bastards gRadio_bastards__options[13] = {
     { 4, 153, 0, { 177, 199, 220, 242, 0 } },
 };
 
-// GLOBAL: CARM95 0x53d1d4
+// GLOBAL: CARM95 0x0053d1d4
 int gKey_count;
 
-// GLOBAL: CARM95 0x53d1d0
+// GLOBAL: CARM95 0x0053d1d0
 int gLast_graph_sel__options; // suffix added to avoid duplicate symbol
 
-// GLOBAL: CARM95 0x53d2f0
+// GLOBAL: CARM95 0x0053d2f0
 char* gKey_names[125];
 
-// GLOBAL: CARM95 0x53d4e4
+// GLOBAL: CARM95 0x0053d4e4
 int gPending_entry;
 
-// GLOBAL: CARM95 0x53d2ec
+// GLOBAL: CARM95 0x0053d2ec
 tInterface_spec* gThe_interface_spec__options; // suffix added to avoid duplicate symbol
 
-// GLOBAL: CARM95 0x53d1e0
+// GLOBAL: CARM95 0x0053d1e0
 int gOrig_key_mapping[67];
 
-// GLOBAL: CARM95 0x53d1d8
+// GLOBAL: CARM95 0x0053d1d8
 br_pixelmap* gDials_pix;
 
-// GLOBAL: CARM95 0x53d4e8
+// GLOBAL: CARM95 0x0053d4e8
 int gCurrent_key;
 
 // IDA: void __usercall DrawDial(int pWhich_one@<EAX>, int pWhich_stage@<EDX>)
-// FUNCTION: CARM95 0x49990d
+// FUNCTION: CARM95 0x0049990d
 void DrawDial(int pWhich_one, int pWhich_stage) {
+
     RemoveTransientBitmaps(1);
     DRPixelmapRectangleMaskedCopy(gBack_screen,
         gCurrent_graf_data->dial__x[pWhich_one],
@@ -88,7 +89,7 @@ void DrawDial(int pWhich_one, int pWhich_stage) {
 }
 
 // IDA: void __usercall MoveDialFromTo(int pWhich_one@<EAX>, int pOld_stage@<EDX>, int pNew_stage@<EBX>)
-// FUNCTION: CARM95 0x49998a
+// FUNCTION: CARM95 0x0049998a
 void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
     tS32 time_diff;
     tU32 start_time;
@@ -128,8 +129,9 @@ void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
 }
 
 // IDA: void __cdecl SoundOptionsStart()
-// FUNCTION: CARM95 0x4998c0
+// FUNCTION: CARM95 0x004998c0
 void SoundOptionsStart(void) {
+
     DrawDial(0, 0);
     DrawDial(1, 0);
     MoveDialFromTo(0, 0, 4 * gProgram_state.music_volume);
@@ -137,15 +139,16 @@ void SoundOptionsStart(void) {
 }
 
 // IDA: int __usercall SoundOptionsDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
-// FUNCTION: CARM95 0x499b6c
+// FUNCTION: CARM95 0x00499b6c
 int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
+
     MoveDialFromTo(0, 4 * gProgram_state.music_volume, 0);
     MoveDialFromTo(0, 4 * gProgram_state.effects_volume, 0);
     return pCurrent_choice;
 }
 
 // IDA: int __usercall SoundOptionsLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x499ba9
+// FUNCTION: CARM95 0x00499ba9
 int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
@@ -166,7 +169,7 @@ int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall SoundOptionsRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x499c49
+// FUNCTION: CARM95 0x00499c49
 int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
@@ -187,7 +190,7 @@ int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall SoundClick@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x499ce9
+// FUNCTION: CARM95 0x00499ce9
 int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     float x_delta;
     float y_delta;
@@ -230,7 +233,7 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 }
 
 // IDA: void __cdecl DoSoundOptions()
-// FUNCTION: CARM95 0x49b7bf
+// FUNCTION: CARM95 0x0049b7bf
 void DoSoundOptions(void) {
     static tFlicette flicker_on[3] = {
         { 156, { 26, 52 }, { 21, 50 } },
@@ -315,7 +318,7 @@ void DoSoundOptions(void) {
 }
 
 // IDA: void __cdecl GetGraphicsOptions()
-// FUNCTION: CARM95 0x49b87f
+// FUNCTION: CARM95 0x0049b87f
 void GetGraphicsOptions(void) {
     int value;
     br_scalar br_value;
@@ -420,8 +423,9 @@ void GetGraphicsOptions(void) {
 }
 
 // IDA: void __cdecl SetGraphicsOptions()
-// FUNCTION: CARM95 0x49bb74
+// FUNCTION: CARM95 0x0049bb74
 void SetGraphicsOptions(void) {
+
     if (gRadio_bastards__options[0].current_value < 2) {
         SetCarSimplificationLevel(gRadio_bastards__options[0].current_value);
     } else {
@@ -499,24 +503,27 @@ void SetGraphicsOptions(void) {
 }
 
 // IDA: void __usercall PlayRadioOn2(int pIndex@<EAX>, int pValue@<EDX>)
-// FUNCTION: CARM95 0x499efe
+// FUNCTION: CARM95 0x00499efe
 void PlayRadioOn2(int pIndex, int pValue) {
+
     RunFlicAt(288,
         gRadio_bastards__options[pIndex].left[pValue],
         gRadio_bastards__options[pIndex].top);
 }
 
 // IDA: void __usercall PlayRadioOff2(int pIndex@<EAX>, int pValue@<EDX>)
-// FUNCTION: CARM95 0x49a05d
+// FUNCTION: CARM95 0x0049a05d
 void PlayRadioOff2(int pIndex, int pValue) {
+
     RunFlicAt(287,
         gRadio_bastards__options[pIndex].left[pValue],
         gRadio_bastards__options[pIndex].top);
 }
 
 // IDA: void __usercall PlayRadioOn(int pIndex@<EAX>, int pValue@<EDX>)
-// FUNCTION: CARM95 0x499feb
+// FUNCTION: CARM95 0x00499feb
 void PlayRadioOn__options(int pIndex, int pValue) {
+
     RemoveTransientBitmaps(1);
     DontLetFlicFuckWithPalettes();
     TurnFlicTransparencyOn();
@@ -526,8 +533,9 @@ void PlayRadioOn__options(int pIndex, int pValue) {
 }
 
 // IDA: void __usercall PlayRadioOff(int pIndex@<EAX>, int pValue@<EDX>)
-// FUNCTION: CARM95 0x49a024
+// FUNCTION: CARM95 0x0049a024
 void PlayRadioOff__options(int pIndex, int pValue) {
+
     RemoveTransientBitmaps(1);
     DontLetFlicFuckWithPalettes();
     TurnFlicTransparencyOn();
@@ -537,7 +545,7 @@ void PlayRadioOff__options(int pIndex, int pValue) {
 }
 
 // IDA: void __cdecl DrawInitialRadios()
-// FUNCTION: CARM95 0x499e9b
+// FUNCTION: CARM95 0x00499e9b
 void DrawInitialRadios(void) {
     int i;
 
@@ -553,15 +561,16 @@ void DrawInitialRadios(void) {
 }
 
 // IDA: void __usercall RadioChanged(int pIndex@<EAX>, int pNew_value@<EDX>)
-// FUNCTION: CARM95 0x499fa8
+// FUNCTION: CARM95 0x00499fa8
 void RadioChanged(int pIndex, int pNew_value) {
+
     PlayRadioOff__options(pIndex, gRadio_bastards__options[pIndex].current_value);
     PlayRadioOn__options(pIndex, pNew_value);
     gRadio_bastards__options[pIndex].current_value = pNew_value;
 }
 
 // IDA: int __usercall GraphOptLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x499f34
+// FUNCTION: CARM95 0x00499f34
 int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
 
@@ -575,7 +584,7 @@ int GraphOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall GraphOptRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x49a093
+// FUNCTION: CARM95 0x0049a093
 int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
 
@@ -589,8 +598,9 @@ int GraphOptRight(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall GraphOptUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x49a109
+// FUNCTION: CARM95 0x0049a109
 int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
+
     if (*pCurrent_mode == 0) {
         *pCurrent_mode = 1;
         *pCurrent_choice = 13;
@@ -607,8 +617,9 @@ int GraphOptUp(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall GraphOptDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x49a19b
+// FUNCTION: CARM95 0x0049a19b
 int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
+
     if (*pCurrent_mode == 0) {
         *pCurrent_mode = 1;
         *pCurrent_choice = 2;
@@ -625,7 +636,7 @@ int GraphOptDown(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall RadioClick@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x49a22d
+// FUNCTION: CARM95 0x0049a22d
 int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
 
@@ -640,16 +651,18 @@ int RadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 }
 
 // IDA: int __usercall GraphOptGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x49a2d1
+// FUNCTION: CARM95 0x0049a2d1
 int GraphOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
+
     GraphOptRight(pCurrent_choice, pCurrent_mode);
     return 0;
 }
 
 // IDA: void __usercall PlotAGraphBox(int pIndex@<EAX>, int pColour_value@<EDX>)
 //  Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x49a34d
+// FUNCTION: CARM95 0x0049a34d
 void PlotAGraphBox__options(int pIndex, int pColour_value) {
+
     if (pIndex < 0) {
         return;
     }
@@ -662,21 +675,24 @@ void PlotAGraphBox__options(int pIndex, int pColour_value) {
 
 // IDA: void __usercall DrawAGraphBox(int pIndex@<EAX>)
 //  Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x49a334
+// FUNCTION: CARM95 0x0049a334
 void DrawAGraphBox__options(int pIndex) {
+
     PlotAGraphBox__options(pIndex, 45);
 }
 
 // IDA: void __usercall EraseAGraphBox(int pIndex@<EAX>)
 //  Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x49a3e1
+// FUNCTION: CARM95 0x0049a3e1
 void EraseAGraphBox__options(int pIndex) {
+
     PlotAGraphBox__options(pIndex, 0);
 }
 
 // IDA: void __usercall DrawGraphBox(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x49a2f3
+// FUNCTION: CARM95 0x0049a2f3
 void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
+
     if (pCurrent_choice != gLast_graph_sel__options) {
         EraseAGraphBox__options(gLast_graph_sel__options - 2);
         DrawAGraphBox__options(pCurrent_choice - 2);
@@ -685,7 +701,7 @@ void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: void __cdecl DoGraphicsOptions()
-// FUNCTION: CARM95 0x49b805
+// FUNCTION: CARM95 0x0049b805
 void DoGraphicsOptions(void) {
     static tFlicette flicker_on[14] = {
         { 43, { 45, 90 }, { 166, 398 } },
@@ -820,7 +836,7 @@ void DoGraphicsOptions(void) {
 }
 
 // IDA: void __cdecl CalibrateJoysticks()
-// FUNCTION: CARM95 0x49bf81
+// FUNCTION: CARM95 0x0049bf81
 void CalibrateJoysticks(void) {
     tJoy_calib_stage stage;
     int escaped;
@@ -848,7 +864,7 @@ void CalibrateJoysticks(void) {
 }
 
 // IDA: void __usercall StripControls(unsigned char *pStr@<EAX>)
-// FUNCTION: CARM95 0x49c0b4
+// FUNCTION: CARM95 0x0049c0b4
 void StripControls(unsigned char* pStr) {
     int i;
     int len;
@@ -867,7 +883,7 @@ void StripControls(unsigned char* pStr) {
 }
 
 // IDA: void __cdecl LoadKeyNames()
-// FUNCTION: CARM95 0x49bf9b
+// FUNCTION: CARM95 0x0049bf9b
 void LoadKeyNames(void) {
     int i;
     FILE* f;
@@ -889,7 +905,7 @@ void LoadKeyNames(void) {
 }
 
 // IDA: void __cdecl DisposeKeyNames()
-// FUNCTION: CARM95 0x49c133
+// FUNCTION: CARM95 0x0049c133
 void DisposeKeyNames(void) {
     int i;
 
@@ -899,13 +915,14 @@ void DisposeKeyNames(void) {
 }
 
 // IDA: void __cdecl SaveOrigKeyMapping()
-// FUNCTION: CARM95 0x49ab5e
+// FUNCTION: CARM95 0x0049ab5e
 void SaveOrigKeyMapping(void) {
+
     memcpy(gOrig_key_mapping, gKey_mapping, sizeof(gKey_mapping));
 }
 
 // IDA: void __usercall GetKeyCoords(int pIndex@<EAX>, int *pY@<EDX>, int *pName_x@<EBX>, int *pKey_x@<ECX>, int *pEnd_box)
-// FUNCTION: CARM95 0x49a8e2
+// FUNCTION: CARM95 0x0049a8e2
 void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box) {
     int col;
 
@@ -930,7 +947,7 @@ void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box)
 }
 
 // IDA: void __cdecl SetKeysToDefault()
-// FUNCTION: CARM95 0x49b3f3
+// FUNCTION: CARM95 0x0049b3f3
 void SetKeysToDefault(void) {
     FILE* f;
     tPath_name the_path;
@@ -949,7 +966,7 @@ void SetKeysToDefault(void) {
 }
 
 // IDA: void __cdecl SaveKeyMapping()
-// FUNCTION: CARM95 0x49ab7a
+// FUNCTION: CARM95 0x0049ab7a
 void SaveKeyMapping(void) {
     FILE* f;
     tPath_name the_path;
@@ -971,8 +988,9 @@ void SaveKeyMapping(void) {
 }
 
 // IDA: void __usercall ChangeKeyMapIndex(int pNew_one@<EAX>)
-// FUNCTION: CARM95 0x49ab3c
+// FUNCTION: CARM95 0x0049ab3c
 void ChangeKeyMapIndex(int pNew_one) {
+
     SaveKeyMapping();
     gKey_map_index = pNew_one;
     LoadKeyMapping();
@@ -980,7 +998,7 @@ void ChangeKeyMapIndex(int pNew_one) {
 }
 
 // IDA: void __usercall DrawKeyAssignments(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x49a3fa
+// FUNCTION: CARM95 0x0049a3fa
 void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     int i;
     int y;
@@ -992,6 +1010,7 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     int end_box;
     tDR_font* font_n;
     tDR_font* font_k;
+    // GLOBAL: CARM95 0x51a654
     static int on_radios_last_time;
 
 #if defined(DETHRACE_FIX_BUGS)
@@ -1063,7 +1082,7 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
 }
 
 // IDA: int __usercall KeyAssignLeft@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x49aa3a
+// FUNCTION: CARM95 0x0049aa3a
 int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
 
@@ -1091,7 +1110,7 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall KeyAssignRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x49ac6f
+// FUNCTION: CARM95 0x0049ac6f
 int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
 
@@ -1119,8 +1138,9 @@ int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall KeyAssignUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x49ad71
+// FUNCTION: CARM95 0x0049ad71
 int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
+
     if (*pCurrent_mode == 0) {
         gCurrent_key = -1;
         *pCurrent_choice = 4;
@@ -1147,8 +1167,9 @@ int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall KeyAssignDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x49ae9b
+// FUNCTION: CARM95 0x0049ae9b
 int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode) {
+
     if (*pCurrent_mode == 0) {
         if (*pCurrent_choice >= 2) {
             gCurrent_key = (gKey_count + 1) / 2;
@@ -1176,7 +1197,7 @@ int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall KeyAssignGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
-// FUNCTION: CARM95 0x49afa5
+// FUNCTION: CARM95 0x0049afa5
 int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     int key;
     int i;
@@ -1303,7 +1324,7 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 }
 
 // IDA: int __usercall MouseyClickBastard@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>, int pX_offset@<EBX>, int pY_offset@<ECX>)
-// FUNCTION: CARM95 0x49b4bd
+// FUNCTION: CARM95 0x0049b4bd
 int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
     int x_coord;
@@ -1327,7 +1348,7 @@ int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, 
 }
 
 // IDA: void __cdecl DrawInitialKMRadios()
-// FUNCTION: CARM95 0x49b56c
+// FUNCTION: CARM95 0x0049b56c
 void DrawInitialKMRadios(void) {
     int i;
 
@@ -1341,7 +1362,7 @@ void DrawInitialKMRadios(void) {
 }
 
 // IDA: void __cdecl DoControlOptions()
-// FUNCTION: CARM95 0x49be2c
+// FUNCTION: CARM95 0x0049be2c
 void DoControlOptions(void) {
     static tFlicette flicker_on[4] = {
         { 177, { 51, 102 }, { 166, 398 } },
@@ -1425,8 +1446,9 @@ void DoControlOptions(void) {
 }
 
 // IDA: void __cdecl LoadSoundOptionsData()
-// FUNCTION: CARM95 0x49b5b2
+// FUNCTION: CARM95 0x0049b5b2
 void LoadSoundOptionsData(void) {
+
     gDials_pix = LoadPixelmap("DIALSTCK.PIX");
     if (gDials_pix == NULL) {
         FatalError(kFatalError_LoadDialsPix);
@@ -1434,13 +1456,14 @@ void LoadSoundOptionsData(void) {
 }
 
 // IDA: void __cdecl FreeSoundOptionsData()
-// FUNCTION: CARM95 0x49b5e6
+// FUNCTION: CARM95 0x0049b5e6
 void FreeSoundOptionsData(void) {
+
     BrPixelmapFree(gDials_pix);
 }
 
 // IDA: void __cdecl DrawDisabledOptions()
-// FUNCTION: CARM95 0x49b5ff
+// FUNCTION: CARM95 0x0049b5ff
 void DrawDisabledOptions(void) {
     br_pixelmap* image;
 
@@ -1470,7 +1493,7 @@ void DrawDisabledOptions(void) {
 }
 
 // IDA: void __cdecl DoOptions()
-// FUNCTION: CARM95 0x49b705
+// FUNCTION: CARM95 0x0049b705
 void DoOptions(void) {
     static tFlicette flicker_on[4] = {
         { 43, { 57, 114 }, { 41, 98 } },

@@ -21,8 +21,9 @@
 tS32 gLast_demo_end_anim = -90000;
 
 // IDA: void __usercall ShowCutScene(int pIndex@<EAX>, int pWait_end@<EDX>, int pSound_ID@<EBX>, br_scalar pDelay)
-// FUNCTION: CARM95 0x4a58c0
+// FUNCTION: CARM95 0x004a58c0
 void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
+
     gProgram_state.cut_scene = 1;
     if (pSound_ID >= 0) {
         DRS3LoadSound(pSound_ID);
@@ -46,17 +47,17 @@ void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
 }
 
 // IDA: void __cdecl DoSCILogo()
-// FUNCTION: CARM95 0x4a5974
+// FUNCTION: CARM95 0x004a5974
 void DoSCILogo(void) {
 }
 
 // IDA: void __cdecl DoStainlessLogo()
-// FUNCTION: CARM95 0x4a597f
+// FUNCTION: CARM95 0x004a597f
 void DoStainlessLogo(void) {
 }
 
 // IDA: void __usercall PlaySmackerFile(char *pSmack_name@<EAX>)
-// FUNCTION: CARM95 0x4a598a
+// FUNCTION: CARM95 0x004a598a
 void PlaySmackerFile(char* pSmack_name) {
     tPath_name the_path;
     br_colour* br_colours_ptr;
@@ -133,21 +134,23 @@ void PlaySmackerFile(char* pSmack_name) {
 }
 
 // IDA: void __cdecl DoOpeningAnimation()
-// FUNCTION: CARM95 0x4a5d73
+// FUNCTION: CARM95 0x004a5d73
 void DoOpeningAnimation(void) {
+
     PlaySmackerFile("LOGO.SMK");
     PlaySmackerFile(harness_game_info.defines.INTRO_SMK_FILE);
     WaitForNoKeys();
 }
 
 // IDA: void __cdecl DoNewGameAnimation()
-// FUNCTION: CARM95 0x4a5de6
+// FUNCTION: CARM95 0x004a5de6
 void DoNewGameAnimation(void) {
 }
 
 // IDA: void __cdecl DoGoToRaceAnimation()
-// FUNCTION: CARM95 0x4a5d9d
+// FUNCTION: CARM95 0x004a5d9d
 void DoGoToRaceAnimation(void) {
+
     if (!gNet_mode) {
         if (PercentageChance(50)) {
             PlaySmackerFile("GARAGE2.SMK");
@@ -158,7 +161,7 @@ void DoGoToRaceAnimation(void) {
 }
 
 // IDA: void __cdecl DoEndRaceAnimation()
-// FUNCTION: CARM95 0x4a5df1
+// FUNCTION: CARM95 0x004a5df1
 void DoEndRaceAnimation(void) {
     int made_a_profit;
     int went_up_a_rank;
@@ -183,16 +186,18 @@ void DoEndRaceAnimation(void) {
 }
 
 // IDA: void __cdecl DoGameOverAnimation()
-// FUNCTION: CARM95 0x4a5ed6
+// FUNCTION: CARM95 0x004a5ed6
 void DoGameOverAnimation(void) {
+
     StopMusic();
     PlaySmackerFile("CRASH.SMK");
     StartMusic();
 }
 
 // IDA: void __cdecl DoGameCompletedAnimation()
-// FUNCTION: CARM95 0x4a5ef8
+// FUNCTION: CARM95 0x004a5ef8
 void DoGameCompletedAnimation(void) {
+
     StopMusic();
     PlaySmackerFile("TOPRANK.SMK");
     StartMusic();
@@ -200,6 +205,7 @@ void DoGameCompletedAnimation(void) {
 
 // DEMO only
 void DoFeatureUnavailableInDemo(void) {
+
     PrintMemoryDump(0, "BEFORE DEMO-ONLY SCREEN");
 
     SuspendPendingFlic();
@@ -212,6 +218,7 @@ void DoFeatureUnavailableInDemo(void) {
 
 // DEMO only
 void DoFullVersionPowerpoint(void) {
+
     FadePaletteDown();
     DRSetPalette(gRender_palette);
     if (harness_game_info.mode == eGame_splatpack_demo) {
@@ -232,8 +239,9 @@ void DoDemoGoodbye(void) {
 }
 
 // IDA: void __cdecl StartLoadingScreen()
-// FUNCTION: CARM95 0x4a5f1a
+// FUNCTION: CARM95 0x004a5f1a
 void StartLoadingScreen(void) {
+
     PossibleService();
     if (gProgram_state.sausage_eater_mode) {
         SplashScreenWith(harness_game_info.defines.GERMAN_LOADSCRN);

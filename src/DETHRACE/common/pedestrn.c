@@ -38,34 +38,34 @@
 
 #define GET_PEDESTRIAN_INDEX(P) ((P) - gPedestrian_array)
 
-// GLOBAL: CARM95 0x511740
+// GLOBAL: CARM95 0x00511740
 int gDetect_peds = 1;
 
-// GLOBAL: CARM95 0x511744
+// GLOBAL: CARM95 0x00511744
 int gReally_stupid_ped_bug_enable = 0;
 
-// GLOBAL: CARM95 0x511748
+// GLOBAL: CARM95 0x00511748
 int gPed_sound_disable = 0;
 
-// GLOBAL: CARM95 0x51174c
+// GLOBAL: CARM95 0x0051174c
 int gVesuvians_last_time = 0;
 
-// GLOBAL: CARM95 0x511750
+// GLOBAL: CARM95 0x00511750
 int gSend_peds = 1;
 
-// GLOBAL: CARM95 0x511754
+// GLOBAL: CARM95 0x00511754
 tU32 gLast_ped_message_send = 0;
 
-// GLOBAL: CARM95 0x511758
+// GLOBAL: CARM95 0x00511758
 tPedestrian_instruction* gInitial_instruction = NULL;
 
-// GLOBAL: CARM95 0x511760
+// GLOBAL: CARM95 0x00511760
 char* gRate_commands[3] = { "fixed", "speed", "variable" };
 
-// GLOBAL: CARM95 0x51176c
+// GLOBAL: CARM95 0x0051176c
 char* gCollide_commands[1] = { "collide" };
 
-// GLOBAL: CARM95 0x511770
+// GLOBAL: CARM95 0x00511770
 char* gInstruc_commands[10] = {
     "point",
     "xpoint",
@@ -79,19 +79,19 @@ char* gInstruc_commands[10] = {
     "reverse"
 };
 
-// GLOBAL: CARM95 0x511798
+// GLOBAL: CARM95 0x00511798
 float gMin_ped_gib_speeds[4] = { 10000.f, .005f, .002f, .001f };
 
-// GLOBAL: CARM95 0x5117a8
+// GLOBAL: CARM95 0x005117a8
 float gPed_gib_distrib[4] = { 0.f, 0.33f, 0.34f, 0.33f };
 
-// GLOBAL: CARM95 0x5117b8
+// GLOBAL: CARM95 0x005117b8
 float gPed_gib_speeds[4] = { 0.f, 1.f, 1.f, 1.f };
 
-// GLOBAL: CARM95 0x5117c8
+// GLOBAL: CARM95 0x005117c8
 int gPed_size_counts[4] = { 3, 5, 5, 5 };
 
-// GLOBAL: CARM95 0x5117d8
+// GLOBAL: CARM95 0x005117d8
 char* gPed_gib_names[4][5] = {
     { "BIGGIBS.PIX", "BIGGIBS2.PIX", "BIGGIBS3.PIX", "", "" },
     { "ELBOW.PIX", "PELVIS.PIX", "HEAD.PIX", "RIBS.PIX", "BONE.PIX" },
@@ -99,7 +99,7 @@ char* gPed_gib_names[4][5] = {
     { "CHUNK04.PIX", "SPLAT1.PIX", "CHUNK03.PIX", "SPLAT2.PIX", "SPLATOUT.PIX" }
 };
 
-// GLOBAL: CARM95 0x511828
+// GLOBAL: CARM95 0x00511828
 char* gPed_geb_names[4][5] = {
     { "GBIGGIBS.PIX", "GBIGGIB2.PIX", "GBIGGIB3.PIX", "", "" },
     { "GELBOW.PIX", "GPELVIS.PIX", "GHEAD.PIX", "GRIBS.PIX", "GBONE.PIX" },
@@ -107,7 +107,7 @@ char* gPed_geb_names[4][5] = {
     { "GCHUNK04.PIX", "GSPLAT1.PIX", "GCHUNK03.PIX", "GSPLAT2.PIX", "GSPLATOT.PIX" }
 };
 
-// GLOBAL: CARM95 0x511878
+// GLOBAL: CARM95 0x00511878
 int gPed_gib_maxes[4][5] = {
     { 1, 1, 1, 0, 0 },
     { 3, 3, 3, 3, 3 },
@@ -115,137 +115,138 @@ int gPed_gib_maxes[4][5] = {
     { 3, 3, 3, 3, 3 },
 };
 
-// GLOBAL: CARM95 0x5118c8
+// GLOBAL: CARM95 0x005118c8
 br_scalar gExploding_ped_scale[3] = { 0.0028f, 0.0033f, 0.0045f };
 
-// GLOBAL: CARM95 0x5118d8
+// GLOBAL: CARM95 0x005118d8
 br_vector3 gZero_v__pedestrn; // suffix added to avoid duplicate symbol
 
-// GLOBAL: CARM95 0x5118e8
+// GLOBAL: CARM95 0x005118e8
 int gPed_instruc_count = 0;
 
-// GLOBAL: CARM95 0x536b50
+// GLOBAL: CARM95 0x00536b50
 int gPed_count;
 
-// GLOBAL: CARM95 0x5118f0
+// GLOBAL: CARM95 0x005118f0
 br_actor* gPath_actor = NULL;
 
-// GLOBAL: CARM95 0x5118f4
+// GLOBAL: CARM95 0x005118f4
 br_actor* gCurrent_ped_path_actor = NULL;
 
-// GLOBAL: CARM95 0x5118f8
+// GLOBAL: CARM95 0x005118f8
 int gPedestrians_on = 0;
 
-// GLOBAL: CARM95 0x5118fc
+// GLOBAL: CARM95 0x005118fc
 int gVesuvian_corpses = 0;
 
-// GLOBAL: CARM95 0x5118e4
+// GLOBAL: CARM95 0x005118e4
 br_material* gPed_material = NULL;
 
-// GLOBAL: CARM95 0x5378c8
+// GLOBAL: CARM95 0x005378c8
 int gPed_gib_counts[4][5];
 
-// GLOBAL: CARM95 0x536c48
+// GLOBAL: CARM95 0x00536c48
 tPedestrian_instruction gPed_instrucs[100];
 
-// GLOBAL: CARM95 0x537418
+// GLOBAL: CARM95 0x00537418
 tPed_gib gPed_gibs[30];
 
-// GLOBAL: CARM95 0x536ab0
+// GLOBAL: CARM95 0x00536ab0
 tPed_gib_materials gPed_gib_materials[4];
 
-// GLOBAL: CARM95 0x536b58
+// GLOBAL: CARM95 0x00536b58
 tProximity_ray gProximity_rays[20];
 
 int gPed_colliding;
 
-// GLOBAL: CARM95 0x550a90
+// GLOBAL: CARM95 0x00550a90
 float gZombie_factor;
 
-// GLOBAL: CARM95 0x550aac
+// GLOBAL: CARM95 0x00550aac
 int gRespawn_variance;
 
-// GLOBAL: CARM95 0x550a94
+// GLOBAL: CARM95 0x00550a94
 br_scalar gPed_scale_factor;
 
-// GLOBAL: CARM95 0x550a8c
+// GLOBAL: CARM95 0x00550a8c
 int gTotal_peds;
 
-// GLOBAL: CARM95 0x550aa0
+// GLOBAL: CARM95 0x00550aa0
 int gPedestrian_harvest;
 br_vector3 gPed_pos_camera;
 
-// GLOBAL: CARM95 0x550aa4
+// GLOBAL: CARM95 0x00550aa4
 int gMin_respawn_time;
 
-// GLOBAL: CARM95 0x536b38
+// GLOBAL: CARM95 0x00536b38
 br_material* gPath_mat_calc;
 
-// GLOBAL: CARM95 0x550aa8
+// GLOBAL: CARM95 0x00550aa8
 float gPedestrian_speed_factor;
 
-// GLOBAL: CARM95 0x550a88
+// GLOBAL: CARM95 0x00550a88
 int gExploding_pedestrians;
 
-// GLOBAL: CARM95 0x550a84
+// GLOBAL: CARM95 0x00550a84
 int gBlind_pedestrians;
 
-// GLOBAL: CARM95 0x536b18
+// GLOBAL: CARM95 0x00536b18
 br_material* gPath_mat_normal;
 
-// GLOBAL: CARM95 0x536b1c
+// GLOBAL: CARM95 0x00536b1c
 br_material* gInit_pos_mat_calc;
 int gPed_other;
 
-// GLOBAL: CARM95 0x550a98
+// GLOBAL: CARM95 0x00550a98
 int gAttracted_pedestrians;
 
-// GLOBAL: CARM95 0x536aac
+// GLOBAL: CARM95 0x00536aac
 int gPed_ref_num;
 
-// GLOBAL: CARM95 0x536b24
+// GLOBAL: CARM95 0x00536b24
 br_scalar gMax_distance_squared;
 
-// GLOBAL: CARM95 0x536b28
+// GLOBAL: CARM95 0x00536b28
 br_model* gPed_model;
 
-// GLOBAL: CARM95 0x536b20
+// GLOBAL: CARM95 0x00536b20
 float gDanger_level;
 
-// GLOBAL: CARM95 0x536b40
+// GLOBAL: CARM95 0x00536b40
 br_vector3 gDanger_direction;
 
-// GLOBAL: CARM95 0x536b4c
+// GLOBAL: CARM95 0x00536b4c
 int gInit_ped_instruc;
 
-// GLOBAL: CARM95 0x536b10
+// GLOBAL: CARM95 0x00536b10
 int gCurrent_lollipop_index;
 
-// GLOBAL: CARM95 0x536aa8
+// GLOBAL: CARM95 0x00536aa8
 int gVesuvians_this_time;
 int gNumber_of_ped_gibs;
 
-// GLOBAL: CARM95 0x536b14
+// GLOBAL: CARM95 0x00536b14
 tPedestrian_data* gFlag_waving_bastard;
 
-// GLOBAL: CARM95 0x5118ec
+// GLOBAL: CARM95 0x005118ec
 int gNumber_of_pedestrians = 0;
 
-// GLOBAL: CARM95 0x536b30
+// GLOBAL: CARM95 0x00536b30
 br_pixelmap* gProx_ray_shade_table;
 
-// GLOBAL: CARM95 0x53791c
+// GLOBAL: CARM95 0x0053791c
 tPedestrian_data* gPedestrian_array;
 
-// GLOBAL: CARM95 0x536b34
+// GLOBAL: CARM95 0x00536b34
 tU32 gLast_ped_splat_time;
 
-// GLOBAL: CARM95 0x537918
+// GLOBAL: CARM95 0x00537918
 int gCurrent_ped_multiplier;
 
 // IDA: void __usercall PedModelUpdate(br_model *pModel@<EAX>, br_scalar x0, br_scalar y0, br_scalar x1, br_scalar y1, br_scalar x2, br_scalar y2, br_scalar x3, br_scalar y3)
-// FUNCTION: CARM95 0x455fcd
+// FUNCTION: CARM95 0x00455fcd
 void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, br_scalar y1, br_scalar x2, br_scalar y2, br_scalar x3, br_scalar y3) {
+
     BrVector2Set(&pModel->vertices[0].p, x0, y0);
     BrVector2Set(&pModel->vertices[1].p, x1, y1);
     BrVector2Set(&pModel->vertices[2].p, x2, y2);
@@ -254,8 +255,9 @@ void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, 
 }
 
 // IDA: int __usercall ActorIsPedestrian@<EAX>(br_actor *pActor@<EAX>)
-// FUNCTION: CARM95 0x455870
+// FUNCTION: CARM95 0x00455870
 int ActorIsPedestrian(br_actor* pActor) {
+
     if (pActor->model == NULL) {
         return 0;
     }
@@ -266,7 +268,7 @@ int ActorIsPedestrian(br_actor* pActor) {
 }
 
 // IDA: br_scalar __usercall PedHeightFromActor@<ST0>(br_actor *pActor@<EAX>)
-// FUNCTION: CARM95 0x4558b8
+// FUNCTION: CARM95 0x004558b8
 br_scalar PedHeightFromActor(br_actor* pActor) {
     if (!ActorIsPedestrian(pActor)) {
         return 0.f;
@@ -275,20 +277,23 @@ br_scalar PedHeightFromActor(br_actor* pActor) {
 }
 
 // IDA: int __usercall GetPedestrianValue@<EAX>(br_actor *pActor@<EAX>)
-// FUNCTION: CARM95 0x4558fa
+// FUNCTION: CARM95 0x004558fa
 int GetPedestrianValue(br_actor* pActor) {
+
     return ActorToPedestrianData(pActor)->credits_value;
 }
 
 // IDA: int __usercall PedestrianActorIsPerson@<EAX>(br_actor *pActor@<EAX>)
-// FUNCTION: CARM95 0x455913
+// FUNCTION: CARM95 0x00455913
 int PedestrianActorIsPerson(br_actor* pActor) {
+
     return ActorToPedestrianData(pActor)->ref_number < 100 && ActorToPedestrianData(pActor)->hit_points != -100;
 }
 
 // IDA: br_actor* __usercall GetPedestrianActor@<EAX>(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x455953
+// FUNCTION: CARM95 0x00455953
 br_actor* GetPedestrianActor(int pIndex) {
+
     if (pIndex >= 0 && pIndex < gPed_count) {
         return gPedestrian_array[pIndex].actor;
     } else {
@@ -297,8 +302,9 @@ br_actor* GetPedestrianActor(int pIndex) {
 }
 
 // IDA: br_pixelmap* __usercall GetPedestrianTexture@<EAX>(br_actor *pActor@<EAX>, int *pFlipped@<EDX>)
-// FUNCTION: CARM95 0x45599e
+// FUNCTION: CARM95 0x0045599e
 br_pixelmap* GetPedestrianTexture(br_actor* pActor, int* pFlipped) {
+
     if (!ActorIsPedestrian(pActor)) {
         return NULL;
     }
@@ -307,8 +313,9 @@ br_pixelmap* GetPedestrianTexture(br_actor* pActor, int* pFlipped) {
 }
 
 // IDA: void __cdecl TogglePedestrians()
-// FUNCTION: CARM95 0x4559ea
+// FUNCTION: CARM95 0x004559ea
 void TogglePedestrians(void) {
+
     if (!gProgram_state.sausage_eater_mode) {
         gPedestrians_on = !gPedestrians_on;
         if (gPedestrians_on) {
@@ -320,7 +327,7 @@ void TogglePedestrians(void) {
 }
 
 // IDA: void __cdecl InitPedGibs()
-// FUNCTION: CARM95 0x45e3ad
+// FUNCTION: CARM95 0x0045e3ad
 void InitPedGibs(void) {
     int i;
     int j;
@@ -386,7 +393,7 @@ void InitPedGibs(void) {
 }
 
 // IDA: void __usercall SetPedMaterialForRender(br_actor *pActor@<EAX>)
-// FUNCTION: CARM95 0x455a76
+// FUNCTION: CARM95 0x00455a76
 void SetPedMaterialForRender(br_actor* pActor) {
     tPedestrian_data* ped;
     int changed;
@@ -411,7 +418,7 @@ void SetPedMaterialForRender(br_actor* pActor) {
 }
 
 // IDA: void __cdecl PedCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, void *pRender_data, br_uint_8 pStyle, int pOn_screen)
-// FUNCTION: CARM95 0x455b6f
+// FUNCTION: CARM95 0x00455b6f
 void PedCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, void* pRender_data, br_uint_8 pStyle, int pOn_screen) {
     tPedestrian_data* ped;
 
@@ -427,8 +434,9 @@ void PedCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, voi
 }
 
 // IDA: void __cdecl InitPeds()
-// FUNCTION: CARM95 0x455c05
+// FUNCTION: CARM95 0x00455c05
 void InitPeds(void) {
+
     gPed_model = BrModelAllocate(NULL, 4, 2);
     gPed_model->faces[0].vertices[0] = 0;
     gPed_model->faces[0].vertices[1] = 2;
@@ -452,7 +460,7 @@ void InitPeds(void) {
 }
 
 // IDA: void __usercall MungeModelSize(br_actor *pActor@<EAX>, br_scalar pScaling_factor)
-// FUNCTION: CARM95 0x455f31
+// FUNCTION: CARM95 0x00455f31
 void MungeModelSize(br_actor* pActor, br_scalar pScaling_factor) {
     br_pixelmap* the_pix;
     br_scalar half_width;
@@ -469,7 +477,7 @@ void MungeModelSize(br_actor* pActor, br_scalar pScaling_factor) {
 }
 
 // IDA: int __usercall BurstPedestrian@<EAX>(tPedestrian_data *pPedestrian@<EAX>, float pSplattitudinalitude, int pAllow_explosion)
-// FUNCTION: CARM95 0x457ff5
+// FUNCTION: CARM95 0x00457ff5
 int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, int pAllow_explosion) {
     int i;
     int j;
@@ -611,7 +619,7 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
 }
 
 // IDA: void __cdecl ResetAllPedGibs()
-// FUNCTION: CARM95 0x455df2
+// FUNCTION: CARM95 0x00455df2
 void ResetAllPedGibs(void) {
     int i;
     tPed_gib* the_ped_gib;
@@ -630,7 +638,7 @@ void ResetAllPedGibs(void) {
 }
 
 // IDA: void __usercall AdjustPedGib(int pIndex@<EAX>, int pSize@<EDX>, int pGib_index@<EBX>, int pPed_index@<ECX>, br_matrix34 *pTrans)
-// FUNCTION: CARM95 0x455e72
+// FUNCTION: CARM95 0x00455e72
 void AdjustPedGib(int pIndex, int pSize, int pGib_index, int pPed_index, br_matrix34* pTrans) {
     tPed_gib* the_ped_gib;
 
@@ -648,7 +656,7 @@ void AdjustPedGib(int pIndex, int pSize, int pGib_index, int pPed_index, br_matr
 }
 
 // IDA: void __usercall MungePedGibs(tU32 pFrame_period@<EAX>)
-// FUNCTION: CARM95 0x456048
+// FUNCTION: CARM95 0x00456048
 void MungePedGibs(tU32 pFrame_period) {
     int i;
     int frame;
@@ -714,8 +722,9 @@ void MungePedGibs(tU32 pFrame_period) {
 }
 
 // IDA: void __usercall KillPedestrian(tPedestrian_data *pPedestrian@<EAX>)
-// FUNCTION: CARM95 0x456e92
+// FUNCTION: CARM95 0x00456e92
 void KillPedestrian(tPedestrian_data* pPedestrian) {
+
     if (pPedestrian->hit_points != -100) {
         if (pPedestrian->ref_number < 100) {
             gProgram_state.peds_killed++;
@@ -741,7 +750,7 @@ void KillPedestrian(tPedestrian_data* pPedestrian) {
 }
 
 // IDA: void __usercall CalcPedWidthNHeight(tPedestrian_data *pPedestrian@<EAX>, br_pixelmap *pPixelmap@<EDX>, br_scalar *pHeight@<EBX>, br_scalar *pWidth@<ECX>)
-// FUNCTION: CARM95 0x457492
+// FUNCTION: CARM95 0x00457492
 void CalcPedWidthNHeight(tPedestrian_data* pPedestrian, br_pixelmap* pPixelmap, br_scalar* pHeight, br_scalar* pWidth) {
     br_pixelmap* reference_pixel_bastard;
     br_scalar scale_to_use;
@@ -760,7 +769,7 @@ void CalcPedWidthNHeight(tPedestrian_data* pPedestrian, br_pixelmap* pPixelmap, 
 }
 
 // IDA: int __usercall PedestrianNextInstruction@<EAX>(tPedestrian_data *pPedestrian@<EAX>, float pDanger_level, int pPosition_explicitly, int pMove_pc)
-// FUNCTION: CARM95 0x4585f1
+// FUNCTION: CARM95 0x004585f1
 int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level, int pPosition_explicitly, int pMove_pc) {
     tPedestrian_instruction* instruction;
     float most_dangerous;
@@ -922,7 +931,7 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
 }
 
 // IDA: void __usercall MungePedestrianSequence(tPedestrian_data *pPedestrian@<EAX>, int pAction_changed@<EDX>)
-// FUNCTION: CARM95 0x4566ee
+// FUNCTION: CARM95 0x004566ee
 void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed) {
     tPedestrian_action* the_action;
     int i;
@@ -968,8 +977,9 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
 }
 
 // IDA: void __usercall DetachPedFromCar(tPedestrian_data *pPedestrian@<EAX>)
-// FUNCTION: CARM95 0x4563dc
+// FUNCTION: CARM95 0x004563dc
 void DetachPedFromCar(tPedestrian_data* pPedestrian) {
+
     if (pPedestrian->actor->parent != gDont_render_actor) {
         BrActorRelink(gDont_render_actor, pPedestrian->actor);
         pPedestrian->actor->render_style = BR_RSTYLE_NONE;
@@ -982,7 +992,7 @@ void DetachPedFromCar(tPedestrian_data* pPedestrian) {
 }
 
 // IDA: void __usercall SetPedPos(tPedestrian_data *pPedestrian@<EAX>)
-// FUNCTION: CARM95 0x45647b
+// FUNCTION: CARM95 0x0045647b
 void SetPedPos(tPedestrian_data* pPedestrian) {
     br_vector3 temp_v;
 
@@ -996,14 +1006,15 @@ void SetPedPos(tPedestrian_data* pPedestrian) {
 }
 
 // IDA: void __usercall DetachPedActorFromCar(br_actor *pActor@<EAX>)
-// FUNCTION: CARM95 0x4563b3
+// FUNCTION: CARM95 0x004563b3
 void DetachPedActorFromCar(br_actor* pActor) {
+
     DetachPedFromCar(ActorToPedestrianData(pActor));
     SetPedPos(ActorToPedestrianData(pActor));
 }
 
 // IDA: void __usercall MungePedestrianFrames(tPedestrian_data *pPedestrian@<EAX>)
-// FUNCTION: CARM95 0x4568d7
+// FUNCTION: CARM95 0x004568d7
 void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
     tPedestrian_sequence* the_sequence;
     float f_the_time;
@@ -1129,7 +1140,7 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
 }
 
 // IDA: void __usercall MungePedModel(tPedestrian_data *pPedestrian@<EAX>)
-// FUNCTION: CARM95 0x456f86
+// FUNCTION: CARM95 0x00456f86
 void MungePedModel(tPedestrian_data* pPedestrian) {
     br_vector3 old_pos;
     br_vector3 delta_pos;
@@ -1210,7 +1221,7 @@ void MungePedModel(tPedestrian_data* pPedestrian) {
 }
 
 // IDA: void __usercall ChangeActionTo(tPedestrian_data *pPedestrian@<EAX>, int pAction_index@<EDX>, int pRedo_frames_etc@<EBX>)
-// FUNCTION: CARM95 0x45654d
+// FUNCTION: CARM95 0x0045654d
 void ChangeActionTo(tPedestrian_data* pPedestrian, int pAction_index, int pRedo_frames_etc) {
     tPedestrian_action* the_action;
     int the_sound;
@@ -1246,7 +1257,7 @@ void ChangeActionTo(tPedestrian_data* pPedestrian, int pAction_index, int pRedo_
 }
 
 // IDA: int __usercall MungePedestrianAction@<EAX>(tPedestrian_data *pPedestrian@<EAX>, float pDanger_level)
-// FUNCTION: CARM95 0x459db7
+// FUNCTION: CARM95 0x00459db7
 int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
     tU32 time_diff;
     int i;
@@ -1305,8 +1316,9 @@ int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
 }
 
 // IDA: void __cdecl MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo()
-// FUNCTION: CARM95 0x4564ed
+// FUNCTION: CARM95 0x004564ed
 void MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo(void) {
+
     if (gFlag_waving_bastard != NULL
         && gFlag_waving_bastard->current_action != gFlag_waving_bastard->fatal_car_impact_action
         && gFlag_waving_bastard->current_action != gFlag_waving_bastard->fatal_ground_impact_action) {
@@ -1315,7 +1327,7 @@ void MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo(
 }
 
 // IDA: void __usercall MungePedestrianPath(tPedestrian_data *pPedestrian@<EAX>, float pDanger_level, br_vector3 *pDanger_direction)
-// FUNCTION: CARM95 0x457548
+// FUNCTION: CARM95 0x00457548
 void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_vector3* pDanger_direction) {
     tPedestrian_action* the_action;
     float terminal_speed;
@@ -1483,7 +1495,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
 }
 
 // IDA: float __usercall CalcPedestrianDangerLevel@<ST0>(tPedestrian_data *pPedestrian@<EAX>, br_vector3 *pDanger_direction@<EDX>)
-// FUNCTION: CARM95 0x45a078
+// FUNCTION: CARM95 0x0045a078
 float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDanger_direction) {
     br_vector3* ped_pos;
     int i;
@@ -1550,7 +1562,7 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
 }
 
 // IDA: tPed_hit_position __usercall MoveToEdgeOfCar@<EAX>(tPedestrian_data *pPedestrian@<EAX>, tCollision_info *pCar@<EDX>, br_actor *pCar_actor@<EBX>, br_scalar pPed_x, br_scalar pPed_z, br_scalar pCar_bounds_min_x, br_scalar pCar_bounds_max_x, br_scalar pCar_bounds_min_z, br_scalar pCar_bounds_max_z, br_vector3 *pMin_ped_bounds_car, br_vector3 *pMax_ped_bounds_car)
-// FUNCTION: CARM95 0x45bcc5
+// FUNCTION: CARM95 0x0045bcc5
 tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info* pCar, br_actor* pCar_actor, br_scalar pPed_x, br_scalar pPed_z, br_scalar pCar_bounds_min_x, br_scalar pCar_bounds_max_x, br_scalar pCar_bounds_min_z, br_scalar pCar_bounds_max_z, br_vector3* pMin_ped_bounds_car, br_vector3* pMax_ped_bounds_car) {
     br_vector3 car_plus_ped;
     br_vector3 delta_vector;
@@ -1627,8 +1639,9 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
 }
 
 // IDA: void __cdecl CheckLastPed()
-// FUNCTION: CARM95 0x45c0db
+// FUNCTION: CARM95 0x0045c0db
 void CheckLastPed(void) {
+
     if (gNet_mode == eNet_mode_none && gProgram_state.peds_killed >= gTotal_peds) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -4, GetMiscString(kMiscString_EveryPedestrianWasted));
         RaceCompleted(eRace_over_peds);
@@ -1636,7 +1649,7 @@ void CheckLastPed(void) {
 }
 
 // IDA: int __usercall BloodyWheels@<EAX>(tCar_spec *pCar@<EAX>, br_vector3 *pPed_car@<EDX>, br_scalar pSize, br_vector3 *pPed_glob)
-// FUNCTION: CARM95 0x45c12c
+// FUNCTION: CARM95 0x0045c12c
 int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vector3* pPed_glob) {
     int wheel;
     int squish;
@@ -1661,8 +1674,9 @@ int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vect
 }
 
 // IDA: int __usercall FancyATossOffMate@<EAX>(tPedestrian_data *pPedestrian@<EAX>, tCollision_info *pCar@<EDX>, float pImpact_speed)
-// FUNCTION: CARM95 0x45c273
+// FUNCTION: CARM95 0x0045c273
 int FancyATossOffMate(tPedestrian_data* pPedestrian, tCollision_info* pCar, float pImpact_speed) {
+
     return !gPedestrian_harvest
         && pPedestrian->ref_number < 100
         && (pCar->driver > 1 || ((tCar_spec*)pCar)->number_of_wheels_on_ground >= 4)
@@ -1671,7 +1685,7 @@ int FancyATossOffMate(tPedestrian_data* pPedestrian, tCollision_info* pCar, floa
 }
 
 // IDA: void __usercall CheckPedestrianDeathScenario(tPedestrian_data *pPedestrian@<EAX>)
-// FUNCTION: CARM95 0x45a3bd
+// FUNCTION: CARM95 0x0045a3bd
 void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
     int norman;
     int i;
@@ -2071,7 +2085,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
 }
 
 // IDA: void __usercall SendPedestrian(tPedestrian_data *pPedestrian@<EAX>, int pIndex@<EDX>)
-// FUNCTION: CARM95 0x45c2f0
+// FUNCTION: CARM95 0x0045c2f0
 void SendPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
     tNet_contents* the_contents;
     tNet_message* the_message;
@@ -2146,7 +2160,7 @@ void SendPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
 }
 
 // IDA: void __usercall DoPedestrian(tPedestrian_data *pPedestrian@<EAX>, int pIndex@<EDX>)
-// FUNCTION: CARM95 0x4598e2
+// FUNCTION: CARM95 0x004598e2
 void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
     float danger_level;
     float start_speed;
@@ -2235,7 +2249,7 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
 }
 
 // IDA: void __usercall AdjustPedestrian(int pIndex@<EAX>, int pAction_index@<EDX>, int pFrame_index@<EBX>, int pHit_points@<ECX>, int pDone_initial, tU16 pParent, br_actor *pParent_actor, float pSpin_period, br_scalar pJump_magnitude, br_vector3 *pOffset, br_vector3 *pTrans)
-// FUNCTION: CARM95 0x458ec7
+// FUNCTION: CARM95 0x00458ec7
 void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_points, int pDone_initial, tU16 pParent, br_actor* pParent_actor, float pSpin_period, br_scalar pJump_magnitude, br_vector3* pOffset, br_vector3* pTrans) {
     tPedestrian_data* pedestrian;
     br_actor* parent;
@@ -2288,8 +2302,9 @@ void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_
 }
 
 // IDA: void __usercall SquirtPathVertex(br_vertex *pFirst_vertex@<EAX>, br_vector3 *pPoint@<EDX>)
-// FUNCTION: CARM95 0x45c66a
+// FUNCTION: CARM95 0x0045c66a
 void SquirtPathVertex(br_vertex* pFirst_vertex, br_vector3* pPoint) {
+
     pFirst_vertex[0].p = *pPoint;
     pFirst_vertex[1].p = *pPoint;
     pFirst_vertex[1].p.v[Y] += .1f;
@@ -2304,7 +2319,7 @@ void SquirtPathVertex(br_vertex* pFirst_vertex, br_vector3* pPoint) {
 }
 
 // IDA: void __cdecl ResetAllPedestrians()
-// FUNCTION: CARM95 0x459239
+// FUNCTION: CARM95 0x00459239
 void ResetAllPedestrians(void) {
     int i;
     tPedestrian_data* the_pedestrian;
@@ -2316,7 +2331,7 @@ void ResetAllPedestrians(void) {
 }
 
 // IDA: void __usercall GroundPedestrian(tPedestrian_data *pPedestrian@<EAX>)
-// FUNCTION: CARM95 0x45c75a
+// FUNCTION: CARM95 0x0045c75a
 void GroundPedestrian(tPedestrian_data* pPedestrian) {
     br_scalar new_y;
     br_vector3 cast_point;
@@ -2358,8 +2373,9 @@ void GroundPedestrian(tPedestrian_data* pPedestrian) {
 }
 
 // IDA: void __usercall RevivePedestrian(tPedestrian_data *pPedestrian@<EAX>, int pAnimate@<EDX>)
-// FUNCTION: CARM95 0x459282
+// FUNCTION: CARM95 0x00459282
 void RevivePedestrian(tPedestrian_data* pPedestrian, int pAnimate) {
+
     pPedestrian->sent_dead_message = 0;
     pPedestrian->respawn_time = 0;
     pPedestrian->current_sequence = 0;
@@ -2403,7 +2419,7 @@ void RevivePedestrian(tPedestrian_data* pPedestrian, int pAnimate) {
 }
 
 // IDA: void __usercall MungePedestrians(tU32 pFrame_period@<EAX>)
-// FUNCTION: CARM95 0x459476
+// FUNCTION: CARM95 0x00459476
 void MungePedestrians(tU32 pFrame_period) {
     int i;
     int mirror_on;
@@ -2496,7 +2512,7 @@ void MungePedestrians(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl RespawnPedestrians()
-// FUNCTION: CARM95 0x45c921
+// FUNCTION: CARM95 0x0045c921
 void RespawnPedestrians(void) {
     int i;
     tPedestrian_data* the_pedestrian;
@@ -2528,18 +2544,20 @@ void RespawnPedestrians(void) {
 }
 
 // IDA: int __cdecl GetPedCount()
-// FUNCTION: CARM95 0x45c9f6
+// FUNCTION: CARM95 0x0045c9f6
 int GetPedCount(void) {
+
     return gPed_count;
 }
 
 // IDA: int __usercall GetPedPosition@<EAX>(int pIndex@<EAX>, br_vector3 *pPos@<EDX>)
-// FUNCTION: CARM95 0x45ca0b
+// FUNCTION: CARM95 0x0045ca0b
 int GetPedPosition(int pIndex, br_vector3* pPos) {
     tPedestrian_data* pedestrian;
 
     pedestrian = &gPedestrian_array[pIndex];
     if (pedestrian->ref_number < 100) {
+
         // Item is a human
         if (pedestrian->hit_points == -100
             || pedestrian->current_action == pedestrian->fatal_car_impact_action
@@ -2562,7 +2580,7 @@ int GetPedPosition(int pIndex, br_vector3* pPos) {
 }
 
 // IDA: void __usercall CreatePedestrian(FILE *pG@<EAX>, tPedestrian_instruction *pInstructions@<EDX>, int pInstruc_count@<EBX>, int pInit_instruc@<ECX>, int pRef_num, int pForce_read)
-// FUNCTION: CARM95 0x45cb28
+// FUNCTION: CARM95 0x0045cb28
 void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pInstruc_count, int pInit_instruc, int pRef_num, int pForce_read) {
     tPath_name the_path;
     char s[256];
@@ -2811,7 +2829,7 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
 }
 
 // IDA: void __cdecl ResetProxRay()
-// FUNCTION: CARM95 0x45da5c
+// FUNCTION: CARM95 0x0045da5c
 void ResetProxRay(void) {
     int i;
 
@@ -2821,19 +2839,19 @@ void ResetProxRay(void) {
 }
 
 // IDA: void __cdecl PedMaterialFromHell()
-// FUNCTION: CARM95 0x45da99
+// FUNCTION: CARM95 0x0045da99
 void PedMaterialFromHell(void) {
 }
 
 // IDA: void __cdecl ResetPedMaterial()
-// FUNCTION: CARM95 0x45daa4
+// FUNCTION: CARM95 0x0045daa4
 void ResetPedMaterial(void) {
     int i;
     int j;
 }
 
 // IDA: void __usercall LoadInPedestrians(FILE *pF@<EAX>, int pSubs_count@<EDX>, tPed_subs *pSubs_array@<EBX>)
-// FUNCTION: CARM95 0x45dab2
+// FUNCTION: CARM95 0x0045dab2
 void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
     tPath_name the_path;
     char s[256];
@@ -3025,7 +3043,7 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
 }
 
 // IDA: br_actor* __usercall BuildPedPaths@<EAX>(tPedestrian_instruction *pInstructions@<EAX>, int pInstruc_count@<EDX>, int pInit_instruc@<EBX>)
-// FUNCTION: CARM95 0x45e839
+// FUNCTION: CARM95 0x0045e839
 br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_count, int pInit_instruc) {
     int vertex_count;
     int last_vertex_count;
@@ -3136,7 +3154,7 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
 }
 
 // IDA: void __cdecl WriteOutPeds()
-// FUNCTION: CARM95 0x45ee73
+// FUNCTION: CARM95 0x0045ee73
 void WriteOutPeds(void) {
     int i;
     int j;
@@ -3226,7 +3244,7 @@ void WriteOutPeds(void) {
 }
 
 // IDA: void __cdecl AddPed()
-// FUNCTION: CARM95 0x45f644
+// FUNCTION: CARM95 0x0045f644
 void AddPed(void) {
     tPedestrian_instruction* instructions;
     FILE* g;
@@ -3248,7 +3266,7 @@ void AddPed(void) {
 }
 
 // IDA: void __usercall NewPed(int pRef_num@<EAX>)
-// FUNCTION: CARM95 0x45f4f1
+// FUNCTION: CARM95 0x0045f4f1
 void NewPed(int pRef_num) {
     char s[255];
 
@@ -3288,8 +3306,9 @@ void NewPed(int pRef_num) {
 }
 
 // IDA: void __cdecl RemoveCurrentPedPath()
-// FUNCTION: CARM95 0x45f409
+// FUNCTION: CARM95 0x0045f409
 void RemoveCurrentPedPath(void) {
+
     if (gCurrent_ped_path_actor != NULL) {
         BrModelRemove(gCurrent_ped_path_actor->model);
         BrModelFree(gCurrent_ped_path_actor->model);
@@ -3300,8 +3319,9 @@ void RemoveCurrentPedPath(void) {
 }
 
 // IDA: void __cdecl ScrubPedestrian()
-// FUNCTION: CARM95 0x45f3cb
+// FUNCTION: CARM95 0x0045f3cb
 void ScrubPedestrian(void) {
+
     gPed_instruc_count = 0;
     gNumber_of_pedestrians--;
     gTotal_peds--;
@@ -3310,8 +3330,9 @@ void ScrubPedestrian(void) {
 }
 
 // IDA: void __cdecl TogglePedDetect()
-// FUNCTION: CARM95 0x45f469
+// FUNCTION: CARM95 0x0045f469
 void TogglePedDetect(void) {
+
     gDetect_peds = !gDetect_peds;
     if (gDetect_peds) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Pedestrian are meat again");
@@ -3321,136 +3342,158 @@ void TogglePedDetect(void) {
 }
 
 // IDA: void __cdecl NewPed0()
-// FUNCTION: CARM95 0x45f4dc
+// FUNCTION: CARM95 0x0045f4dc
 void NewPed0(void) {
+
     NewPed(0);
 }
 
 // IDA: void __cdecl NewPed1()
-// FUNCTION: CARM95 0x45f72e
+// FUNCTION: CARM95 0x0045f72e
 void NewPed1(void) {
+
     NewPed(1);
 }
 
 // IDA: void __cdecl NewPed2()
-// FUNCTION: CARM95 0x45f743
+// FUNCTION: CARM95 0x0045f743
 void NewPed2(void) {
+
     NewPed(2);
 }
 
 // IDA: void __cdecl NewPed3()
-// FUNCTION: CARM95 0x45f758
+// FUNCTION: CARM95 0x0045f758
 void NewPed3(void) {
+
     NewPed(3);
 }
 
 // IDA: void __cdecl NewPed4()
-// FUNCTION: CARM95 0x45f76d
+// FUNCTION: CARM95 0x0045f76d
 void NewPed4(void) {
+
     NewPed(4);
 }
 
 // IDA: void __cdecl NewPed5()
-// FUNCTION: CARM95 0x45f782
+// FUNCTION: CARM95 0x0045f782
 void NewPed5(void) {
+
     NewPed(5);
 }
 
 // IDA: void __cdecl NewPed6()
-// FUNCTION: CARM95 0x45f797
+// FUNCTION: CARM95 0x0045f797
 void NewPed6(void) {
+
     NewPed(6);
 }
 
 // IDA: void __cdecl NewPed7()
-// FUNCTION: CARM95 0x45f7ac
+// FUNCTION: CARM95 0x0045f7ac
 void NewPed7(void) {
+
     NewPed(7);
 }
 
 // IDA: void __cdecl NewPed8()
-// FUNCTION: CARM95 0x45f7c1
+// FUNCTION: CARM95 0x0045f7c1
 void NewPed8(void) {
+
     NewPed(8);
 }
 
 // IDA: void __cdecl NewPed9()
-// FUNCTION: CARM95 0x45f7d6
+// FUNCTION: CARM95 0x0045f7d6
 void NewPed9(void) {
+
     NewPed(9);
 }
 
 // IDA: void __cdecl NewPed0B()
-// FUNCTION: CARM95 0x45f7eb
+// FUNCTION: CARM95 0x0045f7eb
 void NewPed0B(void) {
+
     NewPed(61);
 }
 
 // IDA: void __cdecl NewPed1B()
-// FUNCTION: CARM95 0x45f800
+// FUNCTION: CARM95 0x0045f800
 void NewPed1B(void) {
+
     NewPed(51);
 }
 
 // IDA: void __cdecl NewPed2B()
-// FUNCTION: CARM95 0x45f815
+// FUNCTION: CARM95 0x0045f815
 void NewPed2B(void) {
+
     NewPed(52);
 }
 
 // IDA: void __cdecl NewPed3B()
-// FUNCTION: CARM95 0x45f82a
+// FUNCTION: CARM95 0x0045f82a
 void NewPed3B(void) {
+
     NewPed(53);
 }
 
 // IDA: void __cdecl NewPed4B()
-// FUNCTION: CARM95 0x45f83f
+// FUNCTION: CARM95 0x0045f83f
 void NewPed4B(void) {
+
     NewPed(54);
 }
 
 // IDA: void __cdecl NewPed5B()
-// FUNCTION: CARM95 0x45f854
+// FUNCTION: CARM95 0x0045f854
 void NewPed5B(void) {
+
     NewPed(55);
 }
 
 // IDA: void __cdecl NewPed6B()
-// FUNCTION: CARM95 0x45f869
+// FUNCTION: CARM95 0x0045f869
 void NewPed6B(void) {
+
     NewPed(56);
 }
 
 // IDA: void __cdecl NewPed7B()
-// FUNCTION: CARM95 0x45f87e
+// FUNCTION: CARM95 0x0045f87e
 void NewPed7B(void) {
+
     NewPed(57);
 }
 
 // IDA: void __cdecl NewPed8B()
-// FUNCTION: CARM95 0x45f893
+// FUNCTION: CARM95 0x0045f893
 void NewPed8B(void) {
+
     NewPed(58);
 }
 
 // IDA: void __cdecl NewPed9B()
-// FUNCTION: CARM95 0x45f8a8
+// FUNCTION: CARM95 0x0045f8a8
 void NewPed9B(void) {
+
     NewPed(59);
 }
 
 // IDA: void __cdecl MungeShowPedPath()
-// FUNCTION: CARM95 0x45f94b
+// FUNCTION: CARM95 0x0045f94b
 void MungeShowPedPath(void) {
+
     RemoveCurrentPedPath();
     gPed_instrucs[gPed_instruc_count] = gPed_instrucs[gPed_instruc_count - 1];
     gCurrent_ped_path_actor = BuildPedPaths(gPed_instrucs, gPed_instruc_count + 1, gInit_ped_instruc);
 }
 
 // IDA: void __cdecl DropPedPoint2()
-// FUNCTION: CARM95 0x45f8e5
+// FUNCTION: CARM95 0x0045f8e5
 void DropPedPoint2(void) {
+
     gPed_instrucs[gPed_instruc_count].type = ePed_instruc_point;
     gPed_instrucs[gPed_instruc_count].data.point_data.irreversable = 0;
     gPed_instrucs[gPed_instruc_count].data.point_data.position = *gOur_pos;
@@ -3459,8 +3502,9 @@ void DropPedPoint2(void) {
 }
 
 // IDA: void __cdecl DropPedPoint()
-// FUNCTION: CARM95 0x45f8bd
+// FUNCTION: CARM95 0x0045f8bd
 void DropPedPoint(void) {
+
 #if defined(DETHRACE_FIX_BUGS)
     if (gPath_actor == NULL) {
         return;
@@ -3471,8 +3515,9 @@ void DropPedPoint(void) {
 }
 
 // IDA: void __cdecl DropInitPedPoint()
-// FUNCTION: CARM95 0x45f9a4
+// FUNCTION: CARM95 0x0045f9a4
 void DropInitPedPoint(void) {
+
 #if defined(DETHRACE_FIX_BUGS)
     if (gPath_actor == NULL) {
         return;
@@ -3484,8 +3529,9 @@ void DropInitPedPoint(void) {
 }
 
 // IDA: void __cdecl DropPedPointAir2()
-// FUNCTION: CARM95 0x45f9fe
+// FUNCTION: CARM95 0x0045f9fe
 void DropPedPointAir2(void) {
+
     gPed_instrucs[gPed_instruc_count].type = ePed_instruc_point;
     gPed_instrucs[gPed_instruc_count].data.point_data.irreversable = 0;
     gPed_instrucs[gPed_instruc_count].data.point_data.position = *gOur_pos;
@@ -3495,8 +3541,9 @@ void DropPedPointAir2(void) {
 }
 
 // IDA: void __cdecl DropPedPointAir()
-// FUNCTION: CARM95 0x45f9d6
+// FUNCTION: CARM95 0x0045f9d6
 void DropPedPointAir(void) {
+
 #if defined(DETHRACE_FIX_BUGS)
     if (gPath_actor == NULL) {
         return;
@@ -3507,8 +3554,9 @@ void DropPedPointAir(void) {
 }
 
 // IDA: void __cdecl DropInitPedPointAir()
-// FUNCTION: CARM95 0x45fa88
+// FUNCTION: CARM95 0x0045fa88
 void DropInitPedPointAir(void) {
+
 #if defined(DETHRACE_FIX_BUGS)
     if (gPath_actor == NULL) {
         return;
@@ -3520,8 +3568,9 @@ void DropInitPedPointAir(void) {
 }
 
 // IDA: br_uint_32 __cdecl KillActorsModel(br_actor *pActor, void *pArg)
-// FUNCTION: CARM95 0x45ff83
+// FUNCTION: CARM95 0x0045ff83
 br_uintptr_t KillActorsModel(br_actor* pActor, void* pArg) {
+
     if (pActor->model != NULL) {
         BrModelRemove(pActor->model);
         BrModelFree(pActor->model);
@@ -3530,8 +3579,9 @@ br_uintptr_t KillActorsModel(br_actor* pActor, void* pArg) {
 }
 
 // IDA: void __cdecl DisposePedPaths()
-// FUNCTION: CARM95 0x45fef8
+// FUNCTION: CARM95 0x0045fef8
 void DisposePedPaths(void) {
+
     if (gPath_actor != NULL) {
         DRActorEnumRecurse(gPath_actor, KillActorsModel, NULL);
         BrActorRemove(gPath_actor);
@@ -3545,7 +3595,7 @@ void DisposePedPaths(void) {
 }
 
 // IDA: void __usercall GetPedPos(int *pPed_index@<EAX>, int *pPoint_index@<EDX>)
-// FUNCTION: CARM95 0x45faba
+// FUNCTION: CARM95 0x0045faba
 void GetPedPos(int* pPed_index, int* pPoint_index) {
     int i;
     int j;
@@ -3581,7 +3631,7 @@ void GetPedPos(int* pPed_index, int* pPoint_index) {
 }
 
 // IDA: void __cdecl ShowPedPos()
-// FUNCTION: CARM95 0x45fc96
+// FUNCTION: CARM95 0x0045fc96
 void ShowPedPos(void) {
     int min_ped;
     int min_point;
@@ -3593,7 +3643,7 @@ void ShowPedPos(void) {
 }
 
 // IDA: void __cdecl ShowPedPaths()
-// FUNCTION: CARM95 0x45fcf5
+// FUNCTION: CARM95 0x0045fcf5
 void ShowPedPaths(void) {
     int i;
     br_model* the_model;
@@ -3634,7 +3684,7 @@ void ShowPedPaths(void) {
 }
 
 // IDA: void __cdecl PullPedPoint()
-// FUNCTION: CARM95 0x45fe84
+// FUNCTION: CARM95 0x0045fe84
 void PullPedPoint(void) {
     int the_ped;
     int the_point;
@@ -3649,7 +3699,7 @@ void PullPedPoint(void) {
 }
 
 // IDA: void __cdecl PullPedPointAir()
-// FUNCTION: CARM95 0x45ffc0
+// FUNCTION: CARM95 0x0045ffc0
 void PullPedPointAir(void) {
     int the_ped;
     int the_point;
@@ -3665,7 +3715,7 @@ void PullPedPointAir(void) {
 }
 
 // IDA: void __cdecl DeletePedPath()
-// FUNCTION: CARM95 0x460082
+// FUNCTION: CARM95 0x00460082
 void DeletePedPath(void) {
     int the_ped;
     int the_point;
@@ -3682,8 +3732,9 @@ void DeletePedPath(void) {
 }
 
 // IDA: void __cdecl DeletePedPoint()
-// FUNCTION: CARM95 0x46010f
+// FUNCTION: CARM95 0x0046010f
 void DeletePedPoint(void) {
+
     if (gPed_instruc_count == 0) {
         return;
     }
@@ -3699,7 +3750,7 @@ void DeletePedPoint(void) {
 }
 
 // IDA: void __cdecl DisposePedestrians()
-// FUNCTION: CARM95 0x460169
+// FUNCTION: CARM95 0x00460169
 void DisposePedestrians(void) {
     int i;
     int j;
@@ -3749,7 +3800,7 @@ void DisposePedestrians(void) {
 }
 
 // IDA: void __cdecl DoPedReport()
-// FUNCTION: CARM95 0x4603d6
+// FUNCTION: CARM95 0x004603d6
 void DoPedReport(void) {
     FILE* f;
     tPath_name the_path;
@@ -3804,7 +3855,7 @@ void DoPedReport(void) {
 }
 
 // IDA: void __usercall RenderProximityRays(br_pixelmap *pRender_screen@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, tU32 pTime)
-// FUNCTION: CARM95 0x460696
+// FUNCTION: CARM95 0x00460696
 void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime) {
     int i;
     float seed;
@@ -3875,8 +3926,9 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
 }
 
 // IDA: void __usercall AdjustProxRay(int pRay_index@<EAX>, tU16 pCar_ID@<EDX>, tU16 pPed_index@<EBX>, tU32 pTime@<ECX>)
-// FUNCTION: CARM95 0x460ac5
+// FUNCTION: CARM95 0x00460ac5
 void AdjustProxRay(int pRay_index, tU16 pCar_ID, tU16 pPed_index, tU32 pTime) {
+
     if ((pCar_ID & 0xff00) == 0) {
         gProximity_rays[pRay_index].car = &gProgram_state.current_car;
     } else {
@@ -3887,7 +3939,7 @@ void AdjustProxRay(int pRay_index, tU16 pCar_ID, tU16 pPed_index, tU32 pTime) {
 }
 
 // IDA: void __usercall ReceivedPedestrian(tNet_contents *pContents@<EAX>, tNet_message *pMessage@<EDX>, tU32 pReceive_time@<EBX>)
-// FUNCTION: CARM95 0x460b66
+// FUNCTION: CARM95 0x00460b66
 void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 pReceive_time) {
     tPedestrian_data* the_pedestrian;
     tNet_game_player_info* sender;
@@ -4005,7 +4057,7 @@ void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 p
 }
 
 // IDA: void __usercall SendAllPedestrianPositions(tPlayer_ID pPlayer@<EAX>)
-// FUNCTION: CARM95 0x46109c
+// FUNCTION: CARM95 0x0046109c
 void SendAllPedestrianPositions(tPlayer_ID pPlayer) {
     int i;
     tPedestrian_data* the_pedestrian;

@@ -108,8 +108,8 @@ add_subdirectory(lib/BRender-v1.3.2)
 add_subdirectory(lib/libsmacker)
 
 if(DETHRACE_SOUND_ENABLED)
-    add_subdirectory(lib/miniaudio2)
-    add_subdirectory(lib/stb2)
+    add_subdirectory(lib/miniaudio)
+    add_subdirectory(lib/stb)
 endif()
 
 add_library(compile_with_werror INTERFACE)

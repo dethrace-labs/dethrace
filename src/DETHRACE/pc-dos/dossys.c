@@ -527,7 +527,6 @@ void CopyBackScreen(int pRendering_area_only) {
 
 // IDA: void __usercall PDScreenBufferSwap(int pRendering_area_only@<EAX>)
 void PDScreenBufferSwap(int pRendering_area_only) {
-    LOG_TRACE10("(%d)", pRendering_area_only);
 
     if (gSwitched_resolution) {
         BrPixelmapFill(gTemp_screen, 0);

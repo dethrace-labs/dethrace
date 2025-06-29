@@ -12,17 +12,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-// GLOBAL: CARM95 0x507030
+// GLOBAL: CARM95 0x00507030
 char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
 
-// GLOBAL: CARM95 0x507038
+// GLOBAL: CARM95 0x00507038
 char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
 
-// GLOBAL: CARM95 0x530190
+// GLOBAL: CARM95 0x00530190
 tSkid gSkids[100];
 
 // IDA: void __usercall StretchMark(tSkid *pMark@<EAX>, br_vector3 *pFrom@<EDX>, br_vector3 *pTo@<EBX>, br_scalar pTexture_start)
-// FUNCTION: CARM95 0x401e7c
+// FUNCTION: CARM95 0x00401e7c
 void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTexture_start) {
     br_vector3 temp;
     br_vector3* rows;
@@ -57,8 +57,9 @@ void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTe
 }
 
 // IDA: br_material* __usercall MaterialFromIndex@<EAX>(int pIndex@<EAX>)
-// FUNCTION: CARM95 0x401088
+// FUNCTION: CARM95 0x00401088
 br_material* MaterialFromIndex(int pIndex) {
+
     if (pIndex > -2) {
         return gCurrent_race.material_modifiers[pIndex].skid_mark_material;
     } else {
@@ -67,8 +68,9 @@ br_material* MaterialFromIndex(int pIndex) {
 }
 
 // IDA: void __usercall AdjustSkid(int pSkid_num@<EAX>, br_matrix34 *pMatrix@<EDX>, int pMaterial_index@<EBX>)
-// FUNCTION: CARM95 0x401000
+// FUNCTION: CARM95 0x00401000
 void AdjustSkid(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
+
     gSkids[pSkid_num].actor->t.t.mat = *pMatrix;
     gSkids[pSkid_num].pos.v[0] = pMatrix->m[3][0];
     gSkids[pSkid_num].pos.v[1] = pMatrix->m[3][1];
@@ -78,7 +80,7 @@ void AdjustSkid(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
 }
 
 // IDA: int __usercall FarFromLine2D@<EAX>(br_vector3 *pPt@<EAX>, br_vector3 *pL1@<EDX>, br_vector3 *pL2@<EBX>)
-// FUNCTION: CARM95 0x4020dc
+// FUNCTION: CARM95 0x004020dc
 int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     br_vector2 line;
     br_vector2 to_pt;
@@ -95,7 +97,7 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
 }
 
 // IDA: int __usercall Reflex2D@<EAX>(br_vector3 *pPt@<EAX>, br_vector3 *pL1@<EDX>, br_vector3 *pL2@<EBX>)
-// FUNCTION: CARM95 0x402179
+// FUNCTION: CARM95 0x00402179
 int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     br_vector2 line;
     br_vector2 to_pt;
@@ -108,7 +110,7 @@ int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
 }
 
 // IDA: void __cdecl InitSkids()
-// FUNCTION: CARM95 0x4010c8
+// FUNCTION: CARM95 0x004010c8
 void InitSkids(void) {
     int skid;
     int mat;
@@ -192,13 +194,14 @@ void InitSkids(void) {
 }
 
 // IDA: void __usercall HideSkid(int pSkid_num@<EAX>)
-// FUNCTION: CARM95 0x40148d
+// FUNCTION: CARM95 0x0040148d
 void HideSkid(int pSkid_num) {
+
     gSkids[pSkid_num].actor->render_style = BR_RSTYLE_NONE;
 }
 
 // IDA: void __cdecl HideSkids()
-// FUNCTION: CARM95 0x4014ad
+// FUNCTION: CARM95 0x004014ad
 void HideSkids(void) {
     int skid;
 
@@ -208,8 +211,9 @@ void HideSkids(void) {
 }
 
 // IDA: br_scalar __usercall SkidLen@<ST0>(int pSkid@<EAX>)
-// FUNCTION: CARM95 0x4021f1
+// FUNCTION: CARM95 0x004021f1
 br_scalar SkidLen(int pSkid) {
+
     return sqrtf(
         gSkids[pSkid].actor->t.t.mat.m[0][2] * gSkids[pSkid].actor->t.t.mat.m[0][2]
         + gSkids[pSkid].actor->t.t.mat.m[0][1] * gSkids[pSkid].actor->t.t.mat.m[0][1]
@@ -217,8 +221,9 @@ br_scalar SkidLen(int pSkid) {
 }
 
 // IDA: void __usercall SkidSection(tCar_spec *pCar@<EAX>, int pWheel_num@<EDX>, br_vector3 *pPos@<EBX>, int pMaterial_index@<ECX>)
-// FUNCTION: CARM95 0x401a22
+// FUNCTION: CARM95 0x00401a22
 void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMaterial_index) {
+    // GLOBAL: CARM95 0x530c88
     static tU16 skid;
     br_material* material;
 
@@ -252,7 +257,7 @@ void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMateria
 }
 
 // IDA: void __usercall SkidMark(tCar_spec *pCar@<EAX>, int pWheel_num@<EDX>)
-// FUNCTION: CARM95 0x4014e5
+// FUNCTION: CARM95 0x004014e5
 void SkidMark(tCar_spec* pCar, int pWheel_num) {
     br_vector3 pos;
     br_vector3 world_pos;
@@ -293,6 +298,7 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
         BrMatrix34ApplyP(&world_pos, &pos, &pCar->car_master_actor->t.t.mat);
         BrVector3InvScale(&world_pos, &world_pos, WORLD_SCALE);
         if (pCar->special_start[pWheel_num].v[0] != FLT_MAX) {
+
             BrVector3Sub(&spesh_to_wheel, &world_pos, &pCar->special_start[pWheel_num]);
             dist = BrVector3Length(&spesh_to_wheel);
             if (dist <= BR_SCALAR_EPSILON || (BrVector3Dot(&pCar->direction, &spesh_to_wheel) / dist < 0.70700002)) {
@@ -332,7 +338,7 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
 }
 
 // IDA: void __usercall InitCarSkidStuff(tCar_spec *pCar@<EAX>)
-// FUNCTION: CARM95 0x402282
+// FUNCTION: CARM95 0x00402282
 void InitCarSkidStuff(tCar_spec* pCar) {
     int wheel;
 
@@ -345,7 +351,7 @@ void InitCarSkidStuff(tCar_spec* pCar) {
 }
 
 // IDA: void __cdecl SkidsPerFrame()
-// FUNCTION: CARM95 0x4022f1
+// FUNCTION: CARM95 0x004022f1
 void SkidsPerFrame(void) {
     int skid;
 
