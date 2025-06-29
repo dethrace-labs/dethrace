@@ -41,6 +41,7 @@ option(DETHRACE_WERROR "Treat warnings as errors")
 option(DETHRACE_FIX_BUGS "Fix Dethrace bugs" ON)
 option(DETHRACE_3DFX_PATCH "Include changes from VOODOO2C.EXE" ON)
 option(DETHRACE_SOUND_ENABLED "Include audio support" ON)
+option(DETHRACE_NET_ENABLED "Include net support" ON)
 
 function(add_compile_flag_if_supported TARGET FLAG)
     cmake_parse_arguments(ARGS "" "" "LANGUAGES" ${ARGN})
