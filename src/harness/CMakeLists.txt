@@ -103,7 +103,7 @@ if(DETHRACE_PLATFORM_SDL_DYNAMIC)
     target_link_libraries(harness PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
-if(!DETHRACE_NET_ENABLED)
+if(NOT DETHRACE_NET_ENABLED)
     target_sources(harness PRIVATE
         os/null.c
     )

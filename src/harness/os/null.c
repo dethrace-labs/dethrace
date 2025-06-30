@@ -53,5 +53,5 @@ int OS_SetSocketNonBlocking(int socket) {
 }
 
 int OS_CloseSocket(int socket) {
-    return 0;
+    return 1;
 }
