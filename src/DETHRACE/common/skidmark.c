@@ -28,7 +28,6 @@ void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTe
     br_vector3* rows;
     br_scalar len;
     br_model* model;
-    LOG_TRACE("(%p, %p, %p, %f)", pMark, pFrom, pTo, pTexture_start);
 
     rows = (br_vector3*)&pMark->actor->t.t.mat;
     BrVector3Sub(&temp, pTo, pFrom);
@@ -60,7 +59,6 @@ void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTe
 // IDA: br_material* __usercall MaterialFromIndex@<EAX>(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x00401088
 br_material* MaterialFromIndex(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     if (pIndex > -2) {
         return gCurrent_race.material_modifiers[pIndex].skid_mark_material;
@@ -72,7 +70,6 @@ br_material* MaterialFromIndex(int pIndex) {
 // IDA: void __usercall AdjustSkid(int pSkid_num@<EAX>, br_matrix34 *pMatrix@<EDX>, int pMaterial_index@<EBX>)
 // FUNCTION: CARM95 0x00401000
 void AdjustSkid(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
-    LOG_TRACE("(%d, %p, %d)", pSkid_num, pMatrix, pMaterial_index);
 
     gSkids[pSkid_num].actor->t.t.mat = *pMatrix;
     gSkids[pSkid_num].pos.v[0] = pMatrix->m[3][0];
@@ -89,7 +86,6 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     br_vector2 to_pt;
     br_scalar line_len;
     br_scalar cross;
-    LOG_TRACE("(%p, %p, %p)", pPt, pL1, pL2);
 
     line.v[0] = pL2->v[0] - pL1->v[0];
     line.v[1] = pL2->v[2] - pL1->v[2];
@@ -105,7 +101,6 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
 int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     br_vector2 line;
     br_vector2 to_pt;
-    LOG_TRACE("(%p, %p, %p)", pPt, pL1, pL2);
 
     line.v[0] = pL2->v[0] - pL1->v[0];
     line.v[1] = pL2->v[2] - pL1->v[2];
@@ -125,7 +120,6 @@ void InitSkids(void) {
 #if defined(DETHRACE_FIX_BUGS)
     char mat_name[32];
 #endif
-    LOG_TRACE("()");
 
     for (mat = 0; mat < COUNT_OF(gMaterial_names); mat++) {
         if (gProgram_state.sausage_eater_mode) {
@@ -202,7 +196,6 @@ void InitSkids(void) {
 // IDA: void __usercall HideSkid(int pSkid_num@<EAX>)
 // FUNCTION: CARM95 0x0040148d
 void HideSkid(int pSkid_num) {
-    LOG_TRACE("(%d)", pSkid_num);
 
     gSkids[pSkid_num].actor->render_style = BR_RSTYLE_NONE;
 }
@@ -211,7 +204,6 @@ void HideSkid(int pSkid_num) {
 // FUNCTION: CARM95 0x004014ad
 void HideSkids(void) {
     int skid;
-    LOG_TRACE("()");
 
     for (skid = 0; skid < COUNT_OF(gSkids); skid++) {
         HideSkid(skid);
@@ -221,7 +213,6 @@ void HideSkids(void) {
 // IDA: br_scalar __usercall SkidLen@<ST0>(int pSkid@<EAX>)
 // FUNCTION: CARM95 0x004021f1
 br_scalar SkidLen(int pSkid) {
-    LOG_TRACE("(%d)", pSkid);
 
     return sqrtf(
         gSkids[pSkid].actor->t.t.mat.m[0][2] * gSkids[pSkid].actor->t.t.mat.m[0][2]
@@ -235,7 +226,6 @@ void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMateria
     // GLOBAL: CARM95 0x530c88
     static tU16 skid;
     br_material* material;
-    LOG_TRACE("(%p, %d, %p, %d)", pCar, pWheel_num, pPos, pMaterial_index);
 
     if (BrVector3Dot(&pCar->prev_nor[pWheel_num], &pCar->nor[pWheel_num]) < 0.99699998
         || fabs(BrVector3Dot(&pCar->nor[pWheel_num], pPos) - BrVector3Dot(&pCar->prev_skid_pos[pWheel_num], &pCar->nor[pWheel_num])) > 0.0099999998) {
@@ -278,7 +268,6 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
     br_scalar dist2;
     int on_ground;
     br_material* material;
-    LOG_TRACE("(%p, %d)", pCar, pWheel_num);
 
     on_ground = pCar->susp_height[pWheel_num >> 1] > pCar->oldd[pWheel_num];
     if (!on_ground) {
@@ -352,7 +341,6 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
 // FUNCTION: CARM95 0x00402282
 void InitCarSkidStuff(tCar_spec* pCar) {
     int wheel;
-    LOG_TRACE("(%p)", pCar);
 
     pCar->old_skidding = 0;
     for (wheel = 0; wheel < 4; wheel++) {
@@ -366,7 +354,6 @@ void InitCarSkidStuff(tCar_spec* pCar) {
 // FUNCTION: CARM95 0x004022f1
 void SkidsPerFrame(void) {
     int skid;
-    LOG_TRACE("()");
 
     for (skid = 0; skid < COUNT_OF(gSkids); skid++) {
         if (gSkids[skid].actor->render_style != BR_RSTYLE_NONE) {
@@ -378,6 +365,5 @@ void SkidsPerFrame(void) {
 // IDA: void __cdecl RemoveMaterialsFromSkidmarks()
 void RemoveMaterialsFromSkidmarks(void) {
     int skid;
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }

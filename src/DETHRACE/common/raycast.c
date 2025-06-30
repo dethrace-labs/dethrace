@@ -47,7 +47,6 @@ br_material* material_unk1;
 // IDA: int __usercall DRActorToRoot@<EAX>(br_actor *a@<EAX>, br_actor *world@<EDX>, br_matrix34 *m@<EBX>)
 // FUNCTION: CARM95 0x00494230
 int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
-    LOG_TRACE("(%p, %p, %p)", a, world, m);
 
     if (world == a) {
         BrMatrix34Identity(m);
@@ -67,7 +66,6 @@ int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
 // FUNCTION: CARM95 0x004942e4
 void InitRayCasting(void) {
     br_camera* camera_ptr;
-    LOG_TRACE("()");
 
     gY_picking_camera = BrActorAllocate(BR_ACTOR_CAMERA, NULL);
     camera_ptr = gY_picking_camera->type_data;
@@ -91,8 +89,7 @@ void InitRayCasting(void) {
 // Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004952ca
 int BadDiv__raycast(br_scalar a, br_scalar b) {
-    // LOG_TRACE("(%f, %f)", a, b);
-
+    //
     return fabs(b) < 1.0 && fabs(a) > fabs(b) * BR_SCALAR_MAX;
 }
 
@@ -100,7 +97,6 @@ int BadDiv__raycast(br_scalar a, br_scalar b) {
 //  Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x00495319
 void DRVector2AccumulateScale__raycast(br_vector2* a, br_vector2* b, br_scalar s) {
-    LOG_TRACE("(%p, %p, %f)", a, b, s);
 
     a->v[0] = b->v[0] * s + a->v[0];
     a->v[1] = b->v[1] * s + a->v[1];
@@ -113,7 +109,6 @@ int PickBoundsTestRay__raycast(br_bounds* b, br_vector3* rp, br_vector3* rd, br_
     int i;
     float s;
     float t;
-    LOG_TRACE("(%p, %p, %p, %f, %f, %p, %p)", b, rp, rd, t_near, t_far, new_t_near, new_t_far);
 
     for (i = 0; i < 3; i++) {
         if (rd->v[i] > 0.00000023841858) {
@@ -166,7 +161,6 @@ int ActorPick2D(br_actor* ap, br_model* model, br_material* material, dr_pick2d_
     br_scalar t_far;
     int r;
     br_vector3 dir;
-    LOG_TRACE("(%p, %p, %p, %p, %p)", ap, model, material, callback, arg);
 
     r = 0;
     if (ap->model != NULL) {
@@ -256,7 +250,6 @@ int DRScenePick2DXY(br_actor* world, br_actor* camera, br_pixelmap* viewport, in
     br_scalar sin_angle;
     br_camera* camera_data;
     br_angle view_over_2;
-    LOG_TRACE("(%p, %p, %p, %d, %d, %p, %p)", world, camera, viewport, pick_x, pick_y, callback, arg);
 
     camera_data = camera->type_data;
     DRActorToRoot(camera, world, &camera_tfm);
@@ -278,7 +271,6 @@ int DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, v
     br_matrix34 camera_tfm;
     br_scalar scale;
     br_camera* camera_data;
-    LOG_TRACE("(%p, %p, %p, %p)", world, camera, callback, arg);
 
     camera_data = (br_camera*)camera->type_data;
     DRActorToRoot(camera, world, &camera_tfm);
@@ -324,7 +316,6 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
     br_material* this_material;
     br_scalar numerator;
     double f_numerator;
-    LOG_TRACE("(%p, %p, %p, %p, %f, %f, %p, %p)", model, material, ray_pos, ray_dir, t_near, t_far, callback, arg);
 
     struct v11group* grp_ptr;
     br_vector4* eqn;
@@ -434,7 +425,6 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
 // FUNCTION: CARM95 0x0049534b
 int FindHighestPolyCallBack__raycast(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     br_scalar the_y;
-    LOG_TRACE("(%p, %p, %p, %p, %f, %d, %d, %d, %p, %p, %p)", pModel, pMaterial, pRay_pos, pRay_dir, pT, pF, pE, pV, pPoint, pMap, pArg);
 
     if (pPoint->v[1] > gCurrent_y) {
         if (gLowest_y_above > pPoint->v[1]) {
@@ -454,7 +444,6 @@ int FindHighestPolyCallBack__raycast(br_model* pModel, br_material* pMaterial, b
 //  Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x00494b28
 int FindHighestCallBack__raycast(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
-    LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, pArg);
 
     if (gProgram_state.current_car.current_car_actor < 0
         || gProgram_state.current_car.car_model_actors[gProgram_state.current_car.current_car_actor].actor != pActor) {
@@ -466,7 +455,6 @@ int FindHighestCallBack__raycast(br_actor* pActor, br_model* pModel, br_material
 // IDA: void __usercall FindBestY(br_vector3 *pPosition@<EAX>, br_actor *gWorld@<EDX>, br_scalar pStarting_height, br_scalar *pNearest_y_above, br_scalar *pNearest_y_below, br_model **pNearest_above_model, br_model **pNearest_below_model, int *pNearest_above_face_index, int *pNearest_below_face_index)
 // FUNCTION: CARM95 0x00494a71
 void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_height, br_scalar* pNearest_y_above, br_scalar* pNearest_y_below, br_model** pNearest_above_model, br_model** pNearest_below_model, int* pNearest_above_face_index, int* pNearest_below_face_index) {
-    LOG_TRACE("(%p, %p, %f, %p, %p, %p, %p, %p, %p)", pPosition, gWorld, pStarting_height, pNearest_y_above, pNearest_y_below, pNearest_above_model, pNearest_below_model, pNearest_above_face_index, pNearest_below_face_index);
 
     gLowest_y_above = 30000.0;
     gHighest_y_below = -30000.0;
@@ -486,7 +474,6 @@ void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_heig
 // FUNCTION: CARM95 0x004955eb
 int FindYVerticallyBelowPolyCallBack(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     br_scalar the_y;
-    LOG_TRACE("(%p, %p, %p, %p, %f, %d, %d, %d, %p, %p, %p)", pModel, pMaterial, pRay_pos, pRay_dir, pT, pF, pE, pV, pPoint, pMap, pArg);
 
     if (pMaterial->identifier == NULL || pMaterial->identifier[0] != '!') {
         the_y = pPoint->v[Y];
@@ -500,7 +487,6 @@ int FindYVerticallyBelowPolyCallBack(br_model* pModel, br_material* pMaterial, b
 // IDA: int __cdecl FindYVerticallyBelowCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg)
 // FUNCTION: CARM95 0x0049558b
 int FindYVerticallyBelowCallBack(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
-    LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, pArg);
 
     if (gProgram_state.current_car.current_car_actor < 0
         || gProgram_state.current_car.car_model_actors[gProgram_state.current_car.current_car_actor].actor != pActor) {
@@ -517,7 +503,6 @@ br_scalar FindYVerticallyBelow(br_vector3* pPosition) {
     tU8 x;
     tU8 z;
     tTrack_spec* track_spec;
-    LOG_TRACE("(%p)", pPosition);
 
     track_spec = &gProgram_state.track_spec;
     XZToColumnXZ(&cx, &cz, pPosition->v[X], pPosition->v[Z], track_spec);
@@ -545,7 +530,6 @@ br_scalar FindYVerticallyBelow2(br_vector3* pCast_point) {
     br_scalar result;
     int number_of_attempts;
     br_vector3 cast_point;
-    LOG_TRACE("(%p)", pCast_point);
 
     BrVector3Copy(&cast_point, pCast_point);
     for (number_of_attempts = 0; number_of_attempts <= 10; number_of_attempts++) {

@@ -119,7 +119,6 @@ int gTemp_lost;
 void MungeRankEtc(tProgram_state* pThe_state) {
     int i;
     int not_done_yet;
-    LOG_TRACE("(%p)", pThe_state);
 
     not_done_yet = 0;
     if (!gRank_etc_munged) {
@@ -153,7 +152,6 @@ void MungeRankEtc(tProgram_state* pThe_state) {
 // IDA: void __cdecl CalcRankIncrease()
 // FUNCTION: CARM95 0x0041631f
 void CalcRankIncrease(void) {
-    LOG_TRACE("()");
 
     if (gNet_mode == eNet_mode_none) {
         gRank_increase = gProgram_state.credits_earned / gProgram_state.credits_per_rank;
@@ -168,7 +166,6 @@ void CalcRankIncrease(void) {
 // IDA: int __usercall RaceSummaryDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 // FUNCTION: CARM95 0x0041587e
 int RaceSummaryDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
-    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
     if (pTimed_out) {
         pCurrent_choice = 0;
@@ -181,7 +178,6 @@ int RaceSummaryDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int p
 // IDA: void __usercall DrawInBox(int pBox_left@<EAX>, int pText_left@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour, int pAmount)
 // FUNCTION: CARM95 0x00415e44
 void DrawInBox(int pBox_left, int pText_left, int pTop, int pRight, int pBottom, int pColour, int pAmount) {
-    LOG_TRACE("(%d, %d, %d, %d, %d, %d, %d)", pBox_left, pText_left, pTop, pRight, pBottom, pColour, pAmount);
 
     BrPixelmapRectangleFill(gBack_screen,
         pBox_left,
@@ -197,7 +193,6 @@ void DrawInBox(int pBox_left, int pText_left, int pTop, int pRight, int pBottom,
 // IDA: void __usercall DrawChromeNumber(int pLeft_1@<EAX>, int pLeft_2@<EDX>, int pPitch@<EBX>, int pTop@<ECX>, int pAmount)
 // FUNCTION: CARM95 0x00415ebd
 void DrawChromeNumber(int pLeft_1, int pLeft_2, int pPitch, int pTop, int pAmount) {
-    LOG_TRACE("(%d, %d, %d, %d, %d)", pLeft_1, pLeft_2, pPitch, pTop, pAmount);
 
     if (pAmount < 10) {
         DRPixelmapRectangleMaskedCopy(gBack_screen,
@@ -217,7 +212,6 @@ void DrawChromeNumber(int pLeft_1, int pLeft_2, int pPitch, int pTop, int pAmoun
 // IDA: void __cdecl DrawSummaryItems()
 // FUNCTION: CARM95 0x00415beb
 void DrawSummaryItems(void) {
-    LOG_TRACE("()");
 
     DrawInBox(
         gCurrent_graf_data->summ1_credits_box_left,
@@ -274,7 +268,6 @@ void DrawSummaryItems(void) {
 // IDA: void __usercall RampUpRate(float *pRate@<EAX>, tU32 pTime@<EDX>)
 // FUNCTION: CARM95 0x00415f72
 void RampUpRate(float* pRate, tU32 pTime) {
-    LOG_TRACE("(%p, %d)", pRate, pTime);
 
     if (pTime >= 6000) {
         *pRate = 10.f;
@@ -300,7 +293,6 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
     int credit_delta;
     float old_temp_increase;
     float rank_delta;
-    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
     the_time = PDGetTotalTime();
     if (the_time - gSummary_start > 3000) {
@@ -372,7 +364,6 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
 // IDA: void __cdecl StartSummary()
 // FUNCTION: CARM95 0x00415ff2
 void StartSummary(void) {
-    LOG_TRACE("()");
 
     DrawSummaryItems();
     gSummary_start = PDGetTotalTime();
@@ -381,7 +372,6 @@ void StartSummary(void) {
 // IDA: void __cdecl SetUpTemps()
 // FUNCTION: CARM95 0x00416046
 void SetUpTemps(void) {
-    LOG_TRACE("()");
 
     gTemp_earned = gProgram_state.credits_earned;
     gTemp_lost = gProgram_state.credits_lost;
@@ -393,7 +383,6 @@ void SetUpTemps(void) {
 // IDA: int __usercall Summ1GoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x0041600c
 int Summ1GoAhead(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     S3StopOutletSound(gEffects_outlet);
     MungeRankEtc(&gProgram_state);
@@ -407,7 +396,6 @@ int Summ1GoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     tS3_sound_tag sound_tag;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (gTemp_credits > 0) {
         return 0;
@@ -511,7 +499,6 @@ tSO_result DoEndRaceSummary1(void) {
     };
     int result;
     int completed_already;
-    LOG_TRACE("()");
 
     NetPlayerStatusChanged(ePlayer_status_summary);
     completed_already = gProgram_state.game_completed;
@@ -553,7 +540,6 @@ void PrepareBoundingRadius__racesumm(br_model* model) {
     float max;
     int v;
     br_vertex* vp;
-    LOG_TRACE("(%p)", model);
 
     max = 0.f;
     for (v = 0; v < model->nvertices; v++) {
@@ -576,7 +562,6 @@ void BuildWrecks(void) {
     int car_count;
     br_actor* this_car;
     tCar_spec* the_car;
-    LOG_TRACE("()");
 
     gWreck_count = 0;
     position = 0;
@@ -667,7 +652,6 @@ void DisposeWrecks(void) {
     int car_count;
     br_actor* this_car;
     tCar_spec* the_car;
-    LOG_TRACE("()");
 
     for (cat = eVehicle_self; cat < eVehicle_rozzer; cat++) {
         if (cat == eVehicle_self) {
@@ -707,7 +691,6 @@ void DisposeWrecks(void) {
 // IDA: int __usercall MatrixIsIdentity@<EAX>(br_matrix34 *pMat@<EAX>)
 // FUNCTION: CARM95 0x00416f4e
 int MatrixIsIdentity(br_matrix34* pMat) {
-    LOG_TRACE("(%p)", pMat);
 
     return (pMat->m[0][0] == 1.f && pMat->m[1][1] == 1.f && pMat->m[2][2] == 1.f && pMat->m[0][1] == 0.f && pMat->m[0][2] == 0.f && pMat->m[1][0] == 0.f && pMat->m[1][2] == 0.f && pMat->m[2][0] == 0.f && pMat->m[2][1] == 0.f);
 }
@@ -718,7 +701,6 @@ void SpinWrecks(tU32 pFrame_period) {
     int i;
     br_vector3 translation;
     br_matrix34 old_mat;
-    LOG_TRACE("(%d)", pFrame_period);
 
     for (i = 0; i < gWreck_count; i++) {
         if (gWreck_array[i].customised == 0) {
@@ -740,7 +722,6 @@ void SpinWrecks(tU32 pFrame_period) {
 // IDA: void __usercall ZoomInTo(int pIndex@<EAX>, int *pCurrent_choice@<EDX>, int *pCurrent_mode@<EBX>)
 // FUNCTION: CARM95 0x0041778f
 void ZoomInTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%d, %p, %p)", pIndex, pCurrent_choice, pCurrent_mode);
 
     gWreck_zoom_in = pIndex;
     gWreck_zoom_out = -1;
@@ -763,7 +744,6 @@ void ZoomInTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: void __usercall ZoomOutTo(int pIndex@<EAX>, int *pCurrent_choice@<EDX>, int *pCurrent_mode@<EBX>)
 // FUNCTION: CARM95 0x00416413
 void ZoomOutTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%d, %p, %p)", pIndex, pCurrent_choice, pCurrent_mode);
 
     gWreck_zoom_out = pIndex;
     gWreck_zoom_in = -1;
@@ -781,7 +761,6 @@ void ZoomOutTo(int pIndex, int* pCurrent_choice, int* pCurrent_mode) {
 // FUNCTION: CARM95 0x0041660d
 int WreckPick(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pNear, br_scalar pFar, void* pArg) {
     int i;
-    LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pNear, pFar, pArg);
 
     for (i = 0; i < gWreck_count; i++) {
         if (gWreck_array[i].actor == pActor) {
@@ -800,7 +779,6 @@ int CastSelectionRay(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     int result;
     br_scalar inv_wreck_pick_scale_factor;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (!gMouse_in_use) {
         return 0;
@@ -845,7 +823,6 @@ int CastSelectionRay(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall DamageScrnExit@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x0041636e
 int DamageScrnExit(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (gProgram_state.prog_status == eProg_idling) {
         return 1;
@@ -876,7 +853,6 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
     float spacing;
     br_actor* sel_actor;
     char* name;
-    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
     if (((pCurrent_choice == 0 && pCurrent_mode == 0) || !gDone_initial) && (gWreck_zoomed_in < 0 && gWreck_selected >= 0)) {
         sel_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
@@ -1035,7 +1011,6 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
 // FUNCTION: CARM95 0x00417038
 int DamageScrnLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     gDone_initial = 1;
     DRS3StartSound(gEffects_outlet, 3000);
@@ -1065,7 +1040,6 @@ int DamageScrnLeft(int* pCurrent_choice, int* pCurrent_mode) {
 // FUNCTION: CARM95 0x00417175
 int DamageScrnRight(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     gDone_initial = 1;
     DRS3StartSound(gEffects_outlet, 3000);
@@ -1098,7 +1072,6 @@ int DamageScrnUp(int* pCurrent_choice, int* pCurrent_mode) {
     int difference;
     int new_difference;
     int new_selection;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     gDone_initial = 1;
     DRS3StartSound(gEffects_outlet, 3000);
@@ -1148,7 +1121,6 @@ int DamageScrnDown(int* pCurrent_choice, int* pCurrent_mode) {
     int difference;
     int new_difference;
     int new_selection;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     gDone_initial = 1;
     DRS3StartSound(gEffects_outlet, 3000);
@@ -1197,7 +1169,6 @@ int DamageScrnDown(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall DamageScrnGoHead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x004176dd
 int DamageScrnGoHead(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     gDone_initial = 1;
     if (*pCurrent_choice == 2) {
@@ -1221,7 +1192,6 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
     int mouse_y;
     int old_mouse_x;
     int old_mouse_y;
-    LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
 #if defined(DETHRACE_FIX_BUGS)
     old_mouse_x = 0; // Fixes warning caused by -Wsometimes-uninitialized
@@ -1259,7 +1229,6 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
 // IDA: int __usercall DamageScrnDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 // FUNCTION: CARM95 0x0041794f
 int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
-    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
     if (pTimed_out) {
         pCurrent_choice = 2;
@@ -1306,7 +1275,6 @@ tSO_result DoEndRaceSummary2(void) {
         0, NULL
     };
     int result;
-    LOG_TRACE("()");
 
     if (gAusterity_mode) {
         return eSO_continue;
@@ -1341,7 +1309,6 @@ tSO_result DoEndRaceSummary2(void) {
 //  Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004183be
 void DrawAnItem__racesumm(int pX, int pY_index, int pFont_index, char* pText) {
-    LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
 
     TransBrPixelmapText(gBack_screen,
         pX,
@@ -1355,7 +1322,6 @@ void DrawAnItem__racesumm(int pX, int pY_index, int pFont_index, char* pText) {
 //  Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x00418405
 void DrawColumnHeading__racesumm(int pStr_index, int pX) {
-    LOG_TRACE("(%d, %d)", pStr_index, pX);
 
     TransBrPixelmapText(gBack_screen,
         pX,
@@ -1368,7 +1334,6 @@ void DrawColumnHeading__racesumm(int pStr_index, int pX) {
 // IDA: int __usercall SortScores@<EAX>(void *pFirst_one@<EAX>, void *pSecond_one@<EDX>)
 // FUNCTION: CARM95 0x0041853a
 int SortScores(const void* pFirst_one, const void* pSecond_one) {
-    LOG_TRACE("(%p, %p)", pFirst_one, pSecond_one);
 
     return gNet_players[*(int*)pSecond_one].games_score - gNet_players[*(int*)pFirst_one].games_score;
 }
@@ -1376,7 +1341,6 @@ int SortScores(const void* pFirst_one, const void* pSecond_one) {
 // IDA: void __cdecl SortGameScores()
 // FUNCTION: CARM95 0x00418515
 void SortGameScores(void) {
-    LOG_TRACE("()");
     qsort(gPlayer_lookup, gNumber_of_net_players, sizeof(gPlayer_lookup[0]), SortScores);
 }
 
@@ -1386,7 +1350,6 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     int i;
     char s[256];
     tNet_game_player_info* player;
-    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
     DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_3);
     DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_4);
@@ -1489,7 +1452,6 @@ void DoNetRaceSummary(void) {
     int i;
     int result;
     tS32 start_time;
-    LOG_TRACE("()");
 
     NetPlayerStatusChanged(ePlayer_status_summary);
     start_time = PDGetTotalTime();
@@ -1513,7 +1475,6 @@ void DoNetRaceSummary(void) {
 // FUNCTION: CARM95 0x00418590
 tSO_result DoEndRaceSummary(int* pFirst_summary_done, tRace_result pRace_result) {
     tSO_result result;
-    LOG_TRACE("(%p, %d)", pFirst_summary_done, pRace_result);
 
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         gRank_etc_munged = 1;

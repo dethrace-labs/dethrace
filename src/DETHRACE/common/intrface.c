@@ -36,7 +36,6 @@ int gDisabled_count;
 // IDA: void __cdecl SetAlwaysTyping()
 // FUNCTION: CARM95 0x004735b0
 void SetAlwaysTyping(void) {
-    LOG_TRACE("()");
 
     gAlways_typing = 1;
 }
@@ -44,7 +43,6 @@ void SetAlwaysTyping(void) {
 // IDA: void __cdecl ClearAlwaysTyping()
 // FUNCTION: CARM95 0x004735c5
 void ClearAlwaysTyping(void) {
-    LOG_TRACE("()");
 
     gAlways_typing = 0;
 }
@@ -53,7 +51,6 @@ void ClearAlwaysTyping(void) {
 // FUNCTION: CARM95 0x00475027
 int ChoiceDisabled(int pChoice) {
     int i;
-    LOG_TRACE("(%d)", pChoice);
 
     for (i = 0; i < gDisabled_count; ++i) {
         if (gDisabled_choices[i] == pChoice) {
@@ -66,7 +63,6 @@ int ChoiceDisabled(int pChoice) {
 // IDA: void __cdecl ResetInterfaceTimeout()
 // FUNCTION: CARM95 0x004735da
 void ResetInterfaceTimeout(void) {
-    LOG_TRACE("()");
 
     gStart_time = PDGetTotalTime();
 }
@@ -75,7 +71,6 @@ void ResetInterfaceTimeout(void) {
 // FUNCTION: CARM95 0x00474d84
 void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_selection, int pMode, int pSkip_disabled) {
     int i;
-    LOG_TRACE("(%p, %p, %p, %d, %d)", pSpec, *pOld_selection, *pNew_selection, pMode, pSkip_disabled);
 
     if (ChoiceDisabled(*pNew_selection)) {
         if (!pSkip_disabled) {
@@ -145,7 +140,6 @@ void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
 // FUNCTION: CARM95 0x004735ef
 void DisableChoice(int pChoice) {
     int i;
-    LOG_TRACE("(%d)", pChoice);
 
     for (i = 0; i < gDisabled_count; i++) {
         if (gDisabled_choices[i] == pChoice) {
@@ -160,7 +154,6 @@ void DisableChoice(int pChoice) {
 // FUNCTION: CARM95 0x0047364d
 void EnableChoice(int pChoice) {
     int i;
-    LOG_TRACE("(%d)", pChoice);
 
     for (i = 0; i < gDisabled_count; i++) {
         if (gDisabled_choices[i] == pChoice) {
@@ -204,7 +197,6 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     br_pixelmap* old_current_splash; //
     void* pixels_copy;
     void* palette_copy;
-    LOG_TRACE("(%p, %d, %d)", pSpec, pOptions, pCurrent_choice);
 
 #if defined(DETHRACE_FIX_BUGS)
     mouse_down = 0;
@@ -567,7 +559,6 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
 // FUNCTION: CARM95 0x00475175
 void ChangeSelectionTo(int pNew_choice, int pNew_mode) {
     int last_choice;
-    LOG_TRACE("(%d, %d)", pNew_choice, pNew_mode);
 
     last_choice = gCurrent_choice;
     gCurrent_choice = pNew_choice;

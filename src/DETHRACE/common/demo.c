@@ -25,7 +25,6 @@ void DoDemo(void) {
     char s[256];
     char* str;
     tS3_sound_tag song_tag;
-    LOG_TRACE("()");
 
     PathCat(the_path, gApplication_path, "DEMOFILE.TXT");
     f = DRfopen(the_path, "rt");

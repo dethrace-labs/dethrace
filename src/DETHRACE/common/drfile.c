@@ -63,7 +63,6 @@ br_size_t DRStdioWrite(void* buf, br_size_t size, unsigned int n, void* f) {
 // FUNCTION: CARM95 0x0044d009
 void InstallDRFileCalls(void) {
     br_filesystem* temp_system;
-    LOG_TRACE("()");
     temp_system = BrMemAllocate(sizeof(br_filesystem), kMem_temp_fs);
     gOld_file_system = BrFilesystemSet(temp_system);
     gFilesystem.attributes = gOld_file_system->attributes;

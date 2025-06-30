@@ -20,7 +20,6 @@ int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* 
     br_scalar numerator;
     br_scalar x;
     br_scalar __block0___scale;
-    LOG_TRACE("(%p, %p, %p, %p, %p, %p, %p, %f, %f)", pCent, pRadius, pEntry_length, pLeft_not_right, p1, p2, p3, pWidth12, pWidth23);
     NOT_IMPLEMENTED();
 }
 
@@ -35,7 +34,6 @@ static void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3*
     br_scalar tmp2;
     br_scalar tmp3;
     br_scalar tmp4;
-    LOG_TRACE("(%p, %p, %p, %p, %p, %p, %p, %p, %f, %f)", p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
 
     BrVector3Sub(&rel1, p6, p5);
     rel1.v[1] = 0.f;
@@ -65,7 +63,6 @@ static void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3*
 // IDA: br_scalar __usercall CornerFudge@<ST0>(tCar_spec *pCar_spec@<EAX>)
 // FUNCTION: CARM95 0x004a003e
 br_scalar CornerFudge(tCar_spec* pCar_spec) {
-    LOG_TRACE("(%p)", pCar_spec);
 
     return 1.4f;
 }
@@ -74,7 +71,6 @@ br_scalar CornerFudge(tCar_spec* pCar_spec) {
 // FUNCTION: CARM95 0x004a0054
 br_scalar MaxCurvatureForCarSpeed(tCar_spec* pCar, br_scalar pSpeed) {
     br_scalar curv;
-    LOG_TRACE("(%p, %f)", pCar, pSpeed);
 
     if (pSpeed >= 12.5f) {
         curv = pCar->maxcurve * 12.5f / pSpeed;
@@ -86,14 +82,12 @@ br_scalar MaxCurvatureForCarSpeed(tCar_spec* pCar, br_scalar pSpeed) {
 
 // IDA: br_scalar __usercall Vector2Cross@<ST0>(br_vector2 *pA@<EAX>, br_vector2 *pB@<EDX>)
 br_scalar Vector2Cross(br_vector2* pA, br_vector2* pB) {
-    LOG_TRACE("(%p, %p)", pA, pB);
     NOT_IMPLEMENTED();
 }
 
 // IDA: tFollow_path_result __usercall EndOfPath@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
 tFollow_path_result EndOfPath(tOpponent_spec* pOpponent_spec) {
     tCar_spec* car_spec;
-    LOG_TRACE("(%p)", pOpponent_spec);
     NOT_IMPLEMENTED();
 }
 
@@ -105,7 +99,6 @@ int RoughlyColinear(br_vector2* p1, br_vector2* p2, br_vector2* p3) {
     br_scalar cross;
     br_scalar dot;
     br_scalar wibble;
-    LOG_TRACE("(%p, %p, %p)", p1, p2, p3);
     NOT_IMPLEMENTED();
 }
 
@@ -114,7 +107,6 @@ int GetStraight(br_vector2* pStart, br_vector2* pFinish, br_scalar* pWidth, int 
     int section;
     br_vector2 next;
     br_scalar next_width;
-    LOG_TRACE("(%p, %p, %p, %d, %p, %p)", pStart, pFinish, pWidth, section1, pOpponent_spec, data);
     NOT_IMPLEMENTED();
 }
 
@@ -201,7 +193,6 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
     int left_not_right;
     int later_straight;
     int next_left_not_right;
-    LOG_TRACE("(%p, %d, %d, %d, %d)", pOpponent_spec, pCommand, pPursuit_mode, pIgnore_end, pNever_struggle);
 
     car_spec = pOpponent_spec->car_spec;
     engine_damage = car_spec->damage_units[0].damage_level;
@@ -484,7 +475,6 @@ tFollow_path_result FollowCheatyPath(tOpponent_spec* pOpponent_spec) {
     br_scalar section_min;
     br_scalar section_max;
     br_scalar desired_speed_BRU;
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     data = &pOpponent_spec->follow_path_data;
     start = GetOpponentsSectionStartNodePoint(pOpponent_spec, pOpponent_spec->follow_path_data.section_no);

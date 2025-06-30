@@ -97,7 +97,6 @@ int gLast_credit_headup__mainloop; // suffix added to avoid duplicate symbol
 // IDA: void __cdecl ToggleInfo()
 // FUNCTION: CARM95 0x0046fd00
 void ToggleInfo(void) {
-    LOG_TRACE("()");
 
     if (gProgram_state.game_completed) {
         if (KeyIsDown(KEYMAP_CONTROL_ANY)) {
@@ -126,7 +125,6 @@ void CalculateFrameRate(void) {
     static int last_rates[30];
     int new_rate;
     int i;
-    LOG_TRACE("()");
 
     new_time = PDGetTotalTime();
     if (new_time != last_time) {
@@ -148,7 +146,6 @@ void CalculateFrameRate(void) {
 // FUNCTION: CARM95 0x0046fde6
 void LoseOldestWastedMassage(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 1; i < gQueued_wasted_massages_count; i++) {
         gQueued_wasted_massages[i - 1] = gQueued_wasted_massages[i];
@@ -160,7 +157,6 @@ void LoseOldestWastedMassage(void) {
 // IDA: void __usercall QueueWastedMassage(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x0046fd9c
 void QueueWastedMassage(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     if (gQueued_wasted_massages_count == COUNT_OF(gQueued_wasted_massages)) {
         LoseOldestWastedMassage();
@@ -190,7 +186,6 @@ void MungeHeadups(void) {
     tPixelmap_user_data* user;
     // GLOBAL: CARM95 0x53a1ac
     static tU32 last_rattle_time;
-    LOG_TRACE("()");
 
     ClearHeadupSlot(3);
     gMr_odo = (double)gFrame_period * gProgram_state.current_car.speedo_speed * WORLD_SCALE / 1600.0 + gMr_odo;
@@ -413,7 +408,6 @@ void UpdateFramePeriod(tU32* pCamera_period) {
     int error;
     // GLOBAL: CARM95 0x514b10
     static int last_AR_mode;
-    LOG_TRACE("(%p)", pCamera_period);
 
     if (gAction_replay_mode != last_AR_mode) {
         if (gAction_replay_mode) {
@@ -486,7 +480,6 @@ void UpdateFramePeriod(tU32* pCamera_period) {
 
 // IDA: tU32 __cdecl GetLastTickCount()
 tU32 GetLastTickCount(void) {
-    LOG_TRACE("()");
 
     return gLast_tick_count;
 }
@@ -499,7 +492,6 @@ void CheckTimer(void) {
     // GLOBAL: CARM95 0x514b14
     static tU32 last_time_in_seconds = 0;
     static tU32 last_demo_time_in_seconds = 0;
-    LOG_TRACE("()");
 
     if (harness_game_config.freeze_timer) {
         return;
@@ -540,7 +532,6 @@ void CheckTimer(void) {
 // IDA: int __cdecl MungeRaceFinished()
 // FUNCTION: CARM95 0x00471607
 int MungeRaceFinished(void) {
-    LOG_TRACE("()");
 
     if (!gRace_finished || gAction_replay_mode || (gNet_mode != eNet_mode_none && gRace_over_reason == eRace_not_over_yet)) {
         return 0;
@@ -572,7 +563,6 @@ tRace_result MainGameLoop(void) {
     int tried_to_allocate_AR;
     int i;
     int bonus;
-    LOG_TRACE("()");
 
     tried_to_allocate_AR = 0;
     gCar_to_view = &gProgram_state.current_car;
@@ -816,7 +806,6 @@ tRace_result MainGameLoop(void) {
 // FUNCTION: CARM95 0x0046fe4f
 tRace_result DoRace(void) {
     tRace_result result;
-    LOG_TRACE("()");
 
     gRace_start = GetTotalTime();
     result = MainGameLoop();
