@@ -1,10 +1,10 @@
 #include "globvrbm.h"
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x520038
+// GLOBAL: CARM95 0x00520038
 br_scalar gYon_factor;
 
-// GLOBAL: CARM95 0x530c80
+// GLOBAL: CARM95 0x00530c80
 br_material* gMaterial[2];
 
 // These variables are all used only by the 3dfx patch

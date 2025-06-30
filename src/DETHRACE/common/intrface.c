@@ -12,43 +12,48 @@
 #include "sound.h"
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x53a4d8
+// GLOBAL: CARM95 0x0053a4d8
 int gDisabled_choices[10];
 
-// GLOBAL: CARM95 0x53a500
+// GLOBAL: CARM95 0x0053a500
 int gCurrent_mode;
 
-// GLOBAL: CARM95 0x53a508
+// GLOBAL: CARM95 0x0053a508
 tU32 gStart_time;
 
-// GLOBAL: CARM95 0x53a504
+// GLOBAL: CARM95 0x0053a504
 int gCurrent_choice;
 
-// GLOBAL: CARM95 0x53a4c8
+// GLOBAL: CARM95 0x0053a4c8
 tInterface_spec* gSpec;
 
-// GLOBAL: CARM95 0x53a4d0
+// GLOBAL: CARM95 0x0053a4d0
 int gAlways_typing;
 
-// GLOBAL: CARM95 0x53a4cc
+// GLOBAL: CARM95 0x0053a4cc
 int gDisabled_count;
 
 // IDA: void __cdecl SetAlwaysTyping()
-// FUNCTION: CARM95 0x4735b0
+// FUNCTION: CARM95 0x004735b0
 void SetAlwaysTyping(void) {
+    LOG_TRACE("()");
+
     gAlways_typing = 1;
 }
 
 // IDA: void __cdecl ClearAlwaysTyping()
-// FUNCTION: CARM95 0x4735c5
+// FUNCTION: CARM95 0x004735c5
 void ClearAlwaysTyping(void) {
+    LOG_TRACE("()");
+
     gAlways_typing = 0;
 }
 
 // IDA: int __usercall ChoiceDisabled@<EAX>(int pChoice@<EAX>)
-// FUNCTION: CARM95 0x475027
+// FUNCTION: CARM95 0x00475027
 int ChoiceDisabled(int pChoice) {
     int i;
+    LOG_TRACE("(%d)", pChoice);
 
     for (i = 0; i < gDisabled_count; ++i) {
         if (gDisabled_choices[i] == pChoice) {
@@ -59,15 +64,18 @@ int ChoiceDisabled(int pChoice) {
 }
 
 // IDA: void __cdecl ResetInterfaceTimeout()
-// FUNCTION: CARM95 0x4735da
+// FUNCTION: CARM95 0x004735da
 void ResetInterfaceTimeout(void) {
+    LOG_TRACE("()");
+
     gStart_time = PDGetTotalTime();
 }
 
 // IDA: void __usercall ChangeSelection(tInterface_spec *pSpec@<EAX>, int *pOld_selection@<EDX>, int *pNew_selection@<EBX>, int pMode@<ECX>, int pSkip_disabled)
-// FUNCTION: CARM95 0x474d84
+// FUNCTION: CARM95 0x00474d84
 void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_selection, int pMode, int pSkip_disabled) {
     int i;
+    LOG_TRACE("(%p, %p, %p, %d, %d)", pSpec, *pOld_selection, *pNew_selection, pMode, pSkip_disabled);
 
     if (ChoiceDisabled(*pNew_selection)) {
         if (!pSkip_disabled) {
@@ -115,9 +123,10 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
 }
 
 // IDA: void __usercall RecopyAreas(tInterface_spec *pSpec@<EAX>, br_pixelmap **pCopy_areas@<EDX>)
-// FUNCTION: CARM95 0x47507b
+// FUNCTION: CARM95 0x0047507b
 void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
     int i;
+    LOG_TRACE8("(%p, %p)", pSpec, pCopy_areas);
 
     for (i = 0; i < pSpec->number_of_recopy_areas; i++) {
         BrPixelmapRectangleCopy(
@@ -133,9 +142,10 @@ void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
 }
 
 // IDA: void __usercall DisableChoice(int pChoice@<EAX>)
-// FUNCTION: CARM95 0x4735ef
+// FUNCTION: CARM95 0x004735ef
 void DisableChoice(int pChoice) {
     int i;
+    LOG_TRACE("(%d)", pChoice);
 
     for (i = 0; i < gDisabled_count; i++) {
         if (gDisabled_choices[i] == pChoice) {
@@ -147,9 +157,10 @@ void DisableChoice(int pChoice) {
 }
 
 // IDA: void __usercall EnableChoice(int pChoice@<EAX>)
-// FUNCTION: CARM95 0x47364d
+// FUNCTION: CARM95 0x0047364d
 void EnableChoice(int pChoice) {
     int i;
+    LOG_TRACE("(%d)", pChoice);
 
     for (i = 0; i < gDisabled_count; i++) {
         if (gDisabled_choices[i] == pChoice) {
@@ -161,7 +172,7 @@ void EnableChoice(int pChoice) {
 }
 
 // IDA: int __usercall DoInterfaceScreen@<EAX>(tInterface_spec *pSpec@<EAX>, int pOptions@<EDX>, int pCurrent_choice@<EBX>)
-// FUNCTION: CARM95 0x4736cc
+// FUNCTION: CARM95 0x004736cc
 int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice) {
     tProg_status entry_status; //
     int x_coord;               //
@@ -193,6 +204,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     br_pixelmap* old_current_splash; //
     void* pixels_copy;
     void* palette_copy;
+    LOG_TRACE("(%p, %d, %d)", pSpec, pOptions, pCurrent_choice);
 
 #if defined(DETHRACE_FIX_BUGS)
     mouse_down = 0;
@@ -552,9 +564,10 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
 }
 
 // IDA: void __usercall ChangeSelectionTo(int pNew_choice@<EAX>, int pNew_mode@<EDX>)
-// FUNCTION: CARM95 0x475175
+// FUNCTION: CARM95 0x00475175
 void ChangeSelectionTo(int pNew_choice, int pNew_mode) {
     int last_choice;
+    LOG_TRACE("(%d, %d)", pNew_choice, pNew_mode);
 
     last_choice = gCurrent_choice;
     gCurrent_choice = pNew_choice;

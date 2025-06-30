@@ -21,22 +21,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-// GLOBAL: CARM95 0x50ba00
+// GLOBAL: CARM95 0x0050ba00
 tU8* gPipe_buffer_start = NULL;
 
-// GLOBAL: CARM95 0x50ba04
+// GLOBAL: CARM95 0x0050ba04
 int gDisable_sound = 0;
 
-// GLOBAL: CARM95 0x50ba08
+// GLOBAL: CARM95 0x0050ba08
 int gDisable_advance = 0;
 
-// GLOBAL: CARM95 0x50ba0c
+// GLOBAL: CARM95 0x0050ba0c
 int gMax_rewind_chunks = 1000;
 
-// GLOBAL: CARM95 0x50ba10
+// GLOBAL: CARM95 0x0050ba10
 float gWall_severity = 0.f;
 
-// GLOBAL: CARM95 0x50ba18
+// GLOBAL: CARM95 0x0050ba18
 tPipe_reset_proc* gReset_procs[32] = {
     NULL,
     NULL,
@@ -74,86 +74,86 @@ tPipe_reset_proc* gReset_procs[32] = {
 
 tPiped_registration_snapshot gRegistration_snapshots[5];
 
-// GLOBAL: CARM95 0x531ffc
+// GLOBAL: CARM95 0x00531ffc
 tPipe_smudge_data* gSmudge_space;
 
-// GLOBAL: CARM95 0x532010
+// GLOBAL: CARM95 0x00532010
 tU32 gOldest_time;
 
 int gCurrent_snapshot_registration_index;
 
-// GLOBAL: CARM95 0x531fa0
+// GLOBAL: CARM95 0x00531fa0
 tPipe_chunk* gMr_chunky;
 
-// GLOBAL: CARM95 0x532040
+// GLOBAL: CARM95 0x00532040
 tCar_spec* gCar_ptr;
 
-// GLOBAL: CARM95 0x532068
+// GLOBAL: CARM95 0x00532068
 br_vector3 gZero_vector;
 
-// GLOBAL: CARM95 0x532050
+// GLOBAL: CARM95 0x00532050
 tPipe_chunk_type gReentrancy_array[5];
 
-// GLOBAL: CARM95 0x532000
+// GLOBAL: CARM95 0x00532000
 tU32 gLast_time;
 
-// GLOBAL: CARM95 0x53204c
+// GLOBAL: CARM95 0x0053204c
 tPipe_model_geometry_data* gModel_geometry_space;
 
-// GLOBAL: CARM95 0x531ff8
+// GLOBAL: CARM95 0x00531ff8
 tU32 gEnd_time;
 
-// GLOBAL: CARM95 0x532094
+// GLOBAL: CARM95 0x00532094
 tU32 gTrigger_time;
 
-// GLOBAL: CARM95 0x532074
+// GLOBAL: CARM95 0x00532074
 int gReentrancy_count;
 
-// GLOBAL: CARM95 0x532030
+// GLOBAL: CARM95 0x00532030
 br_vector3 gCar_pos;
 
-// GLOBAL: CARM95 0x532020
+// GLOBAL: CARM95 0x00532020
 br_vector3 gReference_pos;
 
-// GLOBAL: CARM95 0x532004
+// GLOBAL: CARM95 0x00532004
 br_scalar gMax_distance;
 
-// GLOBAL: CARM95 0x532084
+// GLOBAL: CARM95 0x00532084
 tU32 gLoop_abort_time;
 
-// GLOBAL: CARM95 0x532078
+// GLOBAL: CARM95 0x00532078
 br_vector3 gWall_impact_point;
 
-// GLOBAL: CARM95 0x532044
+// GLOBAL: CARM95 0x00532044
 tU8* gPipe_buffer_working_end;
 
-// GLOBAL: CARM95 0x532098
+// GLOBAL: CARM95 0x00532098
 tU32 gYoungest_time;
 
-// GLOBAL: CARM95 0x53208c
+// GLOBAL: CARM95 0x0053208c
 tU8* gPipe_buffer_phys_end;
 
 tU8* gLocal_buffer_record_ptr;
 
-// GLOBAL: CARM95 0x532018
+// GLOBAL: CARM95 0x00532018
 tU8* gPipe_play_ptr;
 
-// GLOBAL: CARM95 0x532048
+// GLOBAL: CARM95 0x00532048
 tU8* gEnd_of_session;
 
-// GLOBAL: CARM95 0x53201c
+// GLOBAL: CARM95 0x0053201c
 tU8* gPipe_record_ptr;
 
-// GLOBAL: CARM95 0x53200c
+// GLOBAL: CARM95 0x0053200c
 tU8* gPipe_buffer_oldest;
 
-// GLOBAL: CARM95 0x532088
+// GLOBAL: CARM95 0x00532088
 tU32 gPipe_buffer_size;
 
-// GLOBAL: CARM95 0x532014
+// GLOBAL: CARM95 0x00532014
 tU8* gLocal_buffer;
 
-// GLOBAL: CARM95 0x532090
+// GLOBAL: CARM95 0x00532090
 tU32 gLocal_buffer_size;
 tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)
 
@@ -173,8 +173,10 @@ tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)
 #endif
 
 // IDA: void __usercall GetReducedPos(br_vector3 *v@<EAX>, tReduced_pos *p@<EDX>)
-// FUNCTION: CARM95 0x427ed0
+// FUNCTION: CARM95 0x00427ed0
 void GetReducedPos(br_vector3* v, tReduced_pos* p) {
+    LOG_TRACE("(%p, %p)", v, p);
+
     v->v[0] = p->v[0] / 800.f;
     v->v[1] = p->v[1] / 800.f;
     v->v[2] = p->v[2] / 800.f;
@@ -182,9 +184,10 @@ void GetReducedPos(br_vector3* v, tReduced_pos* p) {
 }
 
 // IDA: void __usercall SaveReducedPos(tReduced_pos *p@<EAX>, br_vector3 *v@<EDX>)
-// FUNCTION: CARM95 0x427f61
+// FUNCTION: CARM95 0x00427f61
 void SaveReducedPos(tReduced_pos* p, br_vector3* v) {
     br_vector3 tv;
+    LOG_TRACE("(%p, %p)", p, v);
 
     BrVector3Sub(&tv, v, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
     p->v[0] = tv.v[0] * 800.f;
@@ -193,8 +196,10 @@ void SaveReducedPos(tReduced_pos* p, br_vector3* v) {
 }
 
 // IDA: int __cdecl PipeSearchForwards()
-// FUNCTION: CARM95 0x427fdf
+// FUNCTION: CARM95 0x00427fdf
 int PipeSearchForwards(void) {
+    LOG_TRACE("()");
+
     if (gPipe_play_ptr == gPipe_record_ptr) {
         return 0;
     }
@@ -209,35 +214,44 @@ int PipeSearchForwards(void) {
 }
 
 // IDA: int __cdecl IsActionReplayAvailable()
-// FUNCTION: CARM95 0x428078
+// FUNCTION: CARM95 0x00428078
 int IsActionReplayAvailable(void) {
+    LOG_TRACE("()");
+
     return gPipe_buffer_start != NULL;
 }
 
 // IDA: int __cdecl SomeReplayLeft()
-// FUNCTION: CARM95 0x4280a1
+// FUNCTION: CARM95 0x004280a1
 int SomeReplayLeft(void) {
+    LOG_TRACE("()");
+
     return ((GetReplayDirection() >= 1 && gPipe_play_ptr != gPipe_record_ptr) || (GetReplayDirection() <= -1 && gPipe_play_ptr != gPipe_buffer_oldest));
 }
 
 // IDA: void __cdecl DisablePipedSounds()
-// FUNCTION: CARM95 0x4280f9
+// FUNCTION: CARM95 0x004280f9
 void DisablePipedSounds(void) {
+    LOG_TRACE("()");
+
     gDisable_sound = 1;
 }
 
 // IDA: void __cdecl EnablePipedSounds()
-// FUNCTION: CARM95 0x42810e
+// FUNCTION: CARM95 0x0042810e
 void EnablePipedSounds(void) {
+    LOG_TRACE("()");
+
     gDisable_sound = 0;
 }
 
 // IDA: tU32 __usercall LengthOfSession@<EAX>(tPipe_session *pSession@<EAX>)
-// FUNCTION: CARM95 0x428123
+// FUNCTION: CARM95 0x00428123
 tU32 LengthOfSession(tPipe_session* pSession) {
     int i;
     tU32 running_total;
     tPipe_chunk* the_chunk;
+    LOG_TRACE("(%p)", pSession);
 
 #define SIZEOF_CHUNK(MEMBER) (offsetof(tPipe_chunk, chunk_data) + sizeof(pSession->chunks.chunk_data.MEMBER))
 #define ROUND_UP(V, M) (((V) + (M) - 1) & (~((M) - 1)))
@@ -377,8 +391,10 @@ tU32 LengthOfSession(tPipe_session* pSession) {
 }
 
 // IDA: void __usercall StartPipingSession2(tPipe_chunk_type pThe_type@<EAX>, int pMunge_reentrancy@<EDX>)
-// FUNCTION: CARM95 0x4285e1
+// FUNCTION: CARM95 0x004285e1
 void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
+    LOG_TRACE("(%d, %d)", pThe_type, pMunge_reentrancy);
+
     if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
         if (pMunge_reentrancy) {
             if (gReentrancy_count != 0) {
@@ -398,15 +414,18 @@ void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
 }
 
 // IDA: void __usercall StartPipingSession(tPipe_chunk_type pThe_type@<EAX>)
-// FUNCTION: CARM95 0x42868f
+// FUNCTION: CARM95 0x0042868f
 void StartPipingSession(tPipe_chunk_type pThe_type) {
+    LOG_TRACE("(%d)", pThe_type);
+
     StartPipingSession2(pThe_type, 1);
 }
 
 // IDA: void __usercall EndPipingSession2(int pMunge_reentrancy@<EAX>)
-// FUNCTION: CARM95 0x4286a8
+// FUNCTION: CARM95 0x004286a8
 void EndPipingSession2(int pMunge_reentrancy) {
     int a;
+    LOG_TRACE("(%d)", pMunge_reentrancy);
 
     if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
         // Each session ends with a tU16, containing the session size
@@ -458,16 +477,19 @@ void EndPipingSession2(int pMunge_reentrancy) {
 }
 
 // IDA: void __cdecl EndPipingSession()
-// FUNCTION: CARM95 0x42884c
+// FUNCTION: CARM95 0x0042884c
 void EndPipingSession(void) {
+    LOG_TRACE("()");
+
     EndPipingSession2(1);
 }
 
 // IDA: void __usercall AddDataToSession(int pSubject_index@<EAX>, void *pData@<EDX>, tU32 pData_length@<EBX>)
-// FUNCTION: CARM95 0x428861
+// FUNCTION: CARM95 0x00428861
 void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
     tU32 temp_buffer_size;
     int variable_for_breaking_on;
+    LOG_TRACE("(%d, %p, %d)", pSubject_index, pData, pData_length);
 
     if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
         temp_buffer_size = gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data) + pData_length;
@@ -487,9 +509,10 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
 }
 
 // IDA: void __usercall AddModelGeometryToPipingSession(tU16 pCar_ID@<EAX>, int pModel_index@<EDX>, int pVertex_count@<EBX>, tChanged_vertex *pCoordinates@<ECX>)
-// FUNCTION: CARM95 0x428904
+// FUNCTION: CARM95 0x00428904
 void AddModelGeometryToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count, tChanged_vertex* pCoordinates) {
     tU32 data_size;
+    LOG_TRACE("(%d, %d, %d, %p)", pCar_ID, pModel_index, pVertex_count, pCoordinates);
 
     if (gModel_geometry_space != NULL) {
         if (pVertex_count > 600) {
@@ -504,9 +527,10 @@ void AddModelGeometryToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex
 }
 
 // IDA: void __usercall AddSmudgeToPipingSession(tU16 pCar_ID@<EAX>, int pModel_index@<EDX>, int pVertex_count@<EBX>, tSmudged_vertex *pCoordinates@<ECX>)
-// FUNCTION: CARM95 0x42898f
+// FUNCTION: CARM95 0x0042898f
 void AddSmudgeToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count, tSmudged_vertex* pCoordinates) {
     tU32 data_size;
+    LOG_TRACE("(%d, %d, %d, %p)", pCar_ID, pModel_index, pVertex_count, pCoordinates);
 
     if (gSmudge_space != NULL) {
         if (pVertex_count > 600) {
@@ -521,10 +545,11 @@ void AddSmudgeToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count,
 }
 
 // IDA: void __usercall AddPedestrianToPipingSession(int pPedestrian_index@<EAX>, br_matrix34 *pTrans@<EDX>, tU8 pAction_index@<EBX>, tU8 pFrame_index@<ECX>, tS8 pHit_points, int pDone_initial, tU16 pParent_ID, float pSpin_period, br_scalar pJump_magnitude, br_vector3 *pOffset)
-// FUNCTION: CARM95 0x428a1a
+// FUNCTION: CARM95 0x00428a1a
 void AddPedestrianToPipingSession(int pPedestrian_index, br_matrix34* pTrans, tU8 pAction_index, tU8 pFrame_index, tS8 pHit_points, int pDone_initial, tU16 pParent_ID, float pSpin_period, br_scalar pJump_magnitude, br_vector3* pOffset) {
     tPipe_pedestrian_data data;
     tU32 data_size;
+    LOG_TRACE("(%d, %p, %d, %d, %d, %d, %d, %f, %f, %p)", pPedestrian_index, pTrans, pAction_index, pFrame_index, pHit_points, pDone_initial, pParent_ID, pSpin_period, pJump_magnitude, pOffset);
 
     if (pFrame_index == 0xff) {
         pFrame_index = 0;
@@ -548,9 +573,10 @@ void AddPedestrianToPipingSession(int pPedestrian_index, br_matrix34* pTrans, tU
 }
 
 // IDA: void __usercall AddSparkToPipingSession(int pSpark_index@<EAX>, br_vector3 *pPos@<EDX>, br_vector3 *pV@<EBX>)
-// FUNCTION: CARM95 0x428af9
+// FUNCTION: CARM95 0x00428af9
 void AddSparkToPipingSession(int pSpark_index, br_vector3* pPos, br_vector3* pV) {
     tPipe_spark_data data;
+    LOG_TRACE("(%d, %p, %p)", pSpark_index, pPos, pV);
 
     BrVector3Copy(&data.pos, pPos);
     BrVector3Copy(&data.v, pV);
@@ -558,10 +584,11 @@ void AddSparkToPipingSession(int pSpark_index, br_vector3* pPos, br_vector3* pV)
 }
 
 // IDA: void __usercall AddShrapnelToPipingSession(int pShrapnel_index@<EAX>, br_vector3 *pPos@<EDX>, tU16 pAge@<EBX>, br_material *pMaterial@<ECX>)
-// FUNCTION: CARM95 0x428b4d
+// FUNCTION: CARM95 0x00428b4d
 void AddShrapnelToPipingSession(int pShrapnel_index, br_vector3* pPos, tU16 pAge, br_material* pMaterial) {
     tPipe_shrapnel_data data;
     tU32 data_size;
+    LOG_TRACE("(%d, %p, %d, %p)", pShrapnel_index, pPos, pAge, pMaterial);
 
     BrVector3Copy(&data.pos, pPos);
     if ((pShrapnel_index & 0x8000) != 0) {
@@ -575,9 +602,10 @@ void AddShrapnelToPipingSession(int pShrapnel_index, br_vector3* pPos, tU16 pAge
 }
 
 // IDA: void __usercall AddScreenWobbleToPipingSession(int pWobble_x@<EAX>, int pWobble_y@<EDX>)
-// FUNCTION: CARM95 0x428bb4
+// FUNCTION: CARM95 0x00428bb4
 void AddScreenWobbleToPipingSession(int pWobble_x, int pWobble_y) {
     tPipe_screen_shake_data data;
+    LOG_TRACE("(%d, %d)", pWobble_x, pWobble_y);
 
     data.wobble_x = pWobble_x;
     data.wobble_y = pWobble_y;
@@ -585,9 +613,10 @@ void AddScreenWobbleToPipingSession(int pWobble_x, int pWobble_y) {
 }
 
 // IDA: void __usercall AddGrooveStopToPipingSession(int pGroove_index@<EAX>, br_matrix34 *pMatrix@<EDX>, int pPath_interrupt@<EBX>, int pObject_interrupt@<ECX>, float pPath_resumption, float pObject_resumption)
-// FUNCTION: CARM95 0x428bde
+// FUNCTION: CARM95 0x00428bde
 void AddGrooveStopToPipingSession(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
     tPipe_groove_stop_data data;
+    LOG_TRACE("(%d, %p, %d, %d, %f, %f)", pGroove_index, pMatrix, pPath_interrupt, pObject_interrupt, pPath_resumption, pObject_resumption);
 
     BrMatrix34Copy(&data.matrix, pMatrix);
     data.path_interrupt = pPath_interrupt;
@@ -598,9 +627,10 @@ void AddGrooveStopToPipingSession(int pGroove_index, br_matrix34* pMatrix, int p
 }
 
 // IDA: void __usercall AddNonCarToPipingSession(int pIndex@<EAX>, br_actor *pActor@<EDX>)
-// FUNCTION: CARM95 0x428c26
+// FUNCTION: CARM95 0x00428c26
 void AddNonCarToPipingSession(int pIndex, br_actor* pActor) {
     tPipe_non_car_data data;
+    LOG_TRACE("(%d, %p)", pIndex, pActor);
 
     BrMatrix34Copy(&data.mat, &pActor->t.t.mat);
     data.actor = pActor;
@@ -608,9 +638,10 @@ void AddNonCarToPipingSession(int pIndex, br_actor* pActor) {
 }
 
 // IDA: void __usercall AddSmokeToPipingSession(int pIndex@<EAX>, tU8 pType@<EDX>, br_vector3 *pPos@<EBX>, br_scalar pRadius, br_scalar pStrength)
-// FUNCTION: CARM95 0x428c5f
+// FUNCTION: CARM95 0x00428c5f
 void AddSmokeToPipingSession(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_scalar pStrength) {
     tPipe_smoke_data data;
+    LOG_TRACE("(%d, %d, %p, %f, %f)", pIndex, pType, pPos, pRadius, pStrength);
 
     SaveReducedPos(&data.pos, pPos);
     data.type = pType;
@@ -620,9 +651,10 @@ void AddSmokeToPipingSession(int pIndex, tU8 pType, br_vector3* pPos, br_scalar 
 }
 
 // IDA: void __usercall AddSmokeColumnToPipingSession(int pIndex@<EAX>, tCar_spec *pCar@<EDX>, int pVertex@<EBX>, int pColour@<ECX>)
-// FUNCTION: CARM95 0x428cb8
+// FUNCTION: CARM95 0x00428cb8
 void AddSmokeColumnToPipingSession(int pIndex, tCar_spec* pCar, int pVertex, int pColour) {
     tPipe_smoke_column_data data;
+    LOG_TRACE("(%d, %p, %d, %d)", pIndex, pCar, pVertex, pColour);
 
     data.car_ID = pCar->car_ID;
     data.vertex = pVertex;
@@ -630,9 +662,10 @@ void AddSmokeColumnToPipingSession(int pIndex, tCar_spec* pCar, int pVertex, int
 }
 
 // IDA: void __usercall AddFlameToPipingSession(int pIndex@<EAX>, int pFrame_count@<EDX>, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z)
-// FUNCTION: CARM95 0x428cf7
+// FUNCTION: CARM95 0x00428cf7
 void AddFlameToPipingSession(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z) {
     tPipe_flame_data data;
+    LOG_TRACE("(%d, %d, %f, %f, %f, %f)", pIndex, pFrame_count, pScale_x, pScale_y, pOffset_x, pOffset_z);
 
     data.frame_count = pFrame_count;
     data.scale_x = pScale_x;
@@ -643,9 +676,10 @@ void AddFlameToPipingSession(int pIndex, int pFrame_count, br_scalar pScale_x, b
 }
 
 // IDA: void __usercall AddSplashToPipingSession(tCollision_info *pCar@<EAX>)
-// FUNCTION: CARM95 0x428d36
+// FUNCTION: CARM95 0x00428d36
 void AddSplashToPipingSession(tCollision_info* pCar) {
     tPipe_splash_data data;
+    LOG_TRACE("(%p)", pCar);
 
     if (pCar->driver >= eDriver_oppo) {
         data.d = pCar->water_d;
@@ -655,9 +689,10 @@ void AddSplashToPipingSession(tCollision_info* pCar) {
 }
 
 // IDA: void __usercall AddOilSpillToPipingSession(int pIndex@<EAX>, br_matrix34 *pMat@<EDX>, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap)
-// FUNCTION: CARM95 0x428da1
+// FUNCTION: CARM95 0x00428da1
 void AddOilSpillToPipingSession(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap) {
     tPipe_oil_spill_data data;
+    LOG_TRACE("(%d, %p, %f, %f, %d, %d, %p, %p, %p)", pIndex, pMat, pFull_size, pGrow_rate, pSpill_time, pStop_time, pCar, pOriginal_pos, pPixelmap);
 
     BrMatrix34Copy(&data.mat, pMat);
     data.full_size = pFull_size;
@@ -671,18 +706,20 @@ void AddOilSpillToPipingSession(int pIndex, br_matrix34* pMat, br_scalar pFull_s
 }
 
 // IDA: void __usercall AddFrameFinishToPipingSession(tU32 pThe_time@<EAX>)
-// FUNCTION: CARM95 0x428e0f
+// FUNCTION: CARM95 0x00428e0f
 void AddFrameFinishToPipingSession(tU32 pThe_time) {
     tPipe_frame_boundary_data data;
+    LOG_TRACE("(%d)", pThe_time);
 
     data.time = pThe_time;
     AddDataToSession(0, &data, sizeof(tPipe_frame_boundary_data));
 }
 
 // IDA: void __usercall AddCarToPipingSession(int pCar_ID@<EAX>, br_matrix34 *pCar_mat@<EDX>, br_vector3 *pCar_velocity@<EBX>, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag)
-// FUNCTION: CARM95 0x428e33
+// FUNCTION: CARM95 0x00428e33
 void AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag) {
     tPipe_car_data data;
+    LOG_TRACE("(%d, %p, %p, %f, %f, %f, %f, %f, %f, %f, %d, %d)", pCar_ID, pCar_mat, pCar_velocity, pSpeedo_speed, pLf_sus_position, pRf_sus_position, pLr_sus_position, pRr_sus_position, pSteering_angle, pRevs, pGear, pFrame_coll_flag);
 
     BrMatrix34Copy(&data.transformation, pCar_mat);
     BrVector3Copy(&data.velocity, pCar_velocity);
@@ -697,9 +734,10 @@ void AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_
 }
 
 // IDA: void __usercall AddSoundToPipingSession(tS3_outlet_ptr pOutlet@<EAX>, int pSound_index@<EDX>, tS3_volume pL_volume@<EBX>, tS3_volume pR_volume@<ECX>, tS3_pitch pPitch, br_vector3 *pPos)
-// FUNCTION: CARM95 0x428f38
+// FUNCTION: CARM95 0x00428f38
 void AddSoundToPipingSession(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volume pL_volume, tS3_volume pR_volume, tS3_pitch pPitch, br_vector3* pPos) {
     tPipe_sound_data data;
+    LOG_TRACE("(%d, %d, %d, %d, %d, %p)", pOutlet, pSound_index, pL_volume, pR_volume, pPitch, pPos);
 
     data.pitch = pPitch;
     if (pPos == NULL) {
@@ -713,10 +751,11 @@ void AddSoundToPipingSession(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volum
 }
 
 // IDA: void __usercall AddDamageToPipingSession(int pCar_ID@<EAX>, tS8 *pDifferences@<EDX>)
-// FUNCTION: CARM95 0x428fb5
+// FUNCTION: CARM95 0x00428fb5
 void AddDamageToPipingSession(int pCar_ID, tS8* pDifferences) {
     tPipe_damage_data data;
     int i;
+    LOG_TRACE("(%d, %p)", pCar_ID, pDifferences);
 
     for (i = 0; i < COUNT_OF(data.damage_delta); i++) {
         data.damage_delta[i] = pDifferences[i];
@@ -725,17 +764,19 @@ void AddDamageToPipingSession(int pCar_ID, tS8* pDifferences) {
 }
 
 // IDA: void __usercall AddSpecialToPipingSession(tSpecial_type pType@<EAX>)
-// FUNCTION: CARM95 0x429003
+// FUNCTION: CARM95 0x00429003
 void AddSpecialToPipingSession(tSpecial_type pType) {
     tPipe_special_data data;
+    LOG_TRACE("(%d)", pType);
 
     AddDataToSession(pType, &data, sizeof(tPipe_special_data));
 }
 
 // IDA: void __usercall AddPedGibToPipingSession(int pIndex@<EAX>, br_matrix34 *pTrans@<EDX>, int pSize@<EBX>, int pGib_index@<ECX>, int pPed_index)
-// FUNCTION: CARM95 0x429023
+// FUNCTION: CARM95 0x00429023
 void AddPedGibToPipingSession(int pIndex, br_matrix34* pTrans, int pSize, int pGib_index, int pPed_index) {
     tPipe_ped_gib_data data;
+    LOG_TRACE("(%d, %p, %d, %d, %d)", pIndex, pTrans, pSize, pGib_index, pPed_index);
 
     data.ped_parent_index = pPed_index;
     data.size = pSize;
@@ -745,9 +786,10 @@ void AddPedGibToPipingSession(int pIndex, br_matrix34* pTrans, int pSize, int pG
 }
 
 // IDA: void __cdecl AddCarIncidentToPipingSession(float pSeverity, tCar_spec *pCar, br_vector3 *pImpact_point)
-// FUNCTION: CARM95 0x429063
+// FUNCTION: CARM95 0x00429063
 void AddCarIncidentToPipingSession(float pSeverity, tCar_spec* pCar, br_vector3* pImpact_point) {
     tPipe_incident_data data;
+    LOG_TRACE("(%f, %p, %p)", pSeverity, pCar, pImpact_point);
 
     data.severity = pSeverity;
     data.info.car_info.car_ID = pCar->car_ID;
@@ -756,9 +798,10 @@ void AddCarIncidentToPipingSession(float pSeverity, tCar_spec* pCar, br_vector3*
 }
 
 // IDA: void __usercall AddPedIncidentToPipingSession(int pPed_index@<EAX>, br_actor *pActor@<EDX>)
-// FUNCTION: CARM95 0x4290ab
+// FUNCTION: CARM95 0x004290ab
 void AddPedIncidentToPipingSession(int pPed_index, br_actor* pActor) {
     tPipe_incident_data data;
+    LOG_TRACE("(%d, %p)", pPed_index, pActor);
 
     data.severity = 0.f;
     data.info.ped_info.ped_index = pPed_index;
@@ -767,9 +810,10 @@ void AddPedIncidentToPipingSession(int pPed_index, br_actor* pActor) {
 }
 
 // IDA: void __cdecl AddWallIncidentToPipingSession(float pSeverity, br_vector3 *pImpact_point)
-// FUNCTION: CARM95 0x4290dd
+// FUNCTION: CARM95 0x004290dd
 void AddWallIncidentToPipingSession(float pSeverity, br_vector3* pImpact_point) {
     tPipe_incident_data data;
+    LOG_TRACE("(%f, %p)", pSeverity, pImpact_point);
 
     data.severity = pSeverity;
     BrVector3Copy(&data.info.wall_info.pos, pImpact_point);
@@ -777,9 +821,10 @@ void AddWallIncidentToPipingSession(float pSeverity, br_vector3* pImpact_point) 
 }
 
 // IDA: void __usercall AddProxRayToPipingSession(int pRay_index@<EAX>, tCar_spec *pCar@<EDX>, tU16 pPed_index@<EBX>, tU32 pTime@<ECX>)
-// FUNCTION: CARM95 0x429117
+// FUNCTION: CARM95 0x00429117
 void AddProxRayToPipingSession(int pRay_index, tCar_spec* pCar, tU16 pPed_index, tU32 pTime) {
     tPipe_prox_ray_data data;
+    LOG_TRACE("(%d, %p, %d, %d)", pRay_index, pCar, pPed_index, pTime);
 
     data.ped_index = pPed_index;
     data.car_ID = pCar->car_ID;
@@ -788,9 +833,10 @@ void AddProxRayToPipingSession(int pRay_index, tCar_spec* pCar, tU16 pPed_index,
 }
 
 // IDA: void __usercall AddSkidAdjustmentToPipingSession(int pSkid_num@<EAX>, br_matrix34 *pMatrix@<EDX>, int pMaterial_index@<EBX>)
-// FUNCTION: CARM95 0x429153
+// FUNCTION: CARM95 0x00429153
 void AddSkidAdjustmentToPipingSession(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
     tPipe_skid_adjustment adjustment;
+    LOG_TRACE("(%d, %p, %d)", pSkid_num, pMatrix, pMaterial_index);
 
     BrMatrix34Copy(&adjustment.matrix, pMatrix);
     adjustment.material_index = pMaterial_index;
@@ -798,8 +844,10 @@ void AddSkidAdjustmentToPipingSession(int pSkid_num, br_matrix34* pMatrix, int p
 }
 
 // IDA: void __usercall PipeSingleModelGeometry(tU16 pCar_ID@<EAX>, int pModel_index@<EDX>, int pVertex_count@<EBX>, tChanged_vertex *pCoordinates@<ECX>)
-// FUNCTION: CARM95 0x429186
+// FUNCTION: CARM95 0x00429186
 void PipeSingleModelGeometry(tU16 pCar_ID, int pModel_index, int pVertex_count, tChanged_vertex* pCoordinates) {
+    LOG_TRACE("(%d, %d, %d, %p)", pCar_ID, pModel_index, pVertex_count, pCoordinates);
+
     StartPipingSession(ePipe_chunk_model_geometry);
     AddModelGeometryToPipingSession(pCar_ID, pModel_index, pVertex_count, pCoordinates);
     EndPipingSession();
@@ -807,6 +855,8 @@ void PipeSingleModelGeometry(tU16 pCar_ID, int pModel_index, int pVertex_count, 
 
 // IDA: void __usercall PipeSinglePedestrian(int pPedestrian_index@<EAX>, br_matrix34 *pTrans@<EDX>, tU8 pAction_index@<EBX>, tU8 pFrame_index@<ECX>, tS8 pHit_points, int pDone_initial, tU16 pParent_ID, float pSpin_period, br_scalar pJump_magnitude, br_vector3 *pOffset)
 void PipeSinglePedestrian(int pPedestrian_index, br_matrix34* pTrans, tU8 pAction_index, tU8 pFrame_index, tS8 pHit_points, int pDone_initial, tU16 pParent_ID, float pSpin_period, br_scalar pJump_magnitude, br_vector3* pOffset) {
+    LOG_TRACE("(%d, %p, %d, %d, %d, %d, %d, %f, %f, %p)", pPedestrian_index, pTrans, pAction_index, pFrame_index, pHit_points, pDone_initial, pParent_ID, pSpin_period, pJump_magnitude, pOffset);
+
     StartPipingSession(ePipe_chunk_pedestrian);
     AddPedestrianToPipingSession(pPedestrian_index, pTrans, pAction_index,
         pFrame_index, pHit_points, pDone_initial, pParent_ID, pSpin_period,
@@ -816,6 +866,8 @@ void PipeSinglePedestrian(int pPedestrian_index, br_matrix34* pTrans, tU8 pActio
 
 // IDA: void __usercall PipeSingleCar(int pCar_ID@<EAX>, br_matrix34 *pCar_mat@<EDX>, br_vector3 *pCar_velocity@<EBX>, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag)
 void PipeSingleCar(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag) {
+    LOG_TRACE("(%d, %p, %p, %f, %f, %f, %f, %f, %f, %f, %d, %d)", pCar_ID, pCar_mat, pCar_velocity, pSpeedo_speed, pLf_sus_position, pRf_sus_position, pLr_sus_position, pRr_sus_position, pSteering_angle, pRevs, pGear, pFrame_coll_flag);
+
     StartPipingSession(ePipe_chunk_car);
     AddCarToPipingSession(pCar_ID, pCar_mat, pCar_velocity, pSpeedo_speed,
         pLf_sus_position, pRf_sus_position, pLr_sus_position, pRr_sus_position,
@@ -824,8 +876,10 @@ void PipeSingleCar(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity
 }
 
 // IDA: void __usercall PipeSingleSound(tS3_outlet_ptr pOutlet@<EAX>, int pSound_index@<EDX>, tS3_volume pL_volume@<EBX>, tS3_volume pR_volume@<ECX>, tS3_pitch pPitch, br_vector3 *pPos)
-// FUNCTION: CARM95 0x429254
+// FUNCTION: CARM95 0x00429254
 void PipeSingleSound(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volume pL_volume, tS3_volume pR_volume, tS3_pitch pPitch, br_vector3* pPos) {
+    LOG_TRACE("(%d, %d, %d, %d, %d, %p)", pOutlet, pSound_index, pL_volume, pR_volume, pPitch, pPos);
+
     if (!gAction_replay_mode && gProgram_state.racing) {
         StartPipingSession(ePipe_chunk_sound);
         AddSoundToPipingSession(pOutlet, pSound_index, pL_volume, pR_volume, pPitch, pPos);
@@ -834,8 +888,10 @@ void PipeSingleSound(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volume pL_vol
 }
 
 // IDA: void __usercall PipeSingleOilSpill(int pIndex@<EAX>, br_matrix34 *pMat@<EDX>, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap)
-// FUNCTION: CARM95 0x4292a8
+// FUNCTION: CARM95 0x004292a8
 void PipeSingleOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec* pCar, br_vector3* pOriginal_pos, br_pixelmap* pPixelmap) {
+    LOG_TRACE("(%d, %p, %f, %f, %d, %d, %p, %p, %p)", pIndex, pMat, pFull_size, pGrow_rate, pSpill_time, pStop_time, pCar, pOriginal_pos, pPixelmap);
+
     StartPipingSession(ePipe_chunk_oil_spill);
     AddOilSpillToPipingSession(pIndex, pMat, pFull_size, pGrow_rate,
         pSpill_time, pStop_time, pCar, pOriginal_pos, pPixelmap);
@@ -844,14 +900,18 @@ void PipeSingleOilSpill(int pIndex, br_matrix34* pMat, br_scalar pFull_size, br_
 
 // IDA: void __usercall PipeSingleDamage(int pCar_ID@<EAX>, tS8 *pDifferences@<EDX>)
 void PipeSingleDamage(int pCar_ID, tS8* pDifferences) {
+    LOG_TRACE("(%d, %p)", pCar_ID, pDifferences);
+
     StartPipingSession(ePipe_chunk_damage);
     AddDamageToPipingSession(pCar_ID, pDifferences);
     EndPipingSession();
 }
 
 // IDA: void __usercall PipeSingleSpecial(tSpecial_type pType@<EAX>)
-// FUNCTION: CARM95 0x429318
+// FUNCTION: CARM95 0x00429318
 void PipeSingleSpecial(tSpecial_type pType) {
+    LOG_TRACE("(%d)", pType);
+
     StartPipingSession(ePipe_chunk_special);
     AddSpecialToPipingSession(pType);
     EndPipingSession();
@@ -859,22 +919,28 @@ void PipeSingleSpecial(tSpecial_type pType) {
 
 // IDA: void __usercall PipeSinglePedGib(int pIndex@<EAX>, br_matrix34 *pTrans@<EDX>, int pSize@<EBX>, int pGib_index@<ECX>, int pPed_index)
 void PipeSinglePedGib(int pIndex, br_matrix34* pTrans, int pSize, int pGib_index, int pPed_index) {
+    LOG_TRACE("(%d, %p, %d, %d, %d)", pIndex, pTrans, pSize, pGib_index, pPed_index);
+
     StartPipingSession(ePipe_chunk_ped_gib);
     AddPedGibToPipingSession(pIndex, pTrans, pSize, pGib_index, pPed_index);
     EndPipingSession();
 }
 
 // IDA: void __cdecl PipeSingleCarIncident(float pSeverity, tCar_spec *pCar, br_vector3 *pImpact_point)
-// FUNCTION: CARM95 0x429374
+// FUNCTION: CARM95 0x00429374
 void PipeSingleCarIncident(float pSeverity, tCar_spec* pCar, br_vector3* pImpact_point) {
+    LOG_TRACE("(%f, %p, %p)", pSeverity, pCar, pImpact_point);
+
     StartPipingSession(ePipe_chunk_incident);
     AddCarIncidentToPipingSession(pSeverity, pCar, pImpact_point);
     EndPipingSession();
 }
 
 // IDA: void __usercall PipeSinglePedIncident(int pPed_index@<EAX>, br_actor *pActor@<EDX>)
-// FUNCTION: CARM95 0x4293a2
+// FUNCTION: CARM95 0x004293a2
 void PipeSinglePedIncident(int pPed_index, br_actor* pActor) {
+    LOG_TRACE("(%d, %p)", pPed_index, pActor);
+
     StartPipingSession(ePipe_chunk_incident);
     AddPedIncidentToPipingSession(pPed_index, pActor);
     EndPipingSession();
@@ -882,8 +948,10 @@ void PipeSinglePedIncident(int pPed_index, br_actor* pActor) {
 }
 
 // IDA: void __cdecl PipeSingleWallIncident(float pSeverity, br_vector3 *pImpact_point)
-// FUNCTION: CARM95 0x4293d6
+// FUNCTION: CARM95 0x004293d6
 void PipeSingleWallIncident(float pSeverity, br_vector3* pImpact_point) {
+    LOG_TRACE("(%f, %p)", pSeverity, pImpact_point);
+
     if (pSeverity > gWall_severity) {
         gWall_severity = pSeverity;
         BrVector3Copy(&gWall_impact_point, pImpact_point);
@@ -891,16 +959,20 @@ void PipeSingleWallIncident(float pSeverity, br_vector3* pImpact_point) {
 }
 
 // IDA: void __usercall PipeSingleScreenShake(int pWobble_x@<EAX>, int pWobble_y@<EDX>)
-// FUNCTION: CARM95 0x429415
+// FUNCTION: CARM95 0x00429415
 void PipeSingleScreenShake(int pWobble_x, int pWobble_y) {
+    LOG_TRACE("(%d, %d)", pWobble_x, pWobble_y);
+
     StartPipingSession(ePipe_chunk_screen_shake);
     AddScreenWobbleToPipingSession(pWobble_x, pWobble_y);
     EndPipingSession();
 }
 
 // IDA: void __usercall PipeSingleGrooveStop(int pGroove_index@<EAX>, br_matrix34 *pMatrix@<EDX>, int pPath_interrupt@<EBX>, int pObject_interrupt@<ECX>, float pPath_resumption, float pObject_resumption)
-// FUNCTION: CARM95 0x42943f
+// FUNCTION: CARM95 0x0042943f
 void PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_interrupt, int pObject_interrupt, float pPath_resumption, float pObject_resumption) {
+    LOG_TRACE("(%d, %p, %d, %d, %f, %f)", pGroove_index, pMatrix, pPath_interrupt, pObject_interrupt, pPath_resumption, pObject_resumption);
+
     StartPipingSession(ePipe_chunk_groove_stop);
     AddGrooveStopToPipingSession(pGroove_index, pMatrix, pPath_interrupt,
         pObject_interrupt, pPath_resumption, pObject_resumption);
@@ -908,8 +980,10 @@ void PipeSingleGrooveStop(int pGroove_index, br_matrix34* pMatrix, int pPath_int
 }
 
 // IDA: void __cdecl PipeFrameFinish()
-// FUNCTION: CARM95 0x429479
+// FUNCTION: CARM95 0x00429479
 void PipeFrameFinish(void) {
+    LOG_TRACE("()");
+
     if (gWall_severity != 0.f) {
         StartPipingSession(ePipe_chunk_incident);
         AddWallIncidentToPipingSession(gWall_severity, &gWall_impact_point);
@@ -922,9 +996,10 @@ void PipeFrameFinish(void) {
 }
 
 // IDA: void __cdecl PipingFrameReset()
-// FUNCTION: CARM95 0x4294e4
+// FUNCTION: CARM95 0x004294e4
 void PipingFrameReset(void) {
     int i;
+    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gReset_procs); i++) {
         if (gReset_procs[i] != NULL) {
@@ -934,16 +1009,20 @@ void PipingFrameReset(void) {
 }
 
 // IDA: void __usercall PipeSingleSkidAdjustment(int pSkid_num@<EAX>, br_matrix34 *pMatrix@<EDX>, int pMaterial_index@<EBX>)
-// FUNCTION: CARM95 0x42952b
+// FUNCTION: CARM95 0x0042952b
 void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
+    LOG_TRACE("(%d, %p, %d)", pSkid_num, pMatrix, pMaterial_index);
+
     StartPipingSession(ePipe_chunk_skid_adjustment);
     AddSkidAdjustmentToPipingSession(pSkid_num, pMatrix, pMaterial_index);
     EndPipingSession();
 }
 
 // IDA: void __cdecl ResetPiping()
-// FUNCTION: CARM95 0x429559
+// FUNCTION: CARM95 0x00429559
 void ResetPiping(void) {
+    LOG_TRACE("()");
+
     gWall_severity = 0.f;
     gPipe_buffer_oldest = NULL;
     gPipe_record_ptr = gPipe_buffer_start;
@@ -952,8 +1031,10 @@ void ResetPiping(void) {
 }
 
 // IDA: void __cdecl InitialisePiping()
-// FUNCTION: CARM95 0x429596
+// FUNCTION: CARM95 0x00429596
 void InitialisePiping(void) {
+    LOG_TRACE("()");
+
     if (!gAusterity_mode && gNet_mode == eNet_mode_none) {
         PDAllocateActionReplayBuffer((char**)&gPipe_buffer_start, &gPipe_buffer_size);
         gPipe_buffer_phys_end = gPipe_buffer_start + gPipe_buffer_size;
@@ -972,8 +1053,10 @@ void InitialisePiping(void) {
 }
 
 // IDA: void __cdecl DisposePiping()
-// FUNCTION: CARM95 0x42966f
+// FUNCTION: CARM95 0x0042966f
 void DisposePiping(void) {
+    LOG_TRACE("()");
+
     if (gPipe_buffer_start != NULL) {
         PDDisposeActionReplayBuffer((char*)gPipe_buffer_start);
     }
@@ -989,13 +1072,14 @@ void DisposePiping(void) {
 }
 
 // IDA: void __cdecl InitLastDamageArrayEtc()
-// FUNCTION: CARM95 0x4296e9
+// FUNCTION: CARM95 0x004296e9
 void InitLastDamageArrayEtc(void) {
     int i;
     int j;
     int cat;
     int car_count;
     tCar_spec* car;
+    LOG_TRACE("()");
 
     for (cat = eVehicle_self; cat <= eVehicle_not_really; cat++) {
         if (cat == eVehicle_self) {
@@ -1025,6 +1109,7 @@ void ResetCars(void) {
     int cat;
     int i;
     int car_count;
+    LOG_TRACE("()");
 
     for (cat = eVehicle_self; cat < eVehicle_not_really; cat++) {
         if (cat == eVehicle_self) {
@@ -1044,7 +1129,7 @@ void ResetCars(void) {
 }
 
 // IDA: void __cdecl PipeCarPositions()
-// FUNCTION: CARM95 0x42987f
+// FUNCTION: CARM95 0x0042987f
 void PipeCarPositions(void) {
     tCar_spec* car;
     int cat;
@@ -1054,6 +1139,7 @@ void PipeCarPositions(void) {
     int session_started;
     int difference_found;
     tS8 damage_deltas[12];
+    LOG_TRACE("()");
 
     StartPipingSession(ePipe_chunk_car);
     for (cat = eVehicle_self; cat < eVehicle_not_really; cat++) {
@@ -1111,32 +1197,41 @@ void PipeCarPositions(void) {
 }
 
 // IDA: void __cdecl ResetPipePlayToEnd()
-// FUNCTION: CARM95 0x429b22
+// FUNCTION: CARM95 0x00429b22
 void ResetPipePlayToEnd(void) {
+    LOG_TRACE("()");
+
     gPipe_play_ptr = gPipe_record_ptr;
 }
 
 // IDA: void __cdecl ResetPipePlayToStart()
 void ResetPipePlayToStart(void) {
+    LOG_TRACE("()");
+
     gPipe_play_ptr = gPipe_buffer_oldest;
 }
 
 // IDA: tU8* __cdecl GetPipePlayPtr()
-// FUNCTION: CARM95 0x429b4c
+// FUNCTION: CARM95 0x00429b4c
 tU8* GetPipePlayPtr(void) {
+    LOG_TRACE("()");
+
     return gPipe_play_ptr;
 }
 
 // IDA: void __usercall SetPipePlayPtr(tU8 *pPtr@<EAX>)
-// FUNCTION: CARM95 0x429b61
+// FUNCTION: CARM95 0x00429b61
 void SetPipePlayPtr(tU8* pPtr) {
+    LOG_TRACE("(%p)", pPtr);
+
     gPipe_play_ptr = pPtr;
 }
 
 // IDA: void __usercall AdvanceChunkPtr(tPipe_chunk **pChunk@<EAX>, tChunk_subject_index pType@<EDX>)
-// FUNCTION: CARM95 0x429fcd
+// FUNCTION: CARM95 0x00429fcd
 void AdvanceChunkPtr(tPipe_chunk** pChunk, tChunk_subject_index pType) {
     tPipe_chunk* old_chunk;
+    LOG_TRACE("(%p, %d)", pChunk, pType);
 
     old_chunk = *pChunk;
     if (gDisable_advance) {
@@ -1221,11 +1316,12 @@ void AdvanceChunkPtr(tPipe_chunk** pChunk, tChunk_subject_index pType) {
 }
 
 // IDA: void __usercall ApplyModelGeometry(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a1fd
+// FUNCTION: CARM95 0x0042a1fd
 void ApplyModelGeometry(tPipe_chunk** pChunk) {
     int i;
     br_model* model_ptr;
     tCar_spec* car;
+    LOG_TRACE("(%p)", pChunk);
 
     if (((*pChunk)->subject_index & 0xff00) == 0) {
         car = &gProgram_state.current_car;
@@ -1242,7 +1338,7 @@ void ApplyModelGeometry(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall DoSmudge(tPipe_chunk **pChunk@<EAX>, int pDir@<EDX>)
-// FUNCTION: CARM95 0x429b74
+// FUNCTION: CARM95 0x00429b74
 void DoSmudge(tPipe_chunk** pChunk, int pDir) {
     int i;
     int v;
@@ -1250,6 +1346,7 @@ void DoSmudge(tPipe_chunk** pChunk, int pDir) {
     br_model* model_ptr;
     tCar_spec* car;
     int group;
+    LOG_TRACE("(%p, %d)", pChunk, pDir);
 
     if (((*pChunk)->subject_index & 0xff00) == 0) {
         car = &gProgram_state.current_car;
@@ -1268,15 +1365,19 @@ void DoSmudge(tPipe_chunk** pChunk, int pDir) {
 }
 
 // IDA: void __usercall ApplySmudge(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a3b1
+// FUNCTION: CARM95 0x0042a3b1
 void ApplySmudge(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     DoSmudge(pChunk, 1);
     AdvanceChunkPtr(pChunk, ePipe_chunk_smudge);
 }
 
 // IDA: void __usercall ApplyPedestrian(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a3d8
+// FUNCTION: CARM95 0x0042a3d8
 void ApplyPedestrian(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     AdjustPedestrian(
         (*pChunk)->subject_index,
         ((*pChunk)->chunk_data.pedestrian_data.action_and_frame_index & 0x70) >> 4,
@@ -1293,8 +1394,10 @@ void ApplyPedestrian(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplySpark(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a472
+// FUNCTION: CARM95 0x0042a472
 void ApplySpark(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     AdjustSpark((*pChunk)->subject_index,
         &(*pChunk)->chunk_data.spark_data.pos,
         &(*pChunk)->chunk_data.spark_data.v);
@@ -1302,8 +1405,10 @@ void ApplySpark(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplyShrapnel(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a4b0
+// FUNCTION: CARM95 0x0042a4b0
 void ApplyShrapnel(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     AdjustShrapnel((*pChunk)->subject_index,
         &(*pChunk)->chunk_data.shrapnel_data.pos,
         (*pChunk)->chunk_data.shrapnel_data.age,
@@ -1312,16 +1417,20 @@ void ApplyShrapnel(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplyScreenWobble(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a4f8
+// FUNCTION: CARM95 0x0042a4f8
 void ApplyScreenWobble(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     SetScreenWobble((*pChunk)->chunk_data.screen_shake_data.wobble_x,
         (*pChunk)->chunk_data.screen_shake_data.wobble_y);
     AdvanceChunkPtr(pChunk, ePipe_chunk_screen_shake);
 }
 
 // IDA: void __usercall ApplyGrooveStop(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a52d
+// FUNCTION: CARM95 0x0042a52d
 void ApplyGrooveStop(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     SetGrooveInterrupt((*pChunk)->subject_index,
         &(*pChunk)->chunk_data.groove_stop_data.matrix,
         (*pChunk)->chunk_data.groove_stop_data.path_interrupt,
@@ -1332,17 +1441,20 @@ void ApplyGrooveStop(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplyNonCar(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a586
+// FUNCTION: CARM95 0x0042a586
 void ApplyNonCar(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     AdjustNonCar((*pChunk)->chunk_data.non_car_data.actor,
         &(*pChunk)->chunk_data.non_car_data.mat);
     AdvanceChunkPtr(pChunk, ePipe_chunk_non_car);
 }
 
 // IDA: void __usercall ApplySmoke(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a5b9
+// FUNCTION: CARM95 0x0042a5b9
 void ApplySmoke(tPipe_chunk** pChunk) {
     br_vector3 pos;
+    LOG_TRACE("(%p)", pChunk);
 
     GetReducedPos(&pos, &(*pChunk)->chunk_data.smoke_data.pos);
     AdjustSmoke((*pChunk)->subject_index,
@@ -1354,8 +1466,10 @@ void ApplySmoke(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplySmokeColumn(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a651
+// FUNCTION: CARM95 0x0042a651
 void ApplySmokeColumn(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     AdjustSmokeColumn((*pChunk)->subject_index & 0x3fff,
         ((((*pChunk)->chunk_data.smoke_column_data.car_ID) >> 8) == 0) ? &gProgram_state.current_car : GetCarSpec((*pChunk)->chunk_data.smoke_column_data.car_ID >> 8, (*pChunk)->chunk_data.smoke_column_data.car_ID & 0xff),
         (*pChunk)->chunk_data.smoke_column_data.vertex,
@@ -1364,8 +1478,10 @@ void ApplySmokeColumn(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplyFlame(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a6f8
+// FUNCTION: CARM95 0x0042a6f8
 void ApplyFlame(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     AdjustFlame((*pChunk)->subject_index,
         (*pChunk)->chunk_data.flame_data.frame_count,
         (*pChunk)->chunk_data.flame_data.scale_x,
@@ -1380,9 +1496,10 @@ void ApplyFlame(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplySplash(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a752
+// FUNCTION: CARM95 0x0042a752
 void ApplySplash(tPipe_chunk** pChunk) {
     tCar_spec* c;
+    LOG_TRACE("(%p)", pChunk);
 
     if (((*pChunk)->subject_index & 0xff00) == 0) {
         c = &gProgram_state.current_car;
@@ -1395,8 +1512,10 @@ void ApplySplash(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplyOilSpill(tPipe_chunk **pChunk@<EAX>, tU32 pStop_time@<EDX>)
-// FUNCTION: CARM95 0x42a80d
+// FUNCTION: CARM95 0x0042a80d
 void ApplyOilSpill(tPipe_chunk** pChunk, tU32 pStop_time) {
+    LOG_TRACE("(%p, %d)", pChunk, pStop_time);
+
     AdjustOilSpill((*pChunk)->subject_index,
         &(*pChunk)->chunk_data.oil_data.mat,
         (*pChunk)->chunk_data.oil_data.full_size,
@@ -1410,9 +1529,10 @@ void ApplyOilSpill(tPipe_chunk** pChunk, tU32 pStop_time) {
 }
 
 // IDA: void __usercall ApplyFrameBoundary(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a87c
+// FUNCTION: CARM95 0x0042a87c
 void ApplyFrameBoundary(tPipe_chunk** pChunk) {
     tU32 result;
+    LOG_TRACE("(%p)", pChunk);
 
     gLast_replay_frame_time = (*pChunk)->chunk_data.frame_boundary_data.time;
     // DAT_0054b244 = PDGetTotalTime();
@@ -1420,8 +1540,10 @@ void ApplyFrameBoundary(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplySound(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42a8b5
+// FUNCTION: CARM95 0x0042a8b5
 void ApplySound(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     if (!gDisable_sound) {
         if ((*pChunk)->chunk_data.sound_data.volume == 0) {
             DRS3StartSound2(GetOutletFromIndex((*pChunk)->chunk_data.sound_data.outlet_index),
@@ -1454,11 +1576,12 @@ void ApplySound(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplyCar(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42aa59
+// FUNCTION: CARM95 0x0042aa59
 void ApplyCar(tPipe_chunk** pChunk) {
     tCar_spec* car;
     br_vector3 com_offset_c;
     br_vector3 com_offset_w;
+    LOG_TRACE("(%p)", pChunk);
 
     if (((*pChunk)->subject_index & 0xff00) == 0) {
         car = &gProgram_state.current_car;
@@ -1491,10 +1614,11 @@ void ApplyCar(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplyDamage(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42ae65
+// FUNCTION: CARM95 0x0042ae65
 void ApplyDamage(tPipe_chunk** pChunk) {
     tCar_spec* car;
     int i;
+    LOG_TRACE("(%p)", pChunk);
 
     if (((*pChunk)->subject_index & 0xff00) == 0) {
         car = &gProgram_state.current_car;
@@ -1508,8 +1632,10 @@ void ApplyDamage(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplySpecial(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42af1e
+// FUNCTION: CARM95 0x0042af1e
 void ApplySpecial(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     switch ((*pChunk)->subject_index) {
     case 0:
         if (fabsf(GetReplayRate()) <= 1.f) {
@@ -1533,8 +1659,10 @@ void ApplySpecial(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplyPedGib(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42afc8
+// FUNCTION: CARM95 0x0042afc8
 void ApplyPedGib(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     AdjustPedGib((*pChunk)->subject_index,
         (*pChunk)->chunk_data.ped_gib_data.size,
         (*pChunk)->chunk_data.ped_gib_data.gib_index,
@@ -1544,8 +1672,10 @@ void ApplyPedGib(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplyProxRay(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42b01f
+// FUNCTION: CARM95 0x0042b01f
 void ApplyProxRay(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     AdjustProxRay(
         (*pChunk)->subject_index,
         (*pChunk)->chunk_data.prox_ray_data.car_ID,
@@ -1555,8 +1685,10 @@ void ApplyProxRay(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall ApplySkidAdjustment(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42b068
+// FUNCTION: CARM95 0x0042b068
 void ApplySkidAdjustment(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     AdjustSkid((*pChunk)->subject_index,
         &(*pChunk)->chunk_data.skid_adjustment.matrix,
         (*pChunk)->chunk_data.skid_adjustment.material_index);
@@ -1564,12 +1696,13 @@ void ApplySkidAdjustment(tPipe_chunk** pChunk) {
 }
 
 // IDA: int __usercall ApplyPipedSession@<EAX>(tU8 **pPtr@<EAX>)
-// FUNCTION: CARM95 0x429cfb
+// FUNCTION: CARM95 0x00429cfb
 int ApplyPipedSession(tU8** pPtr) {
     int i;
     int return_value;
     tPipe_chunk* chunk_ptr;
     tPipe_chunk_type chunk_type;
+    LOG_TRACE("(%p)", pPtr);
 
     if (*pPtr == gPipe_record_ptr) {
         return 1;
@@ -1664,8 +1797,10 @@ int ApplyPipedSession(tU8** pPtr) {
 }
 
 // IDA: int __usercall MoveSessionPointerBackOne@<EAX>(tU8 **pPtr@<EAX>)
-// FUNCTION: CARM95 0x42b419
+// FUNCTION: CARM95 0x0042b419
 int MoveSessionPointerBackOne(tU8** pPtr) {
+    LOG_TRACE("(%p)", pPtr);
+
     if (*pPtr == gPipe_buffer_oldest && *pPtr != gPipe_record_ptr) {
         return 1;
     }
@@ -1680,8 +1815,10 @@ int MoveSessionPointerBackOne(tU8** pPtr) {
 }
 
 // IDA: int __usercall MoveSessionPointerForwardOne@<EAX>(tU8 **pPtr@<EAX>)
-// FUNCTION: CARM95 0x42bf9e
+// FUNCTION: CARM95 0x0042bf9e
 int MoveSessionPointerForwardOne(tU8** pPtr) {
+    LOG_TRACE("(%p)", pPtr);
+
     REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
 #if defined(DETHRACE_FIX_BUGS)
     *pPtr += PIPE_ALIGN(LengthOfSession((tPipe_session*)*pPtr));
@@ -1695,7 +1832,7 @@ int MoveSessionPointerForwardOne(tU8** pPtr) {
 }
 
 // IDA: tPipe_chunk* __usercall FindPreviousChunk@<EAX>(tU8 *pPtr@<EAX>, tPipe_chunk_type pType@<EDX>, tChunk_subject_index pIndex@<EBX>)
-// FUNCTION: CARM95 0x42b492
+// FUNCTION: CARM95 0x0042b492
 tPipe_chunk* FindPreviousChunk(tU8* pPtr, tPipe_chunk_type pType, tChunk_subject_index pIndex) {
     tU8* ptr;
     int i;
@@ -1703,6 +1840,7 @@ tPipe_chunk* FindPreviousChunk(tU8* pPtr, tPipe_chunk_type pType, tChunk_subject
     int chunk_counter;
     tPipe_chunk* mr_chunky;
     tChunk_subject_index masked_index;
+    LOG_TRACE("(%p, %d, %d)", pPtr, pType, pIndex);
 
     ptr = pPtr;
     chunk_counter = 0;
@@ -1731,11 +1869,12 @@ tPipe_chunk* FindPreviousChunk(tU8* pPtr, tPipe_chunk_type pType, tChunk_subject
 }
 
 // IDA: void __usercall UndoModelGeometry(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42b5ae
+// FUNCTION: CARM95 0x0042b5ae
 void UndoModelGeometry(tPipe_chunk** pChunk) {
     int i;
     br_model* model_ptr;
     tCar_spec* car;
+    LOG_TRACE("(%p)", pChunk);
 
     if (((*pChunk)->subject_index & 0xff00) == 0) {
         car = &gProgram_state.current_car;
@@ -1753,20 +1892,22 @@ void UndoModelGeometry(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall UndoSmudge(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42b762
+// FUNCTION: CARM95 0x0042b762
 void UndoSmudge(tPipe_chunk** pChunk) {
     int i;
     br_model* model_ptr;
     tCar_spec* car;
+    LOG_TRACE("(%p)", pChunk);
 
     DoSmudge(pChunk, -1);
     AdvanceChunkPtr(pChunk, ePipe_chunk_smudge);
 }
 
 // IDA: void __usercall UndoPedestrian(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42b78c
+// FUNCTION: CARM95 0x0042b78c
 void UndoPedestrian(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     temp_prev_chunk = pPrev_chunk;
     if (pPrev_chunk == NULL) {
@@ -1780,18 +1921,20 @@ void UndoPedestrian(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: void __usercall UndoFrameBoundary(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42b7e9
+// FUNCTION: CARM95 0x0042b7e9
 void UndoFrameBoundary(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     ApplyFrameBoundary(pChunk);
     AdvanceChunkPtr(pChunk, ePipe_chunk_frame_boundary);
 }
 
 // IDA: void __usercall UndoCar(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42b817
+// FUNCTION: CARM95 0x0042b817
 void UndoCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     temp_prev_chunk = pPrev_chunk;
     if (pPrev_chunk == NULL) {
@@ -1805,16 +1948,19 @@ void UndoCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: void __usercall UndoSound(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42b874
+// FUNCTION: CARM95 0x0042b874
 void UndoSound(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     AdvanceChunkPtr(pChunk, ePipe_chunk_sound);
 }
 
 // IDA: void __usercall UndoDamage(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42b88d
+// FUNCTION: CARM95 0x0042b88d
 void UndoDamage(tPipe_chunk** pChunk) {
     tCar_spec* car;
     int i;
+    LOG_TRACE("(%p)", pChunk);
 
     if (((*pChunk)->subject_index & 0xff00) == 0) {
         car = &gProgram_state.current_car;
@@ -1828,8 +1974,10 @@ void UndoDamage(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall UndoSpecial(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42b94c
+// FUNCTION: CARM95 0x0042b94c
 void UndoSpecial(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     if ((*pChunk)->subject_index == 0) {
         ApplySpecial(pChunk);
     } else {
@@ -1852,9 +2000,10 @@ void UndoSpecial(tPipe_chunk** pChunk) {
 }
 
 // IDA: void __usercall UndoPedGib(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42b9f6
+// FUNCTION: CARM95 0x0042b9f6
 void UndoPedGib(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
@@ -1866,9 +2015,10 @@ void UndoPedGib(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: void __usercall UndoSpark(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42ba42
+// FUNCTION: CARM95 0x0042ba42
 void UndoSpark(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
@@ -1880,9 +2030,10 @@ void UndoSpark(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: void __usercall UndoShrapnel(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42ba8e
+// FUNCTION: CARM95 0x0042ba8e
 void UndoShrapnel(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
@@ -1894,9 +2045,10 @@ void UndoShrapnel(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: void __usercall UndoScreenWobble(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42bada
+// FUNCTION: CARM95 0x0042bada
 void UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
@@ -1910,9 +2062,10 @@ void UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: void __usercall UndoGrooveStop(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42bb37
+// FUNCTION: CARM95 0x0042bb37
 void UndoGrooveStop(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
@@ -1924,9 +2077,10 @@ void UndoGrooveStop(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: void __usercall UndoNonCar(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42bb83
+// FUNCTION: CARM95 0x0042bb83
 void UndoNonCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
@@ -1938,9 +2092,10 @@ void UndoNonCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: void __usercall UndoSmoke(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42bbcf
+// FUNCTION: CARM95 0x0042bbcf
 void UndoSmoke(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
@@ -1952,23 +2107,27 @@ void UndoSmoke(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: void __usercall UndoSmokeColumn(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42bc1b
+// FUNCTION: CARM95 0x0042bc1b
 void UndoSmokeColumn(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     ApplySmokeColumn(pChunk);
 }
 
 // IDA: void __usercall UndoFlame(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42bc3b
+// FUNCTION: CARM95 0x0042bc3b
 void UndoFlame(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
+
     ApplyFlame(pChunk);
 }
 
 // IDA: void __usercall UndoSplash(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42bc52
+// FUNCTION: CARM95 0x0042bc52
 void UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
@@ -1982,9 +2141,10 @@ void UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: void __usercall UndoOilSpill(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42bd0b
+// FUNCTION: CARM95 0x0042bd0b
 void UndoOilSpill(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
@@ -1996,14 +2156,18 @@ void UndoOilSpill(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: void __usercall UndoProxRay(tPipe_chunk **pChunk@<EAX>)
-// FUNCTION: CARM95 0x42bd60
+// FUNCTION: CARM95 0x0042bd60
 void UndoProxRay(tPipe_chunk** pChunk) {
+    LOG_TRACE("(%p)", pChunk);
+
     ApplyProxRay(pChunk);
 }
 
 // IDA: void __usercall UndoSkidAdjustment(tPipe_chunk **pChunk@<EAX>, tPipe_chunk *pPrev_chunk@<EDX>)
-// FUNCTION: CARM95 0x42bd77
+// FUNCTION: CARM95 0x0042bd77
 void UndoSkidAdjustment(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
+    LOG_TRACE("(%p, %p)", pChunk, pPrev_chunk);
+
     gDisable_advance = 1;
     if (pPrev_chunk == NULL) {
         HideSkid((*pChunk)->subject_index);
@@ -2015,7 +2179,7 @@ void UndoSkidAdjustment(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 }
 
 // IDA: int __usercall UndoPipedSession@<EAX>(tU8 **pPtr@<EAX>)
-// FUNCTION: CARM95 0x42b0a6
+// FUNCTION: CARM95 0x0042b0a6
 int UndoPipedSession(tU8** pPtr) {
     tPipe_chunk* chunk_ptr;
     tPipe_chunk* prev_chunk;
@@ -2023,6 +2187,7 @@ int UndoPipedSession(tU8** pPtr) {
     tU8* pushed_end_of_session;
     int i;
     tPipe_chunk_type chunk_type;
+    LOG_TRACE("(%p)", pPtr);
 
     if (MoveSessionPointerBackOne(pPtr)) {
         return 1;
@@ -2119,6 +2284,7 @@ int UndoPipedSession(tU8** pPtr) {
 // IDA: tU32 __usercall FindPrevFrameTime@<EAX>(tU8 *pPtr@<EAX>)
 tU32 FindPrevFrameTime(tU8* pPtr) {
     tU8* temp_ptr;
+    LOG_TRACE("(%p)", pPtr);
 
     temp_ptr = pPtr;
     do {
@@ -2130,10 +2296,11 @@ tU32 FindPrevFrameTime(tU8* pPtr) {
 }
 
 // IDA: void __usercall ScanBuffer(tU8 **pPtr@<EAX>, tPipe_chunk_type pType@<EDX>, tU32 pDefault_time@<EBX>, int (*pCall_back)(tPipe_chunk*, int, tU32)@<ECX>, int (*pTime_check)(tU32))
-// FUNCTION: CARM95 0x42be18
+// FUNCTION: CARM95 0x0042be18
 void ScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, int (*pCall_back)(tPipe_chunk*, int, tU32), int (*pTime_check)(tU32)) {
     tPipe_chunk* chunk_ptr;
     tU32 the_time;
+    LOG_TRACE("(%p, %d, %d, %p, %p)", pPtr, pType, pDefault_time, pCall_back, pTime_check);
 
     the_time = pDefault_time;
     while (1) {
@@ -2157,26 +2324,29 @@ void ScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, int (*pC
 }
 
 // IDA: int __usercall CheckSound@<EAX>(tPipe_chunk *pChunk_ptr@<EAX>, int pChunk_count@<EDX>, tU32 pTime@<EBX>)
-// FUNCTION: CARM95 0x42c06e
+// FUNCTION: CARM95 0x0042c06e
 int CheckSound(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     int i;
     int sound_length;
     tPipe_chunk* temp_ptr;
+    LOG_TRACE("(%p, %d, %d)", pChunk_ptr, pChunk_count, pTime);
 
     STUB_ONCE();
     return 1;
 }
 
 // IDA: int __usercall SoundTimeout@<EAX>(tU32 pTime@<EAX>)
-// FUNCTION: CARM95 0x42c132
+// FUNCTION: CARM95 0x0042c132
 int SoundTimeout(tU32 pTime) {
+    LOG_TRACE("(%d)", pTime);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall ScanAndPlaySoundsToBe(tU8 *pPtr@<EAX>, tU32 pOldest_time@<EDX>, tU32 pYoungest_time@<EBX>)
-// FUNCTION: CARM95 0x42c00a
+// FUNCTION: CARM95 0x0042c00a
 void ScanAndPlaySoundsToBe(tU8* pPtr, tU32 pOldest_time, tU32 pYoungest_time) {
     tU8* temp_ptr;
+    LOG_TRACE("(%p, %d, %d)", pPtr, pOldest_time, pYoungest_time);
 
     if (!gDisable_sound) {
         temp_ptr = pPtr;
@@ -2188,7 +2358,7 @@ void ScanAndPlaySoundsToBe(tU8* pPtr, tU32 pOldest_time, tU32 pYoungest_time) {
 }
 
 // IDA: int __usercall CheckCar@<EAX>(tPipe_chunk *pChunk_ptr@<EAX>, int pChunk_count@<EDX>, tU32 pTime@<EBX>)
-// FUNCTION: CARM95 0x42c327
+// FUNCTION: CARM95 0x0042c327
 int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     int i;
     tCar_spec* car;
@@ -2196,6 +2366,7 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     br_vector3 com_offset_w;
     br_vector3 difference;
     tPipe_chunk* temp_ptr;
+    LOG_TRACE("(%p, %d, %d)", pChunk_ptr, pChunk_count, pTime);
 
     temp_ptr = pChunk_ptr;
     if (PipeSearchForwards()) {
@@ -2233,8 +2404,10 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 }
 
 // IDA: int __usercall CarTimeout@<EAX>(tU32 pTime@<EAX>)
-// FUNCTION: CARM95 0x42c5b2
+// FUNCTION: CARM95 0x0042c5b2
 int CarTimeout(tU32 pTime) {
+    LOG_TRACE("(%d)", pTime);
+
     if (PipeSearchForwards()) {
         if (pTime > gLoop_abort_time) {
             return 0;
@@ -2248,9 +2421,10 @@ int CarTimeout(tU32 pTime) {
 }
 
 // IDA: void __usercall ScanCarsPositions(tCar_spec *pCar@<EAX>, br_vector3 *pSource_pos@<EDX>, br_scalar pMax_distance_sqr, tU32 pOffset_time, tU32 pTime_period, br_vector3 *pCar_pos, tU32 *pTime_returned)
-// FUNCTION: CARM95 0x42c171
+// FUNCTION: CARM95 0x0042c171
 void ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_distance_sqr, tU32 pOffset_time, tU32 pTime_period, br_vector3* pCar_pos, tU32* pTime_returned) {
     tU8* temp_ptr;
+    LOG_TRACE("(%p, %p, %f, %d, %d, %p, %p)", pCar, pSource_pos, pMax_distance_sqr, pOffset_time, pTime_period, pCar_pos, pTime_returned);
 
     temp_ptr = gPipe_play_ptr;
     gTrigger_time = 0;
@@ -2275,8 +2449,10 @@ void ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_
 }
 
 // IDA: int __usercall CheckIncident@<EAX>(tPipe_chunk *pChunk_ptr@<EAX>, int pChunk_count@<EDX>, tU32 pTime@<EBX>)
-// FUNCTION: CARM95 0x42c90d
+// FUNCTION: CARM95 0x0042c90d
 int CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
+    LOG_TRACE("(%p, %d, %d)", pChunk_ptr, pChunk_count, pTime);
+
     if (PipeSearchForwards()) {
         if (pTime <= gEnd_time) {
             return 0;
@@ -2292,9 +2468,10 @@ int CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 }
 
 // IDA: int __usercall GetNextIncident@<EAX>(tU32 pOffset_time@<EAX>, tIncident_type *pIncident_type@<EDX>, float *pSeverity@<EBX>, tIncident_info *pInfo@<ECX>, tU32 *pTime_away)
-// FUNCTION: CARM95 0x42c6a3
+// FUNCTION: CARM95 0x0042c6a3
 int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pSeverity, tIncident_info* pInfo, tU32* pTime_away) {
     tU8* temp_ptr;
+    LOG_TRACE("(%d, %p, %p, %p, %p)", pOffset_time, pIncident_type, pSeverity, pInfo, pTime_away);
 
     temp_ptr = gPipe_play_ptr;
     gTrigger_time = 0;
@@ -2327,9 +2504,10 @@ int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pS
 }
 
 // IDA: tU32 __cdecl GetARStartTime()
-// FUNCTION: CARM95 0x42ca0e
+// FUNCTION: CARM95 0x0042ca0e
 tU32 GetARStartTime(void) {
     tU8* temp_ptr;
+    LOG_TRACE("()");
 
     temp_ptr = gPipe_buffer_oldest;
     do {

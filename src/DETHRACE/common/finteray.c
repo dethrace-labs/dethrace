@@ -10,65 +10,69 @@
 #include <math.h>
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x51e8fc
+// GLOBAL: CARM95 0x0051e8fc
 int gPling_materials = 1;
 
-// GLOBAL: CARM95 0x51e900
+// GLOBAL: CARM95 0x0051e900
 br_material* gSub_material;
 
-// GLOBAL: CARM95 0x51e904
+// GLOBAL: CARM95 0x0051e904
 br_material* gReal_material;
 
-// GLOBAL: CARM95 0x51e908
+// GLOBAL: CARM95 0x0051e908
 int gNfaces;
 
-// GLOBAL: CARM95 0x53e558
+// GLOBAL: CARM95 0x0053e558
 br_matrix34 gPick_model_to_view__finteray; // suffix added to avoid duplicate symbol
 
-// GLOBAL: CARM95 0x53e588
+// GLOBAL: CARM95 0x0053e588
 int gTemp_group;
 
-// GLOBAL: CARM95 0x53e54c
+// GLOBAL: CARM95 0x0053e54c
 br_model* gNearest_model;
 
-// GLOBAL: CARM95 0x53e58c
+// GLOBAL: CARM95 0x0053e58c
 br_model* gSelected_model;
 
-// GLOBAL: CARM95 0x53e554
+// GLOBAL: CARM95 0x0053e554
 int gNearest_face_group;
 
-// GLOBAL: CARM95 0x53e548
+// GLOBAL: CARM95 0x0053e548
 int gNearest_face;
 
-// GLOBAL: CARM95 0x53e550
+// GLOBAL: CARM95 0x0053e550
 br_scalar gNearest_T;
 
-// GLOBAL: CARM95 0x550240
+// GLOBAL: CARM95 0x00550240
 tFace_ref* gPling_face;
 
 // IDA: int __cdecl BadDiv(br_scalar a, br_scalar b)
 // Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x4abe0c
+// FUNCTION: CARM95 0x004abe0c
 int BadDiv__finteray(br_scalar a, br_scalar b) {
-    //
+    // LOG_TRACE("(%f, %f)", a, b);
+
     return fabsf(b) < 1.0f && fabsf(a) > fabsf(b) * BR_SCALAR_MAX;
 }
 
 // IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
 // Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x4abe5b
+// FUNCTION: CARM95 0x004abe5b
 void DRVector2AccumulateScale__finteray(br_vector2* a, br_vector2* b, br_scalar s) {
+    LOG_TRACE("(%p, %p, %f)", a, b, s);
+
     a->v[0] = b->v[0] * s + a->v[0];
     a->v[1] = b->v[1] * s + a->v[1];
 }
 
 // IDA: int __usercall PickBoundsTestRay@<EAX>(br_bounds *b@<EAX>, br_vector3 *rp@<EDX>, br_vector3 *rd@<EBX>, br_scalar t_near, br_scalar t_far, br_scalar *new_t_near, br_scalar *new_t_far)
 //  Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x4ab244
+// FUNCTION: CARM95 0x004ab244
 int PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br_scalar t_near, br_scalar t_far, br_scalar* new_t_near, br_scalar* new_t_far) {
     int i;
     float s;
     float t;
+    LOG_TRACE("(%p, %p, %p, %f, %f, %p, %p)", b, rp, rd, t_near, t_far, new_t_near, new_t_far);
 
     for (i = 0; i < 3; i++) {
         if (rd->v[i] >= -0.00000023841858) {
@@ -122,7 +126,7 @@ int PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br
 }
 
 // IDA: int __usercall ActorRayPick2D@<EAX>(br_actor *ap@<EAX>, br_vector3 *pPosition@<EDX>, br_vector3 *pDir@<EBX>, br_model *model@<ECX>, br_material *material, dr_pick2d_cbfn *callback)
-// FUNCTION: CARM95 0x4aaf5a
+// FUNCTION: CARM95 0x004aaf5a
 int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_model* model, br_material* material, dr_pick2d_cbfn* callback) {
     br_actor* a;
     br_model* this_model;
@@ -135,6 +139,7 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
     br_vector3 pos;
     br_vector3 dir;
     void* arg;
+    LOG_TRACE("(%p, %p, %p, %p, %p, %p)", ap, pPosition, pDir, model, material, callback);
 
     t_near = 0.0;
     t_far = 1.0;
@@ -194,15 +199,18 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
 }
 
 // IDA: int __usercall DRSceneRayPick2D@<EAX>(br_actor *world@<EAX>, br_vector3 *pPosition@<EDX>, br_vector3 *pDir@<EBX>, dr_pick2d_cbfn *callback@<ECX>)
-// FUNCTION: CARM95 0x4aaf10
+// FUNCTION: CARM95 0x004aaf10
 int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, dr_pick2d_cbfn* callback) {
+    LOG_TRACE("(%p, %p, %p, %p)", world, pPosition, pDir, callback);
+
     BrMatrix34Inverse(&gPick_model_to_view__finteray, &world->t.t.mat);
+    LOG_WARN_ONCE("Missing material and model pointers to ActorRayPick2D");
     return ActorRayPick2D(world, pPosition, pDir, NULL, NULL, callback);
 }
 
 // IDA: int __usercall DRModelPick2D@<EAX>(br_model *model@<EAX>, br_material *material@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg)
 //  Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x4ab5e4
+// FUNCTION: CARM95 0x004ab5e4
 int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* ray_pos, br_vector3* ray_dir, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn* callback, void* arg) {
     // DR_FACE* fp;
     int f;
@@ -235,6 +243,7 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
     br_scalar numerator;
     float f_numerator;
     int group;
+    LOG_TRACE("(%p, %p, %p, %p, %f, %f, %p, %p)", model, material, ray_pos, ray_dir, t_near, t_far, callback, arg);
 
     struct v11group* grp_ptr;
     br_vector4* eqn;
@@ -361,8 +370,10 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
 
 // IDA: int __cdecl FindHighestPolyCallBack(br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3 *pPoint, br_vector2 *pMap, void *pArg)
 // Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x4abe8d
+// FUNCTION: CARM95 0x004abe8d
 int FindHighestPolyCallBack__finteray(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
+    LOG_TRACE("(%p, %p, %p, %p, %f, %d, %d, %d, %p, %p, %p)", pModel, pMaterial, pRay_pos, pRay_dir, pT, pF, pE, pV, pPoint, pMap, pArg);
+
     if (pT < (double)gNearest_T) {
         gNearest_T = pT;
         gNearest_model = pModel;
@@ -374,8 +385,10 @@ int FindHighestPolyCallBack__finteray(br_model* pModel, br_material* pMaterial, 
 
 // IDA: int __cdecl FindHighestCallBack(br_actor *pActor, br_model *pModel, br_material *pMaterial, br_vector3 *pRay_pos, br_vector3 *pRay_dir, br_scalar pT_near, br_scalar pT_far, void *pArg)
 // Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x4ab584
+// FUNCTION: CARM95 0x004ab584
 int FindHighestCallBack__finteray(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
+    LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, pArg);
+
     if (gProgram_state.current_car.current_car_actor < 0
         || gProgram_state.current_car.car_model_actors[gProgram_state.current_car.current_car_actor].actor != pActor) {
         DRModelPick2D__finteray(pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, FindHighestPolyCallBack__finteray, pArg);
@@ -384,9 +397,10 @@ int FindHighestCallBack__finteray(br_actor* pActor, br_model* pModel, br_materia
 }
 
 // IDA: void __usercall FindFace(br_vector3 *pPosition@<EAX>, br_vector3 *pDir@<EDX>, br_vector3 *nor@<EBX>, br_scalar *t@<ECX>, br_material **material)
-// FUNCTION: CARM95 0x4ab47d
+// FUNCTION: CARM95 0x004ab47d
 void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scalar* t, br_material** material) {
     int group;
+    LOG_TRACE("(%p, %p, %p, %p, %p)", pPosition, pDir, nor, t, material);
 
     br_vector4* eqn;
 
@@ -404,19 +418,23 @@ void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scala
 }
 
 // IDA: void __cdecl EnablePlingMaterials()
-// FUNCTION: CARM95 0x4abed5
+// FUNCTION: CARM95 0x004abed5
 void EnablePlingMaterials(void) {
+    LOG_TRACE("()");
+
     gPling_materials = 1;
 }
 
 // IDA: void __cdecl DisablePlingMaterials()
-// FUNCTION: CARM95 0x4abeea
+// FUNCTION: CARM95 0x004abeea
 void DisablePlingMaterials(void) {
+    LOG_TRACE("()");
+
     gPling_materials = 0;
 }
 
 // IDA: void __usercall CheckSingleFace(tFace_ref *pFace@<EAX>, br_vector3 *ray_pos@<EDX>, br_vector3 *ray_dir@<EBX>, br_vector3 *normal@<ECX>, br_scalar *rt)
-// FUNCTION: CARM95 0x4abeff
+// FUNCTION: CARM95 0x004abeff
 void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt) {
     br_scalar t;
     br_scalar numerator;
@@ -440,6 +458,7 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
     double f_n;
     double f_numerator;
     br_material* this_material;
+    LOG_TRACE("(%p, %p, %p, %p, %p)", pFace, ray_pos, ray_dir, normal, rt);
 
     this_material = pFace->material;
     *rt = 100.0;
@@ -510,7 +529,7 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
 }
 
 // IDA: void __usercall MultiRayCheckSingleFace(int pNum_rays@<EAX>, tFace_ref *pFace@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_vector3 *normal, br_scalar *rt)
-// FUNCTION: CARM95 0x4ac3b7
+// FUNCTION: CARM95 0x004ac3b7
 void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir, br_vector3* normal, br_scalar* rt) {
     int i;
     br_scalar t[4];
@@ -535,6 +554,7 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
     double f_n;
     double f_numerator;
     br_material* this_material;
+    LOG_TRACE("(%d, %p, %p, %p, %p, %p)", pNum_rays, pFace, ray_pos, ray_dir, normal, rt);
 
     this_material = pFace->material;
     d = ray_dir->v[2] * pFace->normal.v[2] + ray_dir->v[1] * pFace->normal.v[1] + ray_dir->v[0] * pFace->normal.v[0];
@@ -634,11 +654,12 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
 }
 
 // IDA: void __usercall GetNewBoundingBox(br_bounds *b2@<EAX>, br_bounds *b1@<EDX>, br_matrix34 *m@<EBX>)
-// FUNCTION: CARM95 0x4acaa2
+// FUNCTION: CARM95 0x004acaa2
 void GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
     br_vector3 a;
     br_vector3 c[3];
     int j;
+    LOG_TRACE("(%p, %p, %p)", b2, b1, m);
 
     BrMatrix34ApplyP(&b2->min, &b1->min, m);
     BrVector3Copy(&b2->max, &b2->min);
@@ -659,7 +680,7 @@ void GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
 }
 
 // IDA: int __usercall FindFacesInBox@<EAX>(tBounds *bnds@<EAX>, tFace_ref *face_list@<EDX>, int max_face@<EBX>)
-// FUNCTION: CARM95 0x4accae
+// FUNCTION: CARM95 0x004accae
 int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
     br_vector3 a;
     br_vector3 b;
@@ -673,6 +694,7 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
     tU8 cz_min;
     tU8 cz_max;
     tTrack_spec* track_spec;
+    LOG_TRACE("(%p, %p, %d)", bnds, face_list, max_face);
 
     j = 0;
     track_spec = &gProgram_state.track_spec;
@@ -730,13 +752,14 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
 }
 
 // IDA: int __usercall FindFacesInBox2@<EAX>(tBounds *bnds@<EAX>, tFace_ref *face_list@<EDX>, int max_face@<EBX>)
-// FUNCTION: CARM95 0x4ad176
+// FUNCTION: CARM95 0x004ad176
 int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
     br_vector3 a;
     br_vector3 b;
     br_vector3 c[3];
     int i;
     int j;
+    LOG_TRACE("(%p, %p, %d)", bnds, face_list, max_face);
 
     a.v[0] = (bnds->original_bounds.min.v[0] + bnds->original_bounds.max.v[0]) * .5f;
     a.v[1] = (bnds->original_bounds.min.v[1] + bnds->original_bounds.max.v[1]) * .5f;
@@ -757,7 +780,7 @@ int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
 }
 
 // IDA: int __usercall ActorBoxPick@<EAX>(tBounds *bnds@<EAX>, br_actor *ap@<EDX>, br_model *model@<EBX>, br_material *material@<ECX>, tFace_ref *face_list, int max_face, br_matrix34 *pMat)
-// FUNCTION: CARM95 0x4ad45b
+// FUNCTION: CARM95 0x004ad45b
 int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* material, tFace_ref* face_list, int max_face, br_matrix34* pMat) {
     br_model* this_model;
     br_material* this_material;
@@ -772,6 +795,7 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
     br_matrix34 box_to_actor;
     tBounds new_bounds;
     br_bounds br_bnds;
+    LOG_TRACE("(%p, %p, %p, %p, %p, %d, %p)", bnds, ap, model, material, face_list, max_face, pMat);
 
     i = 0;
     test_children = 1;
@@ -851,7 +875,7 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
 }
 
 // IDA: int __usercall ModelPickBox@<EAX>(br_actor *actor@<EAX>, tBounds *bnds@<EDX>, br_model *model@<EBX>, br_material *model_material@<ECX>, tFace_ref *face_list, int max_face, br_matrix34 *pMat)
-// FUNCTION: CARM95 0x4ad8ce
+// FUNCTION: CARM95 0x004ad8ce
 int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* model_material, tFace_ref* face_list, int max_face, br_matrix34* pMat) {
     int f;
     int i;
@@ -866,6 +890,7 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
     br_vector3 tv;
     br_scalar t;
     struct v11model* prepared;
+    LOG_TRACE("(%p, %p, %p, %p, %p, %d, %p)", actor, bnds, model, model_material, face_list, max_face, pMat);
 
     struct v11group* grp_ptr;
 
@@ -993,13 +1018,14 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
 }
 
 // IDA: void __usercall ClipToPlaneGE(br_vector3 *p@<EAX>, int *nv@<EDX>, int i@<EBX>, br_scalar limit)
-// FUNCTION: CARM95 0x4ae5b5
+// FUNCTION: CARM95 0x004ae5b5
 void ClipToPlaneGE(br_vector3* p, int* nv, int i, br_scalar limit) {
     int last_vertex;
     int j;
     int vertex;
     int k;
     br_vector3 p2[12];
+    LOG_TRACE("(%p, %p, %d, %f)", p, nv, i, limit);
 
     last_vertex = *nv - 1;
     j = 0;
@@ -1028,13 +1054,14 @@ void ClipToPlaneGE(br_vector3* p, int* nv, int i, br_scalar limit) {
 }
 
 // IDA: void __usercall ClipToPlaneLE(br_vector3 *p@<EAX>, int *nv@<EDX>, int i@<EBX>, br_scalar limit)
-// FUNCTION: CARM95 0x4ae89f
+// FUNCTION: CARM95 0x004ae89f
 void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
     int last_vertex;
     int j;
     int vertex;
     int k;
     br_vector3 p2[12];
+    LOG_TRACE("(%p, %p, %d, %f)", p, nv, i, limit);
 
     last_vertex = *nv - 1;
     j = 0;
@@ -1064,8 +1091,10 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
 
 // IDA: int __usercall BoundsOverlapTest@<EAX>(br_bounds *b1@<EAX>, br_bounds *b2@<EDX>)
 // Suffix added to avoid duplicate symbol
-// FUNCTION: CARM95 0x4aeb89
+// FUNCTION: CARM95 0x004aeb89
 int BoundsOverlapTest__finteray(br_bounds* b1, br_bounds* b2) {
+    LOG_TRACE("(%p, %p)", b1, b2);
+
     return b1->min.v[0] <= b2->max.v[0]
         && b2->min.v[0] <= b1->max.v[0]
         && b1->min.v[1] <= b2->max.v[1]
@@ -1075,10 +1104,11 @@ int BoundsOverlapTest__finteray(br_bounds* b1, br_bounds* b2) {
 }
 
 // IDA: int __usercall BoundsTransformTest@<EAX>(br_bounds *b1@<EAX>, br_bounds *b2@<EDX>, br_matrix34 *M@<EBX>)
-// FUNCTION: CARM95 0x4aec32
+// FUNCTION: CARM95 0x004aec32
 int BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M) {
     br_scalar val;
     br_vector3 o;
+    LOG_TRACE("(%p, %p, %p)", b1, b2, M);
 
     BrVector3Sub(&o, &b1->max, &b1->min);
     val = M->m[0][0] * b1->min.v[0] + M->m[1][0] * b1->min.v[1] + M->m[2][0] * b1->min.v[2] + M->m[3][0];
@@ -1134,7 +1164,7 @@ int BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M) {
 }
 
 // IDA: int __usercall LineBoxColl@<EAX>(br_vector3 *o@<EAX>, br_vector3 *p@<EDX>, br_bounds *pB@<EBX>, br_vector3 *pHit_point@<ECX>)
-// FUNCTION: CARM95 0x4af126
+// FUNCTION: CARM95 0x004af126
 int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_point) {
     br_vector3 dir;
     int inside;
@@ -1143,6 +1173,7 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
     int which_plane;
     br_scalar max_t[3];
     br_scalar cp[3];
+    LOG_TRACE("(%p, %p, %p, %p)", o, p, pB, pHit_point);
 
     inside = 1;
     BrVector3Sub(&dir, p, o);
@@ -1197,10 +1228,11 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
 }
 
 // IDA: int __usercall SphereBoxIntersection@<EAX>(br_bounds *pB@<EAX>, br_vector3 *pC@<EDX>, br_scalar pR_squared, br_vector3 *pHit_point)
-// FUNCTION: CARM95 0x4af3f0
+// FUNCTION: CARM95 0x004af3f0
 int SphereBoxIntersection(br_bounds* pB, br_vector3* pC, br_scalar pR_squared, br_vector3* pHit_point) {
     int i;
     br_scalar d;
+    LOG_TRACE("(%p, %p, %f, %p)", pB, pC, pR_squared, pHit_point);
 
     d = 0.f;
     for (i = 0; i < 3; i++) {
@@ -1217,10 +1249,11 @@ int SphereBoxIntersection(br_bounds* pB, br_vector3* pC, br_scalar pR_squared, b
 }
 
 // IDA: int __usercall LineBoxCollWithSphere@<EAX>(br_vector3 *o@<EAX>, br_vector3 *p@<EDX>, br_bounds *pB@<EBX>, br_vector3 *pHit_point@<ECX>)
-// FUNCTION: CARM95 0x4af4d2
+// FUNCTION: CARM95 0x004af4d2
 int LineBoxCollWithSphere(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_point) {
     int i;
     int plane;
+    LOG_TRACE("(%p, %p, %p, %p)", o, p, pB, pHit_point);
 
     plane = LineBoxColl(o, p, pB, pHit_point);
 
@@ -1242,11 +1275,12 @@ int LineBoxCollWithSphere(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector
 }
 
 // IDA: int __usercall CompVert@<EAX>(int v1@<EAX>, int v2@<EDX>)
-// FUNCTION: CARM95 0x4af90e
+// FUNCTION: CARM95 0x004af90e
 int CompVert(int v1, int v2) {
     br_vertex* vl;
     br_vector3 tv;
     br_vector2 tv2;
+    LOG_TRACE("(%d, %d)", v1, v2);
 
     if (v1 == v2) {
         return 1;
@@ -1264,16 +1298,17 @@ int CompVert(int v1, int v2) {
 }
 
 // IDA: void __usercall SetFacesGroup(int pFace@<EAX>)
-// FUNCTION: CARM95 0x4af7d4
+// FUNCTION: CARM95 0x004af7d4
 void SetFacesGroup(int pFace) {
     int f;
     int v;
     int i;
+    LOG_TRACE("(%d)", pFace);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall SelectFace(br_vector3 *pDir@<EAX>)
-// FUNCTION: CARM95 0x4af5e8
+// FUNCTION: CARM95 0x004af5e8
 void SelectFace(br_vector3* pDir) {
     tCar_spec* c;
     br_vector3 dir;
@@ -1281,17 +1316,19 @@ void SelectFace(br_vector3* pDir) {
     br_scalar t;
     br_model* old_model;
     int i;
+    LOG_TRACE("(%p)", pDir);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall GetTilingLimits(br_vector2 *min@<EAX>, br_vector2 *max@<EDX>)
-// FUNCTION: CARM95 0x4afa2a
+// FUNCTION: CARM95 0x004afa2a
 void GetTilingLimits(br_vector2* min, br_vector2* max) {
     int f;
     int i;
     int j;
     br_vertex* verts;
     br_face* faces;
+    LOG_TRACE("(%p, %p)", min, max);
 
     verts = gSelected_model->vertices;
     faces = gSelected_model->faces;
@@ -1314,7 +1351,7 @@ void GetTilingLimits(br_vector2* min, br_vector2* max) {
 }
 
 // IDA: void __usercall Scale(int pD@<EAX>, int factor@<EDX>)
-// FUNCTION: CARM95 0x4afbf3
+// FUNCTION: CARM95 0x004afbf3
 void Scale(int pD, int factor) {
     br_vector2 min;
     br_vector2 max;
@@ -1323,6 +1360,7 @@ void Scale(int pD, int factor) {
     br_scalar d;
     br_vertex* verts;
     br_face* faces;
+    LOG_TRACE("(%d, %d)", pD, factor);
 
     if (gSelected_model == NULL) {
         return;
@@ -1350,42 +1388,52 @@ void Scale(int pD, int factor) {
 }
 
 // IDA: void __cdecl ScaleUpX()
-// FUNCTION: CARM95 0x4afbdc
+// FUNCTION: CARM95 0x004afbdc
 void ScaleUpX(void) {
+    LOG_TRACE("()");
+
     Scale(0, 1);
 }
 
 // IDA: void __cdecl ScaleDnX()
-// FUNCTION: CARM95 0x4afd9a
+// FUNCTION: CARM95 0x004afd9a
 void ScaleDnX(void) {
+    LOG_TRACE("()");
+
     Scale(0, -1);
 }
 
 // IDA: void __cdecl ScaleUpY()
-// FUNCTION: CARM95 0x4afdb1
+// FUNCTION: CARM95 0x004afdb1
 void ScaleUpY(void) {
+    LOG_TRACE("()");
+
     Scale(1, 1);
 }
 
 // IDA: void __cdecl ScaleDnY()
-// FUNCTION: CARM95 0x4afdc8
+// FUNCTION: CARM95 0x004afdc8
 void ScaleDnY(void) {
+    LOG_TRACE("()");
+
     Scale(1, -1);
 }
 
 // IDA: void __cdecl SelectFaceForward()
-// FUNCTION: CARM95 0x4afddf
+// FUNCTION: CARM95 0x004afddf
 void SelectFaceForward(void) {
     br_vector3 dir;
+    LOG_TRACE("()");
 
     BrVector3Scale(&dir, (br_vector3*)&gProgram_state.current_car.car_master_actor->t.t.mat.m[2], -2.f);
     SelectFace(&dir);
 }
 
 // IDA: void __cdecl SelectFaceDown()
-// FUNCTION: CARM95 0x4afe2c
+// FUNCTION: CARM95 0x004afe2c
 void SelectFaceDown(void) {
     br_vector3 dir;
+    LOG_TRACE("()");
 
     BrVector3Scale(&dir, (br_vector3*)&gProgram_state.current_car.car_master_actor->t.t.look_up.up, -2.f);
     SelectFace(&dir);

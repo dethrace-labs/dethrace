@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// GLOBAL: CARM95 0x50a1b0
+// GLOBAL: CARM95 0x0050a1b0
 char* gReplay_pixie_names[10] = {
     "REPLAY.PIX",
     "RBUTTONS.PIX",
@@ -41,94 +41,102 @@ char* gReplay_pixie_names[10] = {
     "CAMERA.PIX",
 };
 
-// GLOBAL: CARM95 0x50a1d8
+// GLOBAL: CARM95 0x0050a1d8
 int gSingle_frame_mode = 0;
 
-// GLOBAL: CARM95 0x50a1dc
+// GLOBAL: CARM95 0x0050a1dc
 tU32 gCam_change_time = 0;
 
-// GLOBAL: CARM95 0x50a1e0
+// GLOBAL: CARM95 0x0050a1e0
 int gSave_file = 0;
 
-// GLOBAL: CARM95 0x50a1e8
+// GLOBAL: CARM95 0x0050a1e8
 int gProgress_line_left[2] = { 70, 141 };
 
-// GLOBAL: CARM95 0x50a1f0
+// GLOBAL: CARM95 0x0050a1f0
 int gProgress_line_right[2] = { 279, 558 };
 
-// GLOBAL: CARM95 0x50a1f8
+// GLOBAL: CARM95 0x0050a1f8
 int gProgress_line_top[2] = { 178, 429 };
 
-// GLOBAL: CARM95 0x531dd0
+// GLOBAL: CARM95 0x00531dd0
 br_pixelmap* gReplay_pixies[10];
 
-// GLOBAL: CARM95 0x531db8
+// GLOBAL: CARM95 0x00531db8
 int gKey_down;
 int gNo_cursor;
 
-// GLOBAL: CARM95 0x531db4
+// GLOBAL: CARM95 0x00531db4
 int gSave_frame_number;
 
-// GLOBAL: CARM95 0x531da8
+// GLOBAL: CARM95 0x00531da8
 int gCam_change_button_down;
 
-// GLOBAL: CARM95 0x531da0
+// GLOBAL: CARM95 0x00531da0
 tU32 gAction_replay_start_time;
 
-// GLOBAL: CARM95 0x531dc4
+// GLOBAL: CARM95 0x00531dc4
 tU32 gLast_replay_zappy_screen;
 
-// GLOBAL: CARM95 0x531dc0
+// GLOBAL: CARM95 0x00531dc0
 tS32 gStopped_time;
 
-// GLOBAL: CARM95 0x531dbc
+// GLOBAL: CARM95 0x00531dbc
 float gPending_replay_rate;
 
-// GLOBAL: CARM95 0x531da4
+// GLOBAL: CARM95 0x00531da4
 tU32 gAction_replay_end_time;
 
-// GLOBAL: CARM95 0x531dcc
+// GLOBAL: CARM95 0x00531dcc
 float gReplay_rate;
 
-// GLOBAL: CARM95 0x531db0
+// GLOBAL: CARM95 0x00531db0
 int gSave_bunch_ID;
 
-// GLOBAL: CARM95 0x531dac
+// GLOBAL: CARM95 0x00531dac
 int gPlay_direction;
 
-// GLOBAL: CARM95 0x531dc8
+// GLOBAL: CARM95 0x00531dc8
 int gPaused;
 
-// GLOBAL: CARM95 0x551db4
+// GLOBAL: CARM95 0x00551db4
 tAction_replay_camera_type gAction_replay_camera_mode;
 
 // IDA: int __cdecl ReplayIsPaused()
-// FUNCTION: CARM95 0x41adc0
+// FUNCTION: CARM95 0x0041adc0
 int ReplayIsPaused(void) {
+    LOG_TRACE8("()");
+
     return gReplay_rate == 0.f;
 }
 
 // IDA: float __cdecl GetReplayRate()
-// FUNCTION: CARM95 0x41adf3
+// FUNCTION: CARM95 0x0041adf3
 float GetReplayRate(void) {
+    LOG_TRACE("()");
+
     return gReplay_rate;
 }
 
 // IDA: int __cdecl GetReplayDirection()
-// FUNCTION: CARM95 0x41ae09
+// FUNCTION: CARM95 0x0041ae09
 int GetReplayDirection(void) {
+    LOG_TRACE("()");
+
     return gPlay_direction;
 }
 
 // IDA: void __cdecl StopSaving()
-// FUNCTION: CARM95 0x41b5a0
+// FUNCTION: CARM95 0x0041b5a0
 void StopSaving(void) {
+    LOG_TRACE("()");
+
     gSave_file = 0;
     gPaused = 1;
 }
 
 // IDA: void __usercall ActualActionReplayHeadups(int pSpecial_zappy_bastard@<EAX>)
-// FUNCTION: CARM95 0x41ae48
+// FUNCTION: CARM95 0x0041ae48
 void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
     int x;
@@ -136,6 +144,7 @@ void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU16 played_col2;
     tU16 to_play_col1;
     tU16 to_play_col2;
+    LOG_TRACE("(%d)", pSpecial_zappy_bastard);
 
     the_time = PDGetTotalTime();
     if (gSave_file || PDKeyDown(KEY_SHIFT_ANY)) {
@@ -237,15 +246,18 @@ void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
 }
 
 // IDA: void __cdecl DoActionReplayPostSwap()
-// FUNCTION: CARM95 0x41ae1e
+// FUNCTION: CARM95 0x0041ae1e
 void DoActionReplayPostSwap(void) {
+    LOG_TRACE("()");
+
     RemoveTransientBitmaps(1);
 }
 
 // IDA: void __usercall DoZappyActionReplayHeadups(int pSpecial_zappy_bastard@<EAX>)
-// FUNCTION: CARM95 0x41b5bf
+// FUNCTION: CARM95 0x0041b5bf
 void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
+    LOG_TRACE("(%d)", pSpecial_zappy_bastard);
 
     the_time = PDGetTotalTime();
     // Draw screen every 50ms (when we are going fast)
@@ -258,13 +270,15 @@ void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
 }
 
 // IDA: void __cdecl DoActionReplayHeadups()
-// FUNCTION: CARM95 0x41ae33
+// FUNCTION: CARM95 0x0041ae33
 void DoActionReplayHeadups(void) {
+    LOG_TRACE("()");
+
     ActualActionReplayHeadups(0);
 }
 
 // IDA: void __usercall MoveReplayBuffer(tS32 pMove_amount@<EAX>)
-// FUNCTION: CARM95 0x41b41e
+// FUNCTION: CARM95 0x0041b41e
 void MoveReplayBuffer(tS32 pMove_amount) {
     tU8* play_ptr;
     tU8* old_play_ptr;
@@ -272,6 +286,7 @@ void MoveReplayBuffer(tS32 pMove_amount) {
     int i;
     int a;
     tU32 old_time;
+    LOG_TRACE("(%d)", pMove_amount);
 
     old_play_ptr = NULL;
     gLast_replay_zappy_screen = 0;
@@ -313,9 +328,10 @@ void MoveReplayBuffer(tS32 pMove_amount) {
 }
 
 // IDA: void __cdecl MoveToEndOfReplay()
-// FUNCTION: CARM95 0x41b3df
+// FUNCTION: CARM95 0x0041b3df
 void MoveToEndOfReplay(void) {
     float old_replay_rate;
+    LOG_TRACE("()");
 
     DisablePipedSounds();
     old_replay_rate = gReplay_rate;
@@ -326,9 +342,10 @@ void MoveToEndOfReplay(void) {
 }
 
 // IDA: void __cdecl MoveToStartOfReplay()
-// FUNCTION: CARM95 0x41b622
+// FUNCTION: CARM95 0x0041b622
 void MoveToStartOfReplay(void) {
     float old_replay_rate;
+    LOG_TRACE("()");
 
     DisablePipedSounds();
     old_replay_rate = gReplay_rate;
@@ -339,8 +356,10 @@ void MoveToStartOfReplay(void) {
 }
 
 // IDA: void __cdecl ToggleReplay()
-// FUNCTION: CARM95 0x41b661
+// FUNCTION: CARM95 0x0041b661
 void ToggleReplay(void) {
+    LOG_TRACE("()");
+
     if (!IsActionReplayAvailable()) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_ACTION_REPLAY_UNAVAILABLE));
         return;
@@ -386,17 +405,19 @@ void ToggleReplay(void) {
 }
 
 // IDA: void __usercall ReverseSound(tS3_effect_tag pEffect_index@<EAX>, tS3_sound_tag pSound_tag@<EDX>)
-// FUNCTION: CARM95 0x41b7fe
+// FUNCTION: CARM95 0x0041b7fe
 void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
+    LOG_TRACE("(%d, %d)", pEffect_index, pSound_tag);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl FindUniqueFile()
-// FUNCTION: CARM95 0x41b819
+// FUNCTION: CARM95 0x0041b819
 int FindUniqueFile(void) {
     int index;
     FILE* f;
     tPath_name the_path;
+    LOG_TRACE("()");
 
     for (index = 0; index < 1000; index++) {
         PathCat(the_path, gApplication_path, "BMPFILES");
@@ -413,7 +434,7 @@ int FindUniqueFile(void) {
 }
 
 // IDA: void __usercall PollActionReplayControls(tU32 pFrame_period@<EAX>)
-// FUNCTION: CARM95 0x41b925
+// FUNCTION: CARM95 0x0041b925
 void PollActionReplayControls(tU32 pFrame_period) {
     float old_replay_rate;
     int old_key_down;
@@ -421,6 +442,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
     int y_coord;
     int i;
     tU32 real_time;
+    // GLOBAL: CARM95 0x50a200
     static tU32 last_real_time = 0;
     static int psuedo_mouse_keys[8] = {
         KEY_KP_7,
@@ -456,6 +478,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
         },
     };
     /* clang-format on */
+    LOG_TRACE("(%d)", pFrame_period);
 
     real_time = PDGetTotalTime();
     old_replay_rate = gReplay_rate;
@@ -598,8 +621,10 @@ void PollActionReplayControls(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl CheckReplayTurnOn()
-// FUNCTION: CARM95 0x41c03b
+// FUNCTION: CARM95 0x0041c03b
 void CheckReplayTurnOn(void) {
+    LOG_TRACE("()");
+
     if (!gAction_replay_mode) {
         if (!KeyIsDown(KEYMAP_REPLAYMODE) || gEntering_message) {
             gKey_down = -1;
@@ -610,9 +635,10 @@ void CheckReplayTurnOn(void) {
 }
 
 // IDA: void __cdecl InitializeActionReplay()
-// FUNCTION: CARM95 0x41c093
+// FUNCTION: CARM95 0x0041c093
 void InitializeActionReplay(void) {
     int i;
+    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gReplay_pixie_names); i++) {
         gReplay_pixies[i] = LoadPixelmap(gReplay_pixie_names[i]);
@@ -621,19 +647,23 @@ void InitializeActionReplay(void) {
 }
 
 // IDA: void __usercall DoActionReplay(tU32 pFrame_period@<EAX>)
-// FUNCTION: CARM95 0x41c0e6
+// FUNCTION: CARM95 0x0041c0e6
 void DoActionReplay(tU32 pFrame_period) {
+    LOG_TRACE("(%d)", pFrame_period);
+
     if (gReplay_rate != 0.f) {
         MoveReplayBuffer((tS32)gReplay_rate);
     }
 }
 
 // IDA: void __cdecl SynchronizeActionReplay()
-// FUNCTION: CARM95 0x41c11c
+// FUNCTION: CARM95 0x0041c11c
 void SynchronizeActionReplay(void) {
     FILE* f;
     tPath_name the_path;
+    // GLOBAL: CARM95 0x50a328
     static tU32 gLast_synch_time;
+    LOG_TRACE("()");
 
     while (gReplay_rate != 0.f) {
         if (PDGetTotalTime() - gLast_synch_time >= gFrame_period / fabsf(gReplay_rate)) {
