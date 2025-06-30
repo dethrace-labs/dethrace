@@ -1320,7 +1320,6 @@ void ReceivedJoin(tNet_contents* pContents, void* pSender_address) {
         SendOutPlayerList();
     }
 }
-
 // IDA: void __usercall KickPlayerOut(tPlayer_ID pID@<EAX>)
 // FUNCTION: CARM95 0x004496f8
 void KickPlayerOut(tPlayer_ID pID) {
@@ -1358,6 +1357,7 @@ void KickPlayerOut(tPlayer_ID pID) {
 }
 
 // IDA: void __usercall ReceivedLeave(tNet_contents *pContents@<EAX>, tNet_message *pMessage@<EDX>)
+// FUNCTION: CARM95 0x4496de
 void ReceivedLeave(tNet_contents* pContents, tNet_message* pMessage) {
     LOG_TRACE("(%p, %p)", pContents, pMessage);
 
@@ -1365,6 +1365,7 @@ void ReceivedLeave(tNet_contents* pContents, tNet_message* pMessage) {
 }
 
 // IDA: void __usercall NetFullScreenMessage(int pStr_index@<EAX>, int pLeave_it_up_there@<EDX>)
+// FUNCTION: CARM95 0x448495
 void NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
     tU32 start_time;
     char* s;
@@ -1429,6 +1430,7 @@ void NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
 }
 
 // IDA: void __usercall HostHasBittenTheDust(int pMessage_index@<EAX>)
+// FUNCTION: CARM95 0x44989e
 void HostHasBittenTheDust(int pMessage_index) {
     LOG_TRACE("(%d)", pMessage_index);
 
@@ -1440,6 +1442,7 @@ void HostHasBittenTheDust(int pMessage_index) {
 }
 
 // IDA: void __usercall ReceivedHosticide(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x449889
 void ReceivedHosticide(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
 
@@ -1454,6 +1457,7 @@ void ConfirmReceipt(void) {
 }
 
 // IDA: void __usercall ReceivedNewPlayerList(tNet_contents *pContents@<EAX>, tNet_message *pM@<EDX>)
+// FUNCTION: CARM95 0x4498d8
 void ReceivedNewPlayerList(tNet_contents* pContents, tNet_message* pM) {
     int i;
     LOG_TRACE("(%p, %p)", pContents, pM);
@@ -1508,6 +1512,7 @@ void ReceivedNewPlayerList(tNet_contents* pContents, tNet_message* pM) {
 }
 
 // IDA: void __usercall ReceivedRaceOver(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x449afb
 void ReceivedRaceOver(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
 
@@ -1518,6 +1523,7 @@ void ReceivedRaceOver(tNet_contents* pContents) {
 }
 
 // IDA: void __usercall ReceivedStatusReport(tNet_contents *pContents@<EAX>, tNet_message *pMessage@<EDX>)
+// FUNCTION: CARM95 0x449b46
 void ReceivedStatusReport(tNet_contents* pContents, tNet_message* pMessage) {
     int i;
     LOG_TRACE("(%p, %p)", pContents, pMessage);
@@ -1542,6 +1548,7 @@ void ReceivedStatusReport(tNet_contents* pContents, tNet_message* pMessage) {
 }
 
 // IDA: void __usercall ReceivedStartRace(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x449c42
 void ReceivedStartRace(tNet_contents* pContents) {
     int i;
     int index;
@@ -1593,6 +1600,7 @@ void ReceivedStartRace(tNet_contents* pContents) {
 }
 
 // IDA: void __usercall ReceivedGuaranteeReply(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x448695
 void ReceivedGuaranteeReply(tNet_contents* pContents) {
     int i;
     LOG_TRACE("(%p)", pContents);
@@ -1605,6 +1613,7 @@ void ReceivedGuaranteeReply(tNet_contents* pContents) {
 }
 
 // IDA: void __usercall ReceivedHeadup(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x4486fb
 void ReceivedHeadup(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
 
@@ -1614,6 +1623,7 @@ void ReceivedHeadup(tNet_contents* pContents) {
 }
 
 // IDA: void __usercall ReceivedHostQuery(tNet_contents *pContents@<EAX>, tNet_message *pMessage@<EDX>)
+// FUNCTION: CARM95 0x44872d
 void ReceivedHostQuery(tNet_contents* pContents, tNet_message* pMessage) {
     tNet_message* message;
     LOG_TRACE("(%p, %p)", pContents, pMessage);
@@ -1630,6 +1640,7 @@ void ReceivedHostQuery(tNet_contents* pContents, tNet_message* pMessage) {
 }
 
 // IDA: void __usercall ReceivedHostReply(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x44879d
 void ReceivedHostReply(tNet_contents* pContents) {
     tNet_message* message;
     LOG_TRACE("(%p)", pContents);
@@ -1650,6 +1661,7 @@ void ReceivedHostReply(tNet_contents* pContents) {
 }
 
 // IDA: void __usercall SendGuaranteeReply(tNet_message *pMessage@<EAX>, void *pSender_address@<EDX>)
+// FUNCTION: CARM95 0x44882b
 void SendGuaranteeReply(tNet_message* pMessage, void* pSender_address) {
     tNet_message* message;
     LOG_TRACE("(%p, %p)", pMessage, pSender_address);
@@ -1661,6 +1673,7 @@ void SendGuaranteeReply(tNet_message* pMessage, void* pSender_address) {
 }
 
 // IDA: int __usercall PlayerIsInList@<EAX>(tPlayer_ID pID@<EAX>)
+// FUNCTION: CARM95 0x449f18
 int PlayerIsInList(tPlayer_ID pID) {
     int i;
     LOG_TRACE("(%d)", pID);
@@ -1675,6 +1688,7 @@ int PlayerIsInList(tPlayer_ID pID) {
 }
 
 // IDA: void __usercall ReceivedTimeSync(tNet_contents *pContents@<EAX>, tNet_message *pMessage@<EDX>, tU32 pReceive_time@<EBX>)
+// FUNCTION: CARM95 0x448874
 void ReceivedTimeSync(tNet_contents* pContents, tNet_message* pMessage, tU32 pReceive_time) {
     LOG_TRACE("(%p, %p, %d)", pContents, pMessage, pReceive_time);
 
@@ -1684,6 +1698,7 @@ void ReceivedTimeSync(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
 }
 
 // IDA: void __usercall ReceivedConfirm(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x4488b4
 void ReceivedConfirm(tNet_contents* pContents) {
     int i;
     LOG_TRACE("(%p)", pContents);
@@ -1697,16 +1712,19 @@ void ReceivedConfirm(tNet_contents* pContents) {
 }
 
 // IDA: void __usercall ReceivedDisableCar(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x448914
 void ReceivedDisableCar(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
 }
 
 // IDA: void __usercall ReceivedEnableCar(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x44891f
 void ReceivedEnableCar(tNet_contents* pContents) {
     LOG_TRACE("(%p)", pContents);
 }
 
 // IDA: void __usercall ReceivedScores(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x44892a
 void ReceivedScores(tNet_contents* pContents) {
     int i;
     LOG_TRACE("(%p)", pContents);
@@ -1718,6 +1736,7 @@ void ReceivedScores(tNet_contents* pContents) {
 }
 
 // IDA: void __usercall ReceivedWasted(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x448981
 void ReceivedWasted(tNet_contents* pContents) {
     tNet_game_player_info* victim;
     tNet_game_player_info* culprit;
@@ -1788,6 +1807,7 @@ void ReceivedWasted(tNet_contents* pContents) {
 }
 
 // IDA: void __usercall ReceivedCarDetailsReq(tNet_contents *pContents@<EAX>, void *pSender_address@<EDX>)
+// FUNCTION: CARM95 0x448ca9
 void ReceivedCarDetailsReq(tNet_contents* pContents, void* pSender_address) {
     tNet_message* message;
     int i;
@@ -1805,6 +1825,7 @@ void ReceivedCarDetailsReq(tNet_contents* pContents, void* pSender_address) {
 }
 
 // IDA: void __usercall ReceivedCarDetails(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x448d70
 void ReceivedCarDetails(tNet_contents* pContents) {
     int i;
     int j;
@@ -1823,6 +1844,7 @@ void ReceivedCarDetails(tNet_contents* pContents) {
 }
 
 // IDA: void __usercall ReceivedGameScores(tNet_contents *pContents@<EAX>)
+// FUNCTION: CARM95 0x448e41
 void ReceivedGameScores(tNet_contents* pContents) {
     int i;
     LOG_TRACE("(%p)", pContents);
@@ -1836,6 +1858,7 @@ void ReceivedGameScores(tNet_contents* pContents) {
 }
 
 // IDA: void __usercall ReceivedMessage(tNet_message *pMessage@<EAX>, void *pSender_address@<EDX>, tU32 pReceive_time@<EBX>)
+// FUNCTION: CARM95 0x448eca
 void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceive_time) {
     tNet_contents* contents;
     int i;
@@ -1958,6 +1981,7 @@ void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceiv
 }
 
 // IDA: void __cdecl NetReceiveAndProcessMessages()
+// FUNCTION: CARM95 0x449f82
 void NetReceiveAndProcessMessages(void) {
     tNet_message* message;
     void* sender_address;
@@ -1983,6 +2007,7 @@ void NetReceiveAndProcessMessages(void) {
 }
 
 // IDA: void __cdecl BroadcastStatus()
+// FUNCTION: CARM95 0x44a046
 void BroadcastStatus(void) {
     tNet_message* message;
     LOG_TRACE("()");
@@ -1993,6 +2018,7 @@ void BroadcastStatus(void) {
 }
 
 // IDA: void __cdecl CheckForDisappearees()
+// FUNCTION: CARM95 0x44a2a3
 void CheckForDisappearees(void) {
     int i;
     int j;
@@ -2021,6 +2047,7 @@ void CheckForDisappearees(void) {
 }
 
 // IDA: void __cdecl CheckForPendingStartRace()
+// FUNCTION: CARM95 0x44a478
 void CheckForPendingStartRace(void) {
     int i;
     LOG_TRACE("()");
@@ -2036,6 +2063,7 @@ void CheckForPendingStartRace(void) {
 }
 
 // IDA: void __usercall NetService(int pIn_race@<EAX>)
+// FUNCTION: CARM95 0x44a08a
 void NetService(int pIn_race) {
     tU32 time;
     static tU32 last_status_broadcast;
@@ -2073,6 +2101,7 @@ void NetService(int pIn_race) {
 }
 
 // IDA: void __usercall NetFinishRace(tNet_game_details *pDetails@<EAX>, tRace_over_reason pReason@<EDX>)
+// FUNCTION: CARM95 0x44a4e1
 void NetFinishRace(tNet_game_details* pDetails, tRace_over_reason pReason) {
     tNet_message* the_message;
     LOG_TRACE("(%p, %d)", pDetails, pReason);
@@ -2084,6 +2113,7 @@ void NetFinishRace(tNet_game_details* pDetails, tRace_over_reason pReason) {
 }
 
 // IDA: void __usercall NetPlayerStatusChanged(tPlayer_status pNew_status@<EAX>)
+// FUNCTION: CARM95 0x44a525
 void NetPlayerStatusChanged(tPlayer_status pNew_status) {
     LOG_TRACE("(%d)", pNew_status);
     tNet_message* the_message;
@@ -2100,6 +2130,7 @@ void NetPlayerStatusChanged(tPlayer_status pNew_status) {
 }
 
 // IDA: tPlayer_status __cdecl NetGetPlayerStatus()
+// FUNCTION: CARM95 0x44a5d0
 tPlayer_status NetGetPlayerStatus(void) {
     LOG_TRACE("()");
 
@@ -2107,6 +2138,7 @@ tPlayer_status NetGetPlayerStatus(void) {
 }
 
 // IDA: int __usercall NetGuaranteedSendMessageToAllPlayers@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, int (*pNotifyFail)(tU32, tNet_message*)@<EBX>)
+// FUNCTION: CARM95 0x44a5ef
 int NetGuaranteedSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessage, int (*pNotifyFail)(tU32, tNet_message*)) {
     int i;
     int err;
@@ -2127,6 +2159,7 @@ int NetGuaranteedSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_messa
 }
 
 // IDA: int __usercall NetGuaranteedSendMessageToEverybody@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, int (*pNotifyFail)(tU32, tNet_message*)@<EBX>)
+// FUNCTION: CARM95 0x44a689
 int NetGuaranteedSendMessageToEverybody(tNet_game_details* pDetails, tNet_message* pMessage, int (*pNotifyFail)(tU32, tNet_message*)) {
     LOG_TRACE("(%p, %p, %p)", pDetails, pMessage, pNotifyFail);
 
@@ -2139,6 +2172,7 @@ int NetGuaranteedSendMessageToEverybody(tNet_game_details* pDetails, tNet_messag
 }
 
 // IDA: int __usercall NetGuaranteedSendMessageToHost@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, int (*pNotifyFail)(tU32, tNet_message*)@<EBX>)
+// FUNCTION: CARM95 0x44a6f9
 int NetGuaranteedSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage, int (*pNotifyFail)(tU32, tNet_message*)) {
     LOG_TRACE("(%p, %p, %p)", pDetails, pMessage, pNotifyFail);
 
@@ -2146,6 +2180,7 @@ int NetGuaranteedSendMessageToHost(tNet_game_details* pDetails, tNet_message* pM
 }
 
 // IDA: int __usercall NetGuaranteedSendMessageToPlayer@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, tPlayer_ID pPlayer@<EBX>, int (*pNotifyFail)(tU32, tNet_message*)@<ECX>)
+// FUNCTION: CARM95 0x44a721
 int NetGuaranteedSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer, int (*pNotifyFail)(tU32, tNet_message*)) {
     int i;
     LOG_TRACE("(%p, %p, %d, %p)", pDetails, pMessage, pPlayer, pNotifyFail);
@@ -2171,6 +2206,7 @@ int NetGuaranteedSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* 
 }
 
 // IDA: int __usercall NetGuaranteedSendMessageToAddress@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, void *pAddress@<EBX>, int (*pNotifyFail)(tU32, tNet_message*)@<ECX>)
+// FUNCTION: CARM95 0x44a80f
 int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress, int (*pNotifyFail)(tU32, tNet_message*)) {
     char buffer[256]; // Added by Dethrace
     LOG_TRACE("(%p, %p, %p, %p)", pDetails, pMessage, pAddress, pNotifyFail);
@@ -2202,6 +2238,7 @@ int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message*
 }
 
 // IDA: void __cdecl ResendGuaranteedMessages()
+// FUNCTION: CARM95 0x44a9f1
 void ResendGuaranteedMessages(void) {
     int i;
     int j;
@@ -2242,6 +2279,7 @@ void ResendGuaranteedMessages(void) {
 }
 
 // IDA: int __usercall SampleFailNotifier@<EAX>(tU32 pAge@<EAX>, tNet_message *pMessage@<EDX>)
+// FUNCTION: CARM95 0x44ad06
 int SampleFailNotifier(tU32 pAge, tNet_message* pMessage) {
     LOG_TRACE("(%d, %p)", pAge, pMessage);
 
@@ -2249,6 +2287,7 @@ int SampleFailNotifier(tU32 pAge, tNet_message* pMessage) {
 }
 
 // IDA: void __cdecl NetWaitForGuaranteeReplies()
+// FUNCTION: CARM95 0x44ad2f
 void NetWaitForGuaranteeReplies(void) {
     tU32 start_time;
     LOG_TRACE("()");
@@ -2263,6 +2302,7 @@ void NetWaitForGuaranteeReplies(void) {
 }
 
 // IDA: tNet_game_player_info* __usercall NetPlayerFromID@<EAX>(tPlayer_ID pPlayer@<EAX>)
+// FUNCTION: CARM95 0x44ad74
 tNet_game_player_info* NetPlayerFromID(tPlayer_ID pPlayer) {
     int i;
     LOG_TRACE("(%d)", pPlayer);
@@ -2276,6 +2316,7 @@ tNet_game_player_info* NetPlayerFromID(tPlayer_ID pPlayer) {
 }
 
 // IDA: tCar_spec* __usercall NetCarFromPlayerID@<EAX>(tPlayer_ID pPlayer@<EAX>)
+// FUNCTION: CARM95 0x44add4
 tCar_spec* NetCarFromPlayerID(tPlayer_ID pPlayer) {
     int i;
     tNet_game_player_info* player;
@@ -2289,6 +2330,7 @@ tCar_spec* NetCarFromPlayerID(tPlayer_ID pPlayer) {
 }
 
 // IDA: tNet_game_player_info* __usercall NetPlayerFromCar@<EAX>(tCar_spec *pCar@<EAX>)
+// FUNCTION: CARM95 0x44ae15
 tNet_game_player_info* NetPlayerFromCar(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
@@ -2302,6 +2344,7 @@ tNet_game_player_info* NetPlayerFromCar(tCar_spec* pCar) {
 }
 
 // IDA: tU32 __usercall DoCheckSum@<EAX>(tNet_message *pMessage@<EAX>)
+// FUNCTION: CARM95 0x44ae74
 tU32 DoCheckSum(tNet_message* pMessage) {
     int i;
     int j;
@@ -2320,6 +2363,7 @@ void GetCheckSum(tNet_message* pMessage) {
 }
 
 // IDA: void __usercall CheckCheckSum(tNet_message *pMessage@<EAX>)
+// FUNCTION: CARM95 0x44ae7f
 void CheckCheckSum(tNet_message* pMessage) {
     LOG_TRACE("(%p)", pMessage);
 }
