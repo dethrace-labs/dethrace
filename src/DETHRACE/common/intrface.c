@@ -121,7 +121,6 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
 // FUNCTION: CARM95 0x0047507b
 void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
     int i;
-    LOG_TRACE8("(%p, %p)", pSpec, pCopy_areas);
 
     for (i = 0; i < pSpec->number_of_recopy_areas; i++) {
         BrPixelmapRectangleCopy(

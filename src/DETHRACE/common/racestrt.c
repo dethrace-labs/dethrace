@@ -1510,7 +1510,6 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
     tU32* test;
     // GLOBAL: CARM95 0x536430
     static tU32 test2;
-    LOG_TRACE8("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
     if (gProgram_state.view_type == eVT_Opponents) {
         the_opponent = &gOpponents[gCurrent_race.opponent_list[gOpponent_index].index];
@@ -2018,7 +2017,6 @@ int CalcGridOffset(int pPosition) {
 // IDA: void __usercall GridDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x00452039
 void GridDraw(int pCurrent_choice, int pCurrent_mode) {
-    LOG_TRACE8("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
     if (gDraw_grid_status > eGrid_draw_none) {
         DrawGrid(gCurrent_graf_data->grid_x_pitch * CalcGridOffset(gOur_starting_position), 0);
@@ -2380,7 +2378,6 @@ int GridClickRight(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int 
 // IDA: int __usercall CheckChallenge@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x0045378a
 int CheckChallenge(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE8("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (!gChallenge_time || PDGetTotalTime() < gChallenge_time) {
         return 0;

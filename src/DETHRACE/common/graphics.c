@@ -691,7 +691,6 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     int chunk_length;
     char* destn_ptr;
     char* destn_ptr2;
-    LOG_TRACE8("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
 
     if (gBack_screen->type == BR_PMT_RGB_565) {
         Copy8BitStripImageTo16Bit(
@@ -2318,7 +2317,6 @@ void ResetPalette(void) {
 // FUNCTION: CARM95 0x004b7a74
 void Darken(tU8* pPtr, unsigned int pDarken_amount) {
     unsigned int value;
-    LOG_TRACE10("(%p, %d)", pPtr, pDarken_amount);
 
     *pPtr = (pDarken_amount * *pPtr) / 256;
 }
@@ -2329,7 +2327,6 @@ void SetFadedPalette(int pDegree) {
     int j;
     br_pixelmap* the_palette;
     char* the_pixels;
-    LOG_TRACE10("(%d)", pDegree);
 
     memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
     for (j = 0; j < 256; j++) {

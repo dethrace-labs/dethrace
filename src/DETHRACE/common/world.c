@@ -3049,7 +3049,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
 #if defined(DETHRACE_FIX_BUGS)
     /* Display skidmarks even if the race has no specified skidmark material. */
     if (!skid_mark_cnt && num_materials) {
-        LOG_WARN("Track %s has no valid skid mark material, setting the default one",
+        LOG_WARN2("Track %s has no valid skid mark material, setting the default one",
             pRace_info->track_file_name);
         LoadSinglePixelmap(&gTrack_storage_space, "SKIDMARK.PIX");
         material = LoadSingleMaterial(&gTrack_storage_space, "SKIDMARK.MAT");

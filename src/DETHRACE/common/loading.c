@@ -1586,7 +1586,6 @@ void LoadGear(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 // IDA: void __usercall AddRefOffset(int *pRef_holder@<EAX>)
 // FUNCTION: CARM95 0x0042387c
 void AddRefOffset(int* pRef_holder) {
-    LOG_TRACE8("(%p)", pRef_holder);
 
     if (*pRef_holder >= 0) {
         *pRef_holder += gGroove_funk_offset;
@@ -2441,14 +2440,14 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     fclose(g);
 
 #if DETHRACE_FIX_BUGS
-#define CHECK_BINDING_INDEX(IDX)                                                                                   \
-    do {                                                                                                           \
-        if ((IDX) >= 0) {                                                                                          \
-            if (IDX >= COUNT_OF(gGroove_funk_bindings) || gGroove_funk_bindings[IDX] == NULL) {                    \
-                LOG_WARN("Disabling invalid groove binding for " #IDX "=%d (%d)", IDX, IDX - gGroove_funk_offset); \
-                IDX = -1;                                                                                          \
-            }                                                                                                      \
-        }                                                                                                          \
+#define CHECK_BINDING_INDEX(IDX)                                                                                    \
+    do {                                                                                                            \
+        if ((IDX) >= 0) {                                                                                           \
+            if (IDX >= COUNT_OF(gGroove_funk_bindings) || gGroove_funk_bindings[IDX] == NULL) {                     \
+                LOG_WARN3("Disabling invalid groove binding for " #IDX "=%d (%d)", IDX, IDX - gGroove_funk_offset); \
+                IDX = -1;                                                                                           \
+            }                                                                                                       \
+        }                                                                                                           \
     } while (0)
     for (i = 0; i < pCar_spec->number_of_steerable_wheels; i++) {
         CHECK_BINDING_INDEX(pCar_spec->steering_ref[i]);
@@ -3483,7 +3482,6 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
     static tPath_name cd_pathname;
     FILE* paths_txt_fp;
     tPath_name paths_txt;
-    LOG_TRACE9("()");
 
     if (!got_it_already) {
         sprintf(paths_txt, "%s%s%s", gApplication_path, gDir_separator, "PATHS.TXT");

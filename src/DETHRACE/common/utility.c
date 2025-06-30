@@ -63,7 +63,6 @@ br_pixelmap* gSource_for_16bit_palette;
 // IDA: int __cdecl CheckQuit()
 // FUNCTION: CARM95 0x004c1590
 int CheckQuit(void) {
-    LOG_TRACE8("()");
 
     if (gIn_check_quit) {
         return 0;
@@ -256,7 +255,6 @@ int IRandomPosNeg(int pN) {
 // IDA: float __cdecl FRandomBetween(float pA, float pB)
 // FUNCTION: CARM95 0x004c16bf
 float FRandomBetween(float pA, float pB) {
-    LOG_TRACE8("(%f, %f)", pA, pB);
     return (double)rand() * (pB - pA) / (double)RAND_MAX + pA;
 }
 
@@ -270,7 +268,6 @@ float FRandomPosNeg(float pN) {
 // IDA: br_scalar __cdecl SRandomBetween(br_scalar pA, br_scalar pB)
 // FUNCTION: CARM95 0x004c1715
 br_scalar SRandomBetween(br_scalar pA, br_scalar pB) {
-    LOG_TRACE8("(%f, %f)", pA, pB);
 
     return FRandomBetween(pA, pB);
 }
@@ -351,7 +348,6 @@ char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
 // IDA: char* __usercall GetALineAndDontArgue@<EAX>(FILE *pF@<EAX>, char *pS@<EDX>)
 // FUNCTION: CARM95 0x004c1d44
 char* GetALineAndDontArgue(FILE* pF, char* pS) {
-    // LOG_TRACE10("(%p, \"%s\")", pF, pS);
 
     PossibleService();
     return GetALineWithNoPossibleService(pF, (unsigned char*)pS);
@@ -793,7 +789,6 @@ void PrintScreen(void) {
 // IDA: tU32 __cdecl GetTotalTime()
 // FUNCTION: CARM95 0x004c2771
 tU32 GetTotalTime(void) {
-    LOG_TRACE9("()");
 
     if (gAction_replay_mode) {
         return gLast_replay_frame_time;
@@ -1839,7 +1834,6 @@ void NobbleNonzeroBlacks(br_pixelmap* pPalette) {
 // IDA: int __usercall PDCheckDriveExists@<EAX>(char *pThe_path@<EAX>)
 // FUNCTION: CARM95 0x004c3e0c
 int PDCheckDriveExists(char* pThe_path) {
-    LOG_TRACE9("(\"%s\")", pThe_path);
 
     return PDCheckDriveExists2(pThe_path, NULL, 0);
 }

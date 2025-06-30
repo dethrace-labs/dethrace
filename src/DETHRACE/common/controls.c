@@ -1144,7 +1144,6 @@ void CheckHelp(void) {
 void CheckLoadSave(void) {
     int save_load_allowed;
     int switched_res;
-    LOG_TRACE8("()");
 
     save_load_allowed = !gProgram_state.saving && !gProgram_state.loading && gProgram_state.prog_status == eProg_game_ongoing && !gProgram_state.dont_save_or_load;
 

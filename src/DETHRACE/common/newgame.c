@@ -187,7 +187,6 @@ int FrankAnneDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // IDA: void __usercall FrankAnneDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x004b01fb
 void FrankAnneDraw(int pCurrent_choice, int pCurrent_mode) {
-    LOG_TRACE9("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
     if (gTyping) {
         if (GetTotalTime() & 0x100) {

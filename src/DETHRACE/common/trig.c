@@ -382,7 +382,6 @@ void DRMatrix34RotateX(br_matrix34* mat, br_angle rx) {
 void DRMatrix34RotateY(br_matrix34* mat, br_angle ry) {
     br_scalar s;
     br_scalar c;
-    LOG_TRACE8("(%p, %d)", mat, ry);
 
     s = FastScalarSinAngle(ry);
     c = FastScalarCosAngle(ry);
@@ -405,7 +404,6 @@ void DRMatrix34RotateY(br_matrix34* mat, br_angle ry) {
 void DRMatrix34RotateZ(br_matrix34* mat, br_angle rz) {
     br_scalar s;
     br_scalar c;
-    LOG_TRACE8("(%p, %d)", mat, rz);
 
     s = FastScalarSinAngle(rz);
     c = FastScalarCosAngle(rz);

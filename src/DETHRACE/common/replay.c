@@ -105,7 +105,6 @@ tAction_replay_camera_type gAction_replay_camera_mode;
 // IDA: int __cdecl ReplayIsPaused()
 // FUNCTION: CARM95 0x0041adc0
 int ReplayIsPaused(void) {
-    LOG_TRACE8("()");
 
     return gReplay_rate == 0.f;
 }

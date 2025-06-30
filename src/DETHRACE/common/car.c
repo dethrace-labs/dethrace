@@ -473,7 +473,7 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
         break;
 
     default:
-        LOG_WARN("Case %d not handled", pCar->driver);
+        LOG_WARN2("Case %d not handled", pCar->driver);
         break;
     }
     PossibleService();

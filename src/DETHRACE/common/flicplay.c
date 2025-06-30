@@ -659,7 +659,6 @@ int TranslationMode(void) {
 // IDA: void __cdecl DontLetFlicFuckWithPalettes()
 // FUNCTION: CARM95 0x004959ea
 void DontLetFlicFuckWithPalettes(void) {
-    LOG_TRACE8("()");
 
     gPalette_fuck_prevention = 1;
 }
@@ -667,7 +666,6 @@ void DontLetFlicFuckWithPalettes(void) {
 // IDA: void __cdecl LetFlicFuckWithPalettes()
 // FUNCTION: CARM95 0x004959ff
 void LetFlicFuckWithPalettes(void) {
-    LOG_TRACE8("()");
 
     gPalette_fuck_prevention = 0;
 }
@@ -690,7 +688,6 @@ void ReilluminateFlics(void) {
 // IDA: void __cdecl TurnFlicTransparencyOn()
 // FUNCTION: CARM95 0x00495a43
 void TurnFlicTransparencyOn(void) {
-    LOG_TRACE8("()");
 
     gTransparency_on = 1;
 }
@@ -698,7 +695,6 @@ void TurnFlicTransparencyOn(void) {
 // IDA: void __cdecl TurnFlicTransparencyOff()
 // FUNCTION: CARM95 0x00495a58
 void TurnFlicTransparencyOff(void) {
-    LOG_TRACE8("()");
     gTransparency_on = 0;
 }
 
@@ -1094,7 +1090,6 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU32 the_row_bytes;
     tU16* line_pixel_ptr;
     tU16 the_word;
-    LOG_TRACE8("(%p, %d)", pFlic_info, chunk_length);
 
     line_count = MemReadU16(&pFlic_info->data);
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
@@ -1276,7 +1271,6 @@ void DoRunLengthTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8* line_pixel_ptr;
     tU8 the_byte;
     tU32 the_row_bytes;
-    LOG_TRACE8("(%p, %d)", pFlic_info, chunk_length);
 
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
     pixel_ptr = pFlic_info->first_pixel;
@@ -1797,7 +1791,6 @@ void ProcessFlicQueue(tU32 pInterval) {
     tFlic_descriptor* doomed_flic;
     tU32 new_time;
     int finished_playing;
-    LOG_TRACE8("(%d)", pInterval);
 
     DontLetFlicFuckWithPalettes();
     TurnFlicTransparencyOn();

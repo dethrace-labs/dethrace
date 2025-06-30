@@ -411,7 +411,6 @@ int PDNetGetNextJoinGame(tNet_game_details* pGame, int pIndex) {
     int j;
     int number_of_hosts_has_changed;
     char str[256];
-    LOG_TRACE9("(%p, %d)", pGame, pIndex);
 
     dr_dprintf("PDNetGetNextJoinGame(): pIndex is %d", pIndex);
     if (pIndex == 0) {

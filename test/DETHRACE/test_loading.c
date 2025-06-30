@@ -225,7 +225,7 @@ void test_loading_LoadOpponentCar() {
     tBrender_storage storage;
     InitialiseStorageSpace(&storage, 50, 50, 50, 50);
     for (int i = 0; i < 10; i++) {
-        LOG_DEBUG("iteration %d", i);
+        LOG_DEBUG2("iteration %d", i);
         LoadCar("NEWEAGLE.TXT", eDriver_oppo, &car_spec, eFrankie, "playerName", &storage);
         ClearOutStorageSpace(&storage);
     }

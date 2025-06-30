@@ -128,7 +128,6 @@ void ResetPollKeys(void) {
 // IDA: void __cdecl CheckKeysForMouldiness()
 // FUNCTION: CARM95 0x00471cdb
 void CheckKeysForMouldiness(void) {
-    LOG_TRACE9("()");
 
     if (PDGetTotalTime() - gLast_poll_keys > 500) {
         ResetPollKeys();
@@ -515,7 +514,6 @@ void RollLettersIn(void) {
     tU8* saved_char_ptr;
     tU8* source_ptr;
     tU8 the_byte;
-    LOG_TRACE9("()");
 
     new_time = PDGetTotalTime();
     if (gLast_roll) {
