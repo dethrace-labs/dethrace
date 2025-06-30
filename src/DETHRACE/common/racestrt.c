@@ -2936,7 +2936,7 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
             gCurrent_net_game->status.stage = eNet_game_ready;
         }
         SetUpNetCarPositions();
-        // gNet_synch_start = PDGetTotalTime();
+        gNet_synch_start = PDGetTotalTime();
     }
     TurnOnPaletteConversion();
     switch (pMode) {

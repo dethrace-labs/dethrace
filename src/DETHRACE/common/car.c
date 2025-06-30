@@ -4949,14 +4949,13 @@ void PutOpponentsInNeutral(void) {
 // FUNCTION: CARM95 0x004879d8
 void SetPanningFieldOfView(void) {
     br_camera* camera_ptr;
-    static br_angle panning_angle = 0; // Added by DethRace
     LOG_TRACE("()");
 
     camera_ptr = gCamera->type_data;
-    if (panning_angle == 0) {
-        panning_angle = BrDegreeToAngle(gCamera_angle) * 0.7f;
+    if (gPanning_camera_angle == 0) {
+        gPanning_camera_angle = BrDegreeToAngle(gCamera_angle) * 0.7f;
     }
-    camera_ptr->field_of_view = panning_angle;
+    camera_ptr->field_of_view = gPanning_camera_angle;
 }
 
 // IDA: void __usercall CheckDisablePlingMaterials(tCar_spec *pCar@<EAX>)

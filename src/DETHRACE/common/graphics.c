@@ -3053,7 +3053,7 @@ int NewCursorGiblet(int pX_coord, int pY_coord, float pX_speed, float pY_speed, 
 // IDA: int __cdecl DoMouseCursor()
 // FUNCTION: CARM95 0x004b89b4
 int DoMouseCursor(void) {
-    int x_coord; // Added by DethRace
+    int x_coord;
     int y_coord;
     int mouse_moved;
     int new_required;
