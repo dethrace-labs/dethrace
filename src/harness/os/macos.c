@@ -29,6 +29,7 @@
 #include <time.h>
 #include <unistd.h> // for close()
 #include <unistd.h>
+#include <SDL.h>
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof(A[0]))
 
@@ -284,13 +285,8 @@ char* OS_Basename(const char* path) {
 }
 
 char* OS_GetWorkingDirectory(char* argv0) {
-    // The application executable in a MacOS bundle is in <bundle.app>/Contents/MacOS/executable
-    // We strip off the bundle paths to get the path that the <bundle.app> is located in
-    char* bundlePath = strstr(argv0, ".app/Contents/MacOS");
-    if (bundlePath != NULL) {
-        *bundlePath = '\0';
-    }
-    return OS_Dirname(argv0);
+    // Looks for the data in "~/Library/Application Support/dethrace"
+    return SDL_GetPrefPath(NULL, "dethrace");
 }
 
 int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
