@@ -1013,6 +1013,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     tU32 the_time;
     tU32 time;
     float credits_squared;
+    // GLOBAL: CARM95 0x5213dc
     static tU32 last_earn_time;
     char s[256];
     tImpact_location modified_location_1;

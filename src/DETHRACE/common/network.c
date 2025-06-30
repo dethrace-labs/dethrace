@@ -1107,8 +1107,11 @@ tNet_message* NetAllocateMessage(int pSize) {
     void* pointer;
     void* last_message;
     char* test;
+    // GLOBAL: CARM95 0x50d2d0
     static int rr_min;
+    // GLOBAL: CARM95 0x50d2d4
     static int rr_mid;
+    // GLOBAL: CARM95 0x50d2d8
     static int rr_max;
     tNet_message* message;
     int i;
@@ -1742,10 +1745,15 @@ void ReceivedWasted(tNet_contents* pContents) {
     tNet_game_player_info* culprit;
     char s[256];
     tCar_spec* car;
+    // GLOBAL: CARM95 0x50d2dc
     static tS32 last_got_wasted_time;
+    // GLOBAL: CARM95 0x50d2e0
     static tS32 last_wasted_em_time;
+    // GLOBAL: CARM95 0x50d2e4
     static tS32 last_wasty_message_time;
+    // GLOBAL: CARM95 0x50d2e8
     static tNet_game_player_info* last_culprit;
+    // GLOBAL: CARM95 0x50d2ec
     static tNet_game_player_info* last_victim;
     LOG_TRACE("(%p)", pContents);
 
@@ -2066,6 +2074,7 @@ void CheckForPendingStartRace(void) {
 // FUNCTION: CARM95 0x0044a08a
 void NetService(int pIn_race) {
     tU32 time;
+    // GLOBAL: CARM95 0x50d2f0
     static tU32 last_status_broadcast;
 
     if (gIn_net_service || gNet_service_disable) {

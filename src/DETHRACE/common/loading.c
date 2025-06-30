@@ -3425,6 +3425,7 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     tPath_name CD_dir;
     tPath_name path_file;
     tPath_name source_check;
+    // GLOBAL: CARM95 0x50a5e0
     static int source_exists = 1;
     int len;
     char ch;
@@ -3564,7 +3565,9 @@ FILE* DRfopen(char* pFilename, char* pMode) {
 // IDA: int __usercall GetCDPathFromPathsTxtFile@<EAX>(char *pPath_name@<EAX>)
 // FUNCTION: CARM95 0x00426cc5
 int GetCDPathFromPathsTxtFile(char* pPath_name) {
+    // GLOBAL: CARM95 0x50a5e4
     static int got_it_already = 0;
+    // GLOBAL: CARM95 0x531e00
     static tPath_name cd_pathname;
     FILE* paths_txt_fp;
     tPath_name paths_txt;

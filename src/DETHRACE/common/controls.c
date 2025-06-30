@@ -1332,7 +1332,9 @@ int HasCarFallenOffWorld(tCar_spec* pCar) {
 // IDA: void __cdecl CheckForBeingOutOfThisWorld()
 // FUNCTION: CARM95 0x004a3328
 void CheckForBeingOutOfThisWorld(void) {
+    // GLOBAL: CARM95 0x53d638
     static tU32 the_time;
+    // GLOBAL: CARM95 0x51cf3c
     static tU32 sLast_check;
     int time_step;
     LOG_TRACE("()");
@@ -1635,11 +1637,17 @@ void CheckOtherRacingKeys(void) {
     int flip_up_flag;
     tCar_spec* car;
     float bodywork_repair_amount;
+    // GLOBAL: CARM95 0x51cf40
     static tU32 total_repair_cost;
+    // GLOBAL: CARM95 0x51cf44
     static tS3_sound_tag sound_tag;
+    // GLOBAL: CARM95 0x53d640
     static br_scalar amount;
+    // GLOBAL: CARM95 0x51cf48
     static int NeedToExpandBoundingBox;
+    // GLOBAL: CARM95 0x53d600
     static int total_difference;
+    // GLOBAL: CARM95 0x51cf4c
     static int stopped_repairing;
     LOG_TRACE("()");
 
@@ -1801,6 +1809,7 @@ int CheckRecoverCost(void) {
 void SortOutRecover(tCar_spec* pCar) {
     int the_time;
     int val;
+    // GLOBAL: CARM95 0x51cf50
     static int old_time;
     LOG_TRACE("(%p)", pCar);
 
@@ -2146,6 +2155,7 @@ void PollCameraControls(tU32 pTime_difference) {
     int swirl_mode;
     int up_and_down_mode;
     int going_up;
+    // GLOBAL: CARM95 0x51cf54
     static int last_swirl_mode = 0;
     LOG_TRACE("(%d)", pTime_difference);
 
@@ -2298,7 +2308,9 @@ void LoseDosh(void) {
 // IDA: void __cdecl ToggleMap()
 // FUNCTION: CARM95 0x004a47f7
 void ToggleMap(void) {
+    // GLOBAL: CARM95 0x53d6a0
     static int old_indent;
+    // GLOBAL: CARM95 0x53d634
     static int was_in_cockpit;
     LOG_TRACE("()");
 
@@ -2339,6 +2351,7 @@ int HornBlowing(void) {
 // IDA: void __cdecl ToggleArrow()
 // FUNCTION: CARM95 0x004a4947
 void ToggleArrow(void) {
+    // GLOBAL: CARM95 0x53d630
     static br_actor* old_actor;
     LOG_TRACE("()");
 
@@ -2638,8 +2651,11 @@ void UserSendMessage(void) {
 // IDA: void __cdecl EnterUserMessage()
 // FUNCTION: CARM95 0x004a50cf
 void EnterUserMessage(void) {
+    // GLOBAL: CARM95 0x51cf58
     static int last_key;
+    // GLOBAL: CARM95 0x51cf5c
     static int about_to_die;
+    // GLOBAL: CARM95 0x53d69c
     static tU32 next_time;
     char* the_message;
     char* p;

@@ -863,6 +863,7 @@ int IsCarInTheSea(void) {
 // IDA: void __usercall RememberSafePosition(tCar_spec *car@<EAX>, tU32 pTime@<EDX>)
 // FUNCTION: CARM95 0x004771a2
 void RememberSafePosition(tCar_spec* car, tU32 pTime) {
+    // GLOBAL: CARM95 0x514e34
     static tU32 time_count;
     int j;
     br_vector3 r;
@@ -1062,6 +1063,7 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
 void PrepareCars(tU32 pFrame_start_time) {
     tCar_spec* car;
     int i;
+    // GLOBAL: CARM95 0x514e3c
     static tU32 last_frame_start;
     LOG_TRACE("(%d)", pFrame_start_time);
 
@@ -1184,6 +1186,7 @@ void ResetOldmat(void) {
     tCar_spec* car;
     int i;
     br_matrix34 mat;
+    // GLOBAL: CARM95 0x514e40
     static int normalise_count = 0;
     LOG_TRACE("()");
 
@@ -2221,7 +2224,9 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     br_scalar rr_oil_factor;
     br_matrix34* mat;
     tMaterial_modifiers* mat_list;
+    // GLOBAL: CARM95 0x514e4c
     static br_scalar stop_timer;
+    // GLOBAL: CARM95 0x514e50
     static br_scalar slide_dist;
     tDamage_type dam;
     br_scalar v;
@@ -2923,6 +2928,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     int k;
     int material;
     int noise_defeat;
+    // GLOBAL: CARM95 0x53a52c
     static int oldk;
     br_scalar min;
     br_scalar max;
@@ -3393,7 +3399,9 @@ void AddFrictionCarToCar(tCollision_info* car1, tCollision_info* car2, br_vector
 // FUNCTION: CARM95 0x00482070
 void ScrapeNoise(br_scalar vel, br_vector3* position, int material) {
     tS3_volume vol;
+    // GLOBAL: CARM95 0x514e54
     static tS3_sound_tag scrape_tag;
+    // GLOBAL: CARM95 0x53a53c
     static tS3_volume last_scrape_vol;
     br_vector3 velocity;
     br_vector3 position_in_br;
@@ -3492,7 +3500,9 @@ void StopSkid(tCar_spec* pC) {
 // IDA: void __usercall CrashNoise(br_vector3 *pForce@<EAX>, br_vector3 *position@<EDX>, int material@<EBX>)
 // FUNCTION: CARM95 0x0048249d
 void CrashNoise(br_vector3* pForce, br_vector3* position, int material) {
+    // GLOBAL: CARM95 0x514e60
     static tS3_sound_tag crunch_tag;
+    // GLOBAL: CARM95 0x53a540
     static tS3_volume last_crunch_vol;
     tS3_volume vol;
     br_vector3 velocity;
@@ -4415,6 +4425,7 @@ void SetAmbientPratCam(tCar_spec* pCar) {
     br_scalar abs_omega_y;
     br_scalar abs_omega_z;
     tU32 the_time;
+    // GLOBAL: CARM95 0x53a598
     static tU32 last_time_on_ground;
     LOG_TRACE("(%p)", pCar);
 
@@ -4784,7 +4795,9 @@ tCar_spec* GetRaceLeader(void) {
 // IDA: void __cdecl AmIGettingBoredWatchingCameraSpin()
 // FUNCTION: CARM95 0x004876f1
 void AmIGettingBoredWatchingCameraSpin(void) {
+    // GLOBAL: CARM95 0x53a528
     static tU32 time_of_death;
+    // GLOBAL: CARM95 0x514e64
     static tU32 headup_timer;
     tCar_spec* car;
     char s[256];
@@ -4859,6 +4872,7 @@ void ViewNetPlayer(void) {
 // IDA: void __cdecl ViewOpponent()
 // FUNCTION: CARM95 0x00487248
 void ViewOpponent(void) {
+    // GLOBAL: CARM95 0x514e68
     static int n;
     LOG_TRACE("()");
 
@@ -4987,6 +5001,7 @@ void CheckDisablePlingMaterials(tCar_spec* pCar) {
 // IDA: void __usercall PositionExternalCamera(tCar_spec *c@<EAX>, tU32 pTime@<EDX>)
 // FUNCTION: CARM95 0x0048754a
 void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
+    // GLOBAL: CARM95 0x514e6c
     static int old_camera_mode;
     br_camera* camera_ptr;
     LOG_TRACE("(%p, %d)", c, pTime);
@@ -5084,11 +5099,17 @@ int IncidentCam(tCar_spec* c, tU32 pTime) {
     br_vector3 murderer_pos;
     br_scalar ts;
     tCar_spec* car2;
+    // GLOBAL: CARM95 0x514e70
     static tU32 next_incident_time = 0;
+    // GLOBAL: CARM95 0x514e74
     static tIncident_type type = eNo_incident;
+    // GLOBAL: CARM95 0x53a5b0
     static float severity;
+    // GLOBAL: CARM95 0x53a588
     static tIncident_info info;
+    // GLOBAL: CARM95 0x514e78
     static int random = 1;
+    // GLOBAL: CARM95 0x514e7c
     static int count = 0;
     br_scalar temp;
     br_vector3 old_cam_pos;
@@ -5292,6 +5313,7 @@ void PanningExternalCamera(tCar_spec* c, tU32 pTime) {
     br_matrix34* m1;
     br_vector3 tv;
     br_scalar ts;
+    // GLOBAL: CARM95 0x514e80
     static int inside_camera_zone = 1;
     LOG_TRACE("(%p, %d)", c, pTime);
 
@@ -5558,6 +5580,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
 void MoveWithWheels(tCar_spec* c, br_vector3* vn, int manual_swing) {
     br_angle yaw;
     br_angle theta;
+    // GLOBAL: CARM95 0x514e84
     static int move_with_wheels;
     LOG_TRACE("(%p, %p, %d)", c, vn, manual_swing);
 
@@ -5601,8 +5624,11 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     br_scalar cos_dtheta;
     br_scalar sign;
     int manual_swing;
+    // GLOBAL: CARM95 0x514e88
     static br_angle omega = 0;
+    // GLOBAL: CARM95 0x514e8c
     static int elapsed_time = -1;
+    // GLOBAL: CARM95 0x514e90
     static br_vector3 old_vn;
     LOG_TRACE("(%p, %p, %p, %p, %d)", c, m1, m2, vn, pTime);
 
@@ -6016,6 +6042,7 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
     br_vector3 step;
     br_matrix34* mat;
     br_angle theta;
+    // GLOBAL: CARM95 0x514e9c
     static br_scalar vel = 0.f;
     tFace_ref faces[20];
     tBounds bnds;
@@ -6573,9 +6600,13 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     br_vector3 sep;
     br_vector3 tv;
     int add_point;
+    // GLOBAL: CARM95 0x53cff0
     static br_vector3 oldr1;
+    // GLOBAL: CARM95 0x53a568
     static br_vector3 oldr2;
+    // GLOBAL: CARM95 0x53a558
     static br_vector3 oldn1;
+    // GLOBAL: CARM95 0x53a548
     static br_vector3 oldn2;
     static int is_old_point_available;
     LOG_TRACE("(%p, %p, %d)", car1, car2, pPass);
@@ -7393,6 +7424,7 @@ int TestForNan(float* f) {
 // FUNCTION: CARM95 0x00493036
 void CheckCameraHither(void) {
     br_camera* cam;
+    // GLOBAL: CARM95 0x514ea4
     static int old_hither;
     LOG_TRACE("()");
 
@@ -7639,6 +7671,7 @@ int DoPullActorFromWorld(br_actor* pActor) {
 // IDA: void __usercall CheckForDeAttachmentOfNonCars(tU32 pTime@<EAX>)
 // FUNCTION: CARM95 0x00493c46
 void CheckForDeAttachmentOfNonCars(tU32 pTime) {
+    // GLOBAL: CARM95 0x514ea8
     static tU32 total_time;
     br_bounds bnds;
     int i;

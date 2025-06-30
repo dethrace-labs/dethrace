@@ -1046,6 +1046,7 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
     int end_box;
     tDR_font* font_n;
     tDR_font* font_k;
+    // GLOBAL: CARM95 0x51a654
     static int on_radios_last_time;
     LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 

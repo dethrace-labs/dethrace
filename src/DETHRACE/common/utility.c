@@ -1079,6 +1079,7 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
 // FUNCTION: CARM95 0x004c2fdb
 void PossibleService(void) {
     tU32 time;
+    // GLOBAL: CARM95 0x5214b4
     static tU32 last_service = 0;
 
     time = PDGetTotalTime();
@@ -1435,6 +1436,7 @@ int NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD) {
 br_material* DRMaterialClone(br_material* pMaterial) {
     br_material* the_material;
     char s[256];
+    // GLOBAL: CARM95 0x5214b8
     static int name_suffix = 0;
     LOG_TRACE("(%p)", pMaterial);
 

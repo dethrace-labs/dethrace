@@ -103,6 +103,7 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
     br_face* face;
     int changed_one;
     char s[256];
+    // GLOBAL: CARM95 0x53e47c
     static tU16 nfaces_allocated;
     LOG_TRACE("(%p, %p)", pActor, pModel);
 
@@ -413,15 +414,25 @@ void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMa
 // IDA: void __usercall RenderTrack(br_actor *pWorld@<EAX>, tTrack_spec *pTrack_spec@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, int pRender_blends)
 // FUNCTION: CARM95 0x004a944a
 void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, br_matrix34* pCamera_to_world, int pRender_blends) {
+    // GLOBAL: CARM95 0x53e4ac
     static tU8 column_x;
+    // GLOBAL: CARM95 0x53e490
     static tU8 column_z;
+    // GLOBAL: CARM95 0x53e48c
     static tU8 min_x;
+    // GLOBAL: CARM95 0x53e480
     static tU8 max_x;
+    // GLOBAL: CARM95 0x53e494
     static tU8 min_z;
+    // GLOBAL: CARM95 0x53e484
     static tU8 max_z;
+    // GLOBAL: CARM95 0x53e470
     static br_vector3 edge_before;
+    // GLOBAL: CARM95 0x53e4a0
     static br_vector3 edge_after;
+    // GLOBAL: CARM95 0x53e498
     static br_camera* camera;
+    // GLOBAL: CARM95 0x53e49c
     static br_scalar tan_fov_ish;
     static br_actor* result;
     LOG_TRACE("(%p, %p, %p, %p, %d)", pWorld, pTrack_spec, pCamera, pCamera_to_world, pRender_blends);

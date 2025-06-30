@@ -120,6 +120,7 @@ void ToggleInfo(void) {
 // IDA: void __cdecl CalculateFrameRate()
 // FUNCTION: CARM95 0x004706fa
 void CalculateFrameRate(void) {
+    // GLOBAL: CARM95 0x53a0ec
     static tU32 last_time;
     tU32 new_time;
     static int last_rates[30];
@@ -187,6 +188,7 @@ void MungeHeadups(void) {
     float bearing;
     br_material* nearby;
     tPixelmap_user_data* user;
+    // GLOBAL: CARM95 0x53a1ac
     static tU32 last_rattle_time;
     LOG_TRACE("()");
 
@@ -409,6 +411,7 @@ void UpdateFramePeriod(tU32* pCamera_period) {
     tU32 new_tick_count;
     tU32 new_camera_tick_count;
     int error;
+    // GLOBAL: CARM95 0x514b10
     static int last_AR_mode;
     LOG_TRACE("(%p)", pCamera_period);
 
@@ -493,6 +496,7 @@ tU32 GetLastTickCount(void) {
 void CheckTimer(void) {
     tS32 time_in_seconds;
     tS32 time_left;
+    // GLOBAL: CARM95 0x514b14
     static tU32 last_time_in_seconds = 0;
     static tU32 last_demo_time_in_seconds = 0;
     LOG_TRACE("()");

@@ -293,7 +293,9 @@ void RampUpRate(float* pRate, tU32 pTime) {
 // FUNCTION: CARM95 0x004158c0
 void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
     tU32 the_time;
+    // GLOBAL: CARM95 0x530e1c
     static tU32 last_time;
+    // GLOBAL: CARM95 0x530e9c
     static tU32 last_change_time;
     int credit_delta;
     float old_temp_increase;

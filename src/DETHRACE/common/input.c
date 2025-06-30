@@ -78,9 +78,13 @@ void SetJoystickArrays(int* pKeys, int pMark) {
     int i;
     tS32 joyX;
     tS32 joyY;
+    // GLOBAL: CARM95 0x53a1b4
     static tS32 old_joy1X;
+    // GLOBAL: CARM95 0x53a43c
     static tS32 old_joy1Y;
+    // GLOBAL: CARM95 0x53a1b0
     static tS32 old_joy2X;
+    // GLOBAL: CARM95 0x53a23c
     static tS32 old_joy2Y;
 }
 
@@ -246,11 +250,17 @@ int AnyKeyDown(void) {
 // IDA: tU32* __cdecl KevKeyService()
 // FUNCTION: CARM95 0x0047202c
 tU32* KevKeyService(void) {
+    // GLOBAL: CARM95 0x514c8c
     static tU32 sum = 0;
+    // GLOBAL: CARM95 0x514c90
     static tU32 code = 0;
+    // GLOBAL: CARM95 0x514c94
     static tU32 code2 = 0;
+    // GLOBAL: CARM95 0x514c98
     static int last_key = -1;
+    // GLOBAL: CARM95 0x514c9c
     static int last_single_key = -1;
+    // GLOBAL: CARM95 0x53a1fc
     static tU32 last_time = 0;
     static tU32 return_val[2];
     tU32 keys;

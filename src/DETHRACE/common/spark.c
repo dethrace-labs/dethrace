@@ -1725,14 +1725,23 @@ void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLi
 // IDA: void __cdecl GenerateSmokeShades()
 // FUNCTION: CARM95 0x0046abc9
 void GenerateSmokeShades(void) {
+    // GLOBAL: CARM95 0x514a34
     static int rb = 0x00;
+    // GLOBAL: CARM95 0x514a38
     static int gb = 0x00;
+    // GLOBAL: CARM95 0x514a3c
     static int bb = 0x00;
+    // GLOBAL: CARM95 0x514a40
     static int rd = 0x40;
+    // GLOBAL: CARM95 0x514a44
     static int gd = 0x40;
+    // GLOBAL: CARM95 0x514a48
     static int bd = 0x40;
+    // GLOBAL: CARM95 0x514a4c
     static int rg = 0x80;
+    // GLOBAL: CARM95 0x514a50
     static int gg = 0x80;
+    // GLOBAL: CARM95 0x514a54
     static int bg = 0x80;
     LOG_TRACE("()");
 
@@ -3021,6 +3030,7 @@ void MakeCarIt(tCar_spec* pCar) {
     br_actor* actor;
     br_actor* bonny;
     br_pixelmap* shade[6];
+    // GLOBAL: CARM95 0x514a58
     static int shade_num = 0;
     int i;
     LOG_TRACE("(%p)", pCar);

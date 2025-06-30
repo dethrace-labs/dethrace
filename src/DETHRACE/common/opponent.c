@@ -663,7 +663,9 @@ void TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add) {
 // IDA: int __usercall SearchForSection@<EAX>(tRoute_section *pTemp_store@<EAX>, tRoute_section *pPerm_store@<EDX>, int *pNum_of_perm_store_sections@<EBX>, tS16 pTarget_section@<ECX>, int pDepth, br_scalar pDistance_so_far, tOpponent_spec *pOpponent_spec)
 // FUNCTION: CARM95 0x00407f5d
 int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, int* pNum_of_perm_store_sections, tS16 pTarget_section, int pDepth, br_scalar pDistance_so_far, tOpponent_spec* pOpponent_spec) {
+    // GLOBAL: CARM95 0x530c9c
     static br_scalar shortest_dist;
+    // GLOBAL: CARM95 0x530db0
     static int routes_found;
     char depth_indent[32];
     int direction;
@@ -2109,8 +2111,11 @@ int RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_sca
 // IDA: int __usercall RematerialiseOpponent@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed)
 // FUNCTION: CARM95 0x00403ad9
 int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
+    // GLOBAL: CARM95 0x507174
     static int count;
+    // GLOBAL: CARM95 0x507170
     static int total;
+    // GLOBAL: CARM95 0x507178
     static int highest;
     int this_total;
     br_matrix34* mat;
@@ -3811,7 +3816,9 @@ void AllocateMatsForOppoPathModel(void) {
 // IDA: void __cdecl RebuildOppoPathModel()
 // FUNCTION: CARM95 0x0040d097
 void RebuildOppoPathModel(void) {
+    // GLOBAL: CARM95 0x50717c
     static int nvertices_last_time = 0;
+    // GLOBAL: CARM95 0x507180
     static int nfaces_last_time = 0;
     int i;
     int at_least_one;

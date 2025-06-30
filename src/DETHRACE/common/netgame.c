@@ -65,6 +65,7 @@ void SendCarData(tU32 pNext_frame_time) {
     tCollision_info* ncar;
     int i;
     int j;
+    // GLOBAL: CARM95 0x50c608
     static tU32 last_time;
     tU32 time;
     int damaged_wheels;
@@ -677,7 +678,9 @@ void EnableCar(tCar_spec* pCar) {
 void DoNetworkHeadups(int pCredits) {
     char s[256];
     char s2[256];
+    // GLOBAL: CARM95 0x50c60c
     static tU32 last_flash;
+    // GLOBAL: CARM95 0x50c610
     static int flash_state;
     LOG_TRACE("(%d)", pCredits);
 
@@ -803,7 +806,9 @@ void DoNetScores2(int pOnly_sort_scores) {
     int len;
     int ascending_order;
     char s[256];
+    // GLOBAL: CARM95 0x50c614
     static tU32 last_flash;
+    // GLOBAL: CARM95 0x50c618
     static int flash_state;
     tHeadup_pair headup_pairs[6];
     LOG_TRACE("(%d)", pOnly_sort_scores);
@@ -1562,6 +1567,7 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
     int gPixel_buffer_size;
     char* gPixels_copy;
     char* gPalette_copy;
+    // GLOBAL: CARM95 0x50c61c
     static int pause_semaphore;
     LOG_TRACE("(%p, %p, %d)", pContents, pMessage, pReceive_time);
 

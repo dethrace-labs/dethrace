@@ -232,6 +232,7 @@ br_scalar SkidLen(int pSkid) {
 // IDA: void __usercall SkidSection(tCar_spec *pCar@<EAX>, int pWheel_num@<EDX>, br_vector3 *pPos@<EBX>, int pMaterial_index@<ECX>)
 // FUNCTION: CARM95 0x00401a22
 void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMaterial_index) {
+    // GLOBAL: CARM95 0x530c88
     static tU16 skid;
     br_material* material;
     LOG_TRACE("(%p, %d, %p, %d)", pCar, pWheel_num, pPos, pMaterial_index);

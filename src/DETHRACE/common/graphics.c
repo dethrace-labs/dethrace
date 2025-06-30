@@ -1829,7 +1829,9 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
 // FUNCTION: CARM95 0x004b7754
 void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
     tCheckpoint* cp;
+    // GLOBAL: CARM95 0x5209f0
     static tU32 last_flash;
+    // GLOBAL: CARM95 0x5209f4
     static int flash_state;
     LOG_TRACE("(%d, %d)", pIndex, pTime);
 
@@ -3063,13 +3065,20 @@ int DoMouseCursor(void) {
     int giblet_chance;
     int giblet_count;
     tU32 this_call_time;
+    // GLOBAL: CARM95 0x520a00
     static tU32 last_cursor_change;
+    // GLOBAL: CARM95 0x520a04
     static tU32 last_call_time;
+    // GLOBAL: CARM95 0x520a08
     static tU32 last_required_change;
     tS32 period;
+    // GLOBAL: CARM95 0x520a0c
     static int delta_x;
+    // GLOBAL: CARM95 0x520a10
     static int required_cursor;
+    // GLOBAL: CARM95 0x520a14
     static int zero_count;
+    // GLOBAL: CARM95 0x520a18
     static int button_was_down;
 
     period = 0;

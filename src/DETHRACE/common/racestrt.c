@@ -1563,6 +1563,7 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
     char* sub_pt;
     char sub_str[16];
     tU32* test;
+    // GLOBAL: CARM95 0x536430
     static tU32 test2;
     LOG_TRACE8("(%d, %d)", pCurrent_choice, pCurrent_mode);
 

@@ -442,6 +442,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
     int y_coord;
     int i;
     tU32 real_time;
+    // GLOBAL: CARM95 0x50a200
     static tU32 last_real_time = 0;
     static int psuedo_mouse_keys[8] = {
         KEY_KP_7,
@@ -660,6 +661,7 @@ void DoActionReplay(tU32 pFrame_period) {
 void SynchronizeActionReplay(void) {
     FILE* f;
     tPath_name the_path;
+    // GLOBAL: CARM95 0x50a328
     static tU32 gLast_synch_time;
     LOG_TRACE("()");
 

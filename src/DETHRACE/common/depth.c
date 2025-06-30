@@ -742,23 +742,41 @@ void DepthEffectSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_
 // FUNCTION: CARM95 0x00463066
 void DoWobbleCamera(br_actor* pCamera) {
     float f_time;
+    // GLOBAL: CARM95 0x51343c
     static br_scalar mag00 = 0.02f;
+    // GLOBAL: CARM95 0x513440
     static br_scalar mag01 = 0.02f;
+    // GLOBAL: CARM95 0x513444
     static br_scalar mag02 = 0.02f;
+    // GLOBAL: CARM95 0x513448
     static br_scalar mag10 = 0.15f;
+    // GLOBAL: CARM95 0x51344c
     static br_scalar mag11 = 0.05f;
+    // GLOBAL: CARM95 0x513450
     static br_scalar mag12 = 0.02f;
+    // GLOBAL: CARM95 0x513454
     static br_scalar mag20 = 0.f;
+    // GLOBAL: CARM95 0x513458
     static br_scalar mag21 = 0.f;
+    // GLOBAL: CARM95 0x51345c
     static br_scalar mag22 = 0.f;
+    // GLOBAL: CARM95 0x513460
     static float period00 = 3000.f;
+    // GLOBAL: CARM95 0x513464
     static float period01 = 3000.f;
+    // GLOBAL: CARM95 0x513468
     static float period02 = 4000.f;
+    // GLOBAL: CARM95 0x51346c
     static float period10 = 2200.f;
+    // GLOBAL: CARM95 0x513470
     static float period11 = 3300.f;
+    // GLOBAL: CARM95 0x513474
     static float period12 = 3100.f;
+    // GLOBAL: CARM95 0x513478
     static float period20 = 2800.f;
+    // GLOBAL: CARM95 0x51347c
     static float period21 = 2500.f;
+    // GLOBAL: CARM95 0x513480
     static float period22 = 3900.f;
     LOG_TRACE("(%p)", pCamera);
 
@@ -778,23 +796,41 @@ void DoWobbleCamera(br_actor* pCamera) {
 // FUNCTION: CARM95 0x00463289
 void DoDrugWobbleCamera(br_actor* pCamera) {
     float f_time;
+    // GLOBAL: CARM95 0x513484
     static br_scalar mag00 = 0.03f;
+    // GLOBAL: CARM95 0x513488
     static br_scalar mag01 = 0.03f;
+    // GLOBAL: CARM95 0x51348c
     static br_scalar mag02 = 0.03f;
+    // GLOBAL: CARM95 0x513490
     static br_scalar mag10 = 0.2f;
+    // GLOBAL: CARM95 0x513494
     static br_scalar mag11 = 0.07;
+    // GLOBAL: CARM95 0x513498
     static br_scalar mag12 = 0.03f;
+    // GLOBAL: CARM95 0x51349c
     static br_scalar mag20 = 0.02f;
+    // GLOBAL: CARM95 0x5134a0
     static br_scalar mag21 = 0.03f;
+    // GLOBAL: CARM95 0x5134a4
     static br_scalar mag22 = 0.01f;
+    // GLOBAL: CARM95 0x5134a8
     static float period00 = 550.f;
+    // GLOBAL: CARM95 0x5134ac
     static float period01 = 700.f;
+    // GLOBAL: CARM95 0x5134b0
     static float period02 = 200.f;
+    // GLOBAL: CARM95 0x5134b4
     static float period10 = 100.f;
+    // GLOBAL: CARM95 0x5134b8
     static float period11 = 1300.f;
+    // GLOBAL: CARM95 0x5134bc
     static float period12 = 500.f;
+    // GLOBAL: CARM95 0x5134c0
     static float period20 = 800.f;
+    // GLOBAL: CARM95 0x5134c4
     static float period21 = 1500.f;
+    // GLOBAL: CARM95 0x5134c8
     static float period22 = 300.f;
     LOG_TRACE("(%p)", pCamera);
 
