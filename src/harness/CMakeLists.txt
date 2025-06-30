@@ -103,17 +103,23 @@ if(DETHRACE_PLATFORM_SDL_DYNAMIC)
     target_link_libraries(harness PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
-if(WIN32)
+if(!DETHRACE_NET_ENABLED)
     target_sources(harness PRIVATE
-        os/windows.c
-    )
-    target_link_libraries(harness PRIVATE dbghelp ws2_32)
-elseif(APPLE)
-    target_sources(harness PRIVATE
-        os/macos.c
+        os/null.c
     )
 else()
-    target_sources(harness PRIVATE
-        os/linux.c
-    )
+    if(WIN32)
+        target_sources(harness PRIVATE
+            os/windows.c
+        )
+        target_link_libraries(harness PRIVATE dbghelp ws2_32)
+    elseif(APPLE)
+        target_sources(harness PRIVATE
+            os/macos.c
+        )
+    else()
+        target_sources(harness PRIVATE
+            os/linux.c
+        )
+    endif()
 endif()

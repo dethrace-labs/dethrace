@@ -5,12 +5,12 @@ option(DETHRACE_REPLAY_DEBUG "Debug replay" OFF)
 
 target_include_directories(dethrace_obj
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        common
-        pd
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    common
+    pd
 )
 
-if (DETHRACE_ASAN)
+if(DETHRACE_ASAN)
     target_compile_options(dethrace_obj PUBLIC -fsanitize=address)
     target_link_options(dethrace_obj PUBLIC -fsanitize=address)
 endif()
@@ -36,10 +36,13 @@ else()
         -Wstrict-prototypes
     )
 endif()
+
 target_compile_definitions(dethrace_obj PRIVATE INSIDE_DETHRACE)
+
 if(DETHRACE_FIX_BUGS)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_FIX_BUGS)
 endif()
+
 if(DETHRACE_3DFX_PATCH)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_3DFX_PATCH)
 endif()
@@ -162,8 +165,6 @@ target_sources(dethrace_obj PRIVATE
     pd/net.h
     pd/sys.h
 
-    # dethrace-added cross platform sys and network implementation
-    pc-all/allnet.c
     pc-all/allsys.c
 
     # original win95 sys and network
@@ -172,9 +173,16 @@ target_sources(dethrace_obj PRIVATE
     # pc-win95/ssdx.h
 
     # original dos sys and network
-    #pc-dos/dosnet.c
+    # pc-dos/dosnet.c
     # pc-dos/dossys.c
 )
+
+if(DETHRACE_NET_ENABLED)
+    # dethrace-added cross platform sys and network implementation
+    target_sources(dethrace_obj PRIVATE pc-all/allnet.c)
+else()
+    target_sources(dethrace_obj PRIVATE pc-none/nonet.c)
+endif()
 
 # Create our main game binary.
 add_executable(dethrace
@@ -200,6 +208,7 @@ if(DETHRACE_IDE_ROOT_DIR)
         VS_DEBUGGER_ENVIRONMENT "DETHRACE_ROOT_DIR=${DETHRACE_IDE_ROOT_DIR}"
     )
 endif()
+
 if(DETHRACE_IDE_ARGUMENTS)
     message(STATUS "before: ${DETHRACE_IDE_ARGUMENTS}")
     separate_arguments(DETHRACE_IDE_ARGUMENTS NATIVE_COMMAND "${DETHRACE_IDE_ARGUMENTS}")
@@ -241,7 +250,6 @@ if(DETHRACE_INSTALL)
             "
             COMPONENT RUNTIME
         )
-
     endif()
 
     if(MSVC)
@@ -249,12 +257,14 @@ if(DETHRACE_INSTALL)
             DESTINATION "."
             OPTIONAL
         )
+
         if(DETHRACE_PLATFORM_SDL_DYNAMIC)
             if(DETHRACE_PLATFORM_SDL1)
                 get_filename_component(sdl1_lib_dir "${SDL_LIBRARY}" DIRECTORY)
                 get_filename_component(sdl1_root_dir "${SDL_LIBRARY}" PATH)
                 set(sdl1_bin_dir "${sdl1_root_dir}/bin" PATH)
                 find_file(SDL1DLL_PATH NAMES "SDL.dll" PATHS ${sdl1_lib_dir} ${sdl1_root_dir} PATH_SUFFIXES "bin" REQUIRED)
+
                 if(SDL1DLL_PATH)
                     install(FILES "${SDL1DLL_PATH}"
                         DESTINATION "."
@@ -262,6 +272,7 @@ if(DETHRACE_INSTALL)
                     )
                 endif()
             endif()
+
             if(DETHRACE_PLATFORM_SDL2)
                 install(FILES "$<TARGET_FILE:SDL2::SDL2>"
                     DESTINATION "."
