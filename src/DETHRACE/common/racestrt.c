@@ -58,6 +58,8 @@ int gChange_race_net_mode;
 
 // GLOBAL: CARM95 0x0053641c
 tParts_category gPart_category;
+
+// GLOBAL: CARM95 0x00536348
 tU32 gNet_synch_start;
 
 // GLOBAL: CARM95 0x0053634c
