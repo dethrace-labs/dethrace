@@ -30,10 +30,19 @@
 #include "world.h"
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x00509a60
 int gLast_wrong_checkpoint;
+
+// GLOBAL: CARM95 0x00509a64
 int gMirror_on__structur = 1; // suffix added to avoid duplicate symbol
+
+// GLOBAL: CARM95 0x00509a68
 int gPratcam_on = 1;
+
+// GLOBAL: CARM95 0x00509a6c
 int gCockpit_on = 1;
+
+// GLOBAL: CARM95 0x00509a70
 int gOpponent_mix[10][5] = {
     { 3, 4, 4, 5, 5 },
     { 2, 3, 4, 5, 5 },
@@ -46,10 +55,15 @@ int gOpponent_mix[10][5] = {
     { 1, 1, 2, 3, 3 },
     { 1, 1, 2, 2, 3 }
 };
+
+// GLOBAL: CARM95 0x00509b38
 tU32 gLast_checkpoint_time;
+
+// GLOBAL: CARM95 0x00551dbc
 tRace_over_reason gRace_over_reason;
 
 // IDA: int __cdecl NumberOfOpponentsLeft()
+// FUNCTION: CARM95 0x00413f90
 int NumberOfOpponentsLeft(void) {
     int i;
     int car_count;
@@ -69,6 +83,7 @@ int NumberOfOpponentsLeft(void) {
 }
 
 // IDA: void __usercall RaceCompleted(tRace_over_reason pReason@<EAX>)
+// FUNCTION: CARM95 0x00413ffe
 void RaceCompleted(tRace_over_reason pReason) {
     LOG_TRACE("(%d)", pReason);
 
@@ -128,6 +143,7 @@ void RaceCompleted(tRace_over_reason pReason) {
 }
 
 // IDA: void __usercall Checkpoint(int pCheckpoint_index@<EAX>, int pDo_sound@<EDX>)
+// FUNCTION: CARM95 0x004141ca
 void Checkpoint(int pCheckpoint_index, int pDo_sound) {
     LOG_TRACE("(%d, %d)", pCheckpoint_index, pDo_sound);
 
@@ -139,6 +155,7 @@ void Checkpoint(int pCheckpoint_index, int pDo_sound) {
 }
 
 // IDA: void __cdecl IncrementCheckpoint()
+// FUNCTION: CARM95 0x00414206
 void IncrementCheckpoint(void) {
     int done_voice;
     LOG_TRACE("()");
@@ -173,6 +190,7 @@ void IncrementCheckpoint(void) {
 }
 
 // IDA: void __cdecl IncrementLap()
+// FUNCTION: CARM95 0x0041433c
 void IncrementLap(void) {
     int i;
     LOG_TRACE("()");
@@ -183,6 +201,7 @@ void IncrementLap(void) {
 }
 
 // IDA: int __usercall RayHitFace@<EAX>(br_vector3 *pV0@<EAX>, br_vector3 *pV1@<EDX>, br_vector3 *pV2@<EBX>, br_vector3 *pNormal@<ECX>, br_vector3 *pStart, br_vector3 *pDir)
+// FUNCTION: CARM95 0x00414835
 int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pNormal, br_vector3* pStart, br_vector3* pDir) {
     tFace_ref the_face;
     br_scalar rt;
@@ -198,6 +217,7 @@ int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pN
 }
 
 // IDA: void __usercall WrongCheckpoint(int pCheckpoint_index@<EAX>)
+// FUNCTION: CARM95 0x00414373
 void WrongCheckpoint(int pCheckpoint_index) {
     LOG_TRACE("(%d)", pCheckpoint_index);
 
@@ -215,6 +235,7 @@ void WrongCheckpoint(int pCheckpoint_index) {
 }
 
 // IDA: void __cdecl CheckCheckpoints()
+// FUNCTION: CARM95 0x00414468
 void CheckCheckpoints(void) {
     tCar_spec* car;
     br_vector3 orig;
@@ -295,6 +316,7 @@ void CheckCheckpoints(void) {
 }
 
 // IDA: void __cdecl TotalRepair()
+// FUNCTION: CARM95 0x004148f7
 void TotalRepair(void) {
     LOG_TRACE("()");
 
@@ -303,6 +325,7 @@ void TotalRepair(void) {
 }
 
 // IDA: void __cdecl DoLogos()
+// FUNCTION: CARM95 0x00414e48
 void DoLogos(void) {
     ClearEntireScreen();
     DoSCILogo();
@@ -320,6 +343,7 @@ void DoLogos(void) {
 }
 
 // IDA: void __cdecl DoProgOpeningAnimation()
+// FUNCTION: CARM95 0x00414e71
 void DoProgOpeningAnimation(void) {
     LOG_TRACE("()");
 
@@ -328,6 +352,7 @@ void DoProgOpeningAnimation(void) {
 }
 
 // IDA: void __cdecl DoProgramDemo()
+// FUNCTION: CARM95 0x00414e94
 void DoProgramDemo(void) {
     LOG_TRACE("()");
 
@@ -337,6 +362,7 @@ void DoProgramDemo(void) {
 }
 
 // IDA: int __usercall ChooseOpponent@<EAX>(int pNastiness@<EAX>, int *pHad_scum@<EDX>)
+// FUNCTION: CARM95 0x00414a47
 int ChooseOpponent(int pNastiness, int* pHad_scum) {
     int i;
     int count;
@@ -361,6 +387,7 @@ int ChooseOpponent(int pNastiness, int* pHad_scum) {
 }
 
 // IDA: void __usercall SelectOpponents(tRace_info *pRace_info@<EAX>)
+// FUNCTION: CARM95 0x00414925
 void SelectOpponents(tRace_info* pRace_info) {
     int i;
     int rank_band;
@@ -397,6 +424,7 @@ void SelectOpponents(tRace_info* pRace_info) {
 }
 
 // IDA: int __usercall PickNetRace@<EAX>(int pCurrent_race@<EAX>, tNet_sequence_type pNet_race_sequence@<EDX>)
+// FUNCTION: CARM95 0x00414b57
 int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
     int i;
     int new_index;
@@ -432,6 +460,7 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
 }
 
 // IDA: void __cdecl SwapNetCarsLoad()
+// FUNCTION: CARM95 0x0041542b
 void SwapNetCarsLoad(void) {
     int i;
     int switched_res;
@@ -457,6 +486,7 @@ void SwapNetCarsLoad(void) {
 }
 
 // IDA: void __cdecl SwapNetCarsDispose()
+// FUNCTION: CARM95 0x0041552d
 void SwapNetCarsDispose(void) {
     int i;
     LOG_TRACE("()");
@@ -474,6 +504,7 @@ void SwapNetCarsDispose(void) {
 }
 
 // IDA: void __cdecl DoGame()
+// FUNCTION: CARM95 0x00414ebc
 void DoGame(void) {
     tSO_result options_result;
     tRace_result race_result;
@@ -635,6 +666,7 @@ void DoGame(void) {
 }
 
 // IDA: void __cdecl InitialiseProgramState()
+// FUNCTION: CARM95 0x00414ca8
 void InitialiseProgramState(void) {
     gProgram_state.loaded = 0;
     gProgram_state.last_slot = 0;
@@ -665,6 +697,7 @@ void InitialiseProgramState(void) {
 }
 
 // IDA: void __cdecl DoProgram()
+// FUNCTION: CARM95 0x00414d8a
 void DoProgram(void) {
     InitialiseProgramState();
     while (gProgram_state.prog_status != eProg_quit) {
@@ -698,6 +731,7 @@ void DoProgram(void) {
 }
 
 // IDA: void __cdecl JumpTheStart()
+// FUNCTION: CARM95 0x004155d4
 void JumpTheStart(void) {
     char s[256];
     LOG_TRACE("()");
@@ -715,6 +749,7 @@ void JumpTheStart(void) {
 }
 
 // IDA: void __cdecl GoingToInterfaceFromRace()
+// FUNCTION: CARM95 0x004156c2
 void GoingToInterfaceFromRace(void) {
     LOG_TRACE("()");
 
@@ -727,6 +762,7 @@ void GoingToInterfaceFromRace(void) {
 }
 
 // IDA: void __cdecl GoingBackToRaceFromInterface()
+// FUNCTION: CARM95 0x00415700
 void GoingBackToRaceFromInterface(void) {
     LOG_TRACE("()");
 

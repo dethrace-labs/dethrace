@@ -22,6 +22,7 @@
 #include "utility.h"
 
 // IDA: void __cdecl QuitGame()
+// FUNCTION: CARM95 0x004a9ea0
 void QuitGame(void) {
     LOG_TRACE("()");
 
@@ -84,6 +85,7 @@ void CheckNumberOfTracks(void) {
 }
 
 // IDA: void __usercall ServiceTheGame(int pRacing@<EAX>)
+// FUNCTION: CARM95 0x004a9f29
 void ServiceTheGame(int pRacing) {
 
     CheckMemory();
@@ -109,11 +111,13 @@ void ServiceTheGame(int pRacing) {
 }
 
 // IDA: void __cdecl ServiceGame()
+// FUNCTION: CARM95 0x004a9fe4
 void ServiceGame(void) {
     ServiceTheGame(0);
 }
 
 // IDA: void __cdecl ServiceGameInRace()
+// FUNCTION: CARM95 0x004a9ff9
 void ServiceGameInRace(void) {
     LOG_TRACE("()");
 
@@ -122,6 +126,7 @@ void ServiceGameInRace(void) {
 }
 
 // IDA: void __usercall GameMain(int pArgc@<EAX>, char **pArgv@<EDX>)
+// FUNCTION: CARM95 0x004aa013
 void GameMain(int pArgc, char** pArgv) {
     tPath_name CD_dir;
 

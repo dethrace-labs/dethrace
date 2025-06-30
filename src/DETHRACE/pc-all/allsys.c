@@ -52,16 +52,22 @@ tS32 gJoystick_range2x;
 tS32 gJoystick_range1y;
 tS32 gJoystick_range1x;
 int gNo_voodoo;
+
+// GLOBAL: CARM95 0x0051d5d0
 int gSwitched_resolution;
+
 br_pixelmap* gReal_back_screen;
+
 tS32 gJoystick_min1x;
+
+// GLOBAL: CARM95 0x0051d59c
 br_pixelmap* gTemp_screen;
-tU32 gUpper_loop_limit;
+
 int gReal_back_screen_locked;
-void (*gPrev_keyboard_handler)(void);
+
 tU8 gScan_code[123][2];
 
-// Added from retail executable
+// Added from VOODOO2C executable
 int gForce_voodoo_rush_mode;
 int gForce_voodoo_mode;
 
@@ -99,6 +105,7 @@ void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
 }
 
 // IDA: void __cdecl KeyBegin()
+// FUNCTION: CARM95 0x004a6b34
 void KeyBegin(void) {
 
     gScan_code[KEY_0][0] = SCANCODE_0;
@@ -234,6 +241,7 @@ int KeyDown22(int pKey_index) {
 }
 
 // IDA: void __usercall PDSetKeyArray(int *pKeys@<EAX>, int pMark@<EDX>)
+// FUNCTION: CARM95 0x004a7d4c
 void PDSetKeyArray(int* pKeys, int pMark) {
     int i;
     tS32 joyX;
@@ -254,6 +262,7 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     }
 }
 
+// FUNCTION: CARM95 0x004a7a49
 int PDGetASCIIFromKey(int pKey) {
     if (PDKeyDown3(KEY_SHIFT_ANY))
         return gASCII_shift_table[pKey];
@@ -261,6 +270,7 @@ int PDGetASCIIFromKey(int pKey) {
         return gASCII_table[pKey];
 }
 
+// FUNCTION: CARM95 0x004a636c
 void Win32FatalError(char* pStr_1, char* pStr_2) {
     gShow_fatal_error = 1;
     sprintf(gFatal_error_string, "%s\n%s", pStr_1, pStr_2);
@@ -269,6 +279,7 @@ void Win32FatalError(char* pStr_1, char* pStr_2) {
 }
 
 // IDA: void __usercall PDFatalError(char *pThe_str@<EAX>)
+// FUNCTION: CARM95 0x004a633f
 void PDFatalError(char* pThe_str) {
     LOG_TRACE("(\"%s\")", pThe_str);
 
@@ -277,6 +288,7 @@ void PDFatalError(char* pThe_str) {
 }
 
 // IDA: void __usercall PDNonFatalError(char *pThe_str@<EAX>)
+// FUNCTION: CARM95 0x004a63aa
 void PDNonFatalError(char* pThe_str) {
     LOG_TRACE("(\"%s\")", pThe_str);
 
@@ -285,6 +297,7 @@ void PDNonFatalError(char* pThe_str) {
 }
 
 // IDA: void __cdecl PDInitialiseSystem()
+// FUNCTION: CARM95 0x004a692c
 void PDInitialiseSystem(void) {
     tPath_name the_path;
     FILE* f;
@@ -320,6 +333,7 @@ void PDInitialiseSystem(void) {
 }
 
 // IDA: void __cdecl PDShutdownSystem()
+// FUNCTION: CARM95 0x004a6f6d
 void PDShutdownSystem(void) {
     static int been_here = 0;
     LOG_TRACE("()");
@@ -347,6 +361,7 @@ void PDSaveOriginalPalette(void) {
 }
 
 // IDA: void __cdecl PDRevertPalette()
+// FUNCTION: CARM95 0x004a70a2
 void PDRevertPalette(void) {
     LOG_TRACE("()");
 
@@ -354,6 +369,7 @@ void PDRevertPalette(void) {
 }
 
 // IDA: int __usercall PDInitScreenVars@<EAX>(int pArgc@<EAX>, char **pArgv@<EDX>)
+// FUNCTION: CARM95 0x004a70ad
 int PDInitScreenVars(int pArgc, char** pArgv) {
     gGraf_specs[gGraf_spec_index].phys_width = gGraf_specs[gGraf_spec_index].total_width;
     gGraf_specs[gGraf_spec_index].phys_height = gGraf_specs[gGraf_spec_index].total_height;
@@ -361,12 +377,14 @@ int PDInitScreenVars(int pArgc, char** pArgv) {
 }
 
 // IDA: void __cdecl PDInitScreen()
+// FUNCTION: CARM95 0x004a70d6
 void PDInitScreen(void) {
     LOG_TRACE("()");
 }
 
 // IDA: void __cdecl PDLockRealBackScreen()
 // In all retail 3dfx executables, it is void __usercall PDLockRealBackScreen(lock@<EAX>)
+// FUNCTION: CARM95 0x004a7217
 void PDLockRealBackScreen(int lock) {
     LOG_TRACE("()");
 
@@ -380,6 +398,7 @@ void PDLockRealBackScreen(int lock) {
 
 // IDA: void __cdecl PDUnlockRealBackScreen()
 // In all retail 3dfx executables, it is void __usercall PDUnlockRealBackScreen(lock@<EAX>)
+// FUNCTION: CARM95 0x004a727d
 void PDUnlockRealBackScreen(int lock) {
     LOG_TRACE("()");
 
@@ -390,6 +409,7 @@ void PDUnlockRealBackScreen(int lock) {
 }
 
 // IDA: void __cdecl PDAllocateScreenAndBack()
+// FUNCTION: CARM95 0x004a728d
 void PDAllocateScreenAndBack(void) {
 
     gScreen = NULL;
@@ -449,7 +469,6 @@ void PDAllocateScreenAndBack(void) {
             BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
             BRT_VIRTUALFB_CALLBACKS_P, &virtualfb_callbacks,
             BR_NULL_TOKEN);
-
         gDOSGfx_initialized = 1;
     }
     gScreen->origin_x = 0;
@@ -577,6 +596,7 @@ void CopyBackScreen(int pRendering_area_only) {
 }
 
 // IDA: void __usercall PDScreenBufferSwap(int pRendering_area_only@<EAX>)
+// FUNCTION: CARM95 0x004a758e
 void PDScreenBufferSwap(int pRendering_area_only) {
     LOG_TRACE10("(%d)", pRendering_area_only);
 
@@ -610,12 +630,14 @@ void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_in
     NOT_IMPLEMENTED();
 }
 
+// FUNCTION: CARM95 0x004a76e9
 void Win32BRenderWarningFunc(char* msg) {
     dr_dprintf("*******************************************************************************");
     dr_dprintf("BRender WARNING: '%s'", msg);
     dr_dprintf("*******************************************************************************");
 }
 
+// FUNCTION: CARM95 0x004a771f
 void Win32BRenderFailureFunc(char* msg) {
     dr_dprintf("*******************************************************************************");
     dr_dprintf("BRender FAILURE: '%s'", msg);
@@ -624,6 +646,7 @@ void Win32BRenderFailureFunc(char* msg) {
 }
 
 // IDA: void __cdecl PDInstallErrorHandlers()
+// FUNCTION: CARM95 0x004a7766
 void PDInstallErrorHandlers(void) {
     LOG_TRACE("()");
 
@@ -634,6 +657,7 @@ void PDInstallErrorHandlers(void) {
 }
 
 // IDA: void __cdecl PDSetFileVariables()
+// FUNCTION: CARM95 0x004a779c
 void PDSetFileVariables(void) {
 
     // gDir_separator[0] = '\\';
@@ -641,6 +665,7 @@ void PDSetFileVariables(void) {
 }
 
 // IDA: void __usercall PDBuildAppPath(char *pThe_path@<EAX>)
+// FUNCTION: CARM95 0x004a77b3
 void PDBuildAppPath(char* pThe_path) {
     int pos;
 
@@ -665,11 +690,13 @@ void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
 }
 
 // IDA: void __usercall PDSetPalette(br_pixelmap *pThe_palette@<EAX>)
+// FUNCTION: CARM95 0x004a7903
 void PDSetPalette(br_pixelmap* pThe_palette) {
     BrDevPaletteSetOld(pThe_palette);
 }
 
 // IDA: void __usercall PDSetPaletteEntries(br_pixelmap *pPalette@<EAX>, int pFirst_colour@<EDX>, int pCount@<EBX>)
+// FUNCTION: CARM95 0x004a79d0
 void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
     int i;
     tU8* p;
@@ -687,6 +714,7 @@ void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 }
 
 // IDA: void __cdecl PDSwitchToRealResolution()
+// FUNCTION: CARM95 0x004a71ce
 void PDSwitchToRealResolution(void) {
     LOG_TRACE("()");
 
@@ -695,6 +723,7 @@ void PDSwitchToRealResolution(void) {
 }
 
 // IDA: void __cdecl PDSwitchToLoresMode()
+// FUNCTION: CARM95 0x004a71f1
 void PDSwitchToLoresMode(void) {
     LOG_TRACE("()");
 
@@ -703,6 +732,7 @@ void PDSwitchToLoresMode(void) {
 }
 
 // IDA: void __usercall PDMouseButtons(int *pButton_1@<EAX>, int *pButton_2@<EDX>)
+// FUNCTION: CARM95 0x004a79f2
 void PDMouseButtons(int* pButton_1, int* pButton_2) {
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x;
@@ -714,6 +744,7 @@ void PDMouseButtons(int* pButton_1, int* pButton_2) {
 }
 
 // IDA: void __usercall PDGetMousePosition(int *pX_coord@<EAX>, int *pY_coord@<EDX>)
+// FUNCTION: CARM95 0x004a7a11
 void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x2;
@@ -750,42 +781,28 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
 }
 
 // IDA: int __cdecl PDGetTotalTime()
+// FUNCTION: CARM95 0x004a83c5
 int PDGetTotalTime(void) {
     return gHarness_platform.GetTicks();
 }
 
 // IDA: int __usercall PDServiceSystem@<EAX>(tU32 pTime_since_last_call@<EAX>)
+// FUNCTION: CARM95 0x004a7b63
 int PDServiceSystem(tU32 pTime_since_last_call) {
 
     gHarness_platform.ProcessWindowMessages();
     return 0;
 }
 
-// IDA: tU32 __cdecl LargestBlockAvail()
-tU32 LargestBlockAvail(void) {
-    // SREGS sregs;
-    tMem_info mem_info;
-    size_t memmax;
-
-    // Added >>
-    return 15000000;
-    // <<
-}
-
-// IDA: void* __usercall PDGrabLargestMammaryWeCanPlayWith@<EAX>(tU32 pMaximum_required@<EAX>, tU32 *pAmount_allocated@<EDX>)
-void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32* pAmount_allocated) {
-    void* result;
-    LOG_TRACE("(%d, %p)", pMaximum_required, pAmount_allocated);
-    NOT_IMPLEMENTED();
-}
-
 // IDA: void __usercall PDAllocateActionReplayBuffer(char **pBuffer@<EAX>, tU32 *pBuffer_size@<EDX>)
+// FUNCTION: CARM95 0x004a68e2
 void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
     tU32 lba;
     tU32 required;
     LOG_TRACE("(%p, %p)", pBuffer, pBuffer_size);
 
-    lba = LargestBlockAvail();
+    // TODO: tidy up
+    lba = 15000000;
     if (gReplay_override) {
         *pBuffer = 0;
         *pBuffer_size = 0;
@@ -808,6 +825,7 @@ void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
 }
 
 // IDA: void __usercall PDDisposeActionReplayBuffer(char *pBuffer@<EAX>)
+// FUNCTION: CARM95 0x004a6906
 void PDDisposeActionReplayBuffer(char* pBuffer) {
     LOG_TRACE("(\"%s\")", pBuffer);
 
@@ -932,6 +950,7 @@ int OurGetChar(void) {
 }
 
 // IDA: void __usercall PDEnterDebugger(char *pStr@<EAX>)
+// FUNCTION: CARM95 0x004a60e3
 void PDEnterDebugger(char* pStr) {
     static unsigned char* save_it;
     LOG_TRACE("(\"%s\")", pStr);
@@ -945,45 +964,11 @@ void PDEndItAllAndReRunTheBastard(void) {
     NOT_IMPLEMENTED();
 }
 
-// IDA: int __usercall LoopLimitTooLow@<EAX>(tU32 limit@<EAX>)
-int LoopLimitTooLow(tU32 limit) {
-    clock_t start;
-    tU32 count;
-    tU32 val;
-    LOG_TRACE("(%d)", limit);
-
-    // v2 = j___clock(limit);
-    // v3 = v2;
-    // for (count = 0; count < limit; gRaw_joystick1x += v2) {
-    //     v5 = __inbyte(0x201u);
-    //     v2 = v5 & 1;
-    //     ++count;
-    // }
-    // return j___clock(v2) < (unsigned int)(v3 + 3);
-
-    return 0;
-}
-
-// IDA: tS32 __cdecl UpperLoopLimit()
-tS32 UpperLoopLimit(void) {
-    tU32 limit;
-    LOG_TRACE("()");
-
-    for (limit = 1024; 2 * limit && LoopLimitTooLow(limit); limit *= 2)
-        ;
-    while (2 * limit && LoopLimitTooLow(limit))
-        limit *= 2;
-    while (2 * limit && LoopLimitTooLow(limit))
-        limit *= 2;
-    return limit - 1;
-}
-
 // IDA: int __cdecl InitJoysticks()
 int InitJoysticks(void) {
     LOG_TRACE("()");
 
     gJoystick_deadzone = 8000;
-    gUpper_loop_limit = UpperLoopLimit() / 2;
     return 0;
 }
 
@@ -996,6 +981,7 @@ tU32 ReadJoystickAxis(int pBit) {
 }
 
 // IDA: void __cdecl PDReadJoySticks()
+// FUNCTION: CARM95 0x004a8152
 void PDReadJoySticks(void) {
     tU32 temp1x;
     tU32 temp1y;
@@ -1006,6 +992,7 @@ void PDReadJoySticks(void) {
 }
 
 // IDA: tS32 __cdecl PDGetJoy1X()
+// FUNCTION: CARM95 0x004a81b5
 tS32 PDGetJoy1X(void) {
     tS32 joy;
     LOG_TRACE("()");
@@ -1013,6 +1000,7 @@ tS32 PDGetJoy1X(void) {
 }
 
 // IDA: tS32 __cdecl PDGetJoy1Y()
+// FUNCTION: CARM95 0x004a81e1
 tS32 PDGetJoy1Y(void) {
     tS32 joy;
     LOG_TRACE("()");
@@ -1020,6 +1008,7 @@ tS32 PDGetJoy1Y(void) {
 }
 
 // IDA: tS32 __cdecl PDGetJoy2X()
+// FUNCTION: CARM95 0x004a820d
 tS32 PDGetJoy2X(void) {
     tS32 joy;
     LOG_TRACE("()");
@@ -1027,6 +1016,7 @@ tS32 PDGetJoy2X(void) {
 }
 
 // IDA: tS32 __cdecl PDGetJoy2Y()
+// FUNCTION: CARM95 0x004a8239
 tS32 PDGetJoy2Y(void) {
     tS32 joy;
     LOG_TRACE("()");
@@ -1034,54 +1024,63 @@ tS32 PDGetJoy2Y(void) {
 }
 
 // IDA: int __cdecl PDGetJoy1Button1()
+// FUNCTION: CARM95 0x004a8265
 int PDGetJoy1Button1(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy1Button2()
+// FUNCTION: CARM95 0x004a8291
 int PDGetJoy1Button2(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy1Button3()
+// FUNCTION: CARM95 0x004a82bd
 int PDGetJoy1Button3(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy1Button4()
+// FUNCTION: CARM95 0x004a82e9
 int PDGetJoy1Button4(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button1()
+// FUNCTION: CARM95 0x004a8315
 int PDGetJoy2Button1(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button2()
+// FUNCTION: CARM95 0x004a8341
 int PDGetJoy2Button2(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button3()
+// FUNCTION: CARM95 0x004a836d
 int PDGetJoy2Button3(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button4()
+// FUNCTION: CARM95 0x004a8399
 int PDGetJoy2Button4(void) {
     LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall PDFileUnlock@<EAX>(char *pThe_path@<EAX>)
+// FUNCTION: CARM95 0x004a83e6
 int PDFileUnlock(char* pThe_path) {
     unsigned int attr;
     LOG_TRACE("(\"%s\")", pThe_path);
@@ -1089,14 +1088,8 @@ int PDFileUnlock(char* pThe_path) {
     return 0;
 }
 
-// IDA: void __cdecl CriticalISR(INTPACK pRegs)
-typedef void* INTPACK;
-void CriticalISR(INTPACK pRegs) {
-    LOG_TRACE("(%d)", pRegs);
-    NOT_IMPLEMENTED();
-}
-
 // IDA: int __usercall PDCheckDriveExists2@<EAX>(char *pThe_path@<EAX>, char *pFile_name@<EDX>, tU32 pMin_size@<EBX>)
+// FUNCTION: CARM95 0x004a8429
 int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     struct stat buf;
     void (*old_critical_isr)(void);
@@ -1124,17 +1117,9 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
 }
 
 // IDA: int __cdecl PDDoWeLeadAnAustereExistance()
+// FUNCTION: CARM95 0x004a856f
 int PDDoWeLeadAnAustereExistance(void) {
-    tU32 block;
-
-    block = LargestBlockAvail();
-
-    dr_dprintf("PDDoWeLeadAnAustereExistance (sic): LargestBlockAvail=%d\n", block);
-
-    if (gReal_graf_data_index == 0) {
-        return block < 13000000;
-    }
-    return block < 15000000;
+    return 0;
 }
 
 int CheckGorePasswordFile(char* pPassword) {
