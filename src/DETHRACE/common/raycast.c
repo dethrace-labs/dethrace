@@ -275,7 +275,7 @@ int DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, v
     camera_data = (br_camera*)camera->type_data;
     DRActorToRoot(camera, world, &camera_tfm);
     BrMatrix34Inverse(&gPick_model_to_view__raycast, &camera_tfm);
-    scale = cosf(BrAngleToRadian(camera_data->field_of_view / 2)) / sinf(BrAngleToRadian(camera_data->field_of_view / 2));
+    scale = cos(BrAngleToRadian(camera_data->field_of_view / 2)) / sin(BrAngleToRadian(camera_data->field_of_view / 2));
 
     BrMatrix34PostScale(&gPick_model_to_view__raycast, scale / camera_data->aspect, scale, 1.0f);
     return ActorPick2D(world, model_unk1, material_unk1, callback, arg);
@@ -332,7 +332,7 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
                 this_material = material;
             }
             d = BrVector3Dot(eqn, ray_dir);
-            if (fabsf(d) >= 0.00000023841858f && ((this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) != 0 || d <= 0.0)) //
+            if (fabs(d) >= 0.00000023841858f && ((this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) != 0 || d <= 0.0)) //
             {
                 numerator = BrVector3Dot(eqn, ray_pos) - eqn->v[3];
                 if (!BadDiv__raycast(numerator, d)) {
@@ -340,8 +340,8 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
                     if (t >= t_near && t <= t_far) {
                         BrVector3Scale(&p, ray_dir, t);
                         BrVector3Accumulate(&p, ray_pos);
-                        axis_m = (fabsf(eqn->v[1]) > fabsf(eqn->v[0])) ? 1 : 0;
-                        if (fabsf(eqn->v[2]) > fabsf(eqn->v[axis_m])) {
+                        axis_m = (fabs(eqn->v[1]) > fabs(eqn->v[0])) ? 1 : 0;
+                        if (fabs(eqn->v[2]) > fabs(eqn->v[axis_m])) {
                             axis_m = 2;
                         }
                         if (axis_m == 0) {

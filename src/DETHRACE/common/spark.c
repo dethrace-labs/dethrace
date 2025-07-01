@@ -1087,7 +1087,7 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
             r_squared = (y * y) * aspect_squared;
             scr_ptr += oy * pRender_screen->row_bytes;
             depth_ptr += oy * (pDepth_buffer->row_bytes / 2);
-            inc = -sqrtf(max_r_squared - r_squared);
+            inc = -sqrt(max_r_squared - r_squared);
             r_squared += inc * inc;
         }
         if (pRender_screen->height < oy + ry) {
@@ -1154,7 +1154,7 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
             r_squared = y * y * aspect_squared;
             scr_ptr = &osp[l2 * pRender_screen->row_bytes];
             depth_ptr = &odp[l2 * (pDepth_buffer->row_bytes / 2)];
-            inc = -sqrtf(max_r_squared - r_squared);
+            inc = -sqrt(max_r_squared - r_squared);
             r_squared += inc * inc;
         }
         if (oy - ry < 0.f) {
@@ -1355,7 +1355,7 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     if (ts < 25.0f) {
         return;
     }
-    decay_factor = sqrtf(ts) / 25.0f;
+    decay_factor = sqrt(ts) / 25.0f;
     if (decay_factor > 1.0f) {
         decay_factor = 1.0f;
     }

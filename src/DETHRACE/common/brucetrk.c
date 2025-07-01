@@ -174,9 +174,9 @@ br_uintptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
             pActor->t.t.translate.t.v[0] += 2000.f;
         }
         if (r1 > 1.001f || r2 > 1.001f || r3 > 1.001f) {
-            r1 = 1.f / sqrtf(r1);
-            r2 = 1.f / sqrtf(r2);
-            r3 = 1.f / sqrtf(r3);
+            r1 = 1.f / sqrt(r1);
+            r2 = 1.f / sqrt(r2);
+            r3 = 1.f / sqrt(r3);
             pActor->t.t.mat.m[0][0] *= r1;
             pActor->t.t.mat.m[0][1] *= r1;
             pActor->t.t.mat.m[0][2] *= r1;
@@ -434,7 +434,7 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
             max_x = column_x;
             min_z = column_z;
             max_z = column_z;
-            tan_fov_ish = sinf(BrAngleToRadian(camera->field_of_view / 2)) / cosf(BrAngleToRadian(camera->field_of_view / 2));
+            tan_fov_ish = sin(BrAngleToRadian(camera->field_of_view / 2)) / cos(BrAngleToRadian(camera->field_of_view / 2));
             edge_after.v[0] = camera->aspect * tan_fov_ish;
             edge_after.v[1] = tan_fov_ish;
             edge_after.v[2] = -1.0;

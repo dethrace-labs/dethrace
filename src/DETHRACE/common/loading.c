@@ -1366,7 +1366,7 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     GetThreeFloats(pF, &len, &wid, &het);
     snap_angle = GetAFloat(pF);
 
-    non_car->snap_off_cosine = cosf(BrAngleToRadian(BrDegreeToAngle(snap_angle)));
+    non_car->snap_off_cosine = cos(BrAngleToRadian(BrDegreeToAngle(snap_angle)));
     non_car->collision_info.break_off_radians_squared = snap_angle * 3.14f / 180.f * (snap_angle * 3.14f / 180.f);
     ts = GetAFloat(pF);
 

@@ -237,7 +237,7 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
     dist = BrVector3Length(&to_camera);
     if (dist > BR_SCALAR_EPSILON) {
         factor = BrVector3Dot(pGround_normal, &to_camera) / dist;
-        if (fabsf(factor) <= 0.01f) {
+        if (fabs(factor) <= 0.01f) {
             s = 0.01f;
         } else {
             s = 0.01f / factor;
@@ -298,7 +298,7 @@ void ProcessOilSpills(tU32 pFrame_period) {
             gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
         } else {
             the_model = gOily_spills[i].actor->model;
-            if (gOily_spills[i].actor->render_style == BR_RSTYLE_NONE && gOily_spills[i].spill_time <= time && fabsf(gOily_spills[i].car->v.v[0]) < .01f && fabsf(gOily_spills[i].car->v.v[1]) < .01f && fabsf(gOily_spills[i].car->v.v[2]) < .01f) {
+            if (gOily_spills[i].actor->render_style == BR_RSTYLE_NONE && gOily_spills[i].spill_time <= time && fabs(gOily_spills[i].car->v.v[0]) < .01f && fabs(gOily_spills[i].car->v.v[1]) < .01f && fabs(gOily_spills[i].car->v.v[2]) < .01f) {
                 if (gAction_replay_mode) {
                     SetInitialOilStuff(&gOily_spills[i], the_model);
                 } else {
@@ -406,7 +406,7 @@ int PointInSpill(br_vector3* pV, int pSpill) {
 
     return gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.8f > SQR(pV->v[0] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.translate.t.v[0])
         && gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.8f > SQR(pV->v[2] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.translate.t.v[2])
-        && fabsf(pV->v[1] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.translate.t.v[1]) < 0.1f;
+        && fabs(pV->v[1] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.translate.t.v[1]) < 0.1f;
 }
 
 // IDA: void __usercall GetOilFrictionFactors(tCar_spec *pCar@<EAX>, br_scalar *pFl_factor@<EDX>, br_scalar *pFr_factor@<EBX>, br_scalar *pRl_factor@<ECX>, br_scalar *pRr_factor)

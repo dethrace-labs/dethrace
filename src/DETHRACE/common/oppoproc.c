@@ -46,16 +46,16 @@ static void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3*
     }
     tmp = BrVector3Dot(&rel1, &rel3);
     BrVector3Cross(&rot1, &rel1, &rel3);
-    tmp2 = sqrtf(tmp * tmp + rot1.v[1] * rot1.v[1]);
-    tmp3 = fabsf(rot1.v[1] / tmp2);
+    tmp2 = sqrt(tmp * tmp + rot1.v[1] * rot1.v[1]);
+    tmp3 = fabs(rot1.v[1] / tmp2);
     tmp4 = p10 * tmp / tmp2 + p9;
-    if ((tmp3 < 1.f && fabsf(tmp4) > tmp3 * 1000.f) || tmp3 < 0.001f) {
+    if ((tmp3 < 1.f && fabs(tmp4) > tmp3 * 1000.f) || tmp3 < 0.001f) {
         *p1 = 1000.f;
         *p2 = 1000.f;
     } else {
         tmp4 = tmp4 / tmp3;
         tmp3 = tmp3 / (tmp / tmp2 + 1.f);
-        *p2 = tmp3 * p10 + sqrtf(tmp3 * p10) + tmp4;
+        *p2 = tmp3 * p10 + sqrt(tmp3 * p10) + tmp4;
         *p1 = *p2 * tmp3;
     }
 }
@@ -194,6 +194,8 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
     int later_straight;
     int next_left_not_right;
 
+     float v104;
+
     car_spec = pOpponent_spec->car_spec;
     engine_damage = car_spec->damage_units[0].damage_level;
     trans_damage = car_spec->damage_units[1].damage_level;
@@ -303,7 +305,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
             car_to_end.v[1] = 0.0f;
             dist_to_end = BrVector3Length(&car_to_end) * WORLD_SCALE;
             if (dist_to_end < 15.0f) {
-                t = sqrtf(225.0f - dist_to_end * dist_to_end) / WORLD_SCALE;
+                t = sqrt(225.0f - dist_to_end * dist_to_end) / WORLD_SCALE;
                 if (t + dot_a >= 0.0) {
                     wank.v[0] = a.v[0] * t;
                     wank.v[2] = a.v[2] * t;
@@ -378,7 +380,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
                 next_corner_size = GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no)->v[0] * -wank.v[2];
                 next_turning_radius = next_turning_radius - (GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no)->v[2] * wank.v[0] + next_corner_size);
                 // FIXME: added temporary variable
-                float v104 = -wank.v[2] * not_our_dir->v[0] + not_our_dir->v[2] * wank.v[0];
+                v104 = -wank.v[2] * not_our_dir->v[0] + not_our_dir->v[2] * wank.v[0];
                 if (v104 * next_turning_radius > 0.0f) {
                     goal_width = 0.0f;
                     speed2d = speed * speed / 24.0f + speed * 1.5f;
@@ -399,7 +401,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
                         corner_speed *= WORLD_SCALE;
                         corner_speed2 *= WORLD_SCALE;
                         stopping_distance = CornerFudge(car_spec) * CornerFudge(car_spec) * (corner_speed * 10.0);
-                        desired_speed = sqrtf(stopping_distance);
+                        desired_speed = sqrt(stopping_distance);
                         if (GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1) < desired_speed) {
                             desired_speed = GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1);
                             stopping_distance = desired_speed * desired_speed;

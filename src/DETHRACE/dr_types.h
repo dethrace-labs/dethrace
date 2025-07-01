@@ -11,9 +11,25 @@
 #include <stddef.h>
 #include <stdio.h>
 
+typedef unsigned int uintptr_t;
+typedef int intptr_t;
+
 // required for platform-specific network structs
 // if needed for a different platform, make this conditional
-#include "pc-all/net_types.h"
+//#include "pc-all/net_types.h"
+
+typedef struct tPD_net_player_info {
+    // cannot be a regular sockaddr_in because it is transmitted between OS's
+    
+    int i;
+} tPD_net_player_info;
+
+// has to match `tPD_net_player_info` - see `PDNetGetNextJoinGame`
+typedef struct tPD_net_game_info {
+    // cannot be a regular sockaddr_in because it is transmitted between OS's
+    int i;
+
+} tPD_net_game_info;
 
 typedef unsigned char tU8;
 typedef signed char tS8;

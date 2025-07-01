@@ -180,6 +180,9 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
     tChanged_vertex pipe_array[600];
     tCar_spec* car;
 
+    float v12;
+    int axis_tmp;
+
     pipe_vertex_count = 0;
     if (gNet_mode == eNet_mode_host && pCar->car_model_actors[pModel_index].min_distance_squared == 0.0f) {
         NetSendPointCrush(pCar, pCrush_point_index, pEnergy_vector);
@@ -242,7 +245,7 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
             old_vector = *target_point;
             for (bend_axis = 0; bend_axis < 3; bend_axis++) {
                 target_point->v[bend_axis] += (1.0f - the_neighbour->factor / 256.0f) * movement.v[bend_axis];
-                float v12;
+                
                 if (the_neighbour->factor <= 128) {
                     v12 = the_neighbour->factor / 128.0f;
                 } else {
@@ -253,7 +256,7 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
                 } else {
                     bend_amount = default_bend_factor[bend_axis];
                 }
-                int axis_tmp = (((int)((target_point->v[2] + target_point->v[1] + target_point->v[0]) * 100.0f) + bend_axis - 1) & 1) % 3;
+                axis_tmp = (((int)((target_point->v[2] + target_point->v[1] + target_point->v[0]) * 100.0f) + bend_axis - 1) & 1) % 3;
                 target_point->v[axis_tmp] += fabs(movement.v[bend_axis]) * bend_amount;
             }
             if (IsActionReplayAvailable() && pipe_vertex_count < 600) {
@@ -383,7 +386,7 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
         model_vertex = &pActor->model->vertices[i];
         old_point = model_vertex->p;
         for (j = 0; j < 3; ++j) {
-            *pTotal_deflection = fabsf(pUndamaged_vertices->p.v[j] - old_point.v[j]) + *pTotal_deflection;
+            *pTotal_deflection = fabs(pUndamaged_vertices->p.v[j] - old_point.v[j]) + *pTotal_deflection;
             if (pUndamaged_vertices->p.v[j] >= old_point.v[j]) {
                 if (pUndamaged_vertices->p.v[j] > old_point.v[j]) {
                     model_vertex->p.v[j] = model_vertex->p.v[j] + pAmount;
@@ -684,7 +687,7 @@ void DoPratcamHit(br_vector3* pHit_vector) {
     } else {
         return;
     }
-    if (fabsf(pHit_vector->v[2]) >= fabsf(pHit_vector->v[0])) {
+    if (fabs(pHit_vector->v[2]) >= fabs(pHit_vector->v[0])) {
         if (pHit_vector->v[2] >= 0.f) {
             PratcamEvent(14 + strength_modifier);
         } else {
@@ -891,9 +894,9 @@ tImpact_location GetDirection(br_vector3* pVelocity) {
     br_scalar mag_y;
     br_scalar mag_z;
 
-    mag_x = fabsf(pVelocity->v[0]);
-    mag_y = fabsf(pVelocity->v[1]);
-    mag_z = fabsf(pVelocity->v[2]);
+    mag_x = fabs(pVelocity->v[0]);
+    mag_y = fabs(pVelocity->v[1]);
+    mag_z = fabs(pVelocity->v[2]);
     if (mag_y >= mag_x || mag_z >= mag_x) {
         if (mag_y <= mag_x || mag_z >= mag_y) {
             if (pVelocity->v[2] >= 0.0f) {
@@ -1358,7 +1361,7 @@ void DoWheelDamage(tU32 pFrame_period) {
             if (gNet_mode == eNet_mode_none || car->driver == eDriver_local_human) {
                 BrVector3Set(&temp_vector, wheel_circum * gWheel_circ_to_width, 0.f, 0.f);
                 BrMatrix34ApplyV(&wonky_vector, &temp_vector, &car->wheel_actors[j]->t.t.mat);
-                car->wheel_dam_offset[j] = fabsf(wonky_vector.v[1]);
+                car->wheel_dam_offset[j] = fabs(wonky_vector.v[1]);
             }
         }
     }

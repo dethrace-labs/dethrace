@@ -12280,7 +12280,7 @@ static MA_INLINE double ma_sqrtd(double x)
 }
 
 
-static MA_INLINE float ma_rsqrtf(float x)
+static MA_INLINE float ma_rsqrt(float x)
 {
     #if defined(MA_SUPPORT_SSE2) && !defined(MA_NO_SSE2) && (defined(MA_X64) || (defined(_M_IX86_FP) && _M_IX86_FP == 2) || defined(__SSE2__))
     {
@@ -49534,7 +49534,7 @@ MA_API ma_vec3f ma_vec3f_normalize(ma_vec3f v)
         return ma_vec3f_init_3f(0, 0, 0);
     }
 
-    invLen = ma_rsqrtf(len2);
+    invLen = ma_rsqrt(len2);
     v.x *= invLen;
     v.y *= invLen;
     v.z *= invLen;

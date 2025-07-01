@@ -2,14 +2,6 @@
 
 #include "brender.h"
 #include "dr_types.h"
-#include "errors.h"
-#include "globvrpb.h"
-#include "harness/config.h"
-#include "harness/hooks.h"
-#include "harness/os.h"
-#include "harness/trace.h"
-#include "net_types.h"
-#include "network.h"
 #include "pd/net.h"
 #include "pd/sys.h"
 #include <ctype.h>
@@ -18,12 +10,12 @@
 
 // IDA: void __cdecl ClearupPDNetworkStuff()
 void ClearupPDNetworkStuff(void) {
-    NOT_IMPLEMENTED();
+    
 }
 
 // IDA: void __usercall MATTMessageCheck(char *pFunction_name@<EAX>, tNet_message *pMessage@<EDX>, int pAlleged_size@<EBX>)
 void MATTMessageCheck(char* pFunction_name, tNet_message* pMessage, int pAlleged_size) {
-    NOT_IMPLEMENTED();
+    
 }
 
 // IDA: int __usercall GetProfileText@<EAX>(char *pDest@<EAX>, int pDest_len@<EDX>, char *pFname@<EBX>, char *pKeyname@<ECX>)
@@ -33,7 +25,7 @@ int GetProfileText(char* pDest, int pDest_len, char* pFname, char* pKeyname) {
     int i;
     int j;
     int len;
-    NOT_IMPLEMENTED();
+
 }
 
 // IDA: int __cdecl GetSocketNumberFromProfileFile()
@@ -41,7 +33,6 @@ int GetSocketNumberFromProfileFile(void) {
     char str[256];
     int sscanf_res;
     tU32 socknum;
-    NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall GetMessageTypeFromMessage@<EAX>(char *pMessage_str@<EAX>)
@@ -119,7 +110,6 @@ int PDNetGetNextJoinGame(tNet_game_details* pGame, int pIndex) {
 
 // IDA: void __usercall PDNetDisposeGameDetails(tNet_game_details *pDetails@<EAX>)
 void PDNetDisposeGameDetails(tNet_game_details* pDetails) {
-    NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall PDNetHostGame@<EAX>(tNet_game_details *pDetails@<EAX>, char *pHost_name@<EDX>, void **pHost_address@<EBX>)
@@ -162,7 +152,6 @@ void PDNetObtainSystemUserName(char* pName, int pMax_length) {
 // IDA: int __usercall PDNetSendMessageToPlayer@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, tPlayer_ID pPlayer@<EBX>)
 int PDNetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer) {
     char str[256];
-    NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall PDNetSendMessageToAllPlayers@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>)
@@ -184,12 +173,10 @@ tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_ad
 
 // IDA: tNet_message* __usercall PDNetAllocateMessage@<EAX>(tU32 pSize@<EAX>, tS32 pSize_decider@<EDX>)
 tNet_message* PDNetAllocateMessage(tU32 pSize, tS32 pSize_decider) {
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall PDNetDisposeMessage(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>)
 void PDNetDisposeMessage(tNet_game_details* pDetails, tNet_message* pMessage) {
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall PDNetSetPlayerSystemInfo(tNet_game_player_info *pPlayer@<EAX>, void *pSender_address@<EDX>)
@@ -198,7 +185,6 @@ void PDNetSetPlayerSystemInfo(tNet_game_player_info* pPlayer, void* pSender_addr
 
 // IDA: void __usercall PDNetDisposePlayer(tNet_game_player_info *pPlayer@<EAX>)
 void PDNetDisposePlayer(tNet_game_player_info* pPlayer) {
-    NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall PDNetSendMessageToAddress@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, void *pAddress@<EBX>)
@@ -210,7 +196,6 @@ int PDNetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessag
 
 // IDA: int __usercall PDNetInitClient@<EAX>(tNet_game_details *pDetails@<EAX>)
 int PDNetInitClient(tNet_game_details* pDetails) {
-    NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDNetGetHeaderSize()

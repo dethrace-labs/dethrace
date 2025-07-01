@@ -326,6 +326,7 @@ void MoveToEndOfReplay(void) {
     DisablePipedSounds();
     old_replay_rate = gReplay_rate;
     gReplay_rate = 100.f;
+#define INT32_MAX 2147483647
     MoveReplayBuffer(INT32_MAX);
     gReplay_rate = old_replay_rate;
     EnablePipedSounds();
@@ -596,7 +597,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
     if (old_replay_rate != 0.f) {
         gFrame_period = gFrame_period * gReplay_rate / old_replay_rate;
     }
-    last_real_time = fabsf(gReplay_rate) >= 1.2f ? real_time : 0;
+    last_real_time = fabs(gReplay_rate) >= 1.2f ? real_time : 0;
 
     if (old_replay_rate <= 0.f && gReplay_rate > 0.f) {
         S3SetEffects(NULL, NULL);
@@ -647,7 +648,7 @@ void SynchronizeActionReplay(void) {
     static tU32 gLast_synch_time;
 
     while (gReplay_rate != 0.f) {
-        if (PDGetTotalTime() - gLast_synch_time >= gFrame_period / fabsf(gReplay_rate)) {
+        if (PDGetTotalTime() - gLast_synch_time >= gFrame_period / fabs(gReplay_rate)) {
             break;
         }
         ServiceGameInRace();

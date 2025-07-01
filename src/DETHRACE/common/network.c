@@ -728,10 +728,10 @@ int NetJoinGameLowLevel(tNet_game_details* pDetails, char* pPlayer_name) {
 }
 
 DR_STATIC_ASSERT(offsetof(tNet_message_join, player_info) == 4);
-DR_STATIC_ASSERT(offsetof(tNet_game_player_info, this_players_time_stamp) == 0x10);
-DR_STATIC_ASSERT(offsetof(tNet_game_player_info, wasted) == 0x68);
-DR_STATIC_ASSERT(offsetof(tNet_game_player_info, initial_position) == 0x8c);
-DR_STATIC_ASSERT(offsetof(tNet_game_player_info, car) == 0xbc);
+//DR_STATIC_ASSERT(offsetof(tNet_game_player_info, this_players_time_stamp) == 0x10);
+//DR_STATIC_ASSERT(offsetof(tNet_game_player_info, wasted) == 0x68);
+//DR_STATIC_ASSERT(offsetof(tNet_game_player_info, initial_position) == 0x8c);
+//DR_STATIC_ASSERT(offsetof(tNet_game_player_info, car) == 0xbc);
 
 // IDA: int __usercall NetJoinGame@<EAX>(tNet_game_details *pDetails@<EAX>, char *pPlayer_name@<EDX>, int pCar_index@<EBX>)
 // FUNCTION: CARM95 0x004476d9

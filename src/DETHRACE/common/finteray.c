@@ -51,7 +51,7 @@ tFace_ref* gPling_face;
 // FUNCTION: CARM95 0x004abe0c
 int BadDiv__finteray(br_scalar a, br_scalar b) {
     //
-    return fabsf(b) < 1.0f && fabsf(a) > fabsf(b) * BR_SCALAR_MAX;
+    return fabs(b) < 1.0f && fabs(a) > fabs(b) * BR_SCALAR_MAX;
 }
 
 // IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
@@ -265,8 +265,8 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
                     if (t >= t_near && t <= t_far) {
                         BrVector3Scale(&p, ray_dir, t);
                         BrVector3Accumulate(&p, ray_pos);
-                        axis_m = fabsf(eqn->v[0]) < fabsf(eqn->v[1]);
-                        if (fabsf(eqn->v[2]) > fabsf(eqn->v[axis_m])) {
+                        axis_m = fabs(eqn->v[0]) < fabs(eqn->v[1]);
+                        if (fabs(eqn->v[2]) > fabs(eqn->v[axis_m])) {
                             axis_m = 2;
                         }
                         if (axis_m) {
@@ -305,7 +305,7 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
                             }
                             alpha = (v0i1 - beta * v2) / v1;
                         } else {
-                            if (fabsf(v2) < fabsf(v0i1)) {
+                            if (fabs(v2) < fabs(v0i1)) {
                                 continue;
                             }
                             if (v2 == 0) {
@@ -889,7 +889,7 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
             BrVector3Sub(&a, &grp_ptr->position[v1], &bnds->box_centre);
             // t = BrVector3Dot((br_vector3*)&fp->eqn, &a);
             t = BrVector3Dot((br_vector3*)&grp_ptr->eqn[f], &a);
-            if (fabsf(t) > bnds->radius) {
+            if (fabs(t) > bnds->radius) {
                 continue;
             }
             // v2 = fp->vertices[1];

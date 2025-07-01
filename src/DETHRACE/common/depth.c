@@ -161,7 +161,7 @@ br_scalar CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon) {
 // IDA: br_scalar __usercall DepthCueingShiftToDistance@<ST0>(int pShift@<EAX>)
 br_scalar DepthCueingShiftToDistance(int pShift) {
 
-    return powf(10.0f, pShift * 0.1f) * gCamera_yon;
+    return pow(10.0f, pShift * 0.1f) * gCamera_yon;
 }
 
 // IDA: void __usercall FogAccordingToGPSCDE(br_material *pMaterial@<EAX>)
@@ -250,7 +250,7 @@ void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int
 // FUNCTION: CARM95 0x00462226
 br_scalar Tan(br_scalar pAngle) {
 
-    return sinf(BrAngleToRadian(pAngle)) / cosf(BrAngleToRadian(pAngle));
+    return sin(BrAngleToRadian(pAngle)) / cos(BrAngleToRadian(pAngle));
 }
 
 // IDA: br_scalar __usercall EdgeU@<ST0>(br_angle pSky@<EAX>, br_angle pView@<EDX>, br_angle pPerfect@<EBX>)
@@ -260,9 +260,9 @@ br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect) {
     br_scalar b;
     br_scalar c;
 
-    a = cosf(BrAngleToRadian(pPerfect));
-    b = sinf(BrAngleToRadian(pView));
-    c = cosf(BrAngleToRadian(pView));
+    a = cos(BrAngleToRadian(pPerfect));
+    b = sin(BrAngleToRadian(pView));
+    c = cos(BrAngleToRadian(pView));
     return b * a * a / (BrAngleToRadian(pSky) * (1.f + c));
 }
 
@@ -292,8 +292,8 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     sky_distance = camera_data->yon_z - 1.f;
     horizon_half_width = sky_distance * tan_half_fov;
     horizon_half_height = horizon_half_width * camera_data->aspect;
-    horizon_half_diag = sqrtf(horizon_half_height * horizon_half_height + horizon_half_width * horizon_half_width);
-    half_diag_fov = BrRadianToAngle(atan2f(horizon_half_diag, sky_distance));
+    horizon_half_diag = sqrt(horizon_half_height * horizon_half_height + horizon_half_width * horizon_half_width);
+    half_diag_fov = BrRadianToAngle(atan2(horizon_half_diag, sky_distance));
     edge_u = EdgeU(gSky_image_width, 2 * half_diag_fov, BR_ANGLE_DEG(10));
     narrow_u = edge_u / 2.f;
     gSky_width = horizon_half_width * 2.f;
@@ -330,24 +330,24 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     for (band = 0; band < 2u; band++) {
         vertex = 4 * band;
         angle = -BR_ANGLE_DEG(90) - half_diag_fov + angle_range * band / 2;
-        pModel->vertices[vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * sky_distance;
-        pModel->vertices[vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * sky_distance;
+        pModel->vertices[vertex].p.v[1] = sin(BrAngleToRadian(angle)) * sky_distance;
+        pModel->vertices[vertex].p.v[2] = -cos(BrAngleToRadian(angle)) * sky_distance;
     }
     min_angle = -gSky_image_underground;
     angle_range = gSky_image_height;
     nbands = 18;
     for (band = 0; band < nbands; band++) {
         vertex = 4 * band + 8;
-        pModel->vertices[vertex].p.v[1] = sinf(BrAngleToRadian(min_angle + angle_range * band / nbands)) * sky_distance;
-        pModel->vertices[vertex].p.v[2] = -cosf(BrAngleToRadian(min_angle + angle_range * band / nbands)) * sky_distance;
+        pModel->vertices[vertex].p.v[1] = sin(BrAngleToRadian(min_angle + angle_range * band / nbands)) * sky_distance;
+        pModel->vertices[vertex].p.v[2] = -cos(BrAngleToRadian(min_angle + angle_range * band / nbands)) * sky_distance;
     }
     min_angle = gSky_image_height - gSky_image_underground;
     angle_range = half_diag_fov + BR_ANGLE_DEG(90) - (gSky_image_height - gSky_image_underground);
     for (band = 0; band <= 1u; band++) {
         vertex = 4 * band + 80;
         angle = min_angle + angle_range * band;
-        pModel->vertices[vertex].p.v[1] = sinf(BrAngleToRadian(angle)) * sky_distance;
-        pModel->vertices[vertex].p.v[2] = -cosf(BrAngleToRadian(angle)) * sky_distance;
+        pModel->vertices[vertex].p.v[1] = sin(BrAngleToRadian(angle)) * sky_distance;
+        pModel->vertices[vertex].p.v[2] = -cos(BrAngleToRadian(angle)) * sky_distance;
     }
     PossibleService();
     for (band = 0; band <= 21u; ++band) {
@@ -507,7 +507,7 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
                 for (x = 0; x < pRender_buffer->width; ++x) {
                     if (*depth_ptr != 0xFFFF) {
                         depth_value = *depth_ptr - too_near;
-                        if (depth_value < -(int16_t)too_near) {
+                        if (depth_value < -(tS16)too_near) {
                             *render_ptr = shade_table_pixels[(depth_value & 0xFF00) + *render_ptr];
                         }
                     }
@@ -522,7 +522,7 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
                 for (x = 0; pRender_buffer->width > x; ++x) {
                     if (*depth_ptr != 0xFFFF) {
                         depth_value = *depth_ptr - too_near;
-                        if (depth_value < -(int16_t)too_near) {
+                        if (depth_value < -(tS16)too_near) {
                             *render_ptr = shade_table_pixels[*render_ptr + ((depth_value >> (pEnd - (pShade_table_power + 8 - pStart))) & 0xFF00)];
                         }
                     }
@@ -538,7 +538,7 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
             for (x = 0; pRender_buffer->width > x; ++x) {
                 if (*depth_ptr != 0xFFFF) {
                     depth_value = *depth_ptr - too_near;
-                    if (depth_value < -(int16_t)too_near) {
+                    if (depth_value < -(tS16)too_near) {
                         *render_ptr = shade_table_pixels[*render_ptr + ((depth_value << depth_shift_amount) & 0xFF00)];
                     }
                 }
@@ -596,7 +596,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     }
 
     hshift = col_map->height - gSky_image_underground * col_map->height / gSky_image_height;
-    tan_pitch = sqrtf(pCamera_to_world->m[2][0] * pCamera_to_world->m[2][0] + pCamera_to_world->m[2][2] * pCamera_to_world->m[2][2]);
+    tan_pitch = sqrt(pCamera_to_world->m[2][0] * pCamera_to_world->m[2][0] + pCamera_to_world->m[2][2] * pCamera_to_world->m[2][2]);
     hori_y = -(pCamera_to_world->m[2][1]
                  / tan_pitch
                  / tan_half_fov * pRender_buffer->height / 2.0f)
@@ -633,7 +633,7 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     br_angle yaw;
     br_actor* actor;
 
-    yaw = BrRadianToAngle(atan2f(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
+    yaw = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
     if (!gProgram_state.cockpit_on && !gAction_replay_mode && gAction_replay_camera_mode != eAction_replay_standard
 
 #ifdef DETHRACE_3DFX_PATCH

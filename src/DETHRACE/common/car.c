@@ -787,7 +787,7 @@ void GetFacesInBox(tCollision_info* c) {
             gInTheSea = 1;
             FreezeCamera();
         }
-        if (gPling_face != NULL && fabsf(gPling_face->normal.v[1]) >= 0.9f) {
+        if (gPling_face != NULL && fabs(gPling_face->normal.v[1]) >= 0.9f) {
             BrVector3Copy(&c->water_normal, &gPling_face->normal);
             if (c->water_normal.v[1] < 0.f) {
                 BrVector3Negate(&c->water_normal, &c->water_normal);
@@ -910,7 +910,7 @@ void ControlOurCar(tU32 pTime_difference) {
             }
         } else {
             ts = pTime_difference * (car->damage_units[eDamage_steering].damage_level - 40) * 0.0045f;
-            if (PercentageChance(ts) && fabsf(car->velocity_car_space.v[2]) > 0.0001f) {
+            if (PercentageChance(ts) && fabs(car->velocity_car_space.v[2]) > 0.0001f) {
                 if (car->keys.left || car->keys.right) {
                     car->false_key_left = !car->keys.left;
                     car->false_key_right = !car->keys.right;
@@ -985,7 +985,7 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
     }
     c->torque = -(c->revs * c->revs / 100000000.0f) - 0.2f;
     if (c->keys.acc || c->joystick.acc >= 0) {
-        if (fabsf(c->curvature) > c->maxcurve / 2.0f && c->gear < 2 && c->gear && c->traction_control) {
+        if (fabs(c->curvature) > c->maxcurve / 2.0f && c->gear < 2 && c->gear && c->traction_control) {
             ts = 0.7f;
         } else if (c->joystick.acc < 0) {
             ts = 1.2;
@@ -1080,9 +1080,9 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
 
     for (i = 0; i < gNum_cars_and_non_cars; i++) {
         car = gActive_car_list[i];
-        if (fabsf(car->omega.v[0]) > 10000.f
-            || fabsf(car->omega.v[1]) > 10000.f
-            || fabsf(car->omega.v[2]) > 10000.f) {
+        if (fabs(car->omega.v[0]) > 10000.f
+            || fabs(car->omega.v[1]) > 10000.f
+            || fabs(car->omega.v[2]) > 10000.f) {
             BrVector3SetFloat(&car->omega, 0.f, 0.f, 0.f);
             BrVector3SetFloat(&car->v, 0.f, 0.f, 0.f);
         }
@@ -1110,7 +1110,7 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
         if (car->driver >= eDriver_oppo) {
             car->speedo_speed = BrVector3Dot(&minus_k, &car->v) / (WORLD_SCALE * 1000.0f);
 
-            car->steering_angle = BrRadianToDegree(atanf((car->wpos[0].v[2] - car->wpos[2].v[2]) * car->curvature));
+            car->steering_angle = BrRadianToDegree(atan((car->wpos[0].v[2] - car->wpos[2].v[2]) * car->curvature));
 
             car->lr_sus_position = (car->ride_height - car->oldd[0]) / WORLD_SCALE;
             car->rr_sus_position = (car->ride_height - car->oldd[1]) / WORLD_SCALE;
@@ -1197,12 +1197,12 @@ void GetNetPos(tCar_spec* pCar) {
         pCar->dt = -1.0f;
         return;
     }
-    if (fabsf(pCar->message.omega.v[0]) > 10000.0
-        || fabsf(pCar->message.omega.v[1]) > 10000.0
-        || fabsf(pCar->message.omega.v[2]) > 10000.0
-        || fabsf(pCar->message.omega.v[0]) > 10000.0
-        || fabsf(pCar->message.omega.v[1]) > 10000.0
-        || fabsf(pCar->message.omega.v[2]) > 10000.0) {
+    if (fabs(pCar->message.omega.v[0]) > 10000.0
+        || fabs(pCar->message.omega.v[1]) > 10000.0
+        || fabs(pCar->message.omega.v[2]) > 10000.0
+        || fabs(pCar->message.omega.v[0]) > 10000.0
+        || fabs(pCar->message.omega.v[1]) > 10000.0
+        || fabs(pCar->message.omega.v[2]) > 10000.0) {
         BrVector3SetFloat(&pCar->message.omega, 0.0, 0.0, 0.0);
         BrVector3SetFloat(&pCar->message.v, 0.0, 0.0, 0.0);
     }
@@ -1731,7 +1731,7 @@ void ControlCar4(tCar_spec* c, br_scalar dt) {
     }
     if (!c->keys.left && !c->keys.right) {
         c->turn_speed = 0.f;
-    } else if (fabsf(c->turn_speed) < fabsf(dt * 2.f * c->curvature) && c->curvature * c->turn_speed < 0.f) {
+    } else if (fabs(c->turn_speed) < fabs(dt * 2.f * c->curvature) && c->curvature * c->turn_speed < 0.f) {
         c->turn_speed = -(dt * 2.f * c->curvature);
     }
     c->curvature += c->turn_speed;
@@ -1967,7 +1967,7 @@ void RotateCar(tCollision_info* c, br_scalar dt) {
     }
 
     if (rad_squared > .008f) {
-        steps = sqrtf(rad_squared / .032f) + 1;
+        steps = sqrt(rad_squared / .032f) + 1;
         dt = dt / steps;
 
         for (i = 0; i < steps && i < 20; i++) {
@@ -2985,9 +2985,9 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
         k = 4;
     }
     for (i = 0; i < k; i++) {
-        if (fabsf(r[i].v[1]) + fabsf(r[i].v[2]) + fabsf(r[i].v[0]) > 500.0f) {
+        if (fabs(r[i].v[1]) + fabs(r[i].v[2]) + fabs(r[i].v[0]) > 500.0f) {
             for (j = i + 1; j < k; j++) {
-                if (fabsf(r[j].v[1]) + fabsf(r[j].v[2]) + fabsf(r[j].v[0]) < 500.0f) {
+                if (fabs(r[j].v[1]) + fabs(r[j].v[2]) + fabs(r[j].v[0]) < 500.0f) {
                     r[i] = r[j];
                     n[i] = n[j];
                     i++;
@@ -2999,9 +2999,9 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     }
     if (dt >= 0.0f) {
         if (k > 0 && c->collision_flag && k < 4
-            && (fabsf(r[0].v[0] - c->old_point.v[0]) > 0.05f
-                || fabsf(r[0].v[1] - c->old_point.v[1]) > 0.05f
-                || fabsf(r[0].v[2] - c->old_point.v[2]) > 0.05f)) {
+            && (fabs(r[0].v[0] - c->old_point.v[0]) > 0.05f
+                || fabs(r[0].v[1] - c->old_point.v[1]) > 0.05f
+                || fabs(r[0].v[2] - c->old_point.v[2]) > 0.05f)) {
             r[k] = c->old_point;
             n[k] = c->old_norm;
             k++;
@@ -3067,7 +3067,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             // if (f[0] > 10.0f || f[1] > 10.0f || f[2] > 10.0f) {
             //     v31 = 0;
             // }
-            if (fabsf(ts) <= 0.000001f) {
+            if (fabs(ts) <= 0.000001f) {
                 BrVector3Set(&c->v, 0.f, 0.f, 0.f);
                 BrVector3Set(&c->omega, 0.f, 0.f, 0.f);
                 BrVector3Set(&c->oldomega, 0.f, 0.f, 0.f);
@@ -3139,7 +3139,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                 && k >= 3
                 && norm.v[1] > min
                 && norm.v[1] < max) {
-                if (c->driver <= eDriver_non_car || fabsf(normal_force.v[2]) <= total_force * 0.9f) {
+                if (c->driver <= eDriver_non_car || fabs(normal_force.v[2]) <= total_force * 0.9f) {
                     BrVector3Set(&c->v, 0.f, 0.f, 0.f);
                     BrVector3Set(&norm, 0.f, 0.f, 0.f);
                     BrVector3Set(&normal_force, 0.f, 0.f, 0.f);
@@ -3253,7 +3253,7 @@ br_scalar AddFriction(tCollision_info* c, br_vector3* vel, br_vector3* normal_fo
     norm.v[1] = pos->v[0] * ftau.v[2] - pos->v[2] * ftau.v[0];
     norm.v[2] = pos->v[1] * ftau.v[0] - pos->v[0] * ftau.v[1];
     ts = max_friction->v[0] * norm.v[0] + max_friction->v[1] * norm.v[1] + max_friction->v[2] * norm.v[2] + ts;
-    if (fabsf(ts) <= 0.0001f) {
+    if (fabs(ts) <= 0.0001f) {
         ts = 0.0f;
     } else {
         ts = -BrVector3Dot(max_friction, vel) / ts;
@@ -3714,7 +3714,7 @@ br_scalar SinglePointColl(br_scalar* f, br_matrix4* m, br_scalar* d) {
     if (f[0] < 0.0f) {
         f[0] = 0.f;
     }
-    return fabsf(m->m[0][0]);
+    return fabs(m->m[0][0]);
 }
 
 // IDA: br_scalar __usercall TwoPointColl@<ST0>(br_scalar *f@<EAX>, br_matrix4 *m@<EDX>, br_scalar *d@<EBX>, br_vector3 *tau@<ECX>, br_vector3 *n)
@@ -3724,7 +3724,7 @@ br_scalar TwoPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* ta
 
     ts = m->m[1][1] * m->m[0][0] - m->m[0][1] * m->m[1][0];
 
-    if (fabsf(ts) >= 0.000001f) {
+    if (fabs(ts) >= 0.000001f) {
         f[0] = (m->m[1][1] * d[0] - m->m[0][1] * d[1]) / ts;
         f[1] = (m->m[1][0] * d[0] - m->m[0][0] * d[1]) / -ts;
     }
@@ -3739,7 +3739,7 @@ br_scalar TwoPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* ta
         ts = SinglePointColl(f, m, d);
         f[1] = 0.0;
     }
-    return fabsf(ts);
+    return fabs(ts);
 }
 
 // IDA: br_scalar __usercall DrMatrix4Inverse@<ST0>(br_matrix4 *mi@<EAX>, br_matrix4 *mc@<EDX>)
@@ -4079,9 +4079,9 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
         for (i = 0; i < n - 1; i++) {
             flag = 1;
             for (j = i + 1; j < n; j++) {
-                if (fabsf(pPoint_list[i].v[0] - pPoint_list[j].v[0]) <= 0.001f
-                    && fabsf(pPoint_list[i].v[1] - pPoint_list[j].v[1]) <= 0.001f
-                    && fabsf(pPoint_list[i].v[2] - pPoint_list[j].v[2]) <= 0.001f) {
+                if (fabs(pPoint_list[i].v[0] - pPoint_list[j].v[0]) <= 0.001f
+                    && fabs(pPoint_list[i].v[1] - pPoint_list[j].v[1]) <= 0.001f
+                    && fabs(pPoint_list[i].v[2] - pPoint_list[j].v[2]) <= 0.001f) {
                     flag = 0;
                     break;
                 }
@@ -4344,12 +4344,12 @@ void SetAmbientPratCam(tCar_spec* pCar) {
     vcs_x = pCar->velocity_car_space.v[0];
     vcs_y = pCar->velocity_car_space.v[1];
     vcs_z = pCar->velocity_car_space.v[2];
-    abs_vcs_x = fabsf(vcs_x);
-    abs_vcs_y = fabsf(vcs_y);
-    abs_vcs_z = fabsf(vcs_z);
-    abs_omega_x = fabsf(pCar->omega.v[0]);
-    abs_omega_y = fabsf(pCar->omega.v[1]);
-    abs_omega_z = fabsf(pCar->omega.v[2]);
+    abs_vcs_x = fabs(vcs_x);
+    abs_vcs_y = fabs(vcs_y);
+    abs_vcs_z = fabs(vcs_z);
+    abs_omega_x = fabs(pCar->omega.v[0]);
+    abs_omega_y = fabs(pCar->omega.v[1]);
+    abs_omega_z = fabs(pCar->omega.v[2]);
 
     if (abs_omega_x > 4.5f || abs_omega_z > 4.5f) {
         ChangeAmbientPratcam(9);
@@ -4469,7 +4469,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                     sine_angle = FRandomBetween(0.4f, 1.6f) * ((double)GetTotalTime() / ((double)gCountdown * 100.0f));
                     sine_angle = frac(sine_angle) * 360.0f;
                     sine_angle = FastScalarSin(sine_angle);
-                    raw_revs = the_car->red_line * fabsf(sine_angle);
+                    raw_revs = the_car->red_line * fabs(sine_angle);
                     rev_reducer = (11.0 - (double)gCountdown) / 10.0;
                     the_car->revs = rev_reducer * raw_revs;
                 } else {
@@ -4526,9 +4526,9 @@ void MungeCarGraphics(tU32 pFrame_period) {
             if (gAction_replay_mode) {
                 MungeSpecialVolume((tCollision_info*)the_car);
             } else if (the_car->driver == eDriver_local_human) {
-                abs_omega_x = (fabsf(the_car->I.v[0]) + 3.3f) / 2.0f * fabsf(the_car->omega.v[0]);
-                abs_omega_y = (fabsf(the_car->I.v[1]) + 3.57f) / 2.0f * fabsf(the_car->omega.v[1]);
-                abs_omega_z = (fabsf(the_car->I.v[2]) + 0.44f) / 2.0f * fabsf(the_car->omega.v[2]);
+                abs_omega_x = (fabs(the_car->I.v[0]) + 3.3f) / 2.0f * fabs(the_car->omega.v[0]);
+                abs_omega_y = (fabs(the_car->I.v[1]) + 3.57f) / 2.0f * fabs(the_car->omega.v[1]);
+                abs_omega_z = (fabs(the_car->I.v[2]) + 0.44f) / 2.0f * fabs(the_car->omega.v[2]);
                 spinning_wildly = abs_omega_x > 26.4f || abs_omega_y > 49.98f || abs_omega_z > 3.52f;
                 if (spinning_wildly && the_time - gLast_cunning_stunt > 10000) {
                     if (!gWild_start
@@ -4640,8 +4640,8 @@ void MungeCarGraphics(tU32 pFrame_period) {
                     update_mat = 1;
                 }
                 if (the_car->screen_material->colour_map != NULL) {
-                    the_car->screen_material->map_transform.m[2][0] = fmodf(car_x, 1.f);
-                    the_car->screen_material->map_transform.m[2][1] = fmodf(car_z, 1.f);
+                    the_car->screen_material->map_transform.m[2][0] = fmod(car_x, 1.f);
+                    the_car->screen_material->map_transform.m[2][1] = fmod(car_z, 1.f);
                     if (!update_mat) {
                         BrMaterialUpdate(the_car->screen_material, BR_MATU_MAP_TRANSFORM);
                     }
@@ -5371,7 +5371,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
             gCamera_yaw = 0;
             manual_swing = 1;
         }
-        if (fabsf(c->speedo_speed) > 0.0006f && gCamera_mode > 0) {
+        if (fabs(c->speedo_speed) > 0.0006f && gCamera_mode > 0) {
             gCamera_mode = -1;
             gCamera_sign = BrVector3Dot((br_vector3*)m2->m[2], &c->direction) > 0.0f;
         }
@@ -5381,7 +5381,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
         if (gCar_flying || gCamera_reset || gCamera_mode == -2) {
             gCamera_mode = 0;
         }
-        d = sqrtf(gCamera_zoom) + 4.f / WORLD_SCALE;
+        d = sqrt(gCamera_zoom) + 4.f / WORLD_SCALE;
         if (!gCamera_mode || gCamera_mode == -1) {
             BrVector3Copy(&vn, &c->direction);
             MoveWithWheels(c, &vn, manual_swing);
@@ -5472,7 +5472,7 @@ void MoveWithWheels(tCar_spec* c, br_vector3* vn, int manual_swing) {
             }
             if (yaw <= BrDegreeToAngle(45) || yaw >= BrDegreeToAngle(135)) {
                 if (!move_with_wheels) {
-                    theta = BrRadianToAngle(atan2f(c->wpos[0].v[2] * c->curvature, 1.0f));
+                    theta = BrRadianToAngle(atan2(c->wpos[0].v[2] * c->curvature, 1.0f));
                     gCamera_yaw -= (-2 * gCamera_sign + 1) * theta;
                     move_with_wheels = 1;
                 }
@@ -5510,6 +5510,9 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     // GLOBAL: CARM95 0x514e90
     static br_vector3 old_vn;
 
+    br_scalar v16, v17;
+    br_angle v8;
+
     manual_swing = gOld_yaw__car != gCamera_yaw;
     if (elapsed_time > 500) {
         elapsed_time = -1;
@@ -5536,7 +5539,7 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
             } else {
                 ts = 0.0001f;
             }
-            if (fabsf(c->speedo_speed) <= ts || gCar_flying) {
+            if (fabs(c->speedo_speed) <= ts || gCar_flying) {
                 BrVector3Negate(vn, vn);
             } else {
                 gCamera_sign = gCamera_sign == 0;
@@ -5546,7 +5549,7 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
                 } else {
                     yaw = gCamera_yaw - 32760;
                 }
-                if ((uint16_t)(gCamera_yaw + 16380) <= 32760) {
+                if ((gCamera_yaw + 16380) <= 32760) {
                     if (yaw > 8190 && yaw < 24570) {
                         gCamera_yaw = 32760 - gCamera_yaw;
                     }
@@ -5575,10 +5578,10 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
         DrVector3RotateY(vn, yaw);
     }
     sin_dtheta = 0.0;
-    br_scalar v16 = vn->v[0] * gView_direction.v[2] - vn->v[2] * gView_direction.v[0];
-    br_scalar v17 = vn->v[0] * gView_direction.v[0] + vn->v[2] * gView_direction.v[2];
+    v16 = vn->v[0] * gView_direction.v[2] - vn->v[2] * gView_direction.v[0];
+    v17 = vn->v[0] * gView_direction.v[0] + vn->v[2] * gView_direction.v[2];
 
-    br_angle v8 = BrRadianToAngle(sqrt(c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0] + c->omega.v[1] * c->omega.v[1]) * pTime / 1000.0);
+    v8 = BrRadianToAngle(sqrt(c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0] + c->omega.v[1] * c->omega.v[1]) * pTime / 1000.0);
     sin_dtheta = sin(BrAngleToRadian(v8)) + 0.1;
 
     if (omega || gCamera_reset || (c->speed < 0.0001f && !manual_swing) || gCamera_mode == -1 || (v17 > 0.0 && !manual_swing && fabs(v16) > sin_dtheta)) {
@@ -5597,11 +5600,11 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
             } else {
                 ts = BrAngleToRadian(omega);
                 if (v16 <= 0.0) {
-                    vn->v[0] = cosf(ts) * gView_direction.v[0] - sinf(ts) * gView_direction.v[2];
-                    vn->v[2] = sinf(ts) * gView_direction.v[0] + cosf(ts) * gView_direction.v[2];
+                    vn->v[0] = cos(ts) * gView_direction.v[0] - sin(ts) * gView_direction.v[2];
+                    vn->v[2] = sin(ts) * gView_direction.v[0] + cos(ts) * gView_direction.v[2];
                 } else {
-                    vn->v[0] = sinf(ts) * gView_direction.v[2] + cosf(ts) * gView_direction.v[0];
-                    vn->v[2] = cosf(ts) * gView_direction.v[2] - sinf(ts) * gView_direction.v[0];
+                    vn->v[0] = sin(ts) * gView_direction.v[2] + cos(ts) * gView_direction.v[0];
+                    vn->v[2] = cos(ts) * gView_direction.v[2] - sin(ts) * gView_direction.v[0];
                 }
                 omega += BrDegreeToAngle(pTime * 0.03f);
                 if (BrDegreeToAngle(pTime * 0.1f) < omega) {
@@ -5656,7 +5659,7 @@ void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
     m2->m[2][2] = -vn.v[2];
     BrVector3Sub(&tv2, pos, (br_vector3*)m2->m[3]);
     dist = BrVector3Dot(&tv2, &vn);
-    BrMatrix34PreRotateX(m2, theta - BrRadianToAngle(atan2f(m2->m[3][1] - pos->v[1], dist)));
+    BrMatrix34PreRotateX(m2, theta - BrRadianToAngle(atan2(m2->m[3][1] - pos->v[1], dist)));
 }
 
 // IDA: void __usercall PointCamera(br_vector3 *pos@<EAX>, br_matrix34 *m2@<EDX>)
@@ -5750,7 +5753,7 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
                 alpha = BrVector3LengthSquared(&tv) - gMin_camera_car_distance * gMin_camera_car_distance;
                 ts2 = l * l - alpha * d * 4.0;
                 if (ts2 >= 0.f && d != 0.f) {
-                    sa = (sqrtf(ts2) - l) / (d * 2.0f);
+                    sa = (sqrt(ts2) - l) / (d * 2.0f);
                     BrVector3Scale(&tv2, &tv2, sa);
                     FindFace(cam_pos, &tv2, &a, &ts, &material);
                     if (ts < 1.0f) {
@@ -5943,7 +5946,7 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
     }
     if (!accflag) {
         if (vel >= 20.f * dt || vel <= -20.f * dt) {
-            vel -= 20.f * vel / fabsf(vel) * dt;
+            vel -= 20.f * vel / fabs(vel) * dt;
         } else {
             vel = 0.f;
         }
@@ -5976,7 +5979,7 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
     BrVector3Accumulate((br_vector3*)&mat->m[3], &step);
     if (c->keys.holdw) {
         BrVector3Copy(&step, (br_vector3*)mat->m[3]);
-        BrMatrix34RotateY(mat, BrDegreeToAngle(90) - BrRadianToAngle(atan2f(mat->m[2][2], mat->m[2][0])));
+        BrMatrix34RotateY(mat, BrDegreeToAngle(90) - BrRadianToAngle(atan2(mat->m[2][2], mat->m[2][0])));
         BrVector3Copy((br_vector3*)mat->m[3], &step);
         BrVector3SetFloat(&step, 0.f, -100.f, 0.f);
         BrVector3Copy(&tmp1, (br_vector3*)&mat->m[3]);
@@ -6001,8 +6004,8 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
         }
         if (tmp_scalar1 <= 1.f) {
             mat->m[3][1] -= tmp_scalar1 * 100.f;
-            BrMatrix34PreRotateX(mat, BrRadianToAngle(asinf(BrVector3Dot((br_vector3*)mat->m[2], &tmp2))));
-            BrMatrix34PreRotateZ(mat, -BrRadianToAngle(asinf(BrVector3Dot((br_vector3*)mat->m[0], &tmp2))));
+            BrMatrix34PreRotateX(mat, BrRadianToAngle(asin(BrVector3Dot((br_vector3*)mat->m[2], &tmp2))));
+            BrMatrix34PreRotateZ(mat, -BrRadianToAngle(asin(BrVector3Dot((br_vector3*)mat->m[0], &tmp2))));
         }
     }
     BrVector3Negate((br_vector3*)&c->direction, (br_vector3*)mat->m[2]);
@@ -6981,7 +6984,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     if (k > 3) {
         k = 3;
     }
-    if (fabsf(ts) <= 0.000001f) {
+    if (fabs(ts) <= 0.000001f) {
         return 0;
     }
     BrVector3SetFloat(&f1, 0.0f, 0.0f, 0.0f);
@@ -7161,7 +7164,7 @@ br_scalar TwoPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* t
     br_scalar ts;
 
     ts = m->m[1][1] * m->m[0][0] - m->m[0][1] * m->m[1][0];
-    if (fabsf(ts) > 0.000001f) {
+    if (fabs(ts) > 0.000001f) {
         f[0] = (m->m[1][1] * d[0] - m->m[0][1] * d[1]) / ts;
         f[1] = (m->m[1][0] * d[0] - m->m[0][0] * d[1]) / -ts;
     }
@@ -7266,9 +7269,11 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
 int TestForNan(float* f) {
     tU32 i;
     // i = *f;
-    // LOG_DEBUG("i %x", i);
-    return isnan(*f);
+    //return isnan(*f);
     // return (~i & 0x7F800000) == 0;
+
+    i = *(unsigned long*)f;
+    return ((i & 0x7F800000) == 0x7F800000) && ((i & 0x007FFFFF) != 0);
 }
 
 // IDA: void __cdecl CheckCameraHither()
@@ -7299,12 +7304,12 @@ void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_s
     front_give = pCar->susp_give[1] * pFront_give_factor * WORLD_SCALE;
     rear_give = pCar->susp_give[0] * pRear_give_factor * WORLD_SCALE;
     damping = pCar->damping * pDamping_factor;
-    ratio = fabsf((pCar->wpos[0].v[2] - pCar->cmpos.v[2]) / (pCar->wpos[2].v[2] - pCar->cmpos.v[2]));
+    ratio = fabs((pCar->wpos[0].v[2] - pCar->cmpos.v[2]) / (pCar->wpos[2].v[2] - pCar->cmpos.v[2]));
     pCar->sk[0] = pCar->M / (ratio + 1.0f) * UNK_SUSPENION_FACTOR / rear_give;
-    pCar->sb[0] = pCar->M / (ratio + 1.0f) * sqrtf(UNK_SUSPENION_FACTOR) / sqrt(rear_give);
+    pCar->sb[0] = pCar->M / (ratio + 1.0f) * sqrt(UNK_SUSPENION_FACTOR) / sqrt(rear_give);
     ratio = 1.0f / ratio;
     pCar->sk[1] = pCar->M / (ratio + 1.0f) * UNK_SUSPENION_FACTOR / front_give;
-    pCar->sb[1] = pCar->M / (ratio + 1.0f) * sqrtf(UNK_SUSPENION_FACTOR) / sqrt(front_give);
+    pCar->sb[1] = pCar->M / (ratio + 1.0f) * sqrt(UNK_SUSPENION_FACTOR) / sqrt(front_give);
 
     pCar->sb[0] *= damping;
     pCar->sb[1] *= damping;

@@ -206,7 +206,7 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
     if (y_delta <= 0.f) {
         return 0;
     }
-    angle = x_delta == 0.f ? PI / 2 : atanf(y_delta / x_delta);
+    angle = x_delta == 0.f ? PI / 2 : atan(y_delta / x_delta);
     if (angle < 0.f) {
         angle += PI;
     }

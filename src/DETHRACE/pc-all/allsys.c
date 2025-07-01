@@ -372,8 +372,11 @@ void PDInitScreen(void) {
 void PDLockRealBackScreen(int lock) {
     if (!gReal_back_screen_locked && !gReal_back_screen->pixels && lock <= gVoodoo_rush_mode) {
         BrPixelmapDirectLock(gReal_back_screen, 1);
-        if (!gReal_back_screen->pixels)
+        #ifdef DETHRACE_3DFX_PATCH
+        if (!gReal_back_screen->pixels) {
             FatalError(kFatalError_CouldntLockPixelmap_S, "gReal_back_screen");
+        }
+        #endif
         gReal_back_screen_locked = 1;
     }
 }
@@ -1027,6 +1030,8 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     char slasher[4];
     char the_path[256];
 
+    char* rep;
+
     strcpy(slasher, "?:\\");
     if (pFile_name) {
         PathCat(the_path, pThe_path, pFile_name);
@@ -1035,9 +1040,10 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     }
 
     // Jeff: force unix dir separator >>
-    char* rep = the_path;
+    rep = the_path;
     while ((rep = strchr(rep, '\\')) != NULL) {
-        *rep++ = '/';
+        *rep = '/';
+        rep++;
     }
     // <<
 

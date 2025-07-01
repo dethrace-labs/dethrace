@@ -37,7 +37,7 @@ void S3Set3DSoundEnvironment(float pInverse_world_scale, float a2, float a3) {
         a3 = 130000.0f;
     }
     dword_531D9C = pInverse_world_scale;
-    tmp = sqrtf(a3 / a2);
+    tmp = sqrt(a3 / a2);
     flt_531D7C = tmp;
     flt_531D98 = tmp * dword_531D9C;
     gS3_listener_position_now.x = 0.0;
@@ -241,8 +241,8 @@ void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source
         src->pitch = pPitch;
         if (chan && chan->descriptor && chan->descriptor->type == eS3_ST_sample) {
             chan->initial_pitch = S3IRandomBetweenLog(chan->descriptor->min_pitch, chan->descriptor->max_pitch, ((tS3_sample*)chan->descriptor->sound_data)->rate);
-            chan->initial_pitch *= ldexpf(src->pitch, -16);
-            chan->initial_pitch *= ldexpf(src->speed, -16);
+            chan->initial_pitch *= ldexp(src->pitch, -16);
+            chan->initial_pitch *= ldexp(src->speed, -16);
         }
     }
     if (pAmbient_repeats != -1) {
@@ -439,9 +439,9 @@ tS3_sound_tag S3StartSound3D(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_vecto
     if (pSpeed == -1) {
         pSpeed = 0x10000;
     }
-    gS3_channel_template.rate = ldexpf(pPitch, -16) * gS3_channel_template.rate;
+    gS3_channel_template.rate = ldexp(pPitch, -16) * gS3_channel_template.rate;
     if (!pOutlet->independent_pitch) {
-        gS3_channel_template.rate = ldexpf(pSpeed, -16) * gS3_channel_template.rate;
+        gS3_channel_template.rate = ldexp(pSpeed, -16) * gS3_channel_template.rate;
     }
     gS3_channel_template.initial_pitch = gS3_channel_template.rate;
     gS3_channel_template.position = *pInitial_position;
@@ -517,7 +517,7 @@ int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
     if (dist_squared == 0.0f) {
         dist = 0.0f;
     } else {
-        dist = sqrtf(dist_squared);
+        dist = sqrt(dist_squared);
     }
     if (pIs_ambient) {
         doppler_shift = 1.0f - ((chan->position.z - gS3_listener_position_now.z) * (chan->velocity.z - gS3_listener_vel_now.z) + (chan->velocity.y - gS3_listener_vel_now.y) * (chan->position.y - gS3_listener_position_now.y) + (chan->position.x - gS3_listener_position_now.x) * (chan->velocity.x - gS3_listener_vel_now.x)) / dist / flt_531D98;

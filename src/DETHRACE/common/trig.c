@@ -253,8 +253,8 @@ float FastFloatArcTan2(float pY, float pX) {
     float abs_x;
     float abs_y;
 
-    abs_x = fabsf(pX);
-    abs_y = fabsf(pY);
+    abs_x = fabs(pX);
+    abs_y = fabs(pY);
     if (pX == 0.0f) {
         if (pY < 0.0f) {
             return 270.0;
@@ -309,8 +309,8 @@ br_angle FastFloatArcTan2Angle(float pY, float pX) {
     float abs_x;
     float abs_y;
 
-    abs_x = fabsf(pX);
-    abs_y = fabsf(pY);
+    abs_x = fabs(pX);
+    abs_y = fabs(pY);
     if (pX == 0.0) {
         if (pY >= 0.0) {
             if (pY <= 0.0) {

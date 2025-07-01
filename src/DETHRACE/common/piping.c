@@ -1479,7 +1479,7 @@ void ApplySound(tPipe_chunk** pChunk) {
                 1,
                 (*pChunk)->chunk_data.sound_data.volume & 0xff,
                 (*pChunk)->chunk_data.sound_data.volume >> 8,
-                (float)(*pChunk)->chunk_data.sound_data.pitch * fabsf(GetReplayRate()),
+                (float)(*pChunk)->chunk_data.sound_data.pitch * fabs(GetReplayRate()),
                 0x10000);
         } else {
             DRS3StartSound3D(GetOutletFromIndex((*pChunk)->chunk_data.sound_data.outlet_index),
@@ -1488,7 +1488,7 @@ void ApplySound(tPipe_chunk** pChunk) {
                 &gZero_vector,
                 1,
                 (*pChunk)->chunk_data.sound_data.volume,
-                (float)(*pChunk)->chunk_data.sound_data.pitch * fabsf(GetReplayRate()),
+                (float)(*pChunk)->chunk_data.sound_data.pitch * fabs(GetReplayRate()),
                 0x10000);
         }
     }
@@ -1555,7 +1555,7 @@ void ApplySpecial(tPipe_chunk** pChunk) {
 
     switch ((*pChunk)->subject_index) {
     case 0:
-        if (fabsf(GetReplayRate()) <= 1.f) {
+        if (fabs(GetReplayRate()) <= 1.f) {
             FadePaletteDown();
         }
         break;

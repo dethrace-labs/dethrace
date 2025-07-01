@@ -616,7 +616,7 @@ void Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 
     char* destn_ptr;
     char* destn_ptr2;
 
-    height = *(uint16_t*)pSource;
+    height = *(tU16*)pSource;
     pSource = pSource + 2;
     if (pDest_y + pOffset_y >= 0) {
         destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
@@ -707,7 +707,7 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
         return;
     }
 
-    height = *(uint16_t*)pSource;
+    height = *(tU16*)pSource;
     pSource = pSource + 2;
     if (pDest_y + pOffset_y >= 0) {
         destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
@@ -1011,7 +1011,7 @@ void InitWobbleStuff(void) {
 
     ClearWobbles();
     for (i = 0; i < COUNT_OF(gCosine_array); i++) {
-        gCosine_array[i] = cosf(i / 64.0f * DR_PI / 2.0f);
+        gCosine_array[i] = cos(i / 64.0f * DR_PI / 2.0f);
     }
 }
 
@@ -1126,7 +1126,7 @@ void CalculateConcussion(tU32 pThe_time) {
             for (j = 0; j < 3; ++j) {
                 the_amplitude = gConcussion.amplitudes.m[i][j];
                 if (the_amplitude != 0.0) {
-                    mod_angle = fmodf(time_difference / gConcussion.periods.m[i][j], TAU);
+                    mod_angle = fmod(time_difference / gConcussion.periods.m[i][j], TAU);
                     if (mod_angle > DR_3PI_OVER_2) {
                         cosine_over_angle = gCosine_array[(unsigned int)((TAU - mod_angle) / DR_PI * 128.f)];
                     } else if (mod_angle > DR_PI) {
@@ -1310,7 +1310,7 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
         if (gBack_screen->type == BR_PMT_RGB_565) {
             offset = ((int)map_pos.v[0] * 2) + gBack_screen->row_bytes * (int)map_pos.v[1];
             pColour = PaletteEntry16Bit(gRender_palette, pColour);
-            br_uint_8* p1 = &(((br_uint_8*)gBack_screen->pixels)[offset]);
+            tU8* p1 = &(((tU8*)gBack_screen->pixels)[offset]);
             *((br_uint_16*)(p1)) = pColour;
         } else
 #endif
@@ -1335,7 +1335,7 @@ void MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vector3* p1, br_vect
     BrMatrix34ApplyP(&v2, p2, &pCar->car_master_actor->t.t.mat);
     BrVector3Sub(&v3, p2, p1);
     BrVector3Cross(&v4, &v3, pLight);
-    if (fabsf(v4.v[0]) >= 0.01f || fabsf(v4.v[1]) >= 0.01f || fabsf(v4.v[2]) >= 0.01f) {
+    if (fabs(v4.v[0]) >= 0.01f || fabs(v4.v[1]) >= 0.01f || fabs(v4.v[2]) >= 0.01f) {
         BrVector3Copy(&v3, p1);
         v3.v[1] -= pY_offset;
         if (BrVector3Dot(&v3, &v4) > 0.f) {
@@ -1377,7 +1377,7 @@ void TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pS
 br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD) {
     br_vector3 normal;
 
-    return fabsf((pPos->v[1] * pB + pPos->v[0] * pA + pPos->v[2] * pC + pD) / (pA * pA + pC * pC + pB * pB));
+    return fabs((pPos->v[1] * pB + pPos->v[0] * pA + pPos->v[2] * pC + pD) / (pA * pA + pC * pC + pB * pB));
 }
 
 // IDA: void __cdecl DisableLights()

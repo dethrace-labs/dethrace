@@ -92,7 +92,7 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     to_pt.v[0] = pPt->v[0] - pL2->v[0];
     to_pt.v[1] = pPt->v[2] - pL2->v[2];
     cross = -line.v[0] * to_pt.v[1] + to_pt.v[0] * line.v[1];
-    line_len = sqrtf(line.v[0] * line.v[0] + line.v[1] * line.v[1]);
+    line_len = sqrt(line.v[0] * line.v[0] + line.v[1] * line.v[1]);
     return fabs(cross) > line_len * 0.050000001;
 }
 
@@ -214,7 +214,7 @@ void HideSkids(void) {
 // FUNCTION: CARM95 0x004021f1
 br_scalar SkidLen(int pSkid) {
 
-    return sqrtf(
+    return sqrt(
         gSkids[pSkid].actor->t.t.mat.m[0][2] * gSkids[pSkid].actor->t.t.mat.m[0][2]
         + gSkids[pSkid].actor->t.t.mat.m[0][1] * gSkids[pSkid].actor->t.t.mat.m[0][1]
         + gSkids[pSkid].actor->t.t.mat.m[0][0] * gSkids[pSkid].actor->t.t.mat.m[0][0]);

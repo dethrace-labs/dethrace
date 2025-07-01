@@ -186,19 +186,19 @@ endif()
 
 # Create our main game binary.
 add_executable(dethrace
-    WIN32
-    ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
-    ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
+#    WIN32
+#    ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
+#    ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
 )
 
-get_property(build_rpaths GLOBAL PROPERTY DETHRACE_BUILD_RPATHS)
-set_property(TARGET dethrace APPEND PROPERTY BUILD_RPATH "${build_rpaths}")
+#get_property(build_rpaths GLOBAL PROPERTY DETHRACE_BUILD_RPATHS)
+#set_property(TARGET dethrace APPEND PROPERTY BUILD_RPATH "${build_rpaths}")
 
 target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
 
 if(MSVC)
-    target_link_libraries(dethrace PRIVATE dbghelp)
+    #target_link_libraries(dethrace PRIVATE dbghelp)
     target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
     target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
 endif()

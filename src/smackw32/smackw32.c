@@ -28,12 +28,13 @@ Smack* SmackOpen(const char* name, unsigned int flags, unsigned int extrabuf) {
     Smack* smack;
     double fps;
     FILE* f = NULL;
+    smk smk_handle;
 
     f = OS_fopen(name, "rb");
     if (f == NULL) {
         return NULL;
     }
-    smk smk_handle = smk_open_filepointer(f, SMK_MODE_MEMORY);
+    smk_handle = smk_open_filepointer(f, SMK_MODE_MEMORY);
     if (smk_handle == NULL) {
         fclose(f);
         return NULL;
@@ -83,15 +84,15 @@ int SmackSoundUseDirectSound(void* dd) {
 
 void SmackToBuffer(Smack* smack, unsigned int left, unsigned int top, unsigned int pitch, unsigned int destheight, void* buf, unsigned int flags) {
     unsigned long i; // Pierre-Marie Baty -- fixed type
+    char* char_buf = buf;
+    const unsigned char* frame;
 
     // minimal implementation
     assert(left == 0);
     assert(top == 0);
     assert(flags == 0);
 
-    char* char_buf = buf;
-
-    const unsigned char* frame = smk_get_video(smack->smk_handle);
+    frame = smk_get_video(smack->smk_handle);
     for (i = 0; i < smack->Height; i++) {
         memcpy(&char_buf[(i * pitch)], &frame[i * smack->Width], smack->Width);
     }

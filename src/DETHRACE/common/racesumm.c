@@ -549,7 +549,7 @@ void PrepareBoundingRadius__racesumm(br_model* model) {
             max = d;
         }
     }
-    d = sqrtf(max);
+    d = sqrt(max);
     model->radius = d;
 }
 

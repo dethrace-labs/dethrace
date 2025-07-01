@@ -378,7 +378,7 @@ int Chance(float pChance_per_second, int pPeriod) {
 float tandeg(float pAngle) {
 
     pAngle = DEG_TO_RAD(pAngle);
-    return sinf(pAngle) / cosf(pAngle);
+    return sin(pAngle) / cos(pAngle);
 }
 
 // IDA: tU32 __usercall GetFileLength@<EAX>(FILE *pF@<EAX>)
@@ -524,7 +524,7 @@ br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     if (the_map != NULL) {
         the_map->origin_x = 0;
         the_map->origin_y = 0;
-        the_map->row_bytes = (the_map->row_bytes + sizeof(int32_t) - 1) & ~(sizeof(int32_t) - 1);
+        the_map->row_bytes = (the_map->row_bytes + sizeof(tS32) - 1) & ~(sizeof(tS32) - 1);
     }
     return the_map;
 }
@@ -539,7 +539,7 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
     number_loaded = BrPixelmapLoadMany(pFile_name, pPixelmaps, pNum);
     for (i = 0; i < number_loaded; i++) {
         the_map = pPixelmaps[i];
-        the_map->row_bytes = (the_map->row_bytes + sizeof(int32_t) - 1) & ~(sizeof(int32_t) - 1);
+        the_map->row_bytes = (the_map->row_bytes + sizeof(tS32) - 1) & ~(sizeof(tS32) - 1);
         the_map->base_x = 0;
         the_map->base_y = 0;
     }
@@ -1890,19 +1890,21 @@ void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
 void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
 
     static br_token_value alpha25[3] = {
-        { BRT_BLEND_B, { .b = 1 } },
-        { BRT_OPACITY_X, { .x = 0x400000 } },
-        { 0 },
+        { BRT_BLEND_B, { 1 } },          // .b = 1
+        { BRT_OPACITY_X, { 0x400000 } }, // .x = 0x400000
+        { 0, { 0 } },
     };
+
     static br_token_value alpha50[3] = {
-        { BRT_BLEND_B, { .b = 1 } },
-        { BRT_OPACITY_X, { .x = 0x800000 } },
-        { 0 },
+        { BRT_BLEND_B, { 1 } },
+        { BRT_OPACITY_X, { 0x800000 } },
+        { 0, { 0 } },
     };
+
     static br_token_value alpha75[3] = {
-        { BRT_BLEND_B, { .b = 1 } },
-        { BRT_OPACITY_X, { .x = 0xc00000 } },
-        { 0 },
+        { BRT_BLEND_B, { 1 } },
+        { BRT_OPACITY_X, { 0xc00000 } },
+        { 0, { 0 } },
     };
 
     switch (pPercent) {

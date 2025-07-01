@@ -639,7 +639,7 @@ void MungeEngineNoise(void) {
         BrVector3Set(&gCamera_velocity, 0.0f, 0.0f, 0.0f);
     }
     BrVector3Copy(&gOld_camera_position, &gCamera_position);
-    stop_all = (gAction_replay_mode && (fabsf(GetReplayRate()) > 1.0f || GetReplayRate() == 0.0f)) || gFaded_palette || gPalette_fade_time;
+    stop_all = (gAction_replay_mode && (fabs(GetReplayRate()) > 1.0f || GetReplayRate() == 0.0f)) || gFaded_palette || gPalette_fade_time;
     for (cat = eVehicle_self; cat <= eVehicle_rozzer; cat++) {
         if (cat) {
             car_count = GetCarCount(cat);
@@ -667,7 +667,7 @@ void MungeEngineNoise(void) {
                         }
                         pitch = the_car->revs * 10.0f + 40960.0f;
                         if (gAction_replay_mode) {
-                            pitch = fabsf(GetReplayRate()) * pitch;
+                            pitch = fabs(GetReplayRate()) * pitch;
                         }
                         if (type_of_engine_noise == 1) {
                             pitch = pitch * 0.75f;

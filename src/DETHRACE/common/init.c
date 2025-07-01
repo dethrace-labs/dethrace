@@ -366,6 +366,8 @@ void AustereWarning(void) {
     }
 }
 
+#ifdef DETHRACE_3DFX_PATCH
+
 // IDA: void __cdecl InitLineStuff()
 void InitLineStuff(void) {
 
@@ -548,6 +550,8 @@ void Init2DStuff(void) {
     BrActorAdd(g2d_camera, gPrat_actor);
     gPrat_actor->render_style = BR_RSTYLE_NONE;
 }
+
+#endif
 
 // IDA: void __usercall InitialiseApplication(int pArgc@<EAX>, char **pArgv@<EDX>)
 // FUNCTION: CARM95 0x004bba54

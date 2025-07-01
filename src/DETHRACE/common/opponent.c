@@ -449,9 +449,9 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
         BrVector3Sub(&p, finish, start);
         BrVector3NormaliseQuick(pPath_direction, &p);
         BrVector3Copy(pIntersect, nearest_node_v);
-        *pDistance = sqrtf(closest_distance_squared);
+        *pDistance = sqrt(closest_distance_squared);
     } else {
-        *pDistance = sqrtf(nearest_node_distance_squared);
+        *pDistance = sqrt(nearest_node_distance_squared);
     }
     if (pPursuee != NULL) {
         nearest_node_section_no += 15000;
@@ -1367,7 +1367,7 @@ void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command 
                 pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
                 pOpponent_spec->car_spec->acc_force = 0.f;
                 BrVector3InvScale(&pOpponent_spec->car_spec->omega, &pOpponent_spec->car_spec->omega,
-                    powf(gFrame_period_for_this_munging / 1000.f, 2.f));
+                    pow(gFrame_period_for_this_munging / 1000.f, 2.f));
             }
         }
         if (!pOpponent_spec->levitate_data.waiting_to_levitate) {
@@ -2085,7 +2085,7 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
     this_total = 0;
     mat = &pOpponent_spec->car_spec->car_master_actor->t.t.mat;
     massage_count = 0;
-    phi = BrDegreeToAngle(90) - BrRadianToAngle(atan2f(mat->m[2][2], mat->m[2][0]));
+    phi = BrDegreeToAngle(90) - BrRadianToAngle(atan2(mat->m[2][2], mat->m[2][0]));
     if (pOpponent_spec->physics_me) {
         dr_dprintf("%s: Actually, we're already materialised", pOpponent_spec->car_spec->driver_name);
     } else {
@@ -2121,10 +2121,10 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
                 dist = -dist2;
                 BrVector3Copy(&norm, &norm2);
             }
-            if (fabsf(dist) <= 1.f) {
+            if (fabs(dist) <= 1.f) {
                 mat->m[3][1] -= dist * 100.f - 2.f;
-                BrMatrix34PreRotateX(mat, BrRadianToAngle(asinf(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
-                BrMatrix34PreRotateZ(mat, BrRadianToAngle(asinf(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
+                BrMatrix34PreRotateX(mat, BrRadianToAngle(asin(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
+                BrMatrix34PreRotateZ(mat, BrRadianToAngle(asin(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
             }
             BrVector3Negate(&pOpponent_spec->car_spec->direction, (br_vector3*)mat->m[2]);
             BrMatrix34ApplyP(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->cmpos, mat);
@@ -2317,7 +2317,7 @@ void LoadInOppoPaths(FILE* pF) {
             z = gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[i].node_indices[1]].p.v[2]
                 - gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[i].node_indices[0]].p.v[2];
 
-            gProgram_state.AI_vehicles.path_sections[i].length = sqrtf(x * x + y * y + z * z);
+            gProgram_state.AI_vehicles.path_sections[i].length = sqrt(x * x + y * y + z * z);
             if (scalars[7] < 1000.0f) {
                 gProgram_state.AI_vehicles.path_sections[i].type = (tU8)scalars[7];
                 gProgram_state.AI_vehicles.path_sections[i].one_way = 0;
@@ -2567,7 +2567,7 @@ void InitOpponents(tRace_info* pRace_info) {
     gDefinite_no_cop_pursuit_speed = 17.8788f;
     gDefinite_cop_pursuit_speed = 44.697f;
     gCop_pursuit_speed_percentage_multiplier = 100.f / (gDefinite_cop_pursuit_speed - gDefinite_no_cop_pursuit_speed);
-    gHead_on_cos_value = cosf(.5235668f);
+    gHead_on_cos_value = cos(.5235668f);
     gAcme_frame_count = 0;
     gProgram_state.current_car.no_of_processes_recording_my_trail = 0;
     rank_dependent_difficulty = (101.f - (gCurrent_race.suggested_rank < 10 ? .5f : gCurrent_race.suggested_rank)) / 10.0f;
@@ -3092,7 +3092,7 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
         return;
     }
     damage = pTwattee->damage_magnitude_accumulator;
-    bangness = MIN(sqrtf(damage * 300000.0f), 100);
+    bangness = MIN(sqrt(damage * 300000.0f), 100);
     grudginess_caused_by_damage = bangness / 10 + 50 * CAR_SPEC_IS_ROZZER(pTwattee);
     dr_dprintf("Frame %0.6d: %s hit %s, damage %f, bangness %d, gBig_bang %d, grudginess %d",
         gAcme_frame_count,

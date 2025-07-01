@@ -691,7 +691,7 @@ int FaceIsRoad(br_model* pModel, tU16 pFace) {
     BrVector3Sub(&v0, &pModel->vertices[pModel->faces[pFace].vertices[0]].p, &pModel->vertices[pModel->faces[pFace].vertices[1]].p);
     BrVector3Sub(&v1, &pModel->vertices[pModel->faces[pFace].vertices[1]].p, &pModel->vertices[pModel->faces[pFace].vertices[2]].p);
     BrVector3Cross(&cross, &v0, &v1);
-    return sqrtf(cross.v[0] * cross.v[0] + cross.v[2] * cross.v[2]) < 0.7f * cross.v[1];
+    return sqrt(cross.v[0] * cross.v[0] + cross.v[2] * cross.v[2]) < 0.7f * cross.v[1];
 }
 
 // IDA: br_material* __usercall RoadPerspToUntex@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -988,7 +988,7 @@ float ControlBoundFunkGroovePlus(int pSlot_number, float pValue) {
     if (pSlot_number >= COUNT_OF(gGroove_funk_bindings)) {
         FatalError(kFatalError_UsedRefNumGrooveFunkOutOfRange);
     }
-    *gGroove_funk_bindings[pSlot_number] = fmodf(*gGroove_funk_bindings[pSlot_number] + pValue, 1.f);
+    *gGroove_funk_bindings[pSlot_number] = fmod(*gGroove_funk_bindings[pSlot_number] + pValue, 1.f);
     return *gGroove_funk_bindings[pSlot_number];
 }
 
@@ -2490,6 +2490,8 @@ void ParseSpecialVolume(FILE* pF, tSpecial_volume* pSpec, char* pScreen_name_str
     pSpec->material_modifier_index = GetAnInt(pF);
 }
 
+#ifdef DETHRACE_3DFX_PATCH
+
 // IDA: void __usercall AddExceptionToList(tException_list *pDst@<EAX>, tException_list pNew@<EDX>)
 void AddExceptionToList(tException_list* pDst, tException_list pNew) {
 
@@ -2582,6 +2584,8 @@ void FreeExceptions(void) {
     }
     gExceptions = NULL;
 }
+
+#endif
 
 // IDA: void __usercall LoadTrack(char *pFile_name@<EAX>, tTrack_spec *pTrack_spec@<EDX>, tRace_info *pRace_info@<EBX>)
 // FUNCTION: CARM95 0x0043a136
@@ -3232,7 +3236,7 @@ br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
     return pAngle;
 }
 
-#define SAW(T, PERIOD) (fmodf((T), (PERIOD)) / (PERIOD))
+#define SAW(T, PERIOD) (fmod((T), (PERIOD)) / (PERIOD))
 
 #define MOVE_FUNK_PARAMETER(DEST, MODE, PERIOD, AMPLITUDE, FLASH_VALUE)                     \
     do {                                                                                    \
@@ -3258,7 +3262,7 @@ br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
             }                                                                               \
             break;                                                                          \
         case eMove_flash:                                                                   \
-            if (2 * fmodf(f_the_time, (PERIOD)) > (PERIOD)) {                               \
+            if (2 * fmod(f_the_time, (PERIOD)) > (PERIOD)) {                               \
                 DEST = (FLASH_VALUE);                                                       \
             } else {                                                                        \
                 DEST = -(FLASH_VALUE);                                                      \
@@ -3328,9 +3332,9 @@ void FunkThoseTronics(void) {
                     the_material->map_transform.m[2][0] -= .5f;
                     the_material->map_transform.m[2][1] -= .5f;
                     if (the_funk->matrix_mod_data.spin_info.period > 0.f) {
-                        f_time_diff = 1.f - fmodf(the_funk->matrix_mod_data.spin_info.period, 1.f);
+                        f_time_diff = 1.f - fmod(the_funk->matrix_mod_data.spin_info.period, 1.f);
                     } else {
-                        f_time_diff = fmodf(-the_funk->matrix_mod_data.spin_info.period, 1.f);
+                        f_time_diff = fmod(-the_funk->matrix_mod_data.spin_info.period, 1.f);
                     }
 
                     MOVE_FUNK_PARAMETER(rot_amount, the_funk->matrix_mode, f_time_diff, 65536.f, 7.5f);
@@ -3394,7 +3398,7 @@ void FunkThoseTronics(void) {
                         MOVE_FUNK_PARAMETER(rot_amount, the_funk->texture_animation_data.frames_info.mode, the_funk->texture_animation_data.frames_info.period, the_funk->texture_animation_data.frames_info.texture_count, the_funk->texture_animation_data.frames_info.texture_count);
                         the_material->colour_map = the_funk->texture_animation_data.frames_info.textures[(int)rot_amount];
                     } else {
-                        if (the_funk->texture_animation_data.frames_info.period <= fabsf(f_the_time - the_funk->last_frame)) {
+                        if (the_funk->texture_animation_data.frames_info.period <= fabs(f_the_time - the_funk->last_frame)) {
                             the_funk->last_frame = f_the_time;
                             the_funk->texture_animation_data.frames_info.current_frame++;
                             if (the_funk->texture_animation_data.frames_info.current_frame >= the_funk->texture_animation_data.frames_info.texture_count) {
@@ -3582,7 +3586,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 if (pGroove->path_data.straight_info.period == 0.0f) {
                     pos = 0.f;
                 } else {
-                    pos = fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.x_delta;
+                    pos = fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.x_delta;
                 }
                 break;
             case eMove_controlled:
@@ -3592,7 +3596,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 pos = pGroove->path_data.straight_info.period;
                 break;
             case eMove_flash:
-                if (fmodf(pTime, pGroove->path_data.straight_info.period) * 2.0f <= pGroove->path_data.straight_info.period) {
+                if (fmod(pTime, pGroove->path_data.straight_info.period) * 2.0f <= pGroove->path_data.straight_info.period) {
                     pos = pGroove->path_data.straight_info.x_delta;
                 } else {
                     pos = -pGroove->path_data.straight_info.x_delta;
@@ -3602,7 +3606,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 if (pGroove->path_data.straight_info.period == 0.0f) {
                     pos = 0.f;
                 } else {
-                    pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0f)))
+                    pos = sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0f)))
                         * pGroove->path_data.straight_info.x_delta;
                 }
                 break;
@@ -3610,7 +3614,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 if (pGroove->path_data.straight_info.period == 0.0f) {
                     pos = 0.f;
                 } else {
-                    pos = MapSawToTriangle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
+                    pos = MapSawToTriangle(fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
                         * pGroove->path_data.straight_info.x_delta;
                 }
                 break;
@@ -3648,7 +3652,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 if (pGroove->path_data.straight_info.period == 0.0f) {
                     pos = 0.f;
                 } else {
-                    pos = fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.y_delta;
+                    pos = fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.y_delta;
                 }
                 break;
             case eMove_controlled:
@@ -3658,7 +3662,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 pos = pGroove->path_data.straight_info.period;
                 break;
             case eMove_flash:
-                if (fmodf(pTime, pGroove->path_data.straight_info.period) * 2.0f <= pGroove->path_data.straight_info.period) {
+                if (fmod(pTime, pGroove->path_data.straight_info.period) * 2.0f <= pGroove->path_data.straight_info.period) {
                     pos = pGroove->path_data.straight_info.y_delta;
                 } else {
                     pos = -pGroove->path_data.straight_info.y_delta;
@@ -3668,7 +3672,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 if (pGroove->path_data.straight_info.period == 0.0) {
                     pos = 0.f;
                 } else {
-                    pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0f)))
+                    pos = sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0f)))
                         * pGroove->path_data.straight_info.y_delta;
                 }
                 break;
@@ -3676,7 +3680,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 if (pGroove->path_data.straight_info.period == 0.0f) {
                     pos = 0.f;
                 } else {
-                    pos = MapSawToTriangle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
+                    pos = MapSawToTriangle(fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
                         * pGroove->path_data.straight_info.y_delta;
                 }
                 break;
@@ -3714,7 +3718,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 if (pGroove->path_data.straight_info.period == 0.0f) {
                     pos = 0.f;
                 } else {
-                    pos = fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.z_delta;
+                    pos = fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * pGroove->path_data.straight_info.z_delta;
                 }
                 break;
             case eMove_controlled:
@@ -3724,7 +3728,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 pos = pGroove->path_data.straight_info.period;
                 break;
             case eMove_flash:
-                if (fmodf(pTime, pGroove->path_data.straight_info.period) * 2.0f <= pGroove->path_data.straight_info.period) {
+                if (fmod(pTime, pGroove->path_data.straight_info.period) * 2.0f <= pGroove->path_data.straight_info.period) {
                     pos = pGroove->path_data.straight_info.z_delta;
                 } else {
                     pos = -pGroove->path_data.straight_info.z_delta;
@@ -3734,7 +3738,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 if (pGroove->path_data.straight_info.period == 0.0f) {
                     pos = 0.f;
                 } else {
-                    pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0f)))
+                    pos = sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period * 360.0f)))
                         * pGroove->path_data.straight_info.z_delta;
                 }
                 break;
@@ -3742,7 +3746,7 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
                 if (pGroove->path_data.straight_info.period == 0.0f) {
                     pos = 0.f;
                 } else {
-                    pos = MapSawToTriangle(fmodf(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
+                    pos = MapSawToTriangle(fmod(pTime, pGroove->path_data.straight_info.period) / pGroove->path_data.straight_info.period)
                         * pGroove->path_data.straight_info.z_delta;
                 }
                 break;
@@ -3782,14 +3786,14 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
             if (pGroove->path_data.circular_info.period == 0.0f) {
                 pos = 0.f;
             } else {
-                pos = cosf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
+                pos = cos(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
             }
             pMat->m[3][0] = pGroove->path_data.circular_info.centre.v[0] + pos;
         } else if (pGroove->path_data.circular_info.axis == eGroove_axis_z) {
             if (pGroove->path_data.circular_info.period == 0.0f) {
                 pos = 0.f;
             } else {
-                pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
+                pos = sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
             }
             pMat->m[3][0] = pGroove->path_data.circular_info.centre.v[0] + pos;
         }
@@ -3798,14 +3802,14 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
             if (pGroove->path_data.circular_info.period == 0.0f) {
                 pos = 0.f;
             } else {
-                pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
+                pos = sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
             }
             pMat->m[3][1] = pGroove->path_data.circular_info.centre.v[1] + pos;
         } else if (pGroove->path_data.circular_info.axis == eGroove_axis_z) {
             if (pGroove->path_data.circular_info.period == 0.0f) {
                 pos = 0.f;
             } else {
-                pos = cosf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
+                pos = cos(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
             }
             pMat->m[3][1] = pGroove->path_data.circular_info.centre.v[1] + pos;
         }
@@ -3814,14 +3818,14 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
             if (pGroove->path_data.circular_info.period == 0.0f) {
                 pos = 0.f;
             } else {
-                pos = cosf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
+                pos = cos(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
             }
             pMat->m[3][2] = pGroove->path_data.circular_info.centre.v[1] + pos;
         } else if (pGroove->path_data.circular_info.axis == eGroove_axis_z) {
             if (pGroove->path_data.circular_info.period == 0.0f) {
                 pos = 0.f;
             } else {
-                pos = sinf(BrAngleToRadian(BrDegreeToAngle(fmodf(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
+                pos = sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->path_data.circular_info.period) / pGroove->path_data.circular_info.period * 360.0f))) * pGroove->path_data.circular_info.radius;
             }
             pMat->m[3][2] = pGroove->path_data.circular_info.centre.v[1] + pos;
         }

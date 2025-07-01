@@ -1541,7 +1541,7 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
                     } else {
                         this_danger = 5.f;
                     }
-                    this_danger = (fabsf(car->speed) + 3e-5f) * this_danger / distance_squared * 400.f;
+                    this_danger = (fabs(car->speed) + 3e-5f) * this_danger / distance_squared * 400.f;
                 }
                 if (this_danger > most_dangerous) {
                     most_dangerous = this_danger;
@@ -1581,12 +1581,12 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
 #ifdef DETHRACE_FIX_BUGS
     x_to_use = 0.0f;
 #endif
-    if (fabsf(pPedestrian->current_speed) >= fabsf(pCar->speed)) {
-        BrVector3Scale(&ped_move_in_global, &pPedestrian->direction, -fabsf(pPedestrian->current_speed));
+    if (fabs(pPedestrian->current_speed) >= fabs(pCar->speed)) {
+        BrVector3Scale(&ped_move_in_global, &pPedestrian->direction, -fabs(pPedestrian->current_speed));
     } else {
-        BrVector3Scale(&ped_move_in_global, &pCar->direction, fabsf(pCar->speed));
+        BrVector3Scale(&ped_move_in_global, &pCar->direction, fabs(pCar->speed));
     }
-    if (fabsf(ped_move_in_global.v[X]) < 5e-5f || fabsf(ped_move_in_global.v[Z]) < 5e-5f) {
+    if (fabs(ped_move_in_global.v[X]) < 5e-5f || fabs(ped_move_in_global.v[Z]) < 5e-5f) {
         return ePed_hit_unknown;
     }
     BrActorToActorMatrix34(&global_to_car, gDont_render_actor, pCar_actor);
@@ -1631,7 +1631,7 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
     BrVector3Set(&scaled_car_direction, 1.01f * x_to_use, 0.f, 1.01f * z_to_use);
     BrMatrix34TApplyV(&scaled_ped_direction, &scaled_car_direction, &global_to_car);
     scaled_ped_direction.v[Y] = 0.f;
-    if (pCar->speed == 0.f || gFrame_period * fabsf(pCar->speed) > BrVector3Length(&scaled_ped_direction) / 10.f) {
+    if (pCar->speed == 0.f || gFrame_period * fabs(pCar->speed) > BrVector3Length(&scaled_ped_direction) / 10.f) {
         BrVector3Accumulate(&pPedestrian->actor->t.t.translate.t, &scaled_ped_direction);
         BrVector3Accumulate(&pPedestrian->pos, &scaled_ped_direction);
     }
@@ -1769,9 +1769,9 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
         }
         car_actor = the_car->car_master_actor;
         car_pos = &car_actor->t.t.translate.t;
-        impact_speed = fabsf(the_car->speed);
+        impact_speed = fabs(the_car->speed);
         if (BrVector3Dot(&pPedestrian->direction, &the_car->direction) > 0.f
-            && impact_speed < fabsf(pPedestrian->current_speed)) {
+            && impact_speed < fabs(pPedestrian->current_speed)) {
             impact_speed = 0.0f;
         }
         distance_squared = Vector3DistanceSquared(ped_pos, car_pos);
@@ -2044,13 +2044,13 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
             credits_value *= 4;
             PratcamEvent(30);
             DoFancyHeadup(kFancyHeadupNiceShotSir);
-        } else if (fabsf(the_car->omega.v[X]) <= 5.0f
-            && fabsf(the_car->omega.v[Z]) <= 5.0f
+        } else if (fabs(the_car->omega.v[X]) <= 5.0f
+            && fabs(the_car->omega.v[Z]) <= 5.0f
             && BrVector3Dot(&the_car->car_master_actor->t.t.look_up.up, &up) >= 0.1f
             && pPedestrian->offset.v[1] >= -0.1f) {
             if (((hit_pos != ePed_hit_lside && hit_pos != ePed_hit_rside)
-                    || (fabsf(the_car->velocity_car_space.v[X]) <= fabsf(the_car->velocity_car_space.v[Z])
-                        && fabsf(the_car->omega.v[Y] / the_car->velocity_car_space.v[Z]) <= 600.0f))
+                    || (fabs(the_car->velocity_car_space.v[X]) <= fabs(the_car->velocity_car_space.v[Z])
+                        && fabs(the_car->omega.v[Y] / the_car->velocity_car_space.v[Z]) <= 600.0f))
                 && (hit_pos != ePed_hit_back || the_car->velocity_car_space.v[Z] <= 0.0f)) {
                 if (gCurrent_ped_multiplier >= 2) {
                     DoFancyHeadup(gCurrent_ped_multiplier + kFancyHeadup2xComboBonus - 2);
@@ -2453,8 +2453,8 @@ void MungePedestrians(tU32 pFrame_period) {
     if (gAction_replay_mode) {
         for (i = 0; i < gPed_count; i++) {
             the_pedestrian = &gPedestrian_array[i];
-            x_delta = fabsf(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
-            z_delta = fabsf(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
+            x_delta = fabs(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
+            z_delta = fabs(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
             if ((the_pedestrian->actor->parent != gDont_render_actor || (x_delta <= ACTIVE_PED_DXDZ && z_delta <= ACTIVE_PED_DXDZ))
                 && (gPedestrians_on || the_pedestrian->ref_number >= 100)
                 && the_pedestrian->hit_points != -100) {
@@ -2465,8 +2465,8 @@ void MungePedestrians(tU32 pFrame_period) {
     } else {
         for (i = 0; i < gPed_count; i++) {
             the_pedestrian = &gPedestrian_array[i];
-            x_delta = fabsf(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
-            z_delta = fabsf(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
+            x_delta = fabs(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
+            z_delta = fabs(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
             if (the_pedestrian->actor->parent == gDont_render_actor
                 && (x_delta > ACTIVE_PED_DXDZ || z_delta > ACTIVE_PED_DXDZ)) {
                 the_pedestrian->active = 0;
@@ -2527,8 +2527,8 @@ void RespawnPedestrians(void) {
             br_scalar x_delta;
             br_scalar z_delta;
             int ped_respawn_animate;
-            x_delta = fabsf(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
-            z_delta = fabsf(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
+            x_delta = fabs(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
+            z_delta = fabs(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
             ped_respawn_animate = x_delta <= ACTIVE_PED_DXDZ && z_delta <= ACTIVE_PED_DXDZ;
 #else
 #define ped_respawn_animate 1
