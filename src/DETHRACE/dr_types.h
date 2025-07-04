@@ -10,9 +10,12 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 
 typedef unsigned int uintptr_t;
 typedef int intptr_t;
+
+#pragma intrinsic(memcpy, memset, memcmp, strlen, strcpy, strcmp, strcat)
 
 // required for platform-specific network structs
 // if needed for a different platform, make this conditional

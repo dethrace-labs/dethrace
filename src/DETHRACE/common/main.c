@@ -135,8 +135,7 @@ void GameMain(int pArgc, char** pArgv) {
     UsePathFileToDetermineIfFullInstallation();
     if (!gCD_fully_installed && GetCDPathFromPathsTxtFile(CD_dir) && !PDCheckDriveExists(CD_dir)) {
         PDInitialiseSystem();
-        fprintf(stderr, "Can't find the Carmageddon CD\n");
-        exit(1);
+        PDFatalError("Can't find the Carmageddon CD\n");
     }
     InitialiseDeathRace(pArgc, pArgv);
     DoProgram();
