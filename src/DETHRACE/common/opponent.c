@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 // GLOBAL: CARM95 0x005070d0
-br_actor* gOppo_path_actor;
+br_actor* gOppo_path_actor = NULL;
 
 // GLOBAL: CARM95 0x005070d4
 br_model* gOppo_path_model;
