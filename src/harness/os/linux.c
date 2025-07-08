@@ -9,7 +9,9 @@
 #include <dirent.h>
 #include <err.h>
 #include <errno.h>
+#ifndef __EMSCRIPTEN__
 #include <execinfo.h>
+#endif
 #include <fcntl.h>
 #include <ifaddrs.h>
 #include <libgen.h>
@@ -73,6 +75,7 @@ int addr2line(char const* const program_name, void const* const addr) {
 }
 
 static void print_stack_trace(void) {
+#ifndef __EMSCRIPTEN__
     int i, trace_size = 0;
     char** messages = (char**)NULL;
 
@@ -91,6 +94,7 @@ static void print_stack_trace(void) {
     if (messages) {
         free(messages);
     }
+#endif
 }
 
 static void signal_handler(int sig, siginfo_t* siginfo, void* context) {
@@ -205,10 +209,11 @@ void OS_InstallSignalHandler(char* program_name) {
         }
         ss.ss_size = 2 * MINSIGSTKSZ;
         ss.ss_flags = 0;
-
+#ifndef __EMSCRIPTEN__
         if (sigaltstack(&ss, NULL) != 0) {
             err(1, "sigaltstack");
         }
+#endif
     }
 
     /* register our signal handlers */

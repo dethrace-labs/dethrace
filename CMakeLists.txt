@@ -30,6 +30,23 @@ endif()
 
 message(STATUS "dethrace version ${DETHRACE_VERSION}")
 
+if (CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+    set(USE_FLAGS "--use-port=sdl2 --use-port=sdl2_image")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS} \
+              -Wl,-u,scalbnl \
+              -sASYNCIFY \
+              -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=256mb -sMEMORY_GROWTH_LINEAR_STEP=128mb \
+              -sSTACK_SIZE=1024kb \
+              -sENVIRONMENT=web \
+              -sMODULARIZE \
+              -sEXPORT_ALL -sEXPORTED_RUNTIME_METHODS=callMain,addRunDependency,removeRunDependency \
+              -sEXIT_RUNTIME \
+              -lwebsocket.js -lidbfs.js -sCASE_INSENSITIVE_FS -sASSERTIONS=2 --profiling-funcs")
+endif ()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 set(DETHRACE_IDE_ARGUMENTS "" CACHE STRING "DethRace arguments (only used by MSVC when debugging")
@@ -67,19 +84,23 @@ option(DETHRACE_PLATFORM_SDL2 "Support SDL 2 platform driver"   ON)
 set(count_sdl_platforms 0)
 
 set(DETHRACE_PLATFORMS )
-if(DETHRACE_PLATFORM_SDL1)
-    find_package(SDL REQUIRED)
-    list(APPEND DETHRACE_PLATFORMS SDL1)
-    math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
-endif()
-if(DETHRACE_PLATFORM_SDL2)
-    find_package(SDL2 CONFIG)
-    if(NOT SDL2_FOUND)
-        find_package(SDL2 MODULE REQUIRED)
+if (NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+    if(DETHRACE_PLATFORM_SDL1)
+        find_package(SDL REQUIRED)
+        list(APPEND DETHRACE_PLATFORMS SDL1)
+        math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
     endif()
+    if(DETHRACE_PLATFORM_SDL2)
+        find_package(SDL2 CONFIG)
+        if(NOT SDL2_FOUND)
+            find_package(SDL2 MODULE REQUIRED)
+        endif()
+        list(APPEND DETHRACE_PLATFORMS SDL2)
+        math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
+    endif()
+else ()
     list(APPEND DETHRACE_PLATFORMS SDL2)
-    math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
-endif()
+endif ()
 
 if(count_sdl_platforms GREATER 1)
     # Force dynamic SDL when enabling 2 (or more) SDL platform backends

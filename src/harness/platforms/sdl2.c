@@ -137,7 +137,9 @@ static void SDL2_Harness_ProcessWindowMessages(void) {
                     }
                 } else if (event.key.type == SDL_KEYUP) {
                     if (is_only_key_modifier(event.key.keysym.mod, KMOD_ALT)) {
+#ifndef __EMSCRIPTEN__
                         SDL2_SetWindowFullscreen(window, (SDL2_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP) ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
+#endif
                     }
                 }
             }
@@ -318,7 +320,9 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
     viewport.scale_y = 1;
 
     if (harness_game_config.start_full_screen) {
+#ifndef __EMSCRIPTEN__
         SDL2_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+#endif
     }
 }
 
