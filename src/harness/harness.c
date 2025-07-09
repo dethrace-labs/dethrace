@@ -432,7 +432,7 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
         harness_game_config.fps = i;
     } else if (MATCH("General", "DemoTimeout")) {
         i = atoi(value);
-        harness_game_config.demo_timeout = i;
+        harness_game_config.demo_timeout = i * 1000;
     } else if (MATCH("General", "Windowed")) {
         harness_game_config.start_full_screen = (value[0] == '0');
     } else if (MATCH("General", "Emulate3DFX")) {
