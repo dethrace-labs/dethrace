@@ -20,16 +20,16 @@ Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](h
 
 ### Dependencies
 
-Dethrace has a dependency on SDL2. The easiest way to install SDL is via your favorite package manager.
+Dethrace using CMake to build, and SDL2 at runtime. The easiest way to install them is via your favorite package manager.
 
 OSX:
 ```sh
-brew install SDL2
+brew install SDL2 cmake
 ```
 
 Linux:
 ```sh
-apt-get install libsdl2-dev
+apt-get install libsdl2-dev cmake
 ```
 
 ### Clone
@@ -41,9 +41,10 @@ cd dethrace
 git submodule update --init --recursive
 ```
 
-Dethrace uses [cmake](https://cmake.org/) for generating build files.
+### Build
+Dethrace uses [cmake](https://cmake.org/)
 
-To generate the build files (generally only required once):
+To generate the build files:
 ```sh
 mkdir build
 cd build
@@ -64,16 +65,12 @@ Dethrace does not ship with any content. You'll need access to the data from the
 - [Splat Pack demo](https://rr2000.cwaboard.co.uk/R4/PC/splatdem.zip)
 - [Splat Pack Xmas demo](https://rr2000.cwaboard.co.uk/R4/PC/Splatpack_christmas_demo.zip)
 
-## Configuration
-
 Dethrace generally expects to be placed into the top level Carmageddon folder. You know you have the right folder when you see the original `CARMA.EXE` there. If you are on Windows, you must also place `SDL2.dll` in the same folder.
 
-<img width="638" alt="Screenshot 2024-09-20 at 12 25 05 PM" src="https://github.com/user-attachments/assets/fda77818-9007-44fa-9d8d-c311396fd435">
-
-Alternatively, you may configure a different directory by providing a [dethrace.ini file](docs/CONFIGURATION.md).
+### Configuration INI file
+Alternatively, you may configure a different Carmageddon directory and settings by providing a [dethrace.ini file](docs/CONFIGURATION.md).
 
 ### CD audio
-
 Dethrace supports the GOG cd audio convention. If there is a `MUSIC` folder in the Carmageddon folder containing files `Track02.ogg`, `Track03.ogg` etc, then Dethrace will use those files in place of the original CD audio functions.
 
 <img width="571" alt="Screenshot 2024-09-30 at 8 31 59 AM" src="https://github.com/user-attachments/assets/cec72203-9156-4c2a-a15a-328609e65c68">
