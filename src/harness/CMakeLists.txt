@@ -4,18 +4,18 @@ add_library(harness STATIC)
 
 target_include_directories(harness
     PRIVATE
-        .
-        ${CMAKE_SOURCE_DIR}
-        "${CMAKE_CURRENT_BINARY_DIR}"
+    .
+    ${CMAKE_SOURCE_DIR}
+    "${CMAKE_CURRENT_BINARY_DIR}"
     PUBLIC
-        include
+    include
 )
 
 if(DETHRACE_FIX_BUGS)
     target_compile_definitions(harness PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
-target_link_libraries(harness PRIVATE brender miniaudio stb compile_with_werror)
+target_link_libraries(harness PRIVATE brender miniaudio stb inih compile_with_werror)
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
@@ -41,6 +41,7 @@ target_sources(harness PRIVATE
     include/harness/config.h
     include/harness/os.h
     include/harness/audio.h
+
     # cameras/debug_camera.c
     # cameras/debug_camera.h
     ascii_tables.h
@@ -61,6 +62,7 @@ if(DETHRACE_PLATFORM_SDL1)
         platforms/sdl1_syms.h
     )
     target_compile_definitions(harness PRIVATE DETHRACE_PLATFORM_SDL1)
+
     if(DETHRACE_PLATFORM_SDL_DYNAMIC)
         set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/platforms/sdl1.c" APPEND PROPERTY INCLUDE_DIRECTORIES "$<TARGET_PROPERTY:SDL::SDL,INTERFACE_INCLUDE_DIRECTORIES>")
         get_filename_component(sdl_library_directory "${SDL_LIBRARY}" DIRECTORY)
@@ -78,6 +80,7 @@ if(DETHRACE_PLATFORM_SDL2)
         platforms/sdl2_syms.h
     )
     target_compile_definitions(harness PRIVATE DETHRACE_PLATFORM_SDL2)
+
     if(DETHRACE_PLATFORM_SDL_DYNAMIC)
         set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/platforms/sdl2.c" APPEND PROPERTY INCLUDE_DIRECTORIES "$<TARGET_PROPERTY:SDL2::SDL2,INTERFACE_INCLUDE_DIRECTORIES>")
         set_property(GLOBAL APPEND PROPERTY DETHRACE_BUILD_RPATHS "$<TARGET_FILE_DIR:SDL2::SDL2>")
