@@ -13,8 +13,11 @@
 #include <string.h>
 #include <sys/stat.h>
 
+// todo tidy this up...
 extern uint32_t gI_am_cheating;
 extern int gSound_override;
+extern int gSausage_override;
+extern int gGraf_spec_index;
 
 extern void Harness_Platform_Init(tHarness_platform* platform);
 
@@ -436,6 +439,10 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
         harness_game_config.opengl_3dfx_mode = (value[0] == '1');
     } else if (MATCH("General", "DefaultGame")) {
         strcpy(harness_game_config.default_game, value);
+    } else if (MATCH("General", "BoringMode")) {
+        gSausage_override = (value[0] == '1');
+    } else if (MATCH("General", "Hires")) {
+        gGraf_spec_index = (value[0] == '1');
     }
 
     else if (MATCH("Cheats", "EditMode")) {
