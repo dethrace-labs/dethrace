@@ -16,36 +16,90 @@
 #include "s3/s3_brender.h"
 #include "utility.h"
 
+// GLOBAL: CARM95 0x00514928
 int gSound_detail_level = 1;
+
+// GLOBAL: CARM95 0x0051492c
 int gVirgin_pass = 1;
+
+// GLOBAL: CARM95 0x00514930
 int gOld_sound_detail_level = -1;
+
+// GLOBAL: CARM95 0x00514934
 int gLast_tune = -1;
+
+// GLOBAL: CARM95 0x00514938
 int gRandom_MIDI_tunes[3] = { 9500, 9501, 9502 };
+
+// GLOBAL: CARM95 0x00514948
 int gRandom_Rockin_MIDI_tunes[3] = { 9500, 9501, 9502 };
+
+// GLOBAL: CARM95 0x00514958
 int gRandom_CDA_tunes[8] = { 9600, 9601, 9602, 9603, 9604, 9605, 9606, 9607 }; /* dethrace: Changed to size 8 */
+
+// GLOBAL: CARM95 0x00514978
 int gCDA_is_playing;
+
+// GLOBAL: CARM95 0x0051497c
 int gServicing_sound;
+
+// GLOBAL: CARM95 0x00514980
 int gSong_repeat_count;
+
+// GLOBAL: CARM95 0x00514984
 int gSound_sources_inited;
+
+// GLOBAL: CARM95 0x00514988
 int gMusic_available;
+
+// GLOBAL: CARM95 0x0051498c
 tS3_sound_tag gCDA_tag;
+
+// GLOBAL: CARM95 0x00514990
 int gCD_fully_installed;
+
+// GLOBAL: CARM95 0x00514994
 tS3_outlet_ptr gEffects_outlet;
+
+// GLOBAL: CARM95 0x00514998
 tS3_outlet_ptr gCar_outlet;
+
+// GLOBAL: CARM95 0x0051499c
 tS3_outlet_ptr gEngine_outlet;
+
+// GLOBAL: CARM95 0x005149a0
 tS3_outlet_ptr gDriver_outlet;
+
+// GLOBAL: CARM95 0x005149a4
 tS3_outlet_ptr gPedestrians_outlet;
+
+// GLOBAL: CARM95 0x005149a8
 tS3_outlet_ptr gMusic_outlet;
 tS3_sound_id gMIDI_id;
+
+// GLOBAL: CARM95 0x00550a20
 tS3_outlet_ptr gIndexed_outlets[6];
+
+// GLOBAL: CARM95 0x00538284
 tU32 gLast_sound_service;
+
+// GLOBAL: CARM95 0x00550a1c
 int gCD_is_disabled;
+
+// GLOBAL: CARM95 0x00550a00
 br_vector3 gCamera_left;
+
+// GLOBAL: CARM95 0x00550a10
 br_vector3 gCamera_position;
+
+// GLOBAL: CARM95 0x00550a40
 br_vector3 gOld_camera_position;
+
+// GLOBAL: CARM95 0x00550a50
 br_vector3 gCamera_velocity;
 
 // IDA: void __cdecl UsePathFileToDetermineIfFullInstallation()
+// FUNCTION: CARM95 0x00463fb0
 void UsePathFileToDetermineIfFullInstallation(void) {
     // changed by dethrace for compatibility
     // char line1[80];
@@ -81,6 +135,7 @@ void UsePathFileToDetermineIfFullInstallation(void) {
 }
 
 // IDA: void __cdecl InitSound()
+// FUNCTION: CARM95 0x00464117
 void InitSound(void) {
     tPath_name the_path;
     tS3_sound_tag tag;
@@ -198,6 +253,7 @@ void InitSound(void) {
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSound@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>)
+// FUNCTION: CARM95 0x0046458b
 tS3_sound_tag DRS3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
     if (!gSound_enabled) {
         return 0;
@@ -209,6 +265,7 @@ tS3_sound_tag DRS3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSoundNoPiping@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>)
+// FUNCTION: CARM95 0x0046461d
 tS3_sound_tag DRS3StartSoundNoPiping(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
     if (!gSound_enabled) {
         return 0;
@@ -217,6 +274,7 @@ tS3_sound_tag DRS3StartSoundNoPiping(tS3_outlet_ptr pOutlet, tS3_sound_id pSound
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSound2@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>, tS3_repeats pRepeats@<EBX>, tS3_volume pLVolume@<ECX>, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed)
+// FUNCTION: CARM95 0x00464656
 tS3_sound_tag DRS3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pLVolume, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     LOG_TRACE("(%d, %d, %d, %d, %d, %d, %d)", pOutlet, pSound, pRepeats, pLVolume, pRVolume, pPitch, pSpeed);
 
@@ -234,6 +292,7 @@ tS3_sound_tag DRS3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_r
 }
 
 // IDA: int __usercall DRS3ChangeVolume@<EAX>(tS3_sound_tag pSound_tag@<EAX>, tS3_volume pNew_volume@<EDX>)
+// FUNCTION: CARM95 0x00464724
 int DRS3ChangeVolume(tS3_sound_tag pSound_tag, tS3_volume pNew_volume) {
     LOG_TRACE("(%d, %d)", pSound_tag, pNew_volume);
 
@@ -263,6 +322,7 @@ int DRS3ChangeSpeed(tS3_sound_tag pTag, tS3_pitch pNew_speed) {
 }
 
 // IDA: int __usercall DRS3ChangePitchSpeed@<EAX>(tS3_sound_tag pTag@<EAX>, tS3_pitch pNew_pitch@<EDX>)
+// FUNCTION: CARM95 0x0046480c
 int DRS3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
     LOG_TRACE("(%d, %d)", pTag, pNew_pitch);
 
@@ -273,6 +333,7 @@ int DRS3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
 }
 
 // IDA: int __usercall DRS3StopSound@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
+// FUNCTION: CARM95 0x00464845
 int DRS3StopSound(tS3_sound_tag pSound_tag) {
     LOG_TRACE("(%d)", pSound_tag);
 
@@ -283,6 +344,7 @@ int DRS3StopSound(tS3_sound_tag pSound_tag) {
 }
 
 // IDA: int __usercall DRS3LoadSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)
+// FUNCTION: CARM95 0x0046487a
 int DRS3LoadSound(tS3_sound_id pThe_sound) {
     LOG_TRACE("(%d)", pThe_sound);
 
@@ -293,6 +355,7 @@ int DRS3LoadSound(tS3_sound_id pThe_sound) {
 }
 
 // IDA: int __usercall DRS3ReleaseSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)
+// FUNCTION: CARM95 0x004648af
 int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
     LOG_TRACE("(%d)", pThe_sound);
 
@@ -303,6 +366,7 @@ int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
 }
 
 // IDA: void __cdecl DRS3Service()
+// FUNCTION: CARM95 0x004648e4
 void DRS3Service(void) {
     LOG_TRACE("()");
 
@@ -316,12 +380,14 @@ void DRS3Service(void) {
 }
 
 // IDA: int __usercall DRS3OutletSoundsPlaying@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
+// FUNCTION: CARM95 0x0046493a
 int DRS3OutletSoundsPlaying(tS3_outlet_ptr pOutlet) {
     LOG_TRACE("(%d)", pOutlet);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall DRS3SoundStillPlaying@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
+// FUNCTION: CARM95 0x0046496f
 int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag) {
     LOG_TRACE("(%d)", pSound_tag);
 
@@ -329,6 +395,7 @@ int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag) {
 }
 
 // IDA: void __cdecl DRS3ShutDown()
+// FUNCTION: CARM95 0x004649a4
 void DRS3ShutDown(void) {
     LOG_TRACE("()");
 
@@ -339,6 +406,7 @@ void DRS3ShutDown(void) {
 }
 
 // IDA: int __usercall DRS3SetOutletVolume@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_volume pVolume@<EDX>)
+// FUNCTION: CARM95 0x004649cb
 int DRS3SetOutletVolume(tS3_outlet_ptr pOutlet, tS3_volume pVolume) {
     LOG_TRACE("(%d, %d)", pOutlet, pVolume);
 
@@ -355,6 +423,7 @@ int DRS3OverallVolume(tS3_volume pVolume) {
 }
 
 // IDA: int __usercall DRS3StopOutletSound@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
+// FUNCTION: CARM95 0x00464a39
 int DRS3StopOutletSound(tS3_outlet_ptr pOutlet) {
     if (!gSound_enabled) {
         return 0;
@@ -363,6 +432,7 @@ int DRS3StopOutletSound(tS3_outlet_ptr pOutlet) {
 }
 
 // IDA: int __cdecl DRS3StopAllOutletSounds()
+// FUNCTION: CARM95 0x00464a6e
 int DRS3StopAllOutletSounds(void) {
     LOG_TRACE("()");
 
@@ -373,6 +443,7 @@ int DRS3StopAllOutletSounds(void) {
 }
 
 // IDA: void __cdecl ToggleSoundEnable()
+// FUNCTION: CARM95 0x00464a9c
 void ToggleSoundEnable(void) {
     LOG_TRACE("()");
 
@@ -387,6 +458,7 @@ void ToggleSoundEnable(void) {
 }
 
 // IDA: void __cdecl SoundService()
+// FUNCTION: CARM95 0x00464adc
 void SoundService(void) {
     br_matrix34 mat;
 
@@ -405,6 +477,7 @@ void SoundService(void) {
 }
 
 // IDA: void __cdecl InitSoundSources()
+// FUNCTION: CARM95 0x00464b51
 void InitSoundSources(void) {
     int cat;
     int car_count;
@@ -462,6 +535,7 @@ void InitSoundSources(void) {
 }
 
 // IDA: void __cdecl DisposeSoundSources()
+// FUNCTION: CARM95 0x00464d79
 void DisposeSoundSources(void) {
     int cat;
     int car_count;
@@ -514,6 +588,7 @@ void DisposeSoundSources(void) {
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSound3D@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>, br_vector3 *pInitial_position@<EBX>, br_vector3 *pInitial_velocity@<ECX>, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed)
+// FUNCTION: CARM95 0x00464f39
 tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_vector3* pInitial_position, br_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_sound_tag tag;
     LOG_TRACE("(%d, %d, %p, %p, %d, %d, %d, %d)", pOutlet, pSound, pInitial_position, pInitial_velocity, pRepeats, pVolume, pPitch, pSpeed);
@@ -542,6 +617,7 @@ tS3_sound_tag DRS3StartSoundFromSource(tS3_sound_source_ptr pSource, tS3_sound_i
 }
 
 // IDA: void __cdecl MungeEngineNoise()
+// FUNCTION: CARM95 0x00465090
 void MungeEngineNoise(void) {
     tCar_spec* the_car;
     tU32 pitch;
@@ -643,6 +719,7 @@ void MungeEngineNoise(void) {
 }
 
 // IDA: void __cdecl SetSoundVolumes()
+// FUNCTION: CARM95 0x004655d8
 void SetSoundVolumes(void) {
 
     if (!gSound_enabled) {
@@ -659,6 +736,7 @@ void SetSoundVolumes(void) {
 }
 
 // IDA: tS3_outlet_ptr __usercall GetOutletFromIndex@<EAX>(int pIndex@<EAX>)
+// FUNCTION: CARM95 0x004656b1
 tS3_outlet_ptr GetOutletFromIndex(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -666,6 +744,7 @@ tS3_outlet_ptr GetOutletFromIndex(int pIndex) {
 }
 
 // IDA: int __usercall GetIndexFromOutlet@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
+// FUNCTION: CARM95 0x004656cb
 int GetIndexFromOutlet(tS3_outlet_ptr pOutlet) {
     int i;
     LOG_TRACE("(%d)", pOutlet);
@@ -679,6 +758,7 @@ int GetIndexFromOutlet(tS3_outlet_ptr pOutlet) {
 }
 
 // IDA: int __usercall DRS3StartCDA@<EAX>(tS3_sound_id pCDA_id@<EAX>)
+// FUNCTION: CARM95 0x00465719
 int DRS3StartCDA(tS3_sound_id pCDA_id) {
     LOG_TRACE("(%d)", pCDA_id);
 
@@ -701,7 +781,7 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
                     gCDA_is_playing = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
 #if defined(DETHRACE_FIX_BUGS)
                     // Initial CD music volume was not set correctly
-                    DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);                    
+                    DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);
 #endif
                     gCDA_tag = gCDA_is_playing;
                     if (!gCDA_is_playing) {
@@ -717,6 +797,7 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
 }
 
 // IDA: int __cdecl DRS3StopCDA()
+// FUNCTION: CARM95 0x00465848
 int DRS3StopCDA(void) {
     LOG_TRACE("()");
 
@@ -729,6 +810,7 @@ int DRS3StopCDA(void) {
 }
 
 // IDA: void __cdecl StartMusic()
+// FUNCTION: CARM95 0x00465899
 void StartMusic(void) {
     if (gCD_fully_installed) {
         gCDA_tag = DRS3StartCDA(9999);
@@ -736,6 +818,7 @@ void StartMusic(void) {
 }
 
 // IDA: void __cdecl StopMusic()
+// FUNCTION: CARM95 0x004658c3
 void StopMusic(void) {
     if (gCD_fully_installed) {
         DRS3StopCDA();

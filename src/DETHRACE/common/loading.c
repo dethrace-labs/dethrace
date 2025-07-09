@@ -43,6 +43,7 @@
 #define NBR_FUNK_GROVE_FLAGS 30
 #define OPPONENT_APC_IDX 3
 
+// GLOBAL: CARM95 0x0050a3f0
 tHeadup_info gHeadup_image_info[32] = {
     // Modified by DethRace to fit the "demo timeout" fancy head-up.
     { "LADY.PIX", eNet_or_otherwise },
@@ -78,8 +79,12 @@ tHeadup_info gHeadup_image_info[32] = {
     { "UWON.PIX", eNet_only },
     { "DTIMEOUT.PIX", eNot_net }, // Only used by the demo, not present in the full version
 };
+
 char* gYour_car_names[2][6];
+
 char* gDrivable_car_names[6];
+
+// GLOBAL: CARM95 0x0050a530
 char* gDamage_names[] = {
     "engine",
     "transmission",
@@ -94,6 +99,8 @@ char* gDamage_names[] = {
     "lr_wheel",
     "rr_wheel"
 };
+
+// GLOBAL: CARM95 0x0050a560
 char* gWheel_actor_names[] = {
     "FLWHEEL.ACT",
     "FRWHEEL.ACT",
@@ -102,6 +109,8 @@ char* gWheel_actor_names[] = {
     "IFLWHEEL.ACT",
     "IFRWHEEL.ACT"
 };
+
+// GLOBAL: CARM95 0x0050a578
 char* gRaces_file_names[] = {
     "RACES.TXT",
     "NETRACES.TXT",
@@ -113,21 +122,53 @@ char* gRaces_file_names[] = {
     "NETRACES.TXT",
     "NETRACES.TXT"
 };
+
+// GLOBAL: CARM95 0x0050a5a0
 char* gNet_avail_names[] = { "never", "eagle", "hawk", "all" };
+
+// GLOBAL: CARM95 0x0050a5b0
 char* gFloorpan_names[] = { "GBUNDER.MAT", "BGLUNDER.MAT", "GRIMBOT.MAT", "DDBASE.MAT", "HFUNDER.MAT" };
+
+// GLOBAL: CARM95 0x0050a5c4
 int gAllow_open_to_fail = 1;
+
+// GLOBAL: CARM95 0x0050a5c8
 int gDecode_thing = '@';
+
+// GLOBAL: CARM95 0x0050a5d0
 char gDecode_string[] = { 0x9B, 0x52, 0x93, 0x9F, 0x52, 0x98, 0x9B, 0x96, 0x96, 0x9E, 0x9B, 0xA0, 0x99, 0x0 };
+
+// GLOBAL: CARM95 0x00531f00
 int gFunk_groove_flags[30];
+
+// GLOBAL: CARM95 0x00531f80
 char gDef_def_water_screen_name[32];
+
+// GLOBAL: CARM95 0x00531dfc
 br_material* gDestn_screen_mat;
+
+// GLOBAL: CARM95 0x00531f78
 br_material* gSource_screen_mat;
+
+// GLOBAL: CARM95 0x00531f7c
 int gCurrent_race_file_index;
+
+// GLOBAL: CARM95 0x00531df8
 int gGroove_funk_offset;
+
+// GLOBAL: CARM95 0x00551da8
 int gDemo_armour;
+
+// GLOBAL: CARM95 0x00551db0
 int gDemo_rank;
+
+// GLOBAL: CARM95 0x00551d90
 int gDemo_opponents[5];
+
+// GLOBAL: CARM95 0x00551da4
 int gDemo_power;
+
+// GLOBAL: CARM95 0x00551dac
 int gDemo_offensive;
 
 // IDA: tU32 __usercall ReadU32@<EAX>(FILE *pF@<EAX>)
@@ -164,6 +205,7 @@ tU8 ReadU8(FILE* pF) {
 }
 
 // IDA: tS32 __usercall ReadS32@<EAX>(FILE *pF@<EAX>)
+// FUNCTION: CARM95 0x0041c32f
 tS32 ReadS32(FILE* pF) {
     tS32 raw_long;
     LOG_TRACE("(%p)", pF);
@@ -197,6 +239,7 @@ tS8 ReadS8(FILE* pF) {
 }
 
 // IDA: void __usercall WriteU32L(FILE *pF@<EAX>, tU32 pNumber@<EDX>)
+// FUNCTION: CARM95 0x0041c3ae
 void WriteU32L(FILE* pF, tU32 pNumber) {
     tU32 raw_long;
     LOG_TRACE("(%p, %d)", pF, pNumber);
@@ -209,6 +252,7 @@ void WriteU32L(FILE* pF, tU32 pNumber) {
 }
 
 // IDA: void __usercall WriteU16L(FILE *pF@<EAX>, tU16 pNumber@<EDX>)
+// FUNCTION: CARM95 0x0041c3d6
 void WriteU16L(FILE* pF, tU16 pNumber) {
     tU16 raw_short;
     LOG_TRACE("(%p, %d)", pF, pNumber);
@@ -221,6 +265,7 @@ void WriteU16L(FILE* pF, tU16 pNumber) {
 }
 
 // IDA: void __usercall WriteU8L(FILE *pF@<EAX>, tU8 pNumber@<EDX>)
+// FUNCTION: CARM95 0x0041c400
 void WriteU8L(FILE* pF, tU8 pNumber) {
     tU8 raw_byte;
     LOG_TRACE("(%p, %d)", pF, pNumber);
@@ -270,6 +315,7 @@ void SkipBytes(FILE* pF, int pBytes_to_skip) {
 }
 
 // IDA: tU32 __usercall MemReadU32@<EAX>(char **pPtr@<EAX>)
+// FUNCTION: CARM95 0x0041c4bf
 tU32 MemReadU32(char** pPtr) {
     tU32 raw_long;
 
@@ -282,6 +328,7 @@ tU32 MemReadU32(char** pPtr) {
 }
 
 // IDA: tU16 __usercall MemReadU16@<AX>(char **pPtr@<EAX>)
+// FUNCTION: CARM95 0x0041c4e5
 tU16 MemReadU16(char** pPtr) {
     tU16 raw_short;
 
@@ -294,6 +341,7 @@ tU16 MemReadU16(char** pPtr) {
 }
 
 // IDA: tU8 __usercall MemReadU8@<AL>(char **pPtr@<EAX>)
+// FUNCTION: CARM95 0x0041c50e
 tU8 MemReadU8(char** pPtr) {
     tU8 raw_byte;
 
@@ -316,6 +364,7 @@ tS32 MemReadS32(char** pPtr) {
 }
 
 // IDA: tS16 __usercall MemReadS16@<AX>(char **pPtr@<EAX>)
+// FUNCTION: CARM95 0x0041c559
 tS16 MemReadS16(char** pPtr) {
     tS16 raw_short;
 
@@ -328,6 +377,7 @@ tS16 MemReadS16(char** pPtr) {
 }
 
 // IDA: tS8 __usercall MemReadS8@<AL>(char **pPtr@<EAX>)
+// FUNCTION: CARM95 0x0041c582
 tS8 MemReadS8(char** pPtr) {
     tS8 raw_byte;
 
@@ -337,11 +387,13 @@ tS8 MemReadS8(char** pPtr) {
 }
 
 // IDA: void __usercall MemSkipBytes(char **pPtr@<EAX>, int pBytes_to_skip@<EDX>)
+// FUNCTION: CARM95 0x0041c5a7
 void MemSkipBytes(char** pPtr, int pBytes_to_skip) {
     *pPtr += pBytes_to_skip;
 }
 
 // IDA: void __cdecl LoadGeneralParameters()
+// FUNCTION: CARM95 0x0041c5ba
 void LoadGeneralParameters(void) {
     FILE* f;
     tPath_name the_path;
@@ -491,11 +543,13 @@ void LoadGeneralParameters(void) {
 }
 
 // IDA: void __cdecl FinishLoadingGeneral()
+// FUNCTION: CARM95 0x0041d210
 void FinishLoadingGeneral(void) {
     gDefault_default_water_spec_vol.screen_material = BrMaterialFind(gDef_def_water_screen_name);
 }
 
 // IDA: br_pixelmap* __usercall LoadPixelmap@<EAX>(char *pName@<EAX>)
+// FUNCTION: CARM95 0x0041d22d
 br_pixelmap* LoadPixelmap(char* pName) {
     tPath_name the_path;
     br_pixelmap* pm = NULL;
@@ -526,6 +580,7 @@ br_pixelmap* LoadPixelmap(char* pName) {
 }
 
 // IDA: br_uint_32 __usercall LoadPixelmaps@<EAX>(char *pFile_name@<EAX>, br_pixelmap **pPixelmaps@<EDX>, br_uint_16 pNum@<EBX>)
+// FUNCTION: CARM95 0x0041d372
 br_uint_32 LoadPixelmaps(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 pNum) {
     tPath_name path;
     int count;
@@ -545,6 +600,7 @@ br_uint_32 LoadPixelmaps(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 
 }
 
 // IDA: br_pixelmap* __usercall LoadShadeTable@<EAX>(char *pName@<EAX>)
+// FUNCTION: CARM95 0x0041d470
 br_pixelmap* LoadShadeTable(char* pName) {
     tPath_name the_path;
     LOG_TRACE("(\"%s\")", pName);
@@ -555,6 +611,7 @@ br_pixelmap* LoadShadeTable(char* pName) {
 }
 
 // IDA: br_material* __usercall LoadMaterial@<EAX>(char *pName@<EAX>)
+// FUNCTION: CARM95 0x0041d4c8
 br_material* LoadMaterial(char* pName) {
     tPath_name the_path;
     br_material* result;
@@ -573,6 +630,7 @@ br_material* LoadMaterial(char* pName) {
 }
 
 // IDA: br_model* __usercall LoadModel@<EAX>(char *pName@<EAX>)
+// FUNCTION: CARM95 0x0041d525
 br_model* LoadModel(char* pName) {
     tPath_name the_path;
     br_model* model;
@@ -589,6 +647,7 @@ br_model* LoadModel(char* pName) {
 }
 
 // IDA: br_actor* __usercall LoadActor@<EAX>(char *pName@<EAX>)
+// FUNCTION: CARM95 0x0041d582
 br_actor* LoadActor(char* pName) {
     tPath_name the_path;
     LOG_TRACE("(\"%s\")", pName);
@@ -600,6 +659,7 @@ br_actor* LoadActor(char* pName) {
 }
 
 // IDA: void __usercall DRLoadPalette(char *pPath_name@<EAX>)
+// FUNCTION: CARM95 0x0041d6d5
 void DRLoadPalette(char* pPath_name) {
     br_pixelmap* palette_array[100];
     int number_of_palettes;
@@ -609,6 +669,7 @@ void DRLoadPalette(char* pPath_name) {
 }
 
 // IDA: void __usercall DRLoadShadeTable(char *pPath_name@<EAX>)
+// FUNCTION: CARM95 0x0041d717
 void DRLoadShadeTable(char* pPath_name) {
     br_pixelmap* table_array[100];
     int number_of_tables;
@@ -618,6 +679,7 @@ void DRLoadShadeTable(char* pPath_name) {
 }
 
 // IDA: void __usercall RezeroPixelmaps(br_pixelmap **pPixelmap_array@<EAX>, int pCount@<EDX>)
+// FUNCTION: CARM95 0x0041d7b6
 void RezeroPixelmaps(br_pixelmap** pPixelmap_array, int pCount) {
     LOG_TRACE("(%p, %d)", pPixelmap_array, pCount);
 
@@ -629,6 +691,7 @@ void RezeroPixelmaps(br_pixelmap** pPixelmap_array, int pCount) {
 }
 
 // IDA: void __usercall DRLoadPixelmaps(char *pPath_name@<EAX>)
+// FUNCTION: CARM95 0x0041d759
 void DRLoadPixelmaps(char* pPath_name) {
     br_pixelmap* pixelmap_array[100];
     int number_of_pixelmaps;
@@ -642,6 +705,7 @@ void DRLoadPixelmaps(char* pPath_name) {
 }
 
 // IDA: void __usercall DRLoadMaterials(char *pPath_name@<EAX>)
+// FUNCTION: CARM95 0x0041d7ed
 void DRLoadMaterials(char* pPath_name) {
     br_material* material_array[100];
     int number_of_materials;
@@ -655,6 +719,7 @@ void DRLoadMaterials(char* pPath_name) {
 }
 
 // IDA: void __usercall DRLoadModels(char *pPath_name@<EAX>)
+// FUNCTION: CARM95 0x0041d82e
 void DRLoadModels(char* pPath_name) {
     br_model* model_array[100];
     int number_of_models;
@@ -669,6 +734,7 @@ void DRLoadModels(char* pPath_name) {
 }
 
 // IDA: void __usercall DRLoadActors(char *pPath_name@<EAX>)
+// FUNCTION: CARM95 0x0041d86f
 void DRLoadActors(char* pPath_name) {
     br_actor* actor_array[100];
     int number_of_actors;
@@ -684,6 +750,7 @@ void DRLoadActors(char* pPath_name) {
 }
 
 // IDA: void __usercall DRLoadLights(char *pPath_name@<EAX>)
+// FUNCTION: CARM95 0x0041d8e0
 void DRLoadLights(char* pPath_name) {
     br_actor* light_array[100];
     int number_of_lights;
@@ -698,6 +765,7 @@ void DRLoadLights(char* pPath_name) {
 }
 
 // IDA: void __usercall LoadInFiles(char *pThe_base_path@<EAX>, char *pThe_dir_name@<EDX>, void (*pLoad_routine)(char*)@<EBX>)
+// FUNCTION: CARM95 0x0041d957
 void LoadInFiles(char* pThe_base_path, char* pThe_dir_name, void (*pLoad_routine)(char*)) {
     tPath_name the_path;
     LOG_TRACE("(\"%s\", \"%s\", %p)", pThe_base_path, pThe_dir_name, pLoad_routine);
@@ -707,6 +775,7 @@ void LoadInFiles(char* pThe_base_path, char* pThe_dir_name, void (*pLoad_routine
 }
 
 // IDA: void __usercall LoadInRegisteeDir(char *pThe_dir_path@<EAX>)
+// FUNCTION: CARM95 0x0041d5fd
 void LoadInRegisteeDir(char* pThe_dir_path) {
     tPath_name the_path;
     tPath_name reg_path;
@@ -726,11 +795,13 @@ void LoadInRegisteeDir(char* pThe_dir_path) {
 }
 
 // IDA: void __cdecl LoadInRegistees()
+// FUNCTION: CARM95 0x0041d5df
 void LoadInRegistees(void) {
     LoadInRegisteeDir(gApplication_path);
 }
 
 // IDA: void __cdecl LoadKeyMapping()
+// FUNCTION: CARM95 0x0041d992
 void LoadKeyMapping(void) {
     FILE* f;
     tPath_name the_path;
@@ -752,6 +823,7 @@ void LoadKeyMapping(void) {
 }
 
 // IDA: void __usercall LoadInterfaceStuff(int pWithin_race@<EAX>)
+// FUNCTION: CARM95 0x0041da5c
 void LoadInterfaceStuff(int pWithin_race) {
     tPath_name path;
     int i;
@@ -782,6 +854,7 @@ void LoadInterfaceStuff(int pWithin_race) {
 }
 
 // IDA: void __cdecl UnlockInterfaceStuff()
+// FUNCTION: CARM95 0x0041dbbf
 void UnlockInterfaceStuff(void) {
     int i;
     LOG_TRACE("()");
@@ -808,6 +881,7 @@ void UnlockInterfaceStuff(void) {
 }
 
 // IDA: void __cdecl InitInterfaceLoadState()
+// FUNCTION: CARM95 0x0041dcc7
 void InitInterfaceLoadState(void) {
     LOG_TRACE("()");
 
@@ -898,6 +972,7 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
 //    chunk_count (1 byte)
 //    for each chunk:
 //      chunk_length (1 signed byte). If positive, skip this number of blank pixels. If negative, copy the following `length` bytes
+// FUNCTION: CARM95 0x0041dd01
 tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     int i;
     int j;
@@ -973,6 +1048,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
 }
 
 // IDA: void __usercall KillWindscreen(br_model *pModel@<EAX>, br_material *pMaterial@<EDX>)
+// FUNCTION: CARM95 0x0041e4de
 void KillWindscreen(br_model* pModel, br_material* pMaterial) {
     br_face* face;
     int i;
@@ -991,6 +1067,7 @@ void KillWindscreen(br_model* pModel, br_material* pMaterial) {
 }
 
 // IDA: void __usercall DropOffDyingPeds(tCar_spec *pCar@<EAX>)
+// FUNCTION: CARM95 0x0041e564
 void DropOffDyingPeds(tCar_spec* pCar) {
     br_actor* child;
     br_actor* next;
@@ -1011,6 +1088,7 @@ void DropOffDyingPeds(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall DisposeCar(tCar_spec *pCar_spec@<EAX>, int pOwner@<EDX>)
+// FUNCTION: CARM95 0x0041dfbd
 void DisposeCar(tCar_spec* pCar_spec, int pOwner) {
     int i;
     int j;
@@ -1107,6 +1185,7 @@ void DisposeCar(tCar_spec* pCar_spec, int pOwner) {
 }
 
 // IDA: void __usercall AdjustCarCoordinates(tCar_spec *pCar@<EAX>)
+// FUNCTION: CARM95 0x00422a79
 void AdjustCarCoordinates(tCar_spec* pCar) {
     int i;
     LOG_TRACE("(%p)", pCar);
@@ -1143,6 +1222,7 @@ void AdjustCarCoordinates(tCar_spec* pCar) {
 }
 
 // IDA: void __usercall LoadSpeedo(FILE *pF@<EAX>, int pIndex@<EDX>, tCar_spec *pCar_spec@<EBX>)
+// FUNCTION: CARM95 0x00422d43
 void LoadSpeedo(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     tPath_name the_path;
     char s[256];
@@ -1195,6 +1275,7 @@ void LoadSpeedo(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 }
 
 // IDA: void __usercall LoadTacho(FILE *pF@<EAX>, int pIndex@<EDX>, tCar_spec *pCar_spec@<EBX>)
+// FUNCTION: CARM95 0x004230de
 void LoadTacho(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     tPath_name the_path;
     char s[256];
@@ -1239,6 +1320,7 @@ void LoadTacho(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 }
 
 // IDA: void __usercall LoadHeadups(FILE *pF@<EAX>, int pIndex@<EDX>, tCar_spec *pCar_spec@<EBX>)
+// FUNCTION: CARM95 0x004233d3
 void LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     char s[256];
     char* str;
@@ -1288,6 +1370,7 @@ void LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 }
 
 // IDA: void __usercall ReadNonCarMechanicsData(FILE *pF@<EAX>, tNon_car_spec *non_car@<EDX>)
+// FUNCTION: CARM95 0x0041e5d0
 void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     int number;
     int i;
@@ -1359,6 +1442,7 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
 }
 
 // IDA: void __usercall ReadMechanicsData(FILE *pF@<EAX>, tCar_spec *c@<EDX>)
+// FUNCTION: CARM95 0x0041edfb
 void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     char s[256];
     char version;
@@ -1521,6 +1605,7 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
 }
 
 // IDA: void __usercall LoadGear(FILE *pF@<EAX>, int pIndex@<EDX>, tCar_spec *pCar_spec@<EBX>)
+// FUNCTION: CARM95 0x004237be
 void LoadGear(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
     tPath_name the_path;
     char s[256];
@@ -1539,6 +1624,7 @@ void LoadGear(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
 }
 
 // IDA: void __usercall AddRefOffset(int *pRef_holder@<EAX>)
+// FUNCTION: CARM95 0x0042387c
 void AddRefOffset(int* pRef_holder) {
     LOG_TRACE8("(%p)", pRef_holder);
 
@@ -1548,6 +1634,7 @@ void AddRefOffset(int* pRef_holder) {
 }
 
 // IDA: void __usercall GetDamageProgram(FILE *pF@<EAX>, tCar_spec *pCar_spec@<EDX>, tImpact_location pImpact_location@<EBX>)
+// FUNCTION: CARM95 0x0042389d
 void GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_location) {
     tDamage_clause* the_clause;
     int i;
@@ -1619,6 +1706,7 @@ void GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_l
 }
 
 // IDA: br_uint_32 __cdecl LinkModel(br_actor *pActor, tModel_pool *pModel_pool)
+// FUNCTION: CARM95 0x00423d40
 intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
     int i;
     LOG_TRACE("(%p, %p)", pActor, pModel_pool);
@@ -1637,6 +1725,7 @@ intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
 }
 
 // IDA: void __usercall FreeUpBonnetModels(br_model **pModel_array@<EAX>, int pModel_count@<EDX>)
+// FUNCTION: CARM95 0x00423c66
 void FreeUpBonnetModels(br_model** pModel_array, int pModel_count) {
     int i;
     LOG_TRACE("(%p, %d)", pModel_array, pModel_count);
@@ -1654,6 +1743,7 @@ void FreeUpBonnetModels(br_model** pModel_array, int pModel_count) {
 }
 
 // IDA: void __usercall LinkModelsToActor(br_actor *pActor@<EAX>, br_model **pModel_array@<EDX>, int pModel_count@<EBX>)
+// FUNCTION: CARM95 0x00423d11
 void LinkModelsToActor(br_actor* pActor, br_model** pModel_array, int pModel_count) {
     tModel_pool model_pool;
     LOG_TRACE("(%p, %p, %d)", pActor, pModel_array, pModel_count);
@@ -1664,6 +1754,7 @@ void LinkModelsToActor(br_actor* pActor, br_model** pModel_array, int pModel_cou
 }
 
 // IDA: void __usercall ReadShrapnelMaterials(FILE *pF@<EAX>, tCollision_info *pCar_spec@<EDX>)
+// FUNCTION: CARM95 0x0041fde3
 void ReadShrapnelMaterials(FILE* pF, tCollision_info* pCar_spec) {
     char s[256];
     char version;
@@ -1700,6 +1791,7 @@ void DisposeClonedCar(tCar_spec* pCar) {
 }
 
 // IDA: int __usercall RemoveDoubleSided@<EAX>(br_model *pModel@<EAX>)
+// FUNCTION: CARM95 0x0041ff58
 int RemoveDoubleSided(br_model* pModel) {
     br_face* faces;
     br_face* face;
@@ -1747,6 +1839,7 @@ int RemoveDoubleSided(br_model* pModel) {
 }
 
 // IDA: void __usercall MungeWindscreen(br_model *pModel@<EAX>)
+// FUNCTION: CARM95 0x00423e17
 void MungeWindscreen(br_model* pModel) {
     br_face* face;
     int i;
@@ -1767,6 +1860,7 @@ void MungeWindscreen(br_model* pModel) {
 }
 
 // IDA: void __usercall SetModelFlags(br_model *pModel@<EAX>, int pOwner@<EDX>)
+// FUNCTION: CARM95 0x00423f0b
 void SetModelFlags(br_model* pModel, int pOwner) {
     LOG_TRACE("(%p, %d)", pModel, pOwner);
 
@@ -1793,6 +1887,7 @@ void SetModelFlags(br_model* pModel, int pOwner) {
 }
 
 // IDA: void __usercall LoadCar(char *pCar_name@<EAX>, tDriver pDriver@<EDX>, tCar_spec *pCar_spec@<EBX>, int pOwner@<ECX>, char *pDriver_name, tBrender_storage *pStorage_space)
+// FUNCTION: CARM95 0x00420144
 void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner, char* pDriver_name, tBrender_storage* pStorage_space) {
     FILE* f;
     FILE* g;
@@ -2434,6 +2529,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
 }
 
 // IDA: void __cdecl LoadHeadupImages()
+// FUNCTION: CARM95 0x00423fad
 void LoadHeadupImages(void) {
     int i;
     tPath_name the_path;
@@ -2450,6 +2546,7 @@ void LoadHeadupImages(void) {
 }
 
 // IDA: void __cdecl DisposeHeadupImages()
+// FUNCTION: CARM95 0x0042405e
 void DisposeHeadupImages(void) {
     int i;
     tPath_name the_path;
@@ -2463,6 +2560,7 @@ void DisposeHeadupImages(void) {
 }
 
 // IDA: FILE* __cdecl OpenRaceFile()
+// FUNCTION: CARM95 0x004240b1
 FILE* OpenRaceFile(void) {
     FILE* f;
     tPath_name the_path;
@@ -2476,6 +2574,7 @@ FILE* OpenRaceFile(void) {
 }
 
 // IDA: void __usercall SkipRestOfRace(FILE *pF@<EAX>)
+// FUNCTION: CARM95 0x0042434a
 void SkipRestOfRace(FILE* pF) {
     int j;
     int k;
@@ -2504,6 +2603,7 @@ void SkipRestOfRace(FILE* pF) {
 }
 
 // IDA: void __usercall LoadRaces(tRace_list_spec *pRace_list@<EAX>, int *pCount@<EDX>, int pRace_type_index@<EBX>)
+// FUNCTION: CARM95 0x00424116
 void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     FILE* f;
     int i;
@@ -2567,6 +2667,7 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
 }
 
 // IDA: void __usercall UnlockOpponentMugshot(int pIndex@<EAX>)
+// FUNCTION: CARM95 0x00424466
 void UnlockOpponentMugshot(int pIndex) {
     LOG_TRACE("(%d)", pIndex);
 
@@ -2606,6 +2707,7 @@ void DisposeOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
 }
 
 // IDA: void __usercall LoadOpponentGridIcon(tRace_info *pRace_info@<EAX>, int pIndex@<EDX>)
+// FUNCTION: CARM95 0x004245cf
 void LoadOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
     LOG_TRACE("(%p, %d)", pRace_info, pIndex);
 
@@ -2619,6 +2721,7 @@ void LoadOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
 }
 
 // IDA: void __usercall LoadRaceInfo(int pRace_index@<EAX>, tRace_info *pRace_info@<EDX>)
+// FUNCTION: CARM95 0x0042466e
 void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
     FILE* f;
     int i;
@@ -2695,6 +2798,7 @@ void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
 }
 
 // IDA: void __usercall DisposeRaceInfo(tRace_info *pRace_info@<EAX>)
+// FUNCTION: CARM95 0x00424ac0
 void DisposeRaceInfo(tRace_info* pRace_info) {
     int i;
     int j;
@@ -2734,6 +2838,7 @@ void DisposeRaceInfo(tRace_info* pRace_info) {
 }
 
 // IDA: void __usercall LoadGridIcons(tRace_info *pRace_info@<EAX>)
+// FUNCTION: CARM95 0x00424c2e
 void LoadGridIcons(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
@@ -2746,6 +2851,7 @@ void LoadGridIcons(tRace_info* pRace_info) {
 }
 
 // IDA: void __usercall DisposeGridIcons(tRace_info *pRace_info@<EAX>)
+// FUNCTION: CARM95 0x00424cab
 void DisposeGridIcons(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
@@ -2759,6 +2865,7 @@ void DisposeGridIcons(tRace_info* pRace_info) {
 }
 
 // IDA: void __cdecl LoadOpponents()
+// FUNCTION: CARM95 0x00424d15
 void LoadOpponents(void) {
     FILE* f;
     tPath_name the_path;
@@ -2839,6 +2946,7 @@ void LoadOpponents(void) {
 }
 
 // IDA: br_font* __usercall LoadBRFont@<EAX>(char *pName@<EAX>)
+// FUNCTION: CARM95 0x004252ee
 br_font* LoadBRFont(char* pName) {
     FILE* f;
     tPath_name the_path;
@@ -2890,6 +2998,7 @@ br_font* LoadBRFont(char* pName) {
 }
 
 // IDA: void __cdecl LoadParts()
+// FUNCTION: CARM95 0x00425573
 void LoadParts(void) {
     int i;
     int j;
@@ -2913,6 +3022,7 @@ void LoadParts(void) {
 }
 
 // IDA: void __cdecl UnlockParts()
+// FUNCTION: CARM95 0x004256b1
 void UnlockParts(void) {
     int i;
     int j;
@@ -2928,6 +3038,7 @@ void UnlockParts(void) {
 }
 
 // IDA: br_pixelmap* __cdecl LoadChromeFont()
+// FUNCTION: CARM95 0x0042575f
 br_pixelmap* LoadChromeFont(void) {
     br_pixelmap* result;
     LOG_TRACE("()");
@@ -2940,6 +3051,7 @@ br_pixelmap* LoadChromeFont(void) {
 }
 
 // IDA: void __usercall DisposeChromeFont(br_pixelmap *pThe_font@<EAX>)
+// FUNCTION: CARM95 0x00425799
 void DisposeChromeFont(br_pixelmap* pThe_font) {
     LOG_TRACE("(%p)", pThe_font);
 
@@ -2947,6 +3059,7 @@ void DisposeChromeFont(br_pixelmap* pThe_font) {
 }
 
 // IDA: int __usercall GetALineAndInterpretCommand@<EAX>(FILE *pF@<EAX>, char **pString_list@<EDX>, int pCount@<EBX>)
+// FUNCTION: CARM95 0x004257b0
 int GetALineAndInterpretCommand(FILE* pF, char** pString_list, int pCount) {
     int i;
     char s[256];
@@ -2964,6 +3077,7 @@ int GetALineAndInterpretCommand(FILE* pF, char** pString_list, int pCount) {
 }
 
 // IDA: int __usercall GetAnInt@<EAX>(FILE *pF@<EAX>)
+// FUNCTION: CARM95 0x00425878
 int GetAnInt(FILE* pF) {
     char s[256];
     char* str;
@@ -2976,6 +3090,7 @@ int GetAnInt(FILE* pF) {
 }
 
 // IDA: float __usercall GetAFloat@<ST0>(FILE *pF@<EAX>)
+// FUNCTION: CARM95 0x004258d0
 float GetAFloat(FILE* pF) {
     char s[256];
     char* str;
@@ -3001,6 +3116,7 @@ float GetAFloatPercent(FILE* pF) {
 }
 
 // IDA: void __usercall GetPairOfFloats(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>)
+// FUNCTION: CARM95 0x00425986
 void GetPairOfFloats(FILE* pF, float* pF1, float* pF2) {
     char s[256];
     char* str;
@@ -3013,6 +3129,7 @@ void GetPairOfFloats(FILE* pF, float* pF1, float* pF2) {
 }
 
 // IDA: void __usercall GetThreeFloats(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>, float *pF3@<ECX>)
+// FUNCTION: CARM95 0x004259fd
 void GetThreeFloats(FILE* pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
     char* str;
@@ -3027,6 +3144,7 @@ void GetThreeFloats(FILE* pF, float* pF1, float* pF2, float* pF3) {
 }
 
 // IDA: void __usercall GetPairOfInts(FILE *pF@<EAX>, int *pF1@<EDX>, int *pF2@<EBX>)
+// FUNCTION: CARM95 0x00425a9b
 void GetPairOfInts(FILE* pF, int* pF1, int* pF2) {
     char s[256];
     char* str;
@@ -3039,6 +3157,7 @@ void GetPairOfInts(FILE* pF, int* pF1, int* pF2) {
 }
 
 // IDA: void __usercall GetThreeInts(FILE *pF@<EAX>, int *pF1@<EDX>, int *pF2@<EBX>, int *pF3@<ECX>)
+// FUNCTION: CARM95 0x00425b12
 void GetThreeInts(FILE* pF, int* pF1, int* pF2, int* pF3) {
     char s[256];
     char* str;
@@ -3070,6 +3189,7 @@ void GetThreeIntsAndAString(FILE* pF, int* pF1, int* pF2, int* pF3, char* pS) {
 }
 
 // IDA: void __usercall GetFourInts(FILE *pF@<EAX>, int *pF1@<EDX>, int *pF2@<EBX>, int *pF3@<ECX>, int *pF4)
+// FUNCTION: CARM95 0x00425c85
 void GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3, int* pF4) {
     char s[256];
     char* str;
@@ -3086,6 +3206,7 @@ void GetFourInts(FILE* pF, int* pF1, int* pF2, int* pF3, int* pF4) {
 }
 
 // IDA: br_scalar __usercall GetAScalar@<ST0>(FILE *pF@<EAX>)
+// FUNCTION: CARM95 0x00425d4a
 br_scalar GetAScalar(FILE* pF) {
     LOG_TRACE("(%p)", pF);
 
@@ -3100,6 +3221,7 @@ void GetPairOfScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2) {
 }
 
 // IDA: void __usercall GetThreeScalars(FILE *pF@<EAX>, br_scalar *pS1@<EDX>, br_scalar *pS2@<EBX>, br_scalar *pS3@<ECX>)
+// FUNCTION: CARM95 0x00425d98
 void GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3) {
     LOG_TRACE("(%p, %p, %p, %p)", pF, pS1, pS2, pS3);
 
@@ -3107,6 +3229,7 @@ void GetThreeScalars(FILE* pF, br_scalar* pS1, br_scalar* pS2, br_scalar* pS3) {
 }
 
 // IDA: void __usercall GetFourScalars(FILE *pF@<EAX>, br_scalar *pF1@<EDX>, br_scalar *pF2@<EBX>, br_scalar *pF3@<ECX>, br_scalar *pF4)
+// FUNCTION: CARM95 0x00425dd6
 void GetFourScalars(FILE* pF, br_scalar* pF1, br_scalar* pF2, br_scalar* pF3, br_scalar* pF4) {
     char s[256];
     char* str;
@@ -3145,6 +3268,7 @@ void GetFiveScalars(FILE* pF, br_scalar* pF1, br_scalar* pF2, br_scalar* pF3, br
 }
 
 // IDA: void __usercall GetNScalars(FILE *pF@<EAX>, int pNumber@<EDX>, br_scalar *pScalars@<EBX>)
+// FUNCTION: CARM95 0x00425fdb
 void GetNScalars(FILE* pF, int pNumber, br_scalar* pScalars) {
     char s[256];
     char* str;
@@ -3162,6 +3286,7 @@ void GetNScalars(FILE* pF, int pNumber, br_scalar* pScalars) {
 }
 
 // IDA: void __usercall GetPairOfFloatPercents(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>)
+// FUNCTION: CARM95 0x0042607b
 void GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
     char s[256];
     char* str;
@@ -3177,6 +3302,7 @@ void GetPairOfFloatPercents(FILE* pF, float* pF1, float* pF2) {
 }
 
 // IDA: void __usercall GetThreeFloatPercents(FILE *pF@<EAX>, float *pF1@<EDX>, float *pF2@<EBX>, float *pF3@<ECX>)
+// FUNCTION: CARM95 0x00426112
 void GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3) {
     char s[256];
     char* str;
@@ -3195,6 +3321,7 @@ void GetThreeFloatPercents(FILE* pF, float* pF1, float* pF2, float* pF3) {
 }
 
 // IDA: void __usercall GetAString(FILE *pF@<EAX>, char *pString@<EDX>)
+// FUNCTION: CARM95 0x004261e0
 void GetAString(FILE* pF, char* pString) {
     char s[256];
     char* str;
@@ -3205,6 +3332,7 @@ void GetAString(FILE* pF, char* pString) {
 }
 
 // IDA: void __cdecl AboutToLoadFirstCar()
+// FUNCTION: CARM95 0x00426240
 void AboutToLoadFirstCar(void) {
     LOG_TRACE("()");
 
@@ -3213,6 +3341,7 @@ void AboutToLoadFirstCar(void) {
 }
 
 // IDA: void __usercall LoadOpponentsCars(tRace_info *pRace_info@<EAX>)
+// FUNCTION: CARM95 0x0042625a
 void LoadOpponentsCars(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
@@ -3235,6 +3364,7 @@ void LoadOpponentsCars(tRace_info* pRace_info) {
 }
 
 // IDA: void __usercall DisposeOpponentsCars(tRace_info *pRace_info@<EAX>)
+// FUNCTION: CARM95 0x00426359
 void DisposeOpponentsCars(tRace_info* pRace_info) {
     int i;
     LOG_TRACE("(%p)", pRace_info);
@@ -3252,6 +3382,7 @@ void DisposeOpponentsCars(tRace_info* pRace_info) {
 }
 
 // IDA: void __cdecl LoadMiscStrings()
+// FUNCTION: CARM95 0x00426410
 void LoadMiscStrings(void) {
     int i;
     FILE* f;
@@ -3276,6 +3407,7 @@ void LoadMiscStrings(void) {
 }
 
 // IDA: void __usercall FillInRaceInfo(tRace_info *pThe_race@<EAX>)
+// FUNCTION: CARM95 0x0042652d
 void FillInRaceInfo(tRace_info* pThe_race) {
     LOG_TRACE("(%p)", pThe_race);
 
@@ -3283,6 +3415,7 @@ void FillInRaceInfo(tRace_info* pThe_race) {
 }
 
 // IDA: FILE* __usercall OldDRfopen@<EAX>(char *pFilename@<EAX>, char *pMode@<EDX>)
+// FUNCTION: CARM95 0x00426654
 FILE* OldDRfopen(char* pFilename, char* pMode) {
     FILE* fp;
     FILE* file_ptr;
@@ -3292,6 +3425,7 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     tPath_name CD_dir;
     tPath_name path_file;
     tPath_name source_check;
+    // GLOBAL: CARM95 0x50a5e0
     static int source_exists = 1;
     int len;
     char ch;
@@ -3390,6 +3524,7 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
 }
 
 // IDA: void __cdecl AllowOpenToFail()
+// FUNCTION: CARM95 0x00426563
 void AllowOpenToFail(void) {
     LOG_TRACE("()");
 
@@ -3404,6 +3539,7 @@ void DoNotAllowOpenToFail(void) {
 }
 
 // IDA: FILE* __usercall DRfopen@<EAX>(char *pFilename@<EAX>, char *pMode@<EDX>)
+// FUNCTION: CARM95 0x00426583
 FILE* DRfopen(char* pFilename, char* pMode) {
     FILE* result;
     tPath_name CD_dir;
@@ -3427,8 +3563,11 @@ FILE* DRfopen(char* pFilename, char* pMode) {
 }
 
 // IDA: int __usercall GetCDPathFromPathsTxtFile@<EAX>(char *pPath_name@<EAX>)
+// FUNCTION: CARM95 0x00426cc5
 int GetCDPathFromPathsTxtFile(char* pPath_name) {
+    // GLOBAL: CARM95 0x50a5e4
     static int got_it_already = 0;
+    // GLOBAL: CARM95 0x531e00
     static tPath_name cd_pathname;
     FILE* paths_txt_fp;
     tPath_name paths_txt;
@@ -3449,6 +3588,7 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
 }
 
 // IDA: int __cdecl TestForOriginalCarmaCDinDrive()
+// FUNCTION: CARM95 0x00426d7a
 int TestForOriginalCarmaCDinDrive(void) {
     // The symbol dump didn't include any local variable information.
     // These names are not necessarily the original names.
@@ -3516,11 +3656,13 @@ int TestForOriginalCarmaCDinDrive(void) {
 }
 
 // IDA: int __cdecl OriginalCarmaCDinDrive()
+// FUNCTION: CARM95 0x00427158
 int OriginalCarmaCDinDrive(void) {
     return gCD_is_in_drive;
 }
 
 // IDA: int __cdecl CarmaCDinDriveOrFullGameInstalled()
+// FUNCTION: CARM95 0x0042716d
 int CarmaCDinDriveOrFullGameInstalled(void) {
     LOG_TRACE("()");
 
@@ -3532,6 +3674,7 @@ int CarmaCDinDriveOrFullGameInstalled(void) {
 }
 
 // IDA: void __usercall ReadNetworkSettings(FILE *pF@<EAX>, tNet_game_options *pOptions@<EDX>)
+// FUNCTION: CARM95 0x00427199
 void ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions) {
     LOG_TRACE("(%p, %p)", pF, pOptions);
 
@@ -3549,6 +3692,7 @@ void ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions) {
 }
 
 // IDA: int __usercall PrintNetOptions@<EAX>(FILE *pF@<EAX>, int pIndex@<EDX>)
+// FUNCTION: CARM95 0x00427269
 int PrintNetOptions(FILE* pF, int pIndex) {
     LOG_TRACE("(%p, %d)", pF, pIndex);
 
@@ -3568,6 +3712,7 @@ int PrintNetOptions(FILE* pF, int pIndex) {
 }
 
 // IDA: int __cdecl SaveOptions()
+// FUNCTION: CARM95 0x004273e5
 int SaveOptions(void) {
     tPath_name the_path;
     FILE* f;
@@ -3632,6 +3777,7 @@ int SaveOptions(void) {
 }
 
 // IDA: int __cdecl RestoreOptions()
+// FUNCTION: CARM95 0x004278be
 int RestoreOptions(void) {
     tPath_name the_path;
     FILE* f;
@@ -3729,6 +3875,7 @@ int RestoreOptions(void) {
 }
 
 // IDA: void __cdecl InitFunkGrooveFlags()
+// FUNCTION: CARM95 0x00427e87
 void InitFunkGrooveFlags(void) {
     int i;
     LOG_TRACE("()");

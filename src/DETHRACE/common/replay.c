@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x0050a1b0
 char* gReplay_pixie_names[10] = {
     "REPLAY.PIX",
     "RBUTTONS.PIX",
@@ -39,29 +40,70 @@ char* gReplay_pixie_names[10] = {
     "FWDEND.PIX",
     "CAMERA.PIX",
 };
+
+// GLOBAL: CARM95 0x0050a1d8
 int gSingle_frame_mode = 0;
+
+// GLOBAL: CARM95 0x0050a1dc
 tU32 gCam_change_time = 0;
+
+// GLOBAL: CARM95 0x0050a1e0
 int gSave_file = 0;
+
+// GLOBAL: CARM95 0x0050a1e8
 int gProgress_line_left[2] = { 70, 141 };
+
+// GLOBAL: CARM95 0x0050a1f0
 int gProgress_line_right[2] = { 279, 558 };
+
+// GLOBAL: CARM95 0x0050a1f8
 int gProgress_line_top[2] = { 178, 429 };
+
+// GLOBAL: CARM95 0x00531dd0
 br_pixelmap* gReplay_pixies[10];
+
+// GLOBAL: CARM95 0x00531db8
 int gKey_down;
 int gNo_cursor;
+
+// GLOBAL: CARM95 0x00531db4
 int gSave_frame_number;
+
+// GLOBAL: CARM95 0x00531da8
 int gCam_change_button_down;
+
+// GLOBAL: CARM95 0x00531da0
 tU32 gAction_replay_start_time;
+
+// GLOBAL: CARM95 0x00531dc4
 tU32 gLast_replay_zappy_screen;
+
+// GLOBAL: CARM95 0x00531dc0
 tS32 gStopped_time;
+
+// GLOBAL: CARM95 0x00531dbc
 float gPending_replay_rate;
+
+// GLOBAL: CARM95 0x00531da4
 tU32 gAction_replay_end_time;
+
+// GLOBAL: CARM95 0x00531dcc
 float gReplay_rate;
+
+// GLOBAL: CARM95 0x00531db0
 int gSave_bunch_ID;
+
+// GLOBAL: CARM95 0x00531dac
 int gPlay_direction;
+
+// GLOBAL: CARM95 0x00531dc8
 int gPaused;
+
+// GLOBAL: CARM95 0x00551db4
 tAction_replay_camera_type gAction_replay_camera_mode;
 
 // IDA: int __cdecl ReplayIsPaused()
+// FUNCTION: CARM95 0x0041adc0
 int ReplayIsPaused(void) {
     LOG_TRACE8("()");
 
@@ -69,6 +111,7 @@ int ReplayIsPaused(void) {
 }
 
 // IDA: float __cdecl GetReplayRate()
+// FUNCTION: CARM95 0x0041adf3
 float GetReplayRate(void) {
     LOG_TRACE("()");
 
@@ -76,6 +119,7 @@ float GetReplayRate(void) {
 }
 
 // IDA: int __cdecl GetReplayDirection()
+// FUNCTION: CARM95 0x0041ae09
 int GetReplayDirection(void) {
     LOG_TRACE("()");
 
@@ -83,6 +127,7 @@ int GetReplayDirection(void) {
 }
 
 // IDA: void __cdecl StopSaving()
+// FUNCTION: CARM95 0x0041b5a0
 void StopSaving(void) {
     LOG_TRACE("()");
 
@@ -91,6 +136,7 @@ void StopSaving(void) {
 }
 
 // IDA: void __usercall ActualActionReplayHeadups(int pSpecial_zappy_bastard@<EAX>)
+// FUNCTION: CARM95 0x0041ae48
 void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
     int x;
@@ -200,6 +246,7 @@ void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
 }
 
 // IDA: void __cdecl DoActionReplayPostSwap()
+// FUNCTION: CARM95 0x0041ae1e
 void DoActionReplayPostSwap(void) {
     LOG_TRACE("()");
 
@@ -207,6 +254,7 @@ void DoActionReplayPostSwap(void) {
 }
 
 // IDA: void __usercall DoZappyActionReplayHeadups(int pSpecial_zappy_bastard@<EAX>)
+// FUNCTION: CARM95 0x0041b5bf
 void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
     LOG_TRACE("(%d)", pSpecial_zappy_bastard);
@@ -222,6 +270,7 @@ void DoZappyActionReplayHeadups(int pSpecial_zappy_bastard) {
 }
 
 // IDA: void __cdecl DoActionReplayHeadups()
+// FUNCTION: CARM95 0x0041ae33
 void DoActionReplayHeadups(void) {
     LOG_TRACE("()");
 
@@ -229,6 +278,7 @@ void DoActionReplayHeadups(void) {
 }
 
 // IDA: void __usercall MoveReplayBuffer(tS32 pMove_amount@<EAX>)
+// FUNCTION: CARM95 0x0041b41e
 void MoveReplayBuffer(tS32 pMove_amount) {
     tU8* play_ptr;
     tU8* old_play_ptr;
@@ -265,7 +315,7 @@ void MoveReplayBuffer(tS32 pMove_amount) {
         ProcessOilSpills(gFrame_period);
     }
     if (gReplay_rate < 0.f) {
-        CheckSound((tPipe_chunk*)old_play_ptr2, old_time, GetTotalTime());
+        ScanAndPlaySoundsToBe(old_play_ptr2, old_time, GetTotalTime());
     }
     if (old_play_ptr == play_ptr) {
         gReplay_rate = 0.f;
@@ -278,6 +328,7 @@ void MoveReplayBuffer(tS32 pMove_amount) {
 }
 
 // IDA: void __cdecl MoveToEndOfReplay()
+// FUNCTION: CARM95 0x0041b3df
 void MoveToEndOfReplay(void) {
     float old_replay_rate;
     LOG_TRACE("()");
@@ -291,6 +342,7 @@ void MoveToEndOfReplay(void) {
 }
 
 // IDA: void __cdecl MoveToStartOfReplay()
+// FUNCTION: CARM95 0x0041b622
 void MoveToStartOfReplay(void) {
     float old_replay_rate;
     LOG_TRACE("()");
@@ -304,6 +356,7 @@ void MoveToStartOfReplay(void) {
 }
 
 // IDA: void __cdecl ToggleReplay()
+// FUNCTION: CARM95 0x0041b661
 void ToggleReplay(void) {
     LOG_TRACE("()");
 
@@ -352,12 +405,14 @@ void ToggleReplay(void) {
 }
 
 // IDA: void __usercall ReverseSound(tS3_effect_tag pEffect_index@<EAX>, tS3_sound_tag pSound_tag@<EDX>)
+// FUNCTION: CARM95 0x0041b7fe
 void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
     LOG_TRACE("(%d, %d)", pEffect_index, pSound_tag);
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl FindUniqueFile()
+// FUNCTION: CARM95 0x0041b819
 int FindUniqueFile(void) {
     int index;
     FILE* f;
@@ -379,6 +434,7 @@ int FindUniqueFile(void) {
 }
 
 // IDA: void __usercall PollActionReplayControls(tU32 pFrame_period@<EAX>)
+// FUNCTION: CARM95 0x0041b925
 void PollActionReplayControls(tU32 pFrame_period) {
     float old_replay_rate;
     int old_key_down;
@@ -386,6 +442,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
     int y_coord;
     int i;
     tU32 real_time;
+    // GLOBAL: CARM95 0x50a200
     static tU32 last_real_time = 0;
     static int psuedo_mouse_keys[8] = {
         KEY_KP_7,
@@ -564,6 +621,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl CheckReplayTurnOn()
+// FUNCTION: CARM95 0x0041c03b
 void CheckReplayTurnOn(void) {
     LOG_TRACE("()");
 
@@ -577,6 +635,7 @@ void CheckReplayTurnOn(void) {
 }
 
 // IDA: void __cdecl InitializeActionReplay()
+// FUNCTION: CARM95 0x0041c093
 void InitializeActionReplay(void) {
     int i;
     LOG_TRACE("()");
@@ -588,6 +647,7 @@ void InitializeActionReplay(void) {
 }
 
 // IDA: void __usercall DoActionReplay(tU32 pFrame_period@<EAX>)
+// FUNCTION: CARM95 0x0041c0e6
 void DoActionReplay(tU32 pFrame_period) {
     LOG_TRACE("(%d)", pFrame_period);
 
@@ -597,9 +657,11 @@ void DoActionReplay(tU32 pFrame_period) {
 }
 
 // IDA: void __cdecl SynchronizeActionReplay()
+// FUNCTION: CARM95 0x0041c11c
 void SynchronizeActionReplay(void) {
     FILE* f;
     tPath_name the_path;
+    // GLOBAL: CARM95 0x50a328
     static tU32 gLast_synch_time;
     LOG_TRACE("()");
 

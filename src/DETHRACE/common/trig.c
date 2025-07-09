@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdlib.h>
 
+// GLOBAL: CARM95 0x0051e620
 float gFloat_sine_table[91] = {
     0.0f,
     0.017452f,
@@ -98,12 +99,21 @@ float gFloat_sine_table[91] = {
     1.0f,
 };
 br_fixed_ls gFixed_sine_table[91];
+
+// GLOBAL: CARM95 0x0053e4b8
 br_matrix23 mat23tmp1;
+
+// GLOBAL: CARM95 0x0053e4d0
 br_matrix23 mat23tmp2;
+
+// GLOBAL: CARM95 0x0053e4e8
 br_matrix34 mattmp1__trig; // suffix added to avoid duplicate symbol
+
+// GLOBAL: CARM95 0x0053e518
 br_matrix34 mattmp2__trig; // suffix added to avoid duplicate symbol
 
 // IDA: float __usercall FastFloatSin@<ST0>(int pAngle_in_degrees@<EAX>)
+// FUNCTION: CARM95 0x004aa0d0
 float FastFloatSin(int pAngle_in_degrees) {
     LOG_TRACE("(%d)", pAngle_in_degrees);
 
@@ -125,6 +135,7 @@ float FastFloatSin(int pAngle_in_degrees) {
 }
 
 // IDA: float __usercall FastFloatCos@<ST0>(int pAngle_in_degrees@<EAX>)
+// FUNCTION: CARM95 0x004aa18c
 float FastFloatCos(int pAngle_in_degrees) {
     LOG_TRACE("(%d)", pAngle_in_degrees);
 
@@ -154,6 +165,7 @@ float FastFloatTan(int pAngle_in_degrees) {
 }
 
 // IDA: br_scalar __usercall FastScalarSin@<ST0>(int pAngle_in_degrees@<EAX>)
+// FUNCTION: CARM95 0x004aa279
 br_scalar FastScalarSin(int pAngle_in_degrees) {
     LOG_TRACE("(%d)", pAngle_in_degrees);
 
@@ -161,6 +173,7 @@ br_scalar FastScalarSin(int pAngle_in_degrees) {
 }
 
 // IDA: br_scalar __usercall FastScalarCos@<ST0>(int pAngle_in_degrees@<EAX>)
+// FUNCTION: CARM95 0x004aa295
 br_scalar FastScalarCos(int pAngle_in_degrees) {
     LOG_TRACE("(%d)", pAngle_in_degrees);
 
@@ -175,6 +188,7 @@ br_scalar FastScalarTan(int pAngle_in_degrees) {
 }
 
 // IDA: br_scalar __usercall FastScalarSinAngle@<ST0>(br_angle pBR_angle@<EAX>)
+// FUNCTION: CARM95 0x004aa2e2
 br_scalar FastScalarSinAngle(br_angle pBR_angle) {
     LOG_TRACE("(%d)", pBR_angle);
 
@@ -182,6 +196,7 @@ br_scalar FastScalarSinAngle(br_angle pBR_angle) {
 }
 
 // IDA: br_scalar __usercall FastScalarCosAngle@<ST0>(br_angle pBR_angle@<EAX>)
+// FUNCTION: CARM95 0x004aa317
 br_scalar FastScalarCosAngle(br_angle pBR_angle) {
     LOG_TRACE("(%d)", pBR_angle);
 
@@ -246,6 +261,7 @@ br_scalar FastScalarArcCos(br_scalar pValue) {
 }
 
 // IDA: float __cdecl FastFloatArcTan2(float pY, float pX)
+// FUNCTION: CARM95 0x004aa4c0
 float FastFloatArcTan2(float pY, float pX) {
     float abs_x;
     float abs_y;
@@ -293,6 +309,7 @@ float FastFloatArcTan2(float pY, float pX) {
 }
 
 // IDA: br_scalar __cdecl FastScalarArcTan2(br_scalar pY, br_scalar pX)
+// FUNCTION: CARM95 0x004aa69f
 br_scalar FastScalarArcTan2(br_scalar pY, br_scalar pX) {
     br_scalar abs_x;
     br_scalar abs_y;
@@ -302,6 +319,7 @@ br_scalar FastScalarArcTan2(br_scalar pY, br_scalar pX) {
 }
 
 // IDA: br_angle __cdecl FastFloatArcTan2Angle(float pY, float pX)
+// FUNCTION: CARM95 0x004aa6c2
 br_angle FastFloatArcTan2Angle(float pY, float pX) {
     float abs_x;
     float abs_y;
@@ -345,6 +363,7 @@ br_angle FastFloatArcTan2Angle(float pY, float pX) {
 }
 
 // IDA: br_angle __cdecl FastScalarArcTan2Angle(br_scalar pY, br_scalar pX)
+// FUNCTION: CARM95 0x004aa8c2
 br_angle FastScalarArcTan2Angle(br_scalar pY, br_scalar pX) {
     br_scalar abs_x;
     br_scalar abs_y;
@@ -354,6 +373,7 @@ br_angle FastScalarArcTan2Angle(br_scalar pY, br_scalar pX) {
 }
 
 // IDA: void __usercall DRMatrix34RotateX(br_matrix34 *mat@<EAX>, br_angle rx@<EDX>)
+// FUNCTION: CARM95 0x004aa8e5
 void DRMatrix34RotateX(br_matrix34* mat, br_angle rx) {
     br_scalar s;
     br_scalar c;
@@ -376,6 +396,7 @@ void DRMatrix34RotateX(br_matrix34* mat, br_angle rx) {
 }
 
 // IDA: void __usercall DRMatrix34RotateY(br_matrix34 *mat@<EAX>, br_angle ry@<EDX>)
+// FUNCTION: CARM95 0x004aa986
 void DRMatrix34RotateY(br_matrix34* mat, br_angle ry) {
     br_scalar s;
     br_scalar c;
@@ -398,6 +419,7 @@ void DRMatrix34RotateY(br_matrix34* mat, br_angle ry) {
 }
 
 // IDA: void __usercall DRMatrix34RotateZ(br_matrix34 *mat@<EAX>, br_angle rz@<EDX>)
+// FUNCTION: CARM95 0x004aaa27
 void DRMatrix34RotateZ(br_matrix34* mat, br_angle rz) {
     br_scalar s;
     br_scalar c;
@@ -466,6 +488,7 @@ void DRMatrix34PreRotateX(br_matrix34* mat, br_angle rx) {
 }
 
 // IDA: void __usercall DRMatrix34PostRotateX(br_matrix34 *mat@<EAX>, br_angle rx@<EDX>)
+// FUNCTION: CARM95 0x004aac41
 void DRMatrix34PostRotateX(br_matrix34* mat, br_angle rx) {
     LOG_TRACE("(%p, %d)", mat, rx);
 
@@ -484,6 +507,7 @@ void DRMatrix34PreRotateY(br_matrix34* mat, br_angle ry) {
 }
 
 // IDA: void __usercall DRMatrix34PostRotateY(br_matrix34 *mat@<EAX>, br_angle ry@<EDX>)
+// FUNCTION: CARM95 0x004aacc7
 void DRMatrix34PostRotateY(br_matrix34* mat, br_angle ry) {
     LOG_TRACE("(%p, %d)", mat, ry);
 
@@ -493,6 +517,7 @@ void DRMatrix34PostRotateY(br_matrix34* mat, br_angle ry) {
 }
 
 // IDA: void __usercall DRMatrix34PreRotateZ(br_matrix34 *mat@<EAX>, br_angle rz@<EDX>)
+// FUNCTION: CARM95 0x004aad0a
 void DRMatrix34PreRotateZ(br_matrix34* mat, br_angle rz) {
     LOG_TRACE("(%p, %d)", mat, rz);
 
@@ -502,6 +527,7 @@ void DRMatrix34PreRotateZ(br_matrix34* mat, br_angle rz) {
 }
 
 // IDA: void __usercall DRMatrix34PostRotateZ(br_matrix34 *mat@<EAX>, br_angle rz@<EDX>)
+// FUNCTION: CARM95 0x004aad4d
 void DRMatrix34PostRotateZ(br_matrix34* mat, br_angle rz) {
     LOG_TRACE("(%p, %d)", mat, rz);
 
@@ -529,6 +555,7 @@ void DRMatrix34PostRotate(br_matrix34* mat, br_angle r, br_vector3* axis) {
 }
 
 // IDA: void __usercall DRMatrix23Rotate(br_matrix23 *mat@<EAX>, br_angle rz@<EDX>)
+// FUNCTION: CARM95 0x004aae1e
 void DRMatrix23Rotate(br_matrix23* mat, br_angle rz) {
     br_scalar s;
     br_scalar c;
@@ -555,6 +582,7 @@ void DRMatrix23PreRotate(br_matrix23* mat, br_angle rz) {
 }
 
 // IDA: void __usercall DRMatrix23PostRotate(br_matrix23 *mat@<EAX>, br_angle rz@<EDX>)
+// FUNCTION: CARM95 0x004aaec6
 void DRMatrix23PostRotate(br_matrix23* mat, br_angle rz) {
     LOG_TRACE("(%p, %d)", mat, rz);
 
