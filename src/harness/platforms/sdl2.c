@@ -367,6 +367,12 @@ static void SDL2_Harness_GetViewport(int* x, int* y, float* width_multipler, flo
     *height_multiplier = viewport.scale_y;
 }
 
+static void SDL2_Harness_GetPrefPath(char* path, char* app_name) {
+    char* sdl_path = SDL2_GetPrefPath(NULL, app_name);
+    strcpy(path, sdl_path);
+    SDL2_free(sdl_path);
+}
+
 static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
     if (SDL2_LoadSymbols() != 0) {
         return 1;
@@ -388,6 +394,7 @@ static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
     platform->PaletteChanged = SDL2_Harness_PaletteChanged;
     platform->GL_GetProcAddress = SDL2_GL_GetProcAddress;
     platform->GetViewport = SDL2_Harness_GetViewport;
+    platform->GetPrefPath = SDL2_Harness_GetPrefPath;
     return 0;
 };
 
