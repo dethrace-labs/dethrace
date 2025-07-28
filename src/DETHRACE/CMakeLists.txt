@@ -185,8 +185,9 @@ else()
 endif()
 
 # Create our main game binary.
-if (MSVC_42_FOR_RECCMP)
+if(MSVC_42_FOR_RECCMP)
     add_executable(dethrace WIN32)
+    set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
     target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()

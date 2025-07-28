@@ -1,6 +1,6 @@
 targets:
   CARM95:
-    filename: carm95.exe
+    filename: CARM95.EXE
     source_root: src
     hash:
       sha256: c6040203856b71e6a22d2a29053a1eadd1a2ab41bce97b6031d745079bc07bdf
@@ -147,4 +147,3 @@ targets:
         "BrQsort",
         "BrFileRead",
       ]
-    
