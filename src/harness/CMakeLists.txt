@@ -15,7 +15,11 @@ if(DETHRACE_FIX_BUGS)
     target_compile_definitions(harness PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
-target_link_libraries(harness PRIVATE brender compile_with_werror)
+if(MSVC_42_FOR_RECCMP)
+  target_link_libraries(harness PRIVATE brender inih compile_with_werror)
+else()
+  target_link_libraries(harness PRIVATE brender miniaudio stb inih compile_with_werror)
+endif()
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE

@@ -88,7 +88,6 @@ endfunction()
 
 test_big_endian(IS_BIGENDIAN)
 
-
 set(count_sdl_platforms 0)
 
 set(DETHRACE_PLATFORMS)
@@ -127,6 +126,7 @@ endif()
 
 add_subdirectory(lib/BRender-v1.3.2)
 add_subdirectory(lib/libsmacker)
+add_subdirectory(lib/inih)
 
 if(DETHRACE_SOUND_ENABLED)
     add_subdirectory(lib/miniaudio)
