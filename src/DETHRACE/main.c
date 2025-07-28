@@ -18,10 +18,12 @@ void BR_CALLBACK _BrBeginHook(void) {
     struct br_device* BR_EXPORT BrDrv1VirtualFramebufferBegin(char* arguments);
     struct br_device* BR_EXPORT BrDrv1GLBegin(char* arguments);
 
-   // BrDevAddStatic(NULL, BrDrv1SoftPrimBegin, NULL);
-   // BrDevAddStatic(NULL, BrDrv1SoftRendBegin, NULL);
-   // BrDevAddStatic(NULL, BrDrv1VirtualFramebufferBegin, NULL);
-   // BrDevAddStatic(NULL, BrDrv1GLBegin, NULL);
+#if _MSC_VER != 1020
+    BrDevAddStatic(NULL, BrDrv1SoftPrimBegin, NULL);
+    BrDevAddStatic(NULL, BrDrv1SoftRendBegin, NULL);
+    BrDevAddStatic(NULL, BrDrv1VirtualFramebufferBegin, NULL);
+    BrDevAddStatic(NULL, BrDrv1GLBegin, NULL);
+#endif
 }
 
 void BR_CALLBACK _BrEndHook(void) {
@@ -30,7 +32,8 @@ void BR_CALLBACK _BrEndHook(void) {
 int main(int argc, char* argv[]) {
     int result;
 
-#ifdef _WIN32XXX
+#ifdef _WIN32
+#if _MSC_VER != 1020
     /* Attach to the console that started us if any */
     if (AttachConsole(ATTACH_PARENT_PROCESS)) {
         /* We attached successfully, lets redirect IO to the consoles handles if not already redirected */
@@ -46,6 +49,7 @@ int main(int argc, char* argv[]) {
             freopen("CONIN$", "r", stdin);
         }
     }
+#endif
 #endif
 
     result = Harness_Init(&argc, argv);

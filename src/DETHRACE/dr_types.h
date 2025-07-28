@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <string.h>
 
+// This is a bit of a hack for compiling with MSVC 4.20
+#if _MSC_VER == 1020
 typedef unsigned int uintptr_t;
 typedef int intptr_t;
 
@@ -19,11 +21,11 @@ typedef int intptr_t;
 
 // required for platform-specific network structs
 // if needed for a different platform, make this conditional
-//#include "pc-all/net_types.h"
+// #include "pc-all/net_types.h"
 
 typedef struct tPD_net_player_info {
     // cannot be a regular sockaddr_in because it is transmitted between OS's
-    
+
     int i;
 } tPD_net_player_info;
 
@@ -33,6 +35,8 @@ typedef struct tPD_net_game_info {
     int i;
 
 } tPD_net_game_info;
+
+#endif
 
 typedef unsigned char tU8;
 typedef signed char tS8;

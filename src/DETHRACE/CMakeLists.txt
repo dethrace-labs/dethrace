@@ -17,7 +17,9 @@ endif()
 
 target_link_libraries(dethrace_obj PUBLIC smackw32 harness BRender::Full BRender::DDI s3)
 
-if(MSVC)
+if(MSVC_42_FOR_RECCMP)
+# do nothing
+elseif(MSVC)
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)
     target_compile_options(dethrace_obj PRIVATE
         /wd4101
