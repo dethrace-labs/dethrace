@@ -20,3 +20,7 @@ sed -i 's/Z://g' reccmp-build.yml
 if [ "$#" -gt 0 ]; then
     exec "$@"
 fi
+
+
+# Unlock directories
+#chmod -R 777 source build

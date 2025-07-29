@@ -21,7 +21,6 @@ typedef int intptr_t;
 
 // required for platform-specific network structs
 // if needed for a different platform, make this conditional
-// #include "pc-all/net_types.h"
 
 typedef struct tPD_net_player_info {
     // cannot be a regular sockaddr_in because it is transmitted between OS's
@@ -35,7 +34,8 @@ typedef struct tPD_net_game_info {
     int i;
 
 } tPD_net_game_info;
-
+#else
+#include "pc-all/net_types.h"
 #endif
 
 typedef unsigned char tU8;

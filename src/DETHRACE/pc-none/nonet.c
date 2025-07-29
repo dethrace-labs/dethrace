@@ -10,12 +10,10 @@
 
 // IDA: void __cdecl ClearupPDNetworkStuff()
 void ClearupPDNetworkStuff(void) {
-    
 }
 
 // IDA: void __usercall MATTMessageCheck(char *pFunction_name@<EAX>, tNet_message *pMessage@<EDX>, int pAlleged_size@<EBX>)
 void MATTMessageCheck(char* pFunction_name, tNet_message* pMessage, int pAlleged_size) {
-    
 }
 
 // IDA: int __usercall GetProfileText@<EAX>(char *pDest@<EAX>, int pDest_len@<EDX>, char *pFname@<EBX>, char *pKeyname@<ECX>)
@@ -25,7 +23,6 @@ int GetProfileText(char* pDest, int pDest_len, char* pFname, char* pKeyname) {
     int i;
     int j;
     int len;
-
 }
 
 // IDA: int __cdecl GetSocketNumberFromProfileFile()
@@ -120,7 +117,6 @@ int PDNetHostGame(tNet_game_details* pDetails, char* pHost_name, void** pHost_ad
 
 // IDA: int __usercall PDNetJoinGame@<EAX>(tNet_game_details *pDetails@<EAX>, char *pPlayer_name@<EDX>)
 int PDNetJoinGame(tNet_game_details* pDetails, char* pPlayer_name) {
-    dr_dprintf("PDNetJoinGame()");
     return 0;
 }
 

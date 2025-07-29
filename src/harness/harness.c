@@ -24,11 +24,16 @@ extern const tPlatform_bootstrap SDL1_bootstrap;
 extern const tPlatform_bootstrap SDL2_bootstrap;
 
 static const tPlatform_bootstrap* platform_bootstraps[] = {
-#ifdef DETHRACE_PLATFORM_SDL2
+#if defined(DETHRACE_PLATFORM_SDL2) && defined(DETHRACE_PLATFORM_SDL1)
     &SDL2_bootstrap,
-#endif
-#ifdef DETHRACE_PLATFORM_SDL1
-    &SDL1_bootstrap,
+    &SDL1_bootstrap
+#elif defined(DETHRACE_PLATFORM_SDL2)
+    &SDL2_bootstrap
+#elif defined(DETHRACE_PLATFORM_SDL1)
+    &SDL1_bootstrap
+#else
+    // This is the case for MSVC 4.20 builds
+    NULL
 #endif
 };
 
@@ -80,12 +85,12 @@ static int Harness_InitPlatform(tArgument_config* argument_config) {
         } else {
             size_t i;
             for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
-                LOG_TRACE10("Attempting video driver \"%s\"", platform_bootstraps[i]->name);
+                LOG_DEBUG2("Attempting video driver \"%s\"", platform_bootstraps[i]->name);
                 if ((platform_bootstraps[i]->capabilities & argument_config->platform_capabilityies) != argument_config->platform_capabilityies) {
                     fprintf(stderr, "Skipping platform \"%s\". Does not support required capabilities.\n", platform_bootstraps[i]->name);
                     continue;
                 }
-                LOG_TRACE10("Try platform \"%s\"...");
+                LOG_DEBUG2("Try platform \"%s\"...", platform_bootstraps[i]->name);
                 if (platform_bootstraps[i]->init(&gHarness_platform) == 0) {
                     selected_bootstrap = platform_bootstraps[i];
                     break;
@@ -100,7 +105,7 @@ static int Harness_InitPlatform(tArgument_config* argument_config) {
             fprintf(stderr, "Could not find a supported platform\n");
             return 1;
         }
-        LOG_INFO("Platform: %s (%s)", selected_bootstrap->name, selected_bootstrap->description);
+        LOG_INFO3("Platform: %s (%s)", selected_bootstrap->name, selected_bootstrap->description);
     }
 
     return 0;
@@ -224,7 +229,7 @@ void Harness_DetectAndSetWorkingDirectory(char* argv0) {
     if (harness_game_config.selected_dir != NULL) {
         path = harness_game_config.selected_dir->directory;
     } else if (env_var != NULL) {
-        LOG_INFO("DETHRACE_ROOT_DIR is set to '%s'", env_var);
+        LOG_INFO2("DETHRACE_ROOT_DIR is set to '%s'", env_var);
         path = env_var;
     } else {
         path = OS_GetWorkingDirectory(argv0);
@@ -240,7 +245,7 @@ void Harness_DetectAndSetWorkingDirectory(char* argv0) {
     if (path != NULL && path[0] != '\0') {
         printf("Using game directory: %s\n", path);
         if (chdir(path) != 0) {
-            LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
+            LOG_PANIC2("Failed to chdir. Error is %s", strerror(errno));
         }
     }
 }
@@ -252,7 +257,6 @@ int Harness_Init(int* argc, char* argv[]) {
 
     printf("Dethrace version: %s\n", DETHRACE_VERSION);
 
-    tArgument_config argument_config;
     // don't require a particular platform
     argument_config.platform_name = NULL;
     // request software renderer capability
@@ -313,7 +317,7 @@ int Harness_Init(int* argc, char* argv[]) {
         printf("Error: data directory does not contain 3dfx assets so opengl mode cannot be used\n");
         exit(1);
     }
-  
+
     return 0;
 }
 
@@ -501,7 +505,7 @@ int Harness_ProcessIniFile(void) {
     strcat(path, "dethrace.ini");
 
     if (ini_parse(path, Harness_Ini_Callback, NULL) < 0) {
-        LOG_DEBUG("Failed to load config file %s", path);
+        LOG_DEBUG2("Failed to load config file %s", path);
         return 1;
     }
 
