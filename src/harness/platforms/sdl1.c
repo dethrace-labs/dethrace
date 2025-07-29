@@ -92,7 +92,7 @@ static void recreate_screen(void) {
     }
     screen = SDL1_SetVideoMode(window_width, window_height, 32, video_flags);
     if (screen == NULL) {
-        LOG_PANIC("SDL_SetVideoMode failed (%s)", SDL1_GetError());
+        LOG_PANIC2("SDL_SetVideoMode failed (%s)", SDL1_GetError());
     }
 }
 
@@ -103,13 +103,13 @@ static void SDL1_Harness_CreateWindow(const char* title, int width, int height, 
     initializeSDL1KeyNums();
 
     if (SDL1_Init(SDL_INIT_VIDEO) != 0) {
-        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL1_GetError());
+        LOG_PANIC2("SDL_INIT_VIDEO error: %s", SDL1_GetError());
     }
 
     if (window_type == eWindow_type_software) {
         recreate_screen();
     } else {
-        LOG_PANIC("Unsupported window type (%d)", window_type);
+        LOG_PANIC2("Unsupported window type (%d)", window_type);
     }
 
     SDL1_WM_SetCaption("Carmageddon", NULL);
@@ -166,7 +166,7 @@ static void SDL1_Harness_ProcessWindowMessages(void) {
             // Map incoming SDL key to PC scan code as used by game code
             dethrace_scancode = sdl1KeyToDirectInputKeyNum[event.key.keysym.sym];
             if (dethrace_scancode == 0) {
-                LOG_WARN("unexpected key \"%s\" (0x%x)", SDL1_GetKeyName(event.key.keysym.sym), event.key.keysym.sym);
+                LOG_WARN3("unexpected key \"%s\" (0x%x)", SDL1_GetKeyName(event.key.keysym.sym), event.key.keysym.sym);
                 return;
             }
             if (event.type == SDL_KEYDOWN) {
