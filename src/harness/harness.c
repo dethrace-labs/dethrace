@@ -251,8 +251,6 @@ void Harness_DetectAndSetWorkingDirectory(char* argv0) {
 }
 
 int Harness_Init(int* argc, char* argv[]) {
-    int result;
-    char* root_dir;
     tArgument_config argument_config;
 
     printf("Dethrace version: %s\n", DETHRACE_VERSION);
