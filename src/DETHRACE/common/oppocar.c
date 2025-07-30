@@ -17,7 +17,6 @@ br_vector3 gNew_ground_normal__oppocar;                // suffix added to avoid 
 
 // IDA: void __usercall MakeCarStationary(tCar_spec *pCar_spec@<EAX>)
 void MakeCarStationary(tCar_spec* pCar_spec) {
-    LOG_TRACE("(%p)", pCar_spec);
     NOT_IMPLEMENTED();
 }
 
@@ -30,6 +29,5 @@ void MoveThisCar(tU32 pTime_difference, tCar_spec* car) {
     int i;
     int j;
     br_angle phi;
-    LOG_TRACE("(%d, %p)", pTime_difference, car);
     NOT_IMPLEMENTED();
 }

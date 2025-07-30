@@ -110,7 +110,6 @@ int gRadio_selected;
 // FUNCTION: CARM95 0x004affc4
 void StartRollingPlayerNamesIn(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gCurrent_graf_data->player_name_x); i++) {
         SetSlotXY(i, gCurrent_graf_data->player_name_x[i], gCurrent_graf_data->player_name_y);
@@ -121,7 +120,6 @@ void StartRollingPlayerNamesIn(void) {
 // IDA: void __cdecl FrankAnneStart1()
 // FUNCTION: CARM95 0x004afe80
 void FrankAnneStart1(void) {
-    LOG_TRACE("()");
 
     StartRollingPlayerNamesIn();
     if (gFrank_flic_data == NULL) {
@@ -153,7 +151,6 @@ void FrankAnneStart1(void) {
 // IDA: void __cdecl FrankAnneStart2()
 // FUNCTION: CARM95 0x004b0057
 void FrankAnneStart2(void) {
-    LOG_TRACE("()");
 
     ChangePanelFlic(0, gFrank_flic_data, gFrank_flic_data_length);
     ChangePanelFlic(1, gAnne_flic_data, gAnne_flic_data_length);
@@ -164,7 +161,6 @@ void FrankAnneStart2(void) {
 // IDA: void __usercall GetPlayerName(int pStarting_to_type@<EAX>, int pCurrent_choice@<EDX>, char *pString@<EBX>, int *pMax_length@<ECX>)
 // FUNCTION: CARM95 0x004b00e4
 void GetPlayerName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length) {
-    LOG_TRACE("(%d, %d, \"%s\", %p)", pStarting_to_type, pCurrent_choice, pString, pMax_length);
 
     strcpy(pString, gProgram_state.player_name[pCurrent_choice]);
     *pMax_length = PLAYER_NAME_MAX_LENGTH;
@@ -173,7 +169,6 @@ void GetPlayerName(int pStarting_to_type, int pCurrent_choice, char* pString, in
 // IDA: int __usercall FrankAnneDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 // FUNCTION: CARM95 0x004b012b
 int FrankAnneDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
-    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
     RemoveTransientBitmaps(1);
     TellyOutImage(GetPanelPixelmap(1), gCurrent_graf_data->anne_panel_left, gCurrent_graf_data->anne_panel_top);
@@ -192,7 +187,6 @@ int FrankAnneDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // IDA: void __usercall FrankAnneDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x004b01fb
 void FrankAnneDraw(int pCurrent_choice, int pCurrent_mode) {
-    LOG_TRACE9("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
     if (gTyping) {
         if (GetTotalTime() & 0x100) {
@@ -290,7 +284,6 @@ int FrankieOrAnnie(void) {
     };
 
     int result;
-    LOG_TRACE("()");
 
     LoadFont(FONT_GRNLIT);
     result = DoInterfaceScreen(&interface_spec, 0, gProgram_state.frank_or_anniness);
@@ -384,7 +377,6 @@ int SelectSkillLevel(void) {
     };
 
     int result;
-    LOG_TRACE("()");
 
     result = DoInterfaceScreen(&interface_spec, 0, gProgram_state.skill_level);
     if (result > 2) {
@@ -399,7 +391,6 @@ int SelectSkillLevel(void) {
 int DoOnePlayerStart(void) {
     int merrily_looping;
     tProgram_state saved_state;
-    LOG_TRACE("()");
 
     if (OriginalCarmaCDinDrive()) {
         memcpy(&saved_state, &gProgram_state, sizeof(tProgram_state));
@@ -449,7 +440,6 @@ int DoOnePlayerStart(void) {
 int NewNetGameUp(int* pCurrent_choice, int* pCurrent_mode) {
     int new_sel;
     int i;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     DRS3StartSound(gEffects_outlet, 3000);
     if (*pCurrent_mode == 0) {
@@ -487,7 +477,6 @@ int NewNetGameUp(int* pCurrent_choice, int* pCurrent_mode) {
 int NewNetGameDown(int* pCurrent_choice, int* pCurrent_mode) {
     int new_sel;
     int i;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     DRS3StartSound(gEffects_outlet, 3000);
     if (*pCurrent_mode == 0) {
@@ -524,7 +513,6 @@ int NewNetGameDown(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: void __usercall DisposeJoinableGame(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x004b0def
 void DisposeJoinableGame(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     NetDisposeGameDetails(gGames_to_join[pIndex].game);
     gGames_to_join[pIndex].game = NULL;
@@ -533,7 +521,6 @@ void DisposeJoinableGame(int pIndex) {
 // IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
 // FUNCTION: CARM95 0x004b0e1b
 void DrawAnItem__newgame(int pX, int pY_index, int pFont_index, char* pText) {
-    LOG_TRACE("(%d, %d, %d, \"%s\")", pX, pY_index, pFont_index, pText);
 
     TransDRPixelmapText(gBack_screen,
         pX,
@@ -546,7 +533,6 @@ void DrawAnItem__newgame(int pX, int pY_index, int pFont_index, char* pText) {
 // IDA: void __usercall DrawColumnHeading(int pStr_index@<EAX>, int pX@<EDX>)
 // FUNCTION: CARM95 0x004b0e9c
 void DrawColumnHeading__newgame(int pStr_index, int pX) {
-    LOG_TRACE("(%d, %d)", pStr_index, pX);
 
     TransDRPixelmapText(gBack_screen,
         pX,
@@ -567,7 +553,6 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
     char s[256];
     char* s2;
     char* s3;
-    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
     current_index = 0;
     BrPixelmapRectangleFill(gBack_screen,
@@ -665,7 +650,6 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
 // FUNCTION: CARM95 0x004b1253
 void InitGamesToJoin(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
         gGames_to_join[i].game = NULL;
@@ -677,7 +661,6 @@ void InitGamesToJoin(void) {
 // FUNCTION: CARM95 0x004b1297
 void DisposeJoinList(int pExemption) {
     int i;
-    LOG_TRACE("(%d)", pExemption);
 
     for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
         if (i == pExemption) {
@@ -695,7 +678,6 @@ void AddToJoinList(tNet_game_details* pGame) {
     int i;
     int slot_to_use;
     tU32 this_game_ID;
-    LOG_TRACE("(%p)", pGame);
 
     slot_to_use = -1;
     this_game_ID = NetExtractGameID(pGame);
@@ -725,7 +707,6 @@ void AddToJoinList(tNet_game_details* pGame) {
 // IDA: void __cdecl NewNetStart1()
 // FUNCTION: CARM95 0x004b0fff
 void NewNetStart1(void) {
-    LOG_TRACE("()");
 
     gTyping = 1;
     SetSlotXY(0, gCurrent_graf_data->net_player_name_x, gCurrent_graf_data->net_player_name_y);
@@ -736,7 +717,6 @@ void NewNetStart1(void) {
 // IDA: void __cdecl NewNetStart2()
 // FUNCTION: CARM95 0x004b105d
 void NewNetStart2(void) {
-    LOG_TRACE("()");
 
     gTyping_slot = 0;
     StartTyping(0, gNet_player_name, 11);
@@ -745,7 +725,6 @@ void NewNetStart2(void) {
 // IDA: void __usercall NewNetGetName(int pStarting_to_type@<EAX>, int pCurrent_choice@<EDX>, char *pString@<EBX>, int *pMax_length@<ECX>)
 // FUNCTION: CARM95 0x004b1083
 void NewNetGetName(int pStarting_to_type, int pCurrent_choice, char* pString, int* pMax_length) {
-    LOG_TRACE("(%d, %d, \"%s\", %p)", pStarting_to_type, pCurrent_choice, pString, pMax_length);
 
     strcpy(pString, gNet_player_name);
     *pMax_length = 10;
@@ -754,7 +733,6 @@ void NewNetGetName(int pStarting_to_type, int pCurrent_choice, char* pString, in
 // IDA: int __usercall NewNetDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 // FUNCTION: CARM95 0x004b10be
 int NewNetDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
-    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
     if (pCurrent_choice != 1) {
         GetTypedName(gNet_player_name, 10);
@@ -765,7 +743,6 @@ int NewNetDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscap
 // IDA: int __usercall NewNetGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x004b10ea
 int NewNetGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     return gLast_graph_sel__newgame >= 0;
 }
@@ -851,7 +828,6 @@ tJoin_or_host_result JoinOrHostGame(tNet_game_details** pGame_to_join) {
         recopy_areas,
     };
     int result;
-    LOG_TRACE("(%p)", pGame_to_join);
 
     gShifted_default_yet = 0;
     LoadFont(kFont_GRNDK);
@@ -887,7 +863,6 @@ tJoin_or_host_result JoinOrHostGame(tNet_game_details** pGame_to_join) {
 // IDA: void __usercall GetNetOptions(tNet_game_options *pGame_options@<EAX>)
 // FUNCTION: CARM95 0x004b2d9b
 void GetNetOptions(tNet_game_options* pGame_options) {
-    LOG_TRACE("(%p)", pGame_options);
 
     pGame_options->enable_text_messages = gRadio_bastards__newgame[0].current_value;
     pGame_options->show_players_on_map = gRadio_bastards__newgame[1].current_value;
@@ -905,7 +880,6 @@ void GetNetOptions(tNet_game_options* pGame_options) {
 // IDA: void __usercall SetNetOptions(tNet_game_options *pGame_options@<EAX>)
 // FUNCTION: CARM95 0x004b1b29
 void SetNetOptions(tNet_game_options* pGame_options) {
-    LOG_TRACE("(%p)", pGame_options);
 
     gRadio_bastards__newgame[0].current_value = pGame_options->enable_text_messages;
     gRadio_bastards__newgame[1].current_value = pGame_options->show_players_on_map;
@@ -923,7 +897,6 @@ void SetNetOptions(tNet_game_options* pGame_options) {
 // IDA: void __usercall NetPlayCheckboxOn2(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x004b13e5
 void NetPlayCheckboxOn2(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     RunFlicAt(95,
         gRadio_bastards__newgame[pIndex].left[0],
@@ -933,7 +906,6 @@ void NetPlayCheckboxOn2(int pIndex) {
 // IDA: void __usercall NetPlayCheckboxOff2(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x004b1415
 void NetPlayCheckboxOff2(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     RunFlicAt(96,
         gRadio_bastards__newgame[pIndex].left[0],
@@ -943,7 +915,6 @@ void NetPlayCheckboxOff2(int pIndex) {
 // IDA: void __usercall NetPlayCheckboxOn(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x004b167d
 void NetPlayCheckboxOn(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     RemoveTransientBitmaps(1);
     DontLetFlicFuckWithPalettes();
@@ -956,7 +927,6 @@ void NetPlayCheckboxOn(int pIndex) {
 // IDA: void __usercall NetPlayCheckboxOff(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x004b16b2
 void NetPlayCheckboxOff(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     RemoveTransientBitmaps(1);
     DontLetFlicFuckWithPalettes();
@@ -969,7 +939,6 @@ void NetPlayCheckboxOff(int pIndex) {
 // IDA: void __usercall NetPlayRadioOn2(int pIndex@<EAX>, int pValue@<EDX>)
 // FUNCTION: CARM95 0x004b1445
 void NetPlayRadioOn2(int pIndex, int pValue) {
-    LOG_TRACE("(%d, %d)", pIndex, pValue);
 
     RunFlicAt(288,
         gRadio_bastards__newgame[pIndex].left[pValue],
@@ -979,7 +948,6 @@ void NetPlayRadioOn2(int pIndex, int pValue) {
 // IDA: void __usercall NetPlayRadioOff2(int pIndex@<EAX>, int pValue@<EDX>)
 // FUNCTION: CARM95 0x004b147c
 void NetPlayRadioOff2(int pIndex, int pValue) {
-    LOG_TRACE("(%d, %d)", pIndex, pValue);
 
     RunFlicAt(287,
         gRadio_bastards__newgame[pIndex].left[pValue],
@@ -989,7 +957,6 @@ void NetPlayRadioOff2(int pIndex, int pValue) {
 // IDA: void __usercall NetPlayRadioOn(int pIndex@<EAX>, int pValue@<EDX>)
 // FUNCTION: CARM95 0x004b1598
 void NetPlayRadioOn(int pIndex, int pValue) {
-    LOG_TRACE("(%d, %d)", pIndex, pValue);
 
     RemoveTransientBitmaps(1);
     DontLetFlicFuckWithPalettes();
@@ -1002,7 +969,6 @@ void NetPlayRadioOn(int pIndex, int pValue) {
 // IDA: void __usercall NetPlayRadioOff(int pIndex@<EAX>, int pValue@<EDX>)
 // FUNCTION: CARM95 0x004b15d1
 void NetPlayRadioOff(int pIndex, int pValue) {
-    LOG_TRACE("(%d, %d)", pIndex, pValue);
 
     RemoveTransientBitmaps(1);
     DontLetFlicFuckWithPalettes();
@@ -1017,7 +983,6 @@ void NetPlayRadioOff(int pIndex, int pValue) {
 void DrawNOptInitialRadios(void) {
     int i;
     int j;
-    LOG_TRACE("()");
 
     RemoveTransientBitmaps(1);
     DontLetFlicFuckWithPalettes();
@@ -1045,7 +1010,6 @@ void DrawNOptInitialRadios(void) {
 // IDA: void __usercall NetRadioChanged(int pIndex@<EAX>, int pNew_value@<EDX>)
 // FUNCTION: CARM95 0x004b1555
 void NetRadioChanged(int pIndex, int pNew_value) {
-    LOG_TRACE("(%d, %d)", pIndex, pNew_value);
 
     NetPlayRadioOff(pIndex, gRadio_bastards__newgame[pIndex].current_value);
     NetPlayRadioOn(pIndex, pNew_value);
@@ -1055,7 +1019,6 @@ void NetRadioChanged(int pIndex, int pNew_value) {
 // IDA: void __usercall NetCheckboxChanged(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x004b160a
 void NetCheckboxChanged(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     if (gRadio_bastards__newgame[pIndex].current_value) {
         NetPlayCheckboxOff(pIndex);
@@ -1069,7 +1032,6 @@ void NetCheckboxChanged(int pIndex) {
 // FUNCTION: CARM95 0x004b14b3
 int NetOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     DRS3StartSound(gEffects_outlet, 3000);
     if (gRadio_bastards__newgame[*pCurrent_choice - 3].count < 2) {
@@ -1088,7 +1050,6 @@ int NetOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
 // FUNCTION: CARM95 0x004b16e7
 int NetOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     DRS3StartSound(gEffects_outlet, 3000);
     if (gRadio_bastards__newgame[*pCurrent_choice - 3].count < 2) {
@@ -1106,7 +1067,6 @@ int NetOptRight(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall NetOptUp@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x004b178b
 int NetOptUp(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (*pCurrent_mode == 0) {
         *pCurrent_mode = 1;
@@ -1126,7 +1086,6 @@ int NetOptUp(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall NetOptDown@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x004b181d
 int NetOptDown(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (*pCurrent_mode == 0) {
         *pCurrent_mode = 1;
@@ -1147,7 +1106,6 @@ int NetOptDown(int* pCurrent_choice, int* pCurrent_mode) {
 // FUNCTION: CARM95 0x004b18af
 int NetRadioClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_offset) {
     int i;
-    LOG_TRACE("(%p, %p, %d, %d)", pCurrent_choice, pCurrent_mode, pX_offset, pY_offset);
 
     if (gRadio_bastards__newgame[*pCurrent_choice - 3].count < 2) {
         NetCheckboxChanged(*pCurrent_choice - 3);
@@ -1170,7 +1128,6 @@ void RevertToDefaults(void) {
     FILE* f;
     tNet_game_options net_options;
     int i;
-    LOG_TRACE("()");
 
     PathCat(the_path, gApplication_path, "NETDEFLT.TXT");
     f = DRfopen(the_path, "rt");
@@ -1208,7 +1165,6 @@ void DefaultNetSettings(void) {
 // IDA: int __usercall NetOptGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x004b1a34
 int NetOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (*pCurrent_mode == 0) {
         if (*pCurrent_choice == 2) {
@@ -1226,7 +1182,6 @@ int NetOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: void __usercall NetPlotAGraphBox(int pIndex@<EAX>, int pColour_value@<EDX>)
 // FUNCTION: CARM95 0x004b1c58
 void NetPlotAGraphBox(int pIndex, int pColour_value) {
-    LOG_TRACE("(%d, %d)", pIndex, pColour_value);
 
     if (pIndex >= 0) {
         DrawRRectangle(gBack_screen,
@@ -1241,7 +1196,6 @@ void NetPlotAGraphBox(int pIndex, int pColour_value) {
 // IDA: void __usercall NetDrawAGraphBox(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x004b1c3f
 void NetDrawAGraphBox(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     NetPlotAGraphBox(pIndex, 45);
 }
@@ -1249,7 +1203,6 @@ void NetDrawAGraphBox(int pIndex) {
 // IDA: void __usercall NetEraseAGraphBox(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x004b1d0a
 void NetEraseAGraphBox(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     NetPlotAGraphBox(pIndex, 0);
 }
@@ -1257,7 +1210,6 @@ void NetEraseAGraphBox(int pIndex) {
 // IDA: void __usercall DrawNetOptBox(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x004b1bfd
 void DrawNetOptBox(int pCurrent_choice, int pCurrent_mode) {
-    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
     if (gRadio_selected != pCurrent_choice) {
         NetEraseAGraphBox(gRadio_selected - 3);
@@ -1346,7 +1298,6 @@ void DoNetOptions(tNet_game_options* pGame_options) {
         COUNT_OF(mouse_areas), mouse_areas,
         0, NULL
     };
-    LOG_TRACE("(%p)", pGame_options);
 
     gThe_interface_spec__newgame = &interface_spec;
     gRadio_selected = -1;
@@ -1362,7 +1313,6 @@ void DoNetOptions(tNet_game_options* pGame_options) {
 //  Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004b1d3c
 void PlayRadioOn__newgame(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     RunFlicAt(288,
         gThe_interface_spec__newgame->pushed_flics[pIndex + 4].x[gGraf_data_index],
@@ -1373,7 +1323,6 @@ void PlayRadioOn__newgame(int pIndex) {
 //  Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004b1f33
 void PlayRadioOff__newgame(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     RunFlicAt(287,
         gThe_interface_spec__newgame->pushed_flics[pIndex + 4].x[gGraf_data_index],
@@ -1383,7 +1332,6 @@ void PlayRadioOff__newgame(int pIndex) {
 // IDA: void __usercall SetOptions(tNet_game_type pGame_type@<EAX>, tNet_game_options *pGame_options@<EDX>)
 // FUNCTION: CARM95 0x004b1e95
 void SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options) {
-    LOG_TRACE("(%d, %p)", pGame_type, pGame_options);
 
     pGame_options->show_players_on_map = gNet_settings[0].show_players_on_map;
     pGame_options->show_peds_on_map = gNet_settings[pGame_type + 1].show_peds_on_map;
@@ -1401,7 +1349,6 @@ void SetOptions(tNet_game_type pGame_type, tNet_game_options* pGame_options) {
 // IDA: void __cdecl DrawNetChooseInitial()
 // FUNCTION: CARM95 0x004b1d23
 void DrawNetChooseInitial(void) {
-    LOG_TRACE("()");
 
     PlayRadioOn__newgame(gCurrent_game_selection);
 }
@@ -1409,7 +1356,6 @@ void DrawNetChooseInitial(void) {
 // IDA: int __usercall NetChooseGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x004b1d9c
 int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     if (*pCurrent_mode == 0) {
         return 1;
@@ -1441,7 +1387,6 @@ int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 // Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004b2277
 void PlotAGraphBox__newgame(int pIndex, int pColour_value) {
-    LOG_TRACE("(%d, %d)", pIndex, pColour_value);
 
     if (pIndex >= 0) {
         DrawRRectangle(gBack_screen,
@@ -1457,7 +1402,6 @@ void PlotAGraphBox__newgame(int pIndex, int pColour_value) {
 // Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004b225e
 void DrawAGraphBox__newgame(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     PlotAGraphBox__newgame(pIndex, 45);
 }
@@ -1466,7 +1410,6 @@ void DrawAGraphBox__newgame(int pIndex) {
 // Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004b2325
 void EraseAGraphBox__newgame(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     PlotAGraphBox__newgame(pIndex, 0);
 }
@@ -1477,7 +1420,6 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
     char s[256];
     tU32* k;
     int i;
-    LOG_TRACE("(%d, %d)", pCurrent_choice, pCurrent_mode);
 
     if (gLast_net_choose_box >= 0) {
         EraseAGraphBox__newgame(gLast_net_choose_box);
@@ -1527,7 +1469,6 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
 // IDA: int __usercall NetChooseLR@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x004b233e
 int NetChooseLR(int* pCurrent_choice, int* pCurrent_mode) {
-    LOG_TRACE("(%p, %p)", pCurrent_choice, pCurrent_mode);
 
     *pCurrent_choice = gCurrent_game_selection + 4;
     return 0;
@@ -1536,7 +1477,6 @@ int NetChooseLR(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: void __usercall SetGameTarget(tNet_game_type *pGame_type@<EAX>, tNet_game_options *pGame_options@<EDX>)
 // FUNCTION: CARM95 0x004b2e6f
 void SetGameTarget(tNet_game_type* pGame_type, tNet_game_options* pGame_options) {
-    LOG_TRACE("(%p, %p)", pGame_type, pGame_options);
 
     pGame_options->race_end_target = gNet_target[*pGame_type];
     switch (*pGame_type) {
@@ -1625,7 +1565,6 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
 
     };
     int result;
-    LOG_TRACE("(%p, %p, %p)", pGame_type, pGame_options, pRace_index);
 
     gRace_index = *pRace_index;
     gCurrent_game_selection = *pGame_type;
@@ -1668,7 +1607,6 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
 // IDA: void __usercall ReadNetGameChoices(tNet_game_type *pGame_type@<EAX>, tNet_game_options *pGame_options@<EDX>, int *pRace_index@<EBX>)
 // FUNCTION: CARM95 0x004b2f38
 void ReadNetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options, int* pRace_index) {
-    LOG_TRACE("(%p, %p, %p)", pGame_type, pGame_options, pRace_index);
 
     *pGame_type = gLast_game_type;
     SetOptions(*pGame_type, pGame_options);
@@ -1679,7 +1617,6 @@ void ReadNetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_opt
 // IDA: int __usercall ChooseStartRace@<EAX>(int *pRank@<EAX>)
 // FUNCTION: CARM95 0x004b235d
 int ChooseStartRace(int* pRank) {
-    LOG_TRACE("(%p)", pRank);
 
     *pRank = 0;
     return 1;
@@ -1688,7 +1625,6 @@ int ChooseStartRace(int* pRank) {
 // IDA: void __usercall SetUpOtherNetThings(tNet_game_details *pNet_game@<EAX>)
 // FUNCTION: CARM95 0x004b237b
 void SetUpOtherNetThings(tNet_game_details* pNet_game) {
-    LOG_TRACE("(%p)", pNet_game);
 
     StartLoadingScreen();
     gProgram_state.skill_level = 1;
@@ -1699,7 +1635,6 @@ void SetUpOtherNetThings(tNet_game_details* pNet_game) {
 // FUNCTION: CARM95 0x004b246e
 void RequestCarDetails(tNet_game_details* pNet_game) {
     tNet_message* message;
-    LOG_TRACE("(%p)", pNet_game);
 
     gReceived_car_details = 0;
     if (gNet_mode == eNet_mode_none) {
@@ -1715,7 +1650,6 @@ int PickARandomCar(void) {
     int i;
     int cars[120];
     int array_size;
-    LOG_TRACE("()");
 
     array_size = 0;
     for (i = 0; i < gNumber_of_racers; i++) {
@@ -1734,7 +1668,6 @@ int PickARandomCar(void) {
 // IDA: void __usercall PollCarDetails(tNet_game_details *pNet_game@<EAX>)
 // FUNCTION: CARM95 0x004b244a
 void PollCarDetails(tNet_game_details* pNet_game) {
-    LOG_TRACE("(%p)", pNet_game);
 
     if (gReceived_car_details) {
         RequestCarDetails(pNet_game);
@@ -1745,7 +1678,6 @@ void PollCarDetails(tNet_game_details* pNet_game) {
 // FUNCTION: CARM95 0x004b24c2
 void SetNetAvailability(tNet_game_options* pOptions) {
     int i;
-    LOG_TRACE("(%p)", pOptions);
 
     for (i = 0; i < gNumber_of_racers; i++) {
         switch (gOpponents[i].network_availability) {
@@ -1784,7 +1716,6 @@ int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int*
     int result;
     int car_index;
     int the_car_index;
-    LOG_TRACE("(%p, %p, %p, %d)", pNet_game, pOptions, pCar_index, pIm_the_host_so_fuck_off);
 
     if (!pOptions->random_car_choice || pIm_the_host_so_fuck_off) {
         gNet_options = pOptions;
@@ -1836,7 +1767,6 @@ int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int*
 // FUNCTION: CARM95 0x004b2f85
 void InitNetStorageSpace(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gNet_players); i++) {
         gCurrent_race.opponent_list[i].car_spec = NULL;
@@ -1848,7 +1778,6 @@ void InitNetStorageSpace(void) {
 // IDA: void __cdecl DisposeNetStorageSpace()
 // FUNCTION: CARM95 0x004b2fe9
 void DisposeNetStorageSpace(void) {
-    LOG_TRACE("()");
 
     if (gNet_storage_allocated) {
         DisposeStorageSpace(&gNet_cars_storage_space);
@@ -1868,7 +1797,6 @@ int DoMultiPlayerStart(void) {
     int start_rank;
     int car_index;
     int race_index; // added by dethrace
-    LOG_TRACE("()");
 
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         SuspendPendingFlic();

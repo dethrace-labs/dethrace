@@ -5,19 +5,21 @@ option(DETHRACE_REPLAY_DEBUG "Debug replay" OFF)
 
 target_include_directories(dethrace_obj
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        common
-        pd
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    common
+    pd
 )
 
-if (DETHRACE_ASAN)
+if(DETHRACE_ASAN)
     target_compile_options(dethrace_obj PUBLIC -fsanitize=address)
     target_link_options(dethrace_obj PUBLIC -fsanitize=address)
 endif()
 
 target_link_libraries(dethrace_obj PUBLIC smackw32 harness BRender::Full BRender::DDI s3)
 
-if(MSVC)
+if(MSVC_42_FOR_RECCMP)
+# do nothing
+elseif(MSVC)
     target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)
     target_compile_options(dethrace_obj PRIVATE
         /wd4101
@@ -36,10 +38,13 @@ else()
         -Wstrict-prototypes
     )
 endif()
+
 target_compile_definitions(dethrace_obj PRIVATE INSIDE_DETHRACE)
+
 if(DETHRACE_FIX_BUGS)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_FIX_BUGS)
 endif()
+
 if(DETHRACE_3DFX_PATCH)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_3DFX_PATCH)
 endif()
@@ -162,8 +167,6 @@ target_sources(dethrace_obj PRIVATE
     pd/net.h
     pd/sys.h
 
-    # dethrace-added cross platform sys and network implementation
-    pc-all/allnet.c
     pc-all/allsys.c
 
     # original win95 sys and network
@@ -172,34 +175,49 @@ target_sources(dethrace_obj PRIVATE
     # pc-win95/ssdx.h
 
     # original dos sys and network
-    #pc-dos/dosnet.c
+    # pc-dos/dosnet.c
     # pc-dos/dossys.c
 )
 
-# Create our main game binary.
-add_executable(dethrace
-    WIN32
-    ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
-    ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
-)
+if(DETHRACE_NET_ENABLED)
+    # dethrace-added cross platform sys and network implementation
+    target_sources(dethrace_obj PRIVATE pc-all/allnet.c)
+else()
+    target_sources(dethrace_obj PRIVATE pc-none/nonet.c)
+endif()
 
-get_property(build_rpaths GLOBAL PROPERTY DETHRACE_BUILD_RPATHS)
-set_property(TARGET dethrace APPEND PROPERTY BUILD_RPATH "${build_rpaths}")
+# Create our main game binary.
+if(MSVC_42_FOR_RECCMP)
+    add_executable(dethrace WIN32)
+    set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
+    target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
+    reccmp_add_target(dethrace ID CARM95)
+    reccmp_configure()
+else()
+    add_executable(dethrace
+        WIN32
+        ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
+        ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
+    )
+    get_property(build_rpaths GLOBAL PROPERTY DETHRACE_BUILD_RPATHS)
+    set_property(TARGET dethrace APPEND PROPERTY BUILD_RPATH "${build_rpaths}")
+
+    if(MSVC)
+        target_link_libraries(dethrace PRIVATE dbghelp)
+        target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
+        target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
+    endif()
+endif()
 
 target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
-
-if(MSVC)
-    target_link_libraries(dethrace PRIVATE dbghelp)
-    target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
-    target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
-endif()
 
 if(DETHRACE_IDE_ROOT_DIR)
     set_target_properties(dethrace PROPERTIES
         VS_DEBUGGER_ENVIRONMENT "DETHRACE_ROOT_DIR=${DETHRACE_IDE_ROOT_DIR}"
     )
 endif()
+
 if(DETHRACE_IDE_ARGUMENTS)
     message(STATUS "before: ${DETHRACE_IDE_ARGUMENTS}")
     separate_arguments(DETHRACE_IDE_ARGUMENTS NATIVE_COMMAND "${DETHRACE_IDE_ARGUMENTS}")
@@ -241,7 +259,6 @@ if(DETHRACE_INSTALL)
             "
             COMPONENT RUNTIME
         )
-
     endif()
 
     if(MSVC)
@@ -249,12 +266,14 @@ if(DETHRACE_INSTALL)
             DESTINATION "."
             OPTIONAL
         )
+
         if(DETHRACE_PLATFORM_SDL_DYNAMIC)
             if(DETHRACE_PLATFORM_SDL1)
                 get_filename_component(sdl1_lib_dir "${SDL_LIBRARY}" DIRECTORY)
                 get_filename_component(sdl1_root_dir "${SDL_LIBRARY}" PATH)
                 set(sdl1_bin_dir "${sdl1_root_dir}/bin" PATH)
                 find_file(SDL1DLL_PATH NAMES "SDL.dll" PATHS ${sdl1_lib_dir} ${sdl1_root_dir} PATH_SUFFIXES "bin" REQUIRED)
+
                 if(SDL1DLL_PATH)
                     install(FILES "${SDL1DLL_PATH}"
                         DESTINATION "."
@@ -262,6 +281,7 @@ if(DETHRACE_INSTALL)
                     )
                 endif()
             endif()
+
             if(DETHRACE_PLATFORM_SDL2)
                 install(FILES "$<TARGET_FILE:SDL2::SDL2>"
                     DESTINATION "."

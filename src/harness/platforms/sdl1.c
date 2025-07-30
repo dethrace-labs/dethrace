@@ -10,7 +10,7 @@
 SDL_COMPILE_TIME_ASSERT(sdl1_platform_requires_SDL1, SDL_MAJOR_VERSION == 1);
 
 static SDL_Surface* screen;
-static uint32_t converted_palette[256];
+static br_uint_32 converted_palette[256];
 static br_pixelmap* last_screen_src;
 
 static Uint32 last_frame_time;
@@ -18,7 +18,7 @@ static Uint32 last_frame_time;
 static void (*gKeyHandler_func)(void);
 
 // 32 bytes, 1 bit per key. Matches dos executable behavior
-static uint32_t key_state[8];
+static br_uint_32 key_state[8];
 
 static struct {
     int x, y;
@@ -92,7 +92,7 @@ static void recreate_screen(void) {
     }
     screen = SDL1_SetVideoMode(window_width, window_height, 32, video_flags);
     if (screen == NULL) {
-        LOG_PANIC("SDL_SetVideoMode failed (%s)", SDL1_GetError());
+        LOG_PANIC2("SDL_SetVideoMode failed (%s)", SDL1_GetError());
     }
 }
 
@@ -103,13 +103,13 @@ static void SDL1_Harness_CreateWindow(const char* title, int width, int height, 
     initializeSDL1KeyNums();
 
     if (SDL1_Init(SDL_INIT_VIDEO) != 0) {
-        LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL1_GetError());
+        LOG_PANIC2("SDL_INIT_VIDEO error: %s", SDL1_GetError());
     }
 
     if (window_type == eWindow_type_software) {
         recreate_screen();
     } else {
-        LOG_PANIC("Unsupported window type (%d)", window_type);
+        LOG_PANIC2("Unsupported window type (%d)", window_type);
     }
 
     SDL1_WM_SetCaption("Carmageddon", NULL);
@@ -166,7 +166,7 @@ static void SDL1_Harness_ProcessWindowMessages(void) {
             // Map incoming SDL key to PC scan code as used by game code
             dethrace_scancode = sdl1KeyToDirectInputKeyNum[event.key.keysym.sym];
             if (dethrace_scancode == 0) {
-                LOG_WARN("unexpected key \"%s\" (0x%x)", SDL1_GetKeyName(event.key.keysym.sym), event.key.keysym.sym);
+                LOG_WARN3("unexpected key \"%s\" (0x%x)", SDL1_GetKeyName(event.key.keysym.sym), event.key.keysym.sym);
                 return;
             }
             if (event.type == SDL_KEYDOWN) {
@@ -193,7 +193,7 @@ static void SDL1_Harness_SetKeyHandler(void (*handler_func)(void)) {
     gKeyHandler_func = handler_func;
 }
 
-static void SDL1_Harness_GetKeyboardState(uint32_t* buffer) {
+static void SDL1_Harness_GetKeyboardState(br_uint_32* buffer) {
     memcpy(buffer, key_state, sizeof(key_state));
 }
 
@@ -225,13 +225,14 @@ static void limit_fps(void) {
 }
 
 static void SDL1_Renderer_Present(br_pixelmap* src) {
+    int i;
     // fastest way to convert 8 bit indexed to 32 bit
     uint8_t* src_pixels = src->pixels;
-    uint32_t* dest_pixels;
+    br_uint_32* dest_pixels;
 
     SDL1_LockSurface(screen);
     dest_pixels = screen->pixels;
-    for (int i = 0; i < src->height * src->width; i++) {
+    for (i = 0; i < src->height * src->width; i++) {
         *dest_pixels = converted_palette[*src_pixels];
         dest_pixels++;
         src_pixels++;
@@ -263,7 +264,8 @@ static void SDL1_Harness_Swap(br_pixelmap* back_buffer) {
 }
 
 static void SDL1_Harness_PaletteChanged(br_colour entries[256]) {
-    for (int i = 0; i < 256; i++) {
+    int i;
+    for (i = 0; i < 256; i++) {
         converted_palette[i] = (0xff << 24 | BR_RED(entries[i]) << 16 | BR_GRN(entries[i]) << 8 | BR_BLU(entries[i]));
     }
     if (last_screen_src != NULL) {

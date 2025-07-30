@@ -268,7 +268,6 @@ br_resource_class gStainless_classes[117];
 // IDA: void __cdecl SetNonFatalAllocationErrors()
 // FUNCTION: CARM95 0x00463d80
 void SetNonFatalAllocationErrors(void) {
-    LOG_TRACE("()");
 
     gNon_fatal_allocation_errors = 1;
 }
@@ -276,7 +275,6 @@ void SetNonFatalAllocationErrors(void) {
 // IDA: void __cdecl ResetNonFatalAllocationErrors()
 // FUNCTION: CARM95 0x00463d95
 void ResetNonFatalAllocationErrors(void) {
-    LOG_TRACE("()");
 
     gNon_fatal_allocation_errors = 0;
 }
@@ -293,13 +291,11 @@ void MAMSInitMem(void) {
     int i;
     FILE* f;
     tPath_name the_path;
-    LOG_TRACE("()");
 }
 
 // IDA: void __usercall PrintMemoryDump(int pFlags@<EAX>, char *pTitle@<EDX>)
 // FUNCTION: CARM95 0x00463de4
 void PrintMemoryDump(int pFlags, char* pTitle) {
-    LOG_TRACE("(%d, \"%s\")", pFlags, pTitle);
 }
 
 // IDA: void* __cdecl DRStdlibAllocate(br_size_t size, br_uint_8 type)
@@ -356,7 +352,6 @@ void MAMSUnlock(void** pPtr) {
 // IDA: void __usercall MAMSLock(void **pPtr@<EAX>)
 // FUNCTION: CARM95 0x00463f1c
 void MAMSLock(void** pPtr) {
-    LOG_TRACE("(%p)", pPtr);
 }
 
 // IDA: void __cdecl CreateStainlessClasses()

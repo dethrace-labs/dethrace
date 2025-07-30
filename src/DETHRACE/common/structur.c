@@ -69,7 +69,6 @@ int NumberOfOpponentsLeft(void) {
     int car_count;
     int result;
     tCar_spec* the_car;
-    LOG_TRACE("()");
 
     result = 0;
     car_count = GetCarCount(eVehicle_opponent);
@@ -85,7 +84,6 @@ int NumberOfOpponentsLeft(void) {
 // IDA: void __usercall RaceCompleted(tRace_over_reason pReason@<EAX>)
 // FUNCTION: CARM95 0x00413ffe
 void RaceCompleted(tRace_over_reason pReason) {
-    LOG_TRACE("(%d)", pReason);
 
     if (!gRace_finished) {
         if (gNet_mode == eNet_mode_host && pReason < eRace_over_network_victory) {
@@ -145,7 +143,6 @@ void RaceCompleted(tRace_over_reason pReason) {
 // IDA: void __usercall Checkpoint(int pCheckpoint_index@<EAX>, int pDo_sound@<EDX>)
 // FUNCTION: CARM95 0x004141ca
 void Checkpoint(int pCheckpoint_index, int pDo_sound) {
-    LOG_TRACE("(%d, %d)", pCheckpoint_index, pDo_sound);
 
     PratcamEvent(33);
     DoFancyHeadup(kFancyHeadupCheckpoint);
@@ -158,7 +155,6 @@ void Checkpoint(int pCheckpoint_index, int pDo_sound) {
 // FUNCTION: CARM95 0x00414206
 void IncrementCheckpoint(void) {
     int done_voice;
-    LOG_TRACE("()");
 
     done_voice = 0;
     if (gRace_finished) {
@@ -193,7 +189,6 @@ void IncrementCheckpoint(void) {
 // FUNCTION: CARM95 0x0041433c
 void IncrementLap(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = gCheckpoint; i <= gCheckpoint_count; i++) {
         IncrementCheckpoint();
@@ -205,7 +200,6 @@ void IncrementLap(void) {
 int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pNormal, br_vector3* pStart, br_vector3* pDir) {
     tFace_ref the_face;
     br_scalar rt;
-    LOG_TRACE("(%p, %p, %p, %p, %p, %p)", pV0, pV1, pV2, pNormal, pStart, pDir);
 
     the_face.material = NULL;
     BrVector3Copy(&the_face.v[0], pV0);
@@ -219,7 +213,6 @@ int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pN
 // IDA: void __usercall WrongCheckpoint(int pCheckpoint_index@<EAX>)
 // FUNCTION: CARM95 0x00414373
 void WrongCheckpoint(int pCheckpoint_index) {
-    LOG_TRACE("(%d)", pCheckpoint_index);
 
     if ((pCheckpoint_index == gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 20000) || (pCheckpoint_index != gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 2000)) {
         if (gNet_mode == eNet_mode_none) {
@@ -246,7 +239,6 @@ void CheckCheckpoints(void) {
     int car_count;
     int car_index;
     tNet_game_player_info* net_player;
-    LOG_TRACE("()");
 
     if (gNet_mode == eNet_mode_client) {
         return;
@@ -318,7 +310,6 @@ void CheckCheckpoints(void) {
 // IDA: void __cdecl TotalRepair()
 // FUNCTION: CARM95 0x004148f7
 void TotalRepair(void) {
-    LOG_TRACE("()");
 
     TotallyRepairCar();
     NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_InstantRepair));
@@ -343,7 +334,6 @@ void DoLogos(void) {
 // IDA: void __cdecl DoProgOpeningAnimation()
 // FUNCTION: CARM95 0x00414e71
 void DoProgOpeningAnimation(void) {
-    LOG_TRACE("()");
 
     gProgram_state.prog_status = eProg_idling;
     DRS3StopOutletSound(gEffects_outlet);
@@ -352,7 +342,6 @@ void DoProgOpeningAnimation(void) {
 // IDA: void __cdecl DoProgramDemo()
 // FUNCTION: CARM95 0x00414e94
 void DoProgramDemo(void) {
-    LOG_TRACE("()");
 
     DoLogos();
     gProgram_state.prog_status = eProg_idling;
@@ -365,7 +354,6 @@ int ChooseOpponent(int pNastiness, int* pHad_scum) {
     int i;
     int count;
     int temp_array[40];
-    LOG_TRACE("(%d, %p)", pNastiness, pHad_scum);
 
     count = 0;
     for (i = 0; i < gNumber_of_racers; ++i) {
@@ -391,7 +379,6 @@ void SelectOpponents(tRace_info* pRace_info) {
     int rank_band;
     int nastiness;
     int had_scum;
-    LOG_TRACE("(%p)", pRace_info);
 
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         pRace_info->number_of_racers = OPPONENT_COUNT;
@@ -429,7 +416,6 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
     int races_count;
     int most_seldom_seen;
     int races_to_pick_from[50];
-    LOG_TRACE("(%d, %d)", pCurrent_race, pNet_race_sequence);
 
     if (pNet_race_sequence == eNet_sequence_sequential) {
         pCurrent_race++;
@@ -462,7 +448,6 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
 void SwapNetCarsLoad(void) {
     int i;
     int switched_res;
-    LOG_TRACE("()");
 
     DisableNetService();
     AboutToLoadFirstCar();
@@ -487,7 +472,6 @@ void SwapNetCarsLoad(void) {
 // FUNCTION: CARM95 0x0041552d
 void SwapNetCarsDispose(void) {
     int i;
-    LOG_TRACE("()");
 
     DisableNetService();
     for (i = 0; i < gNumber_of_net_players; i++) {
@@ -509,7 +493,6 @@ void DoGame(void) {
     int second_select_race;
     int first_summary_done;
     int i;
-    LOG_TRACE("()");
 
     gAbandon_game = 0;
     gDisallow_abandon_race = 0;
@@ -732,7 +715,6 @@ void DoProgram(void) {
 // FUNCTION: CARM95 0x004155d4
 void JumpTheStart(void) {
     char s[256];
-    LOG_TRACE("()");
 
     if (gNet_mode == eNet_mode_none
         || gProgram_state.credits_earned - gProgram_state.credits_lost >= gJump_start_fine[gProgram_state.skill_level]) {
@@ -749,7 +731,6 @@ void JumpTheStart(void) {
 // IDA: void __cdecl GoingToInterfaceFromRace()
 // FUNCTION: CARM95 0x004156c2
 void GoingToInterfaceFromRace(void) {
-    LOG_TRACE("()");
 
     gInterface_within_race_mode = 1;
     PlayFlicsFromDisk();
@@ -762,7 +743,6 @@ void GoingToInterfaceFromRace(void) {
 // IDA: void __cdecl GoingBackToRaceFromInterface()
 // FUNCTION: CARM95 0x00415700
 void GoingBackToRaceFromInterface(void) {
-    LOG_TRACE("()");
 
     gInterface_within_race_mode = 0;
     PlayFlicsFromMemory();

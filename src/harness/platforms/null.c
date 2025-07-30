@@ -1,7 +1,7 @@
 #include "null.h"
 #include <string.h>
 
-static uint32_t null_time;
+static br_uint_32 null_time;
 
 static int null_set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
     null_time += 1;
@@ -21,7 +21,7 @@ static void null_get_and_handle_message(void) {
     null_time += 1;
 }
 
-static void null_get_keyboard_state(uint32_t* buffer) {
+static void null_get_keyboard_state(br_uint_32* buffer) {
     null_time += 1;
 }
 
@@ -44,12 +44,12 @@ static void null_set_palette(br_colour* palette) {
     null_time += 1;
 }
 
-static void null_sleep(uint32_t milliseconds) {
+static void null_sleep(br_uint_32 milliseconds) {
     null_time += 1;
     null_time += milliseconds;
 }
 
-static uint32_t null_getticks(void) {
+static br_uint_32 null_getticks(void) {
     null_time += 1;
     return null_time;
 }

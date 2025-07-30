@@ -430,7 +430,6 @@ br_scalar gYon_squared;
 // IDA: void __cdecl TurnOnPaletteConversion()
 // FUNCTION: CARM95 0x004b3020
 void TurnOnPaletteConversion(void) {
-    LOG_TRACE("()");
 
     gCurrent_conversion_table = gPalette_conversion_table;
 }
@@ -438,7 +437,6 @@ void TurnOnPaletteConversion(void) {
 // IDA: void __cdecl TurnOffPaletteConversion()
 // FUNCTION: CARM95 0x004b3035
 void TurnOffPaletteConversion(void) {
-    LOG_TRACE("()");
 
     gCurrent_conversion_table = NULL;
 }
@@ -446,7 +444,6 @@ void TurnOffPaletteConversion(void) {
 // IDA: void __cdecl ResetLollipopQueue()
 // FUNCTION: CARM95 0x004b304a
 void ResetLollipopQueue(void) {
-    LOG_TRACE("()");
 
     gNumber_of_lollipops = 0;
 }
@@ -454,7 +451,6 @@ void ResetLollipopQueue(void) {
 // IDA: int __usercall AddToLollipopQueue@<EAX>(br_actor *pActor@<EAX>, int pIndex@<EDX>)
 // FUNCTION: CARM95 0x004b305f
 int AddToLollipopQueue(br_actor* pActor, int pIndex) {
-    LOG_TRACE("(%p, %d)", pActor, pIndex);
 
     if (pIndex >= 0) {
         gLollipops[pIndex] = pActor;
@@ -475,7 +471,6 @@ void RenderLollipops(void) {
     int must_relink;
     br_actor** the_actor;
     br_actor* old_parent;
-    LOG_TRACE("()");
 
     for (i = 0, the_actor = gLollipops; i < gNumber_of_lollipops; i++, the_actor++) {
         if ((*the_actor)->render_style == BR_RSTYLE_NONE) {
@@ -507,7 +502,6 @@ void DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pCo
     int x;
     int y;
     int the_diff;
-    LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pDestn, pX1, pY1, pX2, pY2, pColour);
 
 #ifdef DETHRACE_3DFX_PATCH
     if (gBack_screen->type == BR_PMT_RGB_565) {
@@ -520,7 +514,6 @@ void DRDrawLine(br_pixelmap* pDestn, int pX1, int pY1, int pX2, int pY2, int pCo
 // IDA: void __usercall DrawDigitAt(br_pixelmap *gImage@<EAX>, int pX@<EDX>, int pY@<EBX>, int pY_pitch@<ECX>, int pValue)
 // FUNCTION: CARM95 0x004b3180
 void DrawDigitAt(br_pixelmap* gImage, int pX, int pY, int pY_pitch, int pValue) {
-    LOG_TRACE("(%p, %d, %d, %d, %d)", gImage, pX, pY, pY_pitch, pValue);
 
     DRPixelmapRectangleMaskedCopy(gBack_screen, pX, pY, gImage, 0, pY_pitch * pValue, gImage->width, pY_pitch);
 }
@@ -530,7 +523,6 @@ void DrawDigitAt(br_pixelmap* gImage, int pX, int pY, int pY_pitch, int pValue) 
 void DrawNumberAt(br_pixelmap* gImage, int pX, int pY, int pX_pitch, int pY_pitch, int pValue, int pDigit_count, int pLeading_zeroes) {
     int i;
     int the_value;
-    LOG_TRACE("(%p, %d, %d, %d, %d, %d, %d, %d)", gImage, pX, pY, pX_pitch, pY_pitch, pValue, pDigit_count, pLeading_zeroes);
 
     for (i = pDigit_count - 1; i >= 0; i--) {
         the_value = pValue % 10;
@@ -552,7 +544,6 @@ void BuildColourTable(br_pixelmap* pPalette) {
     int blue;
     float nearest_distance;
     float distance;
-    LOG_TRACE("(%p)", pPalette);
 
 #define SQR(i) i* i
 
@@ -577,7 +568,6 @@ void BuildColourTable(br_pixelmap* pPalette) {
 // IDA: void __cdecl ClearConcussion()
 // FUNCTION: CARM95 0x004b32f2
 void ClearConcussion(void) {
-    LOG_TRACE("()");
 
     gConcussion.concussed = 0;
 }
@@ -589,7 +579,6 @@ tS8* SkipLines(tS8* pSource, int pCount) {
     int j;
     int number_of_chunks;
     int chunk_length;
-    LOG_TRACE("(%p, %d)", pSource, pCount);
 
     for (i = 0; i < pCount; ++i) {
         number_of_chunks = *pSource++;
@@ -607,7 +596,6 @@ tS8* SkipLines(tS8* pSource, int pCount) {
 void CopyWords(char* pDst, char* pSrc, int pN) {
     tU16* dst;
     tU16* src;
-    LOG_TRACE("(\"%s\", \"%s\", %d)", pDst, pSrc, pN);
 
     dst = (tU16*)pDst;
     src = (tU16*)pSrc;
@@ -627,9 +615,8 @@ void Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 
     int chunk_length;
     char* destn_ptr;
     char* destn_ptr2;
-    LOG_TRACE("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
 
-    height = *(uint16_t*)pSource;
+    height = *(tU16*)pSource;
     pSource = pSource + 2;
     if (pDest_y + pOffset_y >= 0) {
         destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
@@ -704,7 +691,6 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     int chunk_length;
     char* destn_ptr;
     char* destn_ptr2;
-    LOG_TRACE8("(%p, %d, %d, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pOffset_x, pDest_y, pOffset_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
 
     if (gBack_screen->type == BR_PMT_RGB_565) {
         Copy8BitStripImageTo16Bit(
@@ -721,7 +707,7 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
         return;
     }
 
-    height = *(uint16_t*)pSource;
+    height = *(tU16*)pSource;
     pSource = pSource + 2;
     if (pDest_y + pOffset_y >= 0) {
         destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
@@ -780,7 +766,6 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
 // IDA: void __usercall SetBRenderScreenAndBuffers(int pX_offset@<EAX>, int pY_offset@<EDX>, int pWidth@<EBX>, int pHeight@<ECX>)
 // FUNCTION: CARM95 0x004b35fb
 void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pHeight) {
-    LOG_TRACE("(%d, %d, %d, %d)", pX_offset, pY_offset, pWidth, pHeight);
 
     PDAllocateScreenAndBack();
     if (!pWidth) {
@@ -819,7 +804,6 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
 // IDA: void __cdecl SetIntegerMapRenders()
 // FUNCTION: CARM95 0x004b3810
 void SetIntegerMapRenders(void) {
-    LOG_TRACE("()");
 
     gMap_render_x_i = ((int)gMap_render_x) & ~3;
     gMap_render_y_i = ((int)gMap_render_y) & ~1;
@@ -837,7 +821,6 @@ void SetIntegerMapRenders(void) {
 // FUNCTION: CARM95 0x004b3895
 void AdjustRenderScreenSize(void) {
     int switched_res;
-    LOG_TRACE("()");
 
     switched_res = SwitchToRealResolution();
     ReinitialiseRenderStuff();
@@ -870,7 +853,6 @@ void AdjustRenderScreenSize(void) {
 // IDA: void __cdecl ScreenSmaller()
 // FUNCTION: CARM95 0x004b39f4
 void ScreenSmaller(void) {
-    LOG_TRACE("()");
 
     if (!gMap_mode) {
         if (gProgram_state.cockpit_on) {
@@ -887,7 +869,6 @@ void ScreenSmaller(void) {
 // IDA: void __cdecl ScreenLarger()
 // FUNCTION: CARM95 0x004b3a40
 void ScreenLarger(void) {
-    LOG_TRACE("()");
 
     if (!gMap_mode) {
         if (gProgram_state.cockpit_on) {
@@ -904,7 +885,6 @@ void ScreenLarger(void) {
 // IDA: void __usercall DRSetPaletteEntries(br_pixelmap *pPalette@<EAX>, int pFirst_colour@<EDX>, int pCount@<EBX>)
 // FUNCTION: CARM95 0x004b3a85
 void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
-    LOG_TRACE("(%p, %d, %d)", pPalette, pFirst_colour, pCount);
     if (pFirst_colour == 0) {
         ((br_int_32*)pPalette->pixels)[0] = 0;
     }
@@ -921,7 +901,6 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 // IDA: void __usercall DRSetPalette3(br_pixelmap *pThe_palette@<EAX>, int pSet_current_palette@<EDX>)
 // FUNCTION: CARM95 0x004b3af8
 void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
-    LOG_TRACE("(%p, %d)", pThe_palette, pSet_current_palette);
 
     if (pSet_current_palette) {
         memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
@@ -997,7 +976,6 @@ void InitializePalettes(void) {
 // FUNCTION: CARM95 0x004b3d43
 void SwitchToPalette(char* pPal_name) {
     br_pixelmap* the_palette;
-    LOG_TRACE("(\"%s\")", pPal_name);
 
     the_palette = BrTableFind(pPal_name);
     if (the_palette != NULL) {
@@ -1008,7 +986,6 @@ void SwitchToPalette(char* pPal_name) {
 // IDA: void __cdecl ClearEntireScreen()
 // FUNCTION: CARM95 0x004b3d76
 void ClearEntireScreen(void) {
-    LOG_TRACE("()");
 
     if (gScreen) {
         BrPixelmapFill(gScreen, gGraf_specs[gGraf_spec_index].black_value);
@@ -1021,7 +998,6 @@ void ClearEntireScreen(void) {
 // FUNCTION: CARM95 0x004b3dde
 void ClearWobbles(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gWobble_array); i++) {
         gWobble_array[i].time_started = 0;
@@ -1035,7 +1011,7 @@ void InitWobbleStuff(void) {
 
     ClearWobbles();
     for (i = 0; i < COUNT_OF(gCosine_array); i++) {
-        gCosine_array[i] = cosf(i / 64.0f * DR_PI / 2.0f);
+        gCosine_array[i] = cos(i / 64.0f * DR_PI / 2.0f);
     }
 }
 
@@ -1045,7 +1021,6 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
     int i;
     int oldest_time;
     int oldest_index;
-    LOG_TRACE("(%d, %d, %d)", pAmplitude_x, pAmplitude_y, pPeriod);
 
     oldest_index = -1;
     oldest_time = INT_MAX;
@@ -1068,7 +1043,6 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
 // IDA: void __usercall SetScreenWobble(int pWobble_x@<EAX>, int pWobble_y@<EDX>)
 // FUNCTION: CARM95 0x004b3f3a
 void SetScreenWobble(int pWobble_x, int pWobble_y) {
-    LOG_TRACE("(%d, %d)", pWobble_x, pWobble_y);
 
     gScreen_wobble_y = pWobble_y;
     gScreen_wobble_x = pWobble_x;
@@ -1077,7 +1051,6 @@ void SetScreenWobble(int pWobble_x, int pWobble_y) {
 // IDA: void __cdecl ResetScreenWobble()
 // FUNCTION: CARM95 0x004b3f55
 void ResetScreenWobble(void) {
-    LOG_TRACE("()");
 
     SetScreenWobble(0, 0);
 }
@@ -1090,7 +1063,6 @@ void CalculateWobblitude(tU32 pThe_time) {
     double angle;
     double mod_angle;
     double cosine_over_angle;
-    LOG_TRACE("(%d)", pThe_time);
 
     if (gProgram_state.new_view != eView_undefined) {
         return;
@@ -1142,7 +1114,6 @@ void CalculateConcussion(tU32 pThe_time) {
     float angle;
     float mod_angle;
     float cosine_over_angle;
-    LOG_TRACE("(%d)", pThe_time);
 
     if (!gConcussion.concussed) {
         return;
@@ -1155,7 +1126,7 @@ void CalculateConcussion(tU32 pThe_time) {
             for (j = 0; j < 3; ++j) {
                 the_amplitude = gConcussion.amplitudes.m[i][j];
                 if (the_amplitude != 0.0) {
-                    mod_angle = fmodf(time_difference / gConcussion.periods.m[i][j], TAU);
+                    mod_angle = fmod(time_difference / gConcussion.periods.m[i][j], TAU);
                     if (mod_angle > DR_3PI_OVER_2) {
                         cosine_over_angle = gCosine_array[(unsigned int)((TAU - mod_angle) / DR_PI * 128.f)];
                     } else if (mod_angle > DR_PI) {
@@ -1179,7 +1150,6 @@ void CalculateConcussion(tU32 pThe_time) {
 void SufferFromConcussion(float pSeriousness) {
     int i;
     int j;
-    LOG_TRACE("(%f)", pSeriousness);
 
     for (i = 0; i < 3; i++) {
         for (j = 0; j < 3; j++) {
@@ -1194,7 +1164,6 @@ void SufferFromConcussion(float pSeriousness) {
 // IDA: void __usercall ProcessNonTrackActors(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, br_matrix34 *pOld_camera_matrix)
 // FUNCTION: CARM95 0x004b70e5
 void ProcessNonTrackActors(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, br_matrix34* pOld_camera_matrix) {
-    LOG_TRACE("(%p, %p, %p, %p, %p)", pRender_buffer, pDepth_buffer, pCamera, pCamera_to_world, pOld_camera_matrix);
 
     BrZbSceneRenderAdd(gNon_track_actor);
 }
@@ -1203,7 +1172,6 @@ void ProcessNonTrackActors(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buff
 // FUNCTION: CARM95 0x004b764f
 int OppositeColour(int pColour) {
     int brightness;
-    LOG_TRACE("(%d)", pColour);
 
     if (pColour < 224) {
         if ((pColour & 0x7) < 4) {
@@ -1246,7 +1214,6 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
     float bearing;
     float cos_factor;
     float sin_factor;
-    LOG_TRACE("(%p, %d, %p, %p, %d)", pCar, pTime, pTrans, pPos, pColour);
 
     time_diff = pTime - gMap_mode;
     BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
@@ -1332,7 +1299,6 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
     br_vector3 map_pos;
     int offset;
     tU32 time_diff;
-    LOG_TRACE("(%d, %p, %d)", pTime, pPos, pColour);
 
     if ((pTime & 0x100) == 0) {
         BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
@@ -1344,7 +1310,7 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
         if (gBack_screen->type == BR_PMT_RGB_565) {
             offset = ((int)map_pos.v[0] * 2) + gBack_screen->row_bytes * (int)map_pos.v[1];
             pColour = PaletteEntry16Bit(gRender_palette, pColour);
-            br_uint_8* p1 = &(((br_uint_8*)gBack_screen->pixels)[offset]);
+            tU8* p1 = &(((tU8*)gBack_screen->pixels)[offset]);
             *((br_uint_16*)(p1)) = pColour;
         } else
 #endif
@@ -1364,13 +1330,12 @@ void MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vector3* p1, br_vect
     br_vector3 v4;
     br_scalar length;
     br_actor* new_clip;
-    LOG_TRACE("(%p, %p, %p, %p, %f)", pLight, pCar, p1, p2, pY_offset);
 
     BrMatrix34ApplyP(&v1, p1, &pCar->car_master_actor->t.t.mat);
     BrMatrix34ApplyP(&v2, p2, &pCar->car_master_actor->t.t.mat);
     BrVector3Sub(&v3, p2, p1);
     BrVector3Cross(&v4, &v3, pLight);
-    if (fabsf(v4.v[0]) >= 0.01f || fabsf(v4.v[1]) >= 0.01f || fabsf(v4.v[2]) >= 0.01f) {
+    if (fabs(v4.v[0]) >= 0.01f || fabs(v4.v[1]) >= 0.01f || fabs(v4.v[2]) >= 0.01f) {
         BrVector3Copy(&v3, p1);
         v3.v[1] -= pY_offset;
         if (BrVector3Dot(&v3, &v4) > 0.f) {
@@ -1396,7 +1361,6 @@ void TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pS
     br_scalar dot_1;
     br_scalar dot_2;
     br_scalar mult;
-    LOG_TRACE("(%p, %p, %d, %f, %d, %f, %d, %d, %f)", pCar, pLight, pIndex_1, pSign_1, pIndex_2, pSign_2, pPoint_index_1, pPoint_index_2, pY_offset);
 
     dot_1 = pSign_1 * pLight->v[pIndex_1];
     dot_2 = pSign_2 * pLight->v[pIndex_2];
@@ -1412,15 +1376,13 @@ void TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pS
 // FUNCTION: CARM95 0x004b400e
 br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD) {
     br_vector3 normal;
-    LOG_TRACE("(%p, %f, %f, %f, %f)", pPos, pA, pB, pC, pD);
 
-    return fabsf((pPos->v[1] * pB + pPos->v[0] * pA + pPos->v[2] * pC + pD) / (pA * pA + pC * pC + pB * pB));
+    return fabs((pPos->v[1] * pB + pPos->v[0] * pA + pPos->v[2] * pC + pD) / (pA * pA + pC * pC + pB * pB));
 }
 
 // IDA: void __cdecl DisableLights()
 void DisableLights(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < gNumber_of_lights; i++) {
         BrLightDisable(gLight_array[i]);
@@ -1430,7 +1392,6 @@ void DisableLights(void) {
 // IDA: void __cdecl EnableLights()
 void EnableLights(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < gNumber_of_lights; i++) {
         BrLightEnable(gLight_array[i]);
@@ -1492,7 +1453,6 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
     br_material* material;
     br_vertex verts[48];
     br_face faces[16];
-    LOG_TRACE("(%p, %p, %p, %p, %p, %f)", pCar, pWorld, pTrack_spec, pCamera, pCamera_to_world_transform, pDistance_factor);
 
 #if defined(DETHRACE_FIX_BUGS)
     ray_length = 0.f;
@@ -1778,7 +1738,6 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
     tCar_spec* the_car;
     br_vector3 camera_to_car;
     br_scalar distance_factor;
-    LOG_TRACE("(%p, %p, %p, %p)", pWorld, pTrack_spec, pCamera, pCamera_to_world_transform);
 
     if (gShadow_level == eShadow_none) {
         return;
@@ -1833,7 +1792,6 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
     static tU32 last_flash;
     // GLOBAL: CARM95 0x5209f4
     static int flash_state;
-    LOG_TRACE("(%d, %d)", pIndex, pTime);
 
     if (pIndex >= 0 && pIndex < gCurrent_race.check_point_count && gRace_file_version > 0) {
         if (Flash(300, &last_flash, &flash_state)) {
@@ -1865,7 +1823,6 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
 // FUNCTION: CARM95 0x004b784d
 int ConditionallyFillWithSky(br_pixelmap* pPixelmap) {
     int bgnd_col;
-    LOG_TRACE("(%p)", pPixelmap);
 
     if (gProgram_state.current_depth_effect.sky_texture != NULL && (gLast_camera_special_volume == NULL || gLast_camera_special_volume->sky_col < 0)) {
         return 0;
@@ -1922,7 +1879,6 @@ void RenderAFrame(int pDepth_mask_on) {
     br_vector3 pos;
     char the_text[256];
     tCar_spec* car;
-    LOG_TRACE("(%d)", pDepth_mask_on);
 
 #ifdef DETHRACE_3DFX_PATCH
     if (gVoodoo_rush_mode >= 1) {
@@ -2315,7 +2271,6 @@ void RenderAFrame(int pDepth_mask_on) {
 // IDA: void __cdecl InitPaletteAnimate()
 // FUNCTION: CARM95 0x004b7932
 void InitPaletteAnimate(void) {
-    LOG_TRACE("()");
 
     gLast_palette_change = 0;
     gPalette_index = 0;
@@ -2347,14 +2302,12 @@ void MungePalette(void) {
     static float last_omega;
     static tU32 next_repair_time;
     static tU32 last_sound;
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl ResetPalette()
 // FUNCTION: CARM95 0x004b7997
 void ResetPalette(void) {
-    LOG_TRACE("()");
 
     InitPaletteAnimate();
     DRSetPalette(gRender_palette);
@@ -2364,7 +2317,6 @@ void ResetPalette(void) {
 // FUNCTION: CARM95 0x004b7a74
 void Darken(tU8* pPtr, unsigned int pDarken_amount) {
     unsigned int value;
-    LOG_TRACE10("(%p, %d)", pPtr, pDarken_amount);
 
     *pPtr = (pDarken_amount * *pPtr) / 256;
 }
@@ -2375,7 +2327,6 @@ void SetFadedPalette(int pDegree) {
     int j;
     br_pixelmap* the_palette;
     char* the_pixels;
-    LOG_TRACE10("(%d)", pDegree);
 
     memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
     for (j = 0; j < 256; j++) {
@@ -2393,7 +2344,6 @@ void FadePaletteDown(void) {
     int i;
     int start_time;
     int the_time;
-    LOG_TRACE("()");
 
     if (!gFaded_palette) {
         gFaded_palette = 1;
@@ -2419,7 +2369,6 @@ void FadePaletteUp(void) {
     int i;
     int start_time;
     int the_time;
-    LOG_TRACE("()");
 
     if (gFaded_palette) {
         gFaded_palette = 0;
@@ -2452,7 +2401,6 @@ void KillSplashScreen(void) {
 // IDA: void __cdecl EnsureRenderPalette()
 // FUNCTION: CARM95 0x004b7be4
 void EnsureRenderPalette(void) {
-    LOG_TRACE("()");
 
     if (gPalette_munged) {
         ResetPalette();
@@ -2464,7 +2412,6 @@ void EnsureRenderPalette(void) {
 // FUNCTION: CARM95 0x004b7c0b
 void SplashScreenWith(char* pPixmap_name) {
     br_pixelmap* the_map;
-    LOG_TRACE("(\"%s\")", pPixmap_name);
 
     the_map = BrMapFind(pPixmap_name);
     if (gCurrent_splash == NULL || the_map != gCurrent_splash) {
@@ -2527,7 +2474,6 @@ br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg) {
 // IDA: void __cdecl ChangeAmbience(br_scalar pDelta)
 // FUNCTION: CARM95 0x004b7d29
 void ChangeAmbience(br_scalar pDelta) {
-    LOG_TRACE("(%f)", pDelta);
 
     BrMaterialEnum("*", AmbientificateMaterial, &pDelta);
 }
@@ -2535,7 +2481,6 @@ void ChangeAmbience(br_scalar pDelta) {
 // IDA: void __cdecl InitAmbience()
 // FUNCTION: CARM95 0x004b7dae
 void InitAmbience(void) {
-    LOG_TRACE("()");
 
     gCurrent_ambience = gAmbient_adjustment;
     ChangeAmbience(gAmbient_adjustment);
@@ -2553,7 +2498,6 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
     tU8* source_ptr;
     tU8* dest_ptr;
     tU8* conv_table;
-    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
 
 #ifdef DETHRACE_3DFX_PATCH
     if (pDest->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
@@ -2635,7 +2579,6 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
 // IDA: void __usercall DRMaskedStamp(br_int_16 pDest_x@<EAX>, br_int_16 pDest_y@<EDX>, br_pixelmap *pSource@<EBX>)
 // FUNCTION: CARM95 0x004b80cc
 void DRMaskedStamp(br_int_16 pDest_x, br_int_16 pDest_y, br_pixelmap* pSource) {
-    LOG_TRACE("(%d, %d, %p)", pDest_x, pDest_y, pSource);
 
     DRPixelmapRectangleMaskedCopy(gBack_screen,
         pDest_x,
@@ -2659,7 +2602,6 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
     tU8* source_ptr;
     tU8* dest_ptr;
     tU8* conv_table;
-    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
 
 #ifdef DETHRACE_3DFX_PATCH
     if (pDest->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
@@ -2704,7 +2646,6 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     tU8* dest_ptr;
     tU8* conv_table;
     tX1616 current_shear;
-    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight, pShear);
 
 #ifdef DETHRACE_3DFX_PATCH
     if (pDest->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {
@@ -2807,7 +2748,6 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     tU32 source_y;
     tU32 source_y_delta;
     tU32 old_source_y;
-    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", pDest, pDest_x, pDest_y, pSource, pSource_x, pSource_y, pWidth, pHeight);
 
     if (!pHeight) {
         return;
@@ -2841,7 +2781,6 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
 // FUNCTION: CARM95 0x004b8672
 void InitTransientBitmaps(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gTransient_bitmaps); i++) {
         gTransient_bitmaps[i].pixmap = NULL;
@@ -2853,7 +2792,6 @@ void InitTransientBitmaps(void) {
 // FUNCTION: CARM95 0x004b86c0
 int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data) {
     int bm_index;
-    LOG_TRACE("(%d, %d, %d)", pWidth, pHeight, pUser_data);
 
     for (bm_index = 0; bm_index < COUNT_OF(gTransient_bitmaps); bm_index++) {
         if (gTransient_bitmaps[bm_index].pixmap == NULL) {
@@ -2868,12 +2806,12 @@ int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data) {
         }
     }
     FatalError(kFatalError_FindSpareTransientBitmap);
+    return 0;
 }
 
 // IDA: void __usercall DeallocateTransientBitmap(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x004b8763
 void DeallocateTransientBitmap(int pIndex) {
-    LOG_TRACE("(%d)", pIndex);
 
     if (gTransient_bitmaps[pIndex].pixmap != NULL) {
         BrPixelmapFree(gTransient_bitmaps[pIndex].pixmap);
@@ -2886,7 +2824,6 @@ void DeallocateTransientBitmap(int pIndex) {
 // FUNCTION: CARM95 0x004b87ba
 void DeallocateAllTransientBitmaps(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gTransient_bitmaps); i++) {
         DeallocateTransientBitmap(i);
@@ -2924,7 +2861,6 @@ void RemoveTransientBitmaps(int pGraphically_remove_them) {
 // IDA: void __usercall SaveTransient(int pIndex@<EAX>, int pX_coord@<EDX>, int pY_coord@<EBX>)
 // FUNCTION: CARM95 0x004b88f9
 void SaveTransient(int pIndex, int pX_coord, int pY_coord) {
-    LOG_TRACE("(%d, %d, %d)", pIndex, pX_coord, pY_coord);
 
     gTransient_bitmaps[pIndex].x_coord = pX_coord & ~3;
     gTransient_bitmaps[pIndex].y_coord = pY_coord;
@@ -2945,7 +2881,6 @@ void SaveTransient(int pIndex, int pX_coord, int pY_coord) {
 // FUNCTION: CARM95 0x004b924e
 void DrawCursorGiblet(tCursor_giblet* pGib) {
     br_pixelmap* the_image;
-    LOG_TRACE("(%p)", pGib);
 
     SaveTransient(pGib->transient_index, pGib->x_coord, pGib->y_coord);
     the_image = gCursor_giblet_images[gCursor_giblet_sequences[pGib->sequence_index][pGib->current_giblet]];
@@ -2966,7 +2901,6 @@ void ProcessCursorGiblets(int pPeriod) {
     int kill_the_giblet;
     tU32 time_now;
     tCursor_giblet* gib;
-    LOG_TRACE("(%d)", pPeriod);
 
     time_now = PDGetTotalTime();
     for (i = 0; i < COUNT_OF(gCursor_giblets); i++) {
@@ -3026,7 +2960,6 @@ int NewCursorGiblet(int pX_coord, int pY_coord, float pX_speed, float pY_speed, 
     int the_width;
     int the_height;
     int sequence_number;
-    LOG_TRACE("(%d, %d, %f, %f, %d)", pX_coord, pY_coord, pX_speed, pY_speed, pDrop_time);
 
     sequence_number = IRandomBetween(0, COUNT_OF(gCursor_giblet_sequences) - 1);
     if (pX_coord >= 0 && pX_coord < gGraf_data[gGraf_data_index].width && pY_coord >= 0 && pY_coord < gGraf_data[gGraf_data_index].height) {
@@ -3166,7 +3099,6 @@ int AllocateCursorTransient(void) {
     int i;
     int largest_width;
     int largest_height;
-    LOG_TRACE("()");
 
     largest_width = 0;
     largest_height = 0;
@@ -3185,7 +3117,6 @@ int AllocateCursorTransient(void) {
 // FUNCTION: CARM95 0x004b9535
 void StartMouseCursor(void) {
     int i;
-    LOG_TRACE("()");
 
     gNext_transient = 0;
     gCursor_transient_index = AllocateCursorTransient();
@@ -3201,7 +3132,6 @@ void StartMouseCursor(void) {
 // IDA: void __cdecl EndMouseCursor()
 // FUNCTION: CARM95 0x004b965f
 void EndMouseCursor(void) {
-    LOG_TRACE("()");
 
     RemoveTransientBitmaps(1);
     DeallocateAllTransientBitmaps();
@@ -3216,7 +3146,6 @@ void LoadFont(int pFont_ID) {
     int number_of_chars;
     FILE* f;
     tU32 the_size;
-    LOG_TRACE("(%d)", pFont_ID);
 
     if (gFonts[pFont_ID].images != NULL) {
         return;
@@ -3259,7 +3188,6 @@ void LoadFont(int pFont_ID) {
 // IDA: void __usercall DisposeFont(int pFont_ID@<EAX>)
 // FUNCTION: CARM95 0x004b99cb
 void DisposeFont(int pFont_ID) {
-    LOG_TRACE("(%d)", pFont_ID);
     if (gFonts[pFont_ID].images && (!TranslationMode() || (gAusterity_mode && FlicsPlayedFromDisk()))) {
         BrPixelmapFree(gFonts[pFont_ID].images);
         gFonts[pFont_ID].images = NULL;
@@ -3271,7 +3199,6 @@ void DisposeFont(int pFont_ID) {
 // FUNCTION: CARM95 0x004b9a79
 void InitDRFonts(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < 21; i++) {
         gFonts[i].file_read_once = 0;
@@ -3286,7 +3213,6 @@ void DrawDropImage(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int 
     int src_y;
     int src_height;
     int y_diff;
-    LOG_TRACE("(%p, %d, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip, pOffset);
 
     BrPixelmapRectangleFill(gBack_screen,
         pLeft,
@@ -3326,7 +3252,6 @@ void DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip,
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
-    LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
 
     start_time = PDGetTotalTime();
     drop_distance = pImage->height - pTop_clip + pTop;
@@ -3351,7 +3276,6 @@ void DropOutImageThruBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_c
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
-    LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
 
     start_time = PDGetTotalTime();
     drop_distance = pBottom_clip - pTop;
@@ -3376,7 +3300,6 @@ void DropInImageFromBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_cl
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
-    LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
 
     start_time = PDGetTotalTime();
     drop_distance = pBottom_clip - pTop;
@@ -3401,7 +3324,6 @@ void DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
-    LOG_TRACE("(%p, %d, %d, %d, %d)", pImage, pLeft, pTop, pTop_clip, pBottom_clip);
 
     start_time = PDGetTotalTime();
     drop_distance = pImage->height - pTop_clip + pTop;
@@ -3425,7 +3347,6 @@ void DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip
 void DrawTellyLine(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_width;
     int the_height;
-    LOG_TRACE("(%p, %d, %d, %d)", pImage, pLeft, pTop, pPercentage);
 
     the_width = pImage->width;
     the_height = pImage->height / 2 + pTop;
@@ -3438,7 +3359,6 @@ void DrawTellyLine(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
 // FUNCTION: CARM95 0x004b9f9e
 void DrawTellyImage(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_height;
-    LOG_TRACE("(%p, %d, %d, %d)", pImage, pLeft, pTop, pPercentage);
 
     BrPixelmapRectangleFill(gBack_screen, pLeft, pTop, pImage->width, pImage->height, 0);
     if (pPercentage != 1000) {
@@ -3460,7 +3380,6 @@ void DrawTellyImage(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
 void TellyInImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 start_time;
     tS32 the_time;
-    LOG_TRACE("(%p, %d, %d)", pImage, pLeft, pTop);
 
     start_time = PDGetTotalTime();
     while (1) {
@@ -3487,7 +3406,6 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 start_time;
     tS32 the_time;
     int drop_distance;
-    LOG_TRACE("(%p, %d, %d)", pImage, pLeft, pTop);
 
     start_time = PDGetTotalTime();
     while (1) {
@@ -3513,7 +3431,6 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
 // IDA: void __usercall SetShadowLevel(tShadow_level pLevel@<EAX>)
 // FUNCTION: CARM95 0x004ba135
 void SetShadowLevel(tShadow_level pLevel) {
-    LOG_TRACE("(%d)", pLevel);
 
     gShadow_level = pLevel;
 }
@@ -3521,7 +3438,6 @@ void SetShadowLevel(tShadow_level pLevel) {
 // IDA: tShadow_level __cdecl GetShadowLevel()
 // FUNCTION: CARM95 0x004ba148
 tShadow_level GetShadowLevel(void) {
-    LOG_TRACE("()");
 
     return gShadow_level;
 }
@@ -3529,7 +3445,6 @@ tShadow_level GetShadowLevel(void) {
 // IDA: void __cdecl ToggleShadow()
 // FUNCTION: CARM95 0x004ba15d
 void ToggleShadow(void) {
-    LOG_TRACE("()");
 
     gShadow_level++;
     if (gShadow_level == eShadow_everyone) {
@@ -3558,7 +3473,6 @@ void ToggleShadow(void) {
 void InitShadow(void) {
     int i;
     br_vector3 temp_v;
-    LOG_TRACE("()");
 
     for (i = 0; i < COUNT_OF(gShadow_clip_planes); i++) {
         gShadow_clip_planes[i].clip = BrActorAllocate(BR_ACTOR_CLIP_PLANE, NULL);
@@ -3582,7 +3496,6 @@ void InitShadow(void) {
 // IDA: br_uint_32 __cdecl SaveShadeTable(br_pixelmap *pTable, void *pArg)
 // FUNCTION: CARM95 0x004ba427
 br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
-    LOG_TRACE("(%p, %p)", pTable, pArg);
 
     if (gSaved_table_count == COUNT_OF(gSaved_shade_tables)) {
         return 1;
@@ -3597,7 +3510,6 @@ br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
 // IDA: void __cdecl SaveShadeTables()
 // FUNCTION: CARM95 0x004ba49d
 void SaveShadeTables(void) {
-    LOG_TRACE("()");
 
     PossibleService();
     gSaved_table_count = 0;
@@ -3608,7 +3520,6 @@ void SaveShadeTables(void) {
 // FUNCTION: CARM95 0x004ba4cb
 void DisposeSavedShadeTables(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < gSaved_table_count; i++) {
         BrMemFree(gSaved_shade_tables[i].copy);
@@ -3618,7 +3529,6 @@ void DisposeSavedShadeTables(void) {
 // IDA: void __cdecl ShadowMode()
 // FUNCTION: CARM95 0x004ba50e
 void ShadowMode(void) {
-    LOG_TRACE("()");
 
     gFancy_shadow = !gFancy_shadow;
     if (gFancy_shadow) {
@@ -3631,7 +3541,6 @@ void ShadowMode(void) {
 // IDA: int __cdecl SwitchToRealResolution()
 // FUNCTION: CARM95 0x004ba581
 int SwitchToRealResolution(void) {
-    LOG_TRACE("()");
 
     if (gGraf_data_index == gReal_graf_data_index) {
         return 0;
@@ -3646,7 +3555,6 @@ int SwitchToRealResolution(void) {
 // IDA: int __cdecl SwitchToLoresMode()
 // FUNCTION: CARM95 0x004ba5e7
 int SwitchToLoresMode(void) {
-    LOG_TRACE("()");
     if (!gGraf_data_index || gGraf_data_index != gReal_graf_data_index) {
         return 0;
     }
@@ -3671,7 +3579,6 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
     int dst_row_skip;
     int src_row_skip;
     int width_over_2;
-    LOG_TRACE("(%p, %p, %d, %d, %d, %d)", pDestn, pSource, pSource_width, pSource_height, pX_offset, pY_offset);
 
 #ifdef DETHRACE_3DFX_PATCH
     if (pDestn->type != pSource->type && pDestn->type == BR_PMT_RGB_565 && pSource->type == BR_PMT_INDEX_8) {

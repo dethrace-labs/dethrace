@@ -392,8 +392,8 @@ int S3SoundBankReadEntry(tS3_soundbank_read_ctx* ctx, char* dir_name, int low_me
     if (tmp2 == 0.0f) {
         tmp2 = 1.0f;
     }
-    desc->min_pitch = ldexpf(tmp1, 16);
-    desc->max_pitch = ldexpf(tmp2, 16);
+    desc->min_pitch = ldexp(tmp1, 16);
+    desc->max_pitch = ldexp(tmp2, 16);
     if (sscanf(ctx->data, "%lf,%lf%n", &tmp1, &tmp2, &char_count) != 2) {
         return 0;
     }
@@ -405,8 +405,8 @@ int S3SoundBankReadEntry(tS3_soundbank_read_ctx* ctx, char* dir_name, int low_me
     if (tmp2 == 0.0) {
         tmp2 = 1.0;
     }
-    desc->min_speed = ldexpf(tmp1, 16);
-    desc->max_speed = ldexpf(tmp2, 16);
+    desc->min_speed = ldexp(tmp1, 16);
+    desc->max_speed = ldexp(tmp2, 16);
     if (sscanf(ctx->data, "%i%n", &desc->special_fx, &char_count) != 1) {
         return 0;
     }
@@ -1001,9 +1001,9 @@ tS3_sound_tag S3StartSound2(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_repeat
     if (pSpeed == -1) {
         pSpeed = 0x10000;
     }
-    chan->rate = ldexpf(pPitch, -16) * chan->rate;
+    chan->rate = ldexp(pPitch, -16) * chan->rate;
     if (!pOutlet->independent_pitch) {
-        chan->rate = ldexpf(pSpeed, -16) * chan->rate;
+        chan->rate = ldexp(pSpeed, -16) * chan->rate;
     }
     if (desc->type == eS3_ST_midi && desc->sound_data == NULL && S3MIDILoadSong(chan)) {
         chan->needs_service = 1;
@@ -1253,7 +1253,7 @@ tS3_channel* S3GetChannelForTag(tS3_sound_tag tag) {
     if (!tag) {
         return 0;
     }
-    for (o = gS3_outlets; o && o->id != (uint8_t)tag; o = o->next) {
+    for (o = gS3_outlets; o && o->id != tag; o = o->next) {
         ;
     }
     if (!o) {

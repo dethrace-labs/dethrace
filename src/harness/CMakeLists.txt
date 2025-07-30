@@ -15,7 +15,11 @@ if(DETHRACE_FIX_BUGS)
     target_compile_definitions(harness PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
-target_link_libraries(harness PRIVATE brender miniaudio stb inih compile_with_werror)
+if(MSVC_42_FOR_RECCMP)
+  target_link_libraries(harness PRIVATE brender inih compile_with_werror)
+else()
+  target_link_libraries(harness PRIVATE brender miniaudio stb inih compile_with_werror)
+endif()
 
 if(NOT MSVC)
     target_compile_options(harness PRIVATE
@@ -42,18 +46,37 @@ target_sources(harness PRIVATE
     include/harness/os.h
     include/harness/audio.h
 
-    # cameras/debug_camera.c
-    # cameras/debug_camera.h
     ascii_tables.h
     harness_trace.c
     harness.c
     harness.h
-    audio/miniaudio.c
+
     platforms/null.c
     platforms/null.h
 
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
+
+if(DETHRACE_SOUND_ENABLED)
+    target_sources(harness PRIVATE audio/miniaudio.c)
+    target_link_libraries(harness PRIVATE miniaudio stb)
+else()
+    target_sources(harness PRIVATE audio/null.c)
+endif()
+
+if(MSVC_42_FOR_RECCMP)
+    # we don't currently care about running it, just get it compiled!
+    target_sources(harness PRIVATE os/null.c)
+elseif(WIN32)
+    target_sources(harness PRIVATE os/windows.c)
+    target_link_libraries(harness PRIVATE dbghelp ws2_32)
+elseif(APPLE)
+    target_sources(harness PRIVATE os/macos.c)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_sources(harness PRIVATE os/linux.c)
+else()
+    message(FATAL_ERROR "Unsupported or unknown platform: ${CMAKE_SYSTEM_NAME}")
+endif()
 
 if(DETHRACE_PLATFORM_SDL1)
     target_sources(harness PRIVATE
@@ -94,17 +117,4 @@ if(DETHRACE_PLATFORM_SDL_DYNAMIC)
     target_link_libraries(harness PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
-if(WIN32)
-    target_sources(harness PRIVATE
-        os/windows.c
-    )
-    target_link_libraries(harness PRIVATE dbghelp ws2_32)
-elseif(APPLE)
-    target_sources(harness PRIVATE
-        os/macos.c
-    )
-else()
-    target_sources(harness PRIVATE
-        os/linux.c
-    )
-endif()
+

@@ -11,7 +11,7 @@ void test_utility_EncodeLinex() {
     char input[] = "\x29\x2a\x9c\x22\x61\x4d\x5e\x5f\x60\x34\x64\x57\x8d\x2b\x82\x7b\x33\x4c";
     strcpy(buf, input);
     EncodeLine(buf);
-    //TEST_ASSERT_EQUAL_INT(2, gEncryption_method);
+    // TEST_ASSERT_EQUAL_INT(2, gEncryption_method);
     char expected[] = "0.01\t\t\t\t\t// Hither";
     TEST_ASSERT_EQUAL_STRING(expected, buf);
 }
@@ -45,7 +45,7 @@ void test_utility_StripCR() {
     TEST_ASSERT_EQUAL_STRING("line", buf);
 }
 
-static void get_system_temp_folder(char *buffer, size_t bufferSize) {
+static void get_system_temp_folder(char* buffer, size_t bufferSize) {
 #ifdef _WIN32
     GetTempPathA(bufferSize, buffer);
 #else
@@ -116,7 +116,7 @@ void test_utility_IRandomBetween() {
     };
 
     for (i = 0; i < BR_ASIZE(ranges); i++) {
-        LOG_INFO("Testing min=%d max=%d", ranges[i].min, ranges[i].max);
+        LOG_INFO3("Testing min=%d max=%d", ranges[i].min, ranges[i].max);
         actual_min = MIN(ranges[i].min, ranges[i].max);
         actual_max = MAX(ranges[i].min, ranges[i].max);
         for (j = 0; j < 1000; j++) {

@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 // GLOBAL: CARM95 0x005070d0
-br_actor* gOppo_path_actor;
+br_actor* gOppo_path_actor = NULL;
 
 // GLOBAL: CARM95 0x005070d4
 br_model* gOppo_path_model;
@@ -213,7 +213,6 @@ tS16 gMobile_section;
 // FUNCTION: CARM95 0x00402390
 void PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vector) {
     br_transform trans;
-    LOG_TRACE("(%p, %p)", pThe_actor, pThe_vector);
 
     trans.type = BR_TRANSFORM_LOOK_UP;
     BrVector3Copy(&trans.t.look_up.look, pThe_vector);
@@ -225,7 +224,6 @@ void PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vect
 // IDA: void __usercall ProcessCurrentObjective(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
 // FUNCTION: CARM95 0x004065e0
 void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
 
     switch (pOpponent_spec->current_objective) {
     case eOOT_complete_race:
@@ -271,7 +269,6 @@ void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_
 tS16 ReallocExtraPathNodes(int pHow_many_then) {
     tPath_node* new_nodes;
     tS16 first_new_node;
-    LOG_TRACE("(%d)", pHow_many_then);
 
     first_new_node = -1;
     if (pHow_many_then != 0) {
@@ -296,7 +293,6 @@ tS16 ReallocExtraPathNodes(int pHow_many_then) {
 tS16 ReallocExtraPathSections(int pHow_many_then) {
     tPath_section* new_sections;
     tS16 first_new_section;
-    LOG_TRACE("(%d)", pHow_many_then);
 
     first_new_section = -1;
     if (pHow_many_then != 0) {
@@ -324,7 +320,6 @@ int PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
     br_vector3 norm;
     br_scalar t;
     br_material* material;
-    LOG_TRACE("(%p, %p)", pFrom, pTo);
 
     BrVector3Sub(&dir, pTo, pFrom);
     BrVector3Copy(&from, pFrom);
@@ -341,7 +336,6 @@ tS16 FindNearestPathNode(br_vector3* pActor_coords, br_scalar* pDistance) {
     tS16 nearest_node;
     br_scalar distance;
     br_vector3 actor_to_node;
-    LOG_TRACE("(%p, %p)", pActor_coords, pDistance);
 
     nearest_node = -1;
     *pDistance = FLT_MAX;
@@ -359,7 +353,6 @@ tS16 FindNearestPathNode(br_vector3* pActor_coords, br_scalar* pDistance) {
 // IDA: tS16 __usercall FindNearestPathSection@<AX>(br_vector3 *pActor_coords@<EAX>, br_vector3 *pPath_direction@<EDX>, br_vector3 *pIntersect@<EBX>, br_scalar *pDistance@<ECX>)
 // FUNCTION: CARM95 0x0040294b
 tS16 FindNearestPathSection(br_vector3* pActor_coords, br_vector3* pPath_direction, br_vector3* pIntersect, br_scalar* pDistance) {
-    LOG_TRACE("(%p, %p, %p, %p)", pActor_coords, pPath_direction, pIntersect, pDistance);
 
     return FindNearestGeneralSection(NULL, pActor_coords, pPath_direction, pIntersect, pDistance);
 }
@@ -386,7 +379,6 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
 #if defined(DETHRACE_FIX_BUGS)
     br_vector3 zero_vector;
 #endif
-    LOG_TRACE("(%p, %p, %p, %p, %p)", pPursuee, pActor_coords, pPath_direction, pIntersect, pDistance);
 
     nearest_section = -1;
     nearest_node_section_no = -1;
@@ -457,9 +449,9 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
         BrVector3Sub(&p, finish, start);
         BrVector3NormaliseQuick(pPath_direction, &p);
         BrVector3Copy(pIntersect, nearest_node_v);
-        *pDistance = sqrtf(closest_distance_squared);
+        *pDistance = sqrt(closest_distance_squared);
     } else {
-        *pDistance = sqrtf(nearest_node_distance_squared);
+        *pDistance = sqrt(nearest_node_distance_squared);
     }
     if (pPursuee != NULL) {
         nearest_node_section_no += 15000;
@@ -470,7 +462,6 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
 // IDA: void __usercall DeadStopCar(tCar_spec *pCar_spec@<EAX>)
 // FUNCTION: CARM95 0x00402481
 void DeadStopCar(tCar_spec* pCar_spec) {
-    LOG_TRACE("(%p)", pCar_spec);
 
     pCar_spec->acc_force = 0.f;
     pCar_spec->brake_force = 0.f;
@@ -484,7 +475,6 @@ void DeadStopCar(tCar_spec* pCar_spec) {
 // IDA: void __usercall TurnOpponentPhysicsOn(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x00402401
 void TurnOpponentPhysicsOn(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     if (pOpponent_spec->physics_me == 0) {
         pOpponent_spec->physics_me = 1;
@@ -495,7 +485,6 @@ void TurnOpponentPhysicsOn(tOpponent_spec* pOpponent_spec) {
 // IDA: void __usercall TurnOpponentPhysicsOff(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x0040243f
 void TurnOpponentPhysicsOff(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     DeadStopCar(pOpponent_spec->car_spec);
     if (pOpponent_spec->physics_me) {
@@ -508,7 +497,6 @@ void TurnOpponentPhysicsOff(tOpponent_spec* pOpponent_spec) {
 // FUNCTION: CARM95 0x0040694d
 void NewObjective(tOpponent_spec* pOpponent_spec, tOpponent_objective_type pObjective_type, ...) {
     va_list marker;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pObjective_type);
 
     if (pOpponent_spec->current_objective != eOOT_none) {
         ProcessCurrentObjective(pOpponent_spec, ePOC_die);
@@ -554,7 +542,6 @@ void CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
     char str[256];
     char work_str[32];
     int i;
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     if (pOpponent_spec->nnext_sections >= COUNT_OF(pOpponent_spec->next_sections)) {
         dr_dprintf("%s: CalcRaceRoute() - Pissing off 'cos projected route full up", pOpponent_spec->car_spec->driver_name);
@@ -618,7 +605,6 @@ void TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add) {
     int target;
     int num_of_temp_sections;
     int direction;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pSections_to_add);
 
     if (!pSections_to_add) {
         PDEnterDebugger("TopUpRandomRoute() called with no seed (woof, bark, etc.)");
@@ -674,7 +660,6 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
     tS16 section_no;
     tS16 section_no_index;
     br_scalar distance_so_far;
-    LOG_TRACE("(%p, %p, %p, %d, %d, %f, %p)", pTemp_store, pPerm_store, pNum_of_perm_store_sections, pTarget_section, pDepth, pDistance_so_far, pOpponent_spec);
 
     // added by dethrace for readability (?)
     tS16 section_no_dir_index;
@@ -755,7 +740,6 @@ void CalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPlayer) 
     tRoute_section perm_store[10];
     char work_str[32];
     char str[256];
-    LOG_TRACE("(%p, %p)", pOpponent_spec, pPlayer);
 
     fuck_it = 0;
     if (pOpponent_spec->nnext_sections >= COUNT_OF(pOpponent_spec->next_sections)) {
@@ -824,7 +808,6 @@ void CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec) {
     br_scalar distance;
     tRoute_section temp_store[10];
     tRoute_section perm_store[10];
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     ClearOpponentsProjectedRoute(pOpponent_spec);
     section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &section_v, &intersect, &distance);
@@ -862,7 +845,6 @@ void CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec) {
 // IDA: void __usercall ClearOpponentsProjectedRoute(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x00404684
 void ClearOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     pOpponent_spec->nnext_sections = 0;
 }
@@ -870,7 +852,6 @@ void ClearOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec) {
 // IDA: int __usercall AddToOpponentsProjectedRoute@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection_no@<EDX>, int pDirection@<EBX>)
 // FUNCTION: CARM95 0x004030ef
 int AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_no, int pDirection) {
-    LOG_TRACE("(%p, %d, %d)", pOpponent_spec, pSection_no, pDirection);
 
     if (pOpponent_spec->nnext_sections >= COUNT_OF(pOpponent_spec->next_sections)) {
         return 0;
@@ -885,7 +866,6 @@ int AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_n
 // FUNCTION: CARM95 0x00404699
 int ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces) {
     int i;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pPlaces);
 
     if (pOpponent_spec->nnext_sections <= pPlaces) {
         return 0;
@@ -901,7 +881,6 @@ int ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces) {
 // IDA: void __usercall StunTheBugger(tOpponent_spec *pOpponent_spec@<EAX>, int pMilliseconds@<EDX>)
 // FUNCTION: CARM95 0x0040b12d
 void StunTheBugger(tOpponent_spec* pOpponent_spec, int pMilliseconds) {
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pMilliseconds);
 
     pOpponent_spec->car_spec->acc_force = 0.f;
     pOpponent_spec->car_spec->brake_force = 0.f;
@@ -912,7 +891,6 @@ void StunTheBugger(tOpponent_spec* pOpponent_spec, int pMilliseconds) {
 // IDA: void __usercall UnStunTheBugger(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x00405e44
 void UnStunTheBugger(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     pOpponent_spec->stun_time_ends = 0;
 }
@@ -925,7 +903,6 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
     tComplete_race_data* data;
     int res;
     char str[256];
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
 
     switch (pCommand) {
     case ePOC_start:
@@ -969,7 +946,6 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
 // FUNCTION: CARM95 0x00405e59
 void StartRecordingTrail(tCar_spec* pPursuee) {
     int i;
-    LOG_TRACE("(%p)", pPursuee);
 
     if (pPursuee->no_of_processes_recording_my_trail == 0) {
         dr_dprintf("StartRecordingTrail - starting from scratch");
@@ -1000,7 +976,6 @@ void RecordNextTrailNode(tCar_spec* pPursuee) {
     br_vector3 car_to_last_point_v;
     br_scalar length;
     int visible;
-    LOG_TRACE("(%p)", pPursuee);
 
     trail = &pPursuee->my_trail;
     if (trail->time_of_next_recording >= gTime_stamp_for_this_munging) {
@@ -1043,7 +1018,6 @@ void RecordNextTrailNode(tCar_spec* pPursuee) {
 // IDA: tS16 __usercall FindNearestTrailSection@<AX>(tOpponent_spec *pOpponent_spec@<EAX>, tCar_spec *pPursuee@<EDX>, br_vector3 *pSection_v@<EBX>, br_vector3 *pIntersect@<ECX>, br_scalar *pDistance)
 // FUNCTION: CARM95 0x0040769d
 tS16 FindNearestTrailSection(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee, br_vector3* pSection_v, br_vector3* pIntersect, br_scalar* pDistance) {
-    LOG_TRACE("(%p, %p, %p, %p, %p)", pOpponent_spec, pPursuee, pSection_v, pIntersect, pDistance);
 
     return FindNearestGeneralSection(pPursuee, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, pSection_v, pIntersect, pDistance);
 }
@@ -1053,7 +1027,6 @@ tS16 FindNearestTrailSection(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee
 tS16 CalcNextTrailSection(tOpponent_spec* pOpponent_spec, int pSection) {
     int section_no;
     tPursuee_trail* trail;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pSection);
 
     trail = &pOpponent_spec->pursue_car_data.pursuee->my_trail;
     section_no = pSection - 15000;
@@ -1078,7 +1051,6 @@ void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     tFollow_path_result res;
     char str[256];
     tS16 section_no;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
 
     data = &pOpponent_spec->pursue_car_data;
     if (pCommand == ePOC_start) {
@@ -1249,7 +1221,6 @@ void ProcessRunAway(tOpponent_spec* pOpponent_spec, tProcess_objective_command p
     br_vector3 intersect;
     br_vector3 direction_v;
     char str[256];
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
 
     switch (pCommand) {
 
@@ -1301,7 +1272,6 @@ void ProcessRunAway(tOpponent_spec* pOpponent_spec, tProcess_objective_command p
 // IDA: void __usercall ProcessWaitForSomeHaplessSod(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
 // FUNCTION: CARM95 0x004079da
 void ProcessWaitForSomeHaplessSod(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
 
     switch (pCommand) {
     case ePOC_start:
@@ -1321,7 +1291,6 @@ void ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     br_vector3 cop_to_start;
     br_scalar distance;
     int res;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
 
     switch (pCommand) {
     case ePOC_run:
@@ -1378,7 +1347,6 @@ void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command 
     float t;
     float terminal_time;
     float y;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
 
     if (pCommand == ePOC_start) {
         dr_dprintf("%s: ProcessLevitate() - new objective started", pOpponent_spec->car_spec->driver_name);
@@ -1399,7 +1367,7 @@ void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command 
                 pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
                 pOpponent_spec->car_spec->acc_force = 0.f;
                 BrVector3InvScale(&pOpponent_spec->car_spec->omega, &pOpponent_spec->car_spec->omega,
-                    powf(gFrame_period_for_this_munging / 1000.f, 2.f));
+                    pow(gFrame_period_for_this_munging / 1000.f, 2.f));
             }
         }
         if (!pOpponent_spec->levitate_data.waiting_to_levitate) {
@@ -1425,7 +1393,6 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     br_actor* car_actor;
     int res;
     char str[256];
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
 
     if (pCommand == ePOC_start) {
         dr_dprintf("%s: ProcessGetNearPlayer() - new objective started", pOpponent_spec->car_spec->driver_name);
@@ -1469,7 +1436,6 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
 // IDA: void __usercall ProcessFrozen(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
 // FUNCTION: CARM95 0x00408d47
 void ProcessFrozen(tOpponent_spec* pOpponent_spec, tProcess_objective_command pCommand) {
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pCommand);
 
     switch (pCommand) {
     case ePOC_start:
@@ -1492,7 +1458,6 @@ void ProcessFrozen(tOpponent_spec* pOpponent_spec, tProcess_objective_command pC
 // FUNCTION: CARM95 0x00409cd5
 int HeadOnWithPlayerPossible(tOpponent_spec* pOpponent_spec) {
     br_vector3 oppo_to_player_norm;
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     oppo_to_player_norm.v[0] = gProgram_state.current_car.car_master_actor->t.t.mat.m[3][0]
         - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][0];
@@ -1513,7 +1478,6 @@ int HeadOnWithPlayerPossible(tOpponent_spec* pOpponent_spec) {
 // IDA: int __usercall AlreadyPursuingCar@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tCar_spec *pPursuee@<EDX>)
 // FUNCTION: CARM95 0x00409e29
 int AlreadyPursuingCar(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee) {
-    LOG_TRACE("(%p, %p)", pOpponent_spec, pPursuee);
 
     return pOpponent_spec->current_objective == eOOT_pursue_and_twat && pOpponent_spec->pursue_car_data.pursuee == pPursuee;
 }
@@ -1521,7 +1485,6 @@ int AlreadyPursuingCar(tOpponent_spec* pOpponent_spec, tCar_spec* pPursuee) {
 // IDA: int __usercall LastTwatteeAPlayer@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x00409e64
 int LastTwatteeAPlayer(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     return pOpponent_spec->car_spec->last_person_we_hit && pOpponent_spec->car_spec->last_person_we_hit->driver == eDriver_local_human;
 }
@@ -1529,7 +1492,6 @@ int LastTwatteeAPlayer(tOpponent_spec* pOpponent_spec) {
 // IDA: int __usercall LastTwatterAPlayer@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x00409ea9
 int LastTwatterAPlayer(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     return pOpponent_spec->car_spec->last_person_to_hit_us && pOpponent_spec->car_spec->last_person_to_hit_us->driver == eDriver_local_human;
 }
@@ -1537,7 +1499,6 @@ int LastTwatterAPlayer(tOpponent_spec* pOpponent_spec) {
 // IDA: void __usercall ObjectiveComplete(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x00408e2d
 void ObjectiveComplete(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     dr_dprintf("%s: Objective Completed", pOpponent_spec->car_spec->driver_name);
     pOpponent_spec->new_objective_required = 1;
@@ -1566,7 +1527,6 @@ void TeleportOpponentToNearestSafeLocation(tOpponent_spec* pOpponent_spec) {
     br_vector3 intersect;
     int section_counter;
     int found_safe_place;
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     found_safe_place = 0;
     section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
@@ -1612,7 +1572,6 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
     int pursuit_percentage;
     int percentage;
     int general_grudge_increase;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pMust_choose_one);
 
     // v3 = pMust_choose_one;
     if (pOpponent_spec->current_objective == eOOT_knackered_and_freewheeling || pOpponent_spec->knackeredness_detected) {
@@ -1809,7 +1768,6 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
 // FUNCTION: CARM95 0x00406458
 void ProcessThisOpponent(tOpponent_spec* pOpponent_spec) {
     int i;
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     if ((gMap_mode && gShow_opponents) || pOpponent_spec->last_in_view + 3000 >= gTime_stamp_for_this_munging) {
         if (pOpponent_spec->cheating) {
@@ -1835,7 +1793,6 @@ void ProcessThisOpponent(tOpponent_spec* pOpponent_spec) {
 // FUNCTION: CARM95 0x004034b7
 int IsNetCarActive(br_vector3* pPoint) {
     br_vector3 tv;
-    LOG_TRACE("(%p)", pPoint);
 
     BrVector3Sub(&tv, &gProgram_state.current_car.car_master_actor->t.t.translate.t, pPoint);
     if (BrVector3LengthSquared(&tv) < 100.f) {
@@ -1853,7 +1810,6 @@ int IsNetCarActive(br_vector3* pPoint) {
 void RebuildActiveCarList(void) {
     int i;
     tCar_spec* car_spec;
-    LOG_TRACE("()");
 
     if (gActive_car_list_rebuild_required) {
         gActive_car_list_rebuild_required = 0;
@@ -1912,7 +1868,6 @@ void RebuildActiveCarList(void) {
 // IDA: void __cdecl ForceRebuildActiveCarList()
 // FUNCTION: CARM95 0x0040319c
 void ForceRebuildActiveCarList(void) {
-    LOG_TRACE("()");
 
     gActive_car_list_rebuild_required = 1;
     if (gProgram_state.racing) {
@@ -1923,7 +1878,6 @@ void ForceRebuildActiveCarList(void) {
 // IDA: void __usercall StartToCheat(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x00409eee
 void StartToCheat(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     dr_dprintf("%s: StartToCheat() - Starting to cheat", pOpponent_spec->car_spec->driver_name);
     pOpponent_spec->cheating = 1;
@@ -1937,7 +1891,6 @@ void StartToCheat(tOpponent_spec* pOpponent_spec) {
 // IDA: void __usercall OiStopCheating(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x00409f78
 void OiStopCheating(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     dr_dprintf("%s: OiStopCheating() - End of cheating sesh", pOpponent_spec->car_spec->driver_name);
     pOpponent_spec->cheating = 0;
@@ -1952,7 +1905,6 @@ void OiStopCheating(tOpponent_spec* pOpponent_spec) {
 // FUNCTION: CARM95 0x00409ff7
 int TeleportCopToStart(tOpponent_spec* pOpponent_spec) {
     br_vector3 wank;
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     if (!pOpponent_spec->cheating || !CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
         return 0;
@@ -1975,7 +1927,6 @@ int TeleportCopToStart(tOpponent_spec* pOpponent_spec) {
 // FUNCTION: CARM95 0x0040a13d
 void CalcDistanceFromHome(tOpponent_spec* pOpponent_spec) {
     br_vector3 wank;
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     BrVector3Sub(&wank, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
     pOpponent_spec->distance_from_home = BrVector3Length(&wank);
@@ -1989,7 +1940,6 @@ int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) 
     br_vector3 displacement;
     br_vector3 positive_y_vector;
     br_vector3 direction_v;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pMassage_count);
 
     BrVector3Set(&positive_y_vector, 0.f, 1.f, 0.f);
     mat = &pOpponent_spec->car_spec->car_master_actor->t.t.mat;
@@ -2032,7 +1982,6 @@ int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar
     br_scalar t;
     br_scalar distance_to_end;
     br_scalar length;
-    LOG_TRACE("(%p, %f, %d)", pOpponent_spec, pSpeed, pSection_no);
 
     if (pOpponent_spec->physics_me) {
         dr_dprintf("%s: Actually, we're already materialised", pOpponent_spec->car_spec->driver_name);
@@ -2083,7 +2032,6 @@ int RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_sca
     br_scalar distance;
     br_scalar distance_to_end;
     tS16 section_no;
-    LOG_TRACE("(%p, %f)", pOpponent_spec, pSpeed);
 
     if (pOpponent_spec->physics_me) {
         dr_dprintf("%s: Actually, we're already materialised", pOpponent_spec->car_spec->driver_name);
@@ -2133,12 +2081,11 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
     int massage_count;
     br_angle theta;
     int sensible_place;
-    LOG_TRACE("(%p, %f)", pOpponent_spec, pSpeed);
 
     this_total = 0;
     mat = &pOpponent_spec->car_spec->car_master_actor->t.t.mat;
     massage_count = 0;
-    phi = BrDegreeToAngle(90) - BrRadianToAngle(atan2f(mat->m[2][2], mat->m[2][0]));
+    phi = BrDegreeToAngle(90) - BrRadianToAngle(atan2(mat->m[2][2], mat->m[2][0]));
     if (pOpponent_spec->physics_me) {
         dr_dprintf("%s: Actually, we're already materialised", pOpponent_spec->car_spec->driver_name);
     } else {
@@ -2174,10 +2121,10 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
                 dist = -dist2;
                 BrVector3Copy(&norm, &norm2);
             }
-            if (fabsf(dist) <= 1.f) {
+            if (fabs(dist) <= 1.f) {
                 mat->m[3][1] -= dist * 100.f - 2.f;
-                BrMatrix34PreRotateX(mat, BrRadianToAngle(asinf(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
-                BrMatrix34PreRotateZ(mat, BrRadianToAngle(asinf(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
+                BrMatrix34PreRotateX(mat, BrRadianToAngle(asin(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
+                BrMatrix34PreRotateZ(mat, BrRadianToAngle(asin(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
             }
             BrVector3Negate(&pOpponent_spec->car_spec->direction, (br_vector3*)mat->m[2]);
             BrMatrix34ApplyP(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->cmpos, mat);
@@ -2244,7 +2191,6 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
 void CalcPlayerConspicuousness(tOpponent_spec* pOpponent_spec) {
     br_vector3 pos_in_cop_space;
     br_matrix34 inverse_transform;
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     if (pOpponent_spec->next_player_visibility_check >= gTime_stamp_for_this_munging) {
         return;
@@ -2273,7 +2219,6 @@ void CalcPlayerConspicuousness(tOpponent_spec* pOpponent_spec) {
 // IDA: void __usercall CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x00404a0e
 void CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     BrVector3Sub(&pOpponent_spec->player_to_oppo_v, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
     pOpponent_spec->player_to_oppo_d = BrVector3Length(&pOpponent_spec->player_to_oppo_v);
@@ -2285,7 +2230,6 @@ void CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(tOpponent_spec* pOpp
 // IDA: void __usercall ChallengeOccurred(int pChallenger_index@<EAX>, int pAccepted@<EDX>)
 // FUNCTION: CARM95 0x00404abc
 void ChallengeOccurred(int pChallenger_index, int pAccepted) {
-    LOG_TRACE("(%d, %d)", pChallenger_index, pAccepted);
 
     if (pAccepted) {
         gChallenger_index__opponent = pChallenger_index;
@@ -2296,7 +2240,6 @@ void ChallengeOccurred(int pChallenger_index, int pAccepted) {
 // FUNCTION: CARM95 0x00404ad9
 void LoadCopCars(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
         PossibleService();
@@ -2338,8 +2281,6 @@ void LoadInOppoPaths(FILE* pF) {
     float x_1;
     float x_2;
 
-    LOG_TRACE("(%p)", pF);
-
     data_errors = 0;
     sections_to_delete = 0;
     dr_dprintf("Start of LoadInOppoPaths()...");
@@ -2376,7 +2317,7 @@ void LoadInOppoPaths(FILE* pF) {
             z = gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[i].node_indices[1]].p.v[2]
                 - gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[i].node_indices[0]].p.v[2];
 
-            gProgram_state.AI_vehicles.path_sections[i].length = sqrtf(x * x + y * y + z * z);
+            gProgram_state.AI_vehicles.path_sections[i].length = sqrt(x * x + y * y + z * z);
             if (scalars[7] < 1000.0f) {
                 gProgram_state.AI_vehicles.path_sections[i].type = (tU8)scalars[7];
                 gProgram_state.AI_vehicles.path_sections[i].one_way = 0;
@@ -2481,7 +2422,6 @@ void LoadInOppoPaths(FILE* pF) {
 // IDA: void __cdecl DisposeOpponentPaths()
 // FUNCTION: CARM95 0x00405912
 void DisposeOpponentPaths(void) {
-    LOG_TRACE("()");
 
     if (gProgram_state.AI_vehicles.path_nodes != NULL) {
         BrMemFree(gProgram_state.AI_vehicles.path_nodes);
@@ -2504,7 +2444,6 @@ void DisposeOpponentPaths(void) {
 void MungeOpponents(tU32 pFrame_period) {
     int i;
     int un_stun_flag;
-    LOG_TRACE("(%d)", pFrame_period);
 
     un_stun_flag = 0;
 
@@ -2593,7 +2532,6 @@ void MungeOpponents(tU32 pFrame_period) {
 // FUNCTION: CARM95 0x0040a3a5
 void SetInitialCopPositions(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < GetCarCount(eVehicle_rozzer); i++) {
         PossibleService();
@@ -2615,7 +2553,6 @@ void InitOpponents(tRace_info* pRace_info) {
     br_bounds bounds;
     tCar_spec* car_spec;
     tOpponent_spec* opponent_spec;
-    LOG_TRACE("(%p)", pRace_info);
 
     gNext_grudge_reduction = gTime_stamp_for_this_munging + 8000;
     gGrudge_reduction_per_period = 3 - gProgram_state.skill_level;
@@ -2630,7 +2567,7 @@ void InitOpponents(tRace_info* pRace_info) {
     gDefinite_no_cop_pursuit_speed = 17.8788f;
     gDefinite_cop_pursuit_speed = 44.697f;
     gCop_pursuit_speed_percentage_multiplier = 100.f / (gDefinite_cop_pursuit_speed - gDefinite_no_cop_pursuit_speed);
-    gHead_on_cos_value = cosf(.5235668f);
+    gHead_on_cos_value = cos(.5235668f);
     gAcme_frame_count = 0;
     gProgram_state.current_car.no_of_processes_recording_my_trail = 0;
     rank_dependent_difficulty = (101.f - (gCurrent_race.suggested_rank < 10 ? .5f : gCurrent_race.suggested_rank)) / 10.0f;
@@ -2755,7 +2692,6 @@ void InitOpponents(tRace_info* pRace_info) {
 // FUNCTION: CARM95 0x0040b186
 void DisposeOpponents(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
         DisposeCar(gProgram_state.AI_vehicles.cops[i].car_spec, (i == gBIG_APC_index) ? 4 : 3);
@@ -2767,7 +2703,6 @@ void DisposeOpponents(void) {
 // FUNCTION: CARM95 0x0040b20f
 void WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_was) {
     int i;
-    LOG_TRACE("(%d)", pWhat_the_countdown_was);
 
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
         UnStunTheBugger(&gProgram_state.AI_vehicles.opponents[i]);
@@ -2793,7 +2728,6 @@ void WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_w
 // FUNCTION: CARM95 0x0040b3a5
 void ReportMurderToPoliceDepartment(tCar_spec* pCar_spec) {
     int i;
-    LOG_TRACE("(%p)", pCar_spec);
 
     if (pCar_spec == &gProgram_state.current_car) {
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
@@ -2805,7 +2739,6 @@ void ReportMurderToPoliceDepartment(tCar_spec* pCar_spec) {
 // IDA: int __usercall GetCarCount@<EAX>(tVehicle_type pCategory@<EAX>)
 // FUNCTION: CARM95 0x0040b412
 int GetCarCount(tVehicle_type pCategory) {
-    LOG_TRACE("(%d)", pCategory);
 
     switch (pCategory) {
     case eVehicle_self:
@@ -2838,7 +2771,6 @@ int GetCarCount(tVehicle_type pCategory) {
 // IDA: tCar_spec* __usercall GetCarSpec@<EAX>(tVehicle_type pCategory@<EAX>, int pIndex@<EDX>)
 // FUNCTION: CARM95 0x0040b4b1
 tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
-    LOG_TRACE("(%d, %d)", pCategory, pIndex);
 
     switch (pCategory) {
 
@@ -2873,7 +2805,6 @@ tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
 // IDA: char* __usercall GetDriverName@<EAX>(tVehicle_type pCategory@<EAX>, int pIndex@<EDX>)
 // FUNCTION: CARM95 0x0040b592
 char* GetDriverName(tVehicle_type pCategory, int pIndex) {
-    LOG_TRACE("(%d, %d)", pCategory, pIndex);
 
     switch (pCategory) {
     case eVehicle_self:
@@ -2894,7 +2825,6 @@ char* GetDriverName(tVehicle_type pCategory, int pIndex) {
 // FUNCTION: CARM95 0x0040b639
 tOpponent_spec* GetOpponentSpecFromCarSpec(tCar_spec* pCar_spec) {
     int i;
-    LOG_TRACE("(%p)", pCar_spec);
 
     if ((pCar_spec->car_ID & 0xff00) == 0x200) {
         for (i = 0; i < GetCarCount(eVehicle_opponent); i++) {
@@ -2916,7 +2846,6 @@ tOpponent_spec* GetOpponentSpecFromCarSpec(tCar_spec* pCar_spec) {
 // FUNCTION: CARM95 0x0040b74d
 tCar_spec* GetCarSpecFromGlobalOppoIndex(int pIndex) {
     int i;
-    LOG_TRACE("(%d)", pIndex);
 
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
         if (gProgram_state.AI_vehicles.opponents[i].index == pIndex) {
@@ -2929,7 +2858,6 @@ tCar_spec* GetCarSpecFromGlobalOppoIndex(int pIndex) {
 // IDA: int __usercall GetOpponentsRealSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, int pSection_no@<EDX>)
 // FUNCTION: CARM95 0x0040b7b7
 int GetOpponentsRealSection(tOpponent_spec* pOpponent_spec, int pSection_no) {
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pSection_no);
 
     if (pSection_no >= 20000) {
         return pOpponent_spec->next_sections[pSection_no - 20000].section_no;
@@ -2943,7 +2871,6 @@ int GetOpponentsRealSection(tOpponent_spec* pOpponent_spec, int pSection_no) {
 // IDA: int __usercall GetOpponentsFirstSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x0040b806
 int GetOpponentsFirstSection(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     if (pOpponent_spec->current_objective != eOOT_pursue_and_twat) {
         return 20000;
@@ -2960,7 +2887,6 @@ int GetOpponentsFirstSection(tOpponent_spec* pOpponent_spec) {
 // IDA: int __usercall GetOpponentsNextSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pCurrent_section@<EDX>)
 // FUNCTION: CARM95 0x0040b86e
 int GetOpponentsNextSection(tOpponent_spec* pOpponent_spec, tS16 pCurrent_section) {
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pCurrent_section);
 
     if (pCurrent_section < 20000) {
         if (pCurrent_section < 15000) {
@@ -2980,7 +2906,6 @@ int GetOpponentsNextSection(tOpponent_spec* pOpponent_spec, tS16 pCurrent_sectio
 tS16 GetOpponentsSectionStartNode(tOpponent_spec* pOpponent_spec, tS16 pSection) {
     tS16 section_no;
     int node_index_index;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pSection);
 
     if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
         node_index_index = pOpponent_spec->next_sections[pSection - 20000].direction == 0;
@@ -3002,7 +2927,6 @@ tS16 GetOpponentsSectionStartNode(tOpponent_spec* pOpponent_spec, tS16 pSection)
 tS16 GetOpponentsSectionFinishNode(tOpponent_spec* pOpponent_spec, tS16 pSection) {
     tS16 section_no;
     int node_index_index;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pSection);
 
     if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
         return gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pSection - 20000].section_no].node_indices[pOpponent_spec->next_sections[pSection - 20000].direction];
@@ -3019,7 +2943,6 @@ br_vector3* GetOpponentsSectionStartNodePoint(tOpponent_spec* pOpponent_spec, tS
     tS16 section_no;
     tS16 node_no;
     int node_index_index;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pSection);
 
     if (pSection >= 20000 && pOpponent_spec->nnext_sections > pSection - 20000) {
         section_no = pOpponent_spec->next_sections[pSection - 20000].section_no;
@@ -3045,7 +2968,6 @@ br_vector3* GetOpponentsSectionFinishNodePoint(tOpponent_spec* pOpponent_spec, t
     tS16 section_no;
     tS16 node_no;
     int node_index_index;
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pSection);
 
     if (pSection >= 20000 && pOpponent_spec->nnext_sections > pSection - 20000) {
         section_no = pOpponent_spec->next_sections[pSection - 20000].section_no;
@@ -3067,7 +2989,6 @@ br_vector3* GetOpponentsSectionFinishNodePoint(tOpponent_spec* pOpponent_spec, t
 // IDA: br_scalar __usercall GetOpponentsSectionWidth@<ST0>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>)
 // FUNCTION: CARM95 0x0040bccd
 br_scalar GetOpponentsSectionWidth(tOpponent_spec* pOpponent_spec, tS16 pSection) {
-    LOG_TRACE("(%p, %d)", pOpponent_spec, pSection);
 
     if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
         return gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pSection - 20000].section_no].width;
@@ -3086,7 +3007,6 @@ br_scalar GetOpponentsSectionWidth(tOpponent_spec* pOpponent_spec, tS16 pSection
 int GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish) {
     tS16 section_no;
     int direction;
-    LOG_TRACE("(%p, %d, %d)", pOpponent_spec, pSection, pTowards_finish);
 
     if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
         section_no = pOpponent_spec->next_sections[pSection - 20000].section_no;
@@ -3109,7 +3029,6 @@ int GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, i
 int GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, int pTowards_finish) {
     tS16 section_no;
     int direction;
-    LOG_TRACE("(%p, %d, %d)", pOpponent_spec, pSection, pTowards_finish);
 
     if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
         section_no = pOpponent_spec->next_sections[pSection - 20000].section_no;
@@ -3136,7 +3055,6 @@ void InitOpponentPsyche(int pOpponent_index) {
 // IDA: void __usercall ClearTwattageOccurrenceVariables(tOpponent_spec *pOpponent_spec@<EAX>)
 // FUNCTION: CARM95 0x0040bf8d
 void ClearTwattageOccurrenceVariables(tOpponent_spec* pOpponent_spec) {
-    LOG_TRACE("(%p)", pOpponent_spec);
 
     pOpponent_spec->car_spec->big_bang = 0;
     pOpponent_spec->car_spec->scary_bang = 0;
@@ -3148,7 +3066,6 @@ void ClearTwattageOccurrenceVariables(tOpponent_spec* pOpponent_spec) {
 // IDA: void __usercall TwoCarsHitEachOther(tCar_spec *pA_car@<EAX>, tCar_spec *pAnother_car@<EDX>)
 // FUNCTION: CARM95 0x0040bfdf
 void TwoCarsHitEachOther(tCar_spec* pA_car, tCar_spec* pAnother_car) {
-    LOG_TRACE("(%p, %p)", pA_car, pAnother_car);
 
     if (pA_car->driver == eDriver_local_human) {
         pAnother_car->last_time_we_touched_a_player = gTime_stamp_for_this_munging;
@@ -3170,13 +3087,12 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
     char str[256];
     tOpponent_spec* twattee_opponent_spec;
     tOpponent_spec* twatter_opponent_spec;
-    LOG_TRACE("(%p, %p)", pTwatter, pTwattee);
 
     if (pTwatter->driver != eDriver_oppo && pTwattee->driver != eDriver_oppo) {
         return;
     }
     damage = pTwattee->damage_magnitude_accumulator;
-    bangness = MIN(sqrtf(damage * 300000.0f), 100);
+    bangness = MIN(sqrt(damage * 300000.0f), 100);
     grudginess_caused_by_damage = bangness / 10 + 50 * CAR_SPEC_IS_ROZZER(pTwattee);
     dr_dprintf("Frame %0.6d: %s hit %s, damage %f, bangness %d, gBig_bang %d, grudginess %d",
         gAcme_frame_count,
@@ -3252,7 +3168,6 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
 // IDA: void __cdecl ToggleOpponentTest()
 // FUNCTION: CARM95 0x0040c537
 void ToggleOpponentTest(void) {
-    LOG_TRACE("()");
 
     gTest_toggle = !gTest_toggle;
 }
@@ -3261,7 +3176,6 @@ void ToggleOpponentTest(void) {
 // FUNCTION: CARM95 0x0040c568
 void ToggleOpponentProcessing(void) {
     int i;
-    LOG_TRACE("()");
 
     gProcessing_opponents = !gProcessing_opponents;
     if (gProcessing_opponents) {
@@ -3289,7 +3203,6 @@ void ToggleOpponentProcessing(void) {
 // FUNCTION: CARM95 0x0040c6dd
 void ToggleMellowOpponents(void) {
     int i;
-    LOG_TRACE("()");
 
     gMellow_opponents = !gMellow_opponents;
     if (gMellow_opponents) {
@@ -3306,7 +3219,6 @@ void ToggleMellowOpponents(void) {
 // FUNCTION: CARM95 0x0040c795
 void RepairOpponentsSystems(void) {
     int i;
-    LOG_TRACE("()");
 
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
         if (!gProgram_state.AI_vehicles.opponents[i].pursue_from_start) {
@@ -3322,7 +3234,6 @@ void RepairOpponentsSystems(void) {
 //  Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x0040e205
 void CopyVertex__opponent(br_vertex* pDest_vertex, br_vertex* pSrc_vertex) {
-    LOG_TRACE("(%p, %p)", pDest_vertex, pSrc_vertex);
 
     BrVector3Copy(&pDest_vertex->p, &pSrc_vertex->p);
     pDest_vertex->map.v[0] = pSrc_vertex->map.v[0];
@@ -3337,7 +3248,6 @@ void CopyVertex__opponent(br_vertex* pDest_vertex, br_vertex* pSrc_vertex) {
 //  Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x0040e27a
 void CopyFace__opponent(br_face* pDest_face, br_face* pSrc_face) {
-    LOG_TRACE("(%p, %p)", pDest_face, pSrc_face);
 
     pDest_face->vertices[0] = pSrc_face->vertices[0];
     pDest_face->vertices[1] = pSrc_face->vertices[1];
@@ -3355,7 +3265,6 @@ void DeleteSection(tS16 pSection_to_delete) {
     tS16 node_no;
     tS16 node_no_index;
     tS16 found_it;
-    LOG_TRACE("(%d)", pSection_to_delete);
 
     for (node_no = 0; node_no < 2; node_no++) {
         node_no_index = gProgram_state.AI_vehicles.path_sections[pSection_to_delete].node_indices[node_no];
@@ -3394,7 +3303,6 @@ void DeleteNode(tS16 pNode_to_delete, int pAnd_sections) {
     tS16 section_no;
     tS16 section1;
     tS16 section2;
-    LOG_TRACE("(%d, %d)", pNode_to_delete, pAnd_sections);
 
     dr_dprintf("Node to be deleted #%d", pNode_to_delete);
     if (pAnd_sections) {
@@ -3448,7 +3356,6 @@ void DeleteNode(tS16 pNode_to_delete, int pAnd_sections) {
 // FUNCTION: CARM95 0x0040ca84
 void DeleteOrphanNodes(void) {
     tS16 node_no;
-    LOG_TRACE("()");
 
     for (node_no = 0; node_no < gProgram_state.AI_vehicles.number_of_path_nodes; node_no++) {
         while (node_no < gProgram_state.AI_vehicles.number_of_path_nodes && gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections == 0) {
@@ -3465,7 +3372,6 @@ void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_v
     tS16 node1;
     tS16 node2;
     tS16 node3;
-    LOG_TRACE("(%d, %d, %p)", pInserted_node, pSection_no, pWhere);
 
     section_no_index = gProgram_state.AI_vehicles.path_sections[pSection_no].node_indices[1];
     new_section = ReallocExtraPathSections(1);
@@ -3500,7 +3406,6 @@ void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_v
 // IDA: void __cdecl TrackElasticateyPath()
 // FUNCTION: CARM95 0x0040ce66
 void TrackElasticateyPath(void) {
-    LOG_TRACE("()");
 
     if (gAlready_elasticating && gNext_elastication < gTime_stamp_for_this_munging) {
         gNext_elastication = gTime_stamp_for_this_munging + 2000;
@@ -3526,7 +3431,6 @@ void RecalcNearestPathSectionSpeed(int pMax_not_min, int pAdjustment) {
     char str[128];
     int new_speed;
     int nearest_end;
-    LOG_TRACE("(%d, %d)", pMax_not_min, pAdjustment);
 
     if (gOppo_paths_shown) {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
@@ -3582,7 +3486,6 @@ void RecalcNearestPathSectionWidth(br_scalar pAdjustment) {
     br_vector3 intersect;
     br_scalar distance;
     char str[128];
-    LOG_TRACE("(%f)", pAdjustment);
 
     if (gOppo_paths_shown) {
         if (!gAlready_elasticating) {
@@ -3609,7 +3512,6 @@ void RecalcNearestPathSectionWidth(br_scalar pAdjustment) {
 void CalcNegativeXVector(br_vector3* pNegative_x_vector, br_vector3* pStart, br_vector3* pFinish, br_scalar pLength) {
     br_vector3 positive_y_vector;
     br_vector3 path_vector;
-    LOG_TRACE("(%p, %p, %p, %f)", pNegative_x_vector, pStart, pFinish, pLength);
 
     positive_y_vector.v[0] = pFinish->v[0] - pStart->v[0];
     positive_y_vector.v[1] = pFinish->v[1] - pStart->v[1];
@@ -3625,7 +3527,6 @@ void CalcNegativeXVector(br_vector3* pNegative_x_vector, br_vector3* pStart, br_
 // IDA: void __usercall MakeVertexAndOffsetIt(br_model *pModel@<EAX>, int pVertex_num@<EDX>, br_scalar pX, br_scalar pY, br_scalar pZ, br_vector3 *pOffset)
 // FUNCTION: CARM95 0x0040d9d3
 void MakeVertexAndOffsetIt(br_model* pModel, int pVertex_num, br_scalar pX, br_scalar pY, br_scalar pZ, br_vector3* pOffset) {
-    LOG_TRACE("(%p, %d, %f, %f, %f, %p)", pModel, pVertex_num, pX, pY, pZ, pOffset);
 
     BrVector3Set(&pModel->vertices[pVertex_num].p, pX, pY, pZ);
     BrVector3Accumulate(&pModel->vertices[pVertex_num].p, pOffset);
@@ -3634,7 +3535,6 @@ void MakeVertexAndOffsetIt(br_model* pModel, int pVertex_num, br_scalar pX, br_s
 // IDA: void __usercall MakeFaceAndTextureIt(br_model *pModel@<EAX>, int pFace_num@<EDX>, int pV0@<EBX>, int pV1@<ECX>, int pV2, br_material *pMaterial)
 // FUNCTION: CARM95 0x0040da85
 void MakeFaceAndTextureIt(br_model* pModel, int pFace_num, int pV0, int pV1, int pV2, br_material* pMaterial) {
-    LOG_TRACE("(%p, %d, %d, %d, %d, %p)", pModel, pFace_num, pV0, pV1, pV2, pMaterial);
 
     pModel->faces[pFace_num].vertices[0] = pV0;
     pModel->faces[pFace_num].vertices[1] = pV1;
@@ -3654,7 +3554,6 @@ void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* p
     br_material* the_material_finish_lt;
     br_material* the_material_finish_dk;
     br_scalar height;
-    LOG_TRACE("(%d, %d, %p, %p, %f, %p, %p, %p, %p, %p, %p)", pFirst_vertex, pFirst_face, pStart, pFinish, pWidth, pMaterial_centre_lt, pMaterial_centre_dk, pMaterial_edges_start_lt, pMaterial_edges_start_dk, pMaterial_edges_finish_lt, pMaterial_edges_finish_dk);
 
     CalcNegativeXVector(&offset_v, pStart, pFinish, pWidth);
     for (i = 0; i < 3; i++) {
@@ -3696,7 +3595,6 @@ void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* p
 void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoint, br_material* pMaterial_1, br_material* pMaterial_2, br_material* pMaterial_3) {
     br_vector3 offset_v;
     br_vector3 point;
-    LOG_TRACE("(%d, %d, %p, %p, %p, %p)", pFirst_vertex, pFirst_face, pPoint, pMaterial_1, pMaterial_2, pMaterial_3);
 
     BrVector3Set(&point, pPoint->v[0], pPoint->v[1] + .15f, pPoint->v[2]);
 
@@ -3734,7 +3632,6 @@ void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoi
 // IDA: void __usercall CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16 *pFace_index_ptr@<EAX>, br_uint_16 *pVertex_index_ptr@<EDX>)
 // FUNCTION: CARM95 0x0040e016
 void CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16* pFace_index_ptr, br_uint_16* pVertex_index_ptr) {
-    LOG_TRACE("(%p, %p)", pFace_index_ptr, pVertex_index_ptr);
 
     *pFace_index_ptr = gProgram_state.AI_vehicles.number_of_path_sections * 12 + gProgram_state.AI_vehicles.number_of_cops * 12;
     *pVertex_index_ptr = gProgram_state.AI_vehicles.number_of_path_sections * 18 + gProgram_state.AI_vehicles.number_of_cops * 8;
@@ -3746,7 +3643,6 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
     br_vertex* new_vertices;
     br_face* new_faces;
     int i;
-    LOG_TRACE("(%p, %d, %d)", pModel, pNum_faces, pNum_vertices);
 
     new_vertices = BrResAllocate(pModel, pNum_vertices * sizeof(br_vertex), BR_MEMORY_VERTICES);
     memset(new_vertices, 0, pNum_vertices * sizeof(br_vertex));
@@ -3777,7 +3673,6 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
 // FUNCTION: CARM95 0x0040e3cf
 br_material* CreateSimpleMaterial(int pColour_index) {
     br_material* return_me;
-    LOG_TRACE("(%d)", pColour_index);
 
     return_me = BrMaterialAllocate(NULL);
     return_me->index_base = pColour_index;
@@ -3793,7 +3688,6 @@ br_material* CreateSimpleMaterial(int pColour_index) {
 // IDA: void __cdecl AllocateMatsForOppoPathModel()
 // FUNCTION: CARM95 0x0040e2d3
 void AllocateMatsForOppoPathModel(void) {
-    LOG_TRACE("()");
 
     gMat_dk_yel = CreateSimpleMaterial(50);
     gMat_md_yel = CreateSimpleMaterial(51);
@@ -3832,7 +3726,6 @@ void RebuildOppoPathModel(void) {
     br_material* edge_mat_start_dk;
     br_material* edge_mat_finish_lt;
     br_material* edge_mat_finish_dk;
-    LOG_TRACE("()");
 
     if (gProgram_state.AI_vehicles.number_of_path_nodes < 2) {
         if (gOppo_path_model != NULL) {
@@ -3932,7 +3825,6 @@ int ConsistencyCheck(void) {
     int failed;
     tU8* nodes_referenced_by_sections_array = NULL;
     tU8* sections_referenced_by_nodes_array = NULL;
-    LOG_TRACE("()");
 
     failed = 0;
     if (gProgram_state.AI_vehicles.number_of_path_nodes != 0) {
@@ -4066,7 +3958,6 @@ int ConsistencyCheck(void) {
 // FUNCTION: CARM95 0x0040ed8e
 void ShowOppoPaths(void) {
     char str[256];
-    LOG_TRACE("()");
 
     if (!gOppo_paths_shown) {
         if (gOppo_path_actor != NULL) {
@@ -4095,7 +3986,6 @@ void WriteOutOppoPaths(void) {
     char str[13];
     FILE* f;
     int i;
-    LOG_TRACE("()");
 
     if (!gMade_path_filename) {
         for (i = 0; 1; i++) {
@@ -4168,7 +4058,6 @@ void WriteOutOppoPaths(void) {
 // FUNCTION: CARM95 0x0040f42b
 int NewNodeOKHere(void) {
     br_vector3 last_node_to_this;
-    LOG_TRACE("()");
 
     if (gAlready_elasticating) {
         BrVector3Sub(&last_node_to_this,
@@ -4182,7 +4071,6 @@ int NewNodeOKHere(void) {
 // IDA: void __cdecl ShowHideOppoPaths()
 // FUNCTION: CARM95 0x0040ed4b
 void ShowHideOppoPaths(void) {
-    LOG_TRACE("()");
 
     if (!gAlready_elasticating) {
         gOppo_paths_shown = !gOppo_paths_shown;
@@ -4202,7 +4090,6 @@ void DropElasticateyNode(void) {
     int one_wayness;
     tPath_section_type_enum section_type;
     tPath_section_type_enum original_type;
-    LOG_TRACE("()");
 
     all_the_same_type = 1;
     if (!NewNodeOKHere()) {
@@ -4284,7 +4171,6 @@ void InsertAndElasticate(void) {
     int one_wayness;
     char str[256];
     tPath_section_type_enum section_type;
-    LOG_TRACE("()");
 
     not_perp = 0;
     if (NewNodeOKHere()) {
@@ -4355,7 +4241,6 @@ void InsertAndDontElasticate(void) {
     br_scalar distance;
     int not_perp;
     char str[256];
-    LOG_TRACE("()");
 
     not_perp = 0;
     if (NewNodeOKHere()) {
@@ -4390,7 +4275,6 @@ void InsertAndDontElasticate(void) {
 // FUNCTION: CARM95 0x004100f3
 void DropDeadEndNode(void) {
     char str[256];
-    LOG_TRACE("()");
 
     if (NewNodeOKHere() && gAlready_elasticating) {
         gAlready_elasticating = 0;
@@ -4411,7 +4295,6 @@ void DropNodeOnNodeAndStopElasticating(void) {
     int node_no;
     char str[256];
     br_scalar distance;
-    LOG_TRACE("()");
 
     if (gAlready_elasticating) {
         node_no = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
@@ -4438,7 +4321,6 @@ void DropNodeOnNodeAndStopElasticating(void) {
 // IDA: void __cdecl WidenOppoPathSection()
 // FUNCTION: CARM95 0x004103c5
 void WidenOppoPathSection(void) {
-    LOG_TRACE("()");
 
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionWidth(.05f);
@@ -4448,7 +4330,6 @@ void WidenOppoPathSection(void) {
 // IDA: void __cdecl NarrowOppoPathSection()
 // FUNCTION: CARM95 0x00410573
 void NarrowOppoPathSection(void) {
-    LOG_TRACE("()");
 
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionWidth(-.05f);
@@ -4458,7 +4339,6 @@ void NarrowOppoPathSection(void) {
 // IDA: void __cdecl IncreaseSectionMinSpeed()
 // FUNCTION: CARM95 0x0041059d
 void IncreaseSectionMinSpeed(void) {
-    LOG_TRACE("()");
 
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionSpeed(0, 1);
@@ -4468,7 +4348,6 @@ void IncreaseSectionMinSpeed(void) {
 // IDA: void __cdecl DecreaseSectionMinSpeed()
 // FUNCTION: CARM95 0x00410a7f
 void DecreaseSectionMinSpeed(void) {
-    LOG_TRACE("()");
 
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionSpeed(0, -1);
@@ -4478,7 +4357,6 @@ void DecreaseSectionMinSpeed(void) {
 // IDA: void __cdecl IncreaseSectionMaxSpeed()
 // FUNCTION: CARM95 0x00410aa8
 void IncreaseSectionMaxSpeed(void) {
-    LOG_TRACE("()");
 
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionSpeed(1, 1);
@@ -4488,7 +4366,6 @@ void IncreaseSectionMaxSpeed(void) {
 // IDA: void __cdecl DecreaseSectionMaxSpeed()
 // FUNCTION: CARM95 0x00410ad1
 void DecreaseSectionMaxSpeed(void) {
-    LOG_TRACE("()");
 
     if (gOppo_paths_shown) {
         RecalcNearestPathSectionSpeed(1, -1);
@@ -4500,7 +4377,6 @@ void DecreaseSectionMaxSpeed(void) {
 void PullOppoPoint(void) {
     tS16 node_no;
     br_scalar distance;
-    LOG_TRACE("()");
 
     if (gOppo_paths_shown) {
         if (gAlready_elasticating) {
@@ -4524,7 +4400,6 @@ void ShowNodeInfo(void) {
     tS16 node_no;
     char str[256];
     br_scalar distance;
-    LOG_TRACE("()");
 
     if (!gOppo_paths_shown) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
@@ -4553,7 +4428,6 @@ void ShowSectionInfo1(void) {
     br_scalar distance;
     br_vector3 direction_v;
     br_vector3 intersect;
-    LOG_TRACE("()");
 
     if (!gOppo_paths_shown) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
@@ -4585,7 +4459,6 @@ void ShowSectionInfo2(void) {
     br_scalar distance;
     br_vector3 direction_v;
     br_vector3 intersect;
-    LOG_TRACE("()");
 
     if (!gOppo_paths_shown) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
@@ -4618,7 +4491,6 @@ void DeleteOppoPathSection(void) {
     br_vector3 intersect;
     br_vector3 direction_v;
     tS16 section_no;
-    LOG_TRACE("()");
 
     if (gOppo_paths_shown == 0) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
@@ -4642,7 +4514,6 @@ void DeleteOppoPathSection(void) {
 void DeleteOppoPathNodeAndSections(void) {
     br_scalar distance;
     tS16 node_no;
-    LOG_TRACE("()");
 
     if (!gOppo_paths_shown) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
@@ -4666,7 +4537,6 @@ void DeleteOppoPathNodeAndSections(void) {
 void DeleteOppoPathNodeAndJoin(void) {
     br_scalar distance;
     tS16 node_no;
-    LOG_TRACE("()");
 
     if (!gOppo_paths_shown) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
@@ -4704,7 +4574,6 @@ void ReverseSectionDirection(void) {
     br_vector3 intersect;
     br_vector3 direction_v;
     tS16 section_no;
-    LOG_TRACE("()");
 
     if (!gOppo_paths_shown) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
@@ -4740,7 +4609,6 @@ void CycleSectionType(void) {
     br_vector3 direction_v;
     tS16 section_no;
     char str[256];
-    LOG_TRACE("()");
 
     if (!gOppo_paths_shown) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
@@ -4766,7 +4634,6 @@ void ToggleOneWayNess(void) {
     br_vector3 intersect;
     br_vector3 direction_v;
     tS16 section_no;
-    LOG_TRACE("()");
 
     if (!gOppo_paths_shown) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
@@ -4801,7 +4668,6 @@ void CopStartPointInfo(void) {
     br_scalar closest_distance;
     br_scalar distance;
     br_vector3 car_to_point;
-    LOG_TRACE("()");
 
     closest = -1;
     closest_distance = FLT_MAX;
@@ -4829,7 +4695,6 @@ void CopStartPointInfo(void) {
 // FUNCTION: CARM95 0x00411ae8
 void DropCopStartPoint(void) {
     char str[256];
-    LOG_TRACE("()");
 
     if (!gOppo_paths_shown) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
@@ -4858,7 +4723,6 @@ void DeleteCopStartPoint(void) {
     br_scalar closest_distance;
     br_scalar distance;
     br_vector3 car_to_point;
-    LOG_TRACE("()");
 
     closest = -1;
     closest_distance = FLT_MAX;
@@ -4893,5 +4757,4 @@ void DeleteCopStartPoint(void) {
 // IDA: void __cdecl CycleCopStartPointType()
 // FUNCTION: CARM95 0x00411e7f
 void CycleCopStartPointType(void) {
-    LOG_TRACE("()");
 }

@@ -57,7 +57,7 @@ tAudioBackend_error_code AudioBackend_Init(void) {
         printf("Failed to initialize audio engine.");
         return eAB_error;
     }
-    LOG_INFO("Playback device: '%s'", engine.pDevice->playback.name);
+    LOG_INFO2("Playback device: '%s'", engine.pDevice->playback.name);
     ma_engine_set_volume(&engine, harness_game_config.volume_multiplier);
 
     return eAB_success;

@@ -52,7 +52,6 @@ int ReadCrushData(FILE* pF, tCrush_data* pCrush_data) {
     int k;
     tCrush_point_spec* the_spec;
     tCrush_neighbour* the_neighbour;
-    LOG_TRACE("(%p, %p)", pF, pCrush_data);
 
     pCrush_data->softness_factor = GetAFloat(pF);
     GetPairOfFloats(pF, &pCrush_data->min_fold_factor, &pCrush_data->max_fold_factor);
@@ -89,7 +88,6 @@ float SkipCrushData(FILE* pF) {
     int count_2;
     char s[256];
     float softness;
-    LOG_TRACE("(%p)", pF);
 
     softness = GetAFloat(pF);
     for (i = 0; i < 5; ++i) {
@@ -116,7 +114,6 @@ int WriteCrushData(FILE* pF, tCrush_data* pCrush_data) {
     int k;
     tCrush_point_spec* the_spec;
     tCrush_neighbour* the_neighbour;
-    LOG_TRACE("(%p, %p)", pF, pCrush_data);
 
     fprintf(pF, "%f\n\r", pCrush_data->softness_factor);
     fprintf(pF, "%f,%f\n\r", pCrush_data->min_fold_factor, pCrush_data->max_fold_factor);
@@ -144,7 +141,6 @@ int WriteCrushData(FILE* pF, tCrush_data* pCrush_data) {
 // FUNCTION: CARM95 0x004bd0f7
 void DisposeCrushData(tCrush_data* pCrush_data) {
     int i;
-    LOG_TRACE("(%p)", pCrush_data);
 
     for (i = 0; i < pCrush_data->number_of_crush_points; i++) {
         if (pCrush_data->crush_points[i].neighbours != NULL) {
@@ -183,7 +179,9 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
     float working_split_chance;
     tChanged_vertex pipe_array[600];
     tCar_spec* car;
-    LOG_TRACE("(%p, %d, %p, %d, %p, %f, %p)", pCar, pModel_index, pModel, pCrush_point_index, pEnergy_vector, total_energy, pCrush_data);
+
+    float v12;
+    int axis_tmp;
 
     pipe_vertex_count = 0;
     if (gNet_mode == eNet_mode_host && pCar->car_model_actors[pModel_index].min_distance_squared == 0.0f) {
@@ -247,7 +245,7 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
             old_vector = *target_point;
             for (bend_axis = 0; bend_axis < 3; bend_axis++) {
                 target_point->v[bend_axis] += (1.0f - the_neighbour->factor / 256.0f) * movement.v[bend_axis];
-                float v12;
+                
                 if (the_neighbour->factor <= 128) {
                     v12 = the_neighbour->factor / 128.0f;
                 } else {
@@ -258,7 +256,7 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
                 } else {
                     bend_amount = default_bend_factor[bend_axis];
                 }
-                int axis_tmp = (((int)((target_point->v[2] + target_point->v[1] + target_point->v[0]) * 100.0f) + bend_axis - 1) & 1) % 3;
+                axis_tmp = (((int)((target_point->v[2] + target_point->v[1] + target_point->v[0]) * 100.0f) + bend_axis - 1) & 1) % 3;
                 target_point->v[axis_tmp] += fabs(movement.v[bend_axis]) * bend_amount;
             }
             if (IsActionReplayAvailable() && pipe_vertex_count < 600) {
@@ -289,7 +287,6 @@ void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3*
     br_vertex* vertices;
     br_vertex* the_vertex;
     br_matrix34 inverse_transform;
-    LOG_TRACE("(%p, %d, %p, %p, %p, %p)", pCar, pModel_index, pActor, pImpact_point, pEnergy_vector, pCrush_data);
 
     if (gArrow_mode) {
         return;
@@ -324,7 +321,6 @@ void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3*
 // IDA: void __cdecl JitModelUpdate(br_actor *actor, br_model *model, br_material *material, void *render_data, br_uint_8 style, int on_screen)
 // FUNCTION: CARM95 0x004bdad9
 void JitModelUpdate(br_actor* actor, br_model* model, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
-    LOG_TRACE("(%p, %p, %p, %p, %d, %d)", actor, model, material, render_data, style, on_screen);
 
     BrModelUpdate(model, BR_MODU_VERTEX_POSITIONS);
     model->flags &= ~(BR_MODF_CUSTOM);
@@ -334,7 +330,6 @@ void JitModelUpdate(br_actor* actor, br_model* model, br_material* material, voi
 // IDA: void __usercall SetModelForUpdate(br_model *pModel@<EAX>, tCar_spec *pCar@<EDX>, int crush_only@<EBX>)
 // FUNCTION: CARM95 0x004bdb2f
 void SetModelForUpdate(br_model* pModel, tCar_spec* pCar, int crush_only) {
-    LOG_TRACE("(%p, %p, %d)", pModel, pCar, crush_only);
 
     if (crush_only && pCar != NULL && pCar->car_model_actors[pCar->principal_car_actor].actor->model == pModel) {
         CrushBoundingBox(pCar, crush_only);
@@ -356,7 +351,6 @@ void TotallySpamTheModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, tC
     int the_index;
     br_vertex* the_vertex;
     br_vertex* vertices;
-    LOG_TRACE("(%p, %d, %p, %p, %f)", pCar, pModel_index, pActor, pCrush_data, pMagnitude);
 
     if (gArrow_mode || pCrush_data->number_of_crush_points == 0) {
         return;
@@ -383,7 +377,6 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
     br_scalar amount;
     br_scalar deviation;
     tChanged_vertex pipe_array[600];
-    LOG_TRACE("(%p, %d, %p, %p, %f, %p)", pCar, pModel_index, pActor, pUndamaged_vertices, pAmount, pTotal_deflection);
 
     pipe_vertex_count = 0;
     amount = 0.0f;
@@ -393,7 +386,7 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
         model_vertex = &pActor->model->vertices[i];
         old_point = model_vertex->p;
         for (j = 0; j < 3; ++j) {
-            *pTotal_deflection = fabsf(pUndamaged_vertices->p.v[j] - old_point.v[j]) + *pTotal_deflection;
+            *pTotal_deflection = fabs(pUndamaged_vertices->p.v[j] - old_point.v[j]) + *pTotal_deflection;
             if (pUndamaged_vertices->p.v[j] >= old_point.v[j]) {
                 if (pUndamaged_vertices->p.v[j] > old_point.v[j]) {
                     model_vertex->p.v[j] = model_vertex->p.v[j] + pAmount;
@@ -431,7 +424,6 @@ float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflecti
     tCar_actor* the_car_actor;
     br_scalar amount;
     br_scalar dummy;
-    LOG_TRACE("(%p, %d, %p)", pCar, pFrame_period, pTotal_deflection);
 
     if (gArrow_mode) {
         return 0.0f;
@@ -456,7 +448,6 @@ float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflecti
 // IDA: float __usercall RepairCar@<ST0>(tU16 pCar_ID@<EAX>, tU32 pFrame_period@<EDX>, br_scalar *pTotal_deflection@<EBX>)
 // FUNCTION: CARM95 0x004be159
 float RepairCar(tU16 pCar_ID, tU32 pFrame_period, br_scalar* pTotal_deflection) {
-    LOG_TRACE("(%d, %d, %p)", pCar_ID, pFrame_period, pTotal_deflection);
 
     if (VEHICLE_TYPE_FROM_ID(pCar_ID) == eVehicle_self) {
         return RepairCar2(&gProgram_state.current_car, pFrame_period, pTotal_deflection);
@@ -475,7 +466,6 @@ void TotallyRepairACar(tCar_spec* pCar) {
     tCar_actor* the_car_actor;
     tChanged_vertex pipe_array[600];
     br_bounds storage_bounds;
-    LOG_TRACE("(%p)", pCar);
 
     StopCarSmokingInstantly(pCar);
     if (IsActionReplayAvailable()) {
@@ -521,7 +511,6 @@ void TotallyRepairACar(tCar_spec* pCar) {
 // IDA: void __cdecl TotallyRepairCar()
 // FUNCTION: CARM95 0x004be52a
 void TotallyRepairCar(void) {
-    LOG_TRACE("()");
 
     if (!gArrow_mode) {
         TotallyRepairACar(&gProgram_state.current_car);
@@ -531,7 +520,6 @@ void TotallyRepairCar(void) {
 // IDA: void __cdecl CheckLastCar()
 // FUNCTION: CARM95 0x004be5b5
 void CheckLastCar(void) {
-    LOG_TRACE("()");
 
     if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -4, GetMiscString(kMiscString_EveryOpponentWasted));
@@ -542,7 +530,6 @@ void CheckLastCar(void) {
 // IDA: void __usercall KnackerThisCar(tCar_spec *pCar@<EAX>)
 // FUNCTION: CARM95 0x004be555
 void KnackerThisCar(tCar_spec* pCar) {
-    LOG_TRACE("(%p)", pCar);
 
     pCar->knackered = 1;
     QueueWastedMassage(pCar->index);
@@ -557,7 +544,6 @@ void KnackerThisCar(tCar_spec* pCar) {
 // IDA: void __usercall SetKnackeredFlag(tCar_spec *pCar@<EAX>)
 // FUNCTION: CARM95 0x004be619
 void SetKnackeredFlag(tCar_spec* pCar) {
-    LOG_TRACE("(%p)", pCar);
 
     if (gNet_mode != eNet_mode_client
         && !pCar->knackered
@@ -586,7 +572,6 @@ void SetKnackeredFlag(tCar_spec* pCar) {
 void DamageUnit2(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
     tDamage_unit* the_damage;
     int last_level;
-    LOG_TRACE("(%p, %d, %d)", pCar, pUnit_type, pDamage_amount);
 
     the_damage = &pCar->damage_units[pUnit_type];
     if ((pCar->driver < eDriver_net_human || pUnit_type != eDamage_driver) && pDamage_amount >= 5 && !pCar->invulnerable) {
@@ -612,7 +597,6 @@ void DamageUnit2(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
 // FUNCTION: CARM95 0x004be86b
 void RecordLastDamage(tCar_spec* pCar) {
     int i;
-    LOG_TRACE("(%p)", pCar);
 
     for (i = 0; i < COUNT_OF(pCar->damage_units); i++) {
         pCar->damage_units[i].last_level = pCar->damage_units[i].damage_level;
@@ -630,7 +614,6 @@ void RecordLastDamage(tCar_spec* pCar) {
 // IDA: void __usercall DoDamage(tCar_spec *pCar@<EAX>, tDamage_type pDamage_type@<EDX>, float pMagnitude, float pNastiness)
 // FUNCTION: CARM95 0x004bf3b9
 void DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, float pNastiness) {
-    LOG_TRACE("(%p, %d, %f, %f)", pCar, pDamage_type, pMagnitude, pNastiness);
 
     if (pCar->driver < eDriver_net_human) {
         DamageUnit2(pCar, pDamage_type, ((gCurrent_race.suggested_rank < 10 ? 0.5f : gCurrent_race.suggested_rank) / 20.0f + 1.0f) * (pNastiness * pMagnitude * 10.0f));
@@ -649,7 +632,6 @@ void CheckPiledriverBonus(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3
     br_vector3 norm_child;
     br_vector3 norm_energy;
     br_scalar dp;
-    LOG_TRACE("(%p, %p, %p)", pCar, pImpact_point, pEnergy);
 
     if (pCar->current_car_actor < 0) {
         return;
@@ -675,7 +657,6 @@ void CheckPiledriverBonus(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3
 // IDA: tImpact_location __usercall CalcModifiedLocation@<EAX>(tCar_spec *pCar@<EAX>)
 // FUNCTION: CARM95 0x004c13e0
 tImpact_location CalcModifiedLocation(tCar_spec* pCar) {
-    LOG_TRACE("(%p)", pCar);
 
     if (pCar->last_impact_location != eImpact_left && pCar->last_impact_location != eImpact_right && pCar->last_impact_location != eImpact_top && pCar->last_impact_location != eImpact_bottom) {
         return pCar->last_impact_location;
@@ -695,7 +676,6 @@ tImpact_location CalcModifiedLocation(tCar_spec* pCar) {
 void DoPratcamHit(br_vector3* pHit_vector) {
     int strength_modifier;
     br_scalar strength;
-    LOG_TRACE("(%p)", pHit_vector);
 
     strength = BrVector3LengthSquared(pHit_vector);
     if (strength > 0.2f) {
@@ -707,7 +687,7 @@ void DoPratcamHit(br_vector3* pHit_vector) {
     } else {
         return;
     }
-    if (fabsf(pHit_vector->v[2]) >= fabsf(pHit_vector->v[0])) {
+    if (fabs(pHit_vector->v[2]) >= fabs(pHit_vector->v[0])) {
         if (pHit_vector->v[2] >= 0.f) {
             PratcamEvent(14 + strength_modifier);
         } else {
@@ -750,7 +730,6 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
     tDamage_condition* the_condition;
     tDamage_effect* the_effect;
     tImpact_location modified_location;
-    LOG_TRACE("(%p, %p, %p, %d)", pCar, pImpact_point, pEnergy_vector, pWas_hitting_a_car);
 
 #if defined(DETHRACE_FIX_BUGS)
     proportion_x = 0;
@@ -914,11 +893,10 @@ tImpact_location GetDirection(br_vector3* pVelocity) {
     br_scalar mag_x;
     br_scalar mag_y;
     br_scalar mag_z;
-    LOG_TRACE("(%p)", pVelocity);
 
-    mag_x = fabsf(pVelocity->v[0]);
-    mag_y = fabsf(pVelocity->v[1]);
-    mag_z = fabsf(pVelocity->v[2]);
+    mag_x = fabs(pVelocity->v[0]);
+    mag_y = fabs(pVelocity->v[1]);
+    mag_z = fabs(pVelocity->v[2]);
     if (mag_y >= mag_x || mag_z >= mag_x) {
         if (mag_y <= mag_x || mag_z >= mag_y) {
             if (pVelocity->v[2] >= 0.0f) {
@@ -940,7 +918,6 @@ tImpact_location GetDirection(br_vector3* pVelocity) {
 // FUNCTION: CARM95 0x004bf768
 void SetSmokeLastDamageLevel(tCar_spec* pCar) {
     int i;
-    LOG_TRACE("(%p)", pCar);
 
     for (i = 0; i < COUNT_OF(pCar->damage_units); i++) {
         pCar->damage_units[i].smoke_last_level = pCar->damage_units[i].damage_level;
@@ -956,7 +933,6 @@ void SortOutSmoke(tCar_spec* pCar) {
     int step;
     int pass;
     int repeat;
-    LOG_TRACE("(%p)", pCar);
 
     if (!pCar || pCar->driver <= eDriver_non_car) {
         return;
@@ -981,7 +957,6 @@ void SortOutSmoke(tCar_spec* pCar) {
 // IDA: void __usercall StealCar(tCar_spec *pCar@<EAX>)
 // FUNCTION: CARM95 0x004bf923
 void StealCar(tCar_spec* pCar) {
-    LOG_TRACE("(%p)", pCar);
 
     pCar->has_been_stolen = 1;
     gProgram_state.cars_available[gProgram_state.number_of_cars] = pCar->index;
@@ -1028,7 +1003,6 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
     br_vector3 car_1_offset;
     br_vector3 car_2_offset;
     tNet_message* message;
-    LOG_TRACE("(%p, %p)", pCar1, pCar2);
 
     culprit = 0;
     victim = 0;
@@ -1323,7 +1297,6 @@ void DoWheelDamage(tU32 pFrame_period) {
     br_vector3 temp_vector;
     br_vector3 wonky_vector;
     static int kev_index[4];
-    LOG_TRACE("(%d)", pFrame_period);
 
     if (gAction_replay_mode && ReplayIsPaused()) {
         return;
@@ -1388,7 +1361,7 @@ void DoWheelDamage(tU32 pFrame_period) {
             if (gNet_mode == eNet_mode_none || car->driver == eDriver_local_human) {
                 BrVector3Set(&temp_vector, wheel_circum * gWheel_circ_to_width, 0.f, 0.f);
                 BrMatrix34ApplyV(&wonky_vector, &temp_vector, &car->wheel_actors[j]->t.t.mat);
-                car->wheel_dam_offset[j] = fabsf(wonky_vector.v[1]);
+                car->wheel_dam_offset[j] = fabs(wonky_vector.v[1]);
             }
         }
     }
@@ -1397,7 +1370,6 @@ void DoWheelDamage(tU32 pFrame_period) {
 // IDA: void __usercall CrashEarnings(tCar_spec *pCar1@<EAX>, tCar_spec *pCar2@<EDX>)
 // FUNCTION: CARM95 0x004bfd78
 void CrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
-    LOG_TRACE("(%p, %p)", pCar1, pCar2);
 
     if (DoCrashEarnings(pCar1, pCar2)) {
         SortOutSmoke(pCar1);

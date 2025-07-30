@@ -37,7 +37,7 @@
 #define Vector3DistanceSquared(V1, V2) \
     ((((V1)->v[0] - (V2)->v[0])) * (((V1)->v[0] - (V2)->v[0])) + (((V1)->v[1] - (V2)->v[1])) * (((V1)->v[1] - (V2)->v[1])) + (((V1)->v[2] - (V2)->v[2])) * (((V1)->v[2] - (V2)->v[2])))
 
-#define Vector3Distance(V1, V2) sqrtf(Vector3DistanceSquared((V1), (V2)))
+#define Vector3Distance(V1, V2) sqrt(Vector3DistanceSquared((V1), (V2)))
 #define Vector3AreEqual(V1, V2) \
     ((V1)->v[0] == (V2)->v[0] && (V1)->v[1] == (V2)->v[1] && (V1)->v[2] == (V2)->v[2])
 #define Vector3EqualElements(V, A, B, C) \

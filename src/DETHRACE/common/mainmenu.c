@@ -42,7 +42,6 @@ char* gPixels_copy__mainmenu; // suffix added to avoid duplicate symbol
 // IDA: int __usercall MainMenuDone1@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 // FUNCTION: CARM95 0x0044ae90
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
-    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         if (pCurrent_mode == 0) {
@@ -86,7 +85,6 @@ int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // IDA: int __usercall MainMenuDone2@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
 // FUNCTION: CARM95 0x0044af61
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
-    LOG_TRACE("(%d, %d, %d, %d, %d)", pCurrent_choice, pCurrent_mode, pGo_ahead, pEscaped, pTimed_out);
 
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         if (pCurrent_mode == 0) {
@@ -125,7 +123,6 @@ int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // IDA: void __cdecl StartMainMenu()
 // FUNCTION: CARM95 0x0044b018
 void StartMainMenu(void) {
-    LOG_TRACE("()");
 
     if (gFaded_palette) {
         PlayFlicsInDarkness();
@@ -334,7 +331,6 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
     };
 
     int result;
-    LOG_TRACE("(%d, %d)", pTime_out, pContinue_allowed);
 
     if (pContinue_allowed) {
         gMain_menu_spec = &interface_spec1;
@@ -583,7 +579,6 @@ int DoVerifyQuit(int pReplace_background) {
 // FUNCTION: CARM95 0x0044b51b
 tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tMM_result the_result;
-    LOG_TRACE("(%d, %d, %d)", pTime_out, pSave_allowed, pContinue_allowed);
 
     if (gProgram_state.racing) {
         FadePaletteDown();
@@ -647,7 +642,6 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
 // FUNCTION: CARM95 0x0044b3c3
 void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) {
     tPlayer_status old_status;
-    LOG_TRACE("(%d, %d, %d)", pTime_out, pSave_allowed, pContinue_allowed);
 
     if (pContinue_allowed || gAusterity_mode) {
         PlayFlicsFromDisk();

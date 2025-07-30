@@ -50,16 +50,14 @@ tFace_ref* gPling_face;
 // Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004abe0c
 int BadDiv__finteray(br_scalar a, br_scalar b) {
-    // LOG_TRACE("(%f, %f)", a, b);
-
-    return fabsf(b) < 1.0f && fabsf(a) > fabsf(b) * BR_SCALAR_MAX;
+    //
+    return fabs(b) < 1.0f && fabs(a) > fabs(b) * BR_SCALAR_MAX;
 }
 
 // IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
 // Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004abe5b
 void DRVector2AccumulateScale__finteray(br_vector2* a, br_vector2* b, br_scalar s) {
-    LOG_TRACE("(%p, %p, %f)", a, b, s);
 
     a->v[0] = b->v[0] * s + a->v[0];
     a->v[1] = b->v[1] * s + a->v[1];
@@ -72,7 +70,6 @@ int PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br
     int i;
     float s;
     float t;
-    LOG_TRACE("(%p, %p, %p, %f, %f, %p, %p)", b, rp, rd, t_near, t_far, new_t_near, new_t_far);
 
     for (i = 0; i < 3; i++) {
         if (rd->v[i] >= -0.00000023841858) {
@@ -139,7 +136,6 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
     br_vector3 pos;
     br_vector3 dir;
     void* arg;
-    LOG_TRACE("(%p, %p, %p, %p, %p, %p)", ap, pPosition, pDir, model, material, callback);
 
     t_near = 0.0;
     t_far = 1.0;
@@ -201,10 +197,9 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
 // IDA: int __usercall DRSceneRayPick2D@<EAX>(br_actor *world@<EAX>, br_vector3 *pPosition@<EDX>, br_vector3 *pDir@<EBX>, dr_pick2d_cbfn *callback@<ECX>)
 // FUNCTION: CARM95 0x004aaf10
 int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, dr_pick2d_cbfn* callback) {
-    LOG_TRACE("(%p, %p, %p, %p)", world, pPosition, pDir, callback);
 
     BrMatrix34Inverse(&gPick_model_to_view__finteray, &world->t.t.mat);
-    LOG_WARN_ONCE("Missing material and model pointers to ActorRayPick2D");
+    // LOG_WARN_ONCE("Missing material and model pointers to ActorRayPick2D");
     return ActorRayPick2D(world, pPosition, pDir, NULL, NULL, callback);
 }
 
@@ -243,7 +238,6 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
     br_scalar numerator;
     float f_numerator;
     int group;
-    LOG_TRACE("(%p, %p, %p, %p, %f, %f, %p, %p)", model, material, ray_pos, ray_dir, t_near, t_far, callback, arg);
 
     struct v11group* grp_ptr;
     br_vector4* eqn;
@@ -271,8 +265,8 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
                     if (t >= t_near && t <= t_far) {
                         BrVector3Scale(&p, ray_dir, t);
                         BrVector3Accumulate(&p, ray_pos);
-                        axis_m = fabsf(eqn->v[0]) < fabsf(eqn->v[1]);
-                        if (fabsf(eqn->v[2]) > fabsf(eqn->v[axis_m])) {
+                        axis_m = fabs(eqn->v[0]) < fabs(eqn->v[1]);
+                        if (fabs(eqn->v[2]) > fabs(eqn->v[axis_m])) {
                             axis_m = 2;
                         }
                         if (axis_m) {
@@ -311,7 +305,7 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
                             }
                             alpha = (v0i1 - beta * v2) / v1;
                         } else {
-                            if (fabsf(v2) < fabsf(v0i1)) {
+                            if (fabs(v2) < fabs(v0i1)) {
                                 continue;
                             }
                             if (v2 == 0) {
@@ -372,7 +366,6 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
 // Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004abe8d
 int FindHighestPolyCallBack__finteray(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
-    LOG_TRACE("(%p, %p, %p, %p, %f, %d, %d, %d, %p, %p, %p)", pModel, pMaterial, pRay_pos, pRay_dir, pT, pF, pE, pV, pPoint, pMap, pArg);
 
     if (pT < (double)gNearest_T) {
         gNearest_T = pT;
@@ -387,7 +380,6 @@ int FindHighestPolyCallBack__finteray(br_model* pModel, br_material* pMaterial, 
 // Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004ab584
 int FindHighestCallBack__finteray(br_actor* pActor, br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT_near, br_scalar pT_far, void* pArg) {
-    LOG_TRACE("(%p, %p, %p, %p, %p, %f, %f, %p)", pActor, pModel, pMaterial, pRay_pos, pRay_dir, pT_near, pT_far, pArg);
 
     if (gProgram_state.current_car.current_car_actor < 0
         || gProgram_state.current_car.car_model_actors[gProgram_state.current_car.current_car_actor].actor != pActor) {
@@ -400,7 +392,6 @@ int FindHighestCallBack__finteray(br_actor* pActor, br_model* pModel, br_materia
 // FUNCTION: CARM95 0x004ab47d
 void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scalar* t, br_material** material) {
     int group;
-    LOG_TRACE("(%p, %p, %p, %p, %p)", pPosition, pDir, nor, t, material);
 
     br_vector4* eqn;
 
@@ -420,7 +411,6 @@ void FindFace(br_vector3* pPosition, br_vector3* pDir, br_vector3* nor, br_scala
 // IDA: void __cdecl EnablePlingMaterials()
 // FUNCTION: CARM95 0x004abed5
 void EnablePlingMaterials(void) {
-    LOG_TRACE("()");
 
     gPling_materials = 1;
 }
@@ -428,7 +418,6 @@ void EnablePlingMaterials(void) {
 // IDA: void __cdecl DisablePlingMaterials()
 // FUNCTION: CARM95 0x004abeea
 void DisablePlingMaterials(void) {
-    LOG_TRACE("()");
 
     gPling_materials = 0;
 }
@@ -458,7 +447,6 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
     double f_n;
     double f_numerator;
     br_material* this_material;
-    LOG_TRACE("(%p, %p, %p, %p, %p)", pFace, ray_pos, ray_dir, normal, rt);
 
     this_material = pFace->material;
     *rt = 100.0;
@@ -554,7 +542,6 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
     double f_n;
     double f_numerator;
     br_material* this_material;
-    LOG_TRACE("(%d, %p, %p, %p, %p, %p)", pNum_rays, pFace, ray_pos, ray_dir, normal, rt);
 
     this_material = pFace->material;
     d = ray_dir->v[2] * pFace->normal.v[2] + ray_dir->v[1] * pFace->normal.v[1] + ray_dir->v[0] * pFace->normal.v[0];
@@ -659,7 +646,6 @@ void GetNewBoundingBox(br_bounds* b2, br_bounds* b1, br_matrix34* m) {
     br_vector3 a;
     br_vector3 c[3];
     int j;
-    LOG_TRACE("(%p, %p, %p)", b2, b1, m);
 
     BrMatrix34ApplyP(&b2->min, &b1->min, m);
     BrVector3Copy(&b2->max, &b2->min);
@@ -694,7 +680,6 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
     tU8 cz_min;
     tU8 cz_max;
     tTrack_spec* track_spec;
-    LOG_TRACE("(%p, %p, %d)", bnds, face_list, max_face);
 
     j = 0;
     track_spec = &gProgram_state.track_spec;
@@ -759,7 +744,6 @@ int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
     br_vector3 c[3];
     int i;
     int j;
-    LOG_TRACE("(%p, %p, %d)", bnds, face_list, max_face);
 
     a.v[0] = (bnds->original_bounds.min.v[0] + bnds->original_bounds.max.v[0]) * .5f;
     a.v[1] = (bnds->original_bounds.min.v[1] + bnds->original_bounds.max.v[1]) * .5f;
@@ -795,7 +779,6 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
     br_matrix34 box_to_actor;
     tBounds new_bounds;
     br_bounds br_bnds;
-    LOG_TRACE("(%p, %p, %p, %p, %p, %d, %p)", bnds, ap, model, material, face_list, max_face, pMat);
 
     i = 0;
     test_children = 1;
@@ -890,7 +873,6 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
     br_vector3 tv;
     br_scalar t;
     struct v11model* prepared;
-    LOG_TRACE("(%p, %p, %p, %p, %p, %d, %p)", actor, bnds, model, model_material, face_list, max_face, pMat);
 
     struct v11group* grp_ptr;
 
@@ -907,7 +889,7 @@ int ModelPickBox(br_actor* actor, tBounds* bnds, br_model* model, br_material* m
             BrVector3Sub(&a, &grp_ptr->position[v1], &bnds->box_centre);
             // t = BrVector3Dot((br_vector3*)&fp->eqn, &a);
             t = BrVector3Dot((br_vector3*)&grp_ptr->eqn[f], &a);
-            if (fabsf(t) > bnds->radius) {
+            if (fabs(t) > bnds->radius) {
                 continue;
             }
             // v2 = fp->vertices[1];
@@ -1025,7 +1007,6 @@ void ClipToPlaneGE(br_vector3* p, int* nv, int i, br_scalar limit) {
     int vertex;
     int k;
     br_vector3 p2[12];
-    LOG_TRACE("(%p, %p, %d, %f)", p, nv, i, limit);
 
     last_vertex = *nv - 1;
     j = 0;
@@ -1061,7 +1042,6 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
     int vertex;
     int k;
     br_vector3 p2[12];
-    LOG_TRACE("(%p, %p, %d, %f)", p, nv, i, limit);
 
     last_vertex = *nv - 1;
     j = 0;
@@ -1093,7 +1073,6 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
 // Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004aeb89
 int BoundsOverlapTest__finteray(br_bounds* b1, br_bounds* b2) {
-    LOG_TRACE("(%p, %p)", b1, b2);
 
     return b1->min.v[0] <= b2->max.v[0]
         && b2->min.v[0] <= b1->max.v[0]
@@ -1108,7 +1087,6 @@ int BoundsOverlapTest__finteray(br_bounds* b1, br_bounds* b2) {
 int BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M) {
     br_scalar val;
     br_vector3 o;
-    LOG_TRACE("(%p, %p, %p)", b1, b2, M);
 
     BrVector3Sub(&o, &b1->max, &b1->min);
     val = M->m[0][0] * b1->min.v[0] + M->m[1][0] * b1->min.v[1] + M->m[2][0] * b1->min.v[2] + M->m[3][0];
@@ -1173,7 +1151,6 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
     int which_plane;
     br_scalar max_t[3];
     br_scalar cp[3];
-    LOG_TRACE("(%p, %p, %p, %p)", o, p, pB, pHit_point);
 
     inside = 1;
     BrVector3Sub(&dir, p, o);
@@ -1232,7 +1209,6 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
 int SphereBoxIntersection(br_bounds* pB, br_vector3* pC, br_scalar pR_squared, br_vector3* pHit_point) {
     int i;
     br_scalar d;
-    LOG_TRACE("(%p, %p, %f, %p)", pB, pC, pR_squared, pHit_point);
 
     d = 0.f;
     for (i = 0; i < 3; i++) {
@@ -1253,7 +1229,6 @@ int SphereBoxIntersection(br_bounds* pB, br_vector3* pC, br_scalar pR_squared, b
 int LineBoxCollWithSphere(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_point) {
     int i;
     int plane;
-    LOG_TRACE("(%p, %p, %p, %p)", o, p, pB, pHit_point);
 
     plane = LineBoxColl(o, p, pB, pHit_point);
 
@@ -1280,7 +1255,6 @@ int CompVert(int v1, int v2) {
     br_vertex* vl;
     br_vector3 tv;
     br_vector2 tv2;
-    LOG_TRACE("(%d, %d)", v1, v2);
 
     if (v1 == v2) {
         return 1;
@@ -1303,7 +1277,6 @@ void SetFacesGroup(int pFace) {
     int f;
     int v;
     int i;
-    LOG_TRACE("(%d)", pFace);
     NOT_IMPLEMENTED();
 }
 
@@ -1316,7 +1289,6 @@ void SelectFace(br_vector3* pDir) {
     br_scalar t;
     br_model* old_model;
     int i;
-    LOG_TRACE("(%p)", pDir);
     NOT_IMPLEMENTED();
 }
 
@@ -1328,7 +1300,6 @@ void GetTilingLimits(br_vector2* min, br_vector2* max) {
     int j;
     br_vertex* verts;
     br_face* faces;
-    LOG_TRACE("(%p, %p)", min, max);
 
     verts = gSelected_model->vertices;
     faces = gSelected_model->faces;
@@ -1360,7 +1331,6 @@ void Scale(int pD, int factor) {
     br_scalar d;
     br_vertex* verts;
     br_face* faces;
-    LOG_TRACE("(%d, %d)", pD, factor);
 
     if (gSelected_model == NULL) {
         return;
@@ -1390,7 +1360,6 @@ void Scale(int pD, int factor) {
 // IDA: void __cdecl ScaleUpX()
 // FUNCTION: CARM95 0x004afbdc
 void ScaleUpX(void) {
-    LOG_TRACE("()");
 
     Scale(0, 1);
 }
@@ -1398,7 +1367,6 @@ void ScaleUpX(void) {
 // IDA: void __cdecl ScaleDnX()
 // FUNCTION: CARM95 0x004afd9a
 void ScaleDnX(void) {
-    LOG_TRACE("()");
 
     Scale(0, -1);
 }
@@ -1406,7 +1374,6 @@ void ScaleDnX(void) {
 // IDA: void __cdecl ScaleUpY()
 // FUNCTION: CARM95 0x004afdb1
 void ScaleUpY(void) {
-    LOG_TRACE("()");
 
     Scale(1, 1);
 }
@@ -1414,7 +1381,6 @@ void ScaleUpY(void) {
 // IDA: void __cdecl ScaleDnY()
 // FUNCTION: CARM95 0x004afdc8
 void ScaleDnY(void) {
-    LOG_TRACE("()");
 
     Scale(1, -1);
 }
@@ -1423,7 +1389,6 @@ void ScaleDnY(void) {
 // FUNCTION: CARM95 0x004afddf
 void SelectFaceForward(void) {
     br_vector3 dir;
-    LOG_TRACE("()");
 
     BrVector3Scale(&dir, (br_vector3*)&gProgram_state.current_car.car_master_actor->t.t.mat.m[2], -2.f);
     SelectFace(&dir);
@@ -1433,7 +1398,6 @@ void SelectFaceForward(void) {
 // FUNCTION: CARM95 0x004afe2c
 void SelectFaceDown(void) {
     br_vector3 dir;
-    LOG_TRACE("()");
 
     BrVector3Scale(&dir, (br_vector3*)&gProgram_state.current_car.car_master_actor->t.t.look_up.up, -2.f);
     SelectFace(&dir);

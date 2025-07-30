@@ -160,7 +160,6 @@ void FatalError(int pStr_index, ...) {
     char* sub_pt;
     va_list ap;
     int i;
-    LOG_TRACE("(%d)", pStr_index);
 
     va_start(ap, pStr_index);
 
@@ -195,7 +194,6 @@ void NonFatalError(int pStr_index, ...) {
     char* sub_pt;
     va_list ap;
     int i;
-    LOG_TRACE("(%d)", pStr_index);
 
     va_start(ap, pStr_index);
 
@@ -222,7 +220,6 @@ void NonFatalError(int pStr_index, ...) {
 // This function is stripped from the retail binary, we've guessed at the implementation
 // FUNCTION: CARM95 0x0046162f
 void CloseDiagnostics(void) {
-    LOG_TRACE("()");
 
     if (harness_game_config.enable_diagnostics == 0) {
         return;
@@ -235,7 +232,6 @@ void CloseDiagnostics(void) {
 // This function is stripped from the retail binary, we've guessed at the implementation
 // FUNCTION: CARM95 0x0046163a
 void OpenDiagnostics(void) {
-    LOG_TRACE("()");
 
     if (harness_game_config.enable_diagnostics == 0) {
         return;
@@ -287,7 +283,6 @@ void dr_dprintf(char* fmt_string, ...) {
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)
 // FUNCTION: CARM95 0x00461650
 int DoErrorInterface(int pMisc_text_index) {
-    LOG_TRACE("(%d)", pMisc_text_index);
 
     NetFullScreenMessage(pMisc_text_index, 0);
     return 0;

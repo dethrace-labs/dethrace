@@ -40,6 +40,28 @@ option(DETHRACE_INSTALL "Add install target" OFF)
 option(DETHRACE_WERROR "Treat warnings as errors")
 option(DETHRACE_FIX_BUGS "Fix Dethrace bugs" ON)
 option(DETHRACE_3DFX_PATCH "Include changes from VOODOO2C.EXE" ON)
+option(DETHRACE_SOUND_ENABLED "Include audio support" ON)
+option(DETHRACE_NET_ENABLED "Include net support" ON)
+option(DETHRACE_PLATFORM_SDL1 "Support SDL 1.2 platform driver" OFF)
+option(DETHRACE_PLATFORM_SDL2 "Support SDL 2 platform driver" ON)
+
+option(MSVC_42_FOR_RECCMP "Build with MSVC 4.2 to match assembly" OFF)
+
+if (MSVC_42_FOR_RECCMP)
+    set(DETHRACE_FIX_BUGS OFF)
+    set(DETHRACE_3DFX_PATCH OFF)
+    set(DETHRACE_SOUND_ENABLED OFF)
+    set(DETHRACE_NET_ENABLED OFF)
+    set(DETHRACE_PLATFORM_SDL1 OFF)
+    set(DETHRACE_PLATFORM_SDL2 OFF)
+    set(BRENDER_BUILD_DRIVERS OFF)
+
+    set(CMAKE_C_FLAGS_DEBUG "/Zi /Od /MTd")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/DEBUG")
+    include("reccmp")
+endif()
+
+
 
 function(add_compile_flag_if_supported TARGET FLAG)
     cmake_parse_arguments(ARGS "" "" "LANGUAGES" ${ARGN})
@@ -66,8 +88,6 @@ endfunction()
 
 test_big_endian(IS_BIGENDIAN)
 
-option(DETHRACE_PLATFORM_SDL1 "Support SDL 1.2 platform driver" OFF)
-option(DETHRACE_PLATFORM_SDL2 "Support SDL 2 platform driver" ON)
 set(count_sdl_platforms 0)
 
 set(DETHRACE_PLATFORMS)
@@ -100,17 +120,24 @@ endif()
 
 cmake_dependent_option(DETHRACE_PLATFORM_SDL_DYNAMIC "Load SDL dynamically" FALSE "count_sdl_platforms EQUAL 1" "${dynamic_sdl_force}")
 
-if(NOT DETHRACE_PLATFORMS)
+if(NOT DETHRACE_PLATFORMS AND NOT MSVC_42_FOR_RECCMP)
     message(FATAL_ERROR "No platform drivers enabled")
 endif()
 
 add_subdirectory(lib/BRender-v1.3.2)
 add_subdirectory(lib/libsmacker)
-add_subdirectory(lib/miniaudio)
-add_subdirectory(lib/stb)
 add_subdirectory(lib/inih)
 
+if(DETHRACE_SOUND_ENABLED)
+    add_subdirectory(lib/miniaudio)
+    add_subdirectory(lib/stb)
+endif()
+
 add_library(compile_with_werror INTERFACE)
+add_subdirectory(src/harness)
+add_subdirectory(src/S3)
+add_subdirectory(src/smackw32)
+add_subdirectory(src/DETHRACE)
 
 if(DETHRACE_WERROR)
     if(MSVC)
@@ -119,11 +146,6 @@ if(DETHRACE_WERROR)
         target_compile_options(compile_with_werror INTERFACE -Werror)
     endif()
 endif()
-
-add_subdirectory(src/harness)
-add_subdirectory(src/S3)
-add_subdirectory(src/smackw32)
-add_subdirectory(src/DETHRACE)
 
 if(BUILD_TESTS)
     enable_testing()

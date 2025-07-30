@@ -70,7 +70,6 @@ void KeyboardHandler(void) {
     tU8 scan_code;
     tU8 up;
     static tU8 extended;
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 
     // dos code reads scancodes from interrupt
@@ -83,13 +82,11 @@ int KeyDown(tU8 pScan_code) {
 
 // IDA: void __usercall KeyTranslation(tU8 pKey_index@<EAX>, tU8 pScan_code_1@<EDX>, tU8 pScan_code_2@<EBX>)
 void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
-    LOG_TRACE("(%d, %d, %d)", pKey_index, pScan_code_1, pScan_code_2);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl KeyBegin()
 void KeyBegin(void) {
-
     gScan_code[KEY_0][0] = SCANCODE_0;
     gScan_code[KEY_2][0] = SCANCODE_2;
     gScan_code[KEY_3][0] = SCANCODE_3;
@@ -210,7 +207,6 @@ void KeyBegin(void) {
 
 // IDA: void __cdecl KeyEnd()
 void KeyEnd(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 
     // dos_setvect(9, gPrev_keyboard_handler);
@@ -218,8 +214,6 @@ void KeyEnd(void) {
 
 // IDA: int __usercall KeyDown22@<EAX>(int pKey_index@<EAX>)
 int KeyDown22(int pKey_index) {
-    LOG_TRACE("(%d)", pKey_index);
-
     return KeyDown(gScan_code[pKey_index][0]) || KeyDown(gScan_code[pKey_index][1]);
 }
 
@@ -228,7 +222,6 @@ void PDSetKeyArray(int* pKeys, int pMark) {
     int i;
     tS32 joyX;
     tS32 joyY;
-    LOG_TRACE10("(%p, %d)", pKeys, pMark);
 
     gKeys_pressed = 0;
     for (i = 0; i < COUNT_OF(gScan_code); i++) {
@@ -251,7 +244,6 @@ int PDGetASCIIFromKey(int pKey) {
 // IDA: void __usercall PDFatalError(char *pThe_str@<EAX>)
 void PDFatalError(char* pThe_str) {
     static int been_here = 0;
-    LOG_TRACE("(\"%s\")", pThe_str);
 
     if (been_here) {
         exit(1);
@@ -279,8 +271,6 @@ void PDFatalError(char* pThe_str) {
 
 // IDA: void __usercall PDNonFatalError(char *pThe_str@<EAX>)
 void PDNonFatalError(char* pThe_str) {
-    LOG_TRACE("(\"%s\")", pThe_str);
-
     printf("ERROR: %s", pThe_str);
     while (PDAnyKeyDown() == -1) {
     }
@@ -325,8 +315,6 @@ void PDInitialiseSystem(void) {
 
 // IDA: void __cdecl PDShutdownSystem()
 void PDShutdownSystem(void) {
-    LOG_TRACE("()");
-
     // dos_setvect(9, gPrev_keyboard_handler);
     if (gDOSGfx_initialized) {
         BrDevEndOld();
@@ -337,14 +325,11 @@ void PDShutdownSystem(void) {
 
 // IDA: void __cdecl PDSaveOriginalPalette()
 void PDSaveOriginalPalette(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDRevertPalette()
 void PDRevertPalette(void) {
-    LOG_TRACE("()");
-
     // empty function
 }
 
@@ -357,7 +342,6 @@ int PDInitScreenVars(int pArgc, char** pArgv) {
 
 // IDA: void __cdecl PDInitScreen()
 void PDInitScreen(void) {
-    LOG_TRACE("()");
 }
 
 // IDA: void __cdecl sub_B4DB4()
@@ -370,8 +354,6 @@ void sub_B4DB4(void) {
 // IDA: void __cdecl PDLockRealBackScreen()
 // In all retail 3dfx executables, it is void __usercall PDLockRealBackScreen(lock@<EAX>)
 void PDLockRealBackScreen(int lock) {
-    LOG_TRACE("()");
-
     if (!gReal_back_screen_locked && !gReal_back_screen->pixels && lock <= gVoodoo_rush_mode) {
         sub_B4DB4();
         BrPixelmapDirectLock(gReal_back_screen, 1);
@@ -384,8 +366,6 @@ void PDLockRealBackScreen(int lock) {
 // IDA: void __cdecl PDUnlockRealBackScreen()
 // In all retail 3dfx executables, it is void __usercall PDUnlockRealBackScreen(lock@<EAX>)
 void PDUnlockRealBackScreen(int lock) {
-    LOG_TRACE("()");
-
     if (gReal_back_screen_locked && gReal_back_screen->pixels && lock <= gVoodoo_rush_mode) {
         BrPixelmapDirectUnlock(gReal_back_screen);
         gReal_back_screen_locked = 0;
@@ -394,7 +374,6 @@ void PDUnlockRealBackScreen(int lock) {
 
 // IDA: void __cdecl PDAllocateScreenAndBack()
 void PDAllocateScreenAndBack(void) {
-
     gScreen = NULL;
 
     if (gGraf_spec_index != 0 && !gNo_voodoo) {
@@ -454,7 +433,6 @@ void Copy8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap* 
     tU8 blue;
     tU16* dst;
     tU16* palette_entry;
-    LOG_TRACE("(%p, %p, %p)", pDst, pSrc, pPalette);
 
     palette_entry = PaletteOf16Bits(pPalette)->pixels;
     for (y = 0; pSrc->height > y; y++) {
@@ -482,7 +460,6 @@ void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap
     tU16* dst1;
     tU16 sixteen;
     tU16* palette_entry;
-    LOG_TRACE("(%p, %p, %p, %d, %d, %d)", pDst, pSrc, pPalette, pOff, pSrc_width, pSrc_height);
 
     // added by dethrace. Some local symbols seem to be missing
     int dst_y = 0;
@@ -517,14 +494,11 @@ void Double8BitTo16BitPixelmap(br_pixelmap* pDst, br_pixelmap* pSrc, br_pixelmap
 
 // IDA: br_pixelmap* __cdecl PDInterfacePixelmap()
 br_pixelmap* PDInterfacePixelmap(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl SwapBackScreen()
 void SwapBackScreen(void) {
-    LOG_TRACE("()");
-
     PDUnlockRealBackScreen(1);
     BrPixelmapDoubleBuffer(gScreen, gReal_back_screen);
     PDLockRealBackScreen(1);
@@ -532,8 +506,6 @@ void SwapBackScreen(void) {
 
 // IDA: void __usercall ReallyCopyBackScreen(int pRendering_area_only@<EAX>, int pClear_top_and_bottom@<EDX>)
 void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom) {
-    LOG_TRACE("(%d, %d)", pRendering_area_only, pClear_top_and_bottom);
-
     gAlready_copied = 1;
     if (pRendering_area_only) {
         BrPixelmapRectangleCopy(gScreen, gX_offset, gY_offset, gRender_screen, 0, 0, gWidth, gHeight);
@@ -550,14 +522,11 @@ void ReallyCopyBackScreen(int pRendering_area_only, int pClear_top_and_bottom) {
 
 // IDA: void __usercall CopyBackScreen(int pRendering_area_only@<EAX>)
 void CopyBackScreen(int pRendering_area_only) {
-    LOG_TRACE("(%d)", pRendering_area_only);
-
     ReallyCopyBackScreen(pRendering_area_only, 1);
 }
 
 // IDA: void __usercall PDScreenBufferSwap(int pRendering_area_only@<EAX>)
 void PDScreenBufferSwap(int pRendering_area_only) {
-    LOG_TRACE10("(%d)", pRendering_area_only);
 
     if (gSwitched_resolution) {
         BrPixelmapFill(gTemp_screen, 0);
@@ -573,31 +542,26 @@ void PDScreenBufferSwap(int pRendering_area_only) {
 
 // IDA: void __usercall PDPixelmapToScreenRectangleCopy(br_pixelmap *dst@<EAX>, br_int_16 dx@<EDX>, br_int_16 dy@<EBX>, br_pixelmap *src@<ECX>, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h)
 void PDPixelmapToScreenRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pixelmap* src, br_int_16 sx, br_int_16 sy, br_uint_16 w, br_uint_16 h) {
-    LOG_TRACE("(%p, %d, %d, %p, %d, %d, %d, %d)", dst, dx, dy, src, sx, sy, w, h);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall PDPixelmapHLineOnScreen(br_pixelmap *dst@<EAX>, br_int_16 x1@<EDX>, br_int_16 y1@<EBX>, br_int_16 x2@<ECX>, br_int_16 y2, br_uint_32 colour)
 void PDPixelmapHLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
-    LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x1, y1, x2, y2, colour);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall PDPixelmapVLineOnScreen(br_pixelmap *dst@<EAX>, br_int_16 x1@<EDX>, br_int_16 y1@<EBX>, br_int_16 x2@<ECX>, br_int_16 y2, br_uint_32 colour)
 void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_int_16 x2, br_int_16 y2, br_uint_32 colour) {
-    LOG_TRACE("(%p, %d, %d, %d, %d, %d)", dst, x1, y1, x2, y2, colour);
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDInstallErrorHandlers()
 void PDInstallErrorHandlers(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl PDSetFileVariables()
 void PDSetFileVariables(void) {
-
     // gDir_separator[0] = '\\';
     gDir_separator[0] = '/';
 }
@@ -650,16 +614,12 @@ void PDSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 
 // IDA: void __cdecl PDSwitchToRealResolution()
 void PDSwitchToRealResolution(void) {
-    LOG_TRACE("()");
-
     gBack_screen = gReal_back_screen;
     gSwitched_resolution = 1;
 }
 
 // IDA: void __cdecl PDSwitchToLoresMode()
 void PDSwitchToLoresMode(void) {
-    LOG_TRACE("()");
-
     gBack_screen = gTemp_screen;
     gSwitched_resolution = 0;
 }
@@ -669,7 +629,6 @@ void PDMouseButtons(int* pButton_1, int* pButton_2) {
     br_uint_32 mouse_buttons;
     br_int_32 mouse_x;
     br_int_32 mouse_y;
-    LOG_TRACE("(%p, %p)", pButton_1, pButton_2);
 
     // DOSMouseRead(...)
     gHarness_platform.GetMouseButtons(pButton_1, pButton_2);
@@ -684,7 +643,6 @@ void PDGetMousePosition(int* pX_coord, int* pY_coord) {
     int delta_y;
     static br_int_32 mouse_x;
     static br_int_32 mouse_y;
-    LOG_TRACE("(%p, %p)", pX_coord, pY_coord);
 
     if (gReal_graf_data_index) {
         // DOSMouseRead(&mouse_x, &mouse_y, &mouse_buttons);
@@ -735,7 +693,6 @@ tU32 LargestBlockAvail(void) {
 // IDA: void* __usercall PDGrabLargestMammaryWeCanPlayWith@<EAX>(tU32 pMaximum_required@<EAX>, tU32 *pAmount_allocated@<EDX>)
 void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32* pAmount_allocated) {
     void* result;
-    LOG_TRACE("(%d, %p)", pMaximum_required, pAmount_allocated);
     NOT_IMPLEMENTED();
 }
 
@@ -743,7 +700,6 @@ void* PDGrabLargestMammaryWeCanPlayWith(tU32 pMaximum_required, tU32* pAmount_al
 void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
     tU32 lba;
     tU32 required;
-    LOG_TRACE("(%p, %p)", pBuffer, pBuffer_size);
 
     lba = LargestBlockAvail();
     if (gReplay_override) {
@@ -769,8 +725,6 @@ void PDAllocateActionReplayBuffer(char** pBuffer, tU32* pBuffer_size) {
 
 // IDA: void __usercall PDDisposeActionReplayBuffer(char *pBuffer@<EAX>)
 void PDDisposeActionReplayBuffer(char* pBuffer) {
-    LOG_TRACE("(\"%s\")", pBuffer);
-
     free(pBuffer);
 }
 
@@ -887,21 +841,18 @@ int original_main(int pArgc, char** pArgv) {
 // IDA: int __cdecl OurGetChar()
 int OurGetChar(void) {
     int key;
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: void __usercall PDEnterDebugger(char *pStr@<EAX>)
 void PDEnterDebugger(char* pStr) {
     static unsigned char* save_it;
-    LOG_TRACE("(\"%s\")", pStr);
 
     save_it = (unsigned char*)pStr;
 }
 
 // IDA: void __cdecl PDEndItAllAndReRunTheBastard()
 void PDEndItAllAndReRunTheBastard(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
@@ -910,7 +861,6 @@ int LoopLimitTooLow(tU32 limit) {
     clock_t start;
     tU32 count;
     tU32 val;
-    LOG_TRACE("(%d)", limit);
 
     // v2 = j___clock(limit);
     // v3 = v2;
@@ -927,7 +877,6 @@ int LoopLimitTooLow(tU32 limit) {
 // IDA: tS32 __cdecl UpperLoopLimit()
 tS32 UpperLoopLimit(void) {
     tU32 limit;
-    LOG_TRACE("()");
 
     for (limit = 1024; 2 * limit && LoopLimitTooLow(limit); limit *= 2)
         ;
@@ -940,8 +889,6 @@ tS32 UpperLoopLimit(void) {
 
 // IDA: int __cdecl InitJoysticks()
 int InitJoysticks(void) {
-    LOG_TRACE("()");
-
     gJoystick_deadzone = 8000;
     gUpper_loop_limit = UpperLoopLimit() / 2;
     return 0;
@@ -951,7 +898,6 @@ int InitJoysticks(void) {
 tU32 ReadJoystickAxis(int pBit) {
     tU32 val;
     tU32 count;
-    LOG_TRACE("(%d)", pBit);
     NOT_IMPLEMENTED();
 }
 
@@ -961,90 +907,76 @@ void PDReadJoySticks(void) {
     tU32 temp1y;
     tU32 temp2x;
     tU32 temp2y;
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: tS32 __cdecl PDGetJoy1X()
 tS32 PDGetJoy1X(void) {
     tS32 joy;
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: tS32 __cdecl PDGetJoy1Y()
 tS32 PDGetJoy1Y(void) {
     tS32 joy;
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: tS32 __cdecl PDGetJoy2X()
 tS32 PDGetJoy2X(void) {
     tS32 joy;
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: tS32 __cdecl PDGetJoy2Y()
 tS32 PDGetJoy2Y(void) {
     tS32 joy;
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy1Button1()
 int PDGetJoy1Button1(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy1Button2()
 int PDGetJoy1Button2(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy1Button3()
 int PDGetJoy1Button3(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy1Button4()
 int PDGetJoy1Button4(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button1()
 int PDGetJoy2Button1(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button2()
 int PDGetJoy2Button2(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button3()
 int PDGetJoy2Button3(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __cdecl PDGetJoy2Button4()
 int PDGetJoy2Button4(void) {
-    LOG_TRACE("()");
     NOT_IMPLEMENTED();
 }
 
 // IDA: int __usercall PDFileUnlock@<EAX>(char *pThe_path@<EAX>)
 int PDFileUnlock(char* pThe_path) {
     unsigned int attr;
-    LOG_TRACE("(\"%s\")", pThe_path);
     // _dos_setfileattr_(pThe_path, 0);
     return 0;
 }
@@ -1052,7 +984,6 @@ int PDFileUnlock(char* pThe_path) {
 // IDA: void __cdecl CriticalISR(INTPACK pRegs)
 typedef void* INTPACK;
 void CriticalISR(INTPACK pRegs) {
-    LOG_TRACE("(%d)", pRegs);
     NOT_IMPLEMENTED();
 }
 
@@ -1063,7 +994,6 @@ int PDCheckDriveExists2(char* pThe_path, char* pFile_name, tU32 pMin_size) {
     int stat_failed;
     char slasher[4];
     char the_path[256];
-    LOG_TRACE("(\"%s\", \"%s\", %d)", pThe_path, pFile_name, pMin_size);
 
     strcpy(slasher, "?:\\");
     if (pFile_name) {
@@ -1131,7 +1061,6 @@ int PDGetGorePassword(void) {
     int len;
     int chances;
     char password[17];
-    LOG_TRACE("()");
 
     for (chances = 0; chances < 3; chances++) {
         printf(chances == 0 ? "\n\n\n\n\nEnter password for uncut version...\n" : "\nIncorrect password, please try again...\n");
@@ -1147,7 +1076,6 @@ int PDGetGorePassword(void) {
 // IDA: void __usercall PDDisplayGoreworthiness(int pGory@<EAX>)
 void PDDisplayGoreworthiness(int pGory) {
     tU32 delay_start;
-    LOG_TRACE("(%d)", pGory);
 
     printf(pGory ? "\nPlaying full version...\n" : "\nPlaying zombie version...\n");
     delay_start = 2;
