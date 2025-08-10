@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
-    - uses: dethrace_labs/reccmp-action@main
+    - uses: dethrace-labs/reccmp-action@main
       with:
         cmake-flags: -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on
         command: reccmp-reccmp --target CARM95 --html reccmp-report-new.html --json reccmp-report-new.json
