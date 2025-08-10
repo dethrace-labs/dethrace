@@ -1,8 +1,0 @@
-Windows Registry Editor Version 5.00
-
-[HKEY_CURRENT_USER\Environment]
-"INCLUDE"="C:\\msvc\\include;C:\\msvc\\mfc\\include"
-"LIB"="C:\\msvc\\lib;C:\\msvc\\mfc\\lib"
-"TMP"="Z:\\build"
-"TEMP"="Z:\\build"
-"PATH"="C:\\msvc\\bin;C:\\msvc\\bin\\winnt;C:\\cmake\\bin;C:\\windows\\system32;C:\\ninja"
