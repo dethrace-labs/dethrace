@@ -634,9 +634,9 @@ void InitializeActionReplay(void) {
 // FUNCTION: CARM95 0x0041c0e6
 void DoActionReplay(tU32 pFrame_period) {
 
-    // if (gReplay_rate != 0.f) {
-    //     MoveReplayBuffer((tS32)gReplay_rate);
-    // }
+    if (gReplay_rate != 0.f) {
+        MoveReplayBuffer((tS32)gReplay_rate);
+    }
 }
 
 // IDA: void __cdecl SynchronizeActionReplay()
