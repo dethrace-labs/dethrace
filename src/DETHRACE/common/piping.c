@@ -1246,7 +1246,7 @@ void AdvanceChunkPtr(tPipe_chunk** pChunk, tChunk_subject_index pType) {
     /* Fail-safe to avoid reading junk data from the session after */
     if (*(tU8**)pChunk == gEnd_of_session) {
         *pChunk = old_chunk;
-    } else if (*(tU8**)pChunk > gEnd_of_session) {
+    } else if ((intptr_t)(*(tU8**)pChunk) > (intptr_t)gEnd_of_session) {
         *pChunk = old_chunk;
     }
 }
