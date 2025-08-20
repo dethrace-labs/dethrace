@@ -32,22 +32,13 @@ docker run --platform linux/amd64 \
     -e CMAKE_FLAGS="-G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on" \
     -v <PATH_TO_DETHRACE_DIR>:/source \
     -v <PATH_TO_DETHRACE_BUILD_DIR>:/build \
-    -v <PATH_TO_CARMA_DIR>:/orginal:ro \
+    -v <PATH_TO_CARMA_DIR>:/original:ro \
     msvc420-wine -- \
-    reccmp-reccmp --target CARM95 --silent --html reccmp-report.html --json /source/reccmp/report.json
+    reccmp-reccmp --target CARM95 --silent --html report.html --json /source/reccmp/report.json
 ```
 
-After running, a `reccmp-report.html` file will be created in the build-msvc420 directory.
+After running, a `report.html` file will be created in the build-msvc420 directory.
 
 ### Make a pull request change
 
-The pull request will fail if the `reccmp/report.json` file is different from the version generated during build
-
-docker run --platform linux/amd64 \
-    -e CMAKE_FLAGS="-G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on" \
-    -v .:/source \
-    -v ./build_msvc42:/build \
-    -v /Users/jeff/Downloads/carma/opt/c1:/orginal:ro \
-    msvc420-wine -- \
-    ls -lah /orginal
-    reccmp-reccmp --target CARM95 --silent --html reccmp-report.html --json /source/reccmp/report.json
+The pull request will fail if the `reccmp/report.json` file is different from the version generated during build.
