@@ -145,10 +145,10 @@ jobs:
         original_binary_url: https://archive.org/download/carm-95/CARM95.EXE
         original_binary_filename: CARM95.EXE
     - name: Update report in reccmp-report
-        run: |
-          cd reccmp-report
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          cp ../pr-reccmp-report.json report.json
-          git commit -m "Update report from ${{ github.sha }}" || echo "No changes to commit"
-          git push
+      run: |
+        cd reccmp-report
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        cp ../pr-reccmp-report.json report.json
+        git commit -m "Update report from ${{ github.sha }}" || echo "No changes to commit"
+        git push
