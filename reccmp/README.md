@@ -34,11 +34,13 @@ docker run --platform linux/amd64 \
     -v <PATH_TO_DETHRACE_BUILD_DIR>:/build \
     -v <PATH_TO_CARMA_DIR>:/original:ro \
     msvc420-wine -- \
-    reccmp-reccmp --target CARM95 --silent --html report.html --json /source/reccmp/report.json
+    reccmp-reccmp --target CARM95 --silent --html report.html
 ```
 
 After running, a `report.html` file will be created in the build-msvc420 directory.
 
 ### Make a pull request change
 
-The pull request will fail if the `reccmp/report.json` file is different from the version generated during build.
+reccmp will run against the code in the PR branch. If any functions decrease in accuracy the PR validation will fail.
+
+When the PR is merged, the updated report is stored in https://github.com/dethrace-labs/reccmp-report, and this is used to compare the next PR
