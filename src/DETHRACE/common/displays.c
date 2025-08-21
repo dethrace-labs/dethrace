@@ -84,7 +84,11 @@ int gPed_kill_count_headup;
 int gDim_amount;
 
 // GLOBAL: CARM95 0x00544e70
+#ifdef DETHRACE_FIX_BUGS
 br_pixelmap* gHeadup_images[32]; // Modified by DethRace for the demo
+#else
+br_pixelmap* gHeadup_images[31];
+#endif
 
 // GLOBAL: CARM95 0x00544e58
 int gNet_cash_headup;
@@ -317,12 +321,12 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
     int line_skip;
     int width;
 
-    #ifdef DETHRACE_3DFX_PATCH
+#ifdef DETHRACE_3DFX_PATCH
     if (gDevious_2d) {
         DeviouslyDimRectangle(pPixelmap, pLeft, pTop, pRight, pBottom, pKnock_out_corners);
         return;
     }
-    #endif
+#endif
 
     ptr = (tU8*)pPixelmap->pixels + pLeft + pPixelmap->row_bytes * pTop;
     line_skip = pPixelmap->row_bytes - pRight + pLeft;
