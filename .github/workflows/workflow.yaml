@@ -115,8 +115,6 @@ jobs:
           generate_release_notes: true
           files: |
             artifacts/**
-<<<<<<< Updated upstream
-=======
 
   reccmp:
     name: Verify decomp
@@ -144,4 +142,3 @@ jobs:
         report_filename: reccmp-report/report.json
         original_binary_url: https://archive.org/download/carm-95/CARM95.EXE
         original_binary_filename: CARM95.EXE
->>>>>>> Stashed changes
