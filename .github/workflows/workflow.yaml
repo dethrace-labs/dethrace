@@ -140,6 +140,6 @@ jobs:
       with:
         cmake_flags: -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on
         target: CARM95
-        report_filename: ${{ env.GITHUB_WORKSPACE }}/reccmp-report/report.json
+        report_filename: ${{ github.workspace }}/reccmp-report/report.json
         original_binary_url: https://archive.org/download/carm-95/CARM95.EXE
         original_binary_filename: CARM95.EXE
