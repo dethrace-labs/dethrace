@@ -136,10 +136,19 @@ jobs:
         cmake_flags: -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on
         build_only: true
     - uses: dethrace-labs/reccmp-action@main
-      name: reccmp 2
+      name: reccmp
       with:
         cmake_flags: -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on
         target: CARM95
-        report_filename: ${{ github.workspace }}/reccmp-report/report.json
+        diff_report_filename: reccmp-report/report.json
+        report_filename: pr-reccmp-report.json
         original_binary_url: https://archive.org/download/carm-95/CARM95.EXE
         original_binary_filename: CARM95.EXE
+    - name: Update report in reccmp-report
+        run: |
+          cd reccmp-report
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          cp ../pr-reccmp-report.json report.json
+          git commit -m "Update report from ${{ github.sha }}" || echo "No changes to commit"
+          git push
