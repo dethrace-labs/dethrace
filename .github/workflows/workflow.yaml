@@ -151,5 +151,5 @@ jobs:
         cd reccmp-report
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git commit -am "Update report from ${{ github.sha }}" || echo "No changes to commit"
+        git commit -am "Update report from ${GITHUB_SHA::7}" || echo "No changes to commit"
         git push
