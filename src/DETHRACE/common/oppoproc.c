@@ -26,7 +26,7 @@ int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* 
 // There appears to be two different implementations of this function in different binaries.
 // One does calculations in 2d space, this one calculates in 3d space.
 // FUNCTION: CARM95 0x0049feaa
-static void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3* p4, br_vector3* p5, br_vector3* p6, br_vector3* p7, br_vector3* p8, float p9, float p10) {
+void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3* p4, br_vector3* p5, br_vector3* p6, br_vector3* p7, br_vector3* p8, float p9, float p10) {
     br_vector3 rel1;
     br_vector3 rel3;
     br_vector3 rot1;
@@ -194,7 +194,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
     int later_straight;
     int next_left_not_right;
 
-     float v104;
+    float v104;
 
     car_spec = pOpponent_spec->car_spec;
     engine_damage = car_spec->damage_units[0].damage_level;
