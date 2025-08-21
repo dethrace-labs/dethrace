@@ -135,7 +135,7 @@ jobs:
         cmake_flags: -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on
         build_only: true
     - uses: dethrace-labs/reccmp-action@main
-      name: reccmp
+      name: reccmp 2
       with:
         cmake_flags: -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on
         target: CARM95
