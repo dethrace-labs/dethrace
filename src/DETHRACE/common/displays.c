@@ -84,6 +84,8 @@ int gPed_kill_count_headup;
 int gDim_amount;
 
 // GLOBAL: CARM95 0x00544e70
+// gHeadup_images
+
 #ifdef DETHRACE_FIX_BUGS
 br_pixelmap* gHeadup_images[32]; // Modified by DethRace for the demo
 #else
