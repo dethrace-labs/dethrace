@@ -145,7 +145,7 @@ jobs:
         original_binary_url: https://archive.org/download/carm-95/CARM95.EXE
         original_binary_filename: CARM95.EXE
     - name: Update report in reccmp-report
-      #if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main'
       run: |
         cp new-reccmp-report.json reccmp-report/report.json
         cd reccmp-report
