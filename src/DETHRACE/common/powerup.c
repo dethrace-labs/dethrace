@@ -1215,7 +1215,7 @@ void ResetPedHarvest(tPowerup* pPowerup, tCar_spec* pCar) {
     int i;
 
     gPedestrian_harvest = 0;
-    for (i = 0; i < COUNT_OF(gPed_harvest_sounds); i++) {
+    for (i = 0; i < BR_ASIZE(gPed_harvest_sounds); i++) {
         DRS3StartSound3D(gPedestrians_outlet, gPed_harvest_sounds[i], &pCar->pos,
             &gZero_v__powerup, 1, 255, -1, -1);
     }

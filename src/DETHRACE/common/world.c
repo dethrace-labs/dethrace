@@ -2376,13 +2376,13 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
         return NULL;
     }
     max_suffix_len = 0;
-    for (s = 0; s < COUNT_OF(suffixes); s++) {
+    for (s = 0; s < BR_ASIZE(suffixes); s++) {
         if (max_suffix_len < strlen(suffixes[s])) {
             max_suffix_len = strlen(suffixes[s]);
         }
     }
     id = BrMemAllocate(strlen(mat->identifier) + max_suffix_len + 1, kMem_new_mat_id_3);
-    for (s = 0; s < COUNT_OF(suffixes); s++) {
+    for (s = 0; s < BR_ASIZE(suffixes); s++) {
         sprintf(id, "%s%s", mat->identifier, suffixes[s]);
         victim = BrMaterialFind(id);
         if (victim != NULL) {
@@ -3262,7 +3262,7 @@ br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
             }                                                                               \
             break;                                                                          \
         case eMove_flash:                                                                   \
-            if (2 * fmod(f_the_time, (PERIOD)) > (PERIOD)) {                               \
+            if (2 * fmod(f_the_time, (PERIOD)) > (PERIOD)) {                                \
                 DEST = (FLASH_VALUE);                                                       \
             } else {                                                                        \
                 DEST = -(FLASH_VALUE);                                                      \

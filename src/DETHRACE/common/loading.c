@@ -44,7 +44,7 @@
 #define OPPONENT_APC_IDX 3
 
 // GLOBAL: CARM95 0x0050a3f0
-tHeadup_info gHeadup_image_info[32] = {
+tHeadup_info gHeadup_image_info[] = {
     // Modified by DethRace to fit the "demo timeout" fancy head-up.
     { "LADY.PIX", eNet_or_otherwise },
     { "GENT.PIX", eNet_or_otherwise },
@@ -76,8 +76,11 @@ tHeadup_info gHeadup_image_info[32] = {
     { "GAMEOVER.PIX", eNet_only },
     { "UBROKE.PIX", eNet_only },
     { "ULOST.PIX", eNet_only },
-    { "UWON.PIX", eNet_only },
-    { "DTIMEOUT.PIX", eNot_net }, // Only used by the demo, not present in the full version
+    { "UWON.PIX", eNet_only }
+#ifdef DETHRACE_FIX_BUGS
+    ,
+    { "DTIMEOUT.PIX", eNot_net } // Only used by the demo, not present in the full version
+#endif
 };
 
 char* gYour_car_names[2][6];
@@ -2484,10 +2487,10 @@ void LoadHeadupImages(void) {
 
     for (i = 0; i < COUNT_OF(gHeadup_image_info); i++) {
         PossibleService();
-        if (gHeadup_image_info[i].avail && (gHeadup_image_info[i].avail != eNot_net || gNet_mode) && (gHeadup_image_info[i].avail != eNet_only || !gNet_mode)) {
-            gHeadup_images[i] = NULL;
-        } else {
+        if (gHeadup_image_info[i].avail == eNet_or_otherwise || gHeadup_image_info[i].avail == eNot_net && gNet_mode == eNet_mode_none || gHeadup_image_info[i].avail == eNet_only && gNet_mode) {
             gHeadup_images[i] = LoadPixelmap(gHeadup_image_info[i].name);
+        } else {
+            gHeadup_images[i] = NULL;
         }
     }
 }

@@ -25,7 +25,11 @@ extern int gTimer_headup;
 extern int gTime_awarded_headup;
 extern int gPed_kill_count_headup;
 extern int gDim_amount;
+#ifdef DETHRACE_FIX_BUGS
 extern br_pixelmap* gHeadup_images[32];
+#else
+extern br_pixelmap* gHeadup_images[31];
+#endif
 extern int gNet_cash_headup;
 extern int gNet_ped_headup;
 extern int gCredits_lost_headup;

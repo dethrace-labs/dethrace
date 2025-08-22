@@ -497,7 +497,7 @@ tEdit_func* gEdit_funcs[10][18][8] = {
 };
 
 // GLOBAL: CARM95 0x0051cc80
-tCheat gKev_keys[44] = {
+tCheat gKev_keys[43] = {
     { 0xa11ee75d, 0xf805eddd, SetFlag, 0x0a11ee75d },
     { 0x564e78b9, 0x99155115, SetFlag, 0x0564e78b9 },
     { 0x1f47e5e8, 0xa715222c, SetFlag2, 1 },
@@ -542,7 +542,6 @@ tCheat gKev_keys[44] = {
     { 0x30a19fab, 0x2b0c2782, GetPowerup, 45 },
     { 0x0, 0x0, 0x0, 0x0 },
 };
-
 
 // GLOBAL: CARM95 0x0051cf30
 int gAllow_car_flying;

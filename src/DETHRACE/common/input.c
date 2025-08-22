@@ -340,7 +340,7 @@ int KeyIsDown(int pKey_index) {
     case -2:
         return 1;
     case -1:
-        for (i = 0; i < COUNT_OF(gGo_ahead_keys); i++) {
+        for (i = 0; i < BR_ASIZE(gGo_ahead_keys); i++) {
             if (gKey_array[gGo_ahead_keys[i]]) {
                 return 1;
             }

@@ -949,7 +949,7 @@ void SetYon(br_scalar pYon) {
         pYon = 5.0f;
     }
 
-    for (i = 0; i < COUNT_OF(gCamera_list); i++) {
+    for (i = 0; i < BR_ASIZE(gCamera_list); i++) {
         if (gCamera_list[i]) {
             camera_ptr = gCamera_list[i]->type_data;
             camera_ptr->yon_z = pYon;
