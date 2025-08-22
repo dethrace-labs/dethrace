@@ -1214,7 +1214,7 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     if (*pCurrent_mode == 0) {
         key = -1;
         if (*pCurrent_choice == 0) {
-            for (i = 0; i < COUNT_OF(gKey_defns); i++) {
+            for (i = 0; i < BR_ASIZE(gKey_defns); i++) {
                 if (gKey_mapping[gKey_defns[i]] == -2) {
                     key = i;
                     break;
@@ -1282,7 +1282,7 @@ int KeyAssignGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
                 if (key != -1 && key != 63) {
                     for (i = 27; i < 65; i++) {
                         if (gKey_mapping[i] == key && gKey_defns[gCurrent_key] != i) {
-                            for (j = 0; j < COUNT_OF(gKey_defns); j++) {
+                            for (j = 0; j < BR_ASIZE(gKey_defns); j++) {
                                 if (gKey_defns[j] == i) {
                                     gKey_mapping[i] = -2;
                                     gPending_entry = j;
