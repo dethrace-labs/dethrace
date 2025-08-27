@@ -1320,7 +1320,7 @@ int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
 void MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo(void) {
 
     if (gFlag_waving_bastard != NULL
-        && gFlag_waving_bastard->current_action != gFlag_waving_bastard->fatal_car_impact_action
+        && (gFlag_waving_bastard->current_action != gFlag_waving_bastard->fatal_car_impact_action)
         && gFlag_waving_bastard->current_action != gFlag_waving_bastard->fatal_ground_impact_action) {
         ChangeActionTo(gFlag_waving_bastard, 7, 1);
     }

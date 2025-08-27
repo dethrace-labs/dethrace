@@ -144,6 +144,19 @@ jobs:
         report_filename: ${{ github.workspace}}/new-reccmp-report.json
         original_binary_url: https://archive.org/download/carm-95/CARM95.EXE
         original_binary_filename: CARM95.EXE
+        reccmp_output_filenane: ${{ github.workspace}}/reccmp-output.txt
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: reccmp-output.txt
+        path: ${{ github.workspace}}/reccmp-output.txt
+        if-no-files-found: error
+    - name: Check for
+      run: |
+        if grep -q "Decreased" ${{ github.workspace}}/reccmp-output.txt; then
+          echo "Decomp correctness decreased"
+          exit 1
+        fi
     - name: Update report in reccmp-report
       if: github.ref == 'refs/heads/main'
       run: |

@@ -3843,16 +3843,18 @@ void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pM
     br_scalar pos;
     br_bounds* bounds;
 
+#ifdef DETHRACE_FIX_BUGS
     x_size = 0;
     y_size = 0;
     z_size = 0;
     pos = 0;
+#endif
 
     switch (pGroove->object_type) {
     case eGroove_object_spin:
         if (pGroove->object_data.spin_info.axis == eGroove_axis_y) {
             if (pGroove->object_mode == eMove_continuous) {
-                if (pGroove->object_data.spin_info.period != 0.0) {
+                if (pGroove->object_data.spin_info.period != 0.0f) {
                     pos = fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period * 360.0;
                 }
             } else if (pGroove->object_mode == eMove_controlled) {
