@@ -154,7 +154,7 @@ jobs:
     - name: Validate correctness
       run: |
         if grep -q "Decreased" ${{ github.workspace}}/reccmp-output.txt; then
-          echo "::warning decomp correctness decreased (see report)"
+          echo "::warning file=reccmp-output.txt::Decomp correctness decreased"
         fi
     - name: Update report in reccmp-report
       if: github.ref == 'refs/heads/main'
