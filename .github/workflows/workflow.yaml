@@ -144,7 +144,7 @@ jobs:
         report_filename: ${{ github.workspace}}/new-reccmp-report.json
         original_binary_url: https://archive.org/download/carm-95/CARM95.EXE
         original_binary_filename: CARM95.EXE
-        reccmp_output_filenane: ${{ github.workspace}}/reccmp-output.txt
+        reccmp_output_filename: ${{ github.workspace}}/reccmp-output.txt
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
