@@ -200,3 +200,15 @@
 
 // LIBRARY: CARM95 0x004F0730
 // __cintrindisp2
+
+// LIBRARY: CARM95 0x004EA86A
+// __CIsqrt
+
+// LIBRARY: CARM95 0x0052D4B0
+// __OP_SQRTjmptab
+
+// LIBRARY: CARM95 0x004F7440
+// __loctotime_t
+
+// LIBRARY: CARM95 0x004EA9E0
+// __chkstk

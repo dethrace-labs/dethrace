@@ -256,7 +256,7 @@ void DrawSummaryItems(void) {
         gCurrent_graf_data->summ1_rank_inc_l,
         gCurrent_graf_data->summ1_rank_x_pitch,
         gCurrent_graf_data->summ1_rank_y,
-        (int)(gTemp_rank_increase + .5f));
+        (int)(gTemp_rank_increase + 0.5));
     DrawChromeNumber(
         gCurrent_graf_data->summ1_rank_total_c,
         gCurrent_graf_data->summ1_rank_total_l,

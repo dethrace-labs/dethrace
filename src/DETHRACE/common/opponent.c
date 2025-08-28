@@ -326,7 +326,7 @@ int PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
     from.v[1] += 0.15f;
     dir.v[1] += 0.15f;
     FindFace(&from, &dir, &norm, &t, &material);
-    return t > 1.0;
+    return t > 1.0f;
 }
 
 // IDA: tS16 __usercall FindNearestPathNode@<AX>(br_vector3 *pActor_coords@<EAX>, br_scalar *pDistance@<EDX>)
@@ -3191,7 +3191,7 @@ void ToggleOpponentProcessing(void) {
             gProgram_state.AI_vehicles.opponents[i].physics_me = 0;
         }
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
-            gProgram_state.AI_vehicles.opponents[i].physics_me = 0;
+            gProgram_state.AI_vehicles.cops[i].physics_me = 0;
         }
         gActive_car_list_rebuild_required = 1;
         RebuildActiveCarList();
@@ -3211,7 +3211,7 @@ void ToggleMellowOpponents(void) {
             ObjectiveComplete(&gProgram_state.AI_vehicles.opponents[i]);
         }
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Opponents hostile again");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -1, "Opponents hostile again");
     }
 }
 
@@ -3345,7 +3345,7 @@ void DeleteNode(tS16 pNode_to_delete, int pAnd_sections) {
         if (pNode_to_delete < gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]) {
             gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]--;
         }
-        if (pNode_to_delete < gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]) {
+        if (pNode_to_delete < gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]) {
             gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]--;
         }
     }
@@ -3596,7 +3596,10 @@ void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoi
     br_vector3 offset_v;
     br_vector3 point;
 
-    BrVector3Set(&point, pPoint->v[0], pPoint->v[1] + .15f, pPoint->v[2]);
+    point.v[0] = pPoint->v[0];
+    point.v[1] = pPoint->v[1];
+    point.v[1] += .15f;
+    point.v[2] = pPoint->v[2];
 
     BrVector3Set(&offset_v, .1f, .1f, .1f);
     MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 0, point.v[0], point.v[1], point.v[2], &offset_v);

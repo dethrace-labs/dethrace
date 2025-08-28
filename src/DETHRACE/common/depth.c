@@ -445,7 +445,12 @@ void InitDepthEffects(void) {
     PathCat(the_path, the_path, "HORIZON.MAT");
     gHorizon_material = BrMaterialLoad(the_path);
     if (gHorizon_material == NULL) {
-        FatalError(kFatalError_FindSkyMaterial_S, "HORIZON.MAT"); // 2nd argument added
+        FatalError(kFatalError_FindSkyMaterial_S
+#ifdef DETHRACE_FIX_BUGS
+            ,
+            "HORIZON.MAT"
+#endif
+        );
     }
 #ifdef DETHRACE_3DFX_PATCH
     if (gScreen->type == BR_PMT_INDEX_8 && !gMaterial_fogging)

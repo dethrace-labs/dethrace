@@ -738,7 +738,7 @@ void KillPedestrian(tPedestrian_data* pPedestrian) {
                 pPedestrian->current_frame,
                 pPedestrian->hit_points,
                 pPedestrian->done_initial,
-                (pPedestrian->actor->parent == gDont_render_actor) ? -1 : pPedestrian->killers_ID,
+                (pPedestrian->actor->parent == gDont_render_actor) ? (tU16)-1 : pPedestrian->killers_ID,
                 pPedestrian->spin_period,
                 pPedestrian->jump_magnitude,
                 &pPedestrian->offset);
@@ -2365,7 +2365,7 @@ void GroundPedestrian(tPedestrian_data* pPedestrian) {
             pPedestrian->current_frame,
             pPedestrian->hit_points,
             pPedestrian->done_initial,
-            pPedestrian->actor->parent == gDont_render_actor ? -1 : pPedestrian->killers_ID,
+            pPedestrian->actor->parent == gDont_render_actor ? (tU16)-1 : pPedestrian->killers_ID,
             pPedestrian->spin_period,
             pPedestrian->jump_magnitude,
             &pPedestrian->offset);

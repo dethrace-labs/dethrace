@@ -406,7 +406,7 @@ int PointInSpill(br_vector3* pV, int pSpill) {
 
     return gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.8f > SQR(pV->v[0] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.translate.t.v[0])
         && gOily_spills[pSpill].current_size * gOily_spills[pSpill].current_size * 0.8f > SQR(pV->v[2] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.translate.t.v[2])
-        && fabs(pV->v[1] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.translate.t.v[1]) < 0.1f;
+        && (float)fabs(pV->v[1] / WORLD_SCALE - gOily_spills[pSpill].actor->t.t.translate.t.v[1]) < 0.1f;
 }
 
 // IDA: void __usercall GetOilFrictionFactors(tCar_spec *pCar@<EAX>, br_scalar *pFl_factor@<EDX>, br_scalar *pFr_factor@<EBX>, br_scalar *pRl_factor@<ECX>, br_scalar *pRr_factor)

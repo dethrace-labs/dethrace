@@ -1225,6 +1225,7 @@ tSO_result DoAutoPartsShop(void) {
         { { 84, 168 }, { 95, 228 }, { 147, 294 }, { 115, 276 }, 1, 0, 0, NULL },
         { { 84, 168 }, { 124, 298 }, { 147, 294 }, { 144, 346 }, 2, 0, 0, NULL },
     };
+    // GLOBAL: CARM95 0x0050FD20
     static tInterface_spec interface_spec = {
         0, 280, 0, 0, 0, 0, 6,
         { -1, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { NULL, NULL },
@@ -2088,7 +2089,7 @@ void ChallengeStart(void) {
         gOpponents[gChallenger_index__racestrt].mug_shot_image_data,
         gOpponents[gChallenger_index__racestrt].mug_shot_image_data_length);
     if (gScreen->row_bytes < 0) {
-        BrFatal("C:\\Msdev\\Projects\\DethRace\\Racestrt.c", 2610, "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\Racestrt.c", 50);
+        BrFatal("C:\\Msdev\\Projects\\DethRace\\Racestrt.c", 2610, "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\Racestrt.c", 2610);
     }
     the_map = DRPixelmapAllocate(
 #ifdef DETHRACE_3DFX_PATCH

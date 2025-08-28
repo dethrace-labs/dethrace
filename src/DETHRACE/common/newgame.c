@@ -1426,7 +1426,7 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
     }
     if (pCurrent_mode != 0) {
         gLast_net_choose_box = pCurrent_choice;
-        DrawAGraphBox__newgame(pCurrent_choice);
+        DrawAGraphBox__newgame(gLast_net_choose_box);
     } else {
         gLast_net_choose_box = -1;
     }

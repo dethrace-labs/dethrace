@@ -943,6 +943,7 @@ void DRSetPalette(br_pixelmap* pThe_palette) {
 // IDA: void __cdecl InitializePalettes()
 // FUNCTION: CARM95 0x004b3bd3
 void InitializePalettes(void) {
+    int i;
     int j;
     gCurrent_palette_pixels = BrMemAllocate(0x400u, kMem_cur_pal_pixels);
 #ifdef DETHRACE_3DFX_PATCH
