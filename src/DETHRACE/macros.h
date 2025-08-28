@@ -1,12 +1,12 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-#define DR_JOIN2(A,B) A##B
-#define DR_JOIN(A,B) DR_JOIN2(A, B)
-#define DR_STATIC_ASSERT(V) typedef int DR_JOIN(dr_static_assert_, __COUNTER__)[(V)?1:-1]
+#define DR_JOIN2(A, B) A##B
+#define DR_JOIN(A, B) DR_JOIN2(A, B)
+#define DR_STATIC_ASSERT(V) typedef int DR_JOIN(dr_static_assert_, __COUNTER__)[(V) ? 1 : -1]
 
 #define VEHICLE_TYPE_FROM_ID(id) ((tVehicle_type)(id >> 8))
-#define VEHICLE_INDEX_FROM_ID(id) ((id)&0x00ff)
+#define VEHICLE_INDEX_FROM_ID(id) ((id) & 0x00ff)
 
 // #define VEC3_TRANSLATE(mat) (*(br_vector3*)(&mat->m[3][0]))
 
@@ -19,10 +19,10 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define CONSTRAIN_BETWEEN(lowerbound, upperbound, val) (MIN((upperbound), MAX((lowerbound), (val))))
 
-#define COUNT_OF(array) (sizeof((array)) / sizeof((array)[0]))
+#define COUNT_OF(array) (int)(sizeof((array)) / sizeof((array)[0]))
 #define LEN(array) (sizeof((array)) / sizeof((array)[0]))
 
-#define DEG_TO_RAD(degrees) ((degrees)*3.141592653589793 / 180.0)
+#define DEG_TO_RAD(degrees) ((degrees) * 3.141592653589793 / 180.0)
 
 #define V11MODEL(model) (((struct v11model*)model->prepared))
 #define CAR(c) ((tCar_spec*)c)
@@ -54,6 +54,40 @@
         (T) = (V1);                         \
         (V1) = (V2);                        \
         (V2) = (T);                         \
+    } while (0)
+
+#define ReadVector3(pF, a, b, c)                 \
+    do {                                         \
+        float x[3];                              \
+        GetThreeFloats(pF, &x[2], &x[1], &x[0]); \
+        a = x[2];                                \
+        b = x[1];                                \
+        c = x[0];                                \
+                                                 \
+    } while (0)
+
+#define ReadVector32(pF, a, b, c)                \
+    do {                                         \
+        float x[3];                              \
+        GetThreeFloats(pF, &x[2], &x[1], &x[0]); \
+        b = x[2];                                \
+        c = x[1];                                \
+        a = x[0];                                \
+    } while (0)
+
+#define ReadPairOfFloats(pF, a, b)         \
+    do {                                   \
+        float x[2];                        \
+        GetPairOfFloats(pF, &x[1], &x[0]); \
+        a = x[1];                          \
+        b = x[0];                          \
+    } while (0)
+
+#define DRVector3Scale(v1, v2, s)           \
+    do {                                    \
+        (v1)->v[0] = BR_MUL((v2)->v[0], s); \
+        (v1)->v[1] = BR_MUL((v2)->v[1], s); \
+        (v1)->v[2] = BR_MUL((v2)->v[2], s); \
     } while (0)
 
 #endif

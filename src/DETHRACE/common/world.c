@@ -2376,13 +2376,13 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
         return NULL;
     }
     max_suffix_len = 0;
-    for (s = 0; s < COUNT_OF(suffixes); s++) {
+    for (s = 0; s < BR_ASIZE(suffixes); s++) {
         if (max_suffix_len < strlen(suffixes[s])) {
             max_suffix_len = strlen(suffixes[s]);
         }
     }
     id = BrMemAllocate(strlen(mat->identifier) + max_suffix_len + 1, kMem_new_mat_id_3);
-    for (s = 0; s < COUNT_OF(suffixes); s++) {
+    for (s = 0; s < BR_ASIZE(suffixes); s++) {
         sprintf(id, "%s%s", mat->identifier, suffixes[s]);
         victim = BrMaterialFind(id);
         if (victim != NULL) {
@@ -3262,7 +3262,7 @@ br_scalar NormaliseDegreeAngle(br_scalar pAngle) {
             }                                                                               \
             break;                                                                          \
         case eMove_flash:                                                                   \
-            if (2 * fmod(f_the_time, (PERIOD)) > (PERIOD)) {                               \
+            if (2 * fmod(f_the_time, (PERIOD)) > (PERIOD)) {                                \
                 DEST = (FLASH_VALUE);                                                       \
             } else {                                                                        \
                 DEST = -(FLASH_VALUE);                                                      \
@@ -3843,16 +3843,18 @@ void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pM
     br_scalar pos;
     br_bounds* bounds;
 
+#ifdef DETHRACE_FIX_BUGS
     x_size = 0;
     y_size = 0;
     z_size = 0;
     pos = 0;
+#endif
 
     switch (pGroove->object_type) {
     case eGroove_object_spin:
         if (pGroove->object_data.spin_info.axis == eGroove_axis_y) {
             if (pGroove->object_mode == eMove_continuous) {
-                if (pGroove->object_data.spin_info.period != 0.0) {
+                if (pGroove->object_data.spin_info.period != 0.0f) {
                     pos = fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period * 360.0;
                 }
             } else if (pGroove->object_mode == eMove_controlled) {

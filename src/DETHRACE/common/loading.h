@@ -3,7 +3,7 @@
 
 #include "dr_types.h"
 
-extern tHeadup_info gHeadup_image_info[32];
+extern tHeadup_info gHeadup_image_info[];
 extern char* gYour_car_names[2][6];
 extern char* gDrivable_car_names[6];
 extern char* gDamage_names[12];

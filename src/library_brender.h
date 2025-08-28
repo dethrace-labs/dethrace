@@ -373,12 +373,6 @@
 // LIBRARY: CARM95 0x004df5f0
 // BrResRemove
 
-// LIBRARY: CARM95 0x004df8b0
-// BrStrDup
-
-// LIBRARY: CARM95 0x004df920
-// BrMemSet2
-
 // LIBRARY: CARM95 0x004df980
 // BrSwap32
 

@@ -47,7 +47,7 @@ option(DETHRACE_PLATFORM_SDL2 "Support SDL 2 platform driver" ON)
 
 option(MSVC_42_FOR_RECCMP "Build with MSVC 4.2 to match assembly" OFF)
 
-if (MSVC_42_FOR_RECCMP)
+if(MSVC_42_FOR_RECCMP)
     set(DETHRACE_FIX_BUGS OFF)
     set(DETHRACE_3DFX_PATCH OFF)
     set(DETHRACE_SOUND_ENABLED OFF)
@@ -56,12 +56,11 @@ if (MSVC_42_FOR_RECCMP)
     set(DETHRACE_PLATFORM_SDL2 OFF)
     set(BRENDER_BUILD_DRIVERS OFF)
 
-    set(CMAKE_C_FLAGS_DEBUG "/Zi /Od /MTd")
+    set(CMAKE_C_FLAGS_DEBUG "/Zi /Oi /MLd")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/DEBUG")
+
     include("reccmp")
 endif()
-
-
 
 function(add_compile_flag_if_supported TARGET FLAG)
     cmake_parse_arguments(ARGS "" "" "LANGUAGES" ${ARGN})

@@ -260,10 +260,10 @@ br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect) {
     br_scalar b;
     br_scalar c;
 
-    a = cos(BrAngleToRadian(pPerfect));
+    a = cos(BrAngleToRadian(pPerfect)) * cos(BrAngleToRadian(pPerfect));
     b = sin(BrAngleToRadian(pView));
-    c = cos(BrAngleToRadian(pView));
-    return b * a * a / (BrAngleToRadian(pSky) * (1.f + c));
+    c = cos(BrAngleToRadian(pView) + 1.0f) * BrAngleToRadian(pSky);
+    return b * a / c;
 }
 
 // IDA: void __usercall MungeSkyModel(br_actor *pCamera@<EAX>, br_model *pModel@<EDX>)
@@ -949,7 +949,7 @@ void SetYon(br_scalar pYon) {
         pYon = 5.0f;
     }
 
-    for (i = 0; i < COUNT_OF(gCamera_list); i++) {
+    for (i = 0; i < BR_ASIZE(gCamera_list); i++) {
         if (gCamera_list[i]) {
             camera_ptr = gCamera_list[i]->type_data;
             camera_ptr->yon_z = pYon;

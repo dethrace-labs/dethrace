@@ -44,7 +44,7 @@
 #define OPPONENT_APC_IDX 3
 
 // GLOBAL: CARM95 0x0050a3f0
-tHeadup_info gHeadup_image_info[32] = {
+tHeadup_info gHeadup_image_info[] = {
     // Modified by DethRace to fit the "demo timeout" fancy head-up.
     { "LADY.PIX", eNet_or_otherwise },
     { "GENT.PIX", eNet_or_otherwise },
@@ -76,8 +76,11 @@ tHeadup_info gHeadup_image_info[32] = {
     { "GAMEOVER.PIX", eNet_only },
     { "UBROKE.PIX", eNet_only },
     { "ULOST.PIX", eNet_only },
-    { "UWON.PIX", eNet_only },
-    { "DTIMEOUT.PIX", eNot_net }, // Only used by the demo, not present in the full version
+    { "UWON.PIX", eNet_only }
+#ifdef DETHRACE_FIX_BUGS
+    ,
+    { "DTIMEOUT.PIX", eNot_net } // Only used by the demo, not present in the full version
+#endif
 };
 
 char* gYour_car_names[2][6];
@@ -736,7 +739,8 @@ void DRLoadLights(char* pPath_name) {
 
     PossibleService();
     number_of_lights = BrActorLoadMany(pPath_name, light_array, COUNT_OF(light_array));
-    for (i = 0; i < number_of_lights; i++) {
+
+    for (i = 0; number_of_lights > i; ++i) {
         gLight_array[gNumber_of_lights] = light_array[i];
         gNumber_of_lights++;
     }
@@ -1340,66 +1344,79 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     int j;
     char s[256];
     tCollision_info* c;
-    br_scalar wid;
-    br_scalar het;
-    br_scalar len;
+
+    br_scalar len; // epb-120
+    br_scalar wid; // ebp-110
+    br_scalar het; // ebp-4
+
     br_scalar ts;
     br_scalar ts1;
     br_scalar snap_angle;
 
-    non_car->collision_info.driver = 0;
-    number = GetAnInt(pF);
-    non_car->collision_info.index = number;
-    GetThreeFloats(pF, &non_car->free_cmpos.v[0], &non_car->free_cmpos.v[1], &non_car->free_cmpos.v[2]);
-    GetThreeFloats(pF, &non_car->attached_cmpos.v[0], &non_car->attached_cmpos.v[1], &non_car->attached_cmpos.v[2]);
-    GetThreeFloats(pF, &non_car->collision_info.bounds[1].min.v[0], &non_car->collision_info.bounds[1].min.v[1], &non_car->collision_info.bounds[1].min.v[2]);
-    GetThreeFloats(pF, &non_car->collision_info.bounds[1].max.v[0], &non_car->collision_info.bounds[1].max.v[1], &non_car->collision_info.bounds[1].max.v[2]);
-    non_car->collision_info.extra_point_num = GetAnInt(pF);
-    if (non_car->collision_info.extra_point_num > 6) {
-        sprintf(s, "%d", non_car->collision_info.index);
+    c = &non_car->collision_info;
+    c->driver = 0;
+    c->index = GetAnInt(pF);
+    ReadVector3(pF, non_car->free_cmpos.v[0], non_car->free_cmpos.v[1], non_car->free_cmpos.v[2]);
+    ReadVector3(pF, non_car->attached_cmpos.v[0], non_car->attached_cmpos.v[1], non_car->attached_cmpos.v[2]);
+    ReadVector3(pF, c->bounds[1].min.v[0], c->bounds[1].min.v[1], c->bounds[1].min.v[2]);
+    ReadVector3(pF, c->bounds[1].max.v[0], c->bounds[1].max.v[1], c->bounds[1].max.v[2]);
+    c->extra_point_num = GetAnInt(pF);
+    if (c->extra_point_num > 6) {
+        sprintf(s, "%d", c->index);
         FatalError(kFatalError_TooManyExtraPointsForCar_S, s);
     }
-    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
-        GetThreeFloats(pF, &non_car->collision_info.extra_points[i].v[0], &non_car->collision_info.extra_points[i].v[1], &non_car->collision_info.extra_points[i].v[2]);
+    for (i = 0; c->extra_point_num > i; ++i) {
+        ReadVector3(pF, c->extra_points[i].v[0], c->extra_points[i].v[1], c->extra_points[i].v[2]);
     }
-    GetPairOfFloats(pF, &non_car->free_mass, &non_car->attached_mass);
-    GetThreeFloats(pF, &len, &wid, &het);
+    ReadPairOfFloats(pF, non_car->free_mass, non_car->attached_mass);
+
+    do {
+        float x[3];
+        GetThreeFloats(pF, &x[2], &x[1], &x[0]);
+        wid = x[2];
+        het = x[1];
+        len = x[0];
+    } while (0);
+
     snap_angle = GetAFloat(pF);
 
     non_car->snap_off_cosine = cos(BrAngleToRadian(BrDegreeToAngle(snap_angle)));
-    non_car->collision_info.break_off_radians_squared = snap_angle * 3.14f / 180.f * (snap_angle * 3.14f / 180.f);
+    c->break_off_radians_squared = snap_angle * 3.14 / 180.0 * (snap_angle * 3.14 / 180.0);
     ts = GetAFloat(pF);
 
     non_car->min_torque_squared = ts * ts;
-    non_car->collision_info.bounds[0].min = non_car->collision_info.bounds[1].min;
-    non_car->collision_info.bounds[0].max = non_car->collision_info.bounds[1].max;
-    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
-        for (j = 0; j < 3; ++j) {
-            if (non_car->collision_info.extra_points[i].v[j] < non_car->collision_info.bounds[0].min.v[j]) {
-                non_car->collision_info.bounds[0].min.v[j] = non_car->collision_info.extra_points[i].v[j];
+    BrVector3Copy(&c->bounds[0].min, &c->bounds[1].min);
+    BrVector3Copy(&c->bounds[0].max, &c->bounds[1].max);
+    for (i = 0; i < c->extra_point_num; i++) {
+        for (j = 0; j < 3; j++) {
+            if (c->bounds[0].min.v[j] > c->extra_points[i].v[j]) {
+                c->bounds[0].min.v[j] = c->extra_points[i].v[j];
             }
-            if (non_car->collision_info.extra_points[i].v[j] > non_car->collision_info.bounds[0].max.v[j]) {
-                non_car->collision_info.bounds[0].max.v[j] = non_car->collision_info.extra_points[i].v[j];
+            if (c->extra_points[i].v[j] > c->bounds[0].max.v[j]) {
+                c->bounds[0].max.v[j] = c->extra_points[i].v[j];
             }
         }
     }
-    non_car->collision_info.bounds[2] = non_car->collision_info.bounds[0];
-    non_car->I_over_M.v[2] = (wid * wid + len * len) / 12.0;
-    non_car->I_over_M.v[1] = (het * het + len * len) / 12.0;
-    non_car->I_over_M.v[0] = (het * het + wid * wid) / 12.0;
-    BrVector3Scale(&non_car->free_cmpos, &non_car->free_cmpos, WORLD_SCALE);
-    BrVector3Scale(&non_car->attached_cmpos, &non_car->attached_cmpos, WORLD_SCALE);
-    BrVector3Scale(&non_car->I_over_M, &non_car->I_over_M, 47.610001);
-    BrVector3Scale(&non_car->collision_info.bounds[1].min, &non_car->collision_info.bounds[1].min, WORLD_SCALE);
-    BrVector3Scale(&non_car->collision_info.bounds[1].max, &non_car->collision_info.bounds[1].max, WORLD_SCALE);
+    memcpy(&c->bounds[2], &c->bounds[0], sizeof(c->bounds[2]));
+    ts1 = BR_SQR2(wid, het);
+    non_car->I_over_M.v[2] = ts1 / 12.0f;
+    ts1 = BR_SQR2(wid, len);
+    non_car->I_over_M.v[1] = ts1 / 12.0f;
+    ts1 = BR_SQR2(het, len);
+    non_car->I_over_M.v[0] = ts1 / 12.0f;
+    DRVector3Scale(&non_car->free_cmpos, &non_car->free_cmpos, WORLD_SCALE);
+    DRVector3Scale(&non_car->attached_cmpos, &non_car->attached_cmpos, WORLD_SCALE);
+    DRVector3Scale(&non_car->I_over_M, &non_car->I_over_M, 47.61000061035156f);
+    DRVector3Scale(&c->bounds[1].min, &c->bounds[1].min, WORLD_SCALE);
+    DRVector3Scale(&c->bounds[1].max, &c->bounds[1].max, WORLD_SCALE);
 
-    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
-        BrVector3Scale(&non_car->collision_info.extra_points[i], &non_car->collision_info.extra_points[i], WORLD_SCALE);
+    for (i = 0; c->extra_point_num > i; ++i) {
+        DRVector3Scale(&c->extra_points[i], &c->extra_points[i], WORLD_SCALE);
     }
-    non_car->collision_info.max_bounds[0] = non_car->collision_info.bounds[0];
-    non_car->collision_info.max_bounds[1] = non_car->collision_info.bounds[2];
-    for (i = 0; non_car->collision_info.extra_point_num > i; ++i) {
-        non_car->collision_info.original_extra_points_z[i] = non_car->collision_info.extra_points[i].v[2];
+    memcpy(&c->max_bounds[0], &c->bounds[0], sizeof(c->max_bounds[0]));
+    memcpy(&c->max_bounds[1], &c->bounds[1], sizeof(c->max_bounds[0]));
+    for (i = 0; i < c->extra_point_num; i++) {
+        c->original_extra_points_z[i] = c->extra_points[i].v[2];
     }
 }
 
@@ -1866,8 +1883,9 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     int vertex_total;
 
     if (pDriver == eDriver_local_human) {
-        if (strcmp(gProgram_state.car_name, pCar_name) == 0)
+        if (strcmp(gProgram_state.car_name, pCar_name) == 0) {
             return;
+        }
         if (gProgram_state.car_name[0] != '\0') {
             DisposeCar(&gProgram_state.current_car, gProgram_state.current_car.index);
             ClearOutStorageSpace(&gOur_car_storage_space);
@@ -1878,6 +1896,8 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     pCar_spec->index = pOwner;
     if (pDriver == eDriver_local_human) {
         gProgram_state.current_car_index = pOwner;
+    }
+    if (pDriver == eDriver_local_human) {
         gFunk_groove_flags[0] = 1;
         gGroove_funk_offset = 0;
     } else {
@@ -1895,10 +1915,10 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     if (gGroove_funk_offset < 0) {
         FatalError(kFatalError_NoFunkGrooveSlotBunchesLeft);
     }
-    if (strcmp(pCar_name, "STELLA.TXT") == 0) {
-        pCar_spec->proxy_ray_distance = 6.0f;
-    } else {
+    if (strcmp(pCar_name, "STELLA.TXT") != 0) {
         pCar_spec->proxy_ray_distance = 0.0f;
+    } else {
+        pCar_spec->proxy_ray_distance = 6.0f;
     }
     PathCat(the_path, gApplication_path, "CARS");
     PathCat(the_path, the_path, pCar_name);
@@ -2484,10 +2504,12 @@ void LoadHeadupImages(void) {
 
     for (i = 0; i < COUNT_OF(gHeadup_image_info); i++) {
         PossibleService();
-        if (gHeadup_image_info[i].avail && (gHeadup_image_info[i].avail != eNot_net || gNet_mode) && (gHeadup_image_info[i].avail != eNet_only || !gNet_mode)) {
-            gHeadup_images[i] = NULL;
-        } else {
+        if ((gHeadup_image_info[i].avail == eNet_or_otherwise)
+            || ((gHeadup_image_info[i].avail == eNot_net) && (gNet_mode == eNet_mode_none))
+            || ((gHeadup_image_info[i].avail == eNet_only) && gNet_mode)) {
             gHeadup_images[i] = LoadPixelmap(gHeadup_image_info[i].name);
+        } else {
+            gHeadup_images[i] = NULL;
         }
     }
 }
@@ -2522,11 +2544,11 @@ FILE* OpenRaceFile(void) {
 // IDA: void __usercall SkipRestOfRace(FILE *pF@<EAX>)
 // FUNCTION: CARM95 0x0042434a
 void SkipRestOfRace(FILE* pF) {
-    int j;
-    int k;
-    int text_chunk_count;
-    int line_count;
-    char s[256];
+    int k;                // at [ebp-110h]
+    int j;                // at [ebp-10Ch]
+    int text_chunk_count; // at [ebp-108h]
+    int line_count;       // at [ebp-104h]
+    char s[256];          // at [ebp-100h]
 
     GetALineAndDontArgue(pF, s);
     GetALineAndDontArgue(pF, s);
@@ -2539,9 +2561,10 @@ void SkipRestOfRace(FILE* pF) {
         GetALineAndDontArgue(pF, s);
         line_count = GetAnInt(pF);
         while (line_count > 8) {
-            GetALineAndDontArgue(pF, s);
             line_count--;
+            GetALineAndDontArgue(pF, s);
         }
+
         for (k = 0; k < line_count; k++) {
             GetALineAndDontArgue(pF, s);
         }

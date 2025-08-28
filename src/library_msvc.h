@@ -173,3 +173,30 @@
 
 // LIBRARY: CARM95 0x005002d0
 // wcstombs
+
+// LIBRARY: CARM95 0x004EABD2
+// __CIcos
+
+// LIBRARY: CARM95 0x004EABC8
+// __CIsin
+
+// LIBRARY: CARM95 0x004EC51A
+// __CIfmod
+
+// LIBRARY: CARM95 0x004EA874
+// __ftol
+
+// LIBRARY: CARM95 0x004F076E
+// __cintrindisp1
+
+// LIBRARY: CARM95 0x0052D6C2
+// __OP_COSjmptab
+
+// LIBRARY: CARM95 0x0052D6A2
+// __OP_SINjmptab
+
+// LIBRARY: CARM95 0x0052D140
+// __OP_FMODjmptab
+
+// LIBRARY: CARM95 0x004F0730
+// __cintrindisp2
