@@ -998,7 +998,7 @@ void DeclareWinner(int pWinner_index) {
         if (gCurrent_net_game->type != eNet_game_type_sudden_death && gCurrent_net_game->type != eNet_game_type_tag && gCurrent_net_game->type != eNet_game_type_fight_to_death) {
             best_score_index = gNet_players[i].last_score_index;
             for (j = 0; j < gNumber_of_net_players; j++) {
-                if (gNet_players[j].score == gNet_players[i].score && gNet_players[j].last_score_index < best_score_index) {
+                if (gNet_players[i].score == gNet_players[j].score && gNet_players[j].last_score_index < best_score_index) {
                     best_score_index = gNet_players[j].last_score_index;
                 }
             }
@@ -1057,7 +1057,7 @@ int FarEnoughAway(tNet_game_player_info* pPlayer_1, tNet_game_player_info* pPlay
     br_vector3 difference;
 
     BrVector3Sub(&difference, &pPlayer_1->car->pos, &pPlayer_2->car->pos);
-    return BrVector3LengthSquared(&difference) >= 4.0f;
+    return BrVector3LengthSquared(&difference) >= 4.0;
 }
 
 // IDA: void __usercall CarInContactWithItOrFox(tNet_game_player_info *pPlayer@<EAX>)

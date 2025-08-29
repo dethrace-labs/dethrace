@@ -326,7 +326,7 @@ int PointVisibleFromHere(br_vector3* pFrom, br_vector3* pTo) {
     from.v[1] += 0.15f;
     dir.v[1] += 0.15f;
     FindFace(&from, &dir, &norm, &t, &material);
-    return t > 1.0;
+    return t > 1.0f;
 }
 
 // IDA: tS16 __usercall FindNearestPathNode@<AX>(br_vector3 *pActor_coords@<EAX>, br_scalar *pDistance@<EDX>)
@@ -2192,26 +2192,25 @@ void CalcPlayerConspicuousness(tOpponent_spec* pOpponent_spec) {
     br_vector3 pos_in_cop_space;
     br_matrix34 inverse_transform;
 
-    if (pOpponent_spec->next_player_visibility_check >= gTime_stamp_for_this_munging) {
-        return;
-    }
-    pOpponent_spec->player_in_view_now = 0;
-    if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
-        pOpponent_spec->next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 100;
-        if (pOpponent_spec->player_to_oppo_d < 20.f) {
-            BrMatrix34LPInverse(&inverse_transform, &pOpponent_spec->car_spec->car_master_actor->t.t.mat);
-            BrMatrix34ApplyP(&pos_in_cop_space, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &inverse_transform);
-            if (pos_in_cop_space.v[2] < 0.f && PointVisibleFromHere(&gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
+    if (pOpponent_spec->next_player_visibility_check < gTime_stamp_for_this_munging) {
+        pOpponent_spec->player_in_view_now = 0;
+        if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
+            pOpponent_spec->next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 100;
+            if (pOpponent_spec->player_to_oppo_d < 20.f) {
+                BrMatrix34LPInverse(&inverse_transform, &pOpponent_spec->car_spec->car_master_actor->t.t.mat);
+                BrMatrix34ApplyP(&pos_in_cop_space, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &inverse_transform);
+                if (pos_in_cop_space.v[2] < 0.f && PointVisibleFromHere(&gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
+                    pOpponent_spec->player_in_view_now = 1;
+                    pOpponent_spec->acknowledged_piv = 0;
+                }
+            }
+        } else {
+            pOpponent_spec->next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 6000;
+            dr_dprintf("%s: Time now: %9.2f; next vis check at %9.2f", pOpponent_spec->car_spec->driver_name, gTime_stamp_for_this_munging / 1000.0, pOpponent_spec->next_player_visibility_check / 1000.0);
+            if (pOpponent_spec->player_to_oppo_d < 50.f && PointVisibleFromHere(&gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
                 pOpponent_spec->player_in_view_now = 1;
                 pOpponent_spec->acknowledged_piv = 0;
             }
-        }
-    } else {
-        pOpponent_spec->next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 6000;
-        dr_dprintf("%s: Time now: %9.2f; next vis check at %9.2f", pOpponent_spec->car_spec->driver_name, gTime_stamp_for_this_munging / 1000.f, pOpponent_spec->next_player_visibility_check / 1000.0f);
-        if (pOpponent_spec->player_to_oppo_d < 50.f && PointVisibleFromHere(&gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
-            pOpponent_spec->player_in_view_now = 1;
-            pOpponent_spec->acknowledged_piv = 0;
         }
     }
 }
@@ -3191,7 +3190,7 @@ void ToggleOpponentProcessing(void) {
             gProgram_state.AI_vehicles.opponents[i].physics_me = 0;
         }
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
-            gProgram_state.AI_vehicles.opponents[i].physics_me = 0;
+            gProgram_state.AI_vehicles.cops[i].physics_me = 0;
         }
         gActive_car_list_rebuild_required = 1;
         RebuildActiveCarList();
@@ -3211,7 +3210,7 @@ void ToggleMellowOpponents(void) {
             ObjectiveComplete(&gProgram_state.AI_vehicles.opponents[i]);
         }
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Opponents hostile again");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -1, "Opponents hostile again");
     }
 }
 
@@ -3345,7 +3344,7 @@ void DeleteNode(tS16 pNode_to_delete, int pAnd_sections) {
         if (pNode_to_delete < gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]) {
             gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]--;
         }
-        if (pNode_to_delete < gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]) {
+        if (pNode_to_delete < gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]) {
             gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]--;
         }
     }
@@ -3596,7 +3595,10 @@ void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoi
     br_vector3 offset_v;
     br_vector3 point;
 
-    BrVector3Set(&point, pPoint->v[0], pPoint->v[1] + .15f, pPoint->v[2]);
+    point.v[0] = pPoint->v[0];
+    point.v[1] = pPoint->v[1];
+    point.v[1] += .15f;
+    point.v[2] = pPoint->v[2];
 
     BrVector3Set(&offset_v, .1f, .1f, .1f);
     MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 0, point.v[0], point.v[1], point.v[2], &offset_v);
@@ -4735,8 +4737,8 @@ void DeleteCopStartPoint(void) {
             BrVector3Sub(&car_to_point, &gSelf->t.t.translate.t, &gProgram_state.AI_vehicles.cop_start_points[i]);
             distance = BrVector3Length(&car_to_point);
             if (distance < closest_distance) {
-                closest = i;
                 closest_distance = distance;
+                closest = i;
             }
         }
         if (closest < 0 || closest_distance > 10.f) {

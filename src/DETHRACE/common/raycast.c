@@ -458,7 +458,7 @@ void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_heig
 
     gLowest_y_above = 30000.0;
     gHighest_y_below = -30000.0;
-    gCurrent_y = pPosition->v[1] + 0.000011920929;
+    gCurrent_y = pPosition->v[1] + 0.000011920929f;
     gY_picking_camera->t.t.euler.t = *pPosition;
     gY_picking_camera->t.t.mat.m[3][1] = gY_picking_camera->t.t.mat.m[3][1] + pStarting_height;
     DRScenePick2D(gWorld, gY_picking_camera, FindHighestCallBack__raycast, 0);

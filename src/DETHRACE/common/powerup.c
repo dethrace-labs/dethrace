@@ -1285,7 +1285,7 @@ void SendCurrentPowerups(void) {
     tNet_contents* the_contents;
     tPlayer_ID ID;
 
-    for (cat = eVehicle_self; cat < eVehicle_net_player; cat++) {
+    for (cat = eVehicle_self; cat <= eVehicle_net_player; cat++) {
         if (cat == eVehicle_self) {
             car_count = 1;
         } else {
@@ -1312,7 +1312,7 @@ void SendCurrentPowerups(void) {
                     the_contents->data.powerup.event = ePowerup_ongoing;
                     the_contents->data.powerup.player = ID;
                     the_contents->data.powerup.powerup_index = j;
-                    the_contents->data.powerup.time_left = car->powerups[i] - GetTotalTime();
+                    the_contents->data.powerup.time_left = car->powerups[j] - GetTotalTime();
                 }
             }
         }

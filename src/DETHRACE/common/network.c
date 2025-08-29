@@ -263,17 +263,16 @@ void NetSendHeadupToEverybody(char* pMessage) {
 void NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) {
     tNet_message* message;
 
-    if (gNet_mode == eNet_mode_none) {
-        return;
-    }
-    if (gLocal_net_ID == pPlayer) {
-        if (gProgram_state.racing) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pMessage);
+    if (gNet_mode != eNet_mode_none) {
+        if (gLocal_net_ID == pPlayer) {
+            if (gProgram_state.racing) {
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pMessage);
+            }
+        } else {
+            message = NetBuildMessage(NETMSGID_HEADUP, 0);
+            strcpy(message->contents.data.headup.text, pMessage);
+            NetGuaranteedSendMessageToPlayer(gCurrent_net_game, message, pPlayer, 0);
         }
-    } else {
-        message = NetBuildMessage(NETMSGID_HEADUP, 0);
-        strcpy(message->contents.data.headup.text, pMessage);
-        NetGuaranteedSendMessageToPlayer(gCurrent_net_game, message, pPlayer, 0);
     }
 }
 
@@ -728,10 +727,10 @@ int NetJoinGameLowLevel(tNet_game_details* pDetails, char* pPlayer_name) {
 }
 
 DR_STATIC_ASSERT(offsetof(tNet_message_join, player_info) == 4);
-//DR_STATIC_ASSERT(offsetof(tNet_game_player_info, this_players_time_stamp) == 0x10);
-//DR_STATIC_ASSERT(offsetof(tNet_game_player_info, wasted) == 0x68);
-//DR_STATIC_ASSERT(offsetof(tNet_game_player_info, initial_position) == 0x8c);
-//DR_STATIC_ASSERT(offsetof(tNet_game_player_info, car) == 0xbc);
+// DR_STATIC_ASSERT(offsetof(tNet_game_player_info, this_players_time_stamp) == 0x10);
+// DR_STATIC_ASSERT(offsetof(tNet_game_player_info, wasted) == 0x68);
+// DR_STATIC_ASSERT(offsetof(tNet_game_player_info, initial_position) == 0x8c);
+// DR_STATIC_ASSERT(offsetof(tNet_game_player_info, car) == 0xbc);
 
 // IDA: int __usercall NetJoinGame@<EAX>(tNet_game_details *pDetails@<EAX>, char *pPlayer_name@<EDX>, int pCar_index@<EBX>)
 // FUNCTION: CARM95 0x004476d9
@@ -2038,8 +2037,6 @@ void NetFinishRace(tNet_game_details* pDetails, tRace_over_reason pReason) {
 // IDA: void __usercall NetPlayerStatusChanged(tPlayer_status pNew_status@<EAX>)
 // FUNCTION: CARM95 0x0044a525
 void NetPlayerStatusChanged(tPlayer_status pNew_status) {
-    tNet_message* the_message;
-
     if (gNet_mode != eNet_mode_none && pNew_status != gNet_players[gThis_net_player_index].player_status) {
         gNet_players[gThis_net_player_index].player_status = pNew_status;
         BroadcastStatus();

@@ -230,6 +230,8 @@ int FrankieOrAnnie(void) {
         { { 55, 110 }, { 132, 317 }, { 161, 322 }, { 154, 370 } },
         { { 178, 356 }, { 132, 317 }, { 295, 590 }, { 154, 370 } }
     };
+
+    // GLOBAL: CARM95 0x0051EC18
     static tInterface_spec interface_spec = {
         0,               // initial_imode
         80,              // first_opening_flic
@@ -1131,15 +1133,14 @@ void RevertToDefaults(void) {
 
     PathCat(the_path, gApplication_path, "NETDEFLT.TXT");
     f = DRfopen(the_path, "rt");
-    if (f == NULL) {
-        return;
+    if (f != NULL) {
+        for (i = 0; i < gCurrent_game_selection + 1; i++) {
+            ReadNetworkSettings(f, &net_options);
+        }
+        SetNetOptions(&net_options);
+        DrawNOptInitialRadios();
+        fclose(f);
     }
-    for (i = 0; i < gCurrent_game_selection + 1; i++) {
-        ReadNetworkSettings(f, &net_options);
-    }
-    SetNetOptions(&net_options);
-    DrawNOptInitialRadios();
-    fclose(f);
 }
 
 // IDA: void __cdecl DefaultNetSettings()
@@ -1426,7 +1427,7 @@ void DrawNetChoose(int pCurrent_choice, int pCurrent_mode) {
     }
     if (pCurrent_mode != 0) {
         gLast_net_choose_box = pCurrent_choice;
-        DrawAGraphBox__newgame(pCurrent_choice);
+        DrawAGraphBox__newgame(gLast_net_choose_box);
     } else {
         gLast_net_choose_box = -1;
     }
@@ -1550,6 +1551,8 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
         { { 53, 98 }, { 121, 264 }, { 211, 568 }, { 129, 283 }, 9, 1, 0, NULL },
         { { 53, 98 }, { 131, 264 }, { 211, 568 }, { 139, 283 }, 10, 1, 0, NULL },
     };
+
+    // GLOBAL: CARM95 0x0051FE48
     static tInterface_spec interface_spec = {
         0, 122, 0, 0, 0, 0, -1,
         { 1, 0 }, { 4, -10 }, { 4, 0 }, { 4, 0 }, { NetChooseLR, NULL },

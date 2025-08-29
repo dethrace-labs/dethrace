@@ -717,8 +717,8 @@ void AdjustSpark(int pSpark_num, br_vector3* pos, br_vector3* length) {
     if (gSparks[i].car != NULL) {
         mat = &gSparks[i].car->car_master_actor->t.t.mat;
         tv.v[0] = pos->v[0] - mat->m[3][0];
-        tv.v[1] = pos->v[0] - mat->m[3][1];
-        tv.v[2] = pos->v[0] - mat->m[3][2];
+        tv.v[1] = pos->v[1] - mat->m[3][1];
+        tv.v[2] = pos->v[2] - mat->m[3][2];
         BrMatrix34TApplyV(&gSparks[i].pos, &tv, mat);
     } else {
         gSparks[i].pos.v[0] = pos->v[0];
@@ -740,7 +740,7 @@ void AdjustShrapnel(int pShrapnel_num, br_vector3* pos, tU16 pAge, br_material* 
     if (!(gShrapnel_flags & (1u << i))) {
         BrActorAdd(gNon_track_actor, gShrapnel[i].actor);
     }
-    gShrapnel_flags |= 1u << i;
+    gShrapnel_flags = gShrapnel_flags | (1u << i);
     gShrapnel[i].actor->t.t.translate.t.v[0] = pos->v[0];
     gShrapnel[i].actor->t.t.translate.t.v[1] = pos->v[1];
     gShrapnel[i].actor->t.t.translate.t.v[2] = pos->v[2];
@@ -1315,7 +1315,7 @@ void ReplaySmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
 
     for (i = 0; i < COUNT_OF(gSmoke_column); i++) {
         if (gSmoke_flags & (1 << i)) {
-            aspect = 1.f + (gSmoke[i].radius - .05f) / .25f * .5f;
+            aspect = 1.0 + (gSmoke[i].radius - .05f) / .25f * .5;
             if (gSmoke[i].type & 0x10) {
                 SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius / aspect, gSmoke[i].strength, 1.f,
                     pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xf], pCamera);
@@ -2021,7 +2021,7 @@ void InitFlame(void) {
     if (num != COUNT_OF(gFlame_map)) {
         FatalError(kFatalError_LoadPixelmapFile_S, the_path);
     }
-    BrMapAddMany(gFlame_map, COUNT_OF(gFlame_map));
+    BrMapAddMany(gFlame_map, num);
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
         gSmoke_column[i].flame_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
         for (j = 0; j < COUNT_OF(gSmoke_column[0].frame_count); j++) {

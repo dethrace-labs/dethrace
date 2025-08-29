@@ -16,27 +16,9 @@
 #if _MSC_VER == 1020
 typedef unsigned int uintptr_t;
 typedef int intptr_t;
-
-#pragma intrinsic(memcpy, memset, memcmp, strlen, strcpy, strcmp, strcat)
-
-// required for platform-specific network structs
-// if needed for a different platform, make this conditional
-
-typedef struct tPD_net_player_info {
-    // cannot be a regular sockaddr_in because it is transmitted between OS's
-
-    int i;
-} tPD_net_player_info;
-
-// has to match `tPD_net_player_info` - see `PDNetGetNextJoinGame`
-typedef struct tPD_net_game_info {
-    // cannot be a regular sockaddr_in because it is transmitted between OS's
-    int i;
-
-} tPD_net_game_info;
-#else
-#include "pc-all/net_types.h"
 #endif
+
+#include "pc-all/net_types.h"
 
 typedef unsigned char tU8;
 typedef signed char tS8;

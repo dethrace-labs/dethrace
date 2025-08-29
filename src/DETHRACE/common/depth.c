@@ -445,7 +445,12 @@ void InitDepthEffects(void) {
     PathCat(the_path, the_path, "HORIZON.MAT");
     gHorizon_material = BrMaterialLoad(the_path);
     if (gHorizon_material == NULL) {
-        FatalError(kFatalError_FindSkyMaterial_S, "HORIZON.MAT"); // 2nd argument added
+        FatalError(kFatalError_FindSkyMaterial_S
+#ifdef DETHRACE_FIX_BUGS
+            ,
+            "HORIZON.MAT"
+#endif
+        );
     }
 #ifdef DETHRACE_3DFX_PATCH
     if (gScreen->type == BR_PMT_INDEX_8 && !gMaterial_fogging)
@@ -860,7 +865,7 @@ void LessDepthFactor(void) {
 void MoreDepthFactor(void) {
     char s[256];
 
-    if (gProgram_state.current_depth_effect.start < 14) {
+    if (gProgram_state.current_depth_effect.start < 13) {
         gProgram_state.current_depth_effect.start++;
     }
     sprintf(s, "Depth start increased to %d", gProgram_state.current_depth_effect.start);
@@ -873,7 +878,7 @@ void MoreDepthFactor(void) {
 void LessDepthFactor2(void) {
     char s[256];
 
-    if (gProgram_state.current_depth_effect.end < 14) {
+    if (gProgram_state.current_depth_effect.end < 13) {
         gProgram_state.current_depth_effect.end++;
     }
     sprintf(s, "Depth end reduced to %d", gProgram_state.current_depth_effect.end);

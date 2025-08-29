@@ -354,10 +354,14 @@ char* GetALineAndDontArgue(FILE* pF, char* pS) {
 // IDA: void __usercall PathCat(char *pDestn_str@<EAX>, char *pStr_1@<EDX>, char *pStr_2@<EBX>)
 // FUNCTION: CARM95 0x004c1d69
 void PathCat(char* pDestn_str, char* pStr_1, char* pStr_2) {
-
-    if (pDestn_str != pStr_1) { // Added to avoid strcpy overlap checks
+#ifdef DETHRACE_FIX_BUGS
+    // Added to avoid strcpy overlap checks
+    if (pDestn_str != pStr_1) {
         strcpy(pDestn_str, pStr_1);
     }
+#else
+    strcpy(pDestn_str, pStr_1);
+#endif
     if (strlen(pStr_2) != 0) {
         strcat(pDestn_str, gDir_separator);
         strcat(pDestn_str, pStr_2);

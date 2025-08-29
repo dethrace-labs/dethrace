@@ -26,7 +26,7 @@ void AllocateActorMatrix(tTrack_spec* pTrack_spec, br_actor**** pDst) {
     tU16 z;
 
     *pDst = BrMemAllocate(sizeof(br_actor***) * pTrack_spec->ncolumns_z, kMem_columns_z);
-    for (z = 0; z < pTrack_spec->ncolumns_z; z++) {
+    for (z = 0; z != pTrack_spec->ncolumns_z; z++) {
         (*pDst)[z] = BrMemAllocate(sizeof(br_actor**) * pTrack_spec->ncolumns_x, kMem_columns_x);
         memset((*pDst)[z], 0, sizeof(br_actor**) * pTrack_spec->ncolumns_x);
     }
