@@ -44,14 +44,14 @@ void InitOilSpills(void) {
     for (i = 0; i < COUNT_OF(gOily_spills); i++) {
         the_material = BrMaterialAllocate(NULL);
         BrMaterialAdd(the_material);
+        the_material->flags |= BR_MATF_LIGHT;
+        the_material->flags |= BR_MATF_PERSPECTIVE;
+        the_material->flags |= BR_MATF_SMOOTH;
         the_material->ka = 0.99f;
         the_material->kd = 0.0f;
         the_material->ks = 0.0f;
         the_material->power = 0.0f;
         the_material->index_base = 0;
-        the_material->flags |= BR_MATF_LIGHT;
-        the_material->flags |= BR_MATF_PERSPECTIVE;
-        the_material->flags |= BR_MATF_SMOOTH;
         the_material->index_range = 0;
         the_material->colour_map = NULL;
         BrMatrix23Identity(&the_material->map_transform);
