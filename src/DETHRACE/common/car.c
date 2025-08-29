@@ -4846,7 +4846,7 @@ void FreezeMechanics(void) {
 void PutOpponentsInNeutral(void) {
 
     gStop_opponents_moving = !gStop_opponents_moving;
-    if (gStop_opponents_moving == 0) {
+    if (gStop_opponents_moving) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Opponents in neutral");
     } else {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Back in gear");
@@ -7164,9 +7164,9 @@ br_scalar TwoPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* t
     br_scalar ts;
 
     ts = m->m[1][1] * m->m[0][0] - m->m[0][1] * m->m[1][0];
-    if (fabs(ts) > 0.000001f) {
+    if (fabs(ts) > 0.000001) {
         f[0] = (m->m[1][1] * d[0] - m->m[0][1] * d[1]) / ts;
-        f[1] = (m->m[1][0] * d[0] - m->m[0][0] * d[1]) / -ts;
+        f[1] = (m->m[1][0] * d[0] - m->m[0][0] * d[1]) / (-ts);
     }
     if (f[1] < 0.0f) {
         ts = SinglePointColl(f, m, d);
@@ -7269,7 +7269,7 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
 int TestForNan(float* f) {
     tU32 i;
     // i = *f;
-    //return isnan(*f);
+    // return isnan(*f);
     // return (~i & 0x7F800000) == 0;
 
     i = *(unsigned long*)f;

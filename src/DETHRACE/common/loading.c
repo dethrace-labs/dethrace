@@ -2646,6 +2646,7 @@ void UnlockOpponentMugshot(int pIndex) {
 }
 
 // IDA: void __usercall LoadOpponentMugShot(int pIndex@<EAX>)
+// FUNCTION: CARM95 0x004244B0
 void LoadOpponentMugShot(int pIndex) {
 
     PossibleService();
@@ -2661,6 +2662,7 @@ void LoadOpponentMugShot(int pIndex) {
 }
 
 // IDA: void __usercall DisposeOpponentGridIcon(tRace_info *pRace_info@<EAX>, int pIndex@<EDX>)
+// FUNCTION: CARM95 0x00424557
 void DisposeOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
 
     if (pRace_info->opponent_list[pIndex].index >= 0) {

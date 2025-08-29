@@ -2417,7 +2417,7 @@ void CycleSoundDetailLevel(void) {
     new_level = (gSound_detail_level + 1) % 3;
     ReallySetSoundDetailLevel(new_level);
     SetSoundDetailLevel(new_level);
-    switch (new_level) {
+    switch (gSound_detail_level) {
     case 0:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_FewestSounds));
         break;

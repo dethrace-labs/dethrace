@@ -1681,7 +1681,7 @@ int FancyATossOffMate(tPedestrian_data* pPedestrian, tCollision_info* pCar, floa
         && pPedestrian->ref_number < 100
         && (pCar->driver > 1 || ((tCar_spec*)pCar)->number_of_wheels_on_ground >= 4)
         && PercentageChance(50)
-        && pImpact_speed >= .0035f;
+        && pImpact_speed >= .0035;
 }
 
 // IDA: void __usercall CheckPedestrianDeathScenario(tPedestrian_data *pPedestrian@<EAX>)
@@ -2186,10 +2186,10 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
             pPedestrian->pos.v[X] - gCamera_to_world.m[3][X],
             pPedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
         MungePedestrianSequence(pPedestrian, 0);
-        if (old_frame <= pPedestrian->sequences[pPedestrian->current_sequence].number_of_frames) {
-            pPedestrian->current_frame = old_frame;
-        } else {
+        if (pPedestrian->sequences[pPedestrian->current_sequence].number_of_frames < old_frame) {
             pPedestrian->current_frame = 0;
+        } else {
+            pPedestrian->current_frame = old_frame;
         }
         pPedestrian->colour_map = pPedestrian->sequences[MAX(pPedestrian->current_sequence, 0)].frames[MAX(pPedestrian->current_frame, 0)].pixelmap;
         gCurrent_lollipop_index = -1;
@@ -2231,7 +2231,7 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
                 pPedestrian->current_frame,
                 pPedestrian->hit_points,
                 pPedestrian->done_initial,
-                pPedestrian->actor->parent != gDont_render_actor ? pPedestrian->killers_ID : -1,
+                pPedestrian->actor->parent == gDont_render_actor ? (tU16)-1 : pPedestrian->killers_ID,
                 pPedestrian->spin_period,
                 pPedestrian->jump_magnitude,
                 &pPedestrian->offset);

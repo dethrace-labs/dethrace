@@ -2465,7 +2465,7 @@ br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg) {
     a = pMat->ka + *(br_scalar*)pArg;
     if (a < 0.f) {
         a = 0.f;
-    } else if (a > 0.99f) {
+    } else if (a > 0.99) {
         a = 0.99f;
     }
     pMat->ka = a;

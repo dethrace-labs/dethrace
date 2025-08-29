@@ -2192,26 +2192,25 @@ void CalcPlayerConspicuousness(tOpponent_spec* pOpponent_spec) {
     br_vector3 pos_in_cop_space;
     br_matrix34 inverse_transform;
 
-    if (pOpponent_spec->next_player_visibility_check >= gTime_stamp_for_this_munging) {
-        return;
-    }
-    pOpponent_spec->player_in_view_now = 0;
-    if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
-        pOpponent_spec->next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 100;
-        if (pOpponent_spec->player_to_oppo_d < 20.f) {
-            BrMatrix34LPInverse(&inverse_transform, &pOpponent_spec->car_spec->car_master_actor->t.t.mat);
-            BrMatrix34ApplyP(&pos_in_cop_space, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &inverse_transform);
-            if (pos_in_cop_space.v[2] < 0.f && PointVisibleFromHere(&gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
+    if (pOpponent_spec->next_player_visibility_check < gTime_stamp_for_this_munging) {
+        pOpponent_spec->player_in_view_now = 0;
+        if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
+            pOpponent_spec->next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 100;
+            if (pOpponent_spec->player_to_oppo_d < 20.f) {
+                BrMatrix34LPInverse(&inverse_transform, &pOpponent_spec->car_spec->car_master_actor->t.t.mat);
+                BrMatrix34ApplyP(&pos_in_cop_space, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &inverse_transform);
+                if (pos_in_cop_space.v[2] < 0.f && PointVisibleFromHere(&gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
+                    pOpponent_spec->player_in_view_now = 1;
+                    pOpponent_spec->acknowledged_piv = 0;
+                }
+            }
+        } else {
+            pOpponent_spec->next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 6000;
+            dr_dprintf("%s: Time now: %9.2f; next vis check at %9.2f", pOpponent_spec->car_spec->driver_name, gTime_stamp_for_this_munging / 1000.0, pOpponent_spec->next_player_visibility_check / 1000.0);
+            if (pOpponent_spec->player_to_oppo_d < 50.f && PointVisibleFromHere(&gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
                 pOpponent_spec->player_in_view_now = 1;
                 pOpponent_spec->acknowledged_piv = 0;
             }
-        }
-    } else {
-        pOpponent_spec->next_player_visibility_check = gTime_stamp_for_this_munging + IRandomBetween(0, 900) + 6000;
-        dr_dprintf("%s: Time now: %9.2f; next vis check at %9.2f", pOpponent_spec->car_spec->driver_name, gTime_stamp_for_this_munging / 1000.f, pOpponent_spec->next_player_visibility_check / 1000.0f);
-        if (pOpponent_spec->player_to_oppo_d < 50.f && PointVisibleFromHere(&gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
-            pOpponent_spec->player_in_view_now = 1;
-            pOpponent_spec->acknowledged_piv = 0;
         }
     }
 }
@@ -4738,8 +4737,8 @@ void DeleteCopStartPoint(void) {
             BrVector3Sub(&car_to_point, &gSelf->t.t.translate.t, &gProgram_state.AI_vehicles.cop_start_points[i]);
             distance = BrVector3Length(&car_to_point);
             if (distance < closest_distance) {
-                closest = i;
                 closest_distance = distance;
+                closest = i;
             }
         }
         if (closest < 0 || closest_distance > 10.f) {
