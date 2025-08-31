@@ -4780,13 +4780,12 @@ br_uint_32 IdentifyAccCB(br_actor* pActor, void* pArg) {
 // IDA: void __cdecl IdentifyAcc()
 // FUNCTION: CARM95 0x00444217
 void IdentifyAcc(void) {
-
     gNearest_distance = FLT_MAX;
     gNearest_actor = NULL;
     DRActorEnumRecurse(gAdditional_actors, (br_actor_enum_cbfn*)IdentifyAccCB, NULL);
     if (gNearest_actor != NULL) {
         gLast_actor = gNearest_actor;
-        AccessoryHeadup(gNearest_actor, "Locked onto ");
+        AccessoryHeadup(gLast_actor, "Locked onto ");
     }
 }
 
