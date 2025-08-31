@@ -227,8 +227,8 @@ void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMateria
     static tU16 skid;
     br_material* material;
 
-    if (BrVector3Dot(&pCar->prev_nor[pWheel_num], &pCar->nor[pWheel_num]) < 0.99699998
-        || fabs(BrVector3Dot(&pCar->nor[pWheel_num], pPos) - BrVector3Dot(&pCar->prev_skid_pos[pWheel_num], &pCar->nor[pWheel_num])) > 0.0099999998) {
+    if (BrVector3Dot(&pCar->prev_nor[pWheel_num], &pCar->nor[pWheel_num]) < 0.99699998f
+        || (float)fabs(BrVector3Dot(&pCar->nor[pWheel_num], pPos) - BrVector3Dot(&pCar->prev_skid_pos[pWheel_num], &pCar->nor[pWheel_num])) > 0.01f) {
         pCar->old_skidding &= ~(1 << pWheel_num);
         pCar->old_skid[pWheel_num] = -1;
         return;
@@ -237,7 +237,7 @@ void SkidSection(tCar_spec* pCar, int pWheel_num, br_vector3* pPos, int pMateria
     material = MaterialFromIndex(pMaterial_index);
     if (pCar->old_skid[pWheel_num] >= COUNT_OF(gSkids)
         || gSkids[pCar->old_skid[pWheel_num]].actor->material != material
-        || SkidLen(pCar->old_skid[pWheel_num]) > 0.5
+        || SkidLen(pCar->old_skid[pWheel_num]) > 0.5f
         || FarFromLine2D(pPos, &pCar->skid_line_start[pWheel_num], &pCar->skid_line_end[pWheel_num])
         || Reflex2D(pPos, &pCar->skid_line_start[pWheel_num], &pCar->prev_skid_pos[pWheel_num])) {
 

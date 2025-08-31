@@ -426,21 +426,21 @@ void GetGraphicsOptions(void) {
 // FUNCTION: CARM95 0x0049bb74
 void SetGraphicsOptions(void) {
 
-    if (gRadio_bastards__options[0].current_value < 2) {
-        SetCarSimplificationLevel(gRadio_bastards__options[0].current_value);
-    } else {
+    if (gRadio_bastards__options[0].current_value >= 2) {
         SetCarSimplificationLevel(gRadio_bastards__options[0].current_value + 1);
+    } else {
+        SetCarSimplificationLevel(gRadio_bastards__options[0].current_value);
     }
 
     switch (gRadio_bastards__options[1].current_value) {
-    case 0:
-        SetCarTexturingLevel(eCTL_full);
+    case 2:
+        SetCarTexturingLevel(eCTL_none);
         break;
     case 1:
         SetCarTexturingLevel(eCTL_transparent);
         break;
-    case 2:
-        SetCarTexturingLevel(eCTL_none);
+    case 0:
+        SetCarTexturingLevel(eCTL_full);
         break;
     }
 
