@@ -4824,17 +4824,15 @@ br_uint_32 DelReferencedModels(br_actor* pActor, void* pArg) {
 // IDA: void __cdecl DeleteAcc()
 // FUNCTION: CARM95 0x004443bb
 void DeleteAcc(void) {
-
-    if (gLast_actor == NULL) {
-        return;
+    if (gLast_actor != NULL) {
+        AccessoryHeadup(gLast_actor, "Murdered ");
+        DRActorEnumRecurse(gLast_actor, (br_actor_enum_cbfn*)DelReferencedModels, NULL);
+        DRActorEnumRecurse(gLast_actor, (br_actor_enum_cbfn*)DelGrooveRef, NULL);
+        BrActorRemove(gLast_actor);
+        BrActorFree(gLast_actor);
+        gLast_actor = NULL;
+        SaveAdditionalStuff();
     }
-    AccessoryHeadup(gLast_actor, "Murdered ");
-    DRActorEnumRecurse(gLast_actor, (br_actor_enum_cbfn*)DelReferencedModels, NULL);
-    DRActorEnumRecurse(gLast_actor, (br_actor_enum_cbfn*)DelGrooveRef, NULL);
-    BrActorRemove(gLast_actor);
-    BrActorFree(gLast_actor);
-    gLast_actor = NULL;
-    SaveAdditionalStuff();
 }
 
 // IDA: br_uint_32 __cdecl OffsetModel(br_actor *pActor, void *pArg)
