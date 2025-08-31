@@ -1070,13 +1070,13 @@ void DrawKeyAssignments(int pCurrent_choice, int pCurrent_mode) {
         TurnFlicTransparencyOn();
         RunFlicAt(193, gCurrent_graf_data->key_assign_flic_x, gCurrent_graf_data->key_assign_flic_y);
         TurnFlicTransparencyOff();
-        DontLetFlicFuckWithPalettes();
+        LetFlicFuckWithPalettes();
     } else if (!on_radios_last_time && pCurrent_mode != 0 && gCurrent_key < 0) {
         DontLetFlicFuckWithPalettes();
         TurnFlicTransparencyOn();
         RunFlicAt(194, gCurrent_graf_data->key_assign_flic_x, gCurrent_graf_data->key_assign_flic_y);
         TurnFlicTransparencyOff();
-        DontLetFlicFuckWithPalettes();
+        LetFlicFuckWithPalettes();
     }
     on_radios_last_time = pCurrent_mode != 0 && gCurrent_key < 0;
 }
