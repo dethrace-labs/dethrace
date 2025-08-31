@@ -826,18 +826,17 @@ int DamageScrnExit(int* pCurrent_choice, int* pCurrent_mode) {
 
     if (gProgram_state.prog_status == eProg_idling) {
         return 1;
-    } else {
-        if (gWreck_gallery_start == 0) {
-            gWreck_gallery_start = PDGetTotalTime();
-        } else if (!gDone_initial && gWreck_selected == 0) {
-            if (PDGetTotalTime() - gWreck_gallery_start > 1500) {
-                ZoomOutTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
-                gDone_initial = 1;
-            }
-        }
-        CastSelectionRay(pCurrent_choice, pCurrent_mode);
-        return 0;
     }
+    if (gWreck_gallery_start == 0) {
+        gWreck_gallery_start = PDGetTotalTime();
+    } else if (!gDone_initial && gWreck_selected == 0) {
+        if (PDGetTotalTime() - gWreck_gallery_start > 1500) {
+            ZoomOutTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
+            gDone_initial = 1;
+        }
+    }
+    CastSelectionRay(pCurrent_choice, pCurrent_mode);
+    return 0;
 }
 
 // IDA: void __usercall DamageScrnDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)

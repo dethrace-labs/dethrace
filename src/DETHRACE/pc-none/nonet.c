@@ -82,6 +82,7 @@ int PDNetInitialise(void) {
 }
 
 // IDA: int __cdecl PDNetShutdown()
+// FUNCTION: CARM95 0x004549F2
 int PDNetShutdown(void) {
     return 0;
 }

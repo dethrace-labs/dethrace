@@ -260,10 +260,12 @@ int UpRace(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
-    if (gCurrent_race_index != 0 && (gRace_list[gCurrent_race_index - 1].best_rank <= gProgram_state.rank || gProgram_state.game_completed || gChange_race_net_mode)) {
-        RemoveTransientBitmaps(1);
-        MoveRaceList(gCurrent_race_index, gCurrent_race_index - 1, 150);
-        gCurrent_race_index--;
+    if (gRace_list[gCurrent_race_index - 1].best_rank <= gProgram_state.rank || gProgram_state.game_completed || gChange_race_net_mode) {
+        if (gCurrent_race_index != 0) {
+            RemoveTransientBitmaps(1);
+            MoveRaceList(gCurrent_race_index, gCurrent_race_index - 1, 150);
+            gCurrent_race_index--;
+        }
     }
     return 0;
 }
@@ -579,6 +581,8 @@ int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
         { { 30, 60 }, { 78, 187 }, { 45, 90 }, { 104, 250 }, -1, 0, 0, UpClickCar },
         { { 30, 60 }, { 118, 283 }, { 45, 90 }, { 145, 348 }, -1, 0, 0, DownClickCar },
     };
+
+    // GLOBAL: CARM95 0x0050F670
     static tInterface_spec interface_spec = {
         0,
         236,
@@ -682,9 +686,7 @@ int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
         BrPixelmapFree(gTaken_image);
     }
     if (result == 0) {
-        if (pNet_mode) {
-            *pCar_index = gProgram_state.cars_available[gCurrent_car_index];
-        } else {
+        if (pNet_mode == eNet_mode_none) {
             AboutToLoadFirstCar();
             SwitchToRealResolution();
             for (i = 0; i < COUNT_OF(power_up_levels); i++) {
@@ -704,6 +706,8 @@ int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
             DisposeRaceInfo(&gCurrent_race);
             SelectOpponents(&gCurrent_race);
             LoadRaceInfo(gProgram_state.current_race_index, &gCurrent_race);
+        } else {
+            *pCar_index = gProgram_state.cars_available[gCurrent_car_index];
         }
         return 1;
     } else {

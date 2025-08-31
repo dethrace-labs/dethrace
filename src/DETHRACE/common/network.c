@@ -248,14 +248,13 @@ void NetSendHeadupToAllPlayers(char* pMessage) {
 void NetSendHeadupToEverybody(char* pMessage) {
     tNet_contents* the_contents;
 
-    if (gNet_mode == eNet_mode_none) {
-        return;
+    if (gNet_mode != eNet_mode_none) {
+        if (gProgram_state.racing) {
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pMessage);
+        }
+        the_contents = NetGetBroadcastContents(NETMSGID_HEADUP, 0);
+        strcpy(the_contents->data.headup.text, pMessage);
     }
-    if (gProgram_state.racing) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pMessage);
-    }
-    the_contents = NetGetBroadcastContents(NETMSGID_HEADUP, 0);
-    strcpy(the_contents->data.headup.text, pMessage);
 }
 
 // IDA: void __usercall NetSendHeadupToPlayer(char *pMessage@<EAX>, tPlayer_ID pPlayer@<EDX>)
