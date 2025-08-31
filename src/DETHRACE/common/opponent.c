@@ -1800,7 +1800,9 @@ int IsNetCarActive(br_vector3* pPoint) {
     }
     if (gCar_to_view != &gProgram_state.current_car) {
         BrVector3Sub(&tv, &gCar_to_view->car_master_actor->t.t.translate.t, pPoint);
-        return BrVector3LengthSquared(&tv) < 100.f;
+        if (BrVector3LengthSquared(&tv) < 100.f) {
+            return 1;
+        }
     }
     return 0;
 }
@@ -3980,7 +3982,6 @@ void ShowOppoPaths(void) {
 
 #include <errno.h>
 #include <string.h>
-
 // IDA: void __cdecl WriteOutOppoPaths()
 // FUNCTION: CARM95 0x0040e9d4
 void WriteOutOppoPaths(void) {
