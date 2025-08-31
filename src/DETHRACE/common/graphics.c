@@ -1012,7 +1012,7 @@ void InitWobbleStuff(void) {
 
     ClearWobbles();
     for (i = 0; i < COUNT_OF(gCosine_array); i++) {
-        gCosine_array[i] = cos(i / 64.0f * DR_PI / 2.0f);
+        gCosine_array[i] = cos(i / 64.0 * DR_PI / 2.0f);
     }
 }
 
