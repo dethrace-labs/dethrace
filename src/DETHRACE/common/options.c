@@ -1357,7 +1357,7 @@ void DrawInitialKMRadios(void) {
     PlayRadioOn2(12, gKey_map_index);
     gRadio_bastards__options[12].current_value = gKey_map_index;
     TurnFlicTransparencyOff();
-    DontLetFlicFuckWithPalettes();
+    LetFlicFuckWithPalettes();
 }
 
 // IDA: void __cdecl DoControlOptions()
