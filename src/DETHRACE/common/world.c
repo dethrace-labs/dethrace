@@ -792,8 +792,8 @@ void ProcessModelFaceMaterials(br_model* pModel, tPMFMCB pCallback) {
         if (pModel->faces[f].material != NULL) {
             possible_mat = (*pCallback)(pModel, f);
             if (possible_mat != NULL) {
-                pModel->faces[f].material = possible_mat;
                 new_mat = possible_mat;
+                pModel->faces[f].material = new_mat;
             }
         }
     }

@@ -1340,7 +1340,6 @@ int MouseyClickBastard(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, 
                 break;
             }
         }
-        return 0;
     } else {
         KeyAssignGoAhead(pCurrent_choice, pCurrent_mode);
     }
