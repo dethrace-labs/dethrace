@@ -651,7 +651,7 @@ void AdjustPedGib(int pIndex, int pSize, int pGib_index, int pPed_index, br_matr
     BrActorAdd(gPedestrian_array[pPed_index].actor, the_ped_gib->actor);
     the_ped_gib->actor->t.t.mat = *pTrans;
     the_ped_gib->actor->render_style = BR_RSTYLE_FACES;
-    the_ped_gib->actor->material = gPed_gib_materials[gPed_gibs[pIndex].size].materials[pGib_index];
+    the_ped_gib->actor->material = gPed_gib_materials[the_ped_gib->size].materials[pGib_index];
     MungeModelSize(the_ped_gib->actor, 0.0023f);
 }
 
