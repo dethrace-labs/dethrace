@@ -414,3 +414,6 @@
 
 // LIBRARY: CARM95 0x004DF8B0
 // BrResStrDup
+
+// LIBRARY: CARM95 0x004D6240
+// BrTableAddMany
