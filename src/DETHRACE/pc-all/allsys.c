@@ -372,11 +372,11 @@ void PDInitScreen(void) {
 void PDLockRealBackScreen(int lock) {
     if (!gReal_back_screen_locked && !gReal_back_screen->pixels && lock <= gVoodoo_rush_mode) {
         BrPixelmapDirectLock(gReal_back_screen, 1);
-        #ifdef DETHRACE_3DFX_PATCH
+#ifdef DETHRACE_3DFX_PATCH
         if (!gReal_back_screen->pixels) {
             FatalError(kFatalError_CouldntLockPixelmap_S, "gReal_back_screen");
         }
-        #endif
+#endif
         gReal_back_screen_locked = 1;
     }
 }
@@ -640,6 +640,7 @@ void PDBuildAppPath(char* pThe_path) {
 }
 
 // IDA: void __usercall PDForEveryFile(char *pThe_path@<EAX>, void (*pAction_routine)(char*)@<EDX>)
+// FUNCTION: CARM95 0x004A7807
 void PDForEveryFile(char* pThe_path, void (*pAction_routine)(char*)) {
     char find_path[256];
     char found_path[256];
