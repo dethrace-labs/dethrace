@@ -3485,15 +3485,15 @@ FILE* DRfopen(char* pFilename, char* pMode) {
     result = OldDRfopen(pFilename, pMode);
 
     if (result == NULL && !gAllow_open_to_fail) {
-        if (GetCDPathFromPathsTxtFile(CD_dir) && !PDCheckDriveExists(CD_dir)) {
+        if (GetCDPathFromPathsTxtFile(CD_dir) && PDCheckDriveExists(CD_dir) == 0) {
             if (gMisc_strings[0]) {
                 PDFatalError(GetMiscString(kMiscString_CouldNotFindTheCarmageddonCD));
             } else {
                 PDFatalError("Could not find the Carmageddon CD");
             }
-            sprintf(msg, "DRfopen( \"%s\", \"%s\" ) failed", pFilename, pMode);
-            PDFatalError(msg);
         }
+        sprintf(msg, "DRfopen( \"%s\", \"%s\" ) failed", pFilename, pMode);
+        PDFatalError(msg);
     }
     return result;
 }
