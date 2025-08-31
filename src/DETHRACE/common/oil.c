@@ -419,46 +419,42 @@ void GetOilFrictionFactors(tCar_spec* pCar, br_scalar* pFl_factor, br_scalar* pF
     *pFr_factor = 1.0f;
     *pRl_factor = 1.0f;
     *pRr_factor = 1.0f;
-    switch (pCar->driver) {
-    case eDriver_non_car_unused_slot:
-    case eDriver_non_car:
-        return;
-    default:
-        break;
-    }
-    if (pCar->shadow_intersection_flags != 0) {
-        for (i = 0; i < COUNT_OF(gOily_spills); i++) {
-            if (((1 << i) & pCar->shadow_intersection_flags) != 0 && gOily_spills[i].car != NULL) {
-                BrMatrix34ApplyP(&wheel_world, &pCar->wpos[2], &pCar->car_master_actor->t.t.mat);
-                if (PointInSpill(&wheel_world, i)) {
-                    pCar->oil_remaining[2] = SRandomBetween(1.5f, 2.5f);
-                }
-                BrMatrix34ApplyP(&wheel_world, &pCar->wpos[3], &pCar->car_master_actor->t.t.mat);
-                if (PointInSpill(&wheel_world, i)) {
-                    pCar->oil_remaining[3] = SRandomBetween(1.5f, 2.5f);
-                }
-                BrMatrix34ApplyP(&wheel_world, &pCar->wpos[0], &pCar->car_master_actor->t.t.mat);
-                if (PointInSpill(&wheel_world, i)) {
-                    pCar->oil_remaining[0] = SRandomBetween(1.5f, 2.5f);
-                }
-                BrMatrix34ApplyP(&wheel_world, &pCar->wpos[1], &pCar->car_master_actor->t.t.mat);
-                if (PointInSpill(&wheel_world, i)) {
-                    pCar->oil_remaining[1] = SRandomBetween(1.5f, 2.5f);
+
+    if (pCar->driver > eDriver_non_car) {
+        if (pCar->shadow_intersection_flags != 0) {
+            for (i = 0; i < COUNT_OF(gOily_spills); i++) {
+                if (((1 << i) & pCar->shadow_intersection_flags) != 0 && gOily_spills[i].car != NULL) {
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[2], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[2] = SRandomBetween(1.5f, 2.5f);
+                    }
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[3], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[3] = SRandomBetween(1.5f, 2.5f);
+                    }
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[0], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[0] = SRandomBetween(1.5f, 2.5f);
+                    }
+                    BrMatrix34ApplyP(&wheel_world, &pCar->wpos[1], &pCar->car_master_actor->t.t.mat);
+                    if (PointInSpill(&wheel_world, i)) {
+                        pCar->oil_remaining[1] = SRandomBetween(1.5f, 2.5f);
+                    }
                 }
             }
         }
-    }
-    if (pCar->oil_remaining[2] != 0.0f) {
-        *pFl_factor = SRandomBetween(0.01f, 0.15f);
-    }
-    if (pCar->oil_remaining[3] != 0.0f) {
-        *pFr_factor = SRandomBetween(0.01f, 0.15f);
-    }
-    if (pCar->oil_remaining[0] != 0.0f) {
-        *pRl_factor = SRandomBetween(0.01f, 0.15f);
-    }
-    if (pCar->oil_remaining[1] != 0.0f) {
-        *pRr_factor = SRandomBetween(0.01f, 0.15f);
+        if (pCar->oil_remaining[2] != 0.0f) {
+            *pFl_factor = SRandomBetween(0.01f, 0.15f);
+        }
+        if (pCar->oil_remaining[3] != 0.0f) {
+            *pFr_factor = SRandomBetween(0.01f, 0.15f);
+        }
+        if (pCar->oil_remaining[0] != 0.0f) {
+            *pRl_factor = SRandomBetween(0.01f, 0.15f);
+        }
+        if (pCar->oil_remaining[1] != 0.0f) {
+            *pRr_factor = SRandomBetween(0.01f, 0.15f);
+        }
     }
 }
 
