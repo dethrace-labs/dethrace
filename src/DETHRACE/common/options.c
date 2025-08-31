@@ -153,18 +153,18 @@ int SoundOptionsLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
 
-    if (*pCurrent_choice == 2) {
-        return 0;
+    if (*pCurrent_choice != 2) {
+
+        the_value = (*pCurrent_choice == 0) ? &gProgram_state.music_volume : &gProgram_state.effects_volume;
+        old_value = *the_value;
+        *the_value -= 1;
+        if (*the_value < 0) {
+            *the_value = 0;
+        }
+        SetSoundVolumes();
+        DRS3StartSound(gEffects_outlet, 3000);
+        MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
     }
-    the_value = (*pCurrent_choice == 0) ? &gProgram_state.music_volume : &gProgram_state.effects_volume;
-    old_value = *the_value;
-    *the_value -= 1;
-    if (*the_value < 0) {
-        *the_value = 0;
-    }
-    SetSoundVolumes();
-    DRS3StartSound(gEffects_outlet, 3000);
-    MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
     return 0;
 }
 
