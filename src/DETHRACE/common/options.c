@@ -143,7 +143,7 @@ void SoundOptionsStart(void) {
 int SoundOptionsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
 
     MoveDialFromTo(0, 4 * gProgram_state.music_volume, 0);
-    MoveDialFromTo(0, 4 * gProgram_state.effects_volume, 0);
+    MoveDialFromTo(1, 4 * gProgram_state.effects_volume, 0);
     return pCurrent_choice;
 }
 
