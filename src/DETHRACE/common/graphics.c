@@ -810,10 +810,10 @@ void SetIntegerMapRenders(void) {
     gMap_render_width_i = ((int)gMap_render_width) & ~3;
     gMap_render_height_i = ((int)gMap_render_height) & ~1;
     if (gReal_graf_data_index != 0) {
-        gMap_render_x_i = 2 * gMap_render_x_i;
-        gMap_render_y_i = 2 * gMap_render_y_i + HIRES_Y_OFFSET;
-        gMap_render_width_i = 2 * gMap_render_width_i;
-        gMap_render_height_i = 2 * gMap_render_height_i;
+        gMap_render_x_i *= 2;
+        gMap_render_y_i = (gMap_render_y_i * 2) + HIRES_Y_OFFSET;
+        gMap_render_width_i *= 2;
+        gMap_render_height_i *= 2;
     }
 }
 

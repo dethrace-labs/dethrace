@@ -83,8 +83,10 @@ tHeadup_info gHeadup_image_info[] = {
 #endif
 };
 
+// GLOBAL: CARM95 0x0050A4E8
 char* gYour_car_names[2][6];
 
+// GLOBAL: CARM95 0x0050A518
 char* gDrivable_car_names[6];
 
 // GLOBAL: CARM95 0x0050a530
