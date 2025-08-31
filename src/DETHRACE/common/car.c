@@ -7207,10 +7207,10 @@ br_scalar ThreePointCollRecB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vecto
     } else {
         return 0.0f;
     }
-    m->m[0][0] = ((br_scalar*)(m->m))[5 * i];
+    m->m[0][0] = m->m[i][i];
     m->m[1][0] = m->m[j][i];
     m->m[0][1] = m->m[i][j];
-    m->m[1][1] = ((br_scalar*)(m->m))[5 * j];
+    m->m[1][1] = m->m[j][j];
     BrVector3Copy(&tau[0], &tau[i]);
     BrVector3Copy(&tau[1], &tau[j]);
     BrVector3Copy(&tau[4], &tau[i + 4]);
