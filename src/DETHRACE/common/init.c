@@ -347,7 +347,6 @@ void InitBRFonts(void) {
 // IDA: void __cdecl AustereWarning()
 // FUNCTION: CARM95 0x004bc16d
 void AustereWarning(void) {
-
     ClearEntireScreen();
 
     if (gAusterity_mode) {
@@ -362,7 +361,7 @@ void AustereWarning(void) {
         gAustere_time = PDGetTotalTime();
         DisposeFont(FONT_GRNLIT);
     } else {
-        gAustere_time = gAusterity_mode;
+        gAustere_time = 0;
     }
 }
 
