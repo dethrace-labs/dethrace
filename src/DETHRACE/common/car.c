@@ -4662,7 +4662,7 @@ void ResetCarScreens(void) {
     int i;
     tCar_spec* the_car;
 
-    for (cat = eVehicle_self; cat < eVehicle_drone; cat++) {
+    for (cat = eVehicle_self; cat <= eVehicle_rozzer; cat++) {
         car_count = (cat == eVehicle_self) ? 1 : GetCarCount(cat);
         for (i = 0; i < car_count; i++) {
             the_car = (cat == eVehicle_self) ? &gProgram_state.current_car : GetCarSpec(cat, i);
