@@ -1915,36 +1915,34 @@ void SaveSpecialVolumes(void) {
 
     PathCat(the_path, gApplication_path, "SPECSAVE.TXT");
     f = DRfopen(the_path, "wt");
-    if (f == NULL) {
-        return;
-    }
-    fprintf(f, "// SPECIAL EFFECTS VOLUMES\n\n");
-    fprintf(f, "%d\t\t\t\t// # special effects volumes\n\n", gProgram_state.special_volume_count);
-    for (i = 0; i < gProgram_state.special_volume_count; i++) {
-        v = &gProgram_state.special_volumes[i];
-        if (v->no_mat) {
-            fprintf(f, "%s\n", "DEFAULT WATER");
-        } else {
-            fprintf(f, "NEW IMPROVED!\n");
-            fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[0][0], v->mat.m[0][1], v->mat.m[0][2]);
-            fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[1][0], v->mat.m[1][1], v->mat.m[1][2]);
-            fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[2][0], v->mat.m[2][1], v->mat.m[2][2]);
-            fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[3][0], v->mat.m[3][1], v->mat.m[3][2]);
+    if (f != NULL) {
+        fprintf(f, "// SPECIAL EFFECTS VOLUMES\n\n");
+        fprintf(f, "%d\t\t\t\t// # special effects volumes\n\n", gProgram_state.special_volume_count);
+        for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
+            if (v->no_mat) {
+                fprintf(f, "%s\n", "DEFAULT WATER");
+            } else {
+                fprintf(f, "NEW IMPROVED!\n");
+                fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[0][0], v->mat.m[0][1], v->mat.m[0][2]);
+                fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[1][0], v->mat.m[1][1], v->mat.m[1][2]);
+                fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[2][0], v->mat.m[2][1], v->mat.m[2][2]);
+                fprintf(f, "%.3f, %.3f, %.3f\n", v->mat.m[3][0], v->mat.m[3][1], v->mat.m[3][2]);
+            }
+            fprintf(f, "%.0f\t\t\t\t// gravity multiplier\n", v->gravity_multiplier);
+            fprintf(f, "%.0f\t\t\t\t// viscosity multiplier\n", v->viscosity_multiplier);
+            fprintf(f, "%.0f\t\t\t\t// Car damage per millisecond\n", v->car_damage_per_ms);
+            fprintf(f, "%.0f\t\t\t\t// Pedestrian damage per millisecond\n", v->ped_damage_per_ms);
+            fprintf(f, "%d\t\t\t\t\t// camera effect index\n", v->camera_special_effect_index);
+            fprintf(f, "%d\t\t\t\t\t// sky colour\n", v->sky_col);
+            fprintf(f, "%s\t\t\t\t// Windscreen material to use\n", (v->screen_material != NULL) ? v->screen_material->identifier : "none");
+            fprintf(f, "%d\t\t\t\t\t// Sound ID of entry noise\n", v->entry_noise);
+            fprintf(f, "%d\t\t\t\t\t// Sound ID of exit noise\n", v->exit_noise);
+            fprintf(f, "%d\t\t\t\t\t// Engine noise index\n", v->engine_noise_index);
+            fprintf(f, "%d\t\t\t\t\t// material index\n", v->material_modifier_index);
+            fprintf(f, "\n");
         }
-        fprintf(f, "%.0f\t\t\t\t// gravity multiplier\n", v->gravity_multiplier);
-        fprintf(f, "%.0f\t\t\t\t// viscosity multiplier\n", v->viscosity_multiplier);
-        fprintf(f, "%.0f\t\t\t\t// Car damage per millisecond\n", v->car_damage_per_ms);
-        fprintf(f, "%.0f\t\t\t\t// Pedestrian damage per millisecond\n", v->ped_damage_per_ms);
-        fprintf(f, "%d\t\t\t\t\t// camera effect index\n", v->camera_special_effect_index);
-        fprintf(f, "%d\t\t\t\t\t// sky colour\n", v->sky_col);
-        fprintf(f, "%s\t\t\t\t// Windscreen material to use\n", (v->screen_material != NULL) ? v->screen_material->identifier : "none");
-        fprintf(f, "%d\t\t\t\t\t// Sound ID of entry noise\n", v->entry_noise);
-        fprintf(f, "%d\t\t\t\t\t// Sound ID of exit noise\n", v->exit_noise);
-        fprintf(f, "%d\t\t\t\t\t// Engine noise index\n", v->engine_noise_index);
-        fprintf(f, "%d\t\t\t\t\t// material index\n", v->material_modifier_index);
-        fprintf(f, "\n");
+        fclose(f);
     }
-    fclose(f);
 }
 
 // IDA: void __cdecl SaveAdditionalStuff()
