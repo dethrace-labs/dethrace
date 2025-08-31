@@ -835,10 +835,10 @@ void AdjustRenderScreenSize(void) {
         gRender_screen->height = gProgram_state.current_render_bottom - gProgram_state.current_render_top;
         gRender_screen->width = gProgram_state.current_render_right - gProgram_state.current_render_left;
     }
-    if (gRender_screen->row_bytes == gRender_screen->width) {
-        gRender_screen->flags |= BR_PMF_ROW_WHOLEPIXELS;
-    } else {
+    if (gRender_screen->row_bytes != gRender_screen->width) {
         gRender_screen->flags &= ~BR_PMF_ROW_WHOLEPIXELS;
+    } else {
+        gRender_screen->flags |= BR_PMF_ROW_WHOLEPIXELS;
     }
     gRender_screen->origin_x = gRender_screen->width / 2;
     gRender_screen->origin_y = gRender_screen->height / 2;
