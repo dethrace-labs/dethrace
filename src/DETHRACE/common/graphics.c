@@ -835,10 +835,10 @@ void AdjustRenderScreenSize(void) {
         gRender_screen->height = gProgram_state.current_render_bottom - gProgram_state.current_render_top;
         gRender_screen->width = gProgram_state.current_render_right - gProgram_state.current_render_left;
     }
-    if (gRender_screen->row_bytes == gRender_screen->width) {
-        gRender_screen->flags |= BR_PMF_ROW_WHOLEPIXELS;
-    } else {
+    if (gRender_screen->row_bytes != gRender_screen->width) {
         gRender_screen->flags &= ~BR_PMF_ROW_WHOLEPIXELS;
+    } else {
+        gRender_screen->flags |= BR_PMF_ROW_WHOLEPIXELS;
     }
     gRender_screen->origin_x = gRender_screen->width / 2;
     gRender_screen->origin_y = gRender_screen->height / 2;
@@ -943,6 +943,7 @@ void DRSetPalette(br_pixelmap* pThe_palette) {
 // IDA: void __cdecl InitializePalettes()
 // FUNCTION: CARM95 0x004b3bd3
 void InitializePalettes(void) {
+    int i;
     int j;
     gCurrent_palette_pixels = BrMemAllocate(0x400u, kMem_cur_pal_pixels);
 #ifdef DETHRACE_3DFX_PATCH
@@ -2464,7 +2465,7 @@ br_uint_32 AmbientificateMaterial(br_material* pMat, void* pArg) {
     a = pMat->ka + *(br_scalar*)pArg;
     if (a < 0.f) {
         a = 0.f;
-    } else if (a > 0.99f) {
+    } else if (a > 0.99) {
         a = 0.99f;
     }
     pMat->ka = a;

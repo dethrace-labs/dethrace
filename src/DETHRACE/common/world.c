@@ -2473,8 +2473,8 @@ void ParseSpecialVolume(FILE* pF, tSpecial_volume* pSpec, char* pScreen_name_str
     char s[256];
     pSpec->gravity_multiplier = GetAScalar(pF);
     pSpec->viscosity_multiplier = GetAScalar(pF);
-    pSpec->car_damage_per_ms = GetAScalar(pF);
-    pSpec->ped_damage_per_ms = GetAScalar(pF);
+    pSpec->car_damage_per_ms = GetAFloat(pF);
+    pSpec->ped_damage_per_ms = GetAFloat(pF);
     pSpec->camera_special_effect_index = GetAnInt(pF);
     pSpec->sky_col = GetAnInt(pF);
 
@@ -4475,16 +4475,15 @@ br_uint_32 CalcHighestID(br_actor* pActor, int* pHighest) {
 br_uint_32 SetID(br_actor* pActor, void* pArg) {
     char s[256];
 
-    if (pActor->identifier == NULL) {
-        return 0;
+    if (pActor->identifier != NULL) {
+        strcpy(s, pActor->identifier);
+        strtok(s, ".");
+        strcat(s, "0000");
+        sprintf(&s[4], "%04d", (int)(intptr_t)pArg);
+        strcat(s, ".ACT");
+        BrResFree(pActor->identifier);
+        pActor->identifier = BrResStrDup(pActor, s);
     }
-    strcpy(s, pActor->identifier);
-    strtok(s, ".");
-    strcat(s, "0000");
-    sprintf(&s[4], "%04d", (int)(intptr_t)pArg);
-    strcat(s, ".ACT");
-    BrResFree(pActor->identifier);
-    pActor->identifier = BrResStrDup(pActor, s);
     return 0;
 }
 
@@ -4544,30 +4543,31 @@ br_uint_32 SetIDAndDupModel(br_actor* pActor, void* pArg) {
     char s2[256];
     br_model* new_model;
 
-    if (pActor->identifier == NULL || pActor->identifier[0] == '@') {
-        return 0;
-    }
-    *(int*)(uintptr_t)pArg = *(int*)(uintptr_t)pArg + 1;
-    strcpy(s, pActor->identifier);
-    s[0] = '@';
-    strtok(s, ".");
-    strcat(s, "0000");
-    sprintf(&s[4], "%04d", *(int*)(uintptr_t)pArg);
-    strcpy(s2, s);
-    strcat(s, ".ACT");
-    BrResFree(pActor->identifier);
-    pActor->identifier = BrResStrDup(pActor, s);
-    if (pActor->model != NULL) {
-        strcat(s2, ".DAT");
-        new_model = BrModelAllocate(s2, pActor->model->nvertices, pActor->model->nfaces);
-        memcpy(new_model->vertices, pActor->model->vertices, pActor->model->nvertices * sizeof(br_vertex));
-        memcpy(new_model->faces, pActor->model->faces, pActor->model->nfaces * sizeof(br_face));
-        new_model->flags |= BR_MODF_UPDATEABLE;
-        BrModelAdd(new_model);
-        BrModelUpdate(new_model, BR_MODU_ALL);
-        pActor->model = new_model;
-        gAdditional_models[gNumber_of_additional_models] = new_model;
-        gNumber_of_additional_models++;
+    if (pActor->identifier) {
+        if (pActor->identifier[0] != '@') {
+            *(int*)(uintptr_t)pArg = *(int*)(uintptr_t)pArg + 1;
+            strcpy(s, pActor->identifier);
+            s[0] = '@';
+            strtok(s, ".");
+            strcat(s, "0000");
+            sprintf(&s[4], "%04d", *(int*)(uintptr_t)pArg);
+            strcpy(s2, s);
+            strcat(s, ".ACT");
+            BrResFree(pActor->identifier);
+            pActor->identifier = BrResStrDup(pActor, s);
+            if (pActor->model != NULL) {
+                strcat(s2, ".DAT");
+                new_model = BrModelAllocate(s2, pActor->model->nvertices, pActor->model->nfaces);
+                memcpy(new_model->vertices, pActor->model->vertices, pActor->model->nvertices * sizeof(br_vertex));
+                memcpy(new_model->faces, pActor->model->faces, pActor->model->nfaces * sizeof(br_face));
+                new_model->flags |= BR_MODF_UPDATEABLE;
+                BrModelAdd(new_model);
+                BrModelUpdate(new_model, BR_MODU_ALL);
+                pActor->model = new_model;
+                gAdditional_models[gNumber_of_additional_models] = new_model;
+                gNumber_of_additional_models++;
+            }
+        }
     }
     return 0;
 }
@@ -4843,11 +4843,11 @@ void DeleteAcc(void) {
 br_uint_32 OffsetModel(br_actor* pActor, void* pArg) {
     int i;
 
-    if (pActor->model == NULL) {
-        return 0;
-    }
-    for (i = 0; i < pActor->model->nvertices; i++) {
-        BrVector3Accumulate(&pActor->model->vertices[i].p, (br_vector3*)pArg);
+    if (pActor->model != NULL) {
+
+        for (i = 0; i < pActor->model->nvertices; i++) {
+            BrVector3Accumulate(&pActor->model->vertices[i].p, (br_vector3*)pArg);
+        }
     }
     return 0;
 }
@@ -4893,28 +4893,27 @@ void SnapAccToVertical(void) {
 void RotateAccessory(br_angle pAngle) {
     br_vector3 mr_offset;
 
-    if (gLast_actor == NULL) {
-        return;
+    if (gLast_actor != NULL) {
+        if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
+            CentreActor(gLast_actor, &mr_offset);
+        }
+        switch (gCurrent_rotate_mode) {
+        case eRotate_mode_x:
+            BrMatrix34PreRotateX(&gLast_actor->t.t.mat, pAngle);
+            break;
+        case eRotate_mode_y:
+            BrMatrix34PreRotateY(&gLast_actor->t.t.mat, pAngle);
+            break;
+        case eRotate_mode_z:
+            BrMatrix34PreRotateZ(&gLast_actor->t.t.mat, pAngle);
+            break;
+        }
+        if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
+            DRActorEnumRecurseWithTrans(gLast_actor, NULL, ApplyTransToModels, NULL);
+            OffsetActor(gLast_actor, &mr_offset);
+        }
+        SaveAdditionalStuff();
     }
-    if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
-        CentreActor(gLast_actor, &mr_offset);
-    }
-    switch (gCurrent_rotate_mode) {
-    case eRotate_mode_x:
-        BrMatrix34PreRotateX(&gLast_actor->t.t.mat, pAngle);
-        break;
-    case eRotate_mode_y:
-        BrMatrix34PreRotateY(&gLast_actor->t.t.mat, pAngle);
-        break;
-    case eRotate_mode_z:
-        BrMatrix34PreRotateZ(&gLast_actor->t.t.mat, pAngle);
-        break;
-    }
-    if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
-        DRActorEnumRecurseWithTrans(gLast_actor, NULL, ApplyTransToModels, NULL);
-        OffsetActor(gLast_actor, &mr_offset);
-    }
-    SaveAdditionalStuff();
 }
 
 // IDA: void __cdecl ScaleAccessory(float pScaling_factor)
@@ -5342,10 +5341,10 @@ void BuildSpecVolModel(tSpecial_volume* pSpec, int pIndex, br_material* pInt_mat
     DrVertexSet(model->faces[11].vertices, 11, 10, 2);
 
     memcpy(&model->faces[12], model->faces, 12 * sizeof(br_face));
-    for (i = 12; i < 24; i++) {
-        temp = model->faces[i].vertices[0];
-        model->faces[i].vertices[0] = model->faces[i].vertices[1];
-        model->faces[i].vertices[1] = temp;
+    for (j = 12; j < 24; j++) {
+        temp = model->faces[j].vertices[0];
+        model->faces[j].vertices[0] = model->faces[j].vertices[1];
+        model->faces[j].vertices[1] = temp;
     }
     model->faces[5].material = model->faces[4].material = model->faces[1].material = model->faces[0].material = DRMaterialClone(pExt_mat);
     model->faces[11].material = model->faces[10].material = model->faces[9].material = model->faces[8].material = DRMaterialClone(pExt_mat);

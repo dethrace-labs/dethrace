@@ -699,24 +699,21 @@ void MungeEngineNoise(void) {
 // IDA: void __cdecl SetSoundVolumes()
 // FUNCTION: CARM95 0x004655d8
 void SetSoundVolumes(void) {
-
-    if (!gSound_enabled) {
-        return;
+    if (gSound_enabled) {
+        if (gEffects_outlet != NULL) {
+            DRS3SetOutletVolume(gEffects_outlet, 42 * gProgram_state.effects_volume);
+        }
+        DRS3SetOutletVolume(gCar_outlet, 42 * gProgram_state.effects_volume);
+        DRS3SetOutletVolume(gEngine_outlet, 42 * gProgram_state.effects_volume);
+        DRS3SetOutletVolume(gDriver_outlet, 42 * gProgram_state.effects_volume);
+        DRS3SetOutletVolume(gPedestrians_outlet, 42 * gProgram_state.effects_volume);
+        DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);
     }
-    if (gEffects_outlet != NULL) {
-        DRS3SetOutletVolume(gEffects_outlet, 42 * gProgram_state.effects_volume);
-    }
-    DRS3SetOutletVolume(gCar_outlet, 42 * gProgram_state.effects_volume);
-    DRS3SetOutletVolume(gEngine_outlet, 42 * gProgram_state.effects_volume);
-    DRS3SetOutletVolume(gDriver_outlet, 42 * gProgram_state.effects_volume);
-    DRS3SetOutletVolume(gPedestrians_outlet, 42 * gProgram_state.effects_volume);
-    DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);
 }
 
 // IDA: tS3_outlet_ptr __usercall GetOutletFromIndex@<EAX>(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x004656b1
 tS3_outlet_ptr GetOutletFromIndex(int pIndex) {
-
     return gIndexed_outlets[pIndex];
 }
 

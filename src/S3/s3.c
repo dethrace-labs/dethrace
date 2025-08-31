@@ -1091,6 +1091,7 @@ int S3GenerateTag(tS3_outlet* outlet) {
     return gS3_tag_seed | outlet->id;
 }
 
+// FUNCTION: CARM95 0x0049C829
 int S3SoundStillPlaying(tS3_sound_tag pTag) {
     tS3_channel* chan;
 

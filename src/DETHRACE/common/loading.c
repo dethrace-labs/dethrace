@@ -419,10 +419,11 @@ void LoadGeneralParameters(void) {
     if (f == NULL) {
         FatalError(kFatalError_SettingsFile);
     }
-    gCamera_hither = GetAFloat(f) * HITHER_MULTIPLIER;
-    gCamera_yon = GetAFloat(f);
-    gCamera_angle = GetAFloat(f);
-    gAmbient_adjustment = GetAFloat(f) * AMBIENT_MULTIPLIER;
+    gCamera_hither = GetAScalar(f);
+    gCamera_hither *= HITHER_MULTIPLIER;
+    gCamera_yon = GetAScalar(f);
+    gCamera_angle = GetAScalar(f);
+    gAmbient_adjustment = GetAScalar(f) / 100.0f;
     gDim_amount = GetAnInt(f);
     gInitial_rank = GetAnInt(f);
     GetThreeInts(f, &gInitial_credits[0], &gInitial_credits[1], &gInitial_credits[2]);
@@ -523,10 +524,10 @@ void LoadGeneralParameters(void) {
     }
 
     gDefault_gravity = GetAFloat(f);
-    gCut_delay_1 = GetAFloat(f);
-    gCut_delay_2 = GetAFloat(f);
-    gCut_delay_3 = GetAFloat(f);
-    gCut_delay_4 = GetAFloat(f);
+    gCut_delay_1 = GetAScalar(f);
+    gCut_delay_2 = GetAScalar(f);
+    gCut_delay_3 = GetAScalar(f);
+    gCut_delay_4 = GetAScalar(f);
     gZombie_factor = 1.0f;
     fclose(f);
 }
@@ -759,19 +760,18 @@ void LoadInFiles(char* pThe_base_path, char* pThe_dir_name, void (*pLoad_routine
 // FUNCTION: CARM95 0x0041d5fd
 void LoadInRegisteeDir(char* pThe_dir_path) {
     tPath_name the_path;
-    tPath_name reg_path;
 
-    PathCat(reg_path, pThe_dir_path, "REG");
-    LoadInFiles(reg_path, "PALETTES", DRLoadPalette);
-    LoadInFiles(reg_path, "SHADETAB", DRLoadShadeTable);
+    PathCat(the_path, pThe_dir_path, "REG");
+    LoadInFiles(the_path, "PALETTES", DRLoadPalette);
+    LoadInFiles(the_path, "SHADETAB", DRLoadShadeTable);
 #ifdef DETHRACE_3DFX_PATCH
     InitializePalettes();
 #endif
-    LoadInFiles(reg_path, "PIXELMAP", DRLoadPixelmaps);
-    LoadInFiles(reg_path, "MATERIAL", DRLoadMaterials);
-    LoadInFiles(reg_path, "MODELS", DRLoadModels);
-    LoadInFiles(reg_path, "ACTORS", DRLoadActors);
-    LoadInFiles(reg_path, "LIGHTS", DRLoadLights);
+    LoadInFiles(the_path, "PIXELMAP", DRLoadPixelmaps);
+    LoadInFiles(the_path, "MATERIAL", DRLoadMaterials);
+    LoadInFiles(the_path, "MODELS", DRLoadModels);
+    LoadInFiles(the_path, "ACTORS", DRLoadActors);
+    LoadInFiles(the_path, "LIGHTS", DRLoadLights);
 }
 
 // IDA: void __cdecl LoadInRegistees()
@@ -1065,92 +1065,92 @@ void DisposeCar(tCar_spec* pCar_spec, int pOwner) {
     int i;
     int j;
 
-    if (pCar_spec->driver_name[0] == '\0') {
-        return;
-    }
-    gFunk_groove_flags[pCar_spec->fg_index] = 0;
-    pCar_spec->driver_name[0] = '\0';
-    if (pCar_spec->driver == eDriver_local_human) {
-        for (i = 0; i < COUNT_OF(pCar_spec->cockpit_images); i++) {
-            if (pCar_spec->cockpit_images[i] != NULL) {
-                BrMemFree(pCar_spec->cockpit_images[i]);
-            }
-        }
-        if (pCar_spec->speedo_image[0] != NULL) {
-            BrPixelmapFree(pCar_spec->speedo_image[0]);
-        }
-        if (pCar_spec->speedo_image[1] != NULL) {
-            BrPixelmapFree(pCar_spec->speedo_image[1]);
-        }
-        if (pCar_spec->tacho_image[0] != NULL) {
-            BrPixelmapFree(pCar_spec->tacho_image[0]);
-        }
-        if (pCar_spec->tacho_image[1] != NULL) {
-            BrPixelmapFree(pCar_spec->tacho_image[1]);
-        }
-        for (i = 0; i < pCar_spec->number_of_hands_images; i++) {
-            if (pCar_spec->lhands_images[i] != NULL) {
-                BrPixelmapFree(pCar_spec->lhands_images[i]);
-            }
-            if (pCar_spec->rhands_images[i] != NULL) {
-                BrPixelmapFree(pCar_spec->rhands_images[i]);
-            }
-        }
-        if (pCar_spec->prat_cam_left != NULL) {
-            BrPixelmapFree(pCar_spec->prat_cam_left);
-        }
-        if (pCar_spec->prat_cam_top != NULL) {
-            BrPixelmapFree(pCar_spec->prat_cam_top);
-        }
-        if (pCar_spec->prat_cam_right != NULL) {
-            BrPixelmapFree(pCar_spec->prat_cam_right);
-        }
-        if (pCar_spec->prat_cam_bottom != NULL) {
-            BrPixelmapFree(pCar_spec->prat_cam_bottom);
-        }
-        for (i = 0; i < COUNT_OF(pCar_spec->damage_units); i++) {
-            if (pCar_spec->damage_units[i].images != NULL) {
-                BrPixelmapFree(pCar_spec->damage_units[i].images);
-            }
-        }
-        if (pCar_spec->damage_background != NULL) {
-            BrPixelmapFree(pCar_spec->damage_background);
-        }
-        for (i = 0; i < COUNT_OF(pCar_spec->power_ups); i++) {
-            for (j = 0; j < pCar_spec->power_ups[i].number_of_parts; j++) {
-                if (pCar_spec->power_ups[i].info[j].data_ptr != NULL) {
-                    BrMemFree(pCar_spec->power_ups[i].info[j].data_ptr);
+    if (pCar_spec->driver_name[0] != '\0') {
+
+        gFunk_groove_flags[pCar_spec->fg_index] = 0;
+        pCar_spec->driver_name[0] = '\0';
+        if (pCar_spec->driver == eDriver_local_human) {
+            for (i = 0; i < COUNT_OF(pCar_spec->cockpit_images); i++) {
+                if (pCar_spec->cockpit_images[i] != NULL) {
+                    BrMemFree(pCar_spec->cockpit_images[i]);
                 }
             }
+            if (pCar_spec->speedo_image[0] != NULL) {
+                BrPixelmapFree(pCar_spec->speedo_image[0]);
+            }
+            if (pCar_spec->speedo_image[1] != NULL) {
+                BrPixelmapFree(pCar_spec->speedo_image[1]);
+            }
+            if (pCar_spec->tacho_image[0] != NULL) {
+                BrPixelmapFree(pCar_spec->tacho_image[0]);
+            }
+            if (pCar_spec->tacho_image[1] != NULL) {
+                BrPixelmapFree(pCar_spec->tacho_image[1]);
+            }
+            for (i = 0; i < pCar_spec->number_of_hands_images; i++) {
+                if (pCar_spec->lhands_images[i] != NULL) {
+                    BrPixelmapFree(pCar_spec->lhands_images[i]);
+                }
+                if (pCar_spec->rhands_images[i] != NULL) {
+                    BrPixelmapFree(pCar_spec->rhands_images[i]);
+                }
+            }
+            if (pCar_spec->prat_cam_left != NULL) {
+                BrPixelmapFree(pCar_spec->prat_cam_left);
+            }
+            if (pCar_spec->prat_cam_top != NULL) {
+                BrPixelmapFree(pCar_spec->prat_cam_top);
+            }
+            if (pCar_spec->prat_cam_right != NULL) {
+                BrPixelmapFree(pCar_spec->prat_cam_right);
+            }
+            if (pCar_spec->prat_cam_bottom != NULL) {
+                BrPixelmapFree(pCar_spec->prat_cam_bottom);
+            }
+            for (i = 0; i < COUNT_OF(pCar_spec->damage_units); i++) {
+                if (pCar_spec->damage_units[i].images != NULL) {
+                    BrPixelmapFree(pCar_spec->damage_units[i].images);
+                }
+            }
+            if (pCar_spec->damage_background != NULL) {
+                BrPixelmapFree(pCar_spec->damage_background);
+            }
+            for (i = 0; i < COUNT_OF(pCar_spec->power_ups); i++) {
+                for (j = 0; j < pCar_spec->power_ups[i].number_of_parts; j++) {
+                    if (pCar_spec->power_ups[i].info[j].data_ptr != NULL) {
+                        BrMemFree(pCar_spec->power_ups[i].info[j].data_ptr);
+                    }
+                }
+            }
+            gProgram_state.car_name[0] = '\0';
         }
-        gProgram_state.car_name[0] = '\0';
-    }
-    if (pCar_spec->screen_material != NULL) {
-        KillWindscreen(pCar_spec->car_model_actors[pCar_spec->principal_car_actor].actor->model,
-            pCar_spec->screen_material);
-        BrMaterialRemove(pCar_spec->screen_material);
-        BrMaterialFree(pCar_spec->screen_material);
-    }
-    for (i = 0; i < COUNT_OF(pCar_spec->damage_programs); i++) {
-        BrMemFree(pCar_spec->damage_programs[i].clauses);
-    }
-    DropOffDyingPeds(pCar_spec);
-    for (i = 0; i < pCar_spec->car_actor_count; i++) {
-        BrActorRemove(pCar_spec->car_model_actors[i].actor);
-        BrActorFree(pCar_spec->car_model_actors[i].actor);
-    }
-    if (pCar_spec->driver != eDriver_local_human) {
-        BrActorRemove(pCar_spec->car_master_actor);
-        BrActorFree(pCar_spec->car_master_actor);
-    }
-    DisposeFunkotronics(pOwner);
-    DisposeGroovidelics(pOwner);
-    for (i = 0; i < pCar_spec->car_actor_count; i++) {
-        if (pCar_spec->car_model_actors[i].crush_data.crush_points != NULL) {
-            DisposeCrushData(&pCar_spec->car_model_actors[i].crush_data);
+        if (pCar_spec->screen_material != NULL) {
+            KillWindscreen(pCar_spec->car_model_actors[pCar_spec->principal_car_actor].actor->model,
+                pCar_spec->screen_material);
+            BrMaterialRemove(pCar_spec->screen_material);
+            BrMaterialFree(pCar_spec->screen_material);
         }
-        if (pCar_spec->car_model_actors[i].undamaged_vertices != NULL) {
-            BrMemFree(pCar_spec->car_model_actors[i].undamaged_vertices);
+        for (i = 0; i < COUNT_OF(pCar_spec->damage_programs); i++) {
+            BrMemFree(pCar_spec->damage_programs[i].clauses);
+        }
+        DropOffDyingPeds(pCar_spec);
+        for (i = 0; i < pCar_spec->car_actor_count; i++) {
+            BrActorRemove(pCar_spec->car_model_actors[i].actor);
+            BrActorFree(pCar_spec->car_model_actors[i].actor);
+        }
+        if (pCar_spec->driver != eDriver_local_human) {
+            BrActorRemove(pCar_spec->car_master_actor);
+            BrActorFree(pCar_spec->car_master_actor);
+        }
+        DisposeFunkotronics(pOwner);
+        DisposeGroovidelics(pOwner);
+        for (i = 0; i < pCar_spec->car_actor_count; i++) {
+            if (pCar_spec->car_model_actors[i].crush_data.crush_points != NULL) {
+                DisposeCrushData(&pCar_spec->car_model_actors[i].crush_data);
+            }
+            if (pCar_spec->car_model_actors[i].undamaged_vertices != NULL) {
+                BrMemFree(pCar_spec->car_model_actors[i].undamaged_vertices);
+            }
         }
     }
 }
@@ -2646,6 +2646,7 @@ void UnlockOpponentMugshot(int pIndex) {
 }
 
 // IDA: void __usercall LoadOpponentMugShot(int pIndex@<EAX>)
+// FUNCTION: CARM95 0x004244B0
 void LoadOpponentMugShot(int pIndex) {
 
     PossibleService();
@@ -2661,6 +2662,7 @@ void LoadOpponentMugShot(int pIndex) {
 }
 
 // IDA: void __usercall DisposeOpponentGridIcon(tRace_info *pRace_info@<EAX>, int pIndex@<EDX>)
+// FUNCTION: CARM95 0x00424557
 void DisposeOpponentGridIcon(tRace_info* pRace_info, int pIndex) {
 
     if (pRace_info->opponent_list[pIndex].index >= 0) {
@@ -3483,15 +3485,15 @@ FILE* DRfopen(char* pFilename, char* pMode) {
     result = OldDRfopen(pFilename, pMode);
 
     if (result == NULL && !gAllow_open_to_fail) {
-        if (GetCDPathFromPathsTxtFile(CD_dir) && !PDCheckDriveExists(CD_dir)) {
+        if (GetCDPathFromPathsTxtFile(CD_dir) && PDCheckDriveExists(CD_dir) == 0) {
             if (gMisc_strings[0]) {
                 PDFatalError(GetMiscString(kMiscString_CouldNotFindTheCarmageddonCD));
             } else {
                 PDFatalError("Could not find the Carmageddon CD");
             }
-            sprintf(msg, "DRfopen( \"%s\", \"%s\" ) failed", pFilename, pMode);
-            PDFatalError(msg);
         }
+        sprintf(msg, "DRfopen( \"%s\", \"%s\" ) failed", pFilename, pMode);
+        PDFatalError(msg);
     }
     return result;
 }
@@ -3625,7 +3627,7 @@ void ReadNetworkSettings(FILE* pF, tNet_game_options* pOptions) {
 // FUNCTION: CARM95 0x00427269
 int PrintNetOptions(FILE* pF, int pIndex) {
 
-    fprintf(pF, "NETSETTINGS %d\n", pIndex);
+    fprintf(pF, "NETSETTINGS %d\n\n", pIndex);
     fprintf(pF, "%d // Allow the sending of Abuse-o-Matic(tm) text messages\n", gNet_settings[pIndex].enable_text_messages);
     fprintf(pF, "%d // Show cars on map\n", gNet_settings[pIndex].show_players_on_map);
     fprintf(pF, "%d // Show peds on map\n", gNet_settings[pIndex].show_peds_on_map);

@@ -411,3 +411,6 @@
 
 // LIBRARY: CARM95 0x004e6160
 // BrFileRead
+
+// LIBRARY: CARM95 0x004DF8B0
+// BrResStrDup

@@ -256,7 +256,7 @@ void DrawSummaryItems(void) {
         gCurrent_graf_data->summ1_rank_inc_l,
         gCurrent_graf_data->summ1_rank_x_pitch,
         gCurrent_graf_data->summ1_rank_y,
-        (int)(gTemp_rank_increase + .5f));
+        (int)(gTemp_rank_increase + 0.5));
     DrawChromeNumber(
         gCurrent_graf_data->summ1_rank_total_c,
         gCurrent_graf_data->summ1_rank_total_l,
@@ -826,18 +826,17 @@ int DamageScrnExit(int* pCurrent_choice, int* pCurrent_mode) {
 
     if (gProgram_state.prog_status == eProg_idling) {
         return 1;
-    } else {
-        if (gWreck_gallery_start == 0) {
-            gWreck_gallery_start = PDGetTotalTime();
-        } else if (!gDone_initial && gWreck_selected == 0) {
-            if (PDGetTotalTime() - gWreck_gallery_start > 1500) {
-                ZoomOutTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
-                gDone_initial = 1;
-            }
-        }
-        CastSelectionRay(pCurrent_choice, pCurrent_mode);
-        return 0;
     }
+    if (gWreck_gallery_start == 0) {
+        gWreck_gallery_start = PDGetTotalTime();
+    } else if (!gDone_initial && gWreck_selected == 0) {
+        if (PDGetTotalTime() - gWreck_gallery_start > 1500) {
+            ZoomOutTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
+            gDone_initial = 1;
+        }
+    }
+    CastSelectionRay(pCurrent_choice, pCurrent_mode);
+    return 0;
 }
 
 // IDA: void __usercall DamageScrnDraw(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)

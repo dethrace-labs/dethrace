@@ -1469,7 +1469,10 @@ void DrawDisabledOptions(void) {
 
     PrintMemoryDump(0, "INSIDE OPTIONS");
 
-    if (!harness_game_config.sound_options) {
+#ifdef DETHRACE_FIX_BUGS
+    if (!harness_game_config.sound_options)
+#endif
+    {
         // Disable sound options menu
         image = LoadPixelmap("NOSNDOPT.PIX");
         DisableChoice(0);
