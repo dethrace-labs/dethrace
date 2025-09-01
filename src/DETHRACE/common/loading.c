@@ -2880,8 +2880,7 @@ void LoadOpponents(void) {
         gOpponents[i].text_chunk_count = GetAnInt(f);
         gOpponents[i].text_chunks = BrMemAllocate(sizeof(tText_chunk) * gOpponents[i].text_chunk_count, kMem_oppo_text_chunk);
 
-        for (j = 0; j < gOpponents[i].text_chunk_count; j++) {
-            the_chunk = &gOpponents[i].text_chunks[j];
+        for (j = 0, the_chunk = gOpponents[i].text_chunks; j < gOpponents[i].text_chunk_count; j++, the_chunk++) {
             PossibleService();
             GetPairOfInts(f, &the_chunk->x_coord, &the_chunk->y_coord);
             GetPairOfInts(f, &the_chunk->frame_cue, &the_chunk->frame_end);

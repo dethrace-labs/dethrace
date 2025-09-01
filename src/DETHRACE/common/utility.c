@@ -1430,18 +1430,14 @@ void SubsStringJob(char* pStr, ...) {
     va_list ap;
 
     va_start(ap, pStr);
-    for (;;) {
-        sub_pt = strchr(pStr, '%');
-        if (sub_pt == NULL) {
-            va_end(ap);
-            return;
-        }
+    while ((sub_pt = strchr(pStr, '%')) != NULL) {
         sub_str = va_arg(ap, char*);
         StripCR(sub_str);
         strcpy(temp_str, &sub_pt[1]);
         strcpy(sub_pt, sub_str);
         strcat(pStr, temp_str);
     }
+    va_end(ap);
 }
 
 // IDA: void __usercall DecodeLine2(char *pS@<EAX>)
