@@ -417,3 +417,6 @@
 
 // LIBRARY: CARM95 0x004D6240
 // BrTableAddMany
+
+// LIBRARY: CARM95 0x004D2880
+// BrMatrix34PostTransform
