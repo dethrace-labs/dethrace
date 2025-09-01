@@ -47,19 +47,17 @@ br_material* material_unk1;
 // IDA: int __usercall DRActorToRoot@<EAX>(br_actor *a@<EAX>, br_actor *world@<EDX>, br_matrix34 *m@<EBX>)
 // FUNCTION: CARM95 0x00494230
 int DRActorToRoot(br_actor* a, br_actor* world, br_matrix34* m) {
-
     if (world == a) {
         BrMatrix34Identity(m);
         return 1;
-    } else {
-        BrTransformToMatrix34(m, &a->t);
-        for (a = a->parent; a && world != a; a = a->parent) {
-            if (a->t.type != BR_TRANSFORM_IDENTITY) {
-                BrMatrix34PostTransform(m, &a->t);
-            }
-        }
-        return world == a;
     }
+    BrTransformToMatrix34(m, &a->t);
+    for (a = a->parent; a && world != a; a = a->parent) {
+        if (a->t.type != BR_TRANSFORM_IDENTITY) {
+            BrMatrix34PostTransform(m, &a->t);
+        }
+    }
+    return world == a;
 }
 
 // IDA: void __cdecl InitRayCasting()
