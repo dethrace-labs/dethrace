@@ -102,6 +102,7 @@ void PollKeys(void) {
 // FUNCTION: CARM95 0x00471c03
 void CyclePollKeys(void) {
     int i;
+
     for (i = 0; i < COUNT_OF(gKey_array); i++) {
         if (gKey_array[i] > gKey_poll_counter) {
             gKey_array[i] = 0;
@@ -239,10 +240,7 @@ int AnyKeyDown(void) {
     int the_key;
 
     the_key = PDAnyKeyDown();
-    if ((the_key != -1 && the_key != 4) || EitherMouseButtonDown() != 0) {
-        return 1;
-    }
-    return 0;
+    return the_key != -1 && the_key != 4 || EitherMouseButtonDown();
 }
 
 // IDA: tU32* __cdecl KevKeyService()
