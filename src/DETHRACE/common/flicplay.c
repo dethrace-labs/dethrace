@@ -2037,7 +2037,7 @@ br_pixelmap* GetPanelPixelmap(int pIndex) {
 // IDA: void __cdecl LoadInterfaceStrings()
 // FUNCTION: CARM95 0x004981cf
 void LoadInterfaceStrings(void) {
-    FILE* f; // Added by DethRace
+    FILE* f;
     char s[256];
     char s2[256];
     char* str;
@@ -2051,99 +2051,102 @@ void LoadInterfaceStrings(void) {
     gTranslation_count = 0;
     PathCat(the_path, gApplication_path, "TRNSLATE.TXT");
     f = fopen(the_path, "rt");
-    if (f == NULL) {
-        return;
-    }
-    while (!feof(f)) {
-        GetALineAndDontArgue(f, s);
-        gTranslation_count++;
-    }
-    rewind(f);
-    gTranslations = BrMemAllocate(gTranslation_count * sizeof(tTranslation_record), kMem_translations);
-    for (i = 0; i < gTranslation_count; i++) {
-        GetALineAndDontArgue(f, s);
-        str = strtok(s, "\t ,/");
-        strcpy(s2, str);
-        strtok(s2, ".");
-        strcat(s2, ".FLI");
-        gTranslations[i].flic_index = -1;
-        for (j = 0; j < COUNT_OF(gMain_flic_list); j++) {
-            if (strcmp(gMain_flic_list[j].file_name, s2) == 0) {
-                gTranslations[i].flic_index = j;
+    if (f != NULL) {
+
+        while (!feof(f)) {
+            GetALineAndDontArgue(f, s);
+            gTranslation_count++;
+        }
+        rewind(f);
+        gTranslations = BrMemAllocate(gTranslation_count * sizeof(tTranslation_record), kMem_translations);
+        for (i = 0; i < gTranslation_count; i++) {
+            GetALineAndDontArgue(f, s);
+            str = strtok(s, "\t ,/");
+            strcpy(s2, str);
+            strtok(s2, ".");
+            strcat(s2, ".FLI");
+            gTranslations[i].flic_index = -1;
+            for (j = 0; j < COUNT_OF(gMain_flic_list); j++) {
+                if (strcmp(gMain_flic_list[j].file_name, s2) == 0) {
+                    gTranslations[i].flic_index = j;
+                    break;
+                }
+            }
+            if (gTranslations[i].flic_index < 0) {
+                FatalError(kFatalError_FindFlicUsedInTranslationFile_S, s2);
+            }
+            str[strlen(str)] = ',';
+            str = strtok(s, "\t ,/");
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%d", &gTranslations[i].x);
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%d", &gTranslations[i].y);
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%d", &gTranslations[i].font_index);
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%c", &ch);
+            switch (ch) {
+            case 'L':
+            case 'l':
+                gTranslations[i].justification = eJust_left;
+                break;
+            case 'R':
+            case 'r':
+                gTranslations[i].justification = eJust_right;
+                break;
+            case 'C':
+            case 'c':
+                gTranslations[i].justification = eJust_centre;
                 break;
             }
+            str = strtok(NULL, "\t ,/");
+            sscanf(str, "%c", &ch);
+            gTranslations[i].global = ch == 'g' || ch == 'G';
+            gTranslations[i].every_frame = strlen(str) > 1 && (str[1] == 'e' || str[1] == 'E');
+            str += strlen(str) + 1;
+            comment = strstr(str, "//");
+            if (comment != NULL) {
+                *comment = '\0';
+            }
+            len = strlen(str);
+            for (j = len - 1; j >= 0; j--) {
+                if (str[j] != ' ' && str[j] != '\t') {
+                    break;
+                }
+            }
+            str[j + 1] = '\0';
+            gTranslations[i].text = BrMemAllocate(strlen(str) + 1, kMem_translations_text);
+            strcpy(gTranslations[i].text, str);
         }
-        if (gTranslations[i].flic_index < 0) {
-            FatalError(kFatalError_FindFlicUsedInTranslationFile_S, s2);
-        }
-        str[strlen(str)] = ',';
-        str = strtok(s, "\t ,/");
-        str = strtok(NULL, "\t ,/");
-        sscanf(str, "%d", &gTranslations[i].x);
-        str = strtok(NULL, "\t ,/");
-        sscanf(str, "%d", &gTranslations[i].y);
-        str = strtok(NULL, "\t ,/");
-        sscanf(str, "%d", &gTranslations[i].font_index);
-        str = strtok(NULL, "\t ,/");
-        sscanf(str, "%c", &ch);
-        switch (ch) {
-        case 'C':
-        case 'c':
-            gTranslations[i].justification = eJust_centre;
-            break;
-        case 'L':
-        case 'l':
-            gTranslations[i].justification = eJust_left;
-            break;
-        case 'R':
-        case 'r':
-            gTranslations[i].justification = eJust_right;
-            break;
-        }
-        str = strtok(NULL, "\t ,/");
-        sscanf(str, "%c", &ch);
-        gTranslations[i].global = ch == 'G' || ch == 'g';
-        gTranslations[i].every_frame = strlen(str) > 1 && (str[1] == 'E' || str[1] == 'e');
-        str += strlen(str) + 1;
-        comment = strstr(str, "//");
-        if (comment != NULL) {
-            *comment = '\0';
-        }
-        len = strlen(str);
-        for (j = len - 1; j >= 0 && (str[j] == ' ' || str[j] == '\t'); j--) {
-        }
-        str[j + 1] = '\0';
-        gTranslations[i].text = BrMemAllocate(strlen(str) + 1, kMem_translations_text);
-        strcpy(gTranslations[i].text, str);
+        LoadFont(kFont_BLUEHEAD);
+        LoadFont(kFont_ORANGHED);
+        LoadFont(kFont_GREENHED);
+        LoadFont(kFont_LITPLAQ);
+        LoadFont(kFont_BUTTOUT);
+        LoadFont(kFont_DRKPLAQ);
+        LoadFont(kFont_BUTTIN);
+        LoadFont(kFont_GRNLIT);
+        LoadFont(kFont_GRYLIT);
+        LoadFont(kFont_GRNDK);
+        LoadFont(kFont_GRYDK);
+        LoadFont(kFont_LITPLAQ1);
+        LoadFont(kFont_BUTTOUT1);
+        LoadFont(kFont_DRKPLAQ1);
+        LoadFont(kFont_BUTTIN1);
+        gTrans_fonts[0] = &gFonts[kFont_ORANGHED];
+        gTrans_fonts[1] = &gFonts[kFont_LITPLAQ];
+        gTrans_fonts[2] = &gFonts[kFont_BUTTOUT];
+        gTrans_fonts[3] = &gFonts[kFont_DRKPLAQ];
+        gTrans_fonts[4] = &gFonts[kFont_BUTTIN];
+        gTrans_fonts[5] = &gFonts[kFont_GRNLIT];
+        gTrans_fonts[6] = &gFonts[kFont_GRYLIT];
+        gTrans_fonts[7] = &gFonts[kFont_GRNDK];
+        gTrans_fonts[8] = &gFonts[kFont_GRYDK];
+        gTrans_fonts[9] = &gFonts[kFont_LITPLAQ1];
+        gTrans_fonts[10] = &gFonts[kFont_DRKPLAQ1];
+        gTrans_fonts[11] = &gFonts[kFont_BUTTOUT1];
+        gTrans_fonts[12] = &gFonts[kFont_BUTTIN1];
     }
-    LoadFont(kFont_BLUEHEAD);
-    LoadFont(kFont_ORANGHED);
-    LoadFont(kFont_GREENHED);
-    LoadFont(kFont_LITPLAQ);
-    LoadFont(kFont_BUTTOUT);
-    LoadFont(kFont_DRKPLAQ);
-    LoadFont(kFont_BUTTIN);
-    LoadFont(kFont_GRNLIT);
-    LoadFont(kFont_GRYLIT);
-    LoadFont(kFont_GRNDK);
-    LoadFont(kFont_GRYDK);
-    LoadFont(kFont_LITPLAQ1);
-    LoadFont(kFont_BUTTOUT1);
-    LoadFont(kFont_DRKPLAQ1);
-    LoadFont(kFont_BUTTIN1);
-    gTrans_fonts[0] = &gFonts[kFont_ORANGHED];
-    gTrans_fonts[1] = &gFonts[kFont_LITPLAQ];
-    gTrans_fonts[2] = &gFonts[kFont_BUTTOUT];
-    gTrans_fonts[3] = &gFonts[kFont_DRKPLAQ];
-    gTrans_fonts[4] = &gFonts[kFont_BUTTIN];
-    gTrans_fonts[5] = &gFonts[kFont_GRNLIT];
-    gTrans_fonts[6] = &gFonts[kFont_GRYLIT];
-    gTrans_fonts[7] = &gFonts[kFont_GRNDK];
-    gTrans_fonts[8] = &gFonts[kFont_GRYDK];
-    gTrans_fonts[9] = &gFonts[kFont_LITPLAQ1];
-    gTrans_fonts[10] = &gFonts[kFont_DRKPLAQ1];
-    gTrans_fonts[11] = &gFonts[kFont_BUTTOUT1];
-    gTrans_fonts[12] = &gFonts[kFont_BUTTIN1];
 
 #ifdef DETHRACE_FIX_BUGS
     fclose(f);
