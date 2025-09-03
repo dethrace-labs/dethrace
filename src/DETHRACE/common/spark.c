@@ -1672,7 +1672,7 @@ void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLi
     gSmoke_column[gNext_column].smudge_timer = 1000;
     gSmoke_column[gNext_column].vertex_index = pVertex_index;
     gSmoke_column[gNext_column].upright = 1;
-    gColumn_flags |= 1u << gNext_column;
+    gColumn_flags |= 1 << gNext_column;
     pCar->num_smoke_columns++;
     for (i = 0; i < COUNT_OF(gSmoke_column[gNext_column].frame_count); i++) {
         gSmoke_column[gNext_column].frame_count[i] = 100;

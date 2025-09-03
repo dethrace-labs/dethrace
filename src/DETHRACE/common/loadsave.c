@@ -952,6 +952,7 @@ int SaveGameInterface(int pDefault_choice) {
             { 182, 437 },
         },
     };
+    // GLOBAL: CARM95 0x0050EE80
     static tInterface_spec interface_spec = {
         0, 50, 0, 0, 0, 0, 2,
         { 1, 0 }, { -1, 8 }, { 8, 0 }, { 8, 7 }, { NULL, NULL },
