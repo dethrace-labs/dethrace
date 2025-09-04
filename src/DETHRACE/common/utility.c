@@ -61,23 +61,23 @@ br_pixelmap* gSource_for_16bit_palette;
 // IDA: int __cdecl CheckQuit()
 // FUNCTION: CARM95 0x004c1590
 int CheckQuit(void) {
+    int got_as_far_as_verify;
 
-    if (gIn_check_quit) {
-        return 0;
-    }
-    if (!KeyIsDown(KEYMAP_CTRL_QUIT) || !KeyIsDown(KEYMAP_CONTROL_ANY)) {
-        return 0;
-    }
-    gIn_check_quit = 1;
-    while (AnyKeyDown()) {
-        ;
-    }
+    got_as_far_as_verify = 0;
+    if (!gIn_check_quit && KeyIsDown(KEYMAP_CTRL_QUIT) && KeyIsDown(KEYMAP_CONTROL_ANY)) {
+        gIn_check_quit = 1;
 
-    if (DoVerifyQuit(1)) {
-        QuitGame();
+        do {
+            ;
+        } while (AnyKeyDown());
+
+        got_as_far_as_verify = 1;
+        if (DoVerifyQuit(1)) {
+            QuitGame();
+        }
+        gIn_check_quit = 0;
     }
-    gIn_check_quit = 0;
-    return 1;
+    return got_as_far_as_verify;
 }
 
 // IDA: double __cdecl sqr(double pN)
