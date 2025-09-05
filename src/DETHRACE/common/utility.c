@@ -627,12 +627,14 @@ FILE* OpenUniqueFileB(char* pPrefix, char* pExtension) {
     FILE* f;
     tPath_name the_path;
 
+    index = 0;
     for (index = 0; index < 10000; index++) {
         PathCat(the_path, gApplication_path, pPrefix);
         sprintf(the_path + strlen(the_path), "%04d.%s", index, pExtension);
         f = DRfopen(the_path, "rt");
         if (f == NULL) {
-            return DRfopen(the_path, "wb");
+            f = DRfopen(the_path, "wb");
+            return f;
         }
         fclose(f);
     }
