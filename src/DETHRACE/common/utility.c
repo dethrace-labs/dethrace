@@ -87,43 +87,7 @@ double sqr(double pN) {
     return pN * pN;
 }
 
-// Added to handle demo-specific text file decryption behavior
-void EncodeLine_DEMO(char* pS) {
-    int len;
-    int seed;
-    int i;
-    char* key;
-    unsigned char c;
-    FILE* test;
-    tPath_name the_path;
-#if BR_ENDIAN_BIG
-    const tU32 gLong_key_DEMO[] = { 0x58503A76, 0xCBB68565, 0x15CD5B07, 0xB168DE3A };
-#else
-    const tU32 gLong_key_DEMO[] = { 0x763A5058, 0x6585B6CB, 0x75BCD15, 0x3ADE68B1 };
-#endif
-
-    len = strlen(pS);
-    key = (char*)gLong_key_DEMO;
-
-    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
-        len--;
-        pS[len] = 0;
-    }
-    seed = len % 16;
-    for (i = 0; i < len; i++) {
-        c = pS[i];
-        if (c == '\t') {
-            c = 0x9F;
-        }
-        c = ((key[seed] ^ (c - 32)) & 0x7F) + 32;
-        seed = (seed + 7) % 16;
-        if (c == 0x9F) {
-            c = '\t';
-        }
-        pS[i] = c;
-    }
-}
-
+typedef char tSomething[256];
 // IDA: void __usercall EncodeLine(char *pS@<EAX>)
 // FUNCTION: CARM95 0x004c1ab1
 void EncodeLine(char* pS) {
@@ -131,49 +95,42 @@ void EncodeLine(char* pS) {
     int seed;
     int i;
     char* key;
-    unsigned char c;
     FILE* test;
-    tPath_name the_path;
-    char s[256];
-
-    // Demo has its own decryption key + behavior
-    if (harness_game_info.mode == eGame_carmageddon_demo) {
-        EncodeLine_DEMO(pS);
-        return;
-    }
+    unsigned char c;
 
     len = strlen(pS);
     key = (char*)gLong_key;
     if (gEncryption_method == 0) {
+        tPath_name the_path;
+        char s[256];
         PathCat(the_path, gApplication_path, "GENERAL.TXT");
 
         test = fopen(the_path, "rt");
         if (test != NULL) {
             fgets(s, 256, test);
-            if (s[0] != '@') {
-                gEncryption_method = 2;
-            } else {
+            if (s[0] == '@') {
+
                 gEncryption_method = 1;
                 EncodeLine(&s[1]);
                 s[7] = '\0';
                 if (strcmp(&s[1], "0.01\t\t") != 0) {
                     gEncryption_method = 2;
                 }
+            } else {
+                gEncryption_method = 2;
             }
             fclose(test);
         } else {
             gEncryption_method = 2;
         }
     }
-    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+    while (len != 0 && pS[len - 1] == '\r' || pS[len - 1] == '\n') {
+        pS[len - 1] = '\0';
         len--;
-        pS[len] = '\0';
     }
 
     seed = len % 16;
-
     for (i = 0; i < len; i++) {
-        c = pS[i];
 #if defined(DETHRACE_FIX_BUGS)
         // When loading game data, Carmageddon does not switch the XOR cypher when the comments start.
         if (i >= 2) {
@@ -183,40 +140,31 @@ void EncodeLine(char* pS) {
         }
 #endif
         if (gEncryption_method == 1) {
-            if (c == '\t') {
-                c = 0x9f;
+            if (pS[i] == '\t') {
+                pS[i] = 0x9f;
             }
 
-            c -= 0x20;
-            c ^= key[seed];
-            c &= 0x7f;
-            c += 0x20;
+            pS[i] = ((key[seed] ^ (pS[i] - 32)) & 0x7F) + 32;
+            seed = (seed + 7) % 16;
 
-            seed += 7;
-            seed %= 16;
-
-            if (c == 0x9f) {
-                c = '\t';
+            if (pS[i] == 0xFFFFFF9F) {
+                pS[i] = '\t';
             }
         } else {
-            if (c == '\t') {
-                c = 0x80;
+            if (pS[i] == '\t') {
+                pS[i] = 0x80;
             }
 
-            c -= 0x20;
-            if ((c & 0x80) == 0) {
-                c ^= key[seed] & 0x7f;
+            c = pS[i] - 32;
+            if ((c & 0x80u) == 0) {
+                pS[i] = (c ^ key[seed] & 0x7F) + 32;
             }
-            c += 0x20;
 
-            seed += 7;
-            seed %= 16;
-
-            if (c == 0x80) {
-                c = '\t';
+            seed = (seed + 7) % 16;
+            if (pS[i] == 0xFFFFFF80) {
+                pS[i] = '\t';
             }
         }
-        pS[i] = c;
     }
 }
 
@@ -226,13 +174,13 @@ int IRandomBetween(int pA, int pB) {
     int num;
     char s[32];
 
-    num = rand();
 #if RAND_MAX == 0x7fff
     //  If RAND_MAX == 0x7fff, then `num` can be seen as a fixed point number with 15 fractional and 17 integral bits
-    return pA + ((num * (pB + 1 - pA)) >> 15);
+    num = (pB + 1 - pA) * rand() / (RAND_MAX + 1) + pA;
+    return num;
 #else
     //  If RAND_MAX != 0x7fff, then use floating numbers (alternative is using modulo)
-    return pA + (int)((pB + 1 - pA) * (num / ((float)RAND_MAX + 1)));
+    return pA + (int)((pB + 1 - pA) * (rand() / ((float)RAND_MAX + 1)));
 #endif
 }
 
@@ -1928,5 +1876,42 @@ void BlendifyMaterial(br_material* pMaterial, int pPercent) {
         BlendifyMaterialTablishly(pMaterial, pPercent);
     } else {
         BlendifyMaterialPrimitively(pMaterial, pPercent);
+    }
+}
+
+// Added to handle demo-specific text file decryption behavior
+void EncodeLine_DEMO(char* pS) {
+    int len;
+    int seed;
+    int i;
+    char* key;
+    unsigned char c;
+    FILE* test;
+    tPath_name the_path;
+#if BR_ENDIAN_BIG
+    const tU32 gLong_key_DEMO[] = { 0x58503A76, 0xCBB68565, 0x15CD5B07, 0xB168DE3A };
+#else
+    const tU32 gLong_key_DEMO[] = { 0x763A5058, 0x6585B6CB, 0x75BCD15, 0x3ADE68B1 };
+#endif
+
+    len = strlen(pS);
+    key = (char*)gLong_key_DEMO;
+
+    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+        len--;
+        pS[len] = 0;
+    }
+    seed = len % 16;
+    for (i = 0; i < len; i++) {
+        c = pS[i];
+        if (c == '\t') {
+            c = 0x9F;
+        }
+        c = ((key[seed] ^ (c - 32)) & 0x7F) + 32;
+        seed = (seed + 7) % 16;
+        if (c == 0x9F) {
+            c = '\t';
+        }
+        pS[i] = c;
     }
 }
