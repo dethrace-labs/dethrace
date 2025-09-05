@@ -212,3 +212,12 @@
 
 // LIBRARY: CARM95 0x004EA9E0
 // __chkstk
+
+// GLOBAL: CARM95 0x0052D39C
+// __mb_cur_max
+
+// LIBRARY: CARM95 0x004EC620
+// _isctype
+
+// GLOBAL: CARM95 0x0052D190
+// _pctype

@@ -56,8 +56,7 @@ if(MSVC_42_FOR_RECCMP)
     set(DETHRACE_PLATFORM_SDL2 OFF)
     set(BRENDER_BUILD_DRIVERS OFF)
 
-    set(CMAKE_C_FLAGS_DEBUG "/Zi /Oi /MLd")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/DEBUG")
+    set(CMAKE_C_FLAGS_DEBUG "/Od /Oi /Zi /MLd")
 
     include("reccmp")
 endif()

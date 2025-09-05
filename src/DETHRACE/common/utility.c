@@ -22,6 +22,7 @@
 #include "world.h"
 
 #include <ctype.h>
+#include <float.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -61,23 +62,23 @@ br_pixelmap* gSource_for_16bit_palette;
 // IDA: int __cdecl CheckQuit()
 // FUNCTION: CARM95 0x004c1590
 int CheckQuit(void) {
+    int got_as_far_as_verify;
 
-    if (gIn_check_quit) {
-        return 0;
-    }
-    if (!KeyIsDown(KEYMAP_CTRL_QUIT) || !KeyIsDown(KEYMAP_CONTROL_ANY)) {
-        return 0;
-    }
-    gIn_check_quit = 1;
-    while (AnyKeyDown()) {
-        ;
-    }
+    got_as_far_as_verify = 0;
+    if (!gIn_check_quit && KeyIsDown(KEYMAP_CTRL_QUIT) && KeyIsDown(KEYMAP_CONTROL_ANY)) {
+        gIn_check_quit = 1;
 
-    if (DoVerifyQuit(1)) {
-        QuitGame();
+        do {
+            ;
+        } while (AnyKeyDown());
+
+        got_as_far_as_verify = 1;
+        if (DoVerifyQuit(1)) {
+            QuitGame();
+        }
+        gIn_check_quit = 0;
     }
-    gIn_check_quit = 0;
-    return 1;
+    return got_as_far_as_verify;
 }
 
 // IDA: double __cdecl sqr(double pN)
@@ -87,43 +88,7 @@ double sqr(double pN) {
     return pN * pN;
 }
 
-// Added to handle demo-specific text file decryption behavior
-void EncodeLine_DEMO(char* pS) {
-    int len;
-    int seed;
-    int i;
-    char* key;
-    unsigned char c;
-    FILE* test;
-    tPath_name the_path;
-#if BR_ENDIAN_BIG
-    const tU32 gLong_key_DEMO[] = { 0x58503A76, 0xCBB68565, 0x15CD5B07, 0xB168DE3A };
-#else
-    const tU32 gLong_key_DEMO[] = { 0x763A5058, 0x6585B6CB, 0x75BCD15, 0x3ADE68B1 };
-#endif
-
-    len = strlen(pS);
-    key = (char*)gLong_key_DEMO;
-
-    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
-        len--;
-        pS[len] = 0;
-    }
-    seed = len % 16;
-    for (i = 0; i < len; i++) {
-        c = pS[i];
-        if (c == '\t') {
-            c = 0x9F;
-        }
-        c = ((key[seed] ^ (c - 32)) & 0x7F) + 32;
-        seed = (seed + 7) % 16;
-        if (c == 0x9F) {
-            c = '\t';
-        }
-        pS[i] = c;
-    }
-}
-
+typedef char tSomething[256];
 // IDA: void __usercall EncodeLine(char *pS@<EAX>)
 // FUNCTION: CARM95 0x004c1ab1
 void EncodeLine(char* pS) {
@@ -131,49 +96,42 @@ void EncodeLine(char* pS) {
     int seed;
     int i;
     char* key;
-    unsigned char c;
     FILE* test;
-    tPath_name the_path;
-    char s[256];
-
-    // Demo has its own decryption key + behavior
-    if (harness_game_info.mode == eGame_carmageddon_demo) {
-        EncodeLine_DEMO(pS);
-        return;
-    }
+    unsigned char c;
 
     len = strlen(pS);
     key = (char*)gLong_key;
     if (gEncryption_method == 0) {
+        tPath_name the_path;
+        char s[256];
         PathCat(the_path, gApplication_path, "GENERAL.TXT");
 
         test = fopen(the_path, "rt");
         if (test != NULL) {
             fgets(s, 256, test);
-            if (s[0] != '@') {
-                gEncryption_method = 2;
-            } else {
+            if (s[0] == '@') {
+
                 gEncryption_method = 1;
                 EncodeLine(&s[1]);
                 s[7] = '\0';
                 if (strcmp(&s[1], "0.01\t\t") != 0) {
                     gEncryption_method = 2;
                 }
+            } else {
+                gEncryption_method = 2;
             }
             fclose(test);
         } else {
             gEncryption_method = 2;
         }
     }
-    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+    while (len != 0 && pS[len - 1] == '\r' || pS[len - 1] == '\n') {
+        pS[len - 1] = '\0';
         len--;
-        pS[len] = '\0';
     }
 
     seed = len % 16;
-
     for (i = 0; i < len; i++) {
-        c = pS[i];
 #if defined(DETHRACE_FIX_BUGS)
         // When loading game data, Carmageddon does not switch the XOR cypher when the comments start.
         if (i >= 2) {
@@ -183,40 +141,31 @@ void EncodeLine(char* pS) {
         }
 #endif
         if (gEncryption_method == 1) {
-            if (c == '\t') {
-                c = 0x9f;
+            if (pS[i] == '\t') {
+                pS[i] = 0x9f;
             }
 
-            c -= 0x20;
-            c ^= key[seed];
-            c &= 0x7f;
-            c += 0x20;
+            pS[i] = ((key[seed] ^ (pS[i] - 32)) & 0x7F) + 32;
+            seed = (seed + 7) % 16;
 
-            seed += 7;
-            seed %= 16;
-
-            if (c == 0x9f) {
-                c = '\t';
+            if (pS[i] == 0xFFFFFF9F) {
+                pS[i] = '\t';
             }
         } else {
-            if (c == '\t') {
-                c = 0x80;
+            if (pS[i] == '\t') {
+                pS[i] = 0x80;
             }
 
-            c -= 0x20;
-            if ((c & 0x80) == 0) {
-                c ^= key[seed] & 0x7f;
+            c = pS[i] - 32;
+            if ((c & 0x80u) == 0) {
+                pS[i] = (c ^ key[seed] & 0x7F) + 32;
             }
-            c += 0x20;
 
-            seed += 7;
-            seed %= 16;
-
-            if (c == 0x80) {
-                c = '\t';
+            seed = (seed + 7) % 16;
+            if (pS[i] == 0xFFFFFF80) {
+                pS[i] = '\t';
             }
         }
-        pS[i] = c;
     }
 }
 
@@ -226,13 +175,13 @@ int IRandomBetween(int pA, int pB) {
     int num;
     char s[32];
 
-    num = rand();
 #if RAND_MAX == 0x7fff
     //  If RAND_MAX == 0x7fff, then `num` can be seen as a fixed point number with 15 fractional and 17 integral bits
-    return pA + ((num * (pB + 1 - pA)) >> 15);
+    num = (pB + 1 - pA) * rand() / (RAND_MAX + 1) + pA;
+    return num;
 #else
     //  If RAND_MAX != 0x7fff, then use floating numbers (alternative is using modulo)
-    return pA + (int)((pB + 1 - pA) * (num / ((float)RAND_MAX + 1)));
+    return pA + (int)((pB + 1 - pA) * (rand() / ((float)RAND_MAX + 1)));
 #endif
 }
 
@@ -253,7 +202,7 @@ int IRandomPosNeg(int pN) {
 // IDA: float __cdecl FRandomBetween(float pA, float pB)
 // FUNCTION: CARM95 0x004c16bf
 float FRandomBetween(float pA, float pB) {
-    return (double)rand() * (pB - pA) / (double)RAND_MAX + pA;
+    return (float)rand() * (pB - pA) / (RAND_MAX + 1) + pA;
 }
 
 // IDA: float __cdecl FRandomPosNeg(float pN)
@@ -280,40 +229,43 @@ br_scalar SRandomPosNeg(br_scalar pN) {
 // IDA: char* __usercall GetALineWithNoPossibleService@<EAX>(FILE *pF@<EAX>, unsigned char *pS@<EDX>)
 // FUNCTION: CARM95 0x004c175c
 char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
-    // Jeff removed "signed' to avoid compiler warnings..
-    /*signed*/ char* result;
-    /*signed*/ char s[256];
+    signed char* result;
+    signed char s[256];
+    int i;
     int ch;
     int len;
-    int i;
+    // name unknown, this was not in the DOS symbol dump
+    // the z_ prefix helps it into the correct stack position
+    int z_alnum;
 
     do {
+
         result = fgets(s, 256, pF);
         if (result == NULL) {
-            s[0] = '\0';
             break;
         }
         if (s[0] == '@') {
             EncodeLine(&s[1]);
-            len = strlen(s);
-            memmove(s, &s[1], len);
-        } else {
-            while (s[0] == ' ' || s[0] == '\t') {
-                len = strlen(s);
-                memmove(s, &s[1], len);
-            }
+            memmove(s, &s[1], strlen(s));
+        }
+        while (s[0] == ' ' || s[0] == '\t') {
+            memmove(s, &s[1], strlen(s));
         }
 
-        while (1) {
-            ch = fgetc(pF);
-            if (ch != '\r' && ch != '\n') {
-                break;
-            }
-        }
+        do {
+            do {
+                ch = fgetc(pF);
+            } while (ch == 13);
+        } while (ch == 10);
         if (ch != -1) {
             ungetc(ch, pF);
         }
-    } while (!Harness_Hook_isalnum(s[0])
+#ifdef DETHRACE_FIX_BUGS
+        z_alnum = Harness_Hook_isalnum(s[0]);
+#else
+        z_alnum = isalnum(s[0]);
+#endif
+    } while (!z_alnum
         && s[0] != '-'
         && s[0] != '.'
         && s[0] != '!'
@@ -325,22 +277,22 @@ char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
 
     if (result) {
         len = strlen(result);
-        if (len != 0 && (result[len - 1] == '\r' || result[len - 1] == '\n')) {
+        if (len != 0 && result[len - 1] == '\n' || result[len - 1] == '\r') {
             result[len - 1] = 0;
         }
-        if (len != 1 && (result[len - 2] == '\r' || result[len - 2] == '\n')) {
-            result[len - 2] = 0;
+        len--;
+        if (len != 0 && result[len - 1] == '\n' || result[len - 1] == '\r') {
+            result[len - 1] = 0;
         }
     }
     strcpy((char*)pS, s);
-    len = strlen(s);
+    len = strlen(pS);
     for (i = 0; i < len; i++) {
         if (pS[i] >= 0xe0) {
             pS[i] -= 32;
         }
     }
-    // LOG_DEBUG("%s", result);
-    return result;
+    return pS;
 }
 
 // IDA: char* __usercall GetALineAndDontArgue@<EAX>(FILE *pF@<EAX>, char *pS@<EDX>)
@@ -372,7 +324,7 @@ void PathCat(char* pDestn_str, char* pStr_1, char* pStr_2) {
 // FUNCTION: CARM95 0x004c1e16
 int Chance(float pChance_per_second, int pPeriod) {
 
-    return FRandomBetween(0.f, 1.f) < (pPeriod * pChance_per_second / 1000.f);
+    return pPeriod * pChance_per_second / 1000.0 >= FRandomBetween(0.0f, 1.0f);
 }
 
 // IDA: float __cdecl tandeg(float pAngle)
@@ -408,8 +360,8 @@ br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, v
 
     the_map = BrPixelmapAllocate(pType, pW, pH, pPixels, pFlags);
     if (the_map != NULL) {
-        the_map->origin_y = 0;
         the_map->origin_x = 0;
+        the_map->origin_y = 0;
     }
     return the_map;
 }
@@ -421,8 +373,8 @@ br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 p
 
     the_map = BrPixelmapAllocateSub(pPm, pX, pY, pW, pH);
     if (the_map != NULL) {
-        the_map->origin_y = 0;
         the_map->origin_x = 0;
+        the_map->origin_y = 0;
     }
     return the_map;
 }
@@ -520,13 +472,12 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
 // FUNCTION: CARM95 0x004c1fbb
 br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     br_pixelmap* the_map;
-    br_int_8 lobyte;
 
     the_map = BrPixelmapLoad(pFile_name);
     if (the_map != NULL) {
+        the_map->row_bytes = (the_map->row_bytes + sizeof(tS32) - 1) & ~(sizeof(tS32) - 1);
         the_map->origin_x = 0;
         the_map->origin_y = 0;
-        the_map->row_bytes = (the_map->row_bytes + sizeof(tS32) - 1) & ~(sizeof(tS32) - 1);
     }
     return the_map;
 }
@@ -537,13 +488,13 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
     br_pixelmap* the_map;
     int number_loaded;
     int i;
-    br_uint_8 lobyte;
+
     number_loaded = BrPixelmapLoadMany(pFile_name, pPixelmaps, pNum);
     for (i = 0; i < number_loaded; i++) {
-        the_map = pPixelmaps[i];
-        the_map->row_bytes = (the_map->row_bytes + sizeof(tS32) - 1) & ~(sizeof(tS32) - 1);
-        the_map->base_x = 0;
-        the_map->base_y = 0;
+        // the_map = pPixelmaps[i];
+        pPixelmaps[i]->row_bytes = (pPixelmaps[i]->row_bytes + sizeof(tS32) - 1) & ~(sizeof(tS32) - 1);
+        pPixelmaps[i]->base_x = 0;
+        pPixelmaps[i]->base_y = 0;
     }
     return number_loaded;
 }
@@ -554,7 +505,7 @@ void WaitFor(tU32 pDelay) {
     tU32 start_time;
 
     start_time = PDGetTotalTime();
-    while (start_time + pDelay < PDGetTotalTime()) {
+    while (start_time + pDelay > PDGetTotalTime()) {
         SoundService();
     }
 }
@@ -568,11 +519,14 @@ br_uintptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, 
     if (result != 0) {
         return result;
     }
-    for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
+
+    pActor = pActor->children;
+    while (pActor) {
         result = DRActorEnumRecurse(pActor, callback, arg);
         if (result != 0) {
             return result;
         }
+        pActor = pActor->next;
     }
     return 0;
 }
@@ -607,11 +561,13 @@ br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, recurs
     if (result != 0) {
         return result;
     }
-    for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
+    pActor = pActor->children;
+    while (pActor != NULL) {
         result = DRActorEnumRecurseWithMat(pActor, pMat, pCall_back, pArg);
         if (result != 0) {
             return result;
         }
+        pActor = pActor->next;
     }
     return 0;
 }
@@ -631,11 +587,13 @@ br_uint_32 DRActorEnumRecurseWithTrans(br_actor* pActor, br_matrix34* pMatrix, b
     if (result != 0) {
         return result;
     }
-    for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
+    pActor = pActor->children;
+    while (pActor != NULL) {
         result = DRActorEnumRecurseWithTrans(pActor, &combined_transform, pCall_back, pArg);
         if (result != 0) {
             return result;
         }
+        pActor = pActor->next;
     }
     return 0;
 }
@@ -670,12 +628,14 @@ FILE* OpenUniqueFileB(char* pPrefix, char* pExtension) {
     FILE* f;
     tPath_name the_path;
 
+    index = 0;
     for (index = 0; index < 10000; index++) {
         PathCat(the_path, gApplication_path, pPrefix);
         sprintf(the_path + strlen(the_path), "%04d.%s", index, pExtension);
         f = DRfopen(the_path, "rt");
         if (f == NULL) {
-            return DRfopen(the_path, "wb");
+            f = DRfopen(the_path, "wb");
+            return f;
         }
         fclose(f);
     }
@@ -691,20 +651,21 @@ void PrintScreenFile(FILE* pF) {
     int offset;
     tU8* pixel_ptr;
 
-    bit_map_size = gBack_screen->height * gBack_screen->row_bytes;
+    bit_map_size = gBack_screen->row_bytes * gBack_screen->height;
+    offset = 0x436;
 
     // 1. BMP Header
     //    1. 'BM' Signature
     WriteU8L(pF, 'B');
     WriteU8L(pF, 'M');
     //    2. File size in bytes (header = 0xe bytes; infoHeader = 0x28 bytes; colorTable = 0x400 bytes; pixelData = xxx)
-    WriteU32L(pF, bit_map_size + 0x436);
+    WriteU32L(pF, offset + bit_map_size);
     //    3. unused
     WriteU16L(pF, 0);
     //    4. unused
     WriteU16L(pF, 0);
     //    5. pixelData offset (from beginning of file)
-    WriteU32L(pF, 0x436);
+    WriteU32L(pF, offset);
 
     // 2. Info Header
     //    1. InfoHeader Size
@@ -746,13 +707,13 @@ void PrintScreenFile(FILE* pF) {
     }
 
     // 4. Pixel Data (=LUT)
-    offset = bit_map_size - gBack_screen->row_bytes;
+    // offset = bit_map_size - gBack_screen->row_bytes;
+    pixel_ptr = (tU8*)gBack_screen->pixels + bit_map_size - gBack_screen->row_bytes;
     for (i = 0; i < gBack_screen->height; i++) {
         for (j = 0; j < gBack_screen->row_bytes; j++) {
-            WriteU8L(pF, ((tU8*)gBack_screen->pixels)[offset]);
-            offset++;
+            WriteU8L(pF, *pixel_ptr++);
         }
-        offset -= 2 * gBack_screen->row_bytes;
+        pixel_ptr -= 2 * gBack_screen->row_bytes;
     }
     WriteU16L(pF, 0);
 }
@@ -774,18 +735,18 @@ void PrintScreen(void) {
     FILE* f;
 
     f = OpenUniqueFileB("DUMP", "BMP");
-    if (f == NULL) {
-        return;
-    }
+    if (f != NULL) {
+
 #ifdef DETHRACE_3DFX_PATCH
-    if (gBack_screen->type == BR_PMT_RGB_565) {
-        PrintScreenFile16(f);
-    } else
+        if (gBack_screen->type == BR_PMT_RGB_565) {
+            PrintScreenFile16(f);
+        } else
 #endif
-    {
-        PrintScreenFile(f);
+        {
+            PrintScreenFile(f);
+        }
+        fclose(f);
     }
-    fclose(f);
 }
 
 // IDA: tU32 __cdecl GetTotalTime()
@@ -794,10 +755,10 @@ tU32 GetTotalTime(void) {
 
     if (gAction_replay_mode) {
         return gLast_replay_frame_time;
-    }
-    if (gNet_mode != eNet_mode_none) {
+    } else if (gNet_mode != eNet_mode_none) {
         return PDGetTotalTime();
     }
+
     return PDGetTotalTime() - gLost_time;
 }
 
@@ -896,12 +857,13 @@ int FindBestMatch(tRGB_colour* pRGB_colour, br_pixelmap* pPalette) {
     br_colour* dp;
 
     near_c = 127;
-    min_d = 1.79769e+308; // max double
+    min_d = DBL_MAX;
+    n = 0;
     dp = pPalette->pixels;
-    for (n = 0; n < 256; n++) {
-        trial_RGB.red = (dp[n] >> 16) & 0xff;
-        trial_RGB.green = (dp[n] >> 8) & 0xff;
-        trial_RGB.blue = (dp[n] >> 0) & 0xff;
+    for (; n < 256; n++, dp++) {
+        trial_RGB.red = BR_RED(*dp);
+        trial_RGB.green = BR_GRN(*dp);
+        trial_RGB.blue = BR_BLU(*dp);
         d = RGBDifferenceSqr(pRGB_colour, &trial_RGB);
         if (d < min_d) {
             min_d = d;
@@ -1928,5 +1890,42 @@ void BlendifyMaterial(br_material* pMaterial, int pPercent) {
         BlendifyMaterialTablishly(pMaterial, pPercent);
     } else {
         BlendifyMaterialPrimitively(pMaterial, pPercent);
+    }
+}
+
+// Added to handle demo-specific text file decryption behavior
+void EncodeLine_DEMO(char* pS) {
+    int len;
+    int seed;
+    int i;
+    char* key;
+    unsigned char c;
+    FILE* test;
+    tPath_name the_path;
+#if BR_ENDIAN_BIG
+    const tU32 gLong_key_DEMO[] = { 0x58503A76, 0xCBB68565, 0x15CD5B07, 0xB168DE3A };
+#else
+    const tU32 gLong_key_DEMO[] = { 0x763A5058, 0x6585B6CB, 0x75BCD15, 0x3ADE68B1 };
+#endif
+
+    len = strlen(pS);
+    key = (char*)gLong_key_DEMO;
+
+    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+        len--;
+        pS[len] = 0;
+    }
+    seed = len % 16;
+    for (i = 0; i < len; i++) {
+        c = pS[i];
+        if (c == '\t') {
+            c = 0x9F;
+        }
+        c = ((key[seed] ^ (c - 32)) & 0x7F) + 32;
+        seed = (seed + 7) % 16;
+        if (c == 0x9F) {
+            c = '\t';
+        }
+        pS[i] = c;
     }
 }
