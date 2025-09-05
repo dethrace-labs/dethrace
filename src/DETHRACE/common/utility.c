@@ -504,7 +504,7 @@ void WaitFor(tU32 pDelay) {
     tU32 start_time;
 
     start_time = PDGetTotalTime();
-    while (start_time + pDelay < PDGetTotalTime()) {
+    while (start_time + pDelay > PDGetTotalTime()) {
         SoundService();
     }
 }
