@@ -201,7 +201,7 @@ int IRandomPosNeg(int pN) {
 // IDA: float __cdecl FRandomBetween(float pA, float pB)
 // FUNCTION: CARM95 0x004c16bf
 float FRandomBetween(float pA, float pB) {
-    return (double)rand() * (pB - pA) / (double)RAND_MAX + pA;
+    return (float)rand() * (pB - pA) / (RAND_MAX + 1) + pA;
 }
 
 // IDA: float __cdecl FRandomPosNeg(float pN)
