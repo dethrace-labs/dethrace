@@ -880,12 +880,12 @@ void BuildShadeTablePath(char* pThe_path, int pR, int pG, int pB) {
 
     s[0] = 's';
     s[1] = 't';
-    s[2] = 'A' + ((pR & 0xf0) >> 4);
-    s[3] = 'A' + ((pR & 0x0f) >> 0);
-    s[4] = 'A' + ((pG & 0xf0) >> 4);
-    s[5] = 'A' + ((pG & 0x0f) >> 0);
-    s[6] = 'A' + ((pB & 0xf0) >> 4);
-    s[7] = 'A' + ((pB & 0x0f) >> 0);
+    s[2] = pR / 16 + 'A';
+    s[3] = pR % 16 + 'A';
+    s[4] = pG / 16 + 'A';
+    s[5] = pG % 16 + 'A';
+    s[6] = pB / 16 + 'A';
+    s[7] = pB % 16 + 'A';
     s[8] = '\0';
     strcat(s, ".TAB");
     PathCat(pThe_path, gApplication_path, "SHADETAB");
