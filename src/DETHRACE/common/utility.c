@@ -734,18 +734,18 @@ void PrintScreen(void) {
     FILE* f;
 
     f = OpenUniqueFileB("DUMP", "BMP");
-    if (f == NULL) {
-        return;
-    }
+    if (f != NULL) {
+
 #ifdef DETHRACE_3DFX_PATCH
-    if (gBack_screen->type == BR_PMT_RGB_565) {
-        PrintScreenFile16(f);
-    } else
+        if (gBack_screen->type == BR_PMT_RGB_565) {
+            PrintScreenFile16(f);
+        } else
 #endif
-    {
-        PrintScreenFile(f);
+        {
+            PrintScreenFile(f);
+        }
+        fclose(f);
     }
-    fclose(f);
 }
 
 // IDA: tU32 __cdecl GetTotalTime()
