@@ -22,6 +22,7 @@
 #include "world.h"
 
 #include <ctype.h>
+#include <float.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -856,12 +857,13 @@ int FindBestMatch(tRGB_colour* pRGB_colour, br_pixelmap* pPalette) {
     br_colour* dp;
 
     near_c = 127;
-    min_d = 1.79769e+308; // max double
+    min_d = DBL_MAX;
+    n = 0;
     dp = pPalette->pixels;
-    for (n = 0; n < 256; n++) {
-        trial_RGB.red = (dp[n] >> 16) & 0xff;
-        trial_RGB.green = (dp[n] >> 8) & 0xff;
-        trial_RGB.blue = (dp[n] >> 0) & 0xff;
+    for (; n < 256; n++, dp++) {
+        trial_RGB.red = BR_RED(*dp);
+        trial_RGB.green = BR_GRN(*dp);
+        trial_RGB.blue = BR_BLU(*dp);
         d = RGBDifferenceSqr(pRGB_colour, &trial_RGB);
         if (d < min_d) {
             min_d = d;
