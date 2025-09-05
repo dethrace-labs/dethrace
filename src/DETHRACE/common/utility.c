@@ -754,10 +754,10 @@ tU32 GetTotalTime(void) {
 
     if (gAction_replay_mode) {
         return gLast_replay_frame_time;
-    }
-    if (gNet_mode != eNet_mode_none) {
+    } else if (gNet_mode != eNet_mode_none) {
         return PDGetTotalTime();
     }
+
     return PDGetTotalTime() - gLost_time;
 }
 
