@@ -650,20 +650,21 @@ void PrintScreenFile(FILE* pF) {
     int offset;
     tU8* pixel_ptr;
 
-    bit_map_size = gBack_screen->height * gBack_screen->row_bytes;
+    bit_map_size = gBack_screen->row_bytes * gBack_screen->height;
+    offset = 0x436;
 
     // 1. BMP Header
     //    1. 'BM' Signature
     WriteU8L(pF, 'B');
     WriteU8L(pF, 'M');
     //    2. File size in bytes (header = 0xe bytes; infoHeader = 0x28 bytes; colorTable = 0x400 bytes; pixelData = xxx)
-    WriteU32L(pF, bit_map_size + 0x436);
+    WriteU32L(pF, offset + bit_map_size);
     //    3. unused
     WriteU16L(pF, 0);
     //    4. unused
     WriteU16L(pF, 0);
     //    5. pixelData offset (from beginning of file)
-    WriteU32L(pF, 0x436);
+    WriteU32L(pF, offset);
 
     // 2. Info Header
     //    1. InfoHeader Size
@@ -705,13 +706,13 @@ void PrintScreenFile(FILE* pF) {
     }
 
     // 4. Pixel Data (=LUT)
-    offset = bit_map_size - gBack_screen->row_bytes;
+    // offset = bit_map_size - gBack_screen->row_bytes;
+    pixel_ptr = (tU8*)gBack_screen->pixels + bit_map_size - gBack_screen->row_bytes;
     for (i = 0; i < gBack_screen->height; i++) {
         for (j = 0; j < gBack_screen->row_bytes; j++) {
-            WriteU8L(pF, ((tU8*)gBack_screen->pixels)[offset]);
-            offset++;
+            WriteU8L(pF, *pixel_ptr++);
         }
-        offset -= 2 * gBack_screen->row_bytes;
+        pixel_ptr -= 2 * gBack_screen->row_bytes;
     }
     WriteU16L(pF, 0);
 }
