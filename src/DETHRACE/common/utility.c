@@ -518,11 +518,14 @@ br_uintptr_t DRActorEnumRecurse(br_actor* pActor, br_actor_enum_cbfn* callback, 
     if (result != 0) {
         return result;
     }
-    for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
+
+    pActor = pActor->children;
+    while (pActor) {
         result = DRActorEnumRecurse(pActor, callback, arg);
         if (result != 0) {
             return result;
         }
+        pActor = pActor->next;
     }
     return 0;
 }
@@ -557,11 +560,13 @@ br_uint_32 DRActorEnumRecurseWithMat(br_actor* pActor, br_material* pMat, recurs
     if (result != 0) {
         return result;
     }
-    for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
+    pActor = pActor->children;
+    while (pActor != NULL) {
         result = DRActorEnumRecurseWithMat(pActor, pMat, pCall_back, pArg);
         if (result != 0) {
             return result;
         }
+        pActor = pActor->next;
     }
     return 0;
 }
@@ -581,11 +586,13 @@ br_uint_32 DRActorEnumRecurseWithTrans(br_actor* pActor, br_matrix34* pMatrix, b
     if (result != 0) {
         return result;
     }
-    for (pActor = pActor->children; pActor != NULL; pActor = pActor->next) {
+    pActor = pActor->children;
+    while (pActor != NULL) {
         result = DRActorEnumRecurseWithTrans(pActor, &combined_transform, pCall_back, pArg);
         if (result != 0) {
             return result;
         }
+        pActor = pActor->next;
     }
     return 0;
 }
