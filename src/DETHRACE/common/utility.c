@@ -323,7 +323,7 @@ void PathCat(char* pDestn_str, char* pStr_1, char* pStr_2) {
 // FUNCTION: CARM95 0x004c1e16
 int Chance(float pChance_per_second, int pPeriod) {
 
-    return FRandomBetween(0.f, 1.f) < (pPeriod * pChance_per_second / 1000.f);
+    return pPeriod * pChance_per_second / 1000.0 >= FRandomBetween(0.0f, 1.0f);
 }
 
 // IDA: float __cdecl tandeg(float pAngle)
@@ -359,8 +359,8 @@ br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, v
 
     the_map = BrPixelmapAllocate(pType, pW, pH, pPixels, pFlags);
     if (the_map != NULL) {
-        the_map->origin_y = 0;
         the_map->origin_x = 0;
+        the_map->origin_y = 0;
     }
     return the_map;
 }
@@ -372,8 +372,8 @@ br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 p
 
     the_map = BrPixelmapAllocateSub(pPm, pX, pY, pW, pH);
     if (the_map != NULL) {
-        the_map->origin_y = 0;
         the_map->origin_x = 0;
+        the_map->origin_y = 0;
     }
     return the_map;
 }
@@ -471,13 +471,12 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
 // FUNCTION: CARM95 0x004c1fbb
 br_pixelmap* DRPixelmapLoad(char* pFile_name) {
     br_pixelmap* the_map;
-    br_int_8 lobyte;
 
     the_map = BrPixelmapLoad(pFile_name);
     if (the_map != NULL) {
+        the_map->row_bytes = (the_map->row_bytes + sizeof(tS32) - 1) & ~(sizeof(tS32) - 1);
         the_map->origin_x = 0;
         the_map->origin_y = 0;
-        the_map->row_bytes = (the_map->row_bytes + sizeof(tS32) - 1) & ~(sizeof(tS32) - 1);
     }
     return the_map;
 }
