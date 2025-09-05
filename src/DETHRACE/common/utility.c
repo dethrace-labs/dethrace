@@ -228,40 +228,43 @@ br_scalar SRandomPosNeg(br_scalar pN) {
 // IDA: char* __usercall GetALineWithNoPossibleService@<EAX>(FILE *pF@<EAX>, unsigned char *pS@<EDX>)
 // FUNCTION: CARM95 0x004c175c
 char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
-    // Jeff removed "signed' to avoid compiler warnings..
-    /*signed*/ char* result;
-    /*signed*/ char s[256];
+    signed char* result;
+    signed char s[256];
+    int i;
     int ch;
     int len;
-    int i;
+    // name unknown, this was not in the DOS symbol dump
+    // the z_ prefix helps it into the correct stack position
+    int z_alnum;
 
     do {
+
         result = fgets(s, 256, pF);
         if (result == NULL) {
-            s[0] = '\0';
             break;
         }
         if (s[0] == '@') {
             EncodeLine(&s[1]);
-            len = strlen(s);
-            memmove(s, &s[1], len);
-        } else {
-            while (s[0] == ' ' || s[0] == '\t') {
-                len = strlen(s);
-                memmove(s, &s[1], len);
-            }
+            memmove(s, &s[1], strlen(s));
+        }
+        while (s[0] == ' ' || s[0] == '\t') {
+            memmove(s, &s[1], strlen(s));
         }
 
-        while (1) {
-            ch = fgetc(pF);
-            if (ch != '\r' && ch != '\n') {
-                break;
-            }
-        }
+        do {
+            do {
+                ch = fgetc(pF);
+            } while (ch == 13);
+        } while (ch == 10);
         if (ch != -1) {
             ungetc(ch, pF);
         }
-    } while (!Harness_Hook_isalnum(s[0])
+#ifdef DETHRACE_FIX_BUGS
+        z_alnum = Harness_Hook_isalnum(s[0]);
+#else
+        z_alnum = isalnum(s[0]);
+#endif
+    } while (!z_alnum
         && s[0] != '-'
         && s[0] != '.'
         && s[0] != '!'
@@ -273,22 +276,22 @@ char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
 
     if (result) {
         len = strlen(result);
-        if (len != 0 && (result[len - 1] == '\r' || result[len - 1] == '\n')) {
+        if (len != 0 && result[len - 1] == '\n' || result[len - 1] == '\r') {
             result[len - 1] = 0;
         }
-        if (len != 1 && (result[len - 2] == '\r' || result[len - 2] == '\n')) {
-            result[len - 2] = 0;
+        len--;
+        if (len != 0 && result[len - 1] == '\n' || result[len - 1] == '\r') {
+            result[len - 1] = 0;
         }
     }
     strcpy((char*)pS, s);
-    len = strlen(s);
+    len = strlen(pS);
     for (i = 0; i < len; i++) {
         if (pS[i] >= 0xe0) {
             pS[i] -= 32;
         }
     }
-    // LOG_DEBUG("%s", result);
-    return result;
+    return pS;
 }
 
 // IDA: char* __usercall GetALineAndDontArgue@<EAX>(FILE *pF@<EAX>, char *pS@<EDX>)
