@@ -487,13 +487,13 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
     br_pixelmap* the_map;
     int number_loaded;
     int i;
-    br_uint_8 lobyte;
+
     number_loaded = BrPixelmapLoadMany(pFile_name, pPixelmaps, pNum);
     for (i = 0; i < number_loaded; i++) {
-        the_map = pPixelmaps[i];
-        the_map->row_bytes = (the_map->row_bytes + sizeof(tS32) - 1) & ~(sizeof(tS32) - 1);
-        the_map->base_x = 0;
-        the_map->base_y = 0;
+        // the_map = pPixelmaps[i];
+        pPixelmaps[i]->row_bytes = (pPixelmaps[i]->row_bytes + sizeof(tS32) - 1) & ~(sizeof(tS32) - 1);
+        pPixelmaps[i]->base_x = 0;
+        pPixelmaps[i]->base_y = 0;
     }
     return number_loaded;
 }
