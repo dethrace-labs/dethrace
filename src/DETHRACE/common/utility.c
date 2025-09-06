@@ -950,43 +950,52 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
         if (the_table == NULL) {
             FatalError(kFatalError_LoadGeneratedShadeTable);
         }
-        cp = pPalette->pixels;
-
         ref_col.red = pRed_mix;
         ref_col.green = pGreen_mix;
         ref_col.blue = pBlue_mix;
+        ;
 
-        for (c = 0, tab_ptr = the_table->pixels; c < 256; c++, tab_ptr++) {
-            the_RGB.red = ((cp[c] >> 16) & 0xff) * pDarken;
-            the_RGB.green = ((cp[c] >> 8) & 0xff) * pDarken;
-            the_RGB.blue = ((cp[c] >> 0) & 0xff) * pDarken;
-
+        for (tab_ptr = the_table->pixels, c = 0, cp = pPalette->pixels; c < 256; c++, cp++) {
+            the_RGB.red = BR_RED(*cp) * pDarken;
+            the_RGB.green = BR_GRN(*cp) * pDarken;
+            the_RGB.blue = BR_BLU(*cp) * pDarken;
+            shade_ptr = tab_ptr;
+            tab_ptr++;
             if (pHeight == 1) {
                 f_total_minus_1 = 1.;
             } else {
                 f_total_minus_1 = pHeight - 1;
             }
-            shade_ptr = tab_ptr;
-            for (i = 0, shade_ptr = tab_ptr; i < pHeight; i++, shade_ptr += 0x100) {
-                f_i = i;
+
+            for (i = 0; i < pHeight; i++) {
+                int unk;
+
+                if (pHeight == 1) {
+                    unk = 1;
+                } else {
+                    unk = i;
+                }
+
+                f_i = unk;
                 ratio1 = f_i / f_total_minus_1;
                 if (ratio1 < .5) {
-                    if (ratio1 < .25) {
-                        ratio2 = pQuarter * ratio1 * 4.;
-                    } else {
+                    if (ratio1 >= .25) {
                         ratio2 = (ratio1 - .25) * (pHalf - pQuarter) * 4. + pQuarter;
+                    } else {
+                        ratio2 = pQuarter * ratio1 * 4.;
                     }
                 } else {
-                    if (ratio1 < 0.75) {
-                        ratio2 = (ratio1 - .5) * (pThree_quarter - pHalf) * 4. + pHalf;
+                    if (ratio1 >= 0.75) {
+                        ratio2 = 1.0 - (1.0 - ratio1) * (1.0 - pThree_quarter) * 4.0;
                     } else {
-                        ratio2 = 1. - (1. - pThree_quarter) * (1. - ratio1) * 4.;
+                        ratio2 = (ratio1 - .5) * (pThree_quarter - pHalf) * 4. + pHalf;
                     }
                 }
-                new_RGB.red = ref_col.red * ratio2 + the_RGB.red * (1. - ratio2);
+                new_RGB.red = (int)((double)((1.0 - ratio2) * (double)the_RGB.red) + ((double)ref_col.red * ratio2));
                 new_RGB.green = ref_col.green * ratio2 + the_RGB.green * (1. - ratio2);
                 new_RGB.blue = ref_col.blue * ratio2 + the_RGB.blue * (1. - ratio2);
                 *shade_ptr = FindBestMatch(&new_RGB, pPalette);
+                shade_ptr += 256;
             }
         }
         SaveGeneratedShadeTable(the_table, pRed_mix, pGreen_mix, pBlue_mix);
