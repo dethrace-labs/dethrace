@@ -1029,8 +1029,8 @@ void DRMatrix34TApplyP(br_vector3* pA, br_vector3* pB, br_matrix34* pC) {
     t1 = pB->v[0] - pC->m[3][0];
     t2 = pB->v[1] - pC->m[3][1];
     t3 = pB->v[2] - pC->m[3][2];
-    pA->v[0] = pC->m[0][0] * t1 + pC->m[0][1] * t2 + pC->m[0][2] * t3;
-    pA->v[1] = pC->m[1][0] * t1 + pC->m[1][1] * t2 + pC->m[1][2] * t3;
+    pA->v[0] = pC->m[0][2] * t3 + pC->m[0][1] * t2 + pC->m[0][0] * t1;
+    pA->v[1] = pC->m[1][0] * t1 + pC->m[1][2] * t3 + pC->m[1][1] * t2;
     pA->v[2] = pC->m[2][0] * t1 + pC->m[2][1] * t2 + pC->m[2][2] * t3;
 }
 
