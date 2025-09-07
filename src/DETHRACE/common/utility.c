@@ -1376,8 +1376,8 @@ br_material* DRMaterialClone(br_material* pMaterial) {
     the_material->index_blend = pMaterial->index_blend;
     the_material->colour_map = pMaterial->colour_map;
     memcpy(&the_material->map_transform, &pMaterial->map_transform, sizeof(the_material->map_transform));
-    sprintf(s, "%s(%d)", pMaterial->identifier, name_suffix);
-    name_suffix++;
+    sprintf(s, "%s(%d)", pMaterial->identifier, name_suffix++);
+    // name_suffix++;
     the_material->identifier = BrResAllocate(the_material, strlen(s) + 1, BR_MEMORY_STRING);
     strcpy(the_material->identifier, s);
     BrMaterialAdd(the_material);
