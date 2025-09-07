@@ -1521,80 +1521,67 @@ void EncodeFile(char* pThe_path) {
     int len;
     int count;
 
+    s = line + 1;
     len = strlen(pThe_path);
     strcpy(new_file, pThe_path);
     strcpy(&new_file[len - 3], "ENC");
-
     f = fopen(pThe_path, "rt");
-    if (f == NULL) {
+    if (!f) {
         FatalError(kFatalError_Open_S, pThe_path);
     }
-
     ch = fgetc(f);
     ungetc(ch, f);
-
-    if (gDecode_thing == '@' && gDecode_thing == (char)ch) {
+    if (gDecode_thing == '@' && ch == gDecode_thing) {
         fclose(f);
-        return;
-    }
-
-    d = fopen(new_file, "wb");
-    if (d == NULL) {
-        FatalError(kFatalError_Open_S, new_file);
-    }
-
-    result = &line[1];
-
-    while (!feof(f)) {
-        s = fgets(result, 256, f);
-
-        if (s == NULL) {
-            continue;
+    } else {
+        d = fopen(new_file, "wb");
+        if (!d) {
+            FatalError(kFatalError_Open_S, new_file);
         }
-
-        if (result[0] == '@') {
-            decode = 1;
-        } else {
-            decode = 0;
-            // Strip leading whitespace
-            while (result[0] == ' ' || result[0] == '\t') {
-                memmove(result, &result[1], strlen(result));
+        do {
+            result = fgets(s, 256, f);
+            if (result == NULL) {
+                continue;
             }
-        }
-
-        if (decode) {
-            DecodeLine2(&result[decode]);
-        } else {
-            EncodeLine2(&result[decode]);
-        }
-
-        line[0] = '@';
-        fputs(&line[decode * 2], d);
-        count = -1;
-        while (1) {
-            count++;
-            ch = fgetc(f);
-            if (ch != '\r' && ch != '\n') {
-                break;
+            if (*s == '@') {
+                decode = 1;
+            } else {
+                decode = 0;
+                while (*s == ' ' || *s == '\t') {
+                    memmove(s, s + 1, strlen(s));
+                }
             }
-        }
-        if (count > 2) {
+            if (decode) {
+                DecodeLine2(&s[decode]);
+            } else {
+                EncodeLine2(&s[decode]);
+            }
+            *line = '@';
+            fputs(line + decode * 2, d);
+            count = -1;
+            do {
+                do {
+                    count++;
+                    ch = fgetc(f);
+                } while (ch == '\r');
+            } while (ch == '\n');
+            if (count > 2) {
+                fputc('\r', d);
+                fputc('\n', d);
+            }
             fputc('\r', d);
             fputc('\n', d);
-        }
-        fputc('\r', d);
-        fputc('\n', d);
+            if (ch != -1) {
+                ungetc(ch, f);
+            }
 
-        if (ch != -1) {
-            ungetc(ch, f);
-        }
+        } while (!feof(f));
+        fclose(f);
+        fclose(d);
+        PDFileUnlock(pThe_path);
+        remove(pThe_path);
+        rename(new_file, pThe_path);
     }
-    fclose(f);
-    fclose(d);
-
-    PDFileUnlock(pThe_path);
-    remove(pThe_path);
-    rename(new_file, pThe_path);
 }
 
 // IDA: void __usercall EncodeFileWrapper(char *pThe_path@<EAX>)
