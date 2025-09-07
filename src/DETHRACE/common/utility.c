@@ -1479,39 +1479,31 @@ void EncodeLine2(char* pS) {
     len = strlen(pS);
     count = 0;
     key = (char*)gLong_key;
-    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+    while (len && pS[len - 1] == '\r' || pS[len - 1] == '\n') {
+        pS[len - 1] = 0;
         len--;
-        pS[len] = '\0';
     }
-
     seed = len % 16;
-
-    for (i = 0; i < len; i++) {
+    for (i = 0; i < len; ++i) {
         if (count == 2) {
-            key = (char*)gOther_long_key;
+            key = (char*)&gOther_long_key;
         }
         if (pS[i] == '/') {
-            count++;
+            ++count;
         } else {
             count = 0;
         }
         if (pS[i] == '\t') {
             pS[i] = 0x80;
         }
-
-        c = pS[i] - 0x20;
-        if ((c & 0x80) == 0) {
-            c ^= key[seed] & 0x7f;
+        c = pS[i] - 32;
+        if ((c & 0x80u) == 0) {
+            pS[i] = (c ^ key[seed] & 0x7F) + 32;
         }
-        c += 0x20;
-
-        seed += 7;
-        seed %= 16;
-
-        if (c == 0x80) {
-            c = '\t';
+        seed = (seed + 7) % 16;
+        if (pS[i] == -128) {
+            pS[i] = '\t';
         }
-        pS[i] = c;
     }
 }
 
