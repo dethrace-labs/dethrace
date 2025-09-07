@@ -1389,13 +1389,13 @@ br_material* DRMaterialClone(br_material* pMaterial) {
 void StripCR(char* s) {
     char* pos;
 
-    pos = s;
-    while (*pos != '\0') {
-        if (*pos == '\r' || *pos == '\n') {
-            *pos = '\0';
-            break;
-        }
-        pos++;
+    pos = strchr(s, '\n');
+    if (pos) {
+        *pos = 0;
+    }
+    pos = strchr(s, '\r');
+    if (pos) {
+        *pos = 0;
     }
 }
 
