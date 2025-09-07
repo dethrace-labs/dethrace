@@ -1026,9 +1026,13 @@ void DRMatrix34TApplyP(br_vector3* pA, br_vector3* pB, br_matrix34* pC) {
     br_scalar t2;
     br_scalar t3;
 
-    t1 = pB->v[0] - pC->m[3][0];
-    t2 = pB->v[1] - pC->m[3][1];
-    t3 = pB->v[2] - pC->m[3][2];
+    t1 = BR_SUB(pB->v[0], pC->m[3][0]);
+    t2 = BR_SUB(pB->v[1], pC->m[3][1]);
+    t3 = BR_SUB(pB->v[2], pC->m[3][2]);
+
+    // this avoids the +fstp in the line above, but including the "add" breaks it again. Some combination of braces etc...
+    // pA->v[0] = BR_MUL(pC->m[0][2], t3);
+
     pA->v[0] = pC->m[0][2] * t3 + pC->m[0][1] * t2 + pC->m[0][0] * t1;
     pA->v[1] = pC->m[1][0] * t1 + pC->m[1][2] * t3 + pC->m[1][1] * t2;
     pA->v[2] = pC->m[2][0] * t1 + pC->m[2][1] * t2 + pC->m[2][2] * t3;
@@ -1345,7 +1349,10 @@ int NormalSideOfPlane(br_vector3* pPoint, br_vector3* pNormal, br_scalar pD) {
     br_scalar numer;
     br_scalar denom;
 
-    return (BrVector3Dot(pNormal, pPoint) - pD) >= 0.f;
+    // numer = BR_MUL(pPoint->v[1], pNormal->v[1]) + BR_MUL(pPoint->v[2], pNormal->v[2]); // + BR_MUL(pNormal->v[0], pPoint->v[0]) - pD;
+    numer = pNormal->v[1] * pPoint->v[1] + pNormal->v[2] * pPoint->v[2] + pNormal->v[0] * pPoint->v[0] - pD;
+    denom = BR_SQR(pNormal->v[2]) + BR_SQR(pNormal->v[1]) + BR_SQR(pNormal->v[0]);
+    return denom * numer >= 0.0f;
 }
 
 // IDA: br_material* __usercall DRMaterialClone@<EAX>(br_material *pMaterial@<EAX>)
