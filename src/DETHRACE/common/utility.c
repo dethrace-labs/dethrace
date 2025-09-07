@@ -1429,52 +1429,40 @@ void DecodeLine2(char* pS) {
 
     len = strlen(pS);
     key = (char*)gLong_key;
-    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+    while (len && pS[len - 1] == '\r' || pS[len - 1] == '\n') {
+        pS[len - 1] = 0;
         len--;
-        pS[len] = '\0';
     }
     seed = len % 16;
-    for (i = 0; i < len; i++) {
-        c = pS[i];
-        if (i >= 2) {
-            if (pS[i - 1] == '/' && pS[i - 2] == '/') {
-                key = (char*)gOther_long_key;
-            }
-        }
+    for (i = 0; i < len; ++i) {
         if (gEncryption_method == 1) {
-            if (c == '\t') {
-                c = 0x9f;
+            if (i >= 2 && pS[i - 1] == '/' && pS[i - 2] == '/') {
+                key = (char*)&gOther_long_key;
             }
-
-            c -= 0x20;
-            c ^= key[seed];
-            c &= 0x7f;
-            c += 0x20;
-
-            seed += 7;
-            seed %= 16;
-
-            if (c == 0x9f) {
-                c = '\t';
+            if (pS[i] == '\t') {
+                pS[i] = -97;
+            }
+            pS[i] = ((key[seed] ^ (pS[i] - 32)) & 0x7F) + 32;
+            seed = (seed + 7) % 16;
+            if (pS[i] == -97) {
+                pS[i] = '\t';
             }
         } else {
-            if (c == '\t') {
-                c = 0x80;
+            if (i >= 2 && pS[i - 1] == '/' && pS[i - 2] == '/') {
+                key = (char*)&gOther_long_key;
             }
-            c -= 0x20;
+            if (pS[i] == '\t') {
+                pS[i] = 0x80;
+            }
+            c = pS[i] - 32;
             if ((c & 0x80) == 0) {
-                c ^= key[seed] & 0x7f;
+                pS[i] = (c ^ key[seed] & 0x7F) + 32;
             }
-            c += 0x20;
-
-            seed += 7;
-            seed %= 16;
-
-            if (c == 0x80) {
-                c = '\t';
+            seed = (seed + 7) % 16;
+            if (pS[i] == -128) {
+                pS[i] = '\t';
             }
         }
-        pS[i] = c;
     }
 }
 
