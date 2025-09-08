@@ -1641,15 +1641,6 @@ void SkipNLines(FILE* pF) {
 // FUNCTION: CARM95 0x004c3d94
 int DRStricmp(char* p1, char* p2) {
     int val;
-    // while (p1) {
-    //     val = tolower(*p1) - tolower(*p2);
-    //     if (val != 0) {
-    //         return val;
-    //     }
-    //     p1++;
-    //     p2++;
-    // }
-    // return 0;
 
     do {
         val = tolower(*p1) - tolower(*p2);
@@ -1660,7 +1651,6 @@ int DRStricmp(char* p1, char* p2) {
             break;
         }
     } while (*(p2++));
-endm:
     return val;
 }
 
@@ -1786,13 +1776,7 @@ int OpacityInPrims(br_token_value* pPrims) {
 // FUNCTION: CARM95 0x004c3e2c
 int AlreadyBlended(br_material* pMaterial) {
 
-    if (pMaterial->index_blend != NULL) {
-        return 1;
-    }
-    if (pMaterial->extra_prim == NULL) {
-        return 0;
-    }
-    return OpacityInPrims(pMaterial->extra_prim);
+    return pMaterial->index_blend || (pMaterial->extra_prim && OpacityInPrims(pMaterial->extra_prim));
 }
 
 // IDA: void __usercall BlendifyMaterialTablishly(br_material *pMaterial@<EAX>, int pPercent@<EDX>)
