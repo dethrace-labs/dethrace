@@ -1641,15 +1641,27 @@ void SkipNLines(FILE* pF) {
 // FUNCTION: CARM95 0x004c3d94
 int DRStricmp(char* p1, char* p2) {
     int val;
-    while (p1) {
+    // while (p1) {
+    //     val = tolower(*p1) - tolower(*p2);
+    //     if (val != 0) {
+    //         return val;
+    //     }
+    //     p1++;
+    //     p2++;
+    // }
+    // return 0;
+
+    do {
         val = tolower(*p1) - tolower(*p2);
-        if (val != 0) {
-            return val;
+        if (val) {
+            break;
         }
-        p1++;
-        p2++;
-    }
-    return 0;
+        if (!*(p1++)) {
+            break;
+        }
+    } while (*(p2++));
+endm:
+    return val;
 }
 
 // IDA: void __usercall GlorifyMaterial(br_material **pArray@<EAX>, int pCount@<EDX>)
