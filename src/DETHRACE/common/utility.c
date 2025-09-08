@@ -1589,50 +1589,30 @@ void EncodeFile(char* pThe_path) {
 void EncodeFileWrapper(char* pThe_path) {
     int len;
 
+#define STR_ENDS_WITH(haystack, haystack_len, needle) strcmp(haystack_len - sizeof(needle) + 1 + haystack, needle)
+
     len = strlen(pThe_path);
 
-    // if file doesn't end in .txt, bail out
-    if (STR_ENDS_WITH(pThe_path, ".TXT") != 0) {
+    if (STR_ENDS_WITH(pThe_path, len, ".TXT")) {
         return;
     }
-    if (STR_ENDS_WITH(pThe_path, "DKEYMAP0.TXT") == 0) {
-        return;
-    }
-    if (STR_ENDS_WITH(pThe_path, "DKEYMAP1.TXT") == 0) {
-        return;
-    }
-    if (STR_ENDS_WITH(pThe_path, "DKEYMAP2.TXT") == 0) {
-        return;
-    }
-    if (STR_ENDS_WITH(pThe_path, "DKEYMAP3.TXT") == 0) {
-        return;
-    }
-    if (STR_ENDS_WITH(pThe_path, "KEYMAP_0.TXT") == 0) {
-        return;
-    }
-    if (STR_ENDS_WITH(pThe_path, "KEYMAP_1.TXT") == 0) {
-        return;
-    }
-    if (STR_ENDS_WITH(pThe_path, "KEYMAP_2.TXT") == 0) {
-        return;
-    }
-    if (STR_ENDS_WITH(pThe_path, "KEYMAP_3.TXT") == 0) {
-        return;
-    }
-    if (STR_ENDS_WITH(pThe_path, "OPTIONS.TXT") == 0) {
-        return;
-    }
-    if (STR_ENDS_WITH(pThe_path, "KEYNAMES.TXT") == 0) {
-        return;
-    }
-    if (STR_ENDS_WITH(pThe_path, "KEYMAP.TXT") == 0) {
-        return;
-    }
-    if (STR_ENDS_WITH(pThe_path, "PATHS.TXT") == 0) {
-        return;
-    }
+    if (STR_ENDS_WITH(pThe_path, len, "DKEYMAP0.TXT")
+        && STR_ENDS_WITH(pThe_path, len, "DKEYMAP1.TXT")
+        && STR_ENDS_WITH(pThe_path, len, "DKEYMAP2.TXT")
+        && STR_ENDS_WITH(pThe_path, len, "DKEYMAP3.TXT")
+        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_0.TXT")
+        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_1.TXT")
+        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_2.TXT")
+        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_3.TXT")
+        && STR_ENDS_WITH(pThe_path, len, "OPTIONS.TXT")
+        && STR_ENDS_WITH(pThe_path, len, "KEYNAMES.TXT")
+        && STR_ENDS_WITH(pThe_path, len, "KEYMAP.TXT")) {
 
-    EncodeFile(pThe_path);
+        if (!STR_ENDS_WITH(pThe_path, len, "PATHS.TXT")) {
+            return;
+        }
+        EncodeFile(pThe_path);
+    }
 }
 
 // IDA: void __usercall EncodeAllFilesInDirectory(char *pThe_path@<EAX>)
