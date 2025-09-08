@@ -88,7 +88,6 @@ double sqr(double pN) {
     return pN * pN;
 }
 
-typedef char tSomething[256];
 // IDA: void __usercall EncodeLine(char *pS@<EAX>)
 // FUNCTION: CARM95 0x004c1ab1
 void EncodeLine(char* pS) {
@@ -125,7 +124,11 @@ void EncodeLine(char* pS) {
             gEncryption_method = 2;
         }
     }
+#ifdef DETHRACE_FIX_BUGS
+    while (len != 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+#else
     while (len != 0 && pS[len - 1] == '\r' || pS[len - 1] == '\n') {
+#endif
         pS[len - 1] = '\0';
         len--;
     }
@@ -148,7 +151,7 @@ void EncodeLine(char* pS) {
             pS[i] = ((key[seed] ^ (pS[i] - 32)) & 0x7F) + 32;
             seed = (seed + 7) % 16;
 
-            if (pS[i] == 0xFFFFFF9F) {
+            if ((signed char)pS[i] == (signed char)0x9f) {
                 pS[i] = '\t';
             }
         } else {
@@ -158,11 +161,11 @@ void EncodeLine(char* pS) {
 
             c = pS[i] - 32;
             if ((c & 0x80u) == 0) {
-                pS[i] = (c ^ key[seed] & 0x7F) + 32;
+                pS[i] = (c ^ (key[seed] & 0x7f)) + 32;
             }
 
             seed = (seed + 7) % 16;
-            if (pS[i] == 0xFFFFFF80) {
+            if ((signed char)pS[i] == (signed char)0x80) {
                 pS[i] = '\t';
             }
         }
@@ -240,16 +243,16 @@ char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
 
     do {
 
-        result = fgets(s, 256, pF);
+        result = (signed char*)fgets((char*)s, 256, pF);
         if (result == NULL) {
             break;
         }
         if (s[0] == '@') {
-            EncodeLine(&s[1]);
-            memmove(s, &s[1], strlen(s));
+            EncodeLine((char*)&s[1]);
+            memmove(s, &s[1], strlen((char*)s));
         }
         while (s[0] == ' ' || s[0] == '\t') {
-            memmove(s, &s[1], strlen(s));
+            memmove(s, &s[1], strlen((char*)s));
         }
 
         do {
@@ -276,23 +279,31 @@ char* GetALineWithNoPossibleService(FILE* pF, unsigned char* pS) {
         && s[0] >= 0);
 
     if (result) {
-        len = strlen(result);
+        len = strlen((char*)result);
+#ifdef DETHRACE_FIX_BUGS
+        if (len != 0 && (result[len - 1] == '\n' || result[len - 1] == '\r')) {
+#else
         if (len != 0 && result[len - 1] == '\n' || result[len - 1] == '\r') {
+#endif
             result[len - 1] = 0;
         }
         len--;
+#ifdef DETHRACE_FIX_BUGS
+        if (len != 0 && (result[len - 1] == '\n' || result[len - 1] == '\r')) {
+#else
         if (len != 0 && result[len - 1] == '\n' || result[len - 1] == '\r') {
+#endif
             result[len - 1] = 0;
         }
     }
-    strcpy((char*)pS, s);
-    len = strlen(pS);
+    strcpy((char*)pS, (char*)s);
+    len = strlen((char*)pS);
     for (i = 0; i < len; i++) {
         if (pS[i] >= 0xe0) {
             pS[i] -= 32;
         }
     }
-    return pS;
+    return (char*)pS;
 }
 
 // IDA: char* __usercall GetALineAndDontArgue@<EAX>(FILE *pF@<EAX>, char *pS@<EDX>)
@@ -491,7 +502,6 @@ br_uint_32 DRPixelmapLoadMany(char* pFile_name, br_pixelmap** pPixelmaps, br_uin
 
     number_loaded = BrPixelmapLoadMany(pFile_name, pPixelmaps, pNum);
     for (i = 0; i < number_loaded; i++) {
-        // the_map = pPixelmaps[i];
         pPixelmaps[i]->row_bytes = (pPixelmaps[i]->row_bytes + sizeof(tS32) - 1) & ~(sizeof(tS32) - 1);
         pPixelmaps[i]->base_x = 0;
         pPixelmaps[i]->base_y = 0;
@@ -1429,22 +1439,26 @@ void DecodeLine2(char* pS) {
 
     len = strlen(pS);
     key = (char*)gLong_key;
-    while (len && pS[len - 1] == '\r' || pS[len - 1] == '\n') {
+#ifdef DETHRACE_FIX_BUGS
+    while (len != 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+#else
+    while (len != 0 && pS[len - 1] == '\r' || pS[len - 1] == '\n') {
+#endif
         pS[len - 1] = 0;
         len--;
     }
     seed = len % 16;
-    for (i = 0; i < len; ++i) {
+    for (i = 0; i < len; i++) {
         if (gEncryption_method == 1) {
             if (i >= 2 && pS[i - 1] == '/' && pS[i - 2] == '/') {
                 key = (char*)&gOther_long_key;
             }
             if (pS[i] == '\t') {
-                pS[i] = -97;
+                pS[i] = 0x9f;
             }
-            pS[i] = ((key[seed] ^ (pS[i] - 32)) & 0x7F) + 32;
+            pS[i] = ((key[seed] ^ (pS[i] - 32)) & 0x7f) + 32;
             seed = (seed + 7) % 16;
-            if (pS[i] == -97) {
+            if ((signed char)pS[i] == (signed char)0x9f) {
                 pS[i] = '\t';
             }
         } else {
@@ -1455,11 +1469,11 @@ void DecodeLine2(char* pS) {
                 pS[i] = 0x80;
             }
             c = pS[i] - 32;
-            if ((c & 0x80) == 0) {
-                pS[i] = (c ^ key[seed] & 0x7F) + 32;
+            if (((unsigned char)c & 0x80) == 0) {
+                pS[i] = (c ^ (key[seed] & 0x7f)) + 32;
             }
             seed = (seed + 7) % 16;
-            if (pS[i] == -128) {
+            if ((signed char)pS[i] == (signed char)0x80) {
                 pS[i] = '\t';
             }
         }
@@ -1479,7 +1493,11 @@ void EncodeLine2(char* pS) {
     len = strlen(pS);
     count = 0;
     key = (char*)gLong_key;
-    while (len && pS[len - 1] == '\r' || pS[len - 1] == '\n') {
+#ifdef DETHRACE_FIX_BUGS
+    while (len != 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+#else
+    while (len != 0 && pS[len - 1] == '\r' || pS[len - 1] == '\n') {
+#endif
         pS[len - 1] = 0;
         len--;
     }
@@ -1498,10 +1516,10 @@ void EncodeLine2(char* pS) {
         }
         c = pS[i] - 32;
         if ((c & 0x80u) == 0) {
-            pS[i] = (c ^ key[seed] & 0x7F) + 32;
+            pS[i] = (c ^ (key[seed] & 0x7f)) + 32;
         }
         seed = (seed + 7) % 16;
-        if (pS[i] == -128) {
+        if ((signed char)pS[i] == (signed char)0x80) {
             pS[i] = '\t';
         }
     }
@@ -1782,7 +1800,7 @@ int AlreadyBlended(br_material* pMaterial) {
 // IDA: void __usercall BlendifyMaterialTablishly(br_material *pMaterial@<EAX>, int pPercent@<EDX>)
 // FUNCTION: CARM95 0x004c3f0d
 void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
-    char* s = NULL;
+    char* s;
 
     switch (pPercent) {
     case 25:
@@ -1796,7 +1814,6 @@ void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
         break;
     default:
         PDFatalError("Invalid alpha");
-        break;
     }
     pMaterial->index_blend = BrTableFind(s);
     if (pMaterial->index_blend == NULL) {
@@ -1870,7 +1887,11 @@ void EncodeLine_DEMO(char* pS) {
     len = strlen(pS);
     key = (char*)gLong_key_DEMO;
 
-    while (len > 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+#ifdef DETHRACE_FIX_BUGS
+    while (len != 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+#else
+    while (len != 0 && pS[len - 1] == '\r' || pS[len - 1] == '\n') {
+#endif
         len--;
         pS[len] = 0;
     }
