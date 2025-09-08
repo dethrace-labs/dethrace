@@ -79,14 +79,14 @@ void XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tT
     if (x < 0.0f) {
         x = 0.0f;
     }
-    if (x >= pTrack_spec->ncolumns_x) {
-        x = pTrack_spec->ncolumns_x - 1.0f;
+    if (x >= (float)pTrack_spec->ncolumns_x) {
+        x = (float)pTrack_spec->ncolumns_x - 1.0f;
     }
     if (z < 0.0f) {
         z = 0.0f;
     }
-    if (z >= pTrack_spec->ncolumns_z) {
-        z = pTrack_spec->ncolumns_z - 1.0f;
+    if (z >= (float)pTrack_spec->ncolumns_z) {
+        z = (float)pTrack_spec->ncolumns_z - 1.0f;
     }
     *pColumn_x = x;
     *pColumn_z = z;
