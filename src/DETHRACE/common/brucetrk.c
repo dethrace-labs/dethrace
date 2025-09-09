@@ -104,8 +104,7 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
 
     changed_one = 0;
 
-    for (i = 0; i < pModel->nfaces; i++) {
-        face = &pModel->faces[i];
+    for (i = 0, face = pModel->faces; i < pModel->nfaces; i++, face++) {
         if (face->material != NULL && face->material->identifier != NULL && ((face->material->identifier[0] == '!' && face->material->identifier[1] != '!' && gDefault_blend_pc != 0) || face->material->identifier[1] == '\\')) {
             if (gMr_blendy == NULL) {
                 gMr_blendy = BrActorAllocate(BR_ACTOR_MODEL, NULL);
@@ -117,16 +116,20 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
                 memcpy(gMr_blendy->model->vertices, pModel->vertices, pModel->nvertices * sizeof(br_vertex));
             }
             if (!AlreadyBlended(face->material)) {
-                if (face->material->identifier[1] == '\\') {
-                    if (face->material->identifier[2] == '2') {
-                        BlendifyMaterial(face->material, 25);
-                    } else if (face->material->identifier[2] == '7') {
-                        BlendifyMaterial(face->material, 75);
-                    } else {
-                        BlendifyMaterial(face->material, 50);
-                    }
-                } else {
+                if (face->material->identifier[1] != '\\') {
                     BlendifyMaterial(face->material, gDefault_blend_pc);
+                } else {
+                    switch (face->material->identifier[2]) {
+                    case '2':
+                        BlendifyMaterial(face->material, 25);
+                        break;
+                    case '7':
+                        BlendifyMaterial(face->material, 75);
+                        break;
+                    default:
+                        BlendifyMaterial(face->material, 50);
+                        break;
+                    }
                 }
                 BrMaterialUpdate(face->material, BR_MATU_ALL);
             }
@@ -136,11 +139,14 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
             memcpy(&gMr_blendy->model->faces[gMr_blendy->model->nfaces], face, sizeof(br_face));
             gMr_blendy->model->nfaces++;
             if (i < (pModel->nfaces - 1)) {
-                memmove(&pModel->faces[i], &pModel->faces[i + 1], (pModel->nfaces - i - 1) * sizeof(br_face));
+                // this is a memcpy call in the original code. Cannot figure out how to make it not be replaced with
+                // intrinsic memcpy
+                memmove(pModel->faces + i, pModel->faces + i + 1, (pModel->nfaces - i - 1) * sizeof(br_face));
             }
             pModel->nfaces--;
             changed_one = 1;
             i--;
+            face = &pModel->faces[i];
         }
     }
     if (changed_one) {
