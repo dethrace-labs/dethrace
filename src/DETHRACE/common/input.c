@@ -240,7 +240,7 @@ int AnyKeyDown(void) {
     int the_key;
 
     the_key = PDAnyKeyDown();
-    return the_key != -1 && the_key != 4 || EitherMouseButtonDown();
+    return (the_key != -1 && the_key != 4) || EitherMouseButtonDown();
 }
 
 // IDA: tU32* __cdecl KevKeyService()
