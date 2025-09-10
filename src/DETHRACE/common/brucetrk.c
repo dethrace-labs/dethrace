@@ -168,18 +168,22 @@ br_uintptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
     br_scalar r3;
 
     if (pActor->identifier != NULL && pActor->identifier[0] == '&' && pActor->identifier[1] >= '0' && pActor->identifier[1] <= '9') {
-        i = (pActor->identifier[4] - '0') * 1000 + (pActor->identifier[5] - '0') * 100 + (pActor->identifier[6] - '0') * 10 + (pActor->identifier[7] - '0');
+
+        i = ((pActor->identifier[5] - '0') * 100)
+            + ((pActor->identifier[6] - '0') * 10)
+            + pActor->identifier[7] - '0'
+            + ((pActor->identifier[4] - '0') * 1000);
         if (i < 0 || pTrack_spec->ampersand_digits <= i) {
             return 1;
         }
-        r1 = BR_SQR3(pActor->t.t.mat.m[0][0], pActor->t.t.mat.m[0][1], pActor->t.t.mat.m[0][2]);
-        r2 = BR_SQR3(pActor->t.t.mat.m[1][0], pActor->t.t.mat.m[1][1], pActor->t.t.mat.m[1][2]);
-        r3 = BR_SQR3(pActor->t.t.mat.m[2][0], pActor->t.t.mat.m[2][1], pActor->t.t.mat.m[2][2]);
-        if (r1 < .999f || r2 < .999f || r3 < .999f) {
+        r1 = BR_SQR3(pActor->t.t.mat.m[0][2], pActor->t.t.mat.m[0][1], pActor->t.t.mat.m[0][0]);
+        r2 = BR_SQR3(pActor->t.t.mat.m[1][2], pActor->t.t.mat.m[1][0], pActor->t.t.mat.m[1][1]);
+        r3 = BR_SQR3(pActor->t.t.mat.m[2][2], pActor->t.t.mat.m[2][0], pActor->t.t.mat.m[2][1]);
+        if (r1 < .999 || r2 < .999 || r3 < .999) {
             dr_dprintf("non car was scaled down %s", pActor->identifier);
             pActor->t.t.translate.t.v[0] += 2000.f;
         }
-        if (r1 > 1.001f || r2 > 1.001f || r3 > 1.001f) {
+        if (r1 > 1.001 || r2 > 1.001 || r3 > 1.001) {
             r1 = 1.f / sqrt(r1);
             r2 = 1.f / sqrt(r2);
             r3 = 1.f / sqrt(r3);
