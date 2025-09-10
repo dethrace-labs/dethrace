@@ -261,7 +261,7 @@ void ExtractColumns(tTrack_spec* pTrack_spec) {
     br_bounds bounds;
 
     unsplit = 0;
-    switch (sscanf(pTrack_spec->the_actor->identifier, "%u%u%f%d", &x, &z, &extra_room, &ad)) {
+    switch (sscanf(pTrack_spec->the_actor->identifier, "%u%u%f%d", &x, &z, &e, &ad)) {
     case 3:
         BrFailure(
             "Attempt to extract columns from invalid track\n"
@@ -277,24 +277,25 @@ void ExtractColumns(tTrack_spec* pTrack_spec) {
         unsplit = 1;
         x = 1;
         z = 1;
-        extra_room = 0.0;
+        e = 0.0;
         pTrack_spec->ampersand_digits = 0;
+        break;
     }
     pTrack_spec->ncolumns_x = x;
     pTrack_spec->ncolumns_z = z;
-
+    extra_room = e;
     BrActorToBounds(&bounds, pTrack_spec->the_actor);
-    pTrack_spec->column_size_x = (bounds.max.v[0] - bounds.min.v[0] + extra_room * 2.0) / (double)pTrack_spec->ncolumns_x;
-    pTrack_spec->column_size_z = (bounds.max.v[2] - bounds.min.v[2] + extra_room * 2.0) / (double)pTrack_spec->ncolumns_z;
+    pTrack_spec->column_size_x = (float)(bounds.max.v[0] - bounds.min.v[0] + extra_room * 2.0f) / pTrack_spec->ncolumns_x;
+    pTrack_spec->column_size_z = (float)(bounds.max.v[2] - bounds.min.v[2] + extra_room * 2.0f) / pTrack_spec->ncolumns_z;
     pTrack_spec->origin_x = bounds.min.v[0] - extra_room;
     pTrack_spec->origin_z = bounds.min.v[2] - extra_room;
     AllocateActorMatrix(pTrack_spec, &pTrack_spec->columns);
     AllocateActorMatrix(pTrack_spec, &pTrack_spec->lollipops);
     AllocateActorMatrix(pTrack_spec, &pTrack_spec->blends);
-    if (pTrack_spec->ampersand_digits <= 0) {
-        pTrack_spec->non_car_list = NULL;
-    } else {
+    if (pTrack_spec->ampersand_digits > 0) {
         pTrack_spec->non_car_list = BrMemAllocate(sizeof(br_actor*) * pTrack_spec->ampersand_digits, kMem_non_car_list);
+    } else {
+        pTrack_spec->non_car_list = NULL;
     }
     if (unsplit) {
         **pTrack_spec->columns = pTrack_spec->the_actor;
@@ -342,18 +343,18 @@ void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMa
     br_actor* blended_polys;
 
     maa.m = pCamera_to_world;
-    if (fabs(pCamera_to_world->m[2][2]) >= fabs(pCamera_to_world->m[2][0])) {
-        for (column_z = pMin_z; column_z <= pMax_z; ++column_z) {
-            for (column_x = pMin_x; column_x <= pMax_x; ++column_x) {
-                if (pCamera_to_world->m[2][0] <= 0.0) {
-                    column_x2 = pMin_x + pMax_x - column_x;
-                } else {
+    if (fabs(pCamera_to_world->m[2][2]) < fabs(pCamera_to_world->m[2][0])) {
+        for (column_x = pMin_x; column_x <= pMax_x; ++column_x) {
+            for (column_z = pMin_z; column_z <= pMax_z; ++column_z) {
+                if (pCamera_to_world->m[2][0] > 0.0f) {
                     column_x2 = column_x;
-                }
-                if (pCamera_to_world->m[2][2] <= 0.0) {
-                    column_z2 = pMax_z + pMin_z - column_z;
                 } else {
+                    column_x2 = pMin_x + pMax_x - column_x;
+                }
+                if (pCamera_to_world->m[2][2] > 0.0f) {
                     column_z2 = column_z;
+                } else {
+                    column_z2 = pMin_z + pMax_z - column_z;
                 }
                 if (pDraw_blends) {
                     blended_polys = pTrack_spec->blends[column_z2][column_x2];
@@ -374,18 +375,19 @@ void DrawColumns(int pDraw_blends, tTrack_spec* pTrack_spec, int pMin_x, int pMa
                 }
             }
         }
+
     } else {
-        for (column_x = pMin_x; column_x <= pMax_x; ++column_x) {
-            for (column_z = pMin_z; column_z <= pMax_z; ++column_z) {
-                if (pCamera_to_world->m[2][0] <= 0.0) {
-                    column_x2 = pMin_x + pMax_x - column_x;
-                } else {
+        for (column_z = pMin_z; column_z <= pMax_z; ++column_z) {
+            for (column_x = pMin_x; column_x <= pMax_x; ++column_x) {
+                if (pCamera_to_world->m[2][0] > 0.0f) {
                     column_x2 = column_x;
-                }
-                if (pCamera_to_world->m[2][2] <= 0.0) {
-                    column_z2 = pMax_z + pMin_z - column_z;
                 } else {
+                    column_x2 = pMin_x + pMax_x - column_x;
+                }
+                if (pCamera_to_world->m[2][2] > 0.0f) {
                     column_z2 = column_z;
+                } else {
+                    column_z2 = (pMin_z + pMax_z) - column_z;
                 }
                 if (pDraw_blends) {
                     blended_polys = pTrack_spec->blends[column_z2][column_x2];

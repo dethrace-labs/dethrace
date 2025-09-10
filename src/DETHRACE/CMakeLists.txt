@@ -193,6 +193,8 @@ if(MSVC_42_FOR_RECCMP)
     target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
 
     set_source_files_properties(common/utility.c PROPERTIES COMPILE_FLAGS "/FAs")
+
+    # set_source_files_properties(common/brucetrk.c PROPERTIES COMPILE_FLAGS "/Oi-")
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()
 else()
