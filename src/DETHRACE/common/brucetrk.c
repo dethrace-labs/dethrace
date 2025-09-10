@@ -169,10 +169,11 @@ br_uintptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
 
     if (pActor->identifier != NULL && pActor->identifier[0] == '&' && pActor->identifier[1] >= '0' && pActor->identifier[1] <= '9') {
 
-        i = ((pActor->identifier[5] - '0') * 100)
-            + ((pActor->identifier[6] - '0') * 10)
+        i = (pActor->identifier[5] - '0') * 100
+            + (pActor->identifier[6] - '0') * 10
             + pActor->identifier[7] - '0'
-            + ((pActor->identifier[4] - '0') * 1000);
+            + (pActor->identifier[4] - '0') * 1000;
+
         if (i < 0 || pTrack_spec->ampersand_digits <= i) {
             return 1;
         }
@@ -285,8 +286,8 @@ void ExtractColumns(tTrack_spec* pTrack_spec) {
     pTrack_spec->ncolumns_z = z;
     extra_room = e;
     BrActorToBounds(&bounds, pTrack_spec->the_actor);
-    pTrack_spec->column_size_x = (float)(bounds.max.v[0] - bounds.min.v[0] + extra_room * 2.0f) / pTrack_spec->ncolumns_x;
-    pTrack_spec->column_size_z = (float)(bounds.max.v[2] - bounds.min.v[2] + extra_room * 2.0f) / pTrack_spec->ncolumns_z;
+    pTrack_spec->column_size_x = (bounds.max.v[0] - bounds.min.v[0] + extra_room * 2.0f) / pTrack_spec->ncolumns_x;
+    pTrack_spec->column_size_z = (bounds.max.v[2] - bounds.min.v[2] + extra_room * 2.0f) / pTrack_spec->ncolumns_z;
     pTrack_spec->origin_x = bounds.min.v[0] - extra_room;
     pTrack_spec->origin_z = bounds.min.v[2] - extra_room;
     AllocateActorMatrix(pTrack_spec, &pTrack_spec->columns);
@@ -436,7 +437,9 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
     static br_scalar tan_fov_ish;
     static br_actor* result;
 
-    if (pTrack_spec->columns != NULL) {
+    if (pTrack_spec->columns == NULL) {
+        BrZbSceneRenderAdd(pWorld);
+    } else {
         if (pRender_blends) {
             DrawColumns(1, pTrack_spec, min_x, max_x, min_z, max_z, pCamera_to_world);
         } else {
@@ -447,7 +450,7 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
             min_z = column_z;
             max_z = column_z;
             tan_fov_ish = sin(BrAngleToRadian(camera->field_of_view / 2)) / cos(BrAngleToRadian(camera->field_of_view / 2));
-            edge_after.v[0] = camera->aspect * tan_fov_ish;
+            edge_after.v[0] = BR_MUL(camera->aspect, tan_fov_ish);
             edge_after.v[1] = tan_fov_ish;
             edge_after.v[2] = -1.0;
             edge_before.v[0] = camera->yon_z * gYon_factor * edge_after.v[0];
@@ -520,8 +523,6 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
             }
             DrawColumns(0, pTrack_spec, min_x, max_x, min_z, max_z, pCamera_to_world);
         }
-    } else {
-        BrZbSceneRenderAdd(pWorld);
     }
 }
 
