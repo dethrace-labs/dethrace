@@ -508,7 +508,6 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
 // IDA: void __usercall InitialiseCar(tCar_spec *pCar@<EAX>)
 // FUNCTION: CARM95 0x00475b63
 void InitialiseCar(tCar_spec* pCar) {
-
     InitialiseCar2(pCar, 1);
 }
 
@@ -589,7 +588,9 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
     br_matrix34 initial_yaw_matrix;
     br_bounds bnds;
 
+#ifdef DETHRACE_FIX_BUGS
     initial_yaw = 0;
+#endif
     car_actor = pThe_race->opponent_list[pCar_index].car_spec->car_master_actor;
     car = pThe_race->opponent_list[pCar_index].car_spec;
     BrMatrix34Identity(&car_actor->t.t.mat);
@@ -602,9 +603,9 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
                 if (j != pCar_index) {
                     BrVector3Copy(&real_pos, &pThe_race->opponent_list[j].car_spec->car_master_actor->t.t.translate.t);
                     if (real_pos.v[0] > 500.f) {
-                        real_pos.v[0] -= 1000.f;
-                        real_pos.v[1] -= 1000.f;
-                        real_pos.v[2] -= 1000.f;
+                        real_pos.v[0] -= gDisabled_vector.v[0];
+                        real_pos.v[1] -= gDisabled_vector.v[1];
+                        real_pos.v[2] -= gDisabled_vector.v[2];
                     }
                     BrVector3Sub(&dist, &real_pos, &pThe_race->net_starts[i].pos);
                     if (BrVector3LengthSquared(&dist) < 16.f) {
@@ -616,6 +617,7 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
                 BrVector3Copy(&car_actor->t.t.translate.t, &pThe_race->net_starts[i].pos);
                 initial_yaw = BrDegreeToAngle(pThe_race->net_starts[i].yaw);
                 place_on_grid = 0;
+                break;
             }
             i++;
             if (i == pThe_race->number_of_net_start_points) {
