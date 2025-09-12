@@ -231,12 +231,13 @@ int gNum_cars_and_non_cars;
 void DamageUnit(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
     tDamage_unit* the_damage;
 
-    if (pDamage_amount > 0) {
-        the_damage = &pCar->damage_units[pUnit_type];
-        the_damage->damage_level += pDamage_amount;
-        if (the_damage->damage_level >= 100) {
-            the_damage->damage_level = 99;
-        }
+    if (pDamage_amount <= 0) {
+        return;
+    }
+    the_damage = &pCar->damage_units[pUnit_type];
+    the_damage->damage_level += pDamage_amount;
+    if (the_damage->damage_level >= 100) {
+        the_damage->damage_level = 99;
     }
 }
 
@@ -392,10 +393,10 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
         pCar->car_model_actors[pCar->current_car_actor].actor->render_style = BR_RSTYLE_NONE;
     }
     SwitchCarActor(pCar, pCar->current_car_actor);
-    if (strcmp(pCar->name, "STELLA.TXT") == 0) {
-        pCar->proxy_ray_distance = 6.0f;
-    } else {
+    if (strcmp(pCar->name, "STELLA.TXT") != 0) {
         pCar->proxy_ray_distance = 0.0f;
+    } else {
+        pCar->proxy_ray_distance = 6.0f;
     }
     pCar->last_special_volume = NULL;
     pCar->auto_special_volume = NULL;
@@ -413,11 +414,11 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     BrVector3SetFloat(&pCar->v, 0.0f, 0.0f, 0.0f);
     BrVector3SetFloat(&pCar->omega, 0.0f, 0.0f, 0.0f);
     pCar->curvature = 0.0f;
-    BrMatrix34Copy(&safe_position, &car_actor->t.t.mat);
+    BrMatrix34Copy(&safe_position, &pCar->car_master_actor->t.t.mat);
     if (safe_position.m[3][0] > 500.0f) {
-        safe_position.m[3][0] -= 1000.0f;
-        safe_position.m[3][1] -= 1000.0f;
-        safe_position.m[3][2] -= 1000.0f;
+        safe_position.m[3][0] -= gDisabled_vector.v[0];
+        safe_position.m[3][1] -= gDisabled_vector.v[1];
+        safe_position.m[3][2] -= gDisabled_vector.v[2];
     }
     BrMatrix34Copy(&pCar->old_frame_mat, &safe_position);
     BrMatrix34Copy(&pCar->oldmat, &safe_position);
@@ -430,7 +431,7 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     pCar->gear = 0;
     pCar->revs = 0.f;
     pCar->traction_control = 1;
-    BrVector3Negate(&pCar->direction, (br_vector3*)car_actor->t.t.mat.m[2]);
+    BrVector3Negate(&pCar->direction, (br_vector3*)&pCar->car_master_actor->t.t.mat.m[2]);
     for (j = 0; j < COUNT_OF(pCar->last_safe_positions); j++) {
         BrMatrix34Copy(&pCar->last_safe_positions[j], &safe_position);
     }
@@ -470,10 +471,6 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
 
     case eDriver_local_human:
         pCar->car_ID = 0;
-        break;
-
-    default:
-        LOG_WARN2("Case %d not handled", pCar->driver);
         break;
     }
     PossibleService();

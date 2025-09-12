@@ -81,7 +81,8 @@ tSave_game* gPre_race_saved_game;
 
 FILE* gDiagnostic_file;
 
-br_vector3 gDisabled_vector;
+// GLOBAL: CARM95 0x00521360
+br_vector3 gDisabled_vector = { 1000.f, 1000.f, 1000.f };
 
 // GLOBAL: CARM95 0x0052136c
 tU32 gI_am_cheating;
