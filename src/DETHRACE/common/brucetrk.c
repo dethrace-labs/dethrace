@@ -449,13 +449,14 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
             max_x = column_x;
             min_z = column_z;
             max_z = column_z;
-            tan_fov_ish = sin(BrAngleToRadian(camera->field_of_view / 2)) / cos(BrAngleToRadian(camera->field_of_view / 2));
-            edge_after.v[0] = BR_MUL(camera->aspect, tan_fov_ish);
+            tan_fov_ish = BR_DIV(BR_SIN(camera->field_of_view / 2), BR_COS(camera->field_of_view / 2));
+
+            edge_after.v[0] = tan_fov_ish * camera->aspect;
             edge_after.v[1] = tan_fov_ish;
             edge_after.v[2] = -1.0;
-            edge_before.v[0] = camera->yon_z * gYon_factor * edge_after.v[0];
+            edge_before.v[0] = edge_after.v[0] * camera->yon_z * gYon_factor;
             edge_before.v[1] = camera->yon_z * gYon_factor * tan_fov_ish;
-            edge_before.v[2] = camera->yon_z * gYon_factor * -1.0;
+            edge_before.v[2] = camera->yon_z * gYon_factor * edge_after.v[2];
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
             if (column_x < min_x) {
@@ -476,12 +477,12 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
             } else if (column_x > max_x) {
                 max_x = column_x;
             }
-            if (column_z >= min_z) {
+            if (column_z < min_z) {
+                min_z = column_z;
+            } else {
                 if (column_z > max_z) {
                     max_z = column_z;
                 }
-            } else {
-                min_z = column_z;
             }
             edge_before.v[1] = -edge_before.v[1];
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
@@ -509,13 +510,13 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
             } else if (column_z > max_z) {
                 max_z = column_z;
             }
-            if (min_x != 0) {
+            if (min_x > 0) {
                 min_x--;
             }
             if (pTrack_spec->ncolumns_x - 1 > max_x) {
                 max_x++;
             }
-            if (min_z != 0) {
+            if (min_z > 0) {
                 min_z--;
             }
             if (pTrack_spec->ncolumns_z - 1 > max_z) {
