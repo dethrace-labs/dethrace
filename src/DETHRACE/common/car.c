@@ -684,23 +684,23 @@ void InitialiseNonCar(tNon_car_spec* non_car) {
 
     c = &non_car->collision_info;
     BrMatrix34Copy(&c->oldmat, &c->car_master_actor->t.t.mat);
-    non_car->collision_info.box_face_ref = gFace_num__car - 2;
-    non_car->collision_info.doing_nothing_flag = 1;
-    non_car->collision_info.disabled = 0;
+    c->box_face_ref = gFace_num__car - 2;
+    c->doing_nothing_flag = 1;
+    c->disabled = 0;
     BrVector3SetFloat(&c->v, 0.0f, 0.0f, 0.0f);
     BrVector3SetFloat(&c->omega, 0.0f, 0.0f, 0.0f);
     BrVector3SetFloat(&c->oldomega, 0.0f, 0.0f, 0.0f);
-    non_car->collision_info.box_face_ref = gFace_num__car - 2;
+    c->box_face_ref = gFace_num__car - 2;
     c->collision_flag = 0;
     c->who_last_hit_me = NULL;
-    if (c->car_master_actor->identifier[3] == '!') {
-        c->M = non_car->free_mass;
-        c->min_torque_squared = 0.0f;
-        BrVector3Copy(&c->cmpos, &non_car->free_cmpos);
-    } else {
+    if (c->car_master_actor->identifier[3] != '!') {
         c->M = non_car->attached_mass;
         BrVector3Copy(&c->cmpos, &non_car->attached_cmpos);
         c->min_torque_squared = non_car->min_torque_squared;
+    } else {
+        c->M = non_car->free_mass;
+        c->min_torque_squared = 0.0f;
+        BrVector3Copy(&c->cmpos, &non_car->free_cmpos);
     }
     BrVector3Scale(&c->I, &non_car->I_over_M, c->M);
     c->message.type = 0;
