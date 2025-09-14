@@ -864,26 +864,28 @@ void RememberSafePosition(tCar_spec* car, tU32 pTime) {
             return;
         }
     }
-    if ((car->last_special_volume == NULL || car->last_special_volume->gravity_multiplier == 1.f)
-        && gCurrent_race.material_modifiers[car->material_index[0]].tyre_road_friction >= 0.1f
-        && gCurrent_race.material_modifiers[car->material_index[1]].tyre_road_friction >= 0.1f
-        && gCurrent_race.material_modifiers[car->material_index[2]].tyre_road_friction >= 0.1f
-        && gCurrent_race.material_modifiers[car->material_index[3]].tyre_road_friction >= 0.1f
-        && car->car_master_actor->t.t.mat.m[1][1] > 0.8f) {
-
-        for (j = 0; j < 5; j++) {
-            BrVector3Sub(&r, &car->car_master_actor->t.t.translate.t, (br_vector3*)car->last_safe_positions[j].m[3]);
-
-            if (BrVector3LengthSquared(&r) < 8.4015961f) {
-                return;
-            }
-        }
-        for (j = 3; j > 0; j--) {
-            BrMatrix34Copy(&car->last_safe_positions[j], &car->last_safe_positions[j - 1]);
-        }
-        BrMatrix34Copy(&car->last_safe_positions[0], &car->car_master_actor->t.t.mat);
-        time_count = 0;
+    if ((car->last_special_volume != NULL && car->last_special_volume->gravity_multiplier != 1.0)
+        || gCurrent_race.material_modifiers[car->material_index[0]].tyre_road_friction < 0.1
+        || gCurrent_race.material_modifiers[car->material_index[1]].tyre_road_friction < 0.1
+        || gCurrent_race.material_modifiers[car->material_index[2]].tyre_road_friction < 0.1
+        || gCurrent_race.material_modifiers[car->material_index[3]].tyre_road_friction < 0.1) {
+        return;
     }
+    if (car->car_master_actor->t.t.mat.m[1][1] < 0.8f) {
+        return;
+    }
+    for (j = 0; j < 5; j++) {
+        BrVector3Sub(&r, &car->car_master_actor->t.t.translate.t, (br_vector3*)car->last_safe_positions[j].m[3]);
+
+        if (BrVector3LengthSquared(&r) < 8.4015961f) {
+            return;
+        }
+    }
+    for (j = 3; j > 0; j--) {
+        BrMatrix34Copy(&car->last_safe_positions[j], &car->last_safe_positions[j - 1]);
+    }
+    BrMatrix34Copy(&car->last_safe_positions[0], &car->car_master_actor->t.t.mat);
+    time_count = 0;
 }
 
 // IDA: void __usercall ControlOurCar(tU32 pTime_difference@<EAX>)
