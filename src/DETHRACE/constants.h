@@ -849,6 +849,7 @@ enum ExceptionFlags {
 #define OPPONENT_COUNT 5
 
 #define WORLD_SCALE 6.9f
+#define WORLD_SCALE_D 6.9
 
 #define SHADOW_MAX_RENDER_DISTANCE 36.0f
 
