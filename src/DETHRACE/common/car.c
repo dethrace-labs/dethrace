@@ -727,103 +727,112 @@ void GetFacesInBox(tCollision_info* c) {
 
     BrMatrix34Copy(&mat, &c->car_master_actor->t.t.mat);
     BrMatrix34Copy(&mat2, &c->oldmat);
-    BrVector3InvScale((br_vector3*)mat.m[3], (br_vector3*)mat.m[3], WORLD_SCALE);
-    BrVector3InvScale((br_vector3*)mat2.m[3], (br_vector3*)mat2.m[3], WORLD_SCALE);
+    BrVector3InvScale((br_vector3*)mat.m[3], (br_vector3*)mat.m[3], WORLD_SCALE_D);
+    BrVector3InvScale((br_vector3*)mat2.m[3], (br_vector3*)mat2.m[3], WORLD_SCALE_D);
     BrMatrix34LPInverse(&mat3, &mat);
     BrMatrix34Mul(&mat4, &mat2, &mat3);
     GetNewBoundingBox(&bnds.original_bounds, c->bounds, &mat4);
     for (i = 0; i < 3; i++) {
-        if (bnds.original_bounds.min.v[i] > c->bounds[0].min.v[i]) {
-            bnds.original_bounds.min.v[i] = c->bounds[0].min.v[i];
-        }
-        if (bnds.original_bounds.max.v[i] < c->bounds[0].max.v[i]) {
-            bnds.original_bounds.max.v[i] = c->bounds[0].max.v[i];
-        }
+        bnds.original_bounds.min.v[i] = MIN(bnds.original_bounds.min.v[i], c->bounds[0].min.v[i]);
+        bnds.original_bounds.max.v[i] = MAX(bnds.original_bounds.max.v[i], c->bounds[0].max.v[i]);
         bnds.original_bounds.min.v[i] -= 0.002f;
         bnds.original_bounds.max.v[i] += 0.002f;
     }
     GetNewBoundingBox(&c->bounds_world_space, &bnds.original_bounds, &mat);
     c->bounds_ws_type = eBounds_ws;
-    if ((c->box_face_ref != gFace_num__car && (c->box_face_ref != gFace_num__car - 1 || c->box_face_start <= gFace_count))
-        || (BrMatrix34Mul(&mat5, &mat, &c->last_box_inv_mat),
-            GetNewBoundingBox(&new_in_old, &bnds.original_bounds, &mat5),
-            c->last_box.max.v[0] <= new_in_old.max.v[0])
-        || c->last_box.max.v[1] <= new_in_old.max.v[1]
-        || c->last_box.max.v[2] <= new_in_old.max.v[2]
-        || c->last_box.min.v[0] >= new_in_old.min.v[0]
-        || c->last_box.min.v[1] >= new_in_old.min.v[1]
-        || c->last_box.min.v[2] >= new_in_old.min.v[2]) {
-        BrMatrix34Mul(&mat5, &mat4, &mat4);
-        BrMatrix34Mul(&mat6, &mat5, &mat4);
-        BrMatrix34LPInverse(&mat5, &mat6);
-        GetNewBoundingBox(&predicted_bounds, c->bounds, &mat5);
-        for (i = 0; i < 3; i++) {
-            if (bnds.original_bounds.min.v[i] > predicted_bounds.min.v[i]) {
-                bnds.original_bounds.min.v[i] = predicted_bounds.min.v[i];
-            }
-            if (bnds.original_bounds.max.v[i] < predicted_bounds.max.v[i]) {
-                bnds.original_bounds.max.v[i] = predicted_bounds.max.v[i];
-            }
-            bnds.original_bounds.min.v[i] -= 0.02f;
-            bnds.original_bounds.max.v[i] += 0.02f;
-        }
-        c->last_box = bnds.original_bounds;
-        BrMatrix34Copy(&c->last_box_inv_mat, &mat3);
-        bnds.mat = &mat;
-        c->box_face_start = gFace_count;
-        gPling_face = NULL;
-        gFace_count += FindFacesInBox(&bnds, &gFace_list__car[gFace_count], COUNT_OF(gFace_list__car) - gFace_count);
-        if (gFace_count >= COUNT_OF(gFace_list__car)) {
-            c->box_face_start = 0;
-            gFace_count = FindFacesInBox(&bnds, gFace_list__car, COUNT_OF(gFace_list__car));
-            gFace_num__car++;
-        }
-        old_d = c->water_d;
-        if (c->driver == eDriver_local_human
-            && c->water_d != 10000.f
-            && gDouble_pling_water
-            && BrVector3Dot(&c->bounds_world_space.max, &c->water_normal) - c->water_d <= 0.f) {
-            gInTheSea = 1;
-            FreezeCamera();
-        }
-        if (gPling_face != NULL && fabs(gPling_face->normal.v[1]) >= 0.9f) {
-            BrVector3Copy(&c->water_normal, &gPling_face->normal);
-            if (c->water_normal.v[1] < 0.f) {
-                BrVector3Negate(&c->water_normal, &c->water_normal);
-            }
-            c->water_d = BrVector3Dot(&gPling_face->v[0], &c->water_normal);
-            if (c->driver == eDriver_local_human) {
-                if (gPling_face->material->identifier[1] != '!') {
-                    gDouble_pling_water = 0;
-                } else {
-                    if (BrVector3Dot(&c->bounds_world_space.min, &c->water_normal) - c->water_d < 0.0f) {
-                        GetNewBoundingBox(&current_bounds, &c->bounds[1], &c->car_master_actor->t.t.mat);
-                        if (BrVector3Dot(&current_bounds.min, &c->water_normal) / WORLD_SCALE - c->water_d < 0.0f) {
-                            gInTheSea = 1;
-                            FreezeCamera();
-                        }
-                    }
-                    gDouble_pling_water = 1;
-                }
-            }
-        } else {
-            c->water_d = 10000.0;
-            if (c->driver == eDriver_local_human) {
-                if (gInTheSea == 1) {
-                    gInTheSea = 2;
-                } else {
-                    gInTheSea = 0;
-                }
-            }
-        }
-        if (c->water_d != old_d) {
-            StartPipingSession(ePipe_chunk_splash);
-            AddSplashToPipingSession(c);
-            EndPipingSession();
-        }
-        c->box_face_end = gFace_count;
-        c->box_face_ref = gFace_num__car;
+    // if ((c->box_face_ref != gFace_num__car && (c->box_face_ref != gFace_num__car - 1 || c->box_face_start <= gFace_count))
+    //     || (BrMatrix34Mul(&mat5, &mat, &c->last_box_inv_mat),
+    //         gAustere_override = 2,
+    //         GetNewBoundingBox(&new_in_old, &bnds.original_bounds, &mat5),
+    //         gAustere_override = 3,
+    //         c->last_box.max.v[0] <= new_in_old.max.v[0])
+    //     || c->last_box.max.v[1] <= new_in_old.max.v[1]
+    //     || c->last_box.max.v[2] <= new_in_old.max.v[2]
+    //     || c->last_box.min.v[0] >= new_in_old.min.v[0]
+    //     || c->last_box.min.v[1] >= new_in_old.min.v[1]
+    //     || c->last_box.min.v[2] >= new_in_old.min.v[2])
+
+    if (c->box_face_ref != gFace_num__car && (c->box_face_ref != gFace_num__car - 1 || c->box_face_start <= gFace_count)) {
+        goto condition_met;
     }
+
+    /* Second group (was comma-expression) */
+    BrMatrix34Mul(&mat5, &mat, &c->last_box_inv_mat);
+    GetNewBoundingBox(&new_in_old, &bnds.original_bounds, &mat5);
+
+    if (c->last_box.max.v[0] > new_in_old.max.v[0] && c->last_box.max.v[1] > new_in_old.max.v[1] && c->last_box.max.v[2] > new_in_old.max.v[2] && c->last_box.min.v[0] < new_in_old.min.v[0] && c->last_box.min.v[1] < new_in_old.min.v[1] && c->last_box.min.v[2] < new_in_old.min.v[2]) {
+        return;
+    }
+
+condition_met:
+
+    BrMatrix34Mul(&mat5, &mat4, &mat4);
+    BrMatrix34Mul(&mat6, &mat5, &mat4);
+    BrMatrix34LPInverse(&mat5, &mat6);
+    GetNewBoundingBox(&predicted_bounds, c->bounds, &mat5);
+    for (i = 0; i < 3; i++) {
+        bnds.original_bounds.min.v[i] = MIN(bnds.original_bounds.min.v[i], predicted_bounds.min.v[i]);
+        bnds.original_bounds.max.v[i] = MAX(bnds.original_bounds.max.v[i], predicted_bounds.max.v[i]);
+
+        bnds.original_bounds.min.v[i] -= 0.02f;
+        bnds.original_bounds.max.v[i] += 0.02f;
+    }
+    c->last_box = bnds.original_bounds;
+    BrMatrix34Copy(&c->last_box_inv_mat, &mat3);
+    bnds.mat = &mat;
+    c->box_face_start = gFace_count;
+    gPling_face = NULL;
+    gFace_count += FindFacesInBox(&bnds, &gFace_list__car[gFace_count], COUNT_OF(gFace_list__car) - gFace_count);
+    if (gFace_count >= COUNT_OF(gFace_list__car)) {
+        c->box_face_start = 0;
+        gFace_count = FindFacesInBox(&bnds, gFace_list__car, COUNT_OF(gFace_list__car));
+        gFace_num__car++;
+    }
+    old_d = c->water_d;
+    if (c->driver == eDriver_local_human
+        && c->water_d != 10000.f
+        && gDouble_pling_water
+        && BrVector3Dot(&c->bounds_world_space.max, &c->water_normal) - c->water_d <= 0.f) {
+        gInTheSea = 1;
+        FreezeCamera();
+    }
+    if (gPling_face != NULL && (float)fabs(gPling_face->normal.v[1]) > 0.9f) {
+        BrVector3Copy(&c->water_normal, &gPling_face->normal);
+        if (c->water_normal.v[1] < 0.f) {
+            BrVector3Negate(&c->water_normal, &c->water_normal);
+        }
+        c->water_d = BrVector3Dot(&gPling_face->v[0], &c->water_normal);
+        if (c->driver == eDriver_local_human) {
+            if (gPling_face->material->identifier[1] == '!') {
+                if (BrVector3Dot(&c->bounds_world_space.min, &c->water_normal) - c->water_d < 0.0f) {
+                    GetNewBoundingBox(&current_bounds, &c->bounds[1], &c->car_master_actor->t.t.mat);
+                    if (BrVector3Dot(&current_bounds.min, &c->water_normal) / WORLD_SCALE_D - c->water_d < 0.0) {
+                        gInTheSea = 1;
+                        FreezeCamera();
+                    }
+                }
+                gDouble_pling_water = 1;
+            } else {
+                gDouble_pling_water = 0;
+            }
+        }
+    } else {
+        c->water_d = 10000.0;
+        if (c->driver == eDriver_local_human) {
+            if (gInTheSea == 1) {
+                gInTheSea = 2;
+            } else {
+                gInTheSea = 0;
+            }
+        }
+    }
+    if (c->water_d != old_d) {
+        StartPipingSession(ePipe_chunk_splash);
+        AddSplashToPipingSession(c);
+        EndPipingSession();
+    }
+    c->box_face_end = gFace_count;
+    c->box_face_ref = gFace_num__car;
 }
 
 // IDA: int __cdecl IsCarInTheSea()
