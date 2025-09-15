@@ -740,17 +740,6 @@ void GetFacesInBox(tCollision_info* c) {
     }
     GetNewBoundingBox(&c->bounds_world_space, &bnds.original_bounds, &mat);
     c->bounds_ws_type = eBounds_ws;
-    // if ((c->box_face_ref != gFace_num__car && (c->box_face_ref != gFace_num__car - 1 || c->box_face_start <= gFace_count))
-    //     || (BrMatrix34Mul(&mat5, &mat, &c->last_box_inv_mat),
-    //         gAustere_override = 2,
-    //         GetNewBoundingBox(&new_in_old, &bnds.original_bounds, &mat5),
-    //         gAustere_override = 3,
-    //         c->last_box.max.v[0] <= new_in_old.max.v[0])
-    //     || c->last_box.max.v[1] <= new_in_old.max.v[1]
-    //     || c->last_box.max.v[2] <= new_in_old.max.v[2]
-    //     || c->last_box.min.v[0] >= new_in_old.min.v[0]
-    //     || c->last_box.min.v[1] >= new_in_old.min.v[1]
-    //     || c->last_box.min.v[2] >= new_in_old.min.v[2])
 
     if (c->box_face_ref != gFace_num__car && (c->box_face_ref != gFace_num__car - 1 || c->box_face_start <= gFace_count)) {
         goto condition_met;
@@ -900,63 +889,59 @@ void ControlOurCar(tU32 pTime_difference) {
 
     car = &gProgram_state.current_car;
     if (gCar_flying) {
-        if (gNet_mode != eNet_mode_none) {
-            gCar_flying = 0;
-        } else {
+        if (!gNet_mode) {
             BrVector3Scale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
             FlyCar(car, pTime_difference / 1000.f);
             BrVector3InvScale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
-        }
-        return;
-    }
-    time = GetTotalTime();
-    if (car->damage_units[eDamage_steering].damage_level > 40) {
-        if (car->end_steering_damage_effect) {
-            if (time < car->end_steering_damage_effect || car->damage_units[eDamage_steering].damage_level == 99) {
-                car->keys.left = car->false_key_left;
-                car->keys.right = car->false_key_right;
-            } else {
-                car->end_steering_damage_effect = 0;
-            }
         } else {
-            ts = pTime_difference * (car->damage_units[eDamage_steering].damage_level - 40) * 0.0045f;
-            if (PercentageChance(ts) && fabs(car->velocity_car_space.v[2]) > 0.0001f) {
-                if (car->keys.left || car->keys.right) {
+            gCar_flying = 0;
+        }
+    } else {
+        time = GetTotalTime();
+        if (car->damage_units[eDamage_steering].damage_level > 40) {
+            if (car->end_steering_damage_effect) {
+                if (time < car->end_steering_damage_effect || car->damage_units[eDamage_steering].damage_level == 99) {
+                    car->keys.left = car->false_key_left;
+                    car->keys.right = car->false_key_right;
+                } else {
+                    car->end_steering_damage_effect = 0;
+                }
+            } else if (PercentageChance(pTime_difference * (car->damage_units[eDamage_steering].damage_level - 40) * 0.0045) && fabs(car->velocity_car_space.v[2]) > 0.0001) {
+                if (car->keys.left == 0 && car->keys.right == 0) {
+                    if (PercentageChance(50)) {
+                        car->false_key_left = 1;
+                    } else {
+                        car->false_key_right = 1;
+                    }
+                } else {
                     car->false_key_left = !car->keys.left;
                     car->false_key_right = !car->keys.right;
-                } else if (PercentageChance(50)) {
-                    car->false_key_left = 1;
-                } else {
-                    car->false_key_right = 1;
                 }
-                ts = 5 * (5 * car->damage_units[eDamage_steering].damage_level - 200);
-                car->end_steering_damage_effect = FRandomBetween(0.0f, ts) + time;
+                car->end_steering_damage_effect = FRandomBetween(0.0f, 25 * (car->damage_units[eDamage_steering].damage_level - 40)) + time;
             }
         }
-    }
-    if (car->damage_units[eDamage_transmission].damage_level > 40) {
-        if (car->end_trans_damage_effect) {
-            if (time < car->end_trans_damage_effect || car->damage_units[eDamage_transmission].damage_level == 99) {
-                car->gear = 0;
-                car->just_changed_gear = 1;
+
+        if (car->damage_units[eDamage_transmission].damage_level > 40) {
+            if (car->end_trans_damage_effect) {
+                if (time < car->end_trans_damage_effect || car->damage_units[eDamage_transmission].damage_level == 99) {
+                    car->gear = 0;
+                    car->just_changed_gear = 1;
+                } else {
+                    car->end_trans_damage_effect = 0;
+                }
             } else {
-                car->end_trans_damage_effect = 0;
-            }
-        } else {
-            ts = pTime_difference * (car->damage_units[eDamage_transmission].damage_level - 40) * 0.006;
-            if (PercentageChance(ts) != 0) {
-                ts = 10 * (5 * car->damage_units[eDamage_transmission].damage_level - 200);
-                car->end_trans_damage_effect = FRandomBetween(0.f, ts) + time;
+                if (PercentageChance(pTime_difference * (car->damage_units[eDamage_transmission].damage_level - 40) * 0.006) != 0) {
+                    car->end_trans_damage_effect = FRandomBetween(0.f, 50 * (car->damage_units[eDamage_transmission].damage_level - 40)) + time;
+                }
             }
         }
-    }
-    ts = pTime_difference / 1000.0f;
-    ControlCar[gControl__car](car, ts);
-    RememberSafePosition(car, pTime_difference);
-    if (gCamera_reset) {
-        BrVector3SetFloat(&minus_k, 0.0f, 0.0f, -1.0f);
-        gCamera_sign = 0;
-        BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
+        ControlCar[gControl__car](car, pTime_difference / 1000.0f);
+        RememberSafePosition(car, pTime_difference);
+        if (gCamera_reset) {
+            BrVector3SetFloat(&minus_k, 0.0f, 0.0f, -1.0f);
+            gCamera_sign = 0;
+            BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
+        }
     }
 }
 
