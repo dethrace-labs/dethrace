@@ -184,7 +184,7 @@ int IRandomBetween(int pA, int pB) {
     return num;
 #else
     //  If RAND_MAX != 0x7fff, then use floating numbers (alternative is using modulo)
-    return pA + (int)((pB + 1 - pA) * (rand() / ((float)RAND_MAX + 1)));
+    return pA + (int)((pB + 1 - pA) * (rand() / (float)RAND_MAX));
 #endif
 }
 
@@ -205,7 +205,11 @@ int IRandomPosNeg(int pN) {
 // IDA: float __cdecl FRandomBetween(float pA, float pB)
 // FUNCTION: CARM95 0x004c16bf
 float FRandomBetween(float pA, float pB) {
+#ifdef DETHRACE_FIX_BUGS
+    return (float)rand() * (pB - pA) / (float)RAND_MAX + pA;
+#else
     return (float)rand() * (pB - pA) / (RAND_MAX + 1) + pA;
+#endif
 }
 
 // IDA: float __cdecl FRandomPosNeg(float pN)
