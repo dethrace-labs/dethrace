@@ -2146,11 +2146,11 @@ void LoadInterfaceStrings(void) {
         gTrans_fonts[10] = &gFonts[kFont_DRKPLAQ1];
         gTrans_fonts[11] = &gFonts[kFont_BUTTOUT1];
         gTrans_fonts[12] = &gFonts[kFont_BUTTIN1];
+#ifdef DETHRACE_FIX_BUGS
+        fclose(f);
+#endif
     }
 
-#ifdef DETHRACE_FIX_BUGS
-    fclose(f);
-#endif
 }
 
 // IDA: void __cdecl FlushInterfaceFonts()
