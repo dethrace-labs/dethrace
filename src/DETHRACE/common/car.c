@@ -1081,13 +1081,15 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
     br_vector3 minus_k;
     int i;
     int wheel;
-    br_scalar scale;
 
     for (i = 0; i < gNum_cars_and_non_cars; i++) {
         car = gActive_car_list[i];
-        if (fabs(car->omega.v[0]) > 10000.f
-            || fabs(car->omega.v[1]) > 10000.f
-            || fabs(car->omega.v[2]) > 10000.f) {
+        if ((float)fabs(car->omega.v[0]) > 10000.f
+            || (float)fabs(car->omega.v[1]) > 10000.f
+            || (float)fabs(car->omega.v[2]) > 10000.f
+            || (float)fabs(car->omega.v[0]) > 10000.f
+            || (float)fabs(car->omega.v[1]) > 10000.f
+            || (float)fabs(car->omega.v[2]) > 10000.f) {
             BrVector3SetFloat(&car->omega, 0.f, 0.f, 0.f);
             BrVector3SetFloat(&car->v, 0.f, 0.f, 0.f);
         }
@@ -1096,31 +1098,36 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
 
         car->speed = BR_LENGTH2(car->v.v[0], car->v.v[2]) / (WORLD_SCALE * 1000.0f);
         BrVector3Negate(&minus_k, (br_vector3*)car->car_master_actor->t.t.mat.m[2]);
-        if (car->speed <= 0.0001f) {
-            if (BrVector3Dot(&car->direction, &minus_k) < 0.f) {
-                BrVector3SetFloat(&minus_k, 0.f, 0.f, 1.f);
+        if (car->speed > 0.0001f) {
+            if (gLast_mechanics_time > pLast_frame_time && gCar_to_view == car) {
+                BrVector3Sub(&car->old_v, &car->old_v, &car->v);
+#ifdef DETHRACE_FIX_BUGS
+                BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / harness_game_config.physics_step_time);
+#else
+                BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / 40.f);
+#endif
+                BrVector3Accumulate(&car->old_v, &car->v);
+                BrVector3Normalise(&car->direction, &car->old_v);
             } else {
+                BrVector3Normalise(&car->direction, &car->v);
+            }
+        } else {
+            if (BrVector3Dot(&car->direction, &minus_k) >= 0.f) {
                 BrVector3SetFloat(&minus_k, 0.f, 0.f, -1.f);
+            } else {
+                BrVector3SetFloat(&minus_k, 0.f, 0.f, 1.f);
             }
             BrMatrix34ApplyV(&car->direction, &minus_k, &car->car_master_actor->t.t.mat);
-
-        } else if (gLast_mechanics_time > pLast_frame_time && gCar_to_view == car) {
-            BrVector3Sub(&car->old_v, &car->old_v, &car->v);
-            BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / harness_game_config.physics_step_time);
-            BrVector3Accumulate(&car->old_v, &car->v);
-            BrVector3Normalise(&car->direction, &car->old_v);
-        } else {
-            BrVector3Normalise(&car->direction, &car->v);
         }
-        if (car->driver >= eDriver_oppo) {
+        if (car->driver > eDriver_non_car) {
             car->speedo_speed = BrVector3Dot(&minus_k, &car->v) / (WORLD_SCALE * 1000.0f);
 
             car->steering_angle = BrRadianToDegree(atan((car->wpos[0].v[2] - car->wpos[2].v[2]) * car->curvature));
 
-            car->lr_sus_position = (car->ride_height - car->oldd[0]) / WORLD_SCALE;
-            car->rr_sus_position = (car->ride_height - car->oldd[1]) / WORLD_SCALE;
-            car->lf_sus_position = (car->ride_height - car->oldd[2]) / WORLD_SCALE;
-            car->rf_sus_position = (car->ride_height - car->oldd[3]) / WORLD_SCALE;
+            car->lr_sus_position = (car->ride_height - car->oldd[0]) / WORLD_SCALE_D;
+            car->rr_sus_position = (car->ride_height - car->oldd[1]) / WORLD_SCALE_D;
+            car->lf_sus_position = (car->ride_height - car->oldd[2]) / WORLD_SCALE_D;
+            car->rf_sus_position = (car->ride_height - car->oldd[3]) / WORLD_SCALE_D;
             for (wheel = 0; wheel < 4; wheel++) {
                 if (car->oldd[wheel] < car->susp_height[wheel >> 1] && gCurrent_race.material_modifiers[car->material_index[wheel]].smoke_type >= 2 && !car->doing_nothing_flag) {
                     GenerateContinuousSmoke(car, wheel, pTime);
