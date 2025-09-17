@@ -1148,7 +1148,7 @@ void InterpolateCars(tU32 pLast_frame_time, tU32 pTime) {
     if (dt > 0.04 || dt < 0)
         dt = 0;
 
-    gOver_shoot = dt > 0.0;
+    gOver_shoot = dt > 0.0f;
 
     for (i = 0; i < gNum_cars_and_non_cars; i++) {
         car = gActive_car_list[i];
