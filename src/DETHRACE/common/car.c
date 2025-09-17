@@ -1209,12 +1209,12 @@ void GetNetPos(tCar_spec* pCar) {
         pCar->dt = -1.0f;
         return;
     }
-    if (fabs(pCar->message.omega.v[0]) > 10000.0
-        || fabs(pCar->message.omega.v[1]) > 10000.0
-        || fabs(pCar->message.omega.v[2]) > 10000.0
-        || fabs(pCar->message.omega.v[0]) > 10000.0
-        || fabs(pCar->message.omega.v[1]) > 10000.0
-        || fabs(pCar->message.omega.v[2]) > 10000.0) {
+    if ((float)fabs(pCar->message.omega.v[0]) > 10000.0f
+        || (float)fabs(pCar->message.omega.v[1]) > 10000.0f
+        || (float)fabs(pCar->message.omega.v[2]) > 10000.0f
+        || (float)fabs(pCar->message.omega.v[0]) > 10000.0f
+        || (float)fabs(pCar->message.omega.v[1]) > 10000.0f
+        || (float)fabs(pCar->message.omega.v[2]) > 10000.0f) {
         BrVector3SetFloat(&pCar->message.omega, 0.0, 0.0, 0.0);
         BrVector3SetFloat(&pCar->message.v, 0.0, 0.0, 0.0);
     }
@@ -1229,25 +1229,25 @@ void GetNetPos(tCar_spec* pCar) {
         pCar->curvature = pCar->message.curvature * pCar->maxcurve / 32767.0f;
 
         for (j = 0; j < COUNT_OF(pCar->oldd); j++) {
-            pCar->oldd[j] = (pCar->message.d[j] * pCar->susp_height[j >> 1]) / 255.0f;
+            pCar->oldd[j] = (float)pCar->message.d[j] * pCar->susp_height[j >> 1] / 255.0f;
         }
-        if (pCar->driver == eDriver_oppo || pCar->repair_time >= pCar->message.repair_time) {
-            for (j = 0; j < COUNT_OF(pCar->damage_units); j++) {
-                pCar->damage_units[j].damage_level = pCar->message.damage[j];
-            }
-            SortOutSmoke(pCar);
-        } else {
-            if (pCar->message.repair_time - pCar->repair_time < 100000) {
-                amount = RepairCar2(pCar, pCar->message.repair_time - pCar->repair_time, &total_deflection);
-            } else {
+        if (pCar->driver >= eDriver_net_human && pCar->repair_time < pCar->message.repair_time) {
+            if (pCar->message.repair_time - pCar->repair_time >= 100000) {
                 TotallyRepairACar(pCar);
                 pCar->repair_time = pCar->message.repair_time;
+            } else {
+                amount = RepairCar2(pCar, pCar->message.repair_time - pCar->repair_time, &total_deflection);
             }
             for (j = 0; j < COUNT_OF(pCar->damage_units); j++) {
                 pCar->damage_units[j].damage_level = pCar->message.damage[j];
             }
             SetSmokeLastDamageLevel(pCar);
             StopCarSmoking(pCar);
+        } else {
+            for (j = 0; j < COUNT_OF(pCar->damage_units); j++) {
+                pCar->damage_units[j].damage_level = pCar->message.damage[j];
+            }
+            SortOutSmoke(pCar);
         }
         if (pCar->driver == eDriver_net_human) {
             pCar->revs = pCar->message.revs;
