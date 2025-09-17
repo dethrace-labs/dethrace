@@ -1170,7 +1170,8 @@ void ResetOldmat(void) {
     static int normalise_count = 0;
 
     for (i = 0; i < gNum_cars_and_non_cars; i++) {
-        BrMatrix34Copy(&gActive_car_list[i]->oldmat, &gActive_car_list[i]->car_master_actor->t.t.mat);
+        car = gActive_car_list[i];
+        BrMatrix34Copy(&car->oldmat, &car->car_master_actor->t.t.mat);
     }
     normalise_count++;
     if (normalise_count > 50) {
