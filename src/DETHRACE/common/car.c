@@ -1190,11 +1190,10 @@ void GetNonCars(void) {
     int i;
     int j;
 
-    gNum_cars_and_non_cars = gNum_active_non_cars + gNum_active_cars;
-    j = 0;
-    for (i = gNum_active_cars; i < gNum_cars_and_non_cars; i++) {
+    gNum_cars_and_non_cars = gNum_active_cars + gNum_active_non_cars;
+
+    for (i = gNum_active_cars, j = 0; i < gNum_cars_and_non_cars; i++, j++) {
         gActive_car_list[i] = (tCar_spec*)gActive_non_car_list[j];
-        j++;
     }
 }
 
