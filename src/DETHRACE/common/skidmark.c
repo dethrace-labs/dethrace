@@ -12,14 +12,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+// GLOBAL: CARM95 0x00530190
+tSkid gSkids[100];
+
 // GLOBAL: CARM95 0x00507030
 char* gBoring_material_names[2] = { "OILSMEAR.MAT", "ROBSMEAR.MAT" };
 
 // GLOBAL: CARM95 0x00507038
 char* gMaterial_names[2] = { "OILSMEAR.MAT", "GIBSMEAR.MAT" };
-
-// GLOBAL: CARM95 0x00530190
-tSkid gSkids[100];
 
 // IDA: void __usercall AdjustSkid(int pSkid_num@<EAX>, br_matrix34 *pMatrix@<EDX>, int pMaterial_index@<EBX>)
 // FUNCTION: CARM95 0x00401000
@@ -162,7 +162,8 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
         material_index = -2;
     } else {
         material_index = pCar->material_index[pWheel_num];
-        if (!gCurrent_race.material_modifiers[material_index].skid_mark_material) {
+        material = gCurrent_race.material_modifiers[material_index].skid_mark_material;
+        if (material == NULL) {
             pCar->old_skidding &= ~(1 << pWheel_num);
             return;
         }
@@ -181,8 +182,8 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
         if (pCar->special_start[pWheel_num].v[0] != FLT_MAX) {
 
             BrVector3Sub(&spesh_to_wheel, &world_pos, &pCar->special_start[pWheel_num]);
-            dist = BrVector3Length(&spesh_to_wheel);
-            if (dist <= BR_SCALAR_EPSILON || (BrVector3Dot(&pCar->direction, &spesh_to_wheel) / dist < 0.70700002)) {
+            dist2 = BrVector3Length(&spesh_to_wheel);
+            if (dist2 <= BR_SCALAR_EPSILON || (BrVector3Dot(&pCar->direction, &spesh_to_wheel) / dist2 < 0.70700002f)) {
                 return;
             }
             world_pos = pCar->special_start[pWheel_num];
@@ -191,17 +192,17 @@ void SkidMark(tCar_spec* pCar, int pWheel_num) {
         if (((1 << pWheel_num) & pCar->new_skidding) != 0) {
             if (((1 << pWheel_num) & pCar->old_skidding) != 0) {
                 BrVector3Sub(&disp, &world_pos, &pCar->prev_skid_pos[pWheel_num]);
-                dist2 = BrVector3Length(&disp);
-                if (dist2 < 0.05f) {
+                dist = BrVector3Length(&disp);
+                if (dist < 0.05f) {
                     return;
                 }
                 SkidSection(pCar, pWheel_num, &world_pos, material_index);
-                pCar->total_length[pWheel_num] = pCar->total_length[pWheel_num] + dist2;
-                pCar->oil_remaining[pWheel_num] = pCar->oil_remaining[pWheel_num] - dist2;
+                pCar->total_length[pWheel_num] = pCar->total_length[pWheel_num] + dist;
+                pCar->oil_remaining[pWheel_num] = pCar->oil_remaining[pWheel_num] - dist;
                 if (pCar->oil_remaining[pWheel_num] < 0.0f) {
                     pCar->oil_remaining[pWheel_num] = 0.0f;
                 }
-                pCar->blood_remaining[pWheel_num] = pCar->blood_remaining[pWheel_num] - dist2;
+                pCar->blood_remaining[pWheel_num] = pCar->blood_remaining[pWheel_num] - dist;
                 if (pCar->blood_remaining[pWheel_num] < 0.0f) {
                     pCar->blood_remaining[pWheel_num] = 0.0f;
                 }
