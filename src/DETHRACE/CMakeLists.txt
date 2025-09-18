@@ -60,6 +60,7 @@ if(DETHRACE_REPLAY_DEBUG)
 endif()
 
 target_sources(dethrace_obj PRIVATE
+    common/skidmark.c
     common/brucetrk.c
     common/brucetrk.h
     common/car.c
@@ -148,8 +149,7 @@ target_sources(dethrace_obj PRIVATE
     common/raycast.h
     common/replay.c
     common/replay.h
-    common/skidmark.c
-    common/skidmark.h
+
     common/sound.c
     common/sound.h
     common/spark.c
@@ -193,7 +193,7 @@ if(MSVC_42_FOR_RECCMP)
     set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
     target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
 
-    set_source_files_properties(common/car.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/skidmark.c PROPERTIES COMPILE_FLAGS "/FAs")
 
     # set_source_files_properties(common/brucetrk.c PROPERTIES COMPILE_FLAGS "/G5")
 
