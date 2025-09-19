@@ -131,6 +131,8 @@ jobs:
         repository: dethrace-labs/reccmp-report
         token: ${{ secrets.RECCMP_REPORT_TOKEN }}
         path: reccmp-report
+    - run: |
+        md5sum ${{ github.workspace}}/reccmp-report/report.json
     - uses: dethrace-labs/reccmp-action@main
       name: Build
       with:
