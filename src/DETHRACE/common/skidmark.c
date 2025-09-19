@@ -301,13 +301,18 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     br_scalar line_len;
     br_scalar cross;
 
-    line.v[0] = pL2->v[0] - pL1->v[0];
-    line.v[1] = pL2->v[2] - pL1->v[2];
-    to_pt.v[0] = pPt->v[0] - pL2->v[0];
-    to_pt.v[1] = pPt->v[2] - pL2->v[2];
-    cross = -line.v[0] * to_pt.v[1] + to_pt.v[0] * line.v[1];
-    line_len = sqrt(line.v[0] * line.v[0] + line.v[1] * line.v[1]);
-    return fabs(cross) > line_len * 0.050000001;
+    line.v[0] = BR_SUB(pL2->v[0], pL1->v[0]);
+    line.v[1] = BR_SUB(pL2->v[2], pL1->v[2]);
+    to_pt.v[0] = BR_SUB(pPt->v[0], pL2->v[0]);
+    to_pt.v[1] = BR_SUB(pPt->v[2], pL2->v[2]);
+
+    cross = -(line.v[0]) * to_pt.v[1] + to_pt.v[0] * line.v[1];
+    line_len = BrVector2Length(&line);
+    if (fabs(cross) > line_len * 0.05f) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 // IDA: int __usercall Reflex2D@<EAX>(br_vector3 *pPt@<EAX>, br_vector3 *pL1@<EDX>, br_vector3 *pL2@<EBX>)
@@ -320,13 +325,16 @@ int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     line.v[1] = pL2->v[2] - pL1->v[2];
     to_pt.v[0] = pPt->v[0] - pL2->v[0];
     to_pt.v[1] = pPt->v[2] - pL2->v[2];
-    return to_pt.v[1] * line.v[1] + to_pt.v[0] * line.v[0] < 0.0;
+    if (BrVector2Dot(&to_pt, &line) < 0.0f) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 // IDA: br_scalar __usercall SkidLen@<ST0>(int pSkid@<EAX>)
 // FUNCTION: CARM95 0x004021f1
 br_scalar SkidLen(int pSkid) {
-
     return sqrt(
         gSkids[pSkid].actor->t.t.mat.m[0][2] * gSkids[pSkid].actor->t.t.mat.m[0][2]
         + gSkids[pSkid].actor->t.t.mat.m[0][1] * gSkids[pSkid].actor->t.t.mat.m[0][1]
