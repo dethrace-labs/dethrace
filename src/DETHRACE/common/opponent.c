@@ -215,9 +215,10 @@ void PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vect
     br_transform trans;
 
     trans.type = BR_TRANSFORM_LOOK_UP;
+    BrVector3Copy(&trans.t.look_up.t, &pThe_actor->t.t.translate.t);
     BrVector3Copy(&trans.t.look_up.look, pThe_vector);
     BrVector3Set(&trans.t.look_up.up, 0.f, 1.f, 0.f);
-    BrVector3Copy(&trans.t.look_up.t, &pThe_actor->t.t.translate.t);
+
     BrTransformToTransform(&pThe_actor->t, &trans);
 }
 
