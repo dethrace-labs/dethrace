@@ -7,8 +7,7 @@ on:
       - 'ci-*'
     tags:
       - 'v*'
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  pull_request:
 
 jobs:
 
@@ -125,14 +124,9 @@ jobs:
       name: Checkout
       with:
         submodules: recursive
-    - name: Checkout reccmp-report
-      uses: actions/checkout@v4
-      with:
-        repository: dethrace-labs/reccmp-report
-        token: ${{ secrets.RECCMP_REPORT_TOKEN }}
-        path: reccmp-report
-    - run: |
-        md5sum ${{ github.workspace}}/reccmp-report/report.json
+    - name: Fetch latest report
+      run: |
+        curl -Lo reccmp-report-report.json https://raw.githubusercontent.com/dethrace-labs/reccmp-report/refs/heads/main/report.json
     - uses: dethrace-labs/reccmp-action@main
       name: Build
       with:
@@ -143,7 +137,7 @@ jobs:
       with:
         cmake_flags: -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on
         target: CARM95
-        diff_report_filename: ${{ github.workspace}}/reccmp-report/report.json
+        diff_report_filename: ${{ github.workspace}}/reccmp-report-report.json
         report_filename: ${{ github.workspace}}/new-reccmp-report.json
         original_binary_url: https://archive.org/download/carm-95/CARM95.EXE
         original_binary_filename: CARM95.EXE
@@ -159,7 +153,14 @@ jobs:
         if grep -q "Decreased" ${{ github.workspace}}/reccmp-output.txt; then
           echo "::warning file=reccmp-output.txt::Decomp correctness decreased"
         fi
-    - name: Update report in reccmp-report
+    - name: Checkout reccmp-report repo
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: actions/checkout@v4
+      with:
+        repository: dethrace-labs/reccmp-report
+        token: ${{ secrets.RECCMP_REPORT_TOKEN }}
+        path: reccmp-report
+    - name: Update report in reccmp-report repo
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: |
         cp new-reccmp-report.json reccmp-report/report.json
