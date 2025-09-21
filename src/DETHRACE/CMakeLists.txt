@@ -198,8 +198,7 @@ if(MSVC_42_FOR_RECCMP)
     set_source_files_properties(common/skidmark.c PROPERTIES COMPILE_FLAGS "/FAs")
 
     # set_source_files_properties(common/brucetrk.c PROPERTIES COMPILE_FLAGS "/G5")
-
-    # set_source_files_properties(common/car.c PROPERTIES COMPILE_FLAGS "/GB")
+    set_source_files_properties(common/opponent.c PROPERTIES COMPILE_FLAGS "/FAs /GB")
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()
 else()

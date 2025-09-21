@@ -243,7 +243,6 @@ void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_
         ProcessLevitate(pOpponent_spec, pCommand);
         break;
     case eOOT_knackered_and_freewheeling:
-        // FIXME: is keys correct?
         memset(&pOpponent_spec->car_spec->keys, 0, sizeof(pOpponent_spec->car_spec->keys));
         pOpponent_spec->car_spec->acc_force = 0.f;
         pOpponent_spec->car_spec->brake_force = 0.f;
@@ -341,9 +340,11 @@ tS16 FindNearestPathNode(br_vector3* pActor_coords, br_scalar* pDistance) {
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_path_nodes; i++) {
         BrVector3Sub(&actor_to_node, &gProgram_state.AI_vehicles.path_nodes[i].p, pActor_coords);
         distance = BrVector3Length(&actor_to_node);
-        if (distance < *pDistance && (!gAlready_elasticating || gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1] != i)) {
-            *pDistance = distance;
-            nearest_node = i;
+        if (distance < *pDistance) {
+            if (!gAlready_elasticating || gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1] != i) {
+                *pDistance = distance;
+                nearest_node = i;
+            }
         }
     }
     return nearest_node;
@@ -379,10 +380,10 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
     br_vector3 zero_vector;
 #endif
 
-    nearest_section = -1;
     nearest_node_section_no = -1;
-    closest_distance_squared = BR_SCALAR_MAX;
+    nearest_section = -1;
     nearest_node_distance_squared = BR_SCALAR_MAX;
+    closest_distance_squared = BR_SCALAR_MAX;
 #if defined(DETHRACE_FIX_BUGS)
     BrVector3Set(&zero_vector, 0.f, 0.f, 0.f);
     nearest_node_v = &zero_vector;
@@ -405,57 +406,57 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
         if (!gAlready_elasticating || gMobile_section != section_no) {
             BrVector3Sub(&a, finish, start);
             BrVector3Sub(&p, pActor_coords, start);
-            the_distance_squared = Vector3DistanceSquared(&p, &a);
-            if (the_distance_squared < closest_distance_squared) {
-                closest_distance_squared = the_distance_squared;
-                nearest_section = section_no;
+            BrVector3Sub(&wank, &p, &a);
+            the_distance_squared = BrVector3LengthSquared(&wank);
+            if (the_distance_squared < nearest_node_distance_squared) {
+                nearest_node_distance_squared = the_distance_squared;
+                nearest_node_section_no = section_no;
                 nearest_node_v = finish;
             }
             the_distance_squared = BrVector3LengthSquared(&p);
-            if (the_distance_squared < closest_distance_squared) {
-                closest_distance_squared = the_distance_squared;
-                nearest_section = section_no;
+            if (the_distance_squared < nearest_node_distance_squared) {
+                nearest_node_distance_squared = the_distance_squared;
+                nearest_node_section_no = section_no;
                 nearest_node_v = start;
             }
             length_squared_a = BrVector3LengthSquared(&a);
-            if (length_squared_a >= 0.0001f) {
-                t = BrVector3Dot(&p, &a) / length_squared_a;
-                if (t >= 0 && t <= 1.f) {
-                    p.v[0] -= t * a.v[0];
-                    p.v[1] -= t * a.v[1];
-                    p.v[2] -= t * a.v[2];
-                    the_distance_squared = BrVector3LengthSquared(&p);
-                    if (the_distance_squared < nearest_node_distance_squared) {
-                        BrVector3Scale(&intersect, &a, t);
-                        BrVector3Add(pIntersect, start, &intersect);
-                        BrVector3NormaliseQuick(pPath_direction, &a);
-                        nearest_node_distance_squared = the_distance_squared;
-                        nearest_node_section_no = section_no;
-                    }
+            if (length_squared_a < 0.0001f) {
+                continue;
+            }
+            t = BrVector3Dot(&p, &a) / length_squared_a;
+            if (t >= 0 && t <= 1.f) {
+                BrVector3Scale(&intersect, &a, t);
+                BrVector3Sub(&wank, &p, &intersect);
+                the_distance_squared = BrVector3LengthSquared(&wank);
+                if (the_distance_squared < closest_distance_squared) {
+                    closest_distance_squared = the_distance_squared;
+                    nearest_section = section_no;
+                    BrVector3Add(pIntersect, start, &intersect);
+                    BrVector3NormaliseQuick(pPath_direction, &a);
                 }
             }
         }
     }
-    if (nearest_node_distance_squared > closest_distance_squared) {
-        nearest_node_section_no = nearest_section;
+    if (closest_distance_squared > nearest_node_distance_squared) {
+        nearest_section = nearest_node_section_no;
         if (pPursuee != NULL) {
-            start = &pPursuee->my_trail.trail_nodes[nearest_section];
-            finish = &pPursuee->my_trail.trail_nodes[nearest_section + 1];
+            start = &pPursuee->my_trail.trail_nodes[nearest_node_section_no];
+            finish = &pPursuee->my_trail.trail_nodes[nearest_node_section_no + 1];
         } else {
-            start = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[nearest_section].node_indices[0]].p;
-            finish = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[nearest_section].node_indices[1]].p;
+            start = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[nearest_node_section_no].node_indices[0]].p;
+            finish = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[nearest_node_section_no].node_indices[1]].p;
         }
-        BrVector3Sub(&p, finish, start);
-        BrVector3NormaliseQuick(pPath_direction, &p);
+        BrVector3Sub(&a, finish, start);
+        BrVector3NormaliseQuick(pPath_direction, &a);
         BrVector3Copy(pIntersect, nearest_node_v);
-        *pDistance = sqrt(closest_distance_squared);
-    } else {
         *pDistance = sqrt(nearest_node_distance_squared);
+    } else {
+        *pDistance = sqrt(closest_distance_squared);
     }
     if (pPursuee != NULL) {
-        nearest_node_section_no += 15000;
+        nearest_section += 15000;
     }
-    return nearest_node_section_no;
+    return nearest_section;
 }
 
 // IDA: void __usercall DeadStopCar(tCar_spec *pCar_spec@<EAX>)
