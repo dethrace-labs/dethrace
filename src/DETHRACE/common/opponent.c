@@ -254,8 +254,6 @@ void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_
     case eOOT_wait_for_some_hapless_sod:
         ProcessWaitForSomeHaplessSod(pOpponent_spec, pCommand);
         break;
-    case eOOT_rematerialise:
-        break;
     case eOOT_return_to_start:
         ProcessReturnToStart(pOpponent_spec, pCommand);
         break;
