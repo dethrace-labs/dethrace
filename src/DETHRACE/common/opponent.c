@@ -507,23 +507,25 @@ void NewObjective(tOpponent_spec* pOpponent_spec, tOpponent_objective_type pObje
     if (pObjective_type == eOOT_pursue_and_twat) {
         pOpponent_spec->time_for_this_objective_to_finish += 90000;
     }
+    va_start(marker, pObjective_type);
     switch (pObjective_type) {
     case eOOT_complete_race:
         gNum_of_opponents_completing_race++;
         break;
-    case eOOT_pursue_and_twat:
-        va_start(marker, pObjective_type);
-        pOpponent_spec->pursue_car_data.pursuee = va_arg(marker, tCar_spec*);
-        va_end(marker);
-        break;
     case eOOT_get_near_player:
         gNum_of_opponents_getting_near++;
         break;
+    case eOOT_pursue_and_twat:
+        pOpponent_spec->pursue_car_data.pursuee = va_arg(marker, tCar_spec*);
+        gNum_of_opponents_pursuing++;
+        break;
+
     default:
         break;
     }
     dr_dprintf("%s: NewObjective() - type %d", pOpponent_spec->car_spec->driver_name, pObjective_type);
     ProcessCurrentObjective(pOpponent_spec, ePOC_start);
+    va_end(marker);
 }
 
 // IDA: void __usercall CalcRaceRoute(tOpponent_spec *pOpponent_spec@<EAX>)
