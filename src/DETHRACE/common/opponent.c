@@ -567,8 +567,8 @@ void CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
         race_section_count = 0;
         normal_section_ok_direction_count = 0;
         normal_section_wrong_direction_count = 0;
-        for (i = 0; i < gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections; i++) {
-            section_no = gProgram_state.AI_vehicles.path_nodes[node_no].sections[i];
+        for (section_no_index = 0; section_no_index < gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections; section_no_index++) {
+            section_no = gProgram_state.AI_vehicles.path_nodes[node_no].sections[section_no_index];
             if (pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no != section_no) {
                 if (gProgram_state.AI_vehicles.path_sections[section_no].type == 1 && gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0] == node_no) {
                     pOpponent_spec->complete_race_data.found_race_section = 1;
@@ -588,7 +588,7 @@ void CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
         } else if (normal_section_ok_direction_count != 0) {
             AddToOpponentsProjectedRoute(pOpponent_spec, temp_section_array[IRandomBetween(0, normal_section_ok_direction_count - 1)], 1);
         } else if (normal_section_wrong_direction_count != 0) {
-            AddToOpponentsProjectedRoute(pOpponent_spec, temp_section_array[IRandomBetween(0, normal_section_wrong_direction_count - 1)], 1);
+            AddToOpponentsProjectedRoute(pOpponent_spec, temp_section_array[IRandomBetween(0, normal_section_wrong_direction_count - 1)], 0);
         } else if (pOpponent_spec->complete_race_data.found_race_section) {
             pOpponent_spec->complete_race_data.finished_calcing_race_route = 1;
         } else {
@@ -611,17 +611,14 @@ void TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add) {
     if (!pSections_to_add) {
         PDEnterDebugger("TopUpRandomRoute() called with no seed (woof, bark, etc.)");
     }
-    if (pSections_to_add >= 0) {
-        target = MIN(pSections_to_add + pOpponent_spec->nnext_sections, 10);
-    } else {
+    if (pSections_to_add < 0) {
         target = 10;
+    } else {
+        target = MIN(pSections_to_add + pOpponent_spec->nnext_sections, 10);
     }
     while (pOpponent_spec->nnext_sections < target) {
         node_no = gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no].node_indices[pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction];
-        if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections <= 1) {
-            section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
-            direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction == 0;
-        } else {
+        if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections > 1) {
             num_of_temp_sections = 0;
             for (i = 0; i < gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections; i++) {
                 section_no = gProgram_state.AI_vehicles.path_nodes[node_no].sections[i];
@@ -633,16 +630,19 @@ void TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add) {
                 }
             }
 
-            if (num_of_temp_sections == 0) {
-                section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
-                direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction == 0;
-            } else if (num_of_temp_sections == 1) {
-                section_no = temp_section_array[0];
-                direction = gProgram_state.AI_vehicles.path_sections[temp_section_array[0]].node_indices[1] != node_no;
-            } else {
+            if (num_of_temp_sections > 1) {
                 section_no = temp_section_array[IRandomBetween(0, num_of_temp_sections - 1)];
                 direction = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] != node_no;
+            } else if (num_of_temp_sections == 1) {
+                section_no = temp_section_array[0];
+                direction = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] != node_no;
+            } else {
+                section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
+                direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction == 0;
             }
+        } else {
+            section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
+            direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction == 0;
         }
         AddToOpponentsProjectedRoute(pOpponent_spec, section_no, direction);
     }
