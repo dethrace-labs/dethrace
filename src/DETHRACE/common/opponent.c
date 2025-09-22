@@ -845,13 +845,14 @@ void ClearOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec) {
 // FUNCTION: CARM95 0x004030ef
 int AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_no, int pDirection) {
 
-    if (pOpponent_spec->nnext_sections >= COUNT_OF(pOpponent_spec->next_sections)) {
+    if (pOpponent_spec->nnext_sections < COUNT_OF(pOpponent_spec->next_sections)) {
+        pOpponent_spec->next_sections[pOpponent_spec->nnext_sections].section_no = pSection_no;
+        pOpponent_spec->next_sections[pOpponent_spec->nnext_sections].direction = pDirection;
+        pOpponent_spec->nnext_sections++;
+        return 1;
+    } else {
         return 0;
     }
-    pOpponent_spec->next_sections[pOpponent_spec->nnext_sections].section_no = pSection_no;
-    pOpponent_spec->next_sections[pOpponent_spec->nnext_sections].direction = pDirection;
-    pOpponent_spec->nnext_sections++;
-    return 1;
 }
 
 // IDA: int __usercall ShiftOpponentsProjectedRoute@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, int pPlaces@<EDX>)
