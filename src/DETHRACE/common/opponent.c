@@ -763,7 +763,8 @@ void CalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPlayer) 
         TopUpRandomRoute(pOpponent_spec, 1);
     }
     while (pOpponent_spec->nnext_sections < 6 && !fuck_it) {
-        temp_store[0] = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1];
+        temp_store[0].section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
+        temp_store[0].direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction;
         dr_dprintf("%s: CalcGetNearPlayerRoute() - In loop; our section #%d, player's section #%d", pOpponent_spec->car_spec->driver_name, temp_store[0].section_no, players_section);
         gSFS_count++;
         gSFS_cycles_this_time = 0;
@@ -772,18 +773,18 @@ void CalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPlayer) 
         if (gSFS_max_cycles < gSFS_cycles_this_time) {
             gSFS_max_cycles = gSFS_cycles_this_time;
         }
-        dr_dprintf(">>>SearchForSection() - max %d, avg %.1f", gSFS_max_cycles, gSFS_total_cycles / (float)gSFS_count);
-        if (num_of_perm_store_sections <= 1) {
+        dr_dprintf(">>>SearchForSection() - max %d, avg %.1f", gSFS_max_cycles, (float)gSFS_total_cycles / gSFS_count);
+        if (num_of_perm_store_sections > 1) {
+            sections_to_copy = MIN(COUNT_OF(pOpponent_spec->next_sections) - pOpponent_spec->nnext_sections, num_of_perm_store_sections - 1);
+            memcpy(&pOpponent_spec->next_sections[pOpponent_spec->nnext_sections], &perm_store[1], sizeof(tRoute_section) * sections_to_copy);
+            pOpponent_spec->nnext_sections += sections_to_copy;
+            TopUpRandomRoute(pOpponent_spec, 1);
+        } else {
             dr_dprintf("%s: CalcGetNearPlayerRoute() - SearchForSection() produced bugger all", pOpponent_spec->car_spec->driver_name);
             fuck_it = 1;
             if (pOpponent_spec->nnext_sections <= 4) {
                 TopUpRandomRoute(pOpponent_spec, 4 - pOpponent_spec->nnext_sections + 4);
             }
-        } else {
-            sections_to_copy = MIN(COUNT_OF(pOpponent_spec->next_sections) - pOpponent_spec->nnext_sections, num_of_perm_store_sections - 1);
-            memcpy(&pOpponent_spec->next_sections[pOpponent_spec->nnext_sections], &perm_store[1], sizeof(tRoute_section) * sections_to_copy);
-            pOpponent_spec->nnext_sections += sections_to_copy;
-            TopUpRandomRoute(pOpponent_spec, 1);
         }
     }
 }
