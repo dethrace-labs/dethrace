@@ -663,9 +663,6 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
     tS16 section_no_index;
     br_scalar distance_so_far;
 
-    // added by dethrace for readability (?)
-    tS16 section_no_dir_index;
-
     gSFS_cycles_this_time++;
     if (pDepth == 1) {
         memset(gBit_per_node, 0, (gProgram_state.AI_vehicles.number_of_path_nodes + 7) / 8);
@@ -683,41 +680,36 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
 
         section_no = node_ptr->sections[section_no_index];
         direction = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] != node_no;
-        section_no_dir_index = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[direction];
 
-        // int b = BYTE4(v8);
-        // int y = (int)(((BYTE4(v8) ^ (((BYTE4(v8) ^ v8) - BYTE4(v8)) & 7)) - BYTE4(v8)));
-        // int val = valx(v8);
-        // LOG_DEBUG("val %d, b %d, y %d", val, b, y);
-        // int x = ((BYTE4(v8) ^ (((BYTE4(v8) ^ v8) - BYTE4(v8)) & 7)) - BYTE4(v8));
-        // int x2 = v8 & 7;
-        // if (x != x2 || val != x) {
-        //     TELL_ME_IF_WE_PASS_THIS_WAY();
-        // }
-        if ((gBit_per_node[section_no_dir_index / 8] & (1 << (section_no_dir_index & 7))) == 0
-            && (!gProgram_state.AI_vehicles.path_sections[section_no].one_way || direction)
-            && (pOpponent_spec->cheating || gProgram_state.AI_vehicles.path_sections[section_no].type != ePST_cheat_only)) {
+        if ((gBit_per_node[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[direction] / 8] & (1 << (gProgram_state.AI_vehicles.path_sections[section_no].node_indices[direction] % 8))) != 0) {
+            continue;
+        }
+        if ((gProgram_state.AI_vehicles.path_sections[section_no].one_way && gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] == node_no)) {
+            continue;
+        }
+        if (!pOpponent_spec->cheating && gProgram_state.AI_vehicles.path_sections[section_no].type == ePST_cheat_only) {
+            continue;
+        }
 
-            pTemp_store[pDepth].section_no = section_no;
-            pTemp_store[pDepth].direction = direction;
-            distance_so_far = gProgram_state.AI_vehicles.path_sections[section_no].length + pDistance_so_far;
+        pTemp_store[pDepth].section_no = section_no;
+        pTemp_store[pDepth].direction = direction;
+        distance_so_far = gProgram_state.AI_vehicles.path_sections[section_no].length + pDistance_so_far;
+        if (pTarget_section == section_no && distance_so_far <= shortest_dist) {
+            shortest_dist = distance_so_far;
+            *pNum_of_perm_store_sections = pDepth + 1;
+            memcpy(pPerm_store, pTemp_store, sizeof(tRoute_section) * *pNum_of_perm_store_sections);
 
-            if (pTarget_section == section_no && distance_so_far < shortest_dist) {
-                shortest_dist = distance_so_far;
-                *pNum_of_perm_store_sections = pDepth + 1;
-                memcpy(pPerm_store, pTemp_store, sizeof(tRoute_section) * *pNum_of_perm_store_sections);
-                // dword_530DD4 = ++routes_found
-                routes_found++;
-                if (routes_found >= 2) {
-                    return 1;
-                }
-                break;
-            }
-
-            if (pDepth < 9
-                && SearchForSection(pTemp_store, pPerm_store, pNum_of_perm_store_sections, pTarget_section, pDepth + 1, distance_so_far, pOpponent_spec)) {
+            gWanky_arse_tit_fuck = routes_found + 1;
+            routes_found++;
+            if (routes_found >= 2) {
                 return 1;
+            } else {
+                gBit_per_node[node_no / 8] &= ~(1 << (node_no % 8));
+                return 0;
             }
+        }
+        if (pDepth < 9 && SearchForSection(pTemp_store, pPerm_store, pNum_of_perm_store_sections, pTarget_section, pDepth + 1, distance_so_far, pOpponent_spec)) {
+            return 1;
         }
     }
     gBit_per_node[node_no / 8] &= ~(1 << (node_no % 8));
