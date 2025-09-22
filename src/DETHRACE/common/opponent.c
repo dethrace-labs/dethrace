@@ -769,7 +769,7 @@ void CalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPlayer) 
         gSFS_cycles_this_time = 0;
         SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, players_section, 1, 0.f, pOpponent_spec);
         gSFS_total_cycles += gSFS_cycles_this_time;
-        if (gSFS_max_cycles < gSFS_cycles_this_time) {
+        if (gSFS_cycles_this_time > gSFS_max_cycles) {
             gSFS_max_cycles = gSFS_cycles_this_time;
         }
         dr_dprintf(">>>SearchForSection() - max %d, avg %.1f", gSFS_max_cycles, (float)gSFS_total_cycles / gSFS_count);
@@ -805,34 +805,31 @@ void CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec) {
 
     ClearOpponentsProjectedRoute(pOpponent_spec);
     section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &section_v, &intersect, &distance);
-    distance = BrVector3Length(&section_v);
     BrVector3Normalise(&section_v, &section_v);
 
-    if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &section_v) <= 0.0f) {
-        AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
-    } else {
+    if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &section_v) > 0.0f) {
         AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
+    } else {
+        AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
     }
-    temp_store[0] = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1];
+    temp_store[0].section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
+    temp_store[0].direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction;
     gSFS_count++;
     gSFS_cycles_this_time = 0;
     SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, pOpponent_spec->return_to_start_data.section_no, 1, 0.0f, pOpponent_spec);
     gSFS_total_cycles += gSFS_cycles_this_time;
-    if (gSFS_max_cycles < gSFS_cycles_this_time) {
+    if (gSFS_cycles_this_time > gSFS_max_cycles) {
         gSFS_max_cycles = gSFS_cycles_this_time;
     }
-    if (num_of_perm_store_sections <= 1) {
-        if (pOpponent_spec->nnext_sections <= 6) {
-            TopUpRandomRoute(pOpponent_spec, 4 - pOpponent_spec->nnext_sections + 4);
-        }
-    } else {
-        sections_to_copy = 10 - pOpponent_spec->nnext_sections;
-        if (sections_to_copy >= num_of_perm_store_sections - 1) {
-            sections_to_copy = num_of_perm_store_sections - 1;
-        }
+    if (num_of_perm_store_sections > 1) {
+        sections_to_copy = MIN(num_of_perm_store_sections - 1, 10 - pOpponent_spec->nnext_sections);
         memcpy(&pOpponent_spec->next_sections[pOpponent_spec->nnext_sections], &perm_store[1], sizeof(tRoute_section) * sections_to_copy);
         pOpponent_spec->nnext_sections += sections_to_copy;
         TopUpRandomRoute(pOpponent_spec, 1);
+    } else {
+        if (pOpponent_spec->nnext_sections <= 6) {
+            TopUpRandomRoute(pOpponent_spec, 4 - pOpponent_spec->nnext_sections + 4);
+        }
     }
 }
 
