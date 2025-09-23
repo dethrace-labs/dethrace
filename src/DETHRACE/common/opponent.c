@@ -1032,13 +1032,13 @@ tS16 CalcNextTrailSection(tOpponent_spec* pOpponent_spec, int pSection) {
     int section_no;
     tPursuee_trail* trail;
 
-    trail = &pOpponent_spec->pursue_car_data.pursuee->my_trail;
     section_no = pSection - 15000;
+    trail = &pOpponent_spec->pursue_car_data.pursuee->my_trail;
 
-    if (trail->number_of_nodes - 2 > section_no) {
-        return pSection + 1;
+    if (trail->number_of_nodes - 2 <= section_no) {
+        return -1;
     }
-    return -1;
+    return section_no + 15001;
 }
 
 // IDA: void __usercall ProcessPursueAndTwat(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
