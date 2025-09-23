@@ -860,15 +860,16 @@ int AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_n
 int ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces) {
     int i;
 
-    if (pOpponent_spec->nnext_sections <= pPlaces) {
+    if (pOpponent_spec->nnext_sections > pPlaces) {
+        for (i = 0; i < COUNT_OF(pOpponent_spec->next_sections) - pPlaces; i++) {
+            pOpponent_spec->next_sections[i].section_no = pOpponent_spec->next_sections[pPlaces + i].section_no;
+            pOpponent_spec->next_sections[i].direction = pOpponent_spec->next_sections[pPlaces + i].direction;
+        }
+        pOpponent_spec->nnext_sections -= pPlaces;
+        return 1;
+    } else {
         return 0;
     }
-    for (i = 0; i < COUNT_OF(pOpponent_spec->next_sections) - pPlaces; i++) {
-        pOpponent_spec->next_sections[i].section_no = pOpponent_spec->next_sections[pPlaces + i].section_no;
-        pOpponent_spec->next_sections[i].direction = pOpponent_spec->next_sections[pPlaces + i].direction;
-    }
-    pOpponent_spec->nnext_sections -= pPlaces;
-    return 1;
 }
 
 // IDA: void __usercall StunTheBugger(tOpponent_spec *pOpponent_spec@<EAX>, int pMilliseconds@<EDX>)
