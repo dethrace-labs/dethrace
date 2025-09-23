@@ -1243,48 +1243,50 @@ void ProcessRunAway(tOpponent_spec* pOpponent_spec, tProcess_objective_command p
 
     switch (pCommand) {
 
-    case ePOC_run:
-        if (pOpponent_spec->run_away_data.time_to_stop >= gTime_stamp_for_this_munging) {
-            if (pOpponent_spec->follow_path_data.section_no > 20000) {
-                ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
-                pOpponent_spec->follow_path_data.section_no = 20000;
-            }
-            if (pOpponent_spec->nnext_sections < 10) {
-                TopUpRandomRoute(pOpponent_spec, 10 - pOpponent_spec->nnext_sections);
-            }
-            if (ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0) == eFPR_given_up) {
-                ClearOpponentsProjectedRoute(pOpponent_spec);
-                section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
-                if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) < 0.0f) {
-                    AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
-                } else {
-                    AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
-                }
-                TopUpRandomRoute(pOpponent_spec, -1);
-                ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
-            }
-        } else {
-            ObjectiveComplete(pOpponent_spec);
-        }
-        break;
-
     case ePOC_start:
         dr_dprintf("%s: ProcessRunAway() - new objective started", pOpponent_spec->car_spec->driver_name);
         pOpponent_spec->run_away_data.time_to_stop = gTime_stamp_for_this_munging + 1000 * IRandomBetween(30, 90);
         ClearOpponentsProjectedRoute(pOpponent_spec);
         section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
-        if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) < 0.0f) {
-            AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
-        } else {
+        if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) >= 0.0f) {
             AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
+        } else {
+            AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
         }
         TopUpRandomRoute(pOpponent_spec, -1);
         ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
         sprintf(str, "%s: Shit! I'm out of here...", pOpponent_spec->car_spec->driver_name);
         break;
 
-    case ePOC_die:
+    case ePOC_run:
+        if (pOpponent_spec->run_away_data.time_to_stop < gTime_stamp_for_this_munging) {
+            ObjectiveComplete(pOpponent_spec);
+            return;
+        }
+        if (pOpponent_spec->follow_path_data.section_no > 20000) {
+            ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
+            pOpponent_spec->follow_path_data.section_no = 20000;
+        }
+        if (pOpponent_spec->nnext_sections < 10) {
+            TopUpRandomRoute(pOpponent_spec, 10 - pOpponent_spec->nnext_sections);
+        }
+        res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
+        if (res == eFPR_given_up) {
+            ClearOpponentsProjectedRoute(pOpponent_spec);
+            section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
+            if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) >= 0.0f) {
+                AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
+            } else {
+                AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
+            }
+            TopUpRandomRoute(pOpponent_spec, -1);
+            ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
+        }
+
         break;
+
+    case ePOC_die:
+        return;
     }
 }
 
