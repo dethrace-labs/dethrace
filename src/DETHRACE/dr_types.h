@@ -589,14 +589,14 @@ typedef struct tJoystick {
     tS32 dec;
 } tJoystick;
 
-typedef struct tPursuee_trail {
-    br_vector3 trail_nodes[25];
-    br_vector3 base_heading;
-    tU32 time_of_next_recording;
-    tU32 end_of_deviation;
-    tU8 number_of_nodes;
-    tU8 has_deviated_recently;
-    tU8 nodes_shifted_this_frame;
+typedef struct tPursuee_trail {   // size: 0x144
+    br_vector3 trail_nodes[25];   // @0x0
+    br_vector3 base_heading;      // @0x12c
+    tU32 time_of_next_recording;  // @0x138
+    tU32 end_of_deviation;        // @0x13c
+    tU8 number_of_nodes;          // @0x140
+    tU8 has_deviated_recently;    // @0x141
+    tU8 nodes_shifted_this_frame; // @0x142
 } tPursuee_trail;
 
 typedef struct tCar_spec_struct {              // size: 0x1a9c

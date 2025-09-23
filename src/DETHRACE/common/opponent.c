@@ -917,14 +917,14 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
         if (pOpponent_spec->nnext_sections != 0) {
             res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
             if (res != eFPR_end_of_path) {
-                goto next;
+                goto skip_new_objective;
             }
         }
 
         dr_dprintf("%s: Giving up following race path because ran out of race path", pOpponent_spec->car_spec->driver_name);
         NewObjective(pOpponent_spec, eOOT_get_near_player);
 
-    next:
+    skip_new_objective:
 
         if (res != eFPR_OK) {
             if (res == eFPR_given_up) {
@@ -981,41 +981,42 @@ void RecordNextTrailNode(tCar_spec* pPursuee) {
     int visible;
 
     trail = &pPursuee->my_trail;
-    if (trail->time_of_next_recording >= gTime_stamp_for_this_munging) {
-        return;
-    }
-    trail->time_of_next_recording = gTime_stamp_for_this_munging + 500;
-    trail->nodes_shifted_this_frame = 0;
-    if (BrVector3Dot(&trail->base_heading, &pPursuee->direction) < FastScalarCos(30)) {
-        trail->has_deviated_recently = 1;
-    }
-    BrVector3Sub(&car_to_last_point_v, &trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t);
-    length = BrVector3Length(&car_to_last_point_v);
-    if (length < 0.3f) {
-        return;
-    }
-    CalcNegativeXVector(&offset_v, &trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t, 0.5f);
-
-    BrVector3Add(&start1, &trail->trail_nodes[trail->number_of_nodes - 2], &offset_v);
-    BrVector3Add(&finish1, &pPursuee->car_master_actor->t.t.translate.t, &offset_v);
-    BrVector3Sub(&start2, &trail->trail_nodes[trail->number_of_nodes - 2], &offset_v);
-    BrVector3Sub(&finish2, &pPursuee->car_master_actor->t.t.translate.t, &offset_v);
     visible = 1;
-    if ((trail->has_deviated_recently
-            || !(visible = PointVisibleFromHere(&start1, &finish1))
-            || !(visible = PointVisibleFromHere(&start2, &finish2))
-            || !(visible = PointVisibleFromHere(&trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t)))
-        && ((visible && length > 2.0f) || (!visible && length > 1.5f))) {
-        if (trail->number_of_nodes >= COUNT_OF(trail->trail_nodes)) {
-            memmove(trail->trail_nodes, &trail->trail_nodes[1], (COUNT_OF(trail->trail_nodes) - 1) * sizeof(trail->trail_nodes[0]));
-            trail->nodes_shifted_this_frame = 1;
-        } else {
-            trail->number_of_nodes++;
+    trail->nodes_shifted_this_frame = 0;
+    if (trail->time_of_next_recording < gTime_stamp_for_this_munging) {
+
+        trail->time_of_next_recording = gTime_stamp_for_this_munging + 500;
+        if (BrVector3Dot(&pPursuee->direction, &trail->base_heading) < FastScalarCos(30)) {
+            trail->has_deviated_recently = 1;
         }
-        trail->has_deviated_recently = 0;
-        BrVector3Copy(&trail->base_heading, &pPursuee->direction);
+        BrVector3Sub(&car_to_last_point_v, &trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t);
+        length = BrVector3Length(&car_to_last_point_v);
+        if (length < 0.3f) {
+            return;
+        }
+        CalcNegativeXVector(&offset_v, &trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t, 0.5f);
+
+        BrVector3Add(&start1, &trail->trail_nodes[trail->number_of_nodes - 2], &offset_v);
+        BrVector3Add(&finish1, &pPursuee->car_master_actor->t.t.translate.t, &offset_v);
+        BrVector3Sub(&start2, &trail->trail_nodes[trail->number_of_nodes - 2], &offset_v);
+        BrVector3Sub(&finish2, &pPursuee->car_master_actor->t.t.translate.t, &offset_v);
+
+        if ((trail->has_deviated_recently
+                || !(visible = PointVisibleFromHere(&start1, &finish1))
+                || !(visible = PointVisibleFromHere(&start2, &finish2))
+                || !(visible = PointVisibleFromHere(&trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t)))
+            && ((visible && length > 2.0f) || (!visible && length > 1.5f))) {
+            if (trail->number_of_nodes < COUNT_OF(trail->trail_nodes)) {
+                trail->number_of_nodes++;
+            } else {
+                memmove(trail->trail_nodes, &trail->trail_nodes[1], (COUNT_OF(trail->trail_nodes) - 1) * sizeof(trail->trail_nodes[0]));
+                trail->nodes_shifted_this_frame = 1;
+            }
+            trail->has_deviated_recently = 0;
+            BrVector3Copy(&trail->base_heading, &pPursuee->direction);
+        }
+        BrVector3Copy(&trail->trail_nodes[trail->number_of_nodes - 1], &pPursuee->car_master_actor->t.t.translate.t);
     }
-    BrVector3Copy(&trail->trail_nodes[trail->number_of_nodes - 1], &pPursuee->car_master_actor->t.t.translate.t);
 }
 
 // IDA: tS16 __usercall FindNearestTrailSection@<AX>(tOpponent_spec *pOpponent_spec@<EAX>, tCar_spec *pPursuee@<EDX>, br_vector3 *pSection_v@<EBX>, br_vector3 *pIntersect@<ECX>, br_scalar *pDistance)
