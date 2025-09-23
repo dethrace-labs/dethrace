@@ -1296,11 +1296,14 @@ void ProcessWaitForSomeHaplessSod(tOpponent_spec* pOpponent_spec, tProcess_objec
 
     switch (pCommand) {
     case ePOC_start:
+        pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
+        return;
     case ePOC_run:
         pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
-        break;
-    default:
-        break;
+        return;
+
+    case ePOC_die:
+        return;
     }
 }
 
