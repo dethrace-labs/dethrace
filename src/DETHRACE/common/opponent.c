@@ -898,6 +898,10 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
     int res;
     char str[256];
 
+    initial_pos = &gProgram_state.initial_position;
+    car_actor = pOpponent_spec->car_spec->car_master_actor;
+    data = &pOpponent_spec->complete_race_data;
+
     switch (pCommand) {
     case ePOC_start:
         dr_dprintf("%s: ProcessCompleteRace() - new objective started", pOpponent_spec->car_spec->driver_name);
@@ -910,11 +914,18 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
             ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
             pOpponent_spec->follow_path_data.section_no = 20000;
         }
-        res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
-        if (pOpponent_spec->nnext_sections == 0 || res == eFPR_end_of_path) {
-            dr_dprintf("%s: Giving up following race path because ran out of race path", pOpponent_spec->car_spec->driver_name);
-            NewObjective(pOpponent_spec, eOOT_get_near_player);
+        if (pOpponent_spec->nnext_sections != 0) {
+            res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
+            if (res != eFPR_end_of_path) {
+                goto next;
+            }
         }
+
+        dr_dprintf("%s: Giving up following race path because ran out of race path", pOpponent_spec->car_spec->driver_name);
+        NewObjective(pOpponent_spec, eOOT_get_near_player);
+
+    next:
+
         if (res != eFPR_OK) {
             if (res == eFPR_given_up) {
                 dr_dprintf("%s: Giving up complete_race because ProcessFollowPath() gave up", pOpponent_spec->car_spec->driver_name);
@@ -927,11 +938,9 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
             dr_dprintf("%s: Time to give up complete_race. Might be back in a sec, though!", pOpponent_spec->car_spec->driver_name);
             ObjectiveComplete(pOpponent_spec);
         }
-        if (pOpponent_spec->nnext_sections < 5 && !pOpponent_spec->complete_race_data.finished_calcing_race_route) {
+        if (pOpponent_spec->nnext_sections <= 4 && !data->finished_calcing_race_route) {
             CalcRaceRoute(pOpponent_spec);
         }
-        break;
-    default:
         break;
     }
 }
