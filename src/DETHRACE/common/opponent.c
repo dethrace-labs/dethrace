@@ -1316,17 +1316,26 @@ void ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     int res;
 
     switch (pCommand) {
+    case ePOC_start:
+        dr_dprintf("%s: ProcessReturnToStart() - new objective started", pOpponent_spec->car_spec->driver_name);
+        pOpponent_spec->return_to_start_data.waiting_near_start = 0;
+        pOpponent_spec->return_to_start_data.section_no = FindNearestPathSection(&pOpponent_spec->start_pos, &section_v, &pOpponent_spec->return_to_start_data.nearest_path_point, &distance);
+        pOpponent_spec->return_to_start_data.nearest_path_point.v[1] = 0.0;
+        CalcReturnToStartPointRoute(pOpponent_spec);
+        ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
+        break;
     case ePOC_run:
         if (TeleportCopToStart(pOpponent_spec)) {
             break;
         }
-        if (pOpponent_spec->return_to_start_data.waiting_near_start) {
-            pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
-        } else {
-            our_pos_xz = pOpponent_spec->car_spec->car_master_actor->t.t.translate.t;
+        if (!pOpponent_spec->return_to_start_data.waiting_near_start) {
+            BrVector3Copy(&our_pos_xz, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
             our_pos_xz.v[1] = 0.0f;
             BrVector3Sub(&cop_to_start, &pOpponent_spec->start_pos, &our_pos_xz);
-            if (BrVector3Length(&cop_to_start) >= 10.0) {
+            if (BrVector3Length(&cop_to_start) < 10.f) {
+                pOpponent_spec->return_to_start_data.waiting_near_start = 1;
+                pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
+            } else {
                 if (pOpponent_spec->follow_path_data.section_no > 20000) {
                     ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
                     pOpponent_spec->follow_path_data.section_no = 20000;
@@ -1345,22 +1354,14 @@ void ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProcess_objective_com
                     CalcReturnToStartPointRoute(pOpponent_spec);
                     ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
                 }
-            } else {
-                pOpponent_spec->return_to_start_data.waiting_near_start = 1;
-                pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
             }
+        } else {
+            pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
         }
         break;
-    case ePOC_start:
-        dr_dprintf("%s: ProcessReturnToStart() - new objective started", pOpponent_spec->car_spec->driver_name);
-        pOpponent_spec->return_to_start_data.waiting_near_start = 0;
-        pOpponent_spec->return_to_start_data.section_no = FindNearestPathSection(&pOpponent_spec->start_pos, &section_v, &pOpponent_spec->return_to_start_data.nearest_path_point, &distance);
-        pOpponent_spec->return_to_start_data.nearest_path_point.v[1] = 0.0;
-        CalcReturnToStartPointRoute(pOpponent_spec);
-        ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
-        break;
-    default:
-        break;
+
+    case ePOC_die:
+        return;
     }
 }
 
