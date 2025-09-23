@@ -638,7 +638,7 @@ void MakeSavedGame(tSave_game** pSave_record) {
     for (i = 0; i < gNumber_of_races; i++) {
         (*pSave_record)->race_info[i].been_there_done_that = gRace_list[i].been_there_done_that;
     }
-    for (i = 0; i < gNumber_of_racers; i++) {
+    for (i = 0; i < gNumber_of_racers && i < 48; i++) { // Tracking more than 48 vehicles corrupts save files. This only matters in modded games that add more stealable vehicles
         (*pSave_record)->opponent_info[i].dead = gOpponents[i].dead;
     }
     (*pSave_record)->credits = gProgram_state.credits;
