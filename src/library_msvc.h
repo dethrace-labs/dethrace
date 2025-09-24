@@ -224,3 +224,6 @@
 
 // GLOBAL: CARM95 0x0052D190
 // _pctype
+
+// GLOBAL: CARM95 0x004EAB82
+// __CIpow
