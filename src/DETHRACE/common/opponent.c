@@ -1439,7 +1439,6 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
         break;
 
     case ePOC_run:
-
         if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec) && pOpponent_spec->distance_from_home > 75.0f) {
             dr_dprintf("%s: Completing get_near objective because I'm out of my precinct", pOpponent_spec->car_spec->driver_name);
             NewObjective(pOpponent_spec, eOOT_return_to_start);
@@ -1511,12 +1510,13 @@ int HeadOnWithPlayerPossible(tOpponent_spec* pOpponent_spec) {
         - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2];
 
     BrVector3Normalise(&oppo_to_player_norm, &oppo_to_player_norm);
-    if (gHead_on_cos_value >= BrVector3Dot(&pOpponent_spec->car_spec->direction, &pOpponent_spec->car_spec->direction)
-        || -gHead_on_cos_value <= BrVector3Dot(&pOpponent_spec->car_spec->direction, &pOpponent_spec->car_spec->direction)) {
-        return 0;
+    if (gHead_on_cos_value < BrVector3Dot(&pOpponent_spec->car_spec->direction, &oppo_to_player_norm)
+        && -gHead_on_cos_value > BrVector3Dot(&gProgram_state.current_car.direction, &oppo_to_player_norm)) {
+
+        dr_dprintf("HOORAY! Head-on imminent");
+        return 1;
     }
-    dr_dprintf("HOORAY! Head-on imminent");
-    return 1;
+    return 0;
 }
 
 // IDA: int __usercall AlreadyPursuingCar@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tCar_spec *pPursuee@<EDX>)
