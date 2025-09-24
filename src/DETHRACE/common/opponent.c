@@ -1427,21 +1427,26 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     int res;
     char str[256];
 
-    if (pCommand == ePOC_start) {
+    initial_pos = &gProgram_state.initial_position;
+    car_actor = pOpponent_spec->car_spec->car_master_actor;
+
+    switch (pCommand) {
+    case ePOC_start:
         dr_dprintf("%s: ProcessGetNearPlayer() - new objective started", pOpponent_spec->car_spec->driver_name);
         ClearOpponentsProjectedRoute(pOpponent_spec);
         CalcGetNearPlayerRoute(pOpponent_spec, &gProgram_state.current_car);
         ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
-        return;
-    }
-    if (pCommand == ePOC_run) {
-        if ((pOpponent_spec->car_spec->car_ID & 0xff00) == 768 && pOpponent_spec->distance_from_home > 75.0) {
+        break;
+
+    case ePOC_run:
+
+        if ((pOpponent_spec->car_spec->car_ID & 0xffffff00) == (0x300 & 0xff00) && pOpponent_spec->distance_from_home > 75.0f) {
             dr_dprintf("%s: Completing get_near objective because I'm out of my precinct", pOpponent_spec->car_spec->driver_name);
             NewObjective(pOpponent_spec, eOOT_return_to_start);
             return;
         }
         if (pOpponent_spec->follow_path_data.section_no > 20000) {
-            if (pOpponent_spec->player_to_oppo_d < 10.0 || pOpponent_spec->follow_path_data.section_no == pOpponent_spec->players_section_when_last_calced_full_path) {
+            if (pOpponent_spec->player_to_oppo_d < 10.0f || pOpponent_spec->follow_path_data.section_no == pOpponent_spec->players_section_when_last_calced_full_path) {
                 dr_dprintf("%s: ProcessGetNearPlayer() - giving up 'cos got to player's section", pOpponent_spec->car_spec->driver_name);
                 ObjectiveComplete(pOpponent_spec);
                 return;
@@ -1455,14 +1460,20 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
         res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
         sprintf(str, "Get near: %d", GetOpponentsRealSection(pOpponent_spec, pOpponent_spec->follow_path_data.section_no));
 
-        if (res == eFPR_given_up) {
-            NewObjective(pOpponent_spec, eOOT_pursue_and_twat, &gProgram_state.current_car);
-        } else if (res == eFPR_end_of_path) {
-            dr_dprintf("%s: Restarting get_near_player route because ran out of path!", pOpponent_spec->car_spec->driver_name);
+        if (res == eFPR_given_up || res == eFPR_end_of_path) {
+            if (res == eFPR_given_up) {
+                NewObjective(pOpponent_spec, eOOT_pursue_and_twat, &gProgram_state.current_car);
+                return;
+            } else {
+                dr_dprintf("%s: Restarting get_near_player route because ran out of path!", pOpponent_spec->car_spec->driver_name);
+            }
             ClearOpponentsProjectedRoute(pOpponent_spec);
             CalcGetNearPlayerRoute(pOpponent_spec, &gProgram_state.current_car);
             ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
         }
+
+    default:
+        break;
     }
 }
 
