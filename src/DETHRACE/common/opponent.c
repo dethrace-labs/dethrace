@@ -1441,7 +1441,7 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
 
     case ePOC_run:
 
-        if ((pOpponent_spec->car_spec->car_ID & 0xffffff00) == (0x300 & 0xff00) && pOpponent_spec->distance_from_home > 75.0f) {
+        if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec) && pOpponent_spec->distance_from_home > 75.0f) {
             dr_dprintf("%s: Completing get_near objective because I'm out of my precinct", pOpponent_spec->car_spec->driver_name);
             NewObjective(pOpponent_spec, eOOT_return_to_start);
             return;
