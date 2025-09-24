@@ -1372,41 +1372,50 @@ void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command 
     float terminal_time;
     float y;
 
-    if (pCommand == ePOC_start) {
+    switch (pCommand) {
+    case ePOC_start:
         dr_dprintf("%s: ProcessLevitate() - new objective started", pOpponent_spec->car_spec->driver_name);
         pOpponent_spec->levitate_data.waiting_to_levitate = 1;
         pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
         pOpponent_spec->car_spec->acc_force = 0.f;
         pOpponent_spec->levitate_data.time_started = gTime_stamp_for_this_munging;
-    } else if (pCommand == ePOC_run) {
+        break;
+
+    case ePOC_run:
         if (pOpponent_spec->levitate_data.waiting_to_levitate) {
             if ((BrVector3Length(&pOpponent_spec->car_spec->v) < .01f && BrVector3Length(&pOpponent_spec->car_spec->omega) < 1.f) || gTime_stamp_for_this_munging - pOpponent_spec->levitate_data.time_started > 4000) {
                 pOpponent_spec->levitate_data.waiting_to_levitate = 0;
                 pOpponent_spec->levitate_data.time_started = gTime_stamp_for_this_munging;
                 pOpponent_spec->levitate_data.initial_y = pOpponent_spec->car_spec->car_master_actor->t.t.translate.t.v[1];
                 if (pOpponent_spec->car_spec->has_been_stolen) {
-                    NewTextHeadupSlot(eHeadupSlot_misc, 250, 2500, -4, GetMiscString(kMiscString_CarAddedToChangeCarList));
+                    NewTextHeadupSlot(eHeadupSlot_misc, 250, 5000, -4, GetMiscString(kMiscString_CarAddedToChangeCarList));
                 }
             } else {
                 pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
                 pOpponent_spec->car_spec->acc_force = 0.f;
                 BrVector3InvScale(&pOpponent_spec->car_spec->omega, &pOpponent_spec->car_spec->omega,
-                    pow(gFrame_period_for_this_munging / 1000.f, 2.f));
+                    pow(2.f, gFrame_period_for_this_munging / 1000.0));
             }
         }
         if (!pOpponent_spec->levitate_data.waiting_to_levitate) {
             TurnOpponentPhysicsOff(pOpponent_spec);
-            t = (gTime_stamp_for_this_munging - pOpponent_spec->levitate_data.time_started) / 1000.f;
-            if (t < 20.f) {
-                y = .5f * t * t / 2.f;
+            t = (gTime_stamp_for_this_munging - pOpponent_spec->levitate_data.time_started) / 1000.0;
+            terminal_time = 20.f;
+            if (t < terminal_time) {
+                y = t * t * .5f / 2.f;
             } else {
-                y = 10.f * (t - 20.f) + 100.f;
+                y = terminal_time * terminal_time * 0.5 / 2.0 + (t - terminal_time) * 10.0;
             }
             pOpponent_spec->car_spec->car_master_actor->t.t.translate.t.v[1] = pOpponent_spec->levitate_data.initial_y + y;
             if (y > 200.f) {
                 pOpponent_spec->finished_for_this_race = 1;
             }
         }
+        break;
+    case ePOC_die:
+        return;
+    default:
+        break;
     }
 }
 
