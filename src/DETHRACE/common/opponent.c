@@ -1550,11 +1550,11 @@ void ObjectiveComplete(tOpponent_spec* pOpponent_spec) {
     case eOOT_complete_race:
         gNum_of_opponents_completing_race--;
         break;
-    case eOOT_pursue_and_twat:
-        gNum_of_opponents_pursuing--;
-        break;
     case eOOT_get_near_player:
         gNum_of_opponents_getting_near--;
+        break;
+    case eOOT_pursue_and_twat:
+        gNum_of_opponents_pursuing--;
         break;
     default:
         break;
