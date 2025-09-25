@@ -237,7 +237,7 @@ endif()
 if(DETHRACE_INSTALL)
     install(TARGETS dethrace
         BUNDLE DESTINATION . COMPONENT Runtime
-        RUNTIME DESTINATION . COMPONENT Runtime
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT Runtime
     )
 
     if(APPLE)
