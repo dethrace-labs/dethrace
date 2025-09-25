@@ -1846,32 +1846,39 @@ void RebuildActiveCarList(void) {
         gActive_car_list_rebuild_required = 0;
         gNum_active_cars = 0;
 
-        if (!gProgram_state.current_car.disabled || gAction_replay_mode) {
-            gActive_car_list[gNum_active_cars] = &gProgram_state.current_car;
-            gNum_active_cars++;
-            gProgram_state.current_car.active = 1;
+        for (i = 0; i < 1; i++) {
+            if (i > 0) {
+                PDFatalError("mGet_car_count( eVehicle_self ) > 1 - I didn't know this could happen!");
+            }
+
+            car_spec = &gProgram_state.current_car;
+            if (!car_spec->disabled || gAction_replay_mode) {
+                gActive_car_list[gNum_active_cars] = car_spec;
+                gNum_active_cars++;
+                car_spec->active = 1;
+            }
         }
 
         if (gNet_mode == eNet_mode_host) {
             for (i = 0; i < GetCarCount(eVehicle_net_player); i++) {
                 car_spec = GetCarSpec(eVehicle_net_player, i);
-                if (car_spec->disabled) {
-                    car_spec->active = 0;
-                } else {
+                if (!car_spec->disabled) {
                     gActive_car_list[gNum_active_cars] = car_spec;
                     gNum_active_cars++;
                     car_spec->active = 1;
+                } else {
+                    car_spec->active = 0;
                 }
             }
         } else if (gNet_mode == eNet_mode_client) {
             for (i = 0; i < GetCarCount(eVehicle_net_player); i++) {
                 car_spec = GetCarSpec(eVehicle_net_player, i);
-                if (car_spec->disabled || !IsNetCarActive(&car_spec->car_master_actor->t.t.translate.t)) {
-                    car_spec->active = 0;
-                } else {
+                if (!car_spec->disabled && IsNetCarActive(&car_spec->car_master_actor->t.t.translate.t)) {
                     gActive_car_list[gNum_active_cars] = car_spec;
                     gNum_active_cars++;
                     car_spec->active = 1;
+                } else {
+                    car_spec->active = 0;
                 }
             }
         }
@@ -1885,12 +1892,13 @@ void RebuildActiveCarList(void) {
                 car_spec->active = 0;
             }
         }
-        for (i = 0; gNumber_of_cops_before_faffage > i; ++i) {
+        for (i = 0; i < gNumber_of_cops_before_faffage; i++) {
             car_spec = GetCarSpec(eVehicle_rozzer, i);
             if (gProgram_state.AI_vehicles.cops[i].physics_me || gAction_replay_mode) {
                 gActive_car_list[gNum_active_cars] = car_spec;
                 gNum_active_cars++;
                 car_spec->active = 1;
+            } else {
             }
         }
     }
