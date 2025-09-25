@@ -1795,13 +1795,16 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
 void ProcessThisOpponent(tOpponent_spec* pOpponent_spec) {
     int i;
 
-    if ((gMap_mode && gShow_opponents) || pOpponent_spec->last_in_view + 3000 >= gTime_stamp_for_this_munging) {
+    if ((!gMap_mode || !gShow_opponents) && (pOpponent_spec->last_in_view + 3000 < gTime_stamp_for_this_munging)) {
+        if (pOpponent_spec->cheating == 0) {
+            StartToCheat(pOpponent_spec);
+        }
+    } else {
         if (pOpponent_spec->cheating) {
             OiStopCheating(pOpponent_spec);
         }
-    } else if (pOpponent_spec->cheating == 0) {
-        StartToCheat(pOpponent_spec);
     }
+
     ChooseNewObjective(pOpponent_spec, pOpponent_spec->new_objective_required);
     pOpponent_spec->new_objective_required = 0;
     if (gCountdown || gRace_finished) {
