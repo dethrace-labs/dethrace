@@ -1948,17 +1948,18 @@ int TeleportCopToStart(tOpponent_spec* pOpponent_spec) {
         return 0;
     }
     BrVector3Sub(&wank, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
-    if (BrVector3Length(&wank) <= gIn_view_distance) {
-        return 0;
+    if (BrVector3Length(&wank) > gIn_view_distance) {
+        BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
+        PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &pOpponent_spec->start_direction);
+        pOpponent_spec->physics_me = 0;
+        RematerialiseOpponent(pOpponent_spec, 0.0);
+        TurnOpponentPhysicsOff(pOpponent_spec);
+        RebuildActiveCarList();
+        NewObjective(pOpponent_spec, eOOT_wait_for_some_hapless_sod);
+        return 1;
     }
-    pOpponent_spec->car_spec->car_master_actor->t.t.euler.t = pOpponent_spec->start_pos;
-    PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &pOpponent_spec->start_direction);
-    pOpponent_spec->physics_me = 0;
-    RematerialiseOpponent(pOpponent_spec, 0.0);
-    TurnOpponentPhysicsOff(pOpponent_spec);
-    RebuildActiveCarList();
-    NewObjective(pOpponent_spec, eOOT_wait_for_some_hapless_sod);
-    return 1;
+
+    return 0;
 }
 
 // IDA: void __usercall CalcDistanceFromHome(tOpponent_spec *pOpponent_spec@<EAX>)
