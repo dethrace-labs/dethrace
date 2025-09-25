@@ -1919,7 +1919,7 @@ void StartToCheat(tOpponent_spec* pOpponent_spec) {
 
     dr_dprintf("%s: StartToCheat() - Starting to cheat", pOpponent_spec->car_spec->driver_name);
     pOpponent_spec->cheating = 1;
-    if ((pOpponent_spec->car_spec->car_ID & 0xff00) == 0x300) {
+    if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
         dr_dprintf("%s: StartToCheat() - Turning physics OFF", pOpponent_spec->car_spec->driver_name);
         TurnOpponentPhysicsOff(pOpponent_spec);
         RebuildActiveCarList();
