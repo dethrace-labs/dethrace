@@ -1933,7 +1933,7 @@ void OiStopCheating(tOpponent_spec* pOpponent_spec) {
 
     dr_dprintf("%s: OiStopCheating() - End of cheating sesh", pOpponent_spec->car_spec->driver_name);
     pOpponent_spec->cheating = 0;
-    if ((pOpponent_spec->car_spec->car_ID & 0xff00) == 0x300) {
+    if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
         dr_dprintf("%s: OiStopCheating() - Turning physics ON", pOpponent_spec->car_spec->driver_name);
         TurnOpponentPhysicsOn(pOpponent_spec);
         RebuildActiveCarList();
