@@ -2130,104 +2130,109 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
     this_total = 0;
     mat = &pOpponent_spec->car_spec->car_master_actor->t.t.mat;
     massage_count = 0;
-    phi = BrDegreeToAngle(90) - BrRadianToAngle(atan2(mat->m[2][2], mat->m[2][0]));
+    theta = -BrRadianToAngle(atan2(mat->m[2][2], mat->m[2][0])) + BR_ANGLE_DEG(90);
     if (pOpponent_spec->physics_me) {
         dr_dprintf("%s: Actually, we're already materialised", pOpponent_spec->car_spec->driver_name);
-    } else {
-        total++;
-        BrMatrix34Copy(&original_mat, mat);
-        TurnOpponentPhysicsOn(pOpponent_spec);
-        RebuildActiveCarList();
-        while (1) {
-            count++;
-            BrVector3Scale((br_vector3*)mat->m[3], (br_vector3*)mat->m[3], WORLD_SCALE);
-            BrVector3Copy(&b, (br_vector3*)mat->m[3]);
-            BrMatrix34RotateY(mat, phi);
-            BrVector3Copy((br_vector3*)mat->m[3], &b);
-            BrVector3SetFloat(&b, 0.f, -100.f, 0.f);
-            BrVector3Copy(&a, (br_vector3*)mat->m[3]);
-            a.v[1] += 1.f;
-            findfloor(&a, &b, &norm, &dist);
-            a.v[1] += 100.f;
-            findfloor(&a, &b, &norm2, &dist2);
-            if (dist2 <= 1.f) {
-                BrVector3SetFloat(&b, 0.f, -5.01f, 0.f);
-                a.v[1] -= 100.f;
-                for (i = 0; i < 20; i++) {
-                    a.v[1] += 5.f;
-                    findfloor(&a, &b, &norm2, &dist2);
-                    if (dist2 <= 1.f) {
-                        break;
-                    }
-                }
-                dist2 = (i + 1) * 0.05f - dist2 / 20.f;
-            }
-            if (dist2 < dist) {
-                dist = -dist2;
-                BrVector3Copy(&norm, &norm2);
-            }
-            if (fabs(dist) <= 1.f) {
-                mat->m[3][1] -= dist * 100.f - 2.f;
-                BrMatrix34PreRotateX(mat, BrRadianToAngle(asin(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
-                BrMatrix34PreRotateZ(mat, BrRadianToAngle(asin(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
-            }
-            BrVector3Negate(&pOpponent_spec->car_spec->direction, (br_vector3*)mat->m[2]);
-            BrMatrix34ApplyP(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->cmpos, mat);
-            BrVector3InvScale(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->pos, WORLD_SCALE);
-            BrVector3InvScale((br_vector3*)mat->m[3], (br_vector3*)mat->m[3], WORLD_SCALE);
-            BrVector3Copy(&pOpponent_spec->car_spec->v, (br_vector3*)pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2]);
-            BrVector3Negate(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v);
-            BrVector3Normalise(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v);
-            BrVector3Scale(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v, pSpeed * WORLD_SCALE);
-            BrVector3Set(&pOpponent_spec->car_spec->omega, 0.f, 0.f, 0.f);
-            BrMatrix34Copy(&pOpponent_spec->car_spec->oldmat, mat);
-            BrMatrix34Copy(&pOpponent_spec->car_spec->old_frame_mat, mat);
-            BrVector3Scale((br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], (br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], WORLD_SCALE);
-            for (i = 0; i < COUNT_OF(pOpponent_spec->car_spec->oldd); i++) {
-                pOpponent_spec->car_spec->oldd[i] = pOpponent_spec->car_spec->ride_height;
-            }
-            pOpponent_spec->car_spec->gear = 0;
-            pOpponent_spec->car_spec->revs = 0.f;
-            pOpponent_spec->car_spec->traction_control = 1;
-            BrMatrix34ApplyP(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->cmpos, mat);
-            BrVector3InvScale(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->pos, WORLD_SCALE);
-            BrVector3Negate(&pOpponent_spec->car_spec->direction, (br_vector3*)pOpponent_spec->car_spec->oldmat.m[3]);
-            pOpponent_spec->car_spec->box_face_ref = gFace_num__car - 2;
-            pOpponent_spec->car_spec->doing_nothing_flag = 0;
-            sensible_place = TestForCarInSensiblePlace(pOpponent_spec->car_spec);
-            if (sensible_place) {
-                break;
-            } else {
-                BrMatrix34Copy(mat, &original_mat);
-            }
-            if (!MassageOpponentPosition(pOpponent_spec, massage_count++)) {
-                break;
-            }
-            this_total++;
-        }
-        count--;
-        if (sensible_place) {
-            dr_dprintf("%s: Rematerialised (took %d attempts, orig. pos. (%7.3f,%7.3f,%7.3f), actual pos. (%7.3f,%7.3f,%7.3f))",
-                pOpponent_spec->car_spec->driver_name,
-                this_total + 1,
-                original_mat.m[3][0], original_mat.m[3][1], original_mat.m[3][2],
-                mat->m[3][0], mat->m[3][1], mat->m[3][2]);
-        }
-        if (this_total > highest) {
-            highest = this_total;
-        }
-        if (count != 0) {
-            dr_dprintf("MassageOpponentPosition() called an avg of %.1f times (max %d) per ReMaterialisation",
-                count / total, highest);
-        }
-        if (sensible_place) {
-            ResetCarSpecialVolume((tCollision_info*)pOpponent_spec->car_spec);
-        } else {
-            TurnOpponentPhysicsOff(pOpponent_spec);
-            RebuildActiveCarList();
-            TeleportOpponentToNearestSafeLocation(pOpponent_spec);
-        }
+        return 1;
     }
+    total++;
+    BrMatrix34Copy(&original_mat, mat);
+    TurnOpponentPhysicsOn(pOpponent_spec);
+    RebuildActiveCarList();
+    do {
+        count++;
+        this_total++;
+        BrVector3Scale((br_vector3*)mat->m[3], (br_vector3*)mat->m[3], WORLD_SCALE_D);
+        BrVector3Copy(&b, (br_vector3*)mat->m[3]);
+        BrMatrix34RotateY(mat, theta);
+        BrVector3Copy((br_vector3*)mat->m[3], &b);
+        BrVector3SetFloat(&b, 0.f, -100.f, 0.f);
+        BrVector3Copy(&a, (br_vector3*)mat->m[3]);
+        a.v[1] += 1.f;
+        findfloor(&a, &b, &norm, &dist);
+        a.v[1] += 100.f;
+        findfloor(&a, &b, &norm2, &dist2);
+        if (dist2 <= 1.f) {
+            BrVector3SetFloat(&b, 0.f, -5.01f, 0.f);
+            a.v[1] -= 100.f;
+            for (i = 0; i < 20; i++) {
+                a.v[1] += 5.f;
+                findfloor(&a, &b, &norm2, &dist2);
+                if (dist2 <= 1.f) {
+                    break;
+                }
+            }
+            dist2 = (i + 1) * 0.05f + -dist2 / 20.f;
+        }
+        if (dist2 < dist) {
+            dist = -dist2;
+            BrVector3Copy(&norm, &norm2);
+        }
+        if (BR_ABS(dist) <= 1.f) {
+            mat->m[3][1] -= dist * 100.f - 2.f;
+            ts = BrVector3Dot((br_vector3*)mat->m[2], &norm);
+            phi = BrRadianToAngle(asin(ts));
+            BrMatrix34PreRotateX(mat, phi);
+            ts = BrVector3Dot((br_vector3*)mat->m[0], &norm);
+            phi = -BrRadianToAngle(asin(ts));
+            BrMatrix34PreRotateZ(mat, phi);
+        }
+        BrVector3Negate(&pOpponent_spec->car_spec->direction, (br_vector3*)mat->m[2]);
+        BrMatrix34ApplyP(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->cmpos, mat);
+        BrVector3InvScale(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->pos, WORLD_SCALE);
+        BrVector3InvScale((br_vector3*)mat->m[3], (br_vector3*)mat->m[3], WORLD_SCALE_D);
+        BrVector3Copy(&pOpponent_spec->car_spec->v, (br_vector3*)pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2]);
+        BrVector3Negate(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v);
+        BrVector3Normalise(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v);
+        BrVector3Scale(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v, pSpeed * WORLD_SCALE_D);
+        BrVector3Set(&pOpponent_spec->car_spec->omega, 0.f, 0.f, 0.f);
+        pOpponent_spec->car_spec->curvature = 0.0;
+        BrMatrix34Copy(&pOpponent_spec->car_spec->oldmat, mat);
+        BrMatrix34Copy(&pOpponent_spec->car_spec->old_frame_mat, mat);
+        BrVector3Scale((br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], (br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], WORLD_SCALE);
+        for (j = 0; j < COUNT_OF(pOpponent_spec->car_spec->oldd); j++) {
+            pOpponent_spec->car_spec->oldd[j] = pOpponent_spec->car_spec->ride_height;
+        }
+        pOpponent_spec->car_spec->gear = 0;
+        pOpponent_spec->car_spec->revs = 0.f;
+        pOpponent_spec->car_spec->traction_control = 1;
+        BrMatrix34ApplyP(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->cmpos, mat);
+        BrVector3InvScale(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->pos, WORLD_SCALE);
+        BrVector3Negate(&pOpponent_spec->car_spec->direction, (br_vector3*)pOpponent_spec->car_spec->oldmat.m[3]);
+        pOpponent_spec->car_spec->box_face_ref = gFace_num__car - 2;
+        pOpponent_spec->car_spec->doing_nothing_flag = 0;
+        sensible_place = TestForCarInSensiblePlace(pOpponent_spec->car_spec);
+        if (!sensible_place) {
+            BrMatrix34Copy(mat, &original_mat);
+        }
+        // if (sensible_place) {
+        //     break;
+        // }
+    } while (!sensible_place && MassageOpponentPosition(pOpponent_spec, massage_count++));
+
+    count--;
+    this_total--;
+    if (sensible_place) {
+        dr_dprintf("%s: Rematerialised (took %d attempts, orig. pos. (%7.3f,%7.3f,%7.3f), actual pos. (%7.3f,%7.3f,%7.3f))",
+            pOpponent_spec->car_spec->driver_name,
+            this_total + 1,
+            original_mat.m[3][0], original_mat.m[3][1], original_mat.m[3][2],
+            mat->m[3][0], mat->m[3][1], mat->m[3][2]);
+    }
+    if (this_total > highest) {
+        highest = this_total;
+    }
+    if (count != 0) {
+        dr_dprintf("MassageOpponentPosition() called an avg of %.1f times (max %d) per ReMaterialisation",
+            count / (float)total, highest);
+    }
+    if (!sensible_place) {
+        TurnOpponentPhysicsOff(pOpponent_spec);
+        RebuildActiveCarList();
+        TeleportOpponentToNearestSafeLocation(pOpponent_spec);
+        return 1;
+    }
+    ResetCarSpecialVolume((tCollision_info*)pOpponent_spec->car_spec);
     return 1;
 }
 
