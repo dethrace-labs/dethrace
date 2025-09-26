@@ -2031,36 +2031,38 @@ int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar
     }
     start = GetOpponentsSectionStartNodePoint(pOpponent_spec, pSection_no);
     finish = GetOpponentsSectionFinishNodePoint(pOpponent_spec, pSection_no);
-    BrVector3Sub(&section_v, finish, start);
-    if (BrVector3Length(&section_v) != 0.f) {
-        BrVector3Sub(&a, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, start);
-        t = BrVector3Dot(&section_v, &a) / BrVector3Dot(&section_v, &section_v);
+    BrVector3Sub(&a, finish, start);
+    length = BrVector3Length(&a);
+    if (length != 0.f) {
+        BrVector3Sub(&p, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, start);
+        t = BrVector3Dot(&a, &p) / BrVector3LengthSquared(&a);
         if (t < 0.f) {
-            BrVector3Copy(&p, start);
+            BrVector3Copy(&intersect, start);
         } else if (t > 1.f) {
-            BrVector3Copy(&p, finish);
+            BrVector3Copy(&intersect, finish);
         } else {
-            p.v[0] = start->v[0] + t * section_v.v[0];
-            p.v[1] = start->v[1] + t * section_v.v[1];
-            p.v[2] = start->v[2] + t * section_v.v[2];
+            BrVector3Scale(&intersect, &a, t);
+            BrVector3Add(&intersect, &intersect, start);
         }
-        BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &p);
-        BrVector3Sub(&a, finish, start);
-        PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &a);
+        BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &intersect);
+        BrVector3Sub(&section_v, finish, start);
+        PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &section_v);
     }
-    if (!RematerialiseOpponent(pOpponent_spec, pSpeed)) {
+    if (RematerialiseOpponent(pOpponent_spec, pSpeed)) {
+        BrVector3Sub(&car_to_end, finish, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
+        distance_to_end = BrVector3Length(&car_to_end);
+        pOpponent_spec->car_spec->brake_force = 0.f;
+        pOpponent_spec->car_spec->acc_force = 0.f;
+        if (distance_to_end < 5.f) {
+            pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
+        } else {
+            pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M / 2.f;
+        }
+        pOpponent_spec->last_in_view = gTime_stamp_for_this_munging;
+        return 1;
+    } else {
         return 0;
     }
-    BrVector3Sub(&car_to_end, finish, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
-    pOpponent_spec->car_spec->brake_force = 0.f;
-    pOpponent_spec->car_spec->acc_force = 0.f;
-    if (BrVector3Length(&car_to_end) >= 5.f) {
-        pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M / 2.f;
-    } else {
-        pOpponent_spec->car_spec->acc_force = 15.f * pOpponent_spec->car_spec->M;
-    }
-    pOpponent_spec->last_in_view = gTime_stamp_for_this_munging;
-    return 1;
 }
 
 // IDA: int __usercall RematerialiseOpponentOnNearestSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed)
