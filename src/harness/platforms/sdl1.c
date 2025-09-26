@@ -49,12 +49,11 @@ static const char* const possible_locations[] = {
     "libSDL-1.2.so",
 };
 #endif
-#endif
 
-#ifdef DETHRACE_SDL_DYNAMIC
 static void* sdl1_so;
 #endif
 
+#define SDL_NAME "SDL1"
 #define OBJECT_NAME sdl1_so
 #define SYMBOL_PREFIX SDL1_
 #define FOREACH_SDLX_SYM FOREACH_SDL1_SYM
