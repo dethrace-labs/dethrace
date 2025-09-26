@@ -1980,32 +1980,34 @@ int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) 
     br_vector3 positive_y_vector;
     br_vector3 direction_v;
 
-    BrVector3Set(&positive_y_vector, 0.f, 1.f, 0.f);
     mat = &pOpponent_spec->car_spec->car_master_actor->t.t.mat;
     car_trans = &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t;
     if (pMassage_count > 22) {
         return 0;
-    } else if (pMassage_count > 20) {
+    }
+
+    if (pMassage_count > 20) {
         car_trans->v[1] += (pMassage_count - 20) * 2.0f;
-        return 1;
     } else {
-        direction_v.v[0] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][0];
-        direction_v.v[1] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][1];
-        direction_v.v[2] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][2];
-        if (pMassage_count % 4 >= 2) {
+        direction_v.v[0] = -mat->m[2][0];
+        direction_v.v[1] = -mat->m[2][1];
+        direction_v.v[2] = -mat->m[2][2];
+        if (pMassage_count % 4 < 2) {
+            BrVector3Normalise(&displacement, &direction_v);
+            BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.5f);
+        } else {
+            BrVector3Set(&positive_y_vector, 0.f, 1.f, 0.f);
             BrVector3Cross(&displacement, &positive_y_vector, &direction_v);
             BrVector3Normalise(&displacement, &displacement);
             BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.1f);
-        } else {
-            BrVector3Normalise(&displacement, &direction_v);
-            BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.5f);
         }
         if (pMassage_count % 2) {
             BrVector3Negate(&displacement, &displacement);
         }
         BrVector3Accumulate(car_trans, &displacement);
-        return 1;
     }
+
+    return 1;
 }
 
 // IDA: int __usercall RematerialiseOpponentOnThisSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed, tS16 pSection_no)
