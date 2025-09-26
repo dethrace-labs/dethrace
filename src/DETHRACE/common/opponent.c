@@ -2082,6 +2082,7 @@ int RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_sca
         return 1;
     }
     section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
+    start = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p;
     finish = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p;
     BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &intersect);
     PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &direction_v);
@@ -2089,12 +2090,12 @@ int RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_sca
     if (RematerialiseOpponent(pOpponent_spec, pSpeed)) {
         pOpponent_spec->car_spec->brake_force = 0.0f;
         pOpponent_spec->car_spec->acc_force = 0.0f;
-
         distance_to_end = BrVector3Length(&car_to_end);
-        if (distance_to_end >= 5.0f) {
-            pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M / 2.0f;
-        } else {
+
+        if (distance_to_end < 5.0f) {
             pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
+        } else {
+            pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M / 2.0f;
         }
     }
     return 0;
