@@ -2204,9 +2204,6 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
         if (!sensible_place) {
             BrMatrix34Copy(mat, &original_mat);
         }
-        // if (sensible_place) {
-        //     break;
-        // }
     } while (!sensible_place && MassageOpponentPosition(pOpponent_spec, massage_count++));
 
     count--;
@@ -2289,16 +2286,18 @@ void ChallengeOccurred(int pChallenger_index, int pAccepted) {
 void LoadCopCars(void) {
     int i;
 
-    for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
-        PossibleService();
-        gProgram_state.AI_vehicles.cops[i].car_spec = BrMemAllocate(sizeof(tCar_spec), kMem_cop_car_spec);
-        LoadCar(
-            gBIG_APC_index == i ? "BIGAPC.TXT" : "APC.TXT",
-            eDriver_oppo,
-            gProgram_state.AI_vehicles.cops[i].car_spec,
-            (gBIG_APC_index == i) ? 4 : 3,
-            "The Cops",
-            &gTheir_cars_storage_space);
+    if (gProgram_state.AI_vehicles.number_of_cops != 0) {
+        for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
+            PossibleService();
+            gProgram_state.AI_vehicles.cops[i].car_spec = BrMemAllocate(sizeof(tCar_spec), kMem_cop_car_spec);
+            LoadCar(
+                gBIG_APC_index == i ? "BIGAPC.TXT" : "APC.TXT",
+                eDriver_oppo,
+                gProgram_state.AI_vehicles.cops[i].car_spec,
+                (gBIG_APC_index == i) ? 4 : 3,
+                "The Cops",
+                &gTheir_cars_storage_space);
+        }
     }
 }
 
