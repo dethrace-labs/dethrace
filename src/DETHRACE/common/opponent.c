@@ -215,9 +215,10 @@ void PointActorAlongThisBloodyVector(br_actor* pThe_actor, br_vector3* pThe_vect
     br_transform trans;
 
     trans.type = BR_TRANSFORM_LOOK_UP;
+    BrVector3Copy(&trans.t.look_up.t, &pThe_actor->t.t.translate.t);
     BrVector3Copy(&trans.t.look_up.look, pThe_vector);
     BrVector3Set(&trans.t.look_up.up, 0.f, 1.f, 0.f);
-    BrVector3Copy(&trans.t.look_up.t, &pThe_actor->t.t.translate.t);
+
     BrTransformToTransform(&pThe_actor->t, &trans);
 }
 
@@ -242,7 +243,6 @@ void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_
         ProcessLevitate(pOpponent_spec, pCommand);
         break;
     case eOOT_knackered_and_freewheeling:
-        // FIXME: is keys correct?
         memset(&pOpponent_spec->car_spec->keys, 0, sizeof(pOpponent_spec->car_spec->keys));
         pOpponent_spec->car_spec->acc_force = 0.f;
         pOpponent_spec->car_spec->brake_force = 0.f;
@@ -253,8 +253,6 @@ void ProcessCurrentObjective(tOpponent_spec* pOpponent_spec, tProcess_objective_
         break;
     case eOOT_wait_for_some_hapless_sod:
         ProcessWaitForSomeHaplessSod(pOpponent_spec, pCommand);
-        break;
-    case eOOT_rematerialise:
         break;
     case eOOT_return_to_start:
         ProcessReturnToStart(pOpponent_spec, pCommand);
@@ -342,9 +340,11 @@ tS16 FindNearestPathNode(br_vector3* pActor_coords, br_scalar* pDistance) {
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_path_nodes; i++) {
         BrVector3Sub(&actor_to_node, &gProgram_state.AI_vehicles.path_nodes[i].p, pActor_coords);
         distance = BrVector3Length(&actor_to_node);
-        if (distance < *pDistance && (!gAlready_elasticating || gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1] != i)) {
-            *pDistance = distance;
-            nearest_node = i;
+        if (distance < *pDistance) {
+            if (!gAlready_elasticating || gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1] != i) {
+                *pDistance = distance;
+                nearest_node = i;
+            }
         }
     }
     return nearest_node;
@@ -380,10 +380,10 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
     br_vector3 zero_vector;
 #endif
 
-    nearest_section = -1;
     nearest_node_section_no = -1;
-    closest_distance_squared = BR_SCALAR_MAX;
+    nearest_section = -1;
     nearest_node_distance_squared = BR_SCALAR_MAX;
+    closest_distance_squared = BR_SCALAR_MAX;
 #if defined(DETHRACE_FIX_BUGS)
     BrVector3Set(&zero_vector, 0.f, 0.f, 0.f);
     nearest_node_v = &zero_vector;
@@ -406,57 +406,57 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
         if (!gAlready_elasticating || gMobile_section != section_no) {
             BrVector3Sub(&a, finish, start);
             BrVector3Sub(&p, pActor_coords, start);
-            the_distance_squared = Vector3DistanceSquared(&p, &a);
-            if (the_distance_squared < closest_distance_squared) {
-                closest_distance_squared = the_distance_squared;
-                nearest_section = section_no;
+            BrVector3Sub(&wank, &p, &a);
+            the_distance_squared = BrVector3LengthSquared(&wank);
+            if (the_distance_squared < nearest_node_distance_squared) {
+                nearest_node_distance_squared = the_distance_squared;
+                nearest_node_section_no = section_no;
                 nearest_node_v = finish;
             }
             the_distance_squared = BrVector3LengthSquared(&p);
-            if (the_distance_squared < closest_distance_squared) {
-                closest_distance_squared = the_distance_squared;
-                nearest_section = section_no;
+            if (the_distance_squared < nearest_node_distance_squared) {
+                nearest_node_distance_squared = the_distance_squared;
+                nearest_node_section_no = section_no;
                 nearest_node_v = start;
             }
             length_squared_a = BrVector3LengthSquared(&a);
-            if (length_squared_a >= 0.0001f) {
-                t = BrVector3Dot(&p, &a) / length_squared_a;
-                if (t >= 0 && t <= 1.f) {
-                    p.v[0] -= t * a.v[0];
-                    p.v[1] -= t * a.v[1];
-                    p.v[2] -= t * a.v[2];
-                    the_distance_squared = BrVector3LengthSquared(&p);
-                    if (the_distance_squared < nearest_node_distance_squared) {
-                        BrVector3Scale(&intersect, &a, t);
-                        BrVector3Add(pIntersect, start, &intersect);
-                        BrVector3NormaliseQuick(pPath_direction, &a);
-                        nearest_node_distance_squared = the_distance_squared;
-                        nearest_node_section_no = section_no;
-                    }
+            if (length_squared_a < 0.0001f) {
+                continue;
+            }
+            t = BrVector3Dot(&p, &a) / length_squared_a;
+            if (t >= 0 && t <= 1.f) {
+                BrVector3Scale(&intersect, &a, t);
+                BrVector3Sub(&wank, &p, &intersect);
+                the_distance_squared = BrVector3LengthSquared(&wank);
+                if (the_distance_squared < closest_distance_squared) {
+                    closest_distance_squared = the_distance_squared;
+                    nearest_section = section_no;
+                    BrVector3Add(pIntersect, start, &intersect);
+                    BrVector3NormaliseQuick(pPath_direction, &a);
                 }
             }
         }
     }
-    if (nearest_node_distance_squared > closest_distance_squared) {
-        nearest_node_section_no = nearest_section;
+    if (closest_distance_squared > nearest_node_distance_squared) {
+        nearest_section = nearest_node_section_no;
         if (pPursuee != NULL) {
-            start = &pPursuee->my_trail.trail_nodes[nearest_section];
-            finish = &pPursuee->my_trail.trail_nodes[nearest_section + 1];
+            start = &pPursuee->my_trail.trail_nodes[nearest_node_section_no];
+            finish = &pPursuee->my_trail.trail_nodes[nearest_node_section_no + 1];
         } else {
-            start = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[nearest_section].node_indices[0]].p;
-            finish = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[nearest_section].node_indices[1]].p;
+            start = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[nearest_node_section_no].node_indices[0]].p;
+            finish = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[nearest_node_section_no].node_indices[1]].p;
         }
-        BrVector3Sub(&p, finish, start);
-        BrVector3NormaliseQuick(pPath_direction, &p);
+        BrVector3Sub(&a, finish, start);
+        BrVector3NormaliseQuick(pPath_direction, &a);
         BrVector3Copy(pIntersect, nearest_node_v);
-        *pDistance = sqrt(closest_distance_squared);
-    } else {
         *pDistance = sqrt(nearest_node_distance_squared);
+    } else {
+        *pDistance = sqrt(closest_distance_squared);
     }
     if (pPursuee != NULL) {
-        nearest_node_section_no += 15000;
+        nearest_section += 15000;
     }
-    return nearest_node_section_no;
+    return nearest_section;
 }
 
 // IDA: void __usercall DeadStopCar(tCar_spec *pCar_spec@<EAX>)
@@ -507,23 +507,25 @@ void NewObjective(tOpponent_spec* pOpponent_spec, tOpponent_objective_type pObje
     if (pObjective_type == eOOT_pursue_and_twat) {
         pOpponent_spec->time_for_this_objective_to_finish += 90000;
     }
+    va_start(marker, pObjective_type);
     switch (pObjective_type) {
     case eOOT_complete_race:
         gNum_of_opponents_completing_race++;
         break;
-    case eOOT_pursue_and_twat:
-        va_start(marker, pObjective_type);
-        pOpponent_spec->pursue_car_data.pursuee = va_arg(marker, tCar_spec*);
-        va_end(marker);
-        break;
     case eOOT_get_near_player:
         gNum_of_opponents_getting_near++;
         break;
+    case eOOT_pursue_and_twat:
+        pOpponent_spec->pursue_car_data.pursuee = va_arg(marker, tCar_spec*);
+        gNum_of_opponents_pursuing++;
+        break;
+
     default:
         break;
     }
     dr_dprintf("%s: NewObjective() - type %d", pOpponent_spec->car_spec->driver_name, pObjective_type);
     ProcessCurrentObjective(pOpponent_spec, ePOC_start);
+    va_end(marker);
 }
 
 // IDA: void __usercall CalcRaceRoute(tOpponent_spec *pOpponent_spec@<EAX>)
@@ -565,8 +567,8 @@ void CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
         race_section_count = 0;
         normal_section_ok_direction_count = 0;
         normal_section_wrong_direction_count = 0;
-        for (i = 0; i < gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections; i++) {
-            section_no = gProgram_state.AI_vehicles.path_nodes[node_no].sections[i];
+        for (section_no_index = 0; section_no_index < gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections; section_no_index++) {
+            section_no = gProgram_state.AI_vehicles.path_nodes[node_no].sections[section_no_index];
             if (pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no != section_no) {
                 if (gProgram_state.AI_vehicles.path_sections[section_no].type == 1 && gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0] == node_no) {
                     pOpponent_spec->complete_race_data.found_race_section = 1;
@@ -586,7 +588,7 @@ void CalcRaceRoute(tOpponent_spec* pOpponent_spec) {
         } else if (normal_section_ok_direction_count != 0) {
             AddToOpponentsProjectedRoute(pOpponent_spec, temp_section_array[IRandomBetween(0, normal_section_ok_direction_count - 1)], 1);
         } else if (normal_section_wrong_direction_count != 0) {
-            AddToOpponentsProjectedRoute(pOpponent_spec, temp_section_array[IRandomBetween(0, normal_section_wrong_direction_count - 1)], 1);
+            AddToOpponentsProjectedRoute(pOpponent_spec, temp_section_array[IRandomBetween(0, normal_section_wrong_direction_count - 1)], 0);
         } else if (pOpponent_spec->complete_race_data.found_race_section) {
             pOpponent_spec->complete_race_data.finished_calcing_race_route = 1;
         } else {
@@ -609,17 +611,14 @@ void TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add) {
     if (!pSections_to_add) {
         PDEnterDebugger("TopUpRandomRoute() called with no seed (woof, bark, etc.)");
     }
-    if (pSections_to_add >= 0) {
-        target = MIN(pSections_to_add + pOpponent_spec->nnext_sections, 10);
-    } else {
+    if (pSections_to_add < 0) {
         target = 10;
+    } else {
+        target = MIN(pSections_to_add + pOpponent_spec->nnext_sections, 10);
     }
     while (pOpponent_spec->nnext_sections < target) {
         node_no = gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no].node_indices[pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction];
-        if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections <= 1) {
-            section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
-            direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction == 0;
-        } else {
+        if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections > 1) {
             num_of_temp_sections = 0;
             for (i = 0; i < gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections; i++) {
                 section_no = gProgram_state.AI_vehicles.path_nodes[node_no].sections[i];
@@ -631,16 +630,19 @@ void TopUpRandomRoute(tOpponent_spec* pOpponent_spec, int pSections_to_add) {
                 }
             }
 
-            if (num_of_temp_sections == 0) {
-                section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
-                direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction == 0;
-            } else if (num_of_temp_sections == 1) {
-                section_no = temp_section_array[0];
-                direction = gProgram_state.AI_vehicles.path_sections[temp_section_array[0]].node_indices[1] != node_no;
-            } else {
+            if (num_of_temp_sections > 1) {
                 section_no = temp_section_array[IRandomBetween(0, num_of_temp_sections - 1)];
                 direction = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] != node_no;
+            } else if (num_of_temp_sections == 1) {
+                section_no = temp_section_array[0];
+                direction = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] != node_no;
+            } else {
+                section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
+                direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction == 0;
             }
+        } else {
+            section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
+            direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction == 0;
         }
         AddToOpponentsProjectedRoute(pOpponent_spec, section_no, direction);
     }
@@ -661,9 +663,6 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
     tS16 section_no_index;
     br_scalar distance_so_far;
 
-    // added by dethrace for readability (?)
-    tS16 section_no_dir_index;
-
     gSFS_cycles_this_time++;
     if (pDepth == 1) {
         memset(gBit_per_node, 0, (gProgram_state.AI_vehicles.number_of_path_nodes + 7) / 8);
@@ -681,41 +680,36 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
 
         section_no = node_ptr->sections[section_no_index];
         direction = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] != node_no;
-        section_no_dir_index = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[direction];
 
-        // int b = BYTE4(v8);
-        // int y = (int)(((BYTE4(v8) ^ (((BYTE4(v8) ^ v8) - BYTE4(v8)) & 7)) - BYTE4(v8)));
-        // int val = valx(v8);
-        // LOG_DEBUG("val %d, b %d, y %d", val, b, y);
-        // int x = ((BYTE4(v8) ^ (((BYTE4(v8) ^ v8) - BYTE4(v8)) & 7)) - BYTE4(v8));
-        // int x2 = v8 & 7;
-        // if (x != x2 || val != x) {
-        //     TELL_ME_IF_WE_PASS_THIS_WAY();
-        // }
-        if ((gBit_per_node[section_no_dir_index / 8] & (1 << (section_no_dir_index & 7))) == 0
-            && (!gProgram_state.AI_vehicles.path_sections[section_no].one_way || direction)
-            && (pOpponent_spec->cheating || gProgram_state.AI_vehicles.path_sections[section_no].type != ePST_cheat_only)) {
+        if ((gBit_per_node[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[direction] / 8] & (1 << (gProgram_state.AI_vehicles.path_sections[section_no].node_indices[direction] % 8))) != 0) {
+            continue;
+        }
+        if ((gProgram_state.AI_vehicles.path_sections[section_no].one_way && gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] == node_no)) {
+            continue;
+        }
+        if (!pOpponent_spec->cheating && gProgram_state.AI_vehicles.path_sections[section_no].type == ePST_cheat_only) {
+            continue;
+        }
 
-            pTemp_store[pDepth].section_no = section_no;
-            pTemp_store[pDepth].direction = direction;
-            distance_so_far = gProgram_state.AI_vehicles.path_sections[section_no].length + pDistance_so_far;
+        pTemp_store[pDepth].section_no = section_no;
+        pTemp_store[pDepth].direction = direction;
+        distance_so_far = gProgram_state.AI_vehicles.path_sections[section_no].length + pDistance_so_far;
+        if (pTarget_section == section_no && distance_so_far <= shortest_dist) {
+            shortest_dist = distance_so_far;
+            *pNum_of_perm_store_sections = pDepth + 1;
+            memcpy(pPerm_store, pTemp_store, sizeof(tRoute_section) * *pNum_of_perm_store_sections);
 
-            if (pTarget_section == section_no && distance_so_far < shortest_dist) {
-                shortest_dist = distance_so_far;
-                *pNum_of_perm_store_sections = pDepth + 1;
-                memcpy(pPerm_store, pTemp_store, sizeof(tRoute_section) * *pNum_of_perm_store_sections);
-                // dword_530DD4 = ++routes_found
-                routes_found++;
-                if (routes_found >= 2) {
-                    return 1;
-                }
-                break;
-            }
-
-            if (pDepth < 9
-                && SearchForSection(pTemp_store, pPerm_store, pNum_of_perm_store_sections, pTarget_section, pDepth + 1, distance_so_far, pOpponent_spec)) {
+            gWanky_arse_tit_fuck = routes_found + 1;
+            routes_found++;
+            if (routes_found >= 2) {
                 return 1;
+            } else {
+                gBit_per_node[node_no / 8] &= ~(1 << (node_no % 8));
+                return 0;
             }
+        }
+        if (pDepth < 9 && SearchForSection(pTemp_store, pPerm_store, pNum_of_perm_store_sections, pTarget_section, pDepth + 1, distance_so_far, pOpponent_spec)) {
+            return 1;
         }
     }
     gBit_per_node[node_no / 8] &= ~(1 << (node_no % 8));
@@ -769,27 +763,28 @@ void CalcGetNearPlayerRoute(tOpponent_spec* pOpponent_spec, tCar_spec* pPlayer) 
         TopUpRandomRoute(pOpponent_spec, 1);
     }
     while (pOpponent_spec->nnext_sections < 6 && !fuck_it) {
-        temp_store[0] = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1];
+        temp_store[0].section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
+        temp_store[0].direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction;
         dr_dprintf("%s: CalcGetNearPlayerRoute() - In loop; our section #%d, player's section #%d", pOpponent_spec->car_spec->driver_name, temp_store[0].section_no, players_section);
         gSFS_count++;
         gSFS_cycles_this_time = 0;
         SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, players_section, 1, 0.f, pOpponent_spec);
         gSFS_total_cycles += gSFS_cycles_this_time;
-        if (gSFS_max_cycles < gSFS_cycles_this_time) {
+        if (gSFS_cycles_this_time > gSFS_max_cycles) {
             gSFS_max_cycles = gSFS_cycles_this_time;
         }
-        dr_dprintf(">>>SearchForSection() - max %d, avg %.1f", gSFS_max_cycles, gSFS_total_cycles / (float)gSFS_count);
-        if (num_of_perm_store_sections <= 1) {
+        dr_dprintf(">>>SearchForSection() - max %d, avg %.1f", gSFS_max_cycles, (float)gSFS_total_cycles / gSFS_count);
+        if (num_of_perm_store_sections > 1) {
+            sections_to_copy = MIN(COUNT_OF(pOpponent_spec->next_sections) - pOpponent_spec->nnext_sections, num_of_perm_store_sections - 1);
+            memcpy(&pOpponent_spec->next_sections[pOpponent_spec->nnext_sections], &perm_store[1], sizeof(tRoute_section) * sections_to_copy);
+            pOpponent_spec->nnext_sections += sections_to_copy;
+            TopUpRandomRoute(pOpponent_spec, 1);
+        } else {
             dr_dprintf("%s: CalcGetNearPlayerRoute() - SearchForSection() produced bugger all", pOpponent_spec->car_spec->driver_name);
             fuck_it = 1;
             if (pOpponent_spec->nnext_sections <= 4) {
                 TopUpRandomRoute(pOpponent_spec, 4 - pOpponent_spec->nnext_sections + 4);
             }
-        } else {
-            sections_to_copy = MIN(COUNT_OF(pOpponent_spec->next_sections) - pOpponent_spec->nnext_sections, num_of_perm_store_sections - 1);
-            memcpy(&pOpponent_spec->next_sections[pOpponent_spec->nnext_sections], &perm_store[1], sizeof(tRoute_section) * sections_to_copy);
-            pOpponent_spec->nnext_sections += sections_to_copy;
-            TopUpRandomRoute(pOpponent_spec, 1);
         }
     }
 }
@@ -811,34 +806,31 @@ void CalcReturnToStartPointRoute(tOpponent_spec* pOpponent_spec) {
 
     ClearOpponentsProjectedRoute(pOpponent_spec);
     section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &section_v, &intersect, &distance);
-    distance = BrVector3Length(&section_v);
     BrVector3Normalise(&section_v, &section_v);
 
-    if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &section_v) <= 0.0f) {
-        AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
-    } else {
+    if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &section_v) > 0.0f) {
         AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
+    } else {
+        AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
     }
-    temp_store[0] = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1];
+    temp_store[0].section_no = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].section_no;
+    temp_store[0].direction = pOpponent_spec->next_sections[pOpponent_spec->nnext_sections - 1].direction;
     gSFS_count++;
     gSFS_cycles_this_time = 0;
     SearchForSection(temp_store, perm_store, &num_of_perm_store_sections, pOpponent_spec->return_to_start_data.section_no, 1, 0.0f, pOpponent_spec);
     gSFS_total_cycles += gSFS_cycles_this_time;
-    if (gSFS_max_cycles < gSFS_cycles_this_time) {
+    if (gSFS_cycles_this_time > gSFS_max_cycles) {
         gSFS_max_cycles = gSFS_cycles_this_time;
     }
-    if (num_of_perm_store_sections <= 1) {
-        if (pOpponent_spec->nnext_sections <= 6) {
-            TopUpRandomRoute(pOpponent_spec, 4 - pOpponent_spec->nnext_sections + 4);
-        }
-    } else {
-        sections_to_copy = 10 - pOpponent_spec->nnext_sections;
-        if (sections_to_copy >= num_of_perm_store_sections - 1) {
-            sections_to_copy = num_of_perm_store_sections - 1;
-        }
+    if (num_of_perm_store_sections > 1) {
+        sections_to_copy = MIN(num_of_perm_store_sections - 1, 10 - pOpponent_spec->nnext_sections);
         memcpy(&pOpponent_spec->next_sections[pOpponent_spec->nnext_sections], &perm_store[1], sizeof(tRoute_section) * sections_to_copy);
         pOpponent_spec->nnext_sections += sections_to_copy;
         TopUpRandomRoute(pOpponent_spec, 1);
+    } else {
+        if (pOpponent_spec->nnext_sections <= 6) {
+            TopUpRandomRoute(pOpponent_spec, 4 - pOpponent_spec->nnext_sections + 4);
+        }
     }
 }
 
@@ -853,13 +845,14 @@ void ClearOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec) {
 // FUNCTION: CARM95 0x004030ef
 int AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_no, int pDirection) {
 
-    if (pOpponent_spec->nnext_sections >= COUNT_OF(pOpponent_spec->next_sections)) {
+    if (pOpponent_spec->nnext_sections < COUNT_OF(pOpponent_spec->next_sections)) {
+        pOpponent_spec->next_sections[pOpponent_spec->nnext_sections].section_no = pSection_no;
+        pOpponent_spec->next_sections[pOpponent_spec->nnext_sections].direction = pDirection;
+        pOpponent_spec->nnext_sections++;
+        return 1;
+    } else {
         return 0;
     }
-    pOpponent_spec->next_sections[pOpponent_spec->nnext_sections].section_no = pSection_no;
-    pOpponent_spec->next_sections[pOpponent_spec->nnext_sections].direction = pDirection;
-    pOpponent_spec->nnext_sections++;
-    return 1;
 }
 
 // IDA: int __usercall ShiftOpponentsProjectedRoute@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, int pPlaces@<EDX>)
@@ -867,15 +860,16 @@ int AddToOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, tS16 pSection_n
 int ShiftOpponentsProjectedRoute(tOpponent_spec* pOpponent_spec, int pPlaces) {
     int i;
 
-    if (pOpponent_spec->nnext_sections <= pPlaces) {
+    if (pOpponent_spec->nnext_sections > pPlaces) {
+        for (i = 0; i < COUNT_OF(pOpponent_spec->next_sections) - pPlaces; i++) {
+            pOpponent_spec->next_sections[i].section_no = pOpponent_spec->next_sections[pPlaces + i].section_no;
+            pOpponent_spec->next_sections[i].direction = pOpponent_spec->next_sections[pPlaces + i].direction;
+        }
+        pOpponent_spec->nnext_sections -= pPlaces;
+        return 1;
+    } else {
         return 0;
     }
-    for (i = 0; i < COUNT_OF(pOpponent_spec->next_sections) - pPlaces; i++) {
-        pOpponent_spec->next_sections[i].section_no = pOpponent_spec->next_sections[pPlaces + i].section_no;
-        pOpponent_spec->next_sections[i].direction = pOpponent_spec->next_sections[pPlaces + i].direction;
-    }
-    pOpponent_spec->nnext_sections -= pPlaces;
-    return 1;
 }
 
 // IDA: void __usercall StunTheBugger(tOpponent_spec *pOpponent_spec@<EAX>, int pMilliseconds@<EDX>)
@@ -904,6 +898,10 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
     int res;
     char str[256];
 
+    initial_pos = &gProgram_state.initial_position;
+    car_actor = pOpponent_spec->car_spec->car_master_actor;
+    data = &pOpponent_spec->complete_race_data;
+
     switch (pCommand) {
     case ePOC_start:
         dr_dprintf("%s: ProcessCompleteRace() - new objective started", pOpponent_spec->car_spec->driver_name);
@@ -916,11 +914,18 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
             ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
             pOpponent_spec->follow_path_data.section_no = 20000;
         }
-        res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
-        if (pOpponent_spec->nnext_sections == 0 || res == eFPR_end_of_path) {
-            dr_dprintf("%s: Giving up following race path because ran out of race path", pOpponent_spec->car_spec->driver_name);
-            NewObjective(pOpponent_spec, eOOT_get_near_player);
+        if (pOpponent_spec->nnext_sections != 0) {
+            res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
+            if (res != eFPR_end_of_path) {
+                goto skip_new_objective;
+            }
         }
+
+        dr_dprintf("%s: Giving up following race path because ran out of race path", pOpponent_spec->car_spec->driver_name);
+        NewObjective(pOpponent_spec, eOOT_get_near_player);
+
+    skip_new_objective:
+
         if (res != eFPR_OK) {
             if (res == eFPR_given_up) {
                 dr_dprintf("%s: Giving up complete_race because ProcessFollowPath() gave up", pOpponent_spec->car_spec->driver_name);
@@ -933,11 +938,9 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
             dr_dprintf("%s: Time to give up complete_race. Might be back in a sec, though!", pOpponent_spec->car_spec->driver_name);
             ObjectiveComplete(pOpponent_spec);
         }
-        if (pOpponent_spec->nnext_sections < 5 && !pOpponent_spec->complete_race_data.finished_calcing_race_route) {
+        if (pOpponent_spec->nnext_sections <= 4 && !data->finished_calcing_race_route) {
             CalcRaceRoute(pOpponent_spec);
         }
-        break;
-    default:
         break;
     }
 }
@@ -978,41 +981,42 @@ void RecordNextTrailNode(tCar_spec* pPursuee) {
     int visible;
 
     trail = &pPursuee->my_trail;
-    if (trail->time_of_next_recording >= gTime_stamp_for_this_munging) {
-        return;
-    }
-    trail->time_of_next_recording = gTime_stamp_for_this_munging + 500;
-    trail->nodes_shifted_this_frame = 0;
-    if (BrVector3Dot(&trail->base_heading, &pPursuee->direction) < FastScalarCos(30)) {
-        trail->has_deviated_recently = 1;
-    }
-    BrVector3Sub(&car_to_last_point_v, &trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t);
-    length = BrVector3Length(&car_to_last_point_v);
-    if (length < 0.3f) {
-        return;
-    }
-    CalcNegativeXVector(&offset_v, &trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t, 0.5f);
-
-    BrVector3Add(&start1, &trail->trail_nodes[trail->number_of_nodes - 2], &offset_v);
-    BrVector3Add(&finish1, &pPursuee->car_master_actor->t.t.translate.t, &offset_v);
-    BrVector3Sub(&start2, &trail->trail_nodes[trail->number_of_nodes - 2], &offset_v);
-    BrVector3Sub(&finish2, &pPursuee->car_master_actor->t.t.translate.t, &offset_v);
     visible = 1;
-    if ((trail->has_deviated_recently
-            || !(visible = PointVisibleFromHere(&start1, &finish1))
-            || !(visible = PointVisibleFromHere(&start2, &finish2))
-            || !(visible = PointVisibleFromHere(&trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t)))
-        && ((visible && length > 2.0f) || (!visible && length > 1.5f))) {
-        if (trail->number_of_nodes >= COUNT_OF(trail->trail_nodes)) {
-            memmove(trail->trail_nodes, &trail->trail_nodes[1], (COUNT_OF(trail->trail_nodes) - 1) * sizeof(trail->trail_nodes[0]));
-            trail->nodes_shifted_this_frame = 1;
-        } else {
-            trail->number_of_nodes++;
+    trail->nodes_shifted_this_frame = 0;
+    if (trail->time_of_next_recording < gTime_stamp_for_this_munging) {
+
+        trail->time_of_next_recording = gTime_stamp_for_this_munging + 500;
+        if (BrVector3Dot(&pPursuee->direction, &trail->base_heading) < FastScalarCos(30)) {
+            trail->has_deviated_recently = 1;
         }
-        trail->has_deviated_recently = 0;
-        BrVector3Copy(&trail->base_heading, &pPursuee->direction);
+        BrVector3Sub(&car_to_last_point_v, &trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t);
+        length = BrVector3Length(&car_to_last_point_v);
+        if (length < 0.3f) {
+            return;
+        }
+        CalcNegativeXVector(&offset_v, &trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t, 0.5f);
+
+        BrVector3Add(&start1, &trail->trail_nodes[trail->number_of_nodes - 2], &offset_v);
+        BrVector3Add(&finish1, &pPursuee->car_master_actor->t.t.translate.t, &offset_v);
+        BrVector3Sub(&start2, &trail->trail_nodes[trail->number_of_nodes - 2], &offset_v);
+        BrVector3Sub(&finish2, &pPursuee->car_master_actor->t.t.translate.t, &offset_v);
+
+        if ((trail->has_deviated_recently
+                || !(visible = PointVisibleFromHere(&start1, &finish1))
+                || !(visible = PointVisibleFromHere(&start2, &finish2))
+                || !(visible = PointVisibleFromHere(&trail->trail_nodes[trail->number_of_nodes - 2], &pPursuee->car_master_actor->t.t.translate.t)))
+            && ((visible && length > 2.0f) || (!visible && length > 1.5f))) {
+            if (trail->number_of_nodes < COUNT_OF(trail->trail_nodes)) {
+                trail->number_of_nodes++;
+            } else {
+                memmove(trail->trail_nodes, &trail->trail_nodes[1], (COUNT_OF(trail->trail_nodes) - 1) * sizeof(trail->trail_nodes[0]));
+                trail->nodes_shifted_this_frame = 1;
+            }
+            trail->has_deviated_recently = 0;
+            BrVector3Copy(&trail->base_heading, &pPursuee->direction);
+        }
+        BrVector3Copy(&trail->trail_nodes[trail->number_of_nodes - 1], &pPursuee->car_master_actor->t.t.translate.t);
     }
-    BrVector3Copy(&trail->trail_nodes[trail->number_of_nodes - 1], &pPursuee->car_master_actor->t.t.translate.t);
 }
 
 // IDA: tS16 __usercall FindNearestTrailSection@<AX>(tOpponent_spec *pOpponent_spec@<EAX>, tCar_spec *pPursuee@<EDX>, br_vector3 *pSection_v@<EBX>, br_vector3 *pIntersect@<ECX>, br_scalar *pDistance)
@@ -1028,13 +1032,13 @@ tS16 CalcNextTrailSection(tOpponent_spec* pOpponent_spec, int pSection) {
     int section_no;
     tPursuee_trail* trail;
 
-    trail = &pOpponent_spec->pursue_car_data.pursuee->my_trail;
     section_no = pSection - 15000;
+    trail = &pOpponent_spec->pursue_car_data.pursuee->my_trail;
 
-    if (trail->number_of_nodes - 2 > section_no) {
-        return pSection + 1;
+    if (trail->number_of_nodes - 2 <= section_no) {
+        return -1;
     }
-    return -1;
+    return section_no + 15001;
 }
 
 // IDA: void __usercall ProcessPursueAndTwat(tOpponent_spec *pOpponent_spec@<EAX>, tProcess_objective_command pCommand@<EDX>)
@@ -1053,7 +1057,8 @@ void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     tS16 section_no;
 
     data = &pOpponent_spec->pursue_car_data;
-    if (pCommand == ePOC_start) {
+    switch (pCommand) {
+    case ePOC_start:
         dr_dprintf("%s: ProcessPursueAndTwat() - new objective started", pOpponent_spec->car_spec->driver_name);
         data->direct_line_nodes[0].number_of_sections = 1;
         data->direct_line_nodes[0].sections[0] = 10000;
@@ -1074,139 +1079,153 @@ void ProcessPursueAndTwat(tOpponent_spec* pOpponent_spec, tProcess_objective_com
         data->time_last_away_from_pursuee = gTime_stamp_for_this_munging;
         data->state = ePCS_what_now;
         return;
-    }
 
-    if (pCommand != ePOC_run) {
-        return;
-    }
+    case ePOC_run:
 
-    if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec) && pOpponent_spec->distance_from_home > 75.0f) {
-        dr_dprintf("%s: Completing pursuit objective because I'm out of my precinct", pOpponent_spec->car_spec->driver_name);
-        NewObjective(pOpponent_spec, eOOT_return_to_start);
-        return;
-    }
+        if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec) && pOpponent_spec->distance_from_home > 75.0f) {
+            dr_dprintf("%s: Completing pursuit objective because I'm out of my precinct", pOpponent_spec->car_spec->driver_name);
+            NewObjective(pOpponent_spec, eOOT_return_to_start);
+            return;
+        }
 
-    data->direct_line_section.length = MAX(pOpponent_spec->player_to_oppo_d, 3.0f);
-    if (pOpponent_spec->player_to_oppo_d > 3.0f) {
-        data->time_last_away_from_pursuee = gTime_stamp_for_this_munging;
-    }
-    if (gOpponents[pOpponent_spec->index].psyche.grudge_against_player < 15u) {
-        dr_dprintf("%s: Completing pursuit objective because I'm happy now", pOpponent_spec->car_spec->driver_name);
-        ObjectiveComplete(pOpponent_spec);
-        return;
-    }
-    if (data->state != ePCS_backing_up) {
-        if (data->time_last_twatted_em + 1000 >= gTime_stamp_for_this_munging || data->time_last_twatted_em + 3000 <= gTime_stamp_for_this_munging || BrVector3Length(&data->pursuee->v) >= 0.3f) {
-            if (data->time_last_away_from_pursuee + 7000 >= gTime_stamp_for_this_munging || data->time_last_twatted_em + 7000 >= gTime_stamp_for_this_munging || data->start_backup_time + 10000 >= gTime_stamp_for_this_munging) {
-                if (pOpponent_spec->cheating) {
-                    if (pOpponent_spec->player_to_oppo_d < 50.0f
-                        && PointVisibleFromHere(&data->pursuee->car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
+        data->direct_line_section.length = MAX(pOpponent_spec->player_to_oppo_d, 3.0f);
+        if (pOpponent_spec->player_to_oppo_d > 3.0f) {
+            data->time_last_away_from_pursuee = gTime_stamp_for_this_munging;
+        }
+        if (gOpponents[pOpponent_spec->index].psyche.grudge_against_player < 15) {
+            dr_dprintf("%s: Completing pursuit objective because I'm happy now", pOpponent_spec->car_spec->driver_name);
+            ObjectiveComplete(pOpponent_spec);
+            return;
+        }
+        if (data->state != ePCS_backing_up) {
+            if (data->time_last_twatted_em + 1000 < gTime_stamp_for_this_munging && data->time_last_twatted_em + 3000 > gTime_stamp_for_this_munging && BrVector3Length(&data->pursuee->v) < 0.3f) {
+                dr_dprintf("%s: Backing up because we're 'stationary' after colliding with pursuee", pOpponent_spec->car_spec->driver_name);
+                data->start_backup_time = gTime_stamp_for_this_munging;
+                data->state = ePCS_backing_up;
+            } else {
+
+                if (data->time_last_away_from_pursuee + 7000 < gTime_stamp_for_this_munging && data->time_last_twatted_em + 7000 < gTime_stamp_for_this_munging && data->start_backup_time + 10000 < gTime_stamp_for_this_munging) {
+                    dr_dprintf("%s: Backing up because we're too close to pursuee without having twatted him", pOpponent_spec->car_spec->driver_name);
+                    data->start_backup_time = gTime_stamp_for_this_munging;
+                    data->state = ePCS_backing_up;
+                } else {
+                    if (pOpponent_spec->cheating) {
+                        if (pOpponent_spec->player_to_oppo_d < 50.0f
+                            && PointVisibleFromHere(&data->pursuee->car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
+                            data->time_pursuee_last_visible = gTime_stamp_for_this_munging;
+                        } else {
+                            data->time_pursuee_last_visible = 0;
+                        }
+                    } else if (pOpponent_spec->player_in_view_now || (data->time_of_next_visibility_check < gTime_stamp_for_this_munging && pOpponent_spec->player_to_oppo_d < 35.0f && PointVisibleFromHere(&data->pursuee->car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t))) {
                         data->time_pursuee_last_visible = gTime_stamp_for_this_munging;
+                        data->time_of_next_visibility_check = gTime_stamp_for_this_munging + 600;
+                    }
+                    if (data->time_pursuee_last_visible + 3000 > gTime_stamp_for_this_munging) {
+                        if (data->state != ePCS_following_line_of_sight) {
+                            dr_dprintf("%s: Commencing ePCS_following_line_of_sight state", pOpponent_spec->car_spec->driver_name);
+                            data->state = ePCS_following_line_of_sight;
+                            sprintf(str, "%s: I've spotted you!", pOpponent_spec->car_spec->driver_name);
+                            ProcessFollowPath(pOpponent_spec, ePOC_start, 1, 1, 0);
+                        }
                     } else {
-                        data->time_pursuee_last_visible = 0;
-                    }
-                } else if (pOpponent_spec->player_in_view_now || (data->time_of_next_visibility_check < gTime_stamp_for_this_munging && pOpponent_spec->player_to_oppo_d < 35.0f && PointVisibleFromHere(&data->pursuee->car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t))) {
-                    data->time_pursuee_last_visible = gTime_stamp_for_this_munging;
-                    data->time_of_next_visibility_check = gTime_stamp_for_this_munging + 600;
-                }
-                if (data->time_pursuee_last_visible + 3000 <= gTime_stamp_for_this_munging) {
-                    if (data->pursuee->my_trail.number_of_nodes < 2) {
-                        dr_dprintf("%s: Giving up pursuit - not visible & no trail yet", pOpponent_spec->car_spec->driver_name);
-                        NewObjective(pOpponent_spec, eOOT_get_near_player);
-                        return;
-                    }
-                    if (data->state != ePCS_following_trail) {
-                        section_no = FindNearestTrailSection(pOpponent_spec, data->pursuee, &section_v, &intersect, &distance);
-                        data->state = ePCS_following_trail;
-                        if (distance > 20.0f || section_no == -1) {
-                            dr_dprintf("%s: Giving up pursuit - not visible & trail ain't close enough (%f)", pOpponent_spec->car_spec->driver_name, distance);
+                        if (data->pursuee->my_trail.number_of_nodes < 2) {
+                            dr_dprintf("%s: Giving up pursuit - not visible & no trail yet", pOpponent_spec->car_spec->driver_name);
                             NewObjective(pOpponent_spec, eOOT_get_near_player);
                             return;
                         }
-                        dr_dprintf("%s: Commencing ePCS_following_trail state", pOpponent_spec->car_spec->driver_name);
-                        pOpponent_spec->follow_path_data.section_no = section_no;
-                        ProcessFollowPath(pOpponent_spec, ePOC_start, 1, 0, 0);
+                        if (data->state != ePCS_following_trail) {
+                            section_no = FindNearestTrailSection(pOpponent_spec, data->pursuee, &section_v, &intersect, &distance);
+                            data->state = ePCS_following_trail;
+                            if (distance > 20.0f || section_no == -1) {
+                                dr_dprintf("%s: Giving up pursuit - not visible & trail ain't close enough (%f)", pOpponent_spec->car_spec->driver_name, distance);
+                                NewObjective(pOpponent_spec, eOOT_get_near_player);
+                                return;
+                            }
+                            dr_dprintf("%s: Commencing ePCS_following_trail state", pOpponent_spec->car_spec->driver_name);
+                            pOpponent_spec->follow_path_data.section_no = section_no;
+                            ProcessFollowPath(pOpponent_spec, ePOC_start, 1, 0, 0);
+                        }
                     }
-                } else if (data->state != ePCS_following_line_of_sight) {
-                    dr_dprintf("%s: Commencing ePCS_following_line_of_sight state", pOpponent_spec->car_spec->driver_name);
-                    data->state = ePCS_following_line_of_sight;
-                    sprintf(str, "%s: I've spotted you!", pOpponent_spec->car_spec->driver_name);
-                    ProcessFollowPath(pOpponent_spec, ePOC_start, 1, 1, 0);
                 }
-            } else {
-                dr_dprintf("%s: Backing up because we're too close to pursuee without having twatted him", pOpponent_spec->car_spec->driver_name);
-                data->start_backup_time = gTime_stamp_for_this_munging;
-                data->state = ePCS_backing_up;
             }
-        } else {
-            dr_dprintf("%s: Backing up because we're 'stationary' after colliding with pursuee", pOpponent_spec->car_spec->driver_name);
-            data->start_backup_time = gTime_stamp_for_this_munging;
-            data->state = ePCS_backing_up;
         }
-    }
-    switch (data->state) {
-    case ePCS_what_now:
-        PDEnterDebugger("ERROR: what_now state called in ProcessPursueAndTwat()");
-        break;
-    case ePCS_following_trail:
-        if (data->pursuee->my_trail.nodes_shifted_this_frame) {
-            if (pOpponent_spec->follow_path_data.section_no <= 15000) {
-                data->state = ePCS_following_trail;
-                section_no = FindNearestTrailSection(pOpponent_spec, data->pursuee, &section_v, &intersect, &distance);
-                dr_dprintf("%s: Trail got away; found new trail section %d", pOpponent_spec->car_spec->driver_name, section_no);
-                if (section_no == -1 || distance > 20.0f || !PointVisibleFromHere(&intersect, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
-                    dr_dprintf("%s: ...which unfortunately is too far away (%fBRU) or not visible - end of pursuit", pOpponent_spec->car_spec->driver_name, distance);
-                    NewObjective(pOpponent_spec, eOOT_get_near_player);
-                    return;
-                }
-                pOpponent_spec->follow_path_data.section_no = section_no;
-                ProcessFollowPath(pOpponent_spec, ePOC_start, 1, 0, 0);
-            } else {
-                pOpponent_spec->follow_path_data.section_no--;
-            }
-            dr_dprintf("%s: Following re-jobbied section %d/%d", pOpponent_spec->car_spec->driver_name, pOpponent_spec->follow_path_data.section_no, data->pursuee->my_trail.number_of_nodes - 1);
-        }
-        sprintf(str, "%s: Trail section %d/%d", pOpponent_spec->car_spec->driver_name, pOpponent_spec->follow_path_data.section_no, data->pursuee->my_trail.number_of_nodes - 1);
-        res = ProcessFollowPath(pOpponent_spec, ePOC_run, 1, 0, 0);
-        if (res == eFPR_given_up || res == eFPR_end_of_path) {
-            NewObjective(pOpponent_spec, eOOT_get_near_player);
-        }
-        break;
-    case ePCS_following_line_of_sight:
-        BrVector3Copy(&data->direct_line_nodes[0].p, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
-        BrVector3Sub(&wank, &data->pursuee->car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
-        s = BrVector3Length(&wank);
-        BrVector3Sub(&wank, &data->pursuee->v, &pOpponent_spec->car_spec->v);
-        t = BrVector3Length(&wank);
-        if (t >= 1.0f) {
-            d = s / t / 2.0;
+        switch (data->state) {
 
-        } else {
-            d = 0.0;
-        }
-        BrVector3Scale(&data->direct_line_nodes[1].p, &data->pursuee->v, d);
-        BrVector3Accumulate(&data->direct_line_nodes[1].p, &data->pursuee->car_master_actor->t.t.translate.t);
-        if (s >= 2.0f) {
-            ProcessFollowPath(pOpponent_spec, ePOC_run, 1, 1, 0);
-        } else {
-            ProcessFollowPath(pOpponent_spec, ePOC_run, 1, 1, 1);
-        }
-        break;
-    case ePCS_backing_up:
-        if (data->start_backup_time + 2200 >= gTime_stamp_for_this_munging) {
-            pOpponent_spec->car_spec->curvature = 0.0f;
-            pOpponent_spec->car_spec->brake_force = 0.0f;
-            pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M * -8.0f;
-        } else {
-            pOpponent_spec->car_spec->acc_force = 0.0;
-            pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
-            if (data->start_backup_time + 3000 < gTime_stamp_for_this_munging) {
+        case ePCS_backing_up:
+            if (data->start_backup_time + 2200 < gTime_stamp_for_this_munging) {
+                pOpponent_spec->car_spec->acc_force = 0.0;
+                pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
+                if (data->start_backup_time + 3000 < gTime_stamp_for_this_munging) {
+                    pOpponent_spec->car_spec->brake_force = 0.0f;
+                    data->state = ePCS_what_now;
+                    dr_dprintf("%s: Finished backing up.", pOpponent_spec->car_spec->driver_name);
+                }
+            } else {
+                pOpponent_spec->car_spec->curvature = 0.0f;
                 pOpponent_spec->car_spec->brake_force = 0.0f;
-                data->state = ePCS_what_now;
-                dr_dprintf("%s: Finished backing up.", pOpponent_spec->car_spec->driver_name);
+                pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M * -8.0f;
             }
+            break;
+
+        case ePCS_following_line_of_sight:
+            BrVector3Copy(&data->direct_line_nodes[0].p, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
+            BrVector3Sub(&wank, &data->pursuee->car_master_actor->t.t.translate.t, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
+            d = BrVector3Length(&wank);
+            BrVector3Sub(&wank, &data->pursuee->v, &pOpponent_spec->car_spec->v);
+            s = BrVector3Length(&wank);
+            if (s < 1.0f) {
+                t = 0.0;
+            } else {
+                t = d / s / 2.0f;
+            }
+            BrVector3Scale(&data->direct_line_nodes[1].p, &data->pursuee->v, t);
+            BrVector3Accumulate(&data->direct_line_nodes[1].p, &data->pursuee->car_master_actor->t.t.translate.t);
+            if (d < 2.0f) {
+                ProcessFollowPath(pOpponent_spec, ePOC_run, 1, 1, 1);
+            } else {
+                ProcessFollowPath(pOpponent_spec, ePOC_run, 1, 1, 0);
+            }
+            break;
+
+        case ePCS_following_trail:
+            if (data->pursuee->my_trail.nodes_shifted_this_frame) {
+                if (pOpponent_spec->follow_path_data.section_no > 15000) {
+                    pOpponent_spec->follow_path_data.section_no--;
+                } else {
+                    data->state = ePCS_following_trail;
+                    section_no = FindNearestTrailSection(pOpponent_spec, data->pursuee, &section_v, &intersect, &distance);
+                    dr_dprintf("%s: Trail got away; found new trail section %d", pOpponent_spec->car_spec->driver_name, section_no);
+                    if (section_no == -1 || distance > 20.0f || !PointVisibleFromHere(&intersect, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t)) {
+                        dr_dprintf("%s: ...which unfortunately is too far away (%fBRU) or not visible - end of pursuit", pOpponent_spec->car_spec->driver_name, distance);
+                        NewObjective(pOpponent_spec, eOOT_get_near_player);
+                        break;
+                    }
+                    pOpponent_spec->follow_path_data.section_no = section_no;
+                    ProcessFollowPath(pOpponent_spec, ePOC_start, 1, 0, 0);
+                }
+                dr_dprintf("%s: Following re-jobbied section %d/%d", pOpponent_spec->car_spec->driver_name, pOpponent_spec->follow_path_data.section_no, data->pursuee->my_trail.number_of_nodes - 1);
+            }
+            sprintf(str, "%s: Trail section %d/%d", pOpponent_spec->car_spec->driver_name, pOpponent_spec->follow_path_data.section_no, data->pursuee->my_trail.number_of_nodes - 1);
+            res = ProcessFollowPath(pOpponent_spec, ePOC_run, 1, 0, 0);
+            if (res == eFPR_given_up) {
+                NewObjective(pOpponent_spec, eOOT_get_near_player);
+                return;
+            }
+            if (res == eFPR_end_of_path) {
+                NewObjective(pOpponent_spec, eOOT_get_near_player);
+                return;
+            }
+            break;
+
+        case ePCS_what_now:
+            PDEnterDebugger("ERROR: what_now state called in ProcessPursueAndTwat()");
+
+        default:
+            break;
         }
+
         break;
+
     default:
         return;
     }
@@ -1224,48 +1243,50 @@ void ProcessRunAway(tOpponent_spec* pOpponent_spec, tProcess_objective_command p
 
     switch (pCommand) {
 
-    case ePOC_run:
-        if (pOpponent_spec->run_away_data.time_to_stop >= gTime_stamp_for_this_munging) {
-            if (pOpponent_spec->follow_path_data.section_no > 20000) {
-                ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
-                pOpponent_spec->follow_path_data.section_no = 20000;
-            }
-            if (pOpponent_spec->nnext_sections < 10) {
-                TopUpRandomRoute(pOpponent_spec, 10 - pOpponent_spec->nnext_sections);
-            }
-            if (ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0) == eFPR_given_up) {
-                ClearOpponentsProjectedRoute(pOpponent_spec);
-                section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
-                if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) < 0.0f) {
-                    AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
-                } else {
-                    AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
-                }
-                TopUpRandomRoute(pOpponent_spec, -1);
-                ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
-            }
-        } else {
-            ObjectiveComplete(pOpponent_spec);
-        }
-        break;
-
     case ePOC_start:
         dr_dprintf("%s: ProcessRunAway() - new objective started", pOpponent_spec->car_spec->driver_name);
         pOpponent_spec->run_away_data.time_to_stop = gTime_stamp_for_this_munging + 1000 * IRandomBetween(30, 90);
         ClearOpponentsProjectedRoute(pOpponent_spec);
         section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
-        if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) < 0.0f) {
-            AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
-        } else {
+        if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) >= 0.0f) {
             AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
+        } else {
+            AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
         }
         TopUpRandomRoute(pOpponent_spec, -1);
         ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
         sprintf(str, "%s: Shit! I'm out of here...", pOpponent_spec->car_spec->driver_name);
         break;
 
-    case ePOC_die:
+    case ePOC_run:
+        if (pOpponent_spec->run_away_data.time_to_stop < gTime_stamp_for_this_munging) {
+            ObjectiveComplete(pOpponent_spec);
+            return;
+        }
+        if (pOpponent_spec->follow_path_data.section_no > 20000) {
+            ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
+            pOpponent_spec->follow_path_data.section_no = 20000;
+        }
+        if (pOpponent_spec->nnext_sections < 10) {
+            TopUpRandomRoute(pOpponent_spec, 10 - pOpponent_spec->nnext_sections);
+        }
+        res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
+        if (res == eFPR_given_up) {
+            ClearOpponentsProjectedRoute(pOpponent_spec);
+            section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
+            if (BrVector3Dot(&pOpponent_spec->car_spec->direction, &direction_v) >= 0.0f) {
+                AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 1);
+            } else {
+                AddToOpponentsProjectedRoute(pOpponent_spec, section_no, 0);
+            }
+            TopUpRandomRoute(pOpponent_spec, -1);
+            ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
+        }
+
         break;
+
+    case ePOC_die:
+        return;
     }
 }
 
@@ -1275,11 +1296,14 @@ void ProcessWaitForSomeHaplessSod(tOpponent_spec* pOpponent_spec, tProcess_objec
 
     switch (pCommand) {
     case ePOC_start:
+        pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
+        return;
     case ePOC_run:
         pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
-        break;
-    default:
-        break;
+        return;
+
+    case ePOC_die:
+        return;
     }
 }
 
@@ -1293,17 +1317,26 @@ void ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     int res;
 
     switch (pCommand) {
+    case ePOC_start:
+        dr_dprintf("%s: ProcessReturnToStart() - new objective started", pOpponent_spec->car_spec->driver_name);
+        pOpponent_spec->return_to_start_data.waiting_near_start = 0;
+        pOpponent_spec->return_to_start_data.section_no = FindNearestPathSection(&pOpponent_spec->start_pos, &section_v, &pOpponent_spec->return_to_start_data.nearest_path_point, &distance);
+        pOpponent_spec->return_to_start_data.nearest_path_point.v[1] = 0.0;
+        CalcReturnToStartPointRoute(pOpponent_spec);
+        ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
+        break;
     case ePOC_run:
         if (TeleportCopToStart(pOpponent_spec)) {
             break;
         }
-        if (pOpponent_spec->return_to_start_data.waiting_near_start) {
-            pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
-        } else {
-            our_pos_xz = pOpponent_spec->car_spec->car_master_actor->t.t.translate.t;
+        if (!pOpponent_spec->return_to_start_data.waiting_near_start) {
+            BrVector3Copy(&our_pos_xz, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
             our_pos_xz.v[1] = 0.0f;
             BrVector3Sub(&cop_to_start, &pOpponent_spec->start_pos, &our_pos_xz);
-            if (BrVector3Length(&cop_to_start) >= 10.0) {
+            if (BrVector3Length(&cop_to_start) < 10.f) {
+                pOpponent_spec->return_to_start_data.waiting_near_start = 1;
+                pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
+            } else {
                 if (pOpponent_spec->follow_path_data.section_no > 20000) {
                     ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
                     pOpponent_spec->follow_path_data.section_no = 20000;
@@ -1322,22 +1355,14 @@ void ProcessReturnToStart(tOpponent_spec* pOpponent_spec, tProcess_objective_com
                     CalcReturnToStartPointRoute(pOpponent_spec);
                     ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
                 }
-            } else {
-                pOpponent_spec->return_to_start_data.waiting_near_start = 1;
-                pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
             }
+        } else {
+            pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
         }
         break;
-    case ePOC_start:
-        dr_dprintf("%s: ProcessReturnToStart() - new objective started", pOpponent_spec->car_spec->driver_name);
-        pOpponent_spec->return_to_start_data.waiting_near_start = 0;
-        pOpponent_spec->return_to_start_data.section_no = FindNearestPathSection(&pOpponent_spec->start_pos, &section_v, &pOpponent_spec->return_to_start_data.nearest_path_point, &distance);
-        pOpponent_spec->return_to_start_data.nearest_path_point.v[1] = 0.0;
-        CalcReturnToStartPointRoute(pOpponent_spec);
-        ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
-        break;
-    default:
-        break;
+
+    case ePOC_die:
+        return;
     }
 }
 
@@ -1348,41 +1373,50 @@ void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command 
     float terminal_time;
     float y;
 
-    if (pCommand == ePOC_start) {
+    switch (pCommand) {
+    case ePOC_start:
         dr_dprintf("%s: ProcessLevitate() - new objective started", pOpponent_spec->car_spec->driver_name);
         pOpponent_spec->levitate_data.waiting_to_levitate = 1;
         pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
         pOpponent_spec->car_spec->acc_force = 0.f;
         pOpponent_spec->levitate_data.time_started = gTime_stamp_for_this_munging;
-    } else if (pCommand == ePOC_run) {
+        break;
+
+    case ePOC_run:
         if (pOpponent_spec->levitate_data.waiting_to_levitate) {
             if ((BrVector3Length(&pOpponent_spec->car_spec->v) < .01f && BrVector3Length(&pOpponent_spec->car_spec->omega) < 1.f) || gTime_stamp_for_this_munging - pOpponent_spec->levitate_data.time_started > 4000) {
                 pOpponent_spec->levitate_data.waiting_to_levitate = 0;
                 pOpponent_spec->levitate_data.time_started = gTime_stamp_for_this_munging;
                 pOpponent_spec->levitate_data.initial_y = pOpponent_spec->car_spec->car_master_actor->t.t.translate.t.v[1];
                 if (pOpponent_spec->car_spec->has_been_stolen) {
-                    NewTextHeadupSlot(eHeadupSlot_misc, 250, 2500, -4, GetMiscString(kMiscString_CarAddedToChangeCarList));
+                    NewTextHeadupSlot(eHeadupSlot_misc, 250, 5000, -4, GetMiscString(kMiscString_CarAddedToChangeCarList));
                 }
             } else {
                 pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
                 pOpponent_spec->car_spec->acc_force = 0.f;
                 BrVector3InvScale(&pOpponent_spec->car_spec->omega, &pOpponent_spec->car_spec->omega,
-                    pow(gFrame_period_for_this_munging / 1000.f, 2.f));
+                    pow(2.f, gFrame_period_for_this_munging / 1000.0));
             }
         }
         if (!pOpponent_spec->levitate_data.waiting_to_levitate) {
             TurnOpponentPhysicsOff(pOpponent_spec);
-            t = (gTime_stamp_for_this_munging - pOpponent_spec->levitate_data.time_started) / 1000.f;
-            if (t < 20.f) {
-                y = .5f * t * t / 2.f;
+            t = (gTime_stamp_for_this_munging - pOpponent_spec->levitate_data.time_started) / 1000.0;
+            terminal_time = 20.f;
+            if (t < terminal_time) {
+                y = t * t * .5f / 2.f;
             } else {
-                y = 10.f * (t - 20.f) + 100.f;
+                y = terminal_time * terminal_time * 0.5 / 2.0 + (t - terminal_time) * 10.0;
             }
             pOpponent_spec->car_spec->car_master_actor->t.t.translate.t.v[1] = pOpponent_spec->levitate_data.initial_y + y;
             if (y > 200.f) {
                 pOpponent_spec->finished_for_this_race = 1;
             }
         }
+        break;
+    case ePOC_die:
+        return;
+    default:
+        break;
     }
 }
 
@@ -1394,21 +1428,25 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
     int res;
     char str[256];
 
-    if (pCommand == ePOC_start) {
+    initial_pos = &gProgram_state.initial_position;
+    car_actor = pOpponent_spec->car_spec->car_master_actor;
+
+    switch (pCommand) {
+    case ePOC_start:
         dr_dprintf("%s: ProcessGetNearPlayer() - new objective started", pOpponent_spec->car_spec->driver_name);
         ClearOpponentsProjectedRoute(pOpponent_spec);
         CalcGetNearPlayerRoute(pOpponent_spec, &gProgram_state.current_car);
         ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
-        return;
-    }
-    if (pCommand == ePOC_run) {
-        if ((pOpponent_spec->car_spec->car_ID & 0xff00) == 768 && pOpponent_spec->distance_from_home > 75.0) {
+        break;
+
+    case ePOC_run:
+        if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec) && pOpponent_spec->distance_from_home > 75.0f) {
             dr_dprintf("%s: Completing get_near objective because I'm out of my precinct", pOpponent_spec->car_spec->driver_name);
             NewObjective(pOpponent_spec, eOOT_return_to_start);
             return;
         }
         if (pOpponent_spec->follow_path_data.section_no > 20000) {
-            if (pOpponent_spec->player_to_oppo_d < 10.0 || pOpponent_spec->follow_path_data.section_no == pOpponent_spec->players_section_when_last_calced_full_path) {
+            if (pOpponent_spec->player_to_oppo_d < 10.0f || pOpponent_spec->follow_path_data.section_no == pOpponent_spec->players_section_when_last_calced_full_path) {
                 dr_dprintf("%s: ProcessGetNearPlayer() - giving up 'cos got to player's section", pOpponent_spec->car_spec->driver_name);
                 ObjectiveComplete(pOpponent_spec);
                 return;
@@ -1422,14 +1460,20 @@ void ProcessGetNearPlayer(tOpponent_spec* pOpponent_spec, tProcess_objective_com
         res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
         sprintf(str, "Get near: %d", GetOpponentsRealSection(pOpponent_spec, pOpponent_spec->follow_path_data.section_no));
 
-        if (res == eFPR_given_up) {
-            NewObjective(pOpponent_spec, eOOT_pursue_and_twat, &gProgram_state.current_car);
-        } else if (res == eFPR_end_of_path) {
-            dr_dprintf("%s: Restarting get_near_player route because ran out of path!", pOpponent_spec->car_spec->driver_name);
+        if (res == eFPR_given_up || res == eFPR_end_of_path) {
+            if (res == eFPR_given_up) {
+                NewObjective(pOpponent_spec, eOOT_pursue_and_twat, &gProgram_state.current_car);
+                return;
+            } else {
+                dr_dprintf("%s: Restarting get_near_player route because ran out of path!", pOpponent_spec->car_spec->driver_name);
+            }
             ClearOpponentsProjectedRoute(pOpponent_spec);
             CalcGetNearPlayerRoute(pOpponent_spec, &gProgram_state.current_car);
             ProcessFollowPath(pOpponent_spec, ePOC_start, 0, 0, 0);
         }
+
+    default:
+        break;
     }
 }
 
@@ -1467,12 +1511,13 @@ int HeadOnWithPlayerPossible(tOpponent_spec* pOpponent_spec) {
         - pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][2];
 
     BrVector3Normalise(&oppo_to_player_norm, &oppo_to_player_norm);
-    if (gHead_on_cos_value >= BrVector3Dot(&pOpponent_spec->car_spec->direction, &pOpponent_spec->car_spec->direction)
-        || -gHead_on_cos_value <= BrVector3Dot(&pOpponent_spec->car_spec->direction, &pOpponent_spec->car_spec->direction)) {
-        return 0;
+    if (gHead_on_cos_value < BrVector3Dot(&pOpponent_spec->car_spec->direction, &oppo_to_player_norm)
+        && -gHead_on_cos_value > BrVector3Dot(&gProgram_state.current_car.direction, &oppo_to_player_norm)) {
+
+        dr_dprintf("HOORAY! Head-on imminent");
+        return 1;
     }
-    dr_dprintf("HOORAY! Head-on imminent");
-    return 1;
+    return 0;
 }
 
 // IDA: int __usercall AlreadyPursuingCar@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tCar_spec *pPursuee@<EDX>)
@@ -1506,11 +1551,11 @@ void ObjectiveComplete(tOpponent_spec* pOpponent_spec) {
     case eOOT_complete_race:
         gNum_of_opponents_completing_race--;
         break;
-    case eOOT_pursue_and_twat:
-        gNum_of_opponents_pursuing--;
-        break;
     case eOOT_get_near_player:
         gNum_of_opponents_getting_near--;
+        break;
+    case eOOT_pursue_and_twat:
+        gNum_of_opponents_pursuing--;
         break;
     default:
         break;
@@ -1580,16 +1625,17 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
     if (gTime_stamp_for_this_munging > pOpponent_spec->next_out_of_world_check) {
         pOpponent_spec->next_out_of_world_check = gTime_stamp_for_this_munging + 500;
         if (HasCarFallenOffWorld(pOpponent_spec->car_spec)) {
-            if (pOpponent_spec->car_spec->last_time_we_touched_a_player <= gTime_stamp_for_this_munging - 7000) {
-                TeleportOpponentToNearestSafeLocation(pOpponent_spec);
-                NewObjective(pOpponent_spec, eOOT_complete_race);
-            } else {
+            if (pOpponent_spec->car_spec->last_time_we_touched_a_player > gTime_stamp_for_this_munging - 7000) {
                 TurnOpponentPhysicsOff(pOpponent_spec);
                 pOpponent_spec->finished_for_this_race = 1;
                 KnackerThisCar(pOpponent_spec->car_spec);
                 pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[3][1] -= 1000.0f;
+                return;
+            } else {
+                TeleportOpponentToNearestSafeLocation(pOpponent_spec);
+                NewObjective(pOpponent_spec, eOOT_complete_race);
+                return;
             }
-            return;
         }
     }
     if (pOpponent_spec->car_spec->knackered && !pOpponent_spec->knackeredness_detected) {
@@ -1611,7 +1657,6 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
                 NewObjective(pOpponent_spec, eOOT_get_near_player);
             }
         }
-        return;
     } else {
         if (CAR_SPEC_GET_SPEED_FACTOR(pOpponent_spec->car_spec) == 0.0f) {
             dr_dprintf("%s: Decided to freeze", pOpponent_spec->car_spec->driver_name);
@@ -1627,17 +1672,15 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
             general_grudge_increase = (pOpponent_spec->nastiness * 40.0f + 10.0f);
             if (pOpponent_spec->car_spec->scary_bang && pOpponent_spec->player_to_oppo_d < 10.0f) {
                 if (pOpponent_spec->current_objective == eOOT_pursue_and_twat) {
-                    percentage = 40;
+                    pursuit_percentage = 40;
                 } else {
-                    percentage = 0;
+                    pursuit_percentage = 0;
                 }
-                if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
-                    if (PercentageChance(20)) {
-                        dr_dprintf("%s: Decided to run away", pOpponent_spec->car_spec->driver_name);
-                        NewObjective(pOpponent_spec, eOOT_run_away);
-                        return;
-                    }
-                } else if (PercentageChance((percentage + 60) - pOpponent_spec->nastiness * 50.0)) {
+                if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec) && PercentageChance(20)) {
+                    dr_dprintf("%s: Decided to run away", pOpponent_spec->car_spec->driver_name);
+                    NewObjective(pOpponent_spec, eOOT_run_away);
+                    return;
+                } else if (PercentageChance((pursuit_percentage + 60) - pOpponent_spec->nastiness * 50.0f)) {
                     dr_dprintf("%s: Decided to run away", pOpponent_spec->car_spec->driver_name);
                     NewObjective(pOpponent_spec, eOOT_run_away);
                     return;
@@ -1652,14 +1695,6 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
                     return;
                 }
                 if (pOpponent_spec->car_spec->big_bang && LastTwatterAPlayer(pOpponent_spec) && !AlreadyPursuingCar(pOpponent_spec, pOpponent_spec->car_spec->last_person_to_hit_us)) {
-                    // v4 = gOpponents[pOpponent_spec->index].psyche.grudge_against_player;
-                    // if (v4 <= 20) {
-                    //     v4 = 20;
-                    // }
-                    // v5 = general_grudge_increase + v4;
-                    // if (v5 >= 100) {
-                    //     LOBYTE(v5) = 100;
-                    // }
                     gOpponents[pOpponent_spec->index].psyche.grudge_against_player = MIN(100, MAX(20, gOpponents[pOpponent_spec->index].psyche.grudge_against_player) + general_grudge_increase);
                     sprintf(str, "%s: Christ! What was that?", pOpponent_spec->car_spec->driver_name);
                     dr_dprintf("%s: Decided to pursue after big bang; last person to twat us was %s", pOpponent_spec->car_spec->driver_name, pOpponent_spec->car_spec->last_person_to_hit_us->driver_name);
@@ -1667,14 +1702,6 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
                     return;
                 }
                 if (LastTwatteeAPlayer(pOpponent_spec) && !AlreadyPursuingCar(pOpponent_spec, pOpponent_spec->car_spec->last_person_we_hit)) {
-                    // v6 = gOpponents[pOpponent_spec->index].psyche.grudge_against_player;
-                    // if (v6 <= 20) {
-                    //     v6 = 20;
-                    // }
-                    // v7 = general_grudge_increase + v6;
-                    // if (v7 >= 100) {
-                    //     LOBYTE(v7) = 100;
-                    // }
                     gOpponents[pOpponent_spec->index].psyche.grudge_against_player = MIN(100, MAX(20, gOpponents[pOpponent_spec->index].psyche.grudge_against_player) + general_grudge_increase);
                     sprintf(str, "%s: Ha! Bet you weren't expecting that!", pOpponent_spec->car_spec->driver_name);
                     dr_dprintf("%s: Decided to pursue %s after accidentally hitting them", pOpponent_spec->car_spec->driver_name, pOpponent_spec->car_spec->last_person_we_hit->driver_name);
@@ -1682,15 +1709,7 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
                     return;
                 }
                 if (!AlreadyPursuingCar(pOpponent_spec, &gProgram_state.current_car)) {
-                    if (pOpponent_spec->car_spec->grudge_raised_recently && (!CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec) || pOpponent_spec->player_to_oppo_d <= 20.0) && LastTwatterAPlayer(pOpponent_spec) && gOpponents[pOpponent_spec->index].psyche.grudge_against_player > 20) {
-                        // v8 = gOpponents[pOpponent_spec->index].psyche.grudge_against_player;
-                        // if (v8 <= 20) {
-                        //     v8 = 20;
-                        // }
-                        // v9 = general_grudge_increase + v8;
-                        // if (v9 >= 100) {
-                        //     LOBYTE(v9) = 100;
-                        // }
+                    if (pOpponent_spec->car_spec->grudge_raised_recently && (!CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec) || pOpponent_spec->player_to_oppo_d <= 20.f) && LastTwatterAPlayer(pOpponent_spec) && gOpponents[pOpponent_spec->index].psyche.grudge_against_player > 20) {
                         gOpponents[pOpponent_spec->index].psyche.grudge_against_player = MIN(100, MAX(20, gOpponents[pOpponent_spec->index].psyche.grudge_against_player) + general_grudge_increase);
                         sprintf(str, "%s: Right! That's enough, %s!", pOpponent_spec->car_spec->driver_name, gProgram_state.current_car.driver_name);
                         dr_dprintf("%s: Decided to pursue after grudginess raised; last person to twat us was %s", pOpponent_spec->car_spec->driver_name, pOpponent_spec->car_spec->last_person_to_hit_us->driver_name);
@@ -1698,69 +1717,76 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
                         return;
                     }
 
-                    if ((pOpponent_spec->player_in_view_now) != 0 && (pOpponent_spec->acknowledged_piv) == 0) {
-                        pOpponent_spec->acknowledged_piv = 1;
-                        if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
-                            pursuit_percentage = (BrVector3Length(&gProgram_state.current_car.v) - gDefinite_no_cop_pursuit_speed) * gCop_pursuit_speed_percentage_multiplier;
-                        } else if (gProgram_state.skill_level + 3 > gNum_of_opponents_pursuing) {
-                            pursuit_percentage = gOpponents[pOpponent_spec->index].psyche.grudge_against_player - 20 + pOpponent_spec->nastiness * 30.f;
-                        } else {
-                            pursuit_percentage = 0;
-                        }
+                    if (pOpponent_spec->player_in_view_now) {
+                        do_it = 0;
+                        if (pOpponent_spec->acknowledged_piv == 0) {
 
-                        pursuit_percentage += 50 * HeadOnWithPlayerPossible(pOpponent_spec);
-                        do_it = PercentageChance(pursuit_percentage);
-                        dr_dprintf("%s: Spotted player; chance of pursuing %d%%: %s", pOpponent_spec->car_spec->driver_name, pursuit_percentage, do_it ? "YES, Decided to pursue" : "NO, Decided NOT to pursue");
-                        if (do_it) {
-                            gOpponents[pOpponent_spec->index].psyche.grudge_against_player = MIN(100, MAX(20, gOpponents[pOpponent_spec->index].psyche.grudge_against_player) + general_grudge_increase);
-                            sprintf(str, "%s: I've decided to kill you for the fun of it", pOpponent_spec->car_spec->driver_name);
-                            NewObjective(pOpponent_spec, eOOT_pursue_and_twat, &gProgram_state.current_car);
-                            return;
+                            pOpponent_spec->acknowledged_piv = 1;
+                            if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
+                                percentage = (BrVector3Length(&gProgram_state.current_car.v) - gDefinite_no_cop_pursuit_speed) * gCop_pursuit_speed_percentage_multiplier;
+                            } else if (gProgram_state.skill_level + 3 > gNum_of_opponents_pursuing) {
+                                percentage = gOpponents[pOpponent_spec->index].psyche.grudge_against_player - 20 + pOpponent_spec->nastiness * 30.f;
+                            } else {
+                                percentage = 0;
+                            }
+
+                            percentage += 50 * HeadOnWithPlayerPossible(pOpponent_spec);
+                            do_it = PercentageChance(percentage);
+                            dr_dprintf("%s: Spotted player; chance of pursuing %d%%: %s", pOpponent_spec->car_spec->driver_name, percentage, do_it ? "YES, Decided to pursue" : "NO, Decided NOT to pursue");
+                            if (do_it) {
+                                gOpponents[pOpponent_spec->index].psyche.grudge_against_player = MIN(100, MAX(20, gOpponents[pOpponent_spec->index].psyche.grudge_against_player) + general_grudge_increase);
+                                sprintf(str, "%s: I've decided to kill you for the fun of it", pOpponent_spec->car_spec->driver_name);
+                                NewObjective(pOpponent_spec, eOOT_pursue_and_twat, &gProgram_state.current_car);
+                                return;
+                            }
                         }
                     }
                 }
             }
         }
-        if (!pMust_choose_one) {
-            return;
-        }
-        dr_dprintf("%s: Choosing new objective because we have to...", pOpponent_spec->car_spec->driver_name);
-        if (pOpponent_spec->has_moved_at_some_point) {
-            if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
-                NewObjective(pOpponent_spec, eOOT_return_to_start);
-                return;
-            }
-            if (gNum_of_opponents_pursuing + gNum_of_opponents_getting_near >= 3 || pOpponent_spec->player_to_oppo_d <= 10.0) {
-                if (gNum_of_opponents_completing_race >= 2) {
-                    pursuit_percentage = pOpponent_spec->player_to_oppo_d - 15.0f;
-                    if (PercentageChance(pursuit_percentage)) {
-                        dr_dprintf("%s: Choosing to get_near because chance dictated it (%d%%)", pOpponent_spec->car_spec->driver_name, pursuit_percentage);
+        if (pMust_choose_one) {
+            dr_dprintf("%s: Choosing new objective because we have to...", pOpponent_spec->car_spec->driver_name, pOpponent_spec->car_spec->last_person_to_hit_us);
+            if (pOpponent_spec->has_moved_at_some_point) {
+                if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
+                    NewObjective(pOpponent_spec, eOOT_return_to_start);
+                    return;
+                } else {
+                    if (gNum_of_opponents_getting_near + gNum_of_opponents_pursuing < 3 && pOpponent_spec->player_to_oppo_d > 10.0f) {
+                        dr_dprintf("%s: Choosing to get_near because not enough oppos are yet (%d/%d)", pOpponent_spec->car_spec->driver_name, gNum_of_opponents_getting_near + gNum_of_opponents_pursuing, 3);
+                        NewObjective(pOpponent_spec, eOOT_get_near_player);
+                        return;
+                    }
+                    if (gNum_of_opponents_completing_race < 2) {
+                        dr_dprintf("%s: Choosing to complete_race because not enough oppos are yet (%d/%d)", pOpponent_spec->car_spec->driver_name, gNum_of_opponents_completing_race, 2);
+                        NewObjective(pOpponent_spec, eOOT_complete_race);
+                        return;
+                    }
+
+                    percentage = (int)pOpponent_spec->player_to_oppo_d - 15;
+                    if (PercentageChance(percentage)) {
+                        dr_dprintf("%s: Choosing to get_near because chance dictated it (%d%%)", pOpponent_spec->car_spec->driver_name, percentage);
                         NewObjective(pOpponent_spec, eOOT_get_near_player);
                         return;
                     } else {
-                        dr_dprintf("%s: Choosing to complete_race because chance dictated it (%d%%)", pOpponent_spec->car_spec->driver_name, pursuit_percentage);
+                        dr_dprintf("%s: Choosing to complete_race because chance dictated it (%d%%)", pOpponent_spec->car_spec->driver_name, percentage);
+                        NewObjective(pOpponent_spec, eOOT_complete_race);
+                        return;
                     }
-                } else {
-                    dr_dprintf("%s: Choosing to complete_race because not enough oppos are yet (%d/%d)", pOpponent_spec->car_spec->driver_name, gNum_of_opponents_completing_race, 2);
                 }
+
+            } else if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
+                NewObjective(pOpponent_spec, eOOT_wait_for_some_hapless_sod);
+                return;
+            } else if (pOpponent_spec->pursue_from_start && !gMellow_opponents) {
+                gOpponents[pOpponent_spec->index].psyche.grudge_against_player = MIN(100.f, pOpponent_spec->nastiness * 40.f + (MAX(20, gOpponents[pOpponent_spec->index].psyche.grudge_against_player) + 20));
+                NewObjective(pOpponent_spec, eOOT_pursue_and_twat, &gProgram_state.current_car);
+                return;
+
+            } else {
                 NewObjective(pOpponent_spec, eOOT_complete_race);
                 return;
             }
-            dr_dprintf("%s: Choosing to get_near because not enough oppos are yet (%d/%d)", pOpponent_spec->car_spec->driver_name, gNum_of_opponents_pursuing + gNum_of_opponents_getting_near, 3);
-            NewObjective(pOpponent_spec, eOOT_get_near_player);
-            return;
         }
-        if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
-            NewObjective(pOpponent_spec, eOOT_wait_for_some_hapless_sod);
-            return;
-        }
-        if (!pOpponent_spec->pursue_from_start || gMellow_opponents) {
-            NewObjective(pOpponent_spec, eOOT_complete_race);
-            return;
-        }
-
-        gOpponents[pOpponent_spec->index].psyche.grudge_against_player = MIN(100, pOpponent_spec->nastiness * 40.0 + (MAX(20, gOpponents[pOpponent_spec->index].psyche.grudge_against_player) + 20));
-        NewObjective(pOpponent_spec, eOOT_pursue_and_twat, &gProgram_state.current_car);
     }
 }
 
@@ -1769,13 +1795,16 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
 void ProcessThisOpponent(tOpponent_spec* pOpponent_spec) {
     int i;
 
-    if ((gMap_mode && gShow_opponents) || pOpponent_spec->last_in_view + 3000 >= gTime_stamp_for_this_munging) {
+    if ((!gMap_mode || !gShow_opponents) && (pOpponent_spec->last_in_view + 3000 < gTime_stamp_for_this_munging)) {
+        if (pOpponent_spec->cheating == 0) {
+            StartToCheat(pOpponent_spec);
+        }
+    } else {
         if (pOpponent_spec->cheating) {
             OiStopCheating(pOpponent_spec);
         }
-    } else if (pOpponent_spec->cheating == 0) {
-        StartToCheat(pOpponent_spec);
     }
+
     ChooseNewObjective(pOpponent_spec, pOpponent_spec->new_objective_required);
     pOpponent_spec->new_objective_required = 0;
     if (gCountdown || gRace_finished) {
@@ -1817,32 +1846,39 @@ void RebuildActiveCarList(void) {
         gActive_car_list_rebuild_required = 0;
         gNum_active_cars = 0;
 
-        if (!gProgram_state.current_car.disabled || gAction_replay_mode) {
-            gActive_car_list[gNum_active_cars] = &gProgram_state.current_car;
-            gNum_active_cars++;
-            gProgram_state.current_car.active = 1;
+        for (i = 0; i < 1; i++) {
+            if (i > 0) {
+                PDFatalError("mGet_car_count( eVehicle_self ) > 1 - I didn't know this could happen!");
+            }
+
+            car_spec = &gProgram_state.current_car;
+            if (!car_spec->disabled || gAction_replay_mode) {
+                gActive_car_list[gNum_active_cars] = car_spec;
+                gNum_active_cars++;
+                car_spec->active = 1;
+            }
         }
 
         if (gNet_mode == eNet_mode_host) {
             for (i = 0; i < GetCarCount(eVehicle_net_player); i++) {
                 car_spec = GetCarSpec(eVehicle_net_player, i);
-                if (car_spec->disabled) {
-                    car_spec->active = 0;
-                } else {
+                if (!car_spec->disabled) {
                     gActive_car_list[gNum_active_cars] = car_spec;
                     gNum_active_cars++;
                     car_spec->active = 1;
+                } else {
+                    car_spec->active = 0;
                 }
             }
         } else if (gNet_mode == eNet_mode_client) {
             for (i = 0; i < GetCarCount(eVehicle_net_player); i++) {
                 car_spec = GetCarSpec(eVehicle_net_player, i);
-                if (car_spec->disabled || !IsNetCarActive(&car_spec->car_master_actor->t.t.translate.t)) {
-                    car_spec->active = 0;
-                } else {
+                if (!car_spec->disabled && IsNetCarActive(&car_spec->car_master_actor->t.t.translate.t)) {
                     gActive_car_list[gNum_active_cars] = car_spec;
                     gNum_active_cars++;
                     car_spec->active = 1;
+                } else {
+                    car_spec->active = 0;
                 }
             }
         }
@@ -1856,12 +1892,13 @@ void RebuildActiveCarList(void) {
                 car_spec->active = 0;
             }
         }
-        for (i = 0; gNumber_of_cops_before_faffage > i; ++i) {
+        for (i = 0; i < gNumber_of_cops_before_faffage; i++) {
             car_spec = GetCarSpec(eVehicle_rozzer, i);
             if (gProgram_state.AI_vehicles.cops[i].physics_me || gAction_replay_mode) {
                 gActive_car_list[gNum_active_cars] = car_spec;
                 gNum_active_cars++;
                 car_spec->active = 1;
+            } else {
             }
         }
     }
@@ -1883,7 +1920,7 @@ void StartToCheat(tOpponent_spec* pOpponent_spec) {
 
     dr_dprintf("%s: StartToCheat() - Starting to cheat", pOpponent_spec->car_spec->driver_name);
     pOpponent_spec->cheating = 1;
-    if ((pOpponent_spec->car_spec->car_ID & 0xff00) == 0x300) {
+    if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
         dr_dprintf("%s: StartToCheat() - Turning physics OFF", pOpponent_spec->car_spec->driver_name);
         TurnOpponentPhysicsOff(pOpponent_spec);
         RebuildActiveCarList();
@@ -1896,7 +1933,7 @@ void OiStopCheating(tOpponent_spec* pOpponent_spec) {
 
     dr_dprintf("%s: OiStopCheating() - End of cheating sesh", pOpponent_spec->car_spec->driver_name);
     pOpponent_spec->cheating = 0;
-    if ((pOpponent_spec->car_spec->car_ID & 0xff00) == 0x300) {
+    if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
         dr_dprintf("%s: OiStopCheating() - Turning physics ON", pOpponent_spec->car_spec->driver_name);
         TurnOpponentPhysicsOn(pOpponent_spec);
         RebuildActiveCarList();
@@ -1912,17 +1949,18 @@ int TeleportCopToStart(tOpponent_spec* pOpponent_spec) {
         return 0;
     }
     BrVector3Sub(&wank, &gProgram_state.current_car.car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
-    if (BrVector3Length(&wank) <= gIn_view_distance) {
-        return 0;
+    if (BrVector3Length(&wank) > gIn_view_distance) {
+        BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &pOpponent_spec->start_pos);
+        PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &pOpponent_spec->start_direction);
+        pOpponent_spec->physics_me = 0;
+        RematerialiseOpponent(pOpponent_spec, 0.0);
+        TurnOpponentPhysicsOff(pOpponent_spec);
+        RebuildActiveCarList();
+        NewObjective(pOpponent_spec, eOOT_wait_for_some_hapless_sod);
+        return 1;
     }
-    pOpponent_spec->car_spec->car_master_actor->t.t.euler.t = pOpponent_spec->start_pos;
-    PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &pOpponent_spec->start_direction);
-    pOpponent_spec->physics_me = 0;
-    RematerialiseOpponent(pOpponent_spec, 0.0);
-    TurnOpponentPhysicsOff(pOpponent_spec);
-    RebuildActiveCarList();
-    NewObjective(pOpponent_spec, eOOT_wait_for_some_hapless_sod);
-    return 1;
+
+    return 0;
 }
 
 // IDA: void __usercall CalcDistanceFromHome(tOpponent_spec *pOpponent_spec@<EAX>)
@@ -1943,32 +1981,34 @@ int MassageOpponentPosition(tOpponent_spec* pOpponent_spec, int pMassage_count) 
     br_vector3 positive_y_vector;
     br_vector3 direction_v;
 
-    BrVector3Set(&positive_y_vector, 0.f, 1.f, 0.f);
     mat = &pOpponent_spec->car_spec->car_master_actor->t.t.mat;
     car_trans = &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t;
     if (pMassage_count > 22) {
         return 0;
-    } else if (pMassage_count > 20) {
+    }
+
+    if (pMassage_count > 20) {
         car_trans->v[1] += (pMassage_count - 20) * 2.0f;
-        return 1;
     } else {
-        direction_v.v[0] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][0];
-        direction_v.v[1] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][1];
-        direction_v.v[2] = -pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2][2];
-        if (pMassage_count % 4 >= 2) {
+        direction_v.v[0] = -mat->m[2][0];
+        direction_v.v[1] = -mat->m[2][1];
+        direction_v.v[2] = -mat->m[2][2];
+        if (pMassage_count % 4 < 2) {
+            BrVector3Normalise(&displacement, &direction_v);
+            BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.5f);
+        } else {
+            BrVector3Set(&positive_y_vector, 0.f, 1.f, 0.f);
             BrVector3Cross(&displacement, &positive_y_vector, &direction_v);
             BrVector3Normalise(&displacement, &displacement);
             BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.1f);
-        } else {
-            BrVector3Normalise(&displacement, &direction_v);
-            BrVector3Scale(&displacement, &displacement, (pMassage_count / 4) * 0.5f);
         }
         if (pMassage_count % 2) {
             BrVector3Negate(&displacement, &displacement);
         }
         BrVector3Accumulate(car_trans, &displacement);
-        return 1;
     }
+
+    return 1;
 }
 
 // IDA: int __usercall RematerialiseOpponentOnThisSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed, tS16 pSection_no)
@@ -1991,36 +2031,38 @@ int RematerialiseOpponentOnThisSection(tOpponent_spec* pOpponent_spec, br_scalar
     }
     start = GetOpponentsSectionStartNodePoint(pOpponent_spec, pSection_no);
     finish = GetOpponentsSectionFinishNodePoint(pOpponent_spec, pSection_no);
-    BrVector3Sub(&section_v, finish, start);
-    if (BrVector3Length(&section_v) != 0.f) {
-        BrVector3Sub(&a, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, start);
-        t = BrVector3Dot(&section_v, &a) / BrVector3Dot(&section_v, &section_v);
+    BrVector3Sub(&a, finish, start);
+    length = BrVector3Length(&a);
+    if (length != 0.f) {
+        BrVector3Sub(&p, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, start);
+        t = BrVector3Dot(&a, &p) / BrVector3LengthSquared(&a);
         if (t < 0.f) {
-            BrVector3Copy(&p, start);
+            BrVector3Copy(&intersect, start);
         } else if (t > 1.f) {
-            BrVector3Copy(&p, finish);
+            BrVector3Copy(&intersect, finish);
         } else {
-            p.v[0] = start->v[0] + t * section_v.v[0];
-            p.v[1] = start->v[1] + t * section_v.v[1];
-            p.v[2] = start->v[2] + t * section_v.v[2];
+            BrVector3Scale(&intersect, &a, t);
+            BrVector3Add(&intersect, &intersect, start);
         }
-        BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &p);
-        BrVector3Sub(&a, finish, start);
-        PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &a);
+        BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &intersect);
+        BrVector3Sub(&section_v, finish, start);
+        PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &section_v);
     }
-    if (!RematerialiseOpponent(pOpponent_spec, pSpeed)) {
+    if (RematerialiseOpponent(pOpponent_spec, pSpeed)) {
+        BrVector3Sub(&car_to_end, finish, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
+        distance_to_end = BrVector3Length(&car_to_end);
+        pOpponent_spec->car_spec->brake_force = 0.f;
+        pOpponent_spec->car_spec->acc_force = 0.f;
+        if (distance_to_end < 5.f) {
+            pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
+        } else {
+            pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M / 2.f;
+        }
+        pOpponent_spec->last_in_view = gTime_stamp_for_this_munging;
+        return 1;
+    } else {
         return 0;
     }
-    BrVector3Sub(&car_to_end, finish, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
-    pOpponent_spec->car_spec->brake_force = 0.f;
-    pOpponent_spec->car_spec->acc_force = 0.f;
-    if (BrVector3Length(&car_to_end) >= 5.f) {
-        pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M / 2.f;
-    } else {
-        pOpponent_spec->car_spec->acc_force = 15.f * pOpponent_spec->car_spec->M;
-    }
-    pOpponent_spec->last_in_view = gTime_stamp_for_this_munging;
-    return 1;
 }
 
 // IDA: int __usercall RematerialiseOpponentOnNearestSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, br_scalar pSpeed)
@@ -2040,6 +2082,7 @@ int RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_sca
         return 1;
     }
     section_no = FindNearestPathSection(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &direction_v, &intersect, &distance);
+    start = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p;
     finish = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p;
     BrVector3Copy(&pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, &intersect);
     PointActorAlongThisBloodyVector(pOpponent_spec->car_spec->car_master_actor, &direction_v);
@@ -2047,12 +2090,12 @@ int RematerialiseOpponentOnNearestSection(tOpponent_spec* pOpponent_spec, br_sca
     if (RematerialiseOpponent(pOpponent_spec, pSpeed)) {
         pOpponent_spec->car_spec->brake_force = 0.0f;
         pOpponent_spec->car_spec->acc_force = 0.0f;
-
         distance_to_end = BrVector3Length(&car_to_end);
-        if (distance_to_end >= 5.0f) {
-            pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M / 2.0f;
-        } else {
+
+        if (distance_to_end < 5.0f) {
             pOpponent_spec->car_spec->brake_force = pOpponent_spec->car_spec->M * 15.0f;
+        } else {
+            pOpponent_spec->car_spec->acc_force = pOpponent_spec->car_spec->M / 2.0f;
         }
     }
     return 0;
@@ -2087,104 +2130,106 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
     this_total = 0;
     mat = &pOpponent_spec->car_spec->car_master_actor->t.t.mat;
     massage_count = 0;
-    phi = BrDegreeToAngle(90) - BrRadianToAngle(atan2(mat->m[2][2], mat->m[2][0]));
+    theta = -BrRadianToAngle(atan2(mat->m[2][2], mat->m[2][0])) + BR_ANGLE_DEG(90);
     if (pOpponent_spec->physics_me) {
         dr_dprintf("%s: Actually, we're already materialised", pOpponent_spec->car_spec->driver_name);
-    } else {
-        total++;
-        BrMatrix34Copy(&original_mat, mat);
-        TurnOpponentPhysicsOn(pOpponent_spec);
-        RebuildActiveCarList();
-        while (1) {
-            count++;
-            BrVector3Scale((br_vector3*)mat->m[3], (br_vector3*)mat->m[3], WORLD_SCALE);
-            BrVector3Copy(&b, (br_vector3*)mat->m[3]);
-            BrMatrix34RotateY(mat, phi);
-            BrVector3Copy((br_vector3*)mat->m[3], &b);
-            BrVector3SetFloat(&b, 0.f, -100.f, 0.f);
-            BrVector3Copy(&a, (br_vector3*)mat->m[3]);
-            a.v[1] += 1.f;
-            findfloor(&a, &b, &norm, &dist);
-            a.v[1] += 100.f;
-            findfloor(&a, &b, &norm2, &dist2);
-            if (dist2 <= 1.f) {
-                BrVector3SetFloat(&b, 0.f, -5.01f, 0.f);
-                a.v[1] -= 100.f;
-                for (i = 0; i < 20; i++) {
-                    a.v[1] += 5.f;
-                    findfloor(&a, &b, &norm2, &dist2);
-                    if (dist2 <= 1.f) {
-                        break;
-                    }
-                }
-                dist2 = (i + 1) * 0.05f - dist2 / 20.f;
-            }
-            if (dist2 < dist) {
-                dist = -dist2;
-                BrVector3Copy(&norm, &norm2);
-            }
-            if (fabs(dist) <= 1.f) {
-                mat->m[3][1] -= dist * 100.f - 2.f;
-                BrMatrix34PreRotateX(mat, BrRadianToAngle(asin(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
-                BrMatrix34PreRotateZ(mat, BrRadianToAngle(asin(BrVector3Dot((br_vector3*)mat->m[2], &norm))));
-            }
-            BrVector3Negate(&pOpponent_spec->car_spec->direction, (br_vector3*)mat->m[2]);
-            BrMatrix34ApplyP(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->cmpos, mat);
-            BrVector3InvScale(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->pos, WORLD_SCALE);
-            BrVector3InvScale((br_vector3*)mat->m[3], (br_vector3*)mat->m[3], WORLD_SCALE);
-            BrVector3Copy(&pOpponent_spec->car_spec->v, (br_vector3*)pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2]);
-            BrVector3Negate(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v);
-            BrVector3Normalise(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v);
-            BrVector3Scale(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v, pSpeed * WORLD_SCALE);
-            BrVector3Set(&pOpponent_spec->car_spec->omega, 0.f, 0.f, 0.f);
-            BrMatrix34Copy(&pOpponent_spec->car_spec->oldmat, mat);
-            BrMatrix34Copy(&pOpponent_spec->car_spec->old_frame_mat, mat);
-            BrVector3Scale((br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], (br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], WORLD_SCALE);
-            for (i = 0; i < COUNT_OF(pOpponent_spec->car_spec->oldd); i++) {
-                pOpponent_spec->car_spec->oldd[i] = pOpponent_spec->car_spec->ride_height;
-            }
-            pOpponent_spec->car_spec->gear = 0;
-            pOpponent_spec->car_spec->revs = 0.f;
-            pOpponent_spec->car_spec->traction_control = 1;
-            BrMatrix34ApplyP(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->cmpos, mat);
-            BrVector3InvScale(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->pos, WORLD_SCALE);
-            BrVector3Negate(&pOpponent_spec->car_spec->direction, (br_vector3*)pOpponent_spec->car_spec->oldmat.m[3]);
-            pOpponent_spec->car_spec->box_face_ref = gFace_num__car - 2;
-            pOpponent_spec->car_spec->doing_nothing_flag = 0;
-            sensible_place = TestForCarInSensiblePlace(pOpponent_spec->car_spec);
-            if (sensible_place) {
-                break;
-            } else {
-                BrMatrix34Copy(mat, &original_mat);
-            }
-            if (!MassageOpponentPosition(pOpponent_spec, massage_count++)) {
-                break;
-            }
-            this_total++;
-        }
-        count--;
-        if (sensible_place) {
-            dr_dprintf("%s: Rematerialised (took %d attempts, orig. pos. (%7.3f,%7.3f,%7.3f), actual pos. (%7.3f,%7.3f,%7.3f))",
-                pOpponent_spec->car_spec->driver_name,
-                this_total + 1,
-                original_mat.m[3][0], original_mat.m[3][1], original_mat.m[3][2],
-                mat->m[3][0], mat->m[3][1], mat->m[3][2]);
-        }
-        if (this_total > highest) {
-            highest = this_total;
-        }
-        if (count != 0) {
-            dr_dprintf("MassageOpponentPosition() called an avg of %.1f times (max %d) per ReMaterialisation",
-                count / total, highest);
-        }
-        if (sensible_place) {
-            ResetCarSpecialVolume((tCollision_info*)pOpponent_spec->car_spec);
-        } else {
-            TurnOpponentPhysicsOff(pOpponent_spec);
-            RebuildActiveCarList();
-            TeleportOpponentToNearestSafeLocation(pOpponent_spec);
-        }
+        return 1;
     }
+    total++;
+    BrMatrix34Copy(&original_mat, mat);
+    TurnOpponentPhysicsOn(pOpponent_spec);
+    RebuildActiveCarList();
+    do {
+        count++;
+        this_total++;
+        BrVector3Scale((br_vector3*)mat->m[3], (br_vector3*)mat->m[3], WORLD_SCALE_D);
+        BrVector3Copy(&b, (br_vector3*)mat->m[3]);
+        BrMatrix34RotateY(mat, theta);
+        BrVector3Copy((br_vector3*)mat->m[3], &b);
+        BrVector3SetFloat(&b, 0.f, -100.f, 0.f);
+        BrVector3Copy(&a, (br_vector3*)mat->m[3]);
+        a.v[1] += 1.f;
+        findfloor(&a, &b, &norm, &dist);
+        a.v[1] += 100.f;
+        findfloor(&a, &b, &norm2, &dist2);
+        if (dist2 <= 1.f) {
+            BrVector3SetFloat(&b, 0.f, -5.01f, 0.f);
+            a.v[1] -= 100.f;
+            for (i = 0; i < 20; i++) {
+                a.v[1] += 5.f;
+                findfloor(&a, &b, &norm2, &dist2);
+                if (dist2 <= 1.f) {
+                    break;
+                }
+            }
+            dist2 = (i + 1) * 0.05f + -dist2 / 20.f;
+        }
+        if (dist2 < dist) {
+            dist = -dist2;
+            BrVector3Copy(&norm, &norm2);
+        }
+        if (BR_ABS(dist) <= 1.f) {
+            mat->m[3][1] -= dist * 100.f - 2.f;
+            ts = BrVector3Dot((br_vector3*)mat->m[2], &norm);
+            phi = BrRadianToAngle(asin(ts));
+            BrMatrix34PreRotateX(mat, phi);
+            ts = BrVector3Dot((br_vector3*)mat->m[0], &norm);
+            phi = -BrRadianToAngle(asin(ts));
+            BrMatrix34PreRotateZ(mat, phi);
+        }
+        BrVector3Negate(&pOpponent_spec->car_spec->direction, (br_vector3*)mat->m[2]);
+        BrMatrix34ApplyP(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->cmpos, mat);
+        BrVector3InvScale(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->pos, WORLD_SCALE);
+        BrVector3InvScale((br_vector3*)mat->m[3], (br_vector3*)mat->m[3], WORLD_SCALE_D);
+        BrVector3Copy(&pOpponent_spec->car_spec->v, (br_vector3*)pOpponent_spec->car_spec->car_master_actor->t.t.mat.m[2]);
+        BrVector3Negate(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v);
+        BrVector3Normalise(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v);
+        BrVector3Scale(&pOpponent_spec->car_spec->v, &pOpponent_spec->car_spec->v, pSpeed * WORLD_SCALE_D);
+        BrVector3Set(&pOpponent_spec->car_spec->omega, 0.f, 0.f, 0.f);
+        pOpponent_spec->car_spec->curvature = 0.0;
+        BrMatrix34Copy(&pOpponent_spec->car_spec->oldmat, mat);
+        BrMatrix34Copy(&pOpponent_spec->car_spec->old_frame_mat, mat);
+        BrVector3Scale((br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], (br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], WORLD_SCALE);
+        for (j = 0; j < COUNT_OF(pOpponent_spec->car_spec->oldd); j++) {
+            pOpponent_spec->car_spec->oldd[j] = pOpponent_spec->car_spec->ride_height;
+        }
+        pOpponent_spec->car_spec->gear = 0;
+        pOpponent_spec->car_spec->revs = 0.f;
+        pOpponent_spec->car_spec->traction_control = 1;
+        BrMatrix34ApplyP(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->cmpos, mat);
+        BrVector3InvScale(&pOpponent_spec->car_spec->pos, &pOpponent_spec->car_spec->pos, WORLD_SCALE);
+        BrVector3Negate(&pOpponent_spec->car_spec->direction, (br_vector3*)pOpponent_spec->car_spec->oldmat.m[3]);
+        pOpponent_spec->car_spec->box_face_ref = gFace_num__car - 2;
+        pOpponent_spec->car_spec->doing_nothing_flag = 0;
+        sensible_place = TestForCarInSensiblePlace(pOpponent_spec->car_spec);
+        if (!sensible_place) {
+            BrMatrix34Copy(mat, &original_mat);
+        }
+    } while (!sensible_place && MassageOpponentPosition(pOpponent_spec, massage_count++));
+
+    count--;
+    this_total--;
+    if (sensible_place) {
+        dr_dprintf("%s: Rematerialised (took %d attempts, orig. pos. (%7.3f,%7.3f,%7.3f), actual pos. (%7.3f,%7.3f,%7.3f))",
+            pOpponent_spec->car_spec->driver_name,
+            this_total + 1,
+            original_mat.m[3][0], original_mat.m[3][1], original_mat.m[3][2],
+            mat->m[3][0], mat->m[3][1], mat->m[3][2]);
+    }
+    if (this_total > highest) {
+        highest = this_total;
+    }
+    if (count != 0) {
+        dr_dprintf("MassageOpponentPosition() called an avg of %.1f times (max %d) per ReMaterialisation",
+            count / (float)total, highest);
+    }
+    if (!sensible_place) {
+        TurnOpponentPhysicsOff(pOpponent_spec);
+        RebuildActiveCarList();
+        TeleportOpponentToNearestSafeLocation(pOpponent_spec);
+        return 1;
+    }
+    ResetCarSpecialVolume((tCollision_info*)pOpponent_spec->car_spec);
     return 1;
 }
 
@@ -2242,16 +2287,18 @@ void ChallengeOccurred(int pChallenger_index, int pAccepted) {
 void LoadCopCars(void) {
     int i;
 
-    for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
-        PossibleService();
-        gProgram_state.AI_vehicles.cops[i].car_spec = BrMemAllocate(sizeof(tCar_spec), kMem_cop_car_spec);
-        LoadCar(
-            gBIG_APC_index == i ? "BIGAPC.TXT" : "APC.TXT",
-            eDriver_oppo,
-            gProgram_state.AI_vehicles.cops[i].car_spec,
-            (gBIG_APC_index == i) ? 4 : 3,
-            "The Cops",
-            &gTheir_cars_storage_space);
+    if (gProgram_state.AI_vehicles.number_of_cops != 0) {
+        for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
+            PossibleService();
+            gProgram_state.AI_vehicles.cops[i].car_spec = BrMemAllocate(sizeof(tCar_spec), kMem_cop_car_spec);
+            LoadCar(
+                gBIG_APC_index == i ? "BIGAPC.TXT" : "APC.TXT",
+                eDriver_oppo,
+                gProgram_state.AI_vehicles.cops[i].car_spec,
+                (gBIG_APC_index == i) ? 4 : 3,
+                "The Cops",
+                &gTheir_cars_storage_space);
+        }
     }
 }
 
