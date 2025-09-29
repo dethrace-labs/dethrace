@@ -472,6 +472,10 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
     case eDriver_local_human:
         pCar->car_ID = 0;
         break;
+#ifdef DETHRACE_FIX_BUGS
+    default:
+        break;
+#endif
     }
     PossibleService();
     pCar->box_face_ref = gFace_num__car - 2;
@@ -1327,7 +1331,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
         }
         for (i = 0; i < gNum_active_cars; i++) {
             car = gActive_car_list[i];
-            car_info = car;
+            car_info = (tCollision_info*)car;
             car->dt = -1.f;
             if (car->message.type == NETMSGID_MECHANICS && car->message.time >= gLast_mechanics_time && car->message.time <= gLast_mechanics_time + time_step) {
                 // time between car message and next mechanics
@@ -1370,11 +1374,11 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
             if (non_car->collision_info.doing_nothing_flag) {
                 continue;
             }
-            car_info = non_car;
+            car_info = (tCollision_info*)non_car;
             car_info->dt = -1.f;
             if (car_info->message.type == NETMSGID_NONCAR_INFO && car_info->message.time >= gLast_mechanics_time && gLast_mechanics_time + time_step >= car_info->message.time) {
                 car_info->dt = (gLast_mechanics_time + time_step - car_info->message.time) / 1000.0f;
-                GetNetPos(car_info);
+                GetNetPos((tCar_spec*)car_info);
             }
             if (car_info->box_face_ref != gFace_num__car
                 && (car_info->box_face_ref != gFace_num__car - 1
