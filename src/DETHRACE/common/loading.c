@@ -1358,17 +1358,17 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     c = &non_car->collision_info;
     c->driver = 0;
     c->index = GetAnInt(pF);
-    ReadVector3(pF, non_car->free_cmpos.v[0], non_car->free_cmpos.v[1], non_car->free_cmpos.v[2]);
-    ReadVector3(pF, non_car->attached_cmpos.v[0], non_car->attached_cmpos.v[1], non_car->attached_cmpos.v[2]);
-    ReadVector3(pF, c->bounds[1].min.v[0], c->bounds[1].min.v[1], c->bounds[1].min.v[2]);
-    ReadVector3(pF, c->bounds[1].max.v[0], c->bounds[1].max.v[1], c->bounds[1].max.v[2]);
+    ReadThreeFloats(pF, non_car->free_cmpos.v[0], non_car->free_cmpos.v[1], non_car->free_cmpos.v[2]);
+    ReadThreeFloats(pF, non_car->attached_cmpos.v[0], non_car->attached_cmpos.v[1], non_car->attached_cmpos.v[2]);
+    ReadThreeFloats(pF, c->bounds[1].min.v[0], c->bounds[1].min.v[1], c->bounds[1].min.v[2]);
+    ReadThreeFloats(pF, c->bounds[1].max.v[0], c->bounds[1].max.v[1], c->bounds[1].max.v[2]);
     c->extra_point_num = GetAnInt(pF);
     if (c->extra_point_num > 6) {
         sprintf(s, "%d", c->index);
         FatalError(kFatalError_TooManyExtraPointsForCar_S, s);
     }
     for (i = 0; c->extra_point_num > i; ++i) {
-        ReadVector3(pF, c->extra_points[i].v[0], c->extra_points[i].v[1], c->extra_points[i].v[2]);
+        ReadThreeFloats(pF, c->extra_points[i].v[0], c->extra_points[i].v[1], c->extra_points[i].v[2]);
     }
     ReadPairOfFloats(pF, non_car->free_mass, non_car->attached_mass);
 
@@ -1406,14 +1406,14 @@ void ReadNonCarMechanicsData(FILE* pF, tNon_car_spec* non_car) {
     non_car->I_over_M.v[1] = ts1 / 12.0f;
     ts1 = BR_SQR2(het, len);
     non_car->I_over_M.v[0] = ts1 / 12.0f;
-    DRVector3Scale(&non_car->free_cmpos, &non_car->free_cmpos, WORLD_SCALE);
-    DRVector3Scale(&non_car->attached_cmpos, &non_car->attached_cmpos, WORLD_SCALE);
-    DRVector3Scale(&non_car->I_over_M, &non_car->I_over_M, 47.61000061035156f);
-    DRVector3Scale(&c->bounds[1].min, &c->bounds[1].min, WORLD_SCALE);
-    DRVector3Scale(&c->bounds[1].max, &c->bounds[1].max, WORLD_SCALE);
+    BrVector3Scale(&non_car->free_cmpos, &non_car->free_cmpos, WORLD_SCALE);
+    BrVector3Scale(&non_car->attached_cmpos, &non_car->attached_cmpos, WORLD_SCALE);
+    BrVector3Scale(&non_car->I_over_M, &non_car->I_over_M, 47.61000061035156f);
+    BrVector3Scale(&c->bounds[1].min, &c->bounds[1].min, WORLD_SCALE);
+    BrVector3Scale(&c->bounds[1].max, &c->bounds[1].max, WORLD_SCALE);
 
     for (i = 0; c->extra_point_num > i; ++i) {
-        DRVector3Scale(&c->extra_points[i], &c->extra_points[i], WORLD_SCALE);
+        BrVector3Scale(&c->extra_points[i], &c->extra_points[i], WORLD_SCALE);
     }
     memcpy(&c->max_bounds[0], &c->bounds[0], sizeof(c->max_bounds[0]));
     memcpy(&c->max_bounds[1], &c->bounds[1], sizeof(c->max_bounds[0]));
