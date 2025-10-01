@@ -260,9 +260,9 @@ br_scalar EdgeU(br_angle pSky, br_angle pView, br_angle pPerfect) {
     br_scalar b;
     br_scalar c;
 
-    a = cos(BrAngleToRadian(pPerfect)) * cos(BrAngleToRadian(pPerfect));
-    b = sin(BrAngleToRadian(pView));
-    c = cos(BrAngleToRadian(pView) + 1.0f) * BrAngleToRadian(pSky);
+    a = BR_COS(pPerfect) * BR_COS(pPerfect);
+    b = BR_SIN(pView);
+    c = (BR_COS(pView) + 1.0f) * BrAngleToRadian(pSky);
     return b * a / c;
 }
 
