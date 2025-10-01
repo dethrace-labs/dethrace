@@ -1254,7 +1254,8 @@ tS3_channel* S3GetChannelForTag(tS3_sound_tag tag) {
     if (!tag) {
         return 0;
     }
-    for (o = gS3_outlets; o && o->id != tag; o = o->next) {
+    // the first char of tag is the outlet id. See `S3GenerateTag`
+    for (o = gS3_outlets; o && o->id != (tag & 0xff); o = o->next) {
         ;
     }
     if (!o) {

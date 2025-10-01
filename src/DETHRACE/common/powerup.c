@@ -179,7 +179,7 @@ void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {
         pThe_powerup->lose_proc(pThe_powerup, pThe_powerup->car);
     }
     if (gNet_mode != eNet_mode_none) {
-        the_message = NetBuildMessage(21, 0);
+        the_message = NetBuildMessage(NETMSGID_POWERUP, 0);
         the_message->contents.data.powerup.event = ePowerup_lost;
         the_message->contents.data.powerup.player = gLocal_net_ID;
         the_message->contents.data.powerup.event = GET_POWERUP_INDEX(pThe_powerup);
@@ -287,7 +287,7 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
         PratcamEvent(the_powerup->prat_cam_event);
     }
     if (gNet_mode != eNet_mode_none && pTell_net_players && pIndex == original_index && !ps_power) {
-        the_message = NetBuildMessage(21, 0);
+        the_message = NetBuildMessage(NETMSGID_POWERUP, 0);
         the_message->contents.data.powerup.event = ePowerup_gained;
         the_message->contents.data.powerup.player = gLocal_net_ID;
         the_message->contents.data.powerup.powerup_index = pIndex;

@@ -37,7 +37,7 @@ int gRandom_Rockin_MIDI_tunes[3] = { 9500, 9501, 9502 };
 // GLOBAL: CARM95 0x00514958
 int gRandom_CDA_tunes[8] = { 9600, 9601, 9602, 9603, 9604, 9605, 9606, 9607 }; /* dethrace: Changed to size 8 */
 
-// GLOBAL: CARM95 0x00514978
+// GLOBAL: CARM95 0x0051498c
 int gCDA_is_playing;
 
 // GLOBAL: CARM95 0x0051497c
@@ -52,7 +52,7 @@ int gSound_sources_inited;
 // GLOBAL: CARM95 0x00514988
 int gMusic_available;
 
-// GLOBAL: CARM95 0x0051498c
+// GLOBAL: CARM95 0x00514978
 tS3_sound_tag gCDA_tag;
 
 // GLOBAL: CARM95 0x00514990
@@ -750,13 +750,13 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
                         } while (pCDA_id == gLast_tune);
                     }
                     gLast_tune = pCDA_id;
-                    gCDA_is_playing = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
+                    gCDA_tag = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
 #if defined(DETHRACE_FIX_BUGS)
                     // Initial CD music volume was not set correctly
                     DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);
 #endif
-                    gCDA_tag = gCDA_is_playing;
-                    if (!gCDA_is_playing) {
+                    gCDA_is_playing = gCDA_tag != 0;
+                    if (gCDA_tag == 0) {
                         gCD_is_disabled = 1;
                         S3DisableCDA();
                     }
@@ -765,7 +765,7 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
             }
         }
     }
-    return gCDA_tag;
+    return gCDA_is_playing;
 }
 
 // IDA: int __cdecl DRS3StopCDA()
@@ -777,14 +777,14 @@ int DRS3StopCDA(void) {
         gCDA_is_playing = 0;
         gCDA_tag = 0;
     }
-    return gCDA_tag;
+    return gCDA_is_playing;
 }
 
 // IDA: void __cdecl StartMusic()
 // FUNCTION: CARM95 0x00465899
 void StartMusic(void) {
     if (gCD_fully_installed) {
-        gCDA_tag = DRS3StartCDA(9999);
+        gCDA_is_playing = DRS3StartCDA(9999);
     }
 }
 
