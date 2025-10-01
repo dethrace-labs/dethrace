@@ -1449,6 +1449,14 @@ void DecodeLine2(char* pS) {
     unsigned char c;
     char* key;
 
+#ifdef DETHRACE_FIX_BUGS
+    // Demo has its own decryption key + behavior
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        DecodeLine2_DEMO(pS);
+        return;
+    }
+#endif
+
     len = strlen(pS);
     key = (char*)gLong_key;
 #ifdef DETHRACE_FIX_BUGS
@@ -1501,6 +1509,14 @@ void EncodeLine2(char* pS) {
     int count;
     unsigned char c;
     char* key;
+
+#ifdef DETHRACE_FIX_BUGS
+    // Demo has its own decryption key + behavior
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        EncodeLine2_DEMO(pS);
+        return;
+    }
+#endif
 
     len = strlen(pS);
     count = 0;
@@ -1920,4 +1936,49 @@ void EncodeLine_DEMO(char* pS) {
         }
         pS[i] = c;
     }
+}
+
+void EncodeLine2_DEMO(char* pS) {
+    int len;
+    int seed;
+    int i;
+    const char* key;
+    unsigned char c;
+#if BR_ENDIAN_BIG
+    const tU32 gLong_key_DEMO[] = { 0x58503A76, 0xCBB68565, 0x15CD5B07, 0xB168DE3A };
+#else
+    const tU32 gLong_key_DEMO[] = { 0x763A5058, 0x6585B6CB, 0x75BCD15, 0x3ADE68B1 };
+#endif
+
+    len = strlen(pS);
+    key = (char*)gLong_key_DEMO;
+
+    while (len != 0 && (pS[len - 1] == '\r' || pS[len - 1] == '\n')) {
+        pS[len - 1] = 0;
+        len--;
+    }
+    seed = len % 16;
+    for (i = 0; i < len; i++) {
+        c = pS[i];
+        if (c == '\t') {
+            c = 0x9F;
+        }
+
+        c -= 32;
+        c ^= key[seed];
+        c &= 0x7f;
+        c += 32;
+        if (c == 0x9F) {
+            c = '\t';
+        }
+        if (c == '\n' || c == '\r') {
+            c |= 0x80;
+        }
+        seed = (seed + 7) % 16;
+        pS[i] = c;
+    }
+}
+
+void DecodeLine2_DEMO(char* pS) {
+    EncodeLine_DEMO(pS);
 }
