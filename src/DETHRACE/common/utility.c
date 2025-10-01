@@ -98,6 +98,14 @@ void EncodeLine(char* pS) {
     FILE* test;
     unsigned char c;
 
+#ifdef DETHRACE_FIX_BUGS
+    // Demo has its own decryption key + behavior
+    if (harness_game_info.mode == eGame_carmageddon_demo) {
+        EncodeLine_DEMO(pS);
+        return;
+    }
+#endif
+
     len = strlen(pS);
     key = (char*)gLong_key;
     if (gEncryption_method == 0) {
