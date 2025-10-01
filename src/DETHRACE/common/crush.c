@@ -1177,7 +1177,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                 credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
                 credits = 100 * (int)(credits_squared / 100.0f);
                 if (gNet_mode) {
-                    message = NetBuildMessage(0x18u, 0);
+                    message = NetBuildMessage(NETMSGID_WASTED, 0);
                     message->contents.data.wasted.victim = NetPlayerFromCar(victim)->ID;
                     if (NetPlayerFromCar(culprit)) {
                         message->contents.data.wasted.culprit = NetPlayerFromCar(culprit)->ID;
