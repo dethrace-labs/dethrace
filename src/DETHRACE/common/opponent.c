@@ -2482,11 +2482,12 @@ void DisposeOpponentPaths(void) {
     if (gBit_per_node != NULL) {
         BrMemFree(gBit_per_node);
     }
-    gBit_per_node = NULL;
+
     gProgram_state.AI_vehicles.number_of_path_nodes = 0;
     gProgram_state.AI_vehicles.number_of_path_sections = 0;
     gProgram_state.AI_vehicles.path_nodes = NULL;
     gProgram_state.AI_vehicles.path_sections = NULL;
+    gBit_per_node = NULL;
 }
 
 // IDA: void __usercall MungeOpponents(tU32 pFrame_period@<EAX>)
