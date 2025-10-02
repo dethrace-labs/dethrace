@@ -2788,15 +2788,11 @@ int GetCarCount(tVehicle_type pCategory) {
     case eVehicle_self:
         return 1;
 
-    case eVehicle_net_player:
-        if (gNet_mode) {
-            return gNumber_of_net_players - 1;
-        } else {
-            return 0;
-        }
-        break;
     case eVehicle_opponent:
         return gProgram_state.AI_vehicles.number_of_opponents;
+
+    case eVehicle_net_player:
+        return gNet_mode ? gNumber_of_net_players - 1 : 0;
 
     case eVehicle_rozzer:
         return gNumber_of_cops_before_faffage;
@@ -2806,10 +2802,9 @@ int GetCarCount(tVehicle_type pCategory) {
 
     case eVehicle_not_really:
         return gNum_active_non_cars;
-
-    default:
-        return 0;
     }
+
+    return 0;
 }
 
 // IDA: tCar_spec* __usercall GetCarSpec@<EAX>(tVehicle_type pCategory@<EAX>, int pIndex@<EDX>)
