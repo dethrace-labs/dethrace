@@ -843,6 +843,11 @@ int original_main(int pArgc, char** pArgv) {
 
     for (i = 1; i < pArgc; i++) {
         if (strcasecmp(pArgv[i], "-hires") == 0) {
+#ifdef DETHRACE_FIX_BUGS
+            if (!PDCheckDriveExists("DATA/64X48X8/HEADUP.TXT")) {
+                PDFatalError("No high resolution data (\"DATA/64X48X8\") is available. Run game without -hires.");
+            }
+#endif
             gGraf_spec_index = 1;
         } else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {
             i++;
