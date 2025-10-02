@@ -2566,10 +2566,6 @@ void MungeOpponents(tU32 pFrame_period) {
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
             if (!gProgram_state.AI_vehicles.opponents[i].finished_for_this_race) {
                 gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player -= MIN(gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player, gGrudge_reduction_per_period);
-                // if (gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player >= gGrudge_reduction_per_period) {
-                //     // gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player = gGrudge_reduction_per_period;
-                // }
-                // gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player -= gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player;
             }
         }
     }
@@ -2600,8 +2596,6 @@ void InitOpponents(tRace_info* pRace_info) {
     int rank_dependent_difficulty;
     int skill_dependent_difficulty;
     br_bounds bounds;
-    tCar_spec* car_spec;
-    tOpponent_spec* opponent_spec;
 
     gNext_grudge_reduction = gTime_stamp_for_this_munging + 8000;
     gGrudge_reduction_per_period = 3 - gProgram_state.skill_level;
@@ -2609,29 +2603,28 @@ void InitOpponents(tRace_info* pRace_info) {
     gFirst_frame = 1;
     gAcknowledged_start = 0;
     gStart_jumped = 0;
-    gViewable_car_list[0] = &gProgram_state.current_car;
-    gNum_viewable_cars = 1;
+    gNum_viewable_cars = 0;
+    gViewable_car_list[gNum_viewable_cars] = &gProgram_state.current_car;
+    gNum_viewable_cars++;
     BrActorToBounds(&bounds, gProgram_state.track_spec.the_actor);
     gMinimum_yness_before_knackerisation = bounds.min.v[1] - 2.f;
     gDefinite_no_cop_pursuit_speed = 17.8788f;
     gDefinite_cop_pursuit_speed = 44.697f;
     gCop_pursuit_speed_percentage_multiplier = 100.f / (gDefinite_cop_pursuit_speed - gDefinite_no_cop_pursuit_speed);
-    gHead_on_cos_value = cos(.5235668f);
+    gHead_on_cos_value = cos(0.5235668420791626f);
     gAcme_frame_count = 0;
     gProgram_state.current_car.no_of_processes_recording_my_trail = 0;
-    rank_dependent_difficulty = (101.f - (gCurrent_race.suggested_rank < 10 ? .5f : gCurrent_race.suggested_rank)) / 10.0f;
-    gBig_bang = 70.f - (3 * rank_dependent_difficulty + 10 * gProgram_state.skill_level) * gOpponent_nastyness_frigger;
-    gIn_view_distance = gCamera_yon + 10.f;
-    if (gCamera_yon + 10.f <= 45.f) {
-        gIn_view_distance = 45.f;
-    }
+    rank_dependent_difficulty = (101.0 - (gCurrent_race.suggested_rank < 10 ? 0.5 : gCurrent_race.suggested_rank)) / 10.0;
+    skill_dependent_difficulty = gProgram_state.skill_level * 5;
+    gBig_bang = 70.f - (2 * skill_dependent_difficulty + 3 * rank_dependent_difficulty) * gOpponent_nastyness_frigger;
+    gIn_view_distance = MAX(gCamera_yon + 10.f, 45.f);
     gTime_stamp_for_this_munging = GetTotalTime();
     gFrame_period_for_this_munging = 1;
     gFrame_period_for_this_munging_in_secs = gFrame_period_for_this_munging / 1000.f;
-    if (gNet_mode == eNet_mode_none) {
-        gProgram_state.AI_vehicles.number_of_opponents = pRace_info->number_of_racers - 1;
-    } else {
+    if (gNet_mode != eNet_mode_none) {
         gProgram_state.AI_vehicles.number_of_opponents = 0;
+    } else {
+        gProgram_state.AI_vehicles.number_of_opponents = pRace_info->number_of_racers - 1;
     }
     gNumber_of_cops_before_faffage = gProgram_state.AI_vehicles.number_of_cops;
     for (i = 0, opponent_number = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++, opponent_number++) {
@@ -2640,7 +2633,7 @@ void InitOpponents(tRace_info* pRace_info) {
             opponent_number++;
         }
         gProgram_state.AI_vehicles.opponents[i].car_spec = pRace_info->opponent_list[opponent_number].car_spec;
-        gProgram_state.AI_vehicles.opponents[i].car_spec->car_ID = i | 0x200;
+        gProgram_state.AI_vehicles.opponents[i].car_spec->car_ID = i + 0x200;
         dr_dprintf("Car '%s', car_ID %x",
             gProgram_state.AI_vehicles.opponents[i].car_spec->driver_name,
             gProgram_state.AI_vehicles.opponents[i].car_spec->car_ID);
@@ -2671,10 +2664,11 @@ void InitOpponents(tRace_info* pRace_info) {
         gProgram_state.AI_vehicles.opponents[i].has_moved_at_some_point = 0;
         gProgram_state.AI_vehicles.opponents[i].player_in_view_now = 0;
         gProgram_state.AI_vehicles.opponents[i].acknowledged_piv = 0;
-        gProgram_state.AI_vehicles.opponents[i].nastiness = (gProgram_state.skill_level / 2.f
-                                                                + ((float)(gOpponents[gProgram_state.AI_vehicles.opponents[i].index].strength_rating - 1)) / 4.f
-                                                                + (99.f - (gCurrent_race.suggested_rank < 10 ? .5f : (float)gCurrent_race.suggested_rank)) / 98.f)
-            / 3.f * gOpponent_nastyness_frigger;
+
+        gProgram_state.AI_vehicles.opponents[i].nastiness = ((99.0 - (gCurrent_race.suggested_rank < 10 ? 0.5 : gCurrent_race.suggested_rank)) / 98.0
+                                                                + (gOpponents[gProgram_state.AI_vehicles.opponents[i].index].strength_rating - 1) / 4.0
+                                                                + gProgram_state.skill_level / 2.0)
+            / 3.0 * gOpponent_nastyness_frigger;
         BrVector3Set(&gProgram_state.AI_vehicles.opponents[i].pos_last_frame, 0.f, 0.f, 0.f);
         gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player = 10;
         gViewable_car_list[gNum_viewable_cars] = gProgram_state.AI_vehicles.opponents[i].car_spec;
@@ -2682,18 +2676,20 @@ void InitOpponents(tRace_info* pRace_info) {
         StunTheBugger(&gProgram_state.AI_vehicles.opponents[i], 10000);
     }
     if (gChallenger_index__opponent >= 0) {
+        tCar_spec* car_spec;
+        tOpponent_spec* opponent_spec;
         car_spec = GetCarSpecFromGlobalOppoIndex(gChallenger_index__opponent);
         opponent_spec = GetOpponentSpecFromCarSpec(car_spec);
-        if (opponent_spec == NULL) {
-            dr_dprintf("ERROR - can't record dare - no opponent_spec for car_spec");
-        } else {
+        if (opponent_spec != NULL) {
             opponent_spec->pursue_from_start = 1;
+        } else {
+            dr_dprintf("ERROR - can't record dare - no opponent_spec for car_spec");
         }
         gChallenger_index__opponent = -1;
     }
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
         PossibleService();
-        gProgram_state.AI_vehicles.cops[i].car_spec->car_ID = i | 0x300;
+        gProgram_state.AI_vehicles.cops[i].car_spec->car_ID = i + 0x300;
         gProgram_state.AI_vehicles.cops[i].index = 3;
         gProgram_state.AI_vehicles.cops[i].time_last_processed = gTime_stamp_for_this_munging;
         gProgram_state.AI_vehicles.cops[i].time_this_objective_started = gTime_stamp_for_this_munging;
@@ -2716,10 +2712,15 @@ void InitOpponents(tRace_info* pRace_info) {
         gProgram_state.AI_vehicles.cops[i].has_moved_at_some_point = 0;
         gProgram_state.AI_vehicles.cops[i].player_in_view_now = 0;
         gProgram_state.AI_vehicles.cops[i].acknowledged_piv = 0;
-        gProgram_state.AI_vehicles.cops[i].nastiness = (gProgram_state.skill_level / 2.f
-                                                           + (99.f - (gCurrent_race.suggested_rank < 10 ? .5f : (float)gCurrent_race.suggested_rank)) / 98.f
-                                                           + 2.25f)
+#ifdef DETHRACE_FIX_BUGS
+        gProgram_state.AI_vehicles.cops[i].nastiness =
+#else
+        gProgram_state.AI_vehicles.opponents[i].nastiness =
+#endif
+            ((99.0 - (gCurrent_race.suggested_rank < 10 ? 0.5 : gCurrent_race.suggested_rank)) / 98.0
+                + gProgram_state.skill_level / 2.0 + 2.25)
             / 3.f * gOpponent_nastyness_frigger;
+
         BrVector3Copy(&gProgram_state.AI_vehicles.cops[i].start_pos, &gProgram_state.AI_vehicles.cop_start_points[i]);
         BrVector3Copy(&gProgram_state.AI_vehicles.cops[i].start_direction, &gProgram_state.AI_vehicles.cop_start_vectors[i]);
         BrVector3Set(&gProgram_state.AI_vehicles.cops[i].pos_last_frame, 0.f, 0.f, 0.f);
@@ -2729,6 +2730,7 @@ void InitOpponents(tRace_info* pRace_info) {
         gProgram_state.AI_vehicles.cops[i].car_spec->last_person_we_hit = NULL;
         gProgram_state.AI_vehicles.cops[i].car_spec->last_collision_time = 0;
         gProgram_state.AI_vehicles.cops[i].car_spec->last_time_we_touched_a_player = 0;
+        gProgram_state.AI_vehicles.cops[i].car_spec->no_of_processes_recording_my_trail = 0;
         gProgram_state.AI_vehicles.cops[i].car_spec->grudge_raised_recently = 1;
         gOpponents[gProgram_state.AI_vehicles.cops[i].index].psyche.grudge_against_player = 10;
         StunTheBugger(&gProgram_state.AI_vehicles.cops[i], 10000);
