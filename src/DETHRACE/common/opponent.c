@@ -2505,79 +2505,76 @@ void MungeOpponents(tU32 pFrame_period) {
     gAcme_frame_count++;
     gTime_stamp_for_this_munging = GetTotalTime();
     gFrame_period_for_this_munging = pFrame_period;
-    gFrame_period_for_this_munging_in_secs = pFrame_period / 1000.f;
+    gFrame_period_for_this_munging_in_secs = gFrame_period_for_this_munging / 1000.f;
     if (!gAcknowledged_start && !gCountdown) {
         gAcknowledged_start = 1;
         if (!gStart_jumped) {
             un_stun_flag = 1;
         }
     }
-    if (gProgram_state.current_car.no_of_processes_recording_my_trail == 0) {
-        StartRecordingTrail(&gProgram_state.current_car);
-    } else {
+    if (gProgram_state.current_car.no_of_processes_recording_my_trail != 0) {
         RecordNextTrailNode(&gProgram_state.current_car);
+    } else {
+        StartRecordingTrail(&gProgram_state.current_car);
     }
     TrackElasticateyPath();
-    if (gProcessing_opponents) {
-        gNum_of_opponents_pursuing = 0;
-        gNum_of_opponents_getting_near = 0;
-        gNum_of_opponents_completing_race = 0;
-        for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
-            if (!gProgram_state.AI_vehicles.opponents[i].finished_for_this_race) {
-                switch (gProgram_state.AI_vehicles.opponents[i].current_objective) {
-                case eOOT_pursue_and_twat:
-                    gNum_of_opponents_pursuing++;
-                    break;
-                case eOOT_get_near_player:
-                    gNum_of_opponents_getting_near++;
-                    break;
-                case eOOT_complete_race:
-                    gNum_of_opponents_completing_race++;
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-        for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
-            if (!gProgram_state.AI_vehicles.opponents[i].finished_for_this_race) {
-                if (un_stun_flag) {
-                    UnStunTheBugger(&gProgram_state.AI_vehicles.opponents[i]);
-                }
-                CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(&gProgram_state.AI_vehicles.opponents[i]);
-                CalcPlayerConspicuousness(&gProgram_state.AI_vehicles.opponents[i]);
-                ProcessThisOpponent(&gProgram_state.AI_vehicles.opponents[i]);
-                ClearTwattageOccurrenceVariables(&gProgram_state.AI_vehicles.opponents[i]);
-            }
-        }
-        for (i = 0; i < gNumber_of_cops_before_faffage; i++) {
-            if (!gProgram_state.AI_vehicles.cops[i].finished_for_this_race) {
-                if (un_stun_flag) {
-                    UnStunTheBugger(&gProgram_state.AI_vehicles.cops[i]);
-                }
-                CalcDistanceFromHome(&gProgram_state.AI_vehicles.cops[i]);
-                CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(&gProgram_state.AI_vehicles.cops[i]);
-                CalcPlayerConspicuousness(&gProgram_state.AI_vehicles.cops[i]);
-                ProcessThisOpponent(&gProgram_state.AI_vehicles.cops[i]);
-                ClearTwattageOccurrenceVariables(&gProgram_state.AI_vehicles.cops[i]);
-                gProgram_state.AI_vehicles.cops[i].murder_reported = 0;
-            }
-        }
-        if (gNext_grudge_reduction < gTime_stamp_for_this_munging) {
-            gNext_grudge_reduction = gTime_stamp_for_this_munging + 3000;
-            for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
-                if (!gProgram_state.AI_vehicles.opponents[i].finished_for_this_race) {
-                    if (gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player >= gGrudge_reduction_per_period) {
-                        gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player -= gGrudge_reduction_per_period;
-                    } else {
-                        gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player = 0;
-                    }
-                }
-            }
-        }
-        RebuildActiveCarList();
-        gFirst_frame = 0;
+    if (!gProcessing_opponents) {
+        return;
     }
+    gNum_of_opponents_pursuing = 0;
+    gNum_of_opponents_getting_near = 0;
+    gNum_of_opponents_completing_race = 0;
+    for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
+        if (!gProgram_state.AI_vehicles.opponents[i].finished_for_this_race) {
+            if (gProgram_state.AI_vehicles.opponents[i].current_objective == eOOT_pursue_and_twat) {
+                gNum_of_opponents_pursuing++;
+            } else if (gProgram_state.AI_vehicles.opponents[i].current_objective == eOOT_get_near_player) {
+
+                gNum_of_opponents_getting_near++;
+
+            } else if (gProgram_state.AI_vehicles.opponents[i].current_objective == eOOT_complete_race) {
+                gNum_of_opponents_completing_race++;
+            }
+        }
+    }
+    for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
+        if (!gProgram_state.AI_vehicles.opponents[i].finished_for_this_race) {
+            if (un_stun_flag) {
+                UnStunTheBugger(&gProgram_state.AI_vehicles.opponents[i]);
+            }
+            CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(&gProgram_state.AI_vehicles.opponents[i]);
+            CalcPlayerConspicuousness(&gProgram_state.AI_vehicles.opponents[i]);
+            ProcessThisOpponent(&gProgram_state.AI_vehicles.opponents[i]);
+            ClearTwattageOccurrenceVariables(&gProgram_state.AI_vehicles.opponents[i]);
+        }
+    }
+    for (i = 0; i < gNumber_of_cops_before_faffage; i++) {
+        if (!gProgram_state.AI_vehicles.cops[i].finished_for_this_race) {
+            if (un_stun_flag) {
+                UnStunTheBugger(&gProgram_state.AI_vehicles.cops[i]);
+            }
+            CalcDistanceFromHome(&gProgram_state.AI_vehicles.cops[i]);
+            CalcOpponentConspicuousnessWithAViewToCheatingLikeFuck(&gProgram_state.AI_vehicles.cops[i]);
+            CalcPlayerConspicuousness(&gProgram_state.AI_vehicles.cops[i]);
+            ProcessThisOpponent(&gProgram_state.AI_vehicles.cops[i]);
+            ClearTwattageOccurrenceVariables(&gProgram_state.AI_vehicles.cops[i]);
+            gProgram_state.AI_vehicles.cops[i].murder_reported = 0;
+        }
+    }
+    if (gNext_grudge_reduction < gTime_stamp_for_this_munging) {
+        gNext_grudge_reduction = gTime_stamp_for_this_munging + 3000;
+        for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
+            if (!gProgram_state.AI_vehicles.opponents[i].finished_for_this_race) {
+                gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player -= MIN(gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player, gGrudge_reduction_per_period);
+                // if (gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player >= gGrudge_reduction_per_period) {
+                //     // gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player = gGrudge_reduction_per_period;
+                // }
+                // gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player -= gOpponents[gProgram_state.AI_vehicles.opponents[i].index].psyche.grudge_against_player;
+            }
+        }
+    }
+    RebuildActiveCarList();
+    gFirst_frame = 0;
 }
 
 // IDA: void __cdecl SetInitialCopPositions()
