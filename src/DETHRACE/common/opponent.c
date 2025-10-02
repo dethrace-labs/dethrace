@@ -2757,22 +2757,14 @@ void WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(int pWhat_the_countdown_w
 
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
         UnStunTheBugger(&gProgram_state.AI_vehicles.opponents[i]);
-        if (IRandomBetween(1000, 2500) < 1000 * pWhat_the_countdown_was) {
-            StunTheBugger(&gProgram_state.AI_vehicles.opponents[i], IRandomBetween(1000, 2500));
-        } else {
-            StunTheBugger(&gProgram_state.AI_vehicles.opponents[i], 1000 * pWhat_the_countdown_was);
-        }
+        StunTheBugger(&gProgram_state.AI_vehicles.opponents[i], MIN(IRandomBetween(1000, 2500), 1000 * pWhat_the_countdown_was));
     }
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
         UnStunTheBugger(&gProgram_state.AI_vehicles.cops[i]);
-        if (IRandomBetween(1000, 2500) < 1000 * pWhat_the_countdown_was) {
-            StunTheBugger(&gProgram_state.AI_vehicles.cops[i], IRandomBetween(1000, 2500));
-        } else {
-            StunTheBugger(&gProgram_state.AI_vehicles.cops[i], 1000 * pWhat_the_countdown_was);
-        }
+        StunTheBugger(&gProgram_state.AI_vehicles.cops[i], MIN(IRandomBetween(1000, 2500), 1000 * pWhat_the_countdown_was));
     }
-    gStart_jumped = 1;
     gAcknowledged_start = 1;
+    gStart_jumped = 1;
 }
 
 // IDA: void __usercall ReportMurderToPoliceDepartment(tCar_spec *pCar_spec@<EAX>)
