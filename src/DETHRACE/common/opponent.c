@@ -2816,11 +2816,11 @@ tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
         return &gProgram_state.current_car;
 
     case eVehicle_net_player:
-        if (gThis_net_player_index > pIndex) {
-            return gNet_players[pIndex].car;
-        } else {
-            return gNet_players[pIndex + 1].car;
-        }
+        // if (gThis_net_player_index <= pIndex) {
+        //     return gNet_players[pIndex + 1].car;
+        // }
+        // return gNet_players[pIndex].car;
+        return pIndex >= gThis_net_player_index ? gNet_players[pIndex + 1].car : gNet_players[pIndex].car;
 
     case eVehicle_opponent:
         return gProgram_state.AI_vehicles.opponents[pIndex].car_spec;
@@ -2834,10 +2834,8 @@ tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
 
     case eVehicle_not_really:
         return (tCar_spec*)gActive_non_car_list[pIndex];
-
-    default:
-        return 0;
     }
+    return 0;
 }
 
 // IDA: char* __usercall GetDriverName@<EAX>(tVehicle_type pCategory@<EAX>, int pIndex@<EDX>)
