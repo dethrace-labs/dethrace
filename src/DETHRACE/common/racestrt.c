@@ -1595,7 +1595,7 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
                     fputs("*************", f);
                 }
             }
-            gDecode_thing ^= 0x40u;
+            gDecode_thing ^= '@';
             fclose(f);
             EncodeAllFilesInDirectory("");
             EncodeAllFilesInDirectory("CARS");
