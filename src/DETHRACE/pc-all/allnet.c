@@ -175,7 +175,7 @@ int ReceiveHostResponses(void) {
     int already_registered;
 
     char addr_string[32];
-    unsigned int sa_len;
+    socklen_t sa_len;
     int error;
 
     sa_len = sizeof(gRemote_addr);
@@ -519,7 +519,7 @@ tNet_message* PDNetGetNextMessage(tNet_game_details* pDetails, void** pSender_ad
     int msg_type;
 
     char addr_str[32];
-    unsigned int sa_len;
+    socklen_t sa_len;
     int res;
     tNet_message* msg;
 
