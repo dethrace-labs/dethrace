@@ -3394,10 +3394,12 @@ void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_v
     tS16 node2;
     tS16 node3;
 
-    section_no_index = gProgram_state.AI_vehicles.path_sections[pSection_no].node_indices[1];
+    node1 = gProgram_state.AI_vehicles.path_sections[pSection_no].node_indices[0];
+    node2 = pInserted_node;
+    node3 = gProgram_state.AI_vehicles.path_sections[pSection_no].node_indices[1];
     new_section = ReallocExtraPathSections(1);
-    gProgram_state.AI_vehicles.path_sections[new_section].node_indices[0] = pInserted_node;
-    gProgram_state.AI_vehicles.path_sections[new_section].node_indices[1] = section_no_index;
+    gProgram_state.AI_vehicles.path_sections[new_section].node_indices[0] = node2;
+    gProgram_state.AI_vehicles.path_sections[new_section].node_indices[1] = node3;
     gProgram_state.AI_vehicles.path_sections[new_section].min_speed[0] = 0;
     gProgram_state.AI_vehicles.path_sections[new_section].max_speed[0] = 255;
     gProgram_state.AI_vehicles.path_sections[new_section].min_speed[1] = gProgram_state.AI_vehicles.path_sections[pSection_no].min_speed[1];
@@ -3405,21 +3407,21 @@ void InsertThisNodeInThisSectionHere(tS16 pInserted_node, tS16 pSection_no, br_v
     gProgram_state.AI_vehicles.path_sections[new_section].width = gProgram_state.AI_vehicles.path_sections[pSection_no].width;
     gProgram_state.AI_vehicles.path_sections[new_section].type = gProgram_state.AI_vehicles.path_sections[pSection_no].type;
     gProgram_state.AI_vehicles.path_sections[new_section].one_way = gProgram_state.AI_vehicles.path_sections[pSection_no].one_way;
-    gProgram_state.AI_vehicles.path_sections[pSection_no].node_indices[1] = pInserted_node;
+    gProgram_state.AI_vehicles.path_sections[pSection_no].node_indices[1] = node2;
     gProgram_state.AI_vehicles.path_sections[pSection_no].min_speed[1] = 0;
     gProgram_state.AI_vehicles.path_sections[pSection_no].max_speed[1] = 255;
-    BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[pInserted_node].p, pWhere);
-    gProgram_state.AI_vehicles.path_nodes[pInserted_node].sections
-        [gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections]
+    BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[node2].p, pWhere);
+    gProgram_state.AI_vehicles.path_nodes[node2].sections
+        [gProgram_state.AI_vehicles.path_nodes[node2].number_of_sections]
         = pSection_no;
-    gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections = gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections + 1;
-    gProgram_state.AI_vehicles.path_nodes[pInserted_node].sections
-        [gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections]
+    gProgram_state.AI_vehicles.path_nodes[node2].number_of_sections++; // = gProgram_state.AI_vehicles.path_nodes[node2].number_of_sections + 1;
+    gProgram_state.AI_vehicles.path_nodes[node2].sections
+        [gProgram_state.AI_vehicles.path_nodes[node2].number_of_sections]
         = new_section;
-    gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections = gProgram_state.AI_vehicles.path_nodes[pInserted_node].number_of_sections + 1;
-    for (node1 = 0; node1 < gProgram_state.AI_vehicles.path_nodes[section_no_index].number_of_sections; node1++) {
-        if (gProgram_state.AI_vehicles.path_nodes[section_no_index].sections[node1] == pSection_no) {
-            gProgram_state.AI_vehicles.path_nodes[section_no_index].sections[node1] = new_section;
+    gProgram_state.AI_vehicles.path_nodes[node2].number_of_sections++;
+    for (section_no_index = 0; section_no_index < gProgram_state.AI_vehicles.path_nodes[node3].number_of_sections; section_no_index++) {
+        if (gProgram_state.AI_vehicles.path_nodes[node3].sections[section_no_index] == pSection_no) {
+            gProgram_state.AI_vehicles.path_nodes[node3].sections[section_no_index] = new_section;
         }
     }
 }
