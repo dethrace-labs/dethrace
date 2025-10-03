@@ -3288,20 +3288,20 @@ void DeleteSection(tS16 pSection_to_delete) {
     tS16 node_no_index;
     tS16 found_it;
 
-    for (node_no = 0; node_no < 2; node_no++) {
-        node_no_index = gProgram_state.AI_vehicles.path_sections[pSection_to_delete].node_indices[node_no];
-        if (node_no_index >= 0) {
+    for (node_no_index = 0; node_no_index < 2; node_no_index++) {
+        node_no = gProgram_state.AI_vehicles.path_sections[pSection_to_delete].node_indices[node_no_index];
+        if (node_no >= 0) {
             found_it = 0;
-            for (section_no = 0; section_no < (gProgram_state.AI_vehicles.path_nodes[node_no_index].number_of_sections - 1); section_no++) {
-                if (gProgram_state.AI_vehicles.path_nodes[node_no_index].sections[section_no] == pSection_to_delete) {
+            for (section_no_index = 0; section_no_index < (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections - 1); section_no_index++) {
+                if (gProgram_state.AI_vehicles.path_nodes[node_no].sections[section_no_index] == pSection_to_delete) {
                     found_it = 1;
                 }
                 if (found_it) {
-                    gProgram_state.AI_vehicles.path_nodes[node_no_index].sections[section_no] = gProgram_state.AI_vehicles.path_nodes[node_no_index].sections[section_no + 1];
+                    gProgram_state.AI_vehicles.path_nodes[node_no].sections[section_no_index] = gProgram_state.AI_vehicles.path_nodes[node_no].sections[section_no_index + 1];
                 }
             }
-            if (gProgram_state.AI_vehicles.path_nodes[node_no_index].number_of_sections != 0) {
-                gProgram_state.AI_vehicles.path_nodes[node_no_index].number_of_sections--;
+            if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections != 0) {
+                gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections--;
             }
         }
     }
