@@ -2973,20 +2973,17 @@ br_vector3* GetOpponentsSectionStartNodePoint(tOpponent_spec* pOpponent_spec, tS
 
     if (pSection >= 20000 && pOpponent_spec->nnext_sections > pSection - 20000) {
         section_no = pOpponent_spec->next_sections[pSection - 20000].section_no;
-        node_index_index = pOpponent_spec->next_sections[pSection - 20000].direction;
-        node_no = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_index_index == 0];
+        node_index_index = pOpponent_spec->next_sections[pSection - 20000].direction == 0;
+        node_no = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_index_index];
         return &gProgram_state.AI_vehicles.path_nodes[node_no].p;
-    }
-
-    if (pSection >= 15000) {
+    } else if (pSection >= 15000) {
         return &pOpponent_spec->pursue_car_data.pursuee->my_trail.trail_nodes[pSection - 15000];
-    }
-    if (pSection == 10000) {
+    } else if (pSection == 10000) {
         return &pOpponent_spec->pursue_car_data.direct_line_nodes[0].p;
     }
     dr_dprintf("BIG ERROR - GetOpponentsSectionStartNodePoint() - section not found in next_section array for opponent %s", pOpponent_spec->car_spec->driver_name);
     PDEnterDebugger("BIG ERROR - GetOpponentsSectionStartNodePoint()");
-    return 0;
+    return NULL;
 }
 
 // IDA: br_vector3* __usercall GetOpponentsSectionFinishNodePoint@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>)
@@ -3005,12 +3002,11 @@ br_vector3* GetOpponentsSectionFinishNodePoint(tOpponent_spec* pOpponent_spec, t
         return &pOpponent_spec->pursue_car_data.pursuee->my_trail.trail_nodes[(pSection + 1) - 15000];
     } else if (pSection == 10000) {
         return &pOpponent_spec->pursue_car_data.direct_line_nodes[1].p;
-    } else {
-        dr_dprintf("BIG ERROR - GetOpponentsSectionFinishNodePoint() - section not found in next_section array for opponent %s",
-            pOpponent_spec->car_spec->driver_name);
-        PDEnterDebugger("BIG ERROR - GetOpponentsSectionFinishNodePoint()");
-        return NULL;
     }
+    dr_dprintf("BIG ERROR - GetOpponentsSectionFinishNodePoint() - section not found in next_section array for opponent %s",
+        pOpponent_spec->car_spec->driver_name);
+    PDEnterDebugger("BIG ERROR - GetOpponentsSectionFinishNodePoint()");
+    return NULL;
 }
 
 // IDA: br_scalar __usercall GetOpponentsSectionWidth@<ST0>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>)
