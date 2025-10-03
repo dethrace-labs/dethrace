@@ -2939,16 +2939,15 @@ tS16 GetOpponentsSectionStartNode(tOpponent_spec* pOpponent_spec, tS16 pSection)
     int node_index_index;
 
     if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
+        section_no = pOpponent_spec->next_sections[pSection - 20000].section_no;
         node_index_index = pOpponent_spec->next_sections[pSection - 20000].direction == 0;
-        if (pSection - 20000 > pOpponent_spec->nnext_sections) {
-            section_no = -1;
-        } else {
-            section_no = gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pSection - 20000].section_no].node_indices[node_index_index];
-            return section_no;
-        }
+        // if (pSection - 20000 <= pOpponent_spec->nnext_sections) {
+        //     return gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_index_index];
+        // }
+        return pOpponent_spec->nnext_sections >= pSection - 20000 ? gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_index_index] : -1;
+        // return -1;
     }
-    dr_dprintf("BIG ERROR - GetOpponentsSectionStartNode() - section not found in next_section array for opponent %s",
-        pOpponent_spec->car_spec->driver_name);
+    dr_dprintf("BIG ERROR - GetOpponentsSectionStartNode() - section not found in next_section array for opponent %s", pOpponent_spec->car_spec->driver_name);
     PDEnterDebugger("BIG ERROR - GetOpponentsSectionStartNode()");
     return -1;
 }
