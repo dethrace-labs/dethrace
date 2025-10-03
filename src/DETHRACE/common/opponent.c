@@ -3065,6 +3065,8 @@ int GetOpponentsSectionMaxSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, i
 // IDA: void __usercall InitOpponentPsyche(int pOpponent_index@<EAX>)
 // FUNCTION: CARM95 0x0040bf68
 void InitOpponentPsyche(int pOpponent_index) {
+    int i;
+
     gOpponents[pOpponent_index].psyche.grudge_against_player = 0;
 }
 
@@ -3108,7 +3110,7 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
         return;
     }
     damage = pTwattee->damage_magnitude_accumulator;
-    bangness = MIN(sqrt(damage * 300000.0f), 100);
+    bangness = MIN(sqrt(damage * 300000.0), 100);
     grudginess_caused_by_damage = bangness / 10 + 50 * CAR_SPEC_IS_ROZZER(pTwattee);
     dr_dprintf("Frame %0.6d: %s hit %s, damage %f, bangness %d, gBig_bang %d, grudginess %d",
         gAcme_frame_count,
@@ -3118,65 +3120,68 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
         bangness,
         gBig_bang,
         grudginess_caused_by_damage);
-    if (gMin_bangness <= bangness) {
+    if (gMin_bangness > bangness) {
+        gMin_bangness = bangness;
+        dr_dprintf("(New gMin_bangness - %d)", gMin_bangness);
+    } else {
         if (gMax_bangness < bangness) {
             gMax_bangness = bangness;
-            dr_dprintf("(New gMax_bangness - %d)", bangness);
+            dr_dprintf("(New gMax_bangness - %d)", gMax_bangness);
         }
-    } else {
-        gMin_bangness = bangness;
-        dr_dprintf("(New gMin_bangness - %d)", bangness);
     }
-    if (bangness >= 5) {
-        pTwatter->last_collision_time = gTime_stamp_for_this_munging;
-        pTwatter->last_person_we_hit = pTwattee;
-        pTwattee->last_collision_time = gTime_stamp_for_this_munging;
-        pTwattee->last_person_to_hit_us = pTwatter;
-        pTwattee->grudge_raised_recently = 1;
-        if (bangness >= gBig_bang || CAR_SPEC_IS_ROZZER(pTwattee)) {
-            pTwattee->big_bang = 1;
+    if (bangness < 5) {
+        return;
+    }
+    pTwatter->last_collision_time = gTime_stamp_for_this_munging;
+    pTwatter->last_person_we_hit = pTwattee;
+    pTwattee->last_collision_time = gTime_stamp_for_this_munging;
+    pTwattee->last_person_to_hit_us = pTwatter;
+    pTwattee->grudge_raised_recently = 1;
+    if (bangness >= gBig_bang || CAR_SPEC_IS_ROZZER(pTwattee)) {
+        pTwattee->big_bang = 1;
+    }
+    if (bangness >= 80) {
+        pTwattee->scary_bang = 1;
+    }
+    if (pTwatter->driver == eDriver_local_human) {
+        twattee_opponent_spec = GetOpponentSpecFromCarSpec(pTwattee);
+        if (pTwattee->scary_bang) {
+            StunTheBugger(twattee_opponent_spec, 30 * MIN(bangness, 100) + 1000);
         }
-        if (bangness >= 80) {
-            pTwattee->scary_bang = 1;
+        twattee_index = twattee_opponent_spec->index;
+        new_grudge_value = grudginess_caused_by_damage + gOpponents[twattee_index].psyche.grudge_against_player;
+        if (new_grudge_value > 100) {
+            new_grudge_value = 100;
         }
-        if (pTwatter->driver == eDriver_local_human) {
-            twattee_opponent_spec = GetOpponentSpecFromCarSpec(pTwattee);
-            if (pTwattee->scary_bang) {
-                StunTheBugger(twattee_opponent_spec, 30 * bangness + 1000);
-            }
-            new_grudge_value = grudginess_caused_by_damage + gOpponents[twattee_opponent_spec->index].psyche.grudge_against_player;
+        gOpponents[twattee_index].psyche.grudge_against_player = new_grudge_value;
+    } else if (pTwattee->driver == eDriver_local_human) {
+        twatter_opponent_spec = GetOpponentSpecFromCarSpec(pTwatter);
+        if (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat && twatter_opponent_spec->pursue_car_data.pursuee == pTwattee) {
+            twatter_opponent_spec->pursue_car_data.time_last_twatted_em = gTime_stamp_for_this_munging;
+        }
+        twatter_index = twatter_opponent_spec->index;
+        new_grudge_value = gOpponents[twatter_index].psyche.grudge_against_player - (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat ? 0 : 2 * grudginess_caused_by_damage);
+        if (new_grudge_value < 0) {
+            new_grudge_value = 0;
+        }
+        gOpponents[twatter_index].psyche.grudge_against_player = new_grudge_value;
+    } else {
+        twatter_opponent_spec = GetOpponentSpecFromCarSpec(pTwatter);
+        twattee_opponent_spec = GetOpponentSpecFromCarSpec(pTwattee);
+        if (pTwattee->scary_bang) {
+            StunTheBugger(twattee_opponent_spec, 30 * bangness + 1000);
+        }
+        twatter_index = twatter_opponent_spec->index;
+        twattee_index = twattee_opponent_spec->index;
+        if (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat && twatter_opponent_spec->pursue_car_data.pursuee == pTwattee) {
+            twatter_opponent_spec->pursue_car_data.time_last_twatted_em = gTime_stamp_for_this_munging;
+        }
+        if (CAR_SPEC_IS_OPPONENT(pTwatter) && CAR_SPEC_IS_ROZZER(pTwattee)) {
+            new_grudge_value = grudginess_caused_by_damage + gOpponents[twattee_index].psyche.grudge_against_player;
             if (new_grudge_value > 100) {
                 new_grudge_value = 100;
             }
-            gOpponents[twattee_opponent_spec->index].psyche.grudge_against_player = new_grudge_value;
-        } else if (pTwattee->driver == eDriver_local_human) {
-            twatter_opponent_spec = GetOpponentSpecFromCarSpec(pTwatter);
-            if (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat && twatter_opponent_spec->pursue_car_data.pursuee == pTwattee) {
-                twatter_opponent_spec->pursue_car_data.time_last_twatted_em = gTime_stamp_for_this_munging;
-            }
-            twatter_index = twatter_opponent_spec->index;
-            new_grudge_value = gOpponents[twatter_index].psyche.grudge_against_player - (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat ? 0 : 2 * grudginess_caused_by_damage);
-            if (new_grudge_value < 0) {
-                new_grudge_value = 0;
-            }
-            gOpponents[twatter_index].psyche.grudge_against_player = new_grudge_value;
-        } else {
-            twatter_opponent_spec = GetOpponentSpecFromCarSpec(pTwatter);
-            twattee_opponent_spec = GetOpponentSpecFromCarSpec(pTwattee);
-            if (pTwattee->scary_bang) {
-                StunTheBugger(twattee_opponent_spec, 30 * bangness + 1000);
-            }
-            twattee_index = twattee_opponent_spec->index;
-            if (twatter_opponent_spec->current_objective == eOOT_pursue_and_twat && twatter_opponent_spec->pursue_car_data.pursuee == pTwattee) {
-                twatter_opponent_spec->pursue_car_data.time_last_twatted_em = gTime_stamp_for_this_munging;
-            }
-            if (CAR_SPEC_IS_OPPONENT(pTwatter) && CAR_SPEC_IS_ROZZER(pTwattee)) {
-                new_grudge_value = grudginess_caused_by_damage + gOpponents[twattee_index].psyche.grudge_against_player;
-                if (new_grudge_value > 100) {
-                    new_grudge_value = 100;
-                }
-                gOpponents[twattee_index].psyche.grudge_against_player = new_grudge_value;
-            }
+            gOpponents[twattee_index].psyche.grudge_against_player = new_grudge_value;
         }
     }
 }
