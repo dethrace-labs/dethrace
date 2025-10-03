@@ -110,7 +110,11 @@ tU32 gNext_elastication;
 
 // GLOBAL: CARM95 0x00507150
 tU32 gNext_write_during_elastication;
+
+// GLOBAL: CARM95 0x00507154
 char* gCop_name = "Faceless Cop";
+
+// GLOBAL: CARM95 0x00507158
 char* gDrone_name = "Innocent Civilian";
 
 // GLOBAL: CARM95 0x0050715c
@@ -2816,10 +2820,6 @@ tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
         return &gProgram_state.current_car;
 
     case eVehicle_net_player:
-        // if (gThis_net_player_index <= pIndex) {
-        //     return gNet_players[pIndex + 1].car;
-        // }
-        // return gNet_players[pIndex].car;
         return pIndex >= gThis_net_player_index ? gNet_players[pIndex + 1].car : gNet_players[pIndex].car;
 
     case eVehicle_opponent:
@@ -2848,13 +2848,13 @@ char* GetDriverName(tVehicle_type pCategory, int pIndex) {
     case eVehicle_opponent:
         return gOpponents[gProgram_state.AI_vehicles.opponents[pIndex].index].name;
     case eVehicle_rozzer:
-        return "Faceless Cop";
+        return gCop_name;
     case eVehicle_drone:
-        return "Innocent Civilian";
+        return gDrone_name;
     case eVehicle_not_really:
-    default:
         return NULL;
     }
+    return NULL;
 }
 
 // IDA: tOpponent_spec* __usercall GetOpponentSpecFromCarSpec@<EAX>(tCar_spec *pCar_spec@<EAX>)
