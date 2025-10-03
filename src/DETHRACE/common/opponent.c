@@ -3014,11 +3014,9 @@ br_scalar GetOpponentsSectionWidth(tOpponent_spec* pOpponent_spec, tS16 pSection
 
     if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
         return gProgram_state.AI_vehicles.path_sections[pOpponent_spec->next_sections[pSection - 20000].section_no].width;
-    }
-    if (pSection >= 15000) {
+    } else if (pSection >= 15000) {
         return 0.5f;
-    }
-    if (pSection == 10000) {
+    } else if (pSection == 10000) {
         return pOpponent_spec->pursue_car_data.direct_line_section.width;
     }
     return gProgram_state.AI_vehicles.path_sections[pSection].width;
