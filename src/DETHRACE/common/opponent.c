@@ -3031,12 +3031,10 @@ int GetOpponentsSectionMinSpeed(tOpponent_spec* pOpponent_spec, tS16 pSection, i
     if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
         section_no = pOpponent_spec->next_sections[pSection - 20000].section_no;
         direction = pOpponent_spec->next_sections[pSection - 20000].direction;
-        return gProgram_state.AI_vehicles.path_sections[section_no].min_speed[pTowards_finish == direction];
-    }
-    if (pSection >= 15000) {
+        return gProgram_state.AI_vehicles.path_sections[section_no].min_speed[(direction ^ pTowards_finish) == 0];
+    } else if (pSection >= 15000) {
         return 0;
-    }
-    if (pSection == 10000) {
+    } else if (pSection == 10000) {
         return pOpponent_spec->pursue_car_data.direct_line_section.min_speed[pTowards_finish];
     }
     dr_dprintf("WARNING - GetOpponentsSectionMinSpeed() - section not found in next_section array for opponent %s", pOpponent_spec->car_spec->driver_name);
