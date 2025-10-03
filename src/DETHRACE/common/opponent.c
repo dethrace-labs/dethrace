@@ -2897,11 +2897,10 @@ int GetOpponentsRealSection(tOpponent_spec* pOpponent_spec, int pSection_no) {
 
     if (pSection_no >= 20000) {
         return pOpponent_spec->next_sections[pSection_no - 20000].section_no;
-    } else if (pSection_no >= 10000) {
-        return -1;
-    } else {
+    } else if (pSection_no < 10000) {
         return pSection_no;
     }
+    return -1;
 }
 
 // IDA: int __usercall GetOpponentsFirstSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>)
