@@ -3455,50 +3455,59 @@ void RecalcNearestPathSectionSpeed(int pMax_not_min, int pAdjustment) {
     int new_speed;
     int nearest_end;
 
-    if (gOppo_paths_shown) {
+    if (!gOppo_paths_shown) {
+        return;
+    }
+    if (!gAlready_elasticating) {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
-        if (!gAlready_elasticating && distance > 10.f) {
+        if (distance > 10.f) {
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any paths close enough");
-        } else {
-            BrVector3Sub(&wank, &gSelf->t.t.translate.t, &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p);
-            dist_to_start = BrVector3Length(&wank);
-            BrVector3Sub(&wank, &gSelf->t.t.translate.t, &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p);
-            dist_to_finish = BrVector3Length(&wank);
-            nearest_end = dist_to_finish < dist_to_start ? 1 : 0;
-            if (pMax_not_min) {
-                new_speed = gProgram_state.AI_vehicles.path_sections[section_no].max_speed[nearest_end];
-            } else {
-                new_speed = gProgram_state.AI_vehicles.path_sections[section_no].min_speed[nearest_end];
-            }
-            new_speed += 5 * pAdjustment;
-            if (5 * pAdjustment < 0 && new_speed > 100) {
-                new_speed = 100;
-            } else if (5 * pAdjustment > 0 && new_speed > 100) {
-                new_speed = 255;
-            }
-            if (new_speed < 0) {
-                new_speed = 0;
-            } else if (new_speed > 255) {
-                new_speed = 255;
-            }
-            if (pMax_not_min) {
-                gProgram_state.AI_vehicles.path_sections[section_no].max_speed[nearest_end] = new_speed;
-            } else {
-                gProgram_state.AI_vehicles.path_sections[section_no].min_speed[nearest_end] = new_speed;
-            }
-            if (nearest_end != 0) {
-                sprintf(str, "Towards section finish - Min Speed %d mph - Max speed %d mph",
-                    (int)(2.2f * gProgram_state.AI_vehicles.path_sections[section_no].min_speed[nearest_end]),
-                    (int)(2.2f * gProgram_state.AI_vehicles.path_sections[section_no].max_speed[nearest_end]));
-            } else {
-                sprintf(str, "Towards section start - Min Speed %d mph - Max speed %d mph",
-                    (int)(2.2f * gProgram_state.AI_vehicles.path_sections[section_no].min_speed[0]),
-                    (int)(2.2f * gProgram_state.AI_vehicles.path_sections[section_no].max_speed[0]));
-            }
-            ShowOppoPaths();
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+            return;
         }
     }
+    BrVector3Sub(&wank, &gSelf->t.t.translate.t, &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p);
+    dist_to_start = BrVector3Length(&wank);
+    BrVector3Sub(&wank, &gSelf->t.t.translate.t, &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p);
+    dist_to_finish = BrVector3Length(&wank);
+    if (dist_to_finish < dist_to_start) {
+        nearest_end = 1;
+    } else {
+        nearest_end = 0;
+    }
+    pAdjustment *= 5;
+
+    if (pMax_not_min) {
+        new_speed = gProgram_state.AI_vehicles.path_sections[section_no].max_speed[nearest_end] + pAdjustment;
+    } else {
+        new_speed = gProgram_state.AI_vehicles.path_sections[section_no].min_speed[nearest_end] + pAdjustment;
+    }
+
+    if (pAdjustment < 0 && new_speed > 100) {
+        new_speed = 100;
+    } else if (pAdjustment > 0 && new_speed > 100) {
+        new_speed = 255;
+    }
+    if (new_speed < 0) {
+        new_speed = 0;
+    } else if (new_speed > 255) {
+        new_speed = 255;
+    }
+    if (pMax_not_min) {
+        gProgram_state.AI_vehicles.path_sections[section_no].max_speed[nearest_end] = new_speed;
+    } else {
+        gProgram_state.AI_vehicles.path_sections[section_no].min_speed[nearest_end] = new_speed;
+    }
+    if (nearest_end != 0) {
+        sprintf(str, "Towards section finish - Min Speed %d mph - Max speed %d mph",
+            (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].min_speed[nearest_end]),
+            (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].max_speed[nearest_end]));
+    } else {
+        sprintf(str, "Towards section start - Min Speed %d mph - Max speed %d mph",
+            (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].min_speed[nearest_end]),
+            (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].max_speed[nearest_end]));
+    }
+    ShowOppoPaths();
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
 }
 
 // IDA: void __cdecl RecalcNearestPathSectionWidth(br_scalar pAdjustment)
