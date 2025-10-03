@@ -3189,7 +3189,6 @@ void RecordOpponentTwattageOccurrence(tCar_spec* pTwatter, tCar_spec* pTwattee) 
 // IDA: void __cdecl ToggleOpponentTest()
 // FUNCTION: CARM95 0x0040c537
 void ToggleOpponentTest(void) {
-
     gTest_toggle = !gTest_toggle;
 }
 
@@ -3242,9 +3241,10 @@ void RepairOpponentsSystems(void) {
     int i;
 
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
-        if (!gProgram_state.AI_vehicles.opponents[i].pursue_from_start) {
+        if (!gProgram_state.AI_vehicles.opponents[i].finished_for_this_race) {
             TotallyRepairACar(gProgram_state.AI_vehicles.opponents[i].car_spec);
-            TurnOpponentPhysicsOff(&gProgram_state.AI_vehicles.opponents[i]);
+            TurnOpponentPhysicsOn(&gProgram_state.AI_vehicles.opponents[i]);
+            NewObjective(&gProgram_state.AI_vehicles.opponents[i], eOOT_complete_race);
             gProgram_state.AI_vehicles.opponents[i].knackeredness_detected = 0;
         }
     }
