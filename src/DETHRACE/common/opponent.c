@@ -2862,13 +2862,13 @@ char* GetDriverName(tVehicle_type pCategory, int pIndex) {
 tOpponent_spec* GetOpponentSpecFromCarSpec(tCar_spec* pCar_spec) {
     int i;
 
-    if ((pCar_spec->car_ID & 0xff00) == 0x200) {
+    if (CAR_SPEC_IS_OPPONENT(pCar_spec)) {
         for (i = 0; i < GetCarCount(eVehicle_opponent); i++) {
             if (gProgram_state.AI_vehicles.opponents[i].car_spec == pCar_spec) {
                 return &gProgram_state.AI_vehicles.opponents[i];
             }
         }
-    } else if ((pCar_spec->car_ID & 0xff00) == 0x300) {
+    } else if (CAR_SPEC_IS_ROZZER(pCar_spec)) {
         for (i = 0; i < GetCarCount(eVehicle_rozzer); i++) {
             if (gProgram_state.AI_vehicles.cops[i].car_spec == pCar_spec) {
                 return &gProgram_state.AI_vehicles.cops[i];
