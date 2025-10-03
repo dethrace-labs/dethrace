@@ -2921,18 +2921,15 @@ int GetOpponentsFirstSection(tOpponent_spec* pOpponent_spec) {
 // IDA: int __usercall GetOpponentsNextSection@<EAX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pCurrent_section@<EDX>)
 // FUNCTION: CARM95 0x0040b86e
 int GetOpponentsNextSection(tOpponent_spec* pOpponent_spec, tS16 pCurrent_section) {
-
-    if (pCurrent_section < 20000) {
-        if (pCurrent_section < 15000) {
-            return -1;
-        } else {
-            return CalcNextTrailSection(pOpponent_spec, pCurrent_section);
+    if (pCurrent_section >= 20000) {
+        if (pCurrent_section - 19999 < pOpponent_spec->nnext_sections && (pOpponent_spec->cheating || gProgram_state.AI_vehicles.path_sections[pCurrent_section - 19999].type != ePST_cheat_only)) {
+            return pCurrent_section + 1;
         }
-    } else if (pCurrent_section - 19999 >= pOpponent_spec->nnext_sections || (!pOpponent_spec->cheating && gProgram_state.AI_vehicles.path_sections[pCurrent_section - 19999].type == ePST_cheat_only)) {
         return -1;
-    } else {
-        return pCurrent_section + 1;
+    } else if (pCurrent_section >= 15000) {
+        return CalcNextTrailSection(pOpponent_spec, pCurrent_section);
     }
+    return -1;
 }
 
 // IDA: tS16 __usercall GetOpponentsSectionStartNode@<AX>(tOpponent_spec *pOpponent_spec@<EAX>, tS16 pSection@<EDX>)
