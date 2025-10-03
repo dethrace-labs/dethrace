@@ -3519,24 +3519,26 @@ void RecalcNearestPathSectionWidth(br_scalar pAdjustment) {
     br_scalar distance;
     char str[128];
 
-    if (gOppo_paths_shown) {
-        if (!gAlready_elasticating) {
-            section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
-            if (distance > 10.f) {
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any paths close enough");
-                return;
-            }
-        } else {
-            section_no = gMobile_section;
-        }
-        gProgram_state.AI_vehicles.path_sections[section_no].width += (int)pAdjustment * pAdjustment + pAdjustment;
-        if (gProgram_state.AI_vehicles.path_sections[section_no].width < .05f) {
-            gProgram_state.AI_vehicles.path_sections[section_no].width = .05f;
-        }
-        ShowOppoPaths();
-        sprintf(str, "Width %2.1f BRU", 2.f * gProgram_state.AI_vehicles.path_sections[section_no].width);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+    if (!gOppo_paths_shown) {
+        return;
     }
+    if (gAlready_elasticating) {
+        section_no = gMobile_section;
+    } else {
+        section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
+        if (distance > 10.f) {
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any paths close enough");
+            return;
+        }
+    }
+    pAdjustment = (int)pAdjustment * pAdjustment + pAdjustment;
+    gProgram_state.AI_vehicles.path_sections[section_no].width += pAdjustment;
+    if (gProgram_state.AI_vehicles.path_sections[section_no].width < .05f) {
+        gProgram_state.AI_vehicles.path_sections[section_no].width = .05f;
+    }
+    ShowOppoPaths();
+    sprintf(str, "Width %2.1f BRU", 2.0 * gProgram_state.AI_vehicles.path_sections[section_no].width);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
 }
 
 // IDA: void __usercall CalcNegativeXVector(br_vector3 *pNegative_x_vector@<EAX>, br_vector3 *pStart@<EDX>, br_vector3 *pFinish@<EBX>, br_scalar pLength)
