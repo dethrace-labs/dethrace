@@ -2907,14 +2907,12 @@ int GetOpponentsRealSection(tOpponent_spec* pOpponent_spec, int pSection_no) {
 // FUNCTION: CARM95 0x0040b806
 int GetOpponentsFirstSection(tOpponent_spec* pOpponent_spec) {
 
-    if (pOpponent_spec->current_objective != eOOT_pursue_and_twat) {
-        return 20000;
-    }
-    if (pOpponent_spec->pursue_car_data.state == ePCS_following_trail) {
-        return pOpponent_spec->follow_path_data.section_no;
-    }
-    if (pOpponent_spec->pursue_car_data.state == ePCS_following_line_of_sight) {
-        return 10000;
+    if (pOpponent_spec->current_objective == eOOT_pursue_and_twat) {
+        if (pOpponent_spec->pursue_car_data.state == ePCS_following_trail) {
+            return pOpponent_spec->follow_path_data.section_no;
+        } else if (pOpponent_spec->pursue_car_data.state == ePCS_following_line_of_sight) {
+            return 10000;
+        }
     }
     return 20000;
 }
