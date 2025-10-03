@@ -117,11 +117,10 @@ void SockAddrToString(char* pString, struct sockaddr_in* pSock_addr) {
 
 // added by dethrace
 void CopyableSockAddrToString(char* pString, tCopyable_sockaddr_in* pSock_addr) {
-    char portbuf[10];
+    struct sockaddr_in someaddr;
 
-    inet_ntop(AF_INET, &pSock_addr->address, pString, 32);
-    sprintf(portbuf, ":%d", ntohs(pSock_addr->port));
-    strcat(pString, portbuf);
+    PDNetCopyToNative(&someaddr, pSock_addr);
+    SockAddrToString(pString, &someaddr);
 }
 
 // IDA: int __usercall GetMessageTypeFromMessage@<EAX>(char *pMessage_str@<EAX>)
