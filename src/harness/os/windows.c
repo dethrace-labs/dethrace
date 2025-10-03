@@ -437,7 +437,7 @@ int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
     }
 
     for (IP_ADAPTER_ADDRESSES* aa = adapter_addrs; aa != NULL; aa = aa->Next) {
-        LOG_DEBUG("name: %s", aa->FriendlyName); // Skip if name is provided and doesn't match FriendlyName
+        LOG_DEBUG2("name: %s", aa->FriendlyName); // Skip if name is provided and doesn't match FriendlyName
         if (wcslen(wideName) > 0 && wcscmp(aa->FriendlyName, wideName) != 0)
             continue;
 
