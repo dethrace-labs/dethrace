@@ -3547,12 +3547,16 @@ void CalcNegativeXVector(br_vector3* pNegative_x_vector, br_vector3* pStart, br_
     br_vector3 positive_y_vector;
     br_vector3 path_vector;
 
-    positive_y_vector.v[0] = pFinish->v[0] - pStart->v[0];
-    positive_y_vector.v[1] = pFinish->v[1] - pStart->v[1];
-    positive_y_vector.v[2] = pFinish->v[2] - pStart->v[2];
-    pNegative_x_vector->v[0] = 1.0 * positive_y_vector.v[2] - positive_y_vector.v[1] * 0.0;
-    pNegative_x_vector->v[1] = 0.0 * positive_y_vector.v[0] - positive_y_vector.v[2] * 0.0;
-    pNegative_x_vector->v[2] = positive_y_vector.v[1] * 0.0 - 1.0 * positive_y_vector.v[0];
+    BrVector3Set(&positive_y_vector, 0, 1.0, 0.0);
+    // positive_y_vector.v[0] = pFinish->v[0] - pStart->v[0];
+    // positive_y_vector.v[1] = pFinish->v[1] - pStart->v[1];
+    // positive_y_vector.v[2] = pFinish->v[2] - pStart->v[2];
+    BrVector3Sub(&path_vector, pFinish, pStart);
+    // pNegative_x_vector->v[0] = 1.0 * positive_y_vector.v[2] - positive_y_vector.v[1] * 0.0;
+    // pNegative_x_vector->v[1] = 0.0 * positive_y_vector.v[0] - positive_y_vector.v[2] * 0.0;
+    // pNegative_x_vector->v[2] = positive_y_vector.v[1] * 0.0 - 1.0 * positive_y_vector.v[0];
+
+    BrVector3Cross(pNegative_x_vector, &positive_y_vector, &path_vector);
 
     BrVector3Normalise(pNegative_x_vector, pNegative_x_vector);
     BrVector3Scale(pNegative_x_vector, pNegative_x_vector, pLength);
