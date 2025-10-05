@@ -3677,6 +3677,7 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
     int i;
 
     new_vertices = BrResAllocate(pModel, pNum_vertices * sizeof(br_vertex), BR_MEMORY_VERTICES);
+    // this is something like BrMemSet32 in the dissassembly, although no such function exists in open-source BRender
     memset(new_vertices, 0, pNum_vertices * sizeof(br_vertex));
     if (pModel->nvertices != 0) {
         for (i = 0; i < ((pNum_vertices <= pModel->nvertices) ? pNum_vertices : pModel->nvertices); i++) {
@@ -3689,6 +3690,7 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
     pModel->nvertices = pNum_vertices;
 
     new_faces = BrResAllocate(pModel, pNum_faces * sizeof(br_face), BR_MEMORY_FACES);
+    // this is something like BrMemSet32 in the dissassembly, although no such function exists in open-source BRender
     memset(new_faces, 0, pNum_faces * sizeof(br_face));
     if (pModel->nfaces != 0) {
         for (i = 0; i < ((pNum_faces <= pModel->nfaces) ? pNum_faces : pModel->nfaces); i++) {
