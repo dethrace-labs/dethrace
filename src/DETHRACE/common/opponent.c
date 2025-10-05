@@ -3760,6 +3760,7 @@ void RebuildOppoPathModel(void) {
     br_material* edge_mat_finish_lt;
     br_material* edge_mat_finish_dk;
 
+    at_least_one = 0;
     if (gProgram_state.AI_vehicles.number_of_path_nodes < 2) {
         if (gOppo_path_model != NULL) {
             BrModelRemove(gOppo_path_model);
@@ -3832,14 +3833,20 @@ void RebuildOppoPathModel(void) {
                 centre_mat_lt, centre_mat_dk,
                 edge_mat_start_lt, edge_mat_start_dk,
                 edge_mat_finish_lt, edge_mat_finish_dk);
+            at_least_one = 1;
         }
+
+        first_face = 12 * gProgram_state.AI_vehicles.number_of_path_sections;
+        first_vertex = 18 * gProgram_state.AI_vehicles.number_of_path_sections;
+
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
-            MakeCube(18 * gProgram_state.AI_vehicles.number_of_path_sections + 8 * i,
-                12 * gProgram_state.AI_vehicles.number_of_path_sections + 12 * i,
+            MakeCube(first_vertex + 8 * i,
+                first_face + 12 * i,
                 gProgram_state.AI_vehicles.cop_start_points + i,
                 gMat_lt_turq,
                 gMat_lt_turq,
                 gMat_dk_turq);
+            at_least_one = 1;
         }
         BrModelUpdate(gOppo_path_model, BR_MODU_ALL);
     }
