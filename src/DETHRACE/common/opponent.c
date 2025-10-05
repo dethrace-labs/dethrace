@@ -3863,8 +3863,8 @@ int ConsistencyCheck(void) {
     tS16 section_no_index1;
     int found_how_many;
     int failed;
-    tU8* nodes_referenced_by_sections_array = NULL;
-    tU8* sections_referenced_by_nodes_array = NULL;
+    tU8* nodes_referenced_by_sections_array;
+    tU8* sections_referenced_by_nodes_array;
 
     failed = 0;
     if (gProgram_state.AI_vehicles.number_of_path_nodes != 0) {
@@ -3875,64 +3875,70 @@ int ConsistencyCheck(void) {
         sections_referenced_by_nodes_array = BrMemAllocate(gProgram_state.AI_vehicles.number_of_path_sections, kMem_sections_array);
         memset(sections_referenced_by_nodes_array, 0, gProgram_state.AI_vehicles.number_of_path_sections);
     }
-    for (section_no_index = 0; section_no_index < gProgram_state.AI_vehicles.number_of_path_sections; section_no_index++) {
-        start_node = gProgram_state.AI_vehicles.path_sections[section_no_index].node_indices[0];
-        finish_node = gProgram_state.AI_vehicles.path_sections[section_no_index].node_indices[1];
+    for (section_no = 0; section_no < gProgram_state.AI_vehicles.number_of_path_sections; section_no++) {
+        start_node = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0];
+        finish_node = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1];
         if (finish_node == start_node) {
-            dr_dprintf("CONSISTENCY FAILURE: Section #%d has both ends attached to same node!", section_no_index);
+            dr_dprintf("CONSISTENCY FAILURE: Section #%d has both ends attached to same node!", section_no);
             failed = 1;
         }
-        if (start_node >= 0 && gProgram_state.AI_vehicles.number_of_path_nodes - 1 >= start_node) {
+        if (start_node < 0 || gProgram_state.AI_vehicles.number_of_path_nodes - 1 < start_node) {
+            dr_dprintf(
+                "CONSISTENCY FAILURE: Section #%d references invalid node (#%d) - should be in range 0..%d",
+                section_no, start_node, gProgram_state.AI_vehicles.number_of_path_nodes - 1);
+            failed = 1;
+        } else {
             nodes_referenced_by_sections_array[start_node] = 1;
             nodes_referenced_by_sections_array[finish_node] = 1;
             found_how_many = 0;
-            for (section_no_index1 = 0; section_no_index1 < gProgram_state.AI_vehicles.path_nodes[start_node].number_of_sections; section_no_index1++) {
-                if (gProgram_state.AI_vehicles.path_nodes[start_node].sections[section_no_index1] == section_no_index) {
+            for (section_no_index = 0; section_no_index < gProgram_state.AI_vehicles.path_nodes[start_node].number_of_sections; section_no_index++) {
+                if (gProgram_state.AI_vehicles.path_nodes[start_node].sections[section_no_index] == section_no) {
                     found_how_many++;
                 }
             }
             if (found_how_many == 0) {
                 dr_dprintf(
                     "CONSISTENCY FAILURE: Section #%d references node #%d but not vice-versa",
-                    section_no_index,
+                    section_no,
                     start_node);
                 failed = 1;
             }
-        } else {
+        }
+        if (finish_node < 0 || gProgram_state.AI_vehicles.number_of_path_nodes - 1 < finish_node) {
             dr_dprintf(
                 "CONSISTENCY FAILURE: Section #%d references invalid node (#%d) - should be in range 0..%d",
-                section_no_index,
-                start_node,
+                section_no,
+                finish_node,
                 gProgram_state.AI_vehicles.number_of_path_nodes - 1);
             failed = 1;
-        }
-        if (finish_node >= 0 && gProgram_state.AI_vehicles.number_of_path_nodes - 1 >= finish_node) {
+
+        } else {
             found_how_many = 0;
-            for (section_no_index1 = 0; section_no_index1 < gProgram_state.AI_vehicles.path_nodes[finish_node].number_of_sections; section_no_index1++) {
-                if (gProgram_state.AI_vehicles.path_nodes[finish_node].sections[section_no_index1] == section_no_index) {
+            for (section_no_index = 0; section_no_index < gProgram_state.AI_vehicles.path_nodes[finish_node].number_of_sections; section_no_index++) {
+                if (gProgram_state.AI_vehicles.path_nodes[finish_node].sections[section_no_index] == section_no) {
                     found_how_many++;
                 }
             }
             if (found_how_many == 0) {
                 dr_dprintf(
                     "CONSISTENCY FAILURE: Section #%d references node #%d but not vice-versa",
-                    section_no_index,
+                    section_no,
                     finish_node);
                 failed = 1;
             }
-        } else {
-            dr_dprintf(
-                "CONSISTENCY FAILURE: Section #%d references invalid node (#%d) - should be in range 0..%d",
-                section_no_index,
-                finish_node,
-                gProgram_state.AI_vehicles.number_of_path_nodes - 1);
-            failed = 1;
         }
     }
     for (node_no = 0; node_no < gProgram_state.AI_vehicles.number_of_path_nodes; node_no++) {
         for (section_no_index = 0; section_no_index < gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections; section_no_index++) {
             section_no = gProgram_state.AI_vehicles.path_nodes[node_no].sections[section_no_index];
-            if (section_no >= 0 && gProgram_state.AI_vehicles.number_of_path_sections - 1 >= section_no) {
+            if (section_no < 0 || gProgram_state.AI_vehicles.number_of_path_sections - 1 < section_no) {
+                dr_dprintf(
+                    "CONSISTENCY FAILURE: Node #%d references invalid section (#%d) - should be in range 0..%d",
+                    node_no,
+                    section_no,
+                    gProgram_state.AI_vehicles.number_of_path_sections - 1);
+                failed = 1;
+            } else {
                 sections_referenced_by_nodes_array[section_no] = 1;
                 if (gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0] != node_no
                     && gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] != node_no) {
@@ -3942,18 +3948,12 @@ int ConsistencyCheck(void) {
                         section_no);
                     failed = 1;
                 }
-            } else {
-                dr_dprintf(
-                    "CONSISTENCY FAILURE: Node #%d references invalid section (#%d) - should be in range 0..%d",
-                    node_no,
-                    section_no,
-                    gProgram_state.AI_vehicles.number_of_path_sections - 1);
-                failed = 1;
             }
             found_how_many = 0;
-            for (section_no_index1 = section_no; section_no_index1 < gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections; section_no_index1++) {
+            for (section_no_index1 = section_no_index; section_no_index1 < gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections; section_no_index1++) {
                 if (gProgram_state.AI_vehicles.path_nodes[node_no].sections[section_no_index1] == section_no) {
                     found_how_many++;
+                } else {
                 }
             }
             if (found_how_many > 1) {
@@ -3990,8 +3990,9 @@ int ConsistencyCheck(void) {
             gProgram_state.AI_vehicles.number_of_path_nodes);
         dr_dprintf("^^^ CONSISTENCY FAILURE ^^^");
         PDEnterDebugger("OPPONENT PATH CONSISTENCY FAILURE - refer to DIAGNOST.TXT");
+        return 0;
     }
-    return !failed;
+    return 1;
 }
 
 // IDA: void __cdecl ShowOppoPaths()
