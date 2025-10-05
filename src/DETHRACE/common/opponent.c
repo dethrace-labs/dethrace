@@ -4000,17 +4000,17 @@ int ConsistencyCheck(void) {
 void ShowOppoPaths(void) {
     char str[256];
 
-    if (!gOppo_paths_shown) {
-        if (gOppo_path_actor != NULL) {
-            gOppo_path_actor->render_style = BR_RSTYLE_NONE;
-        }
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -1, "Not displaying any paths");
-    } else {
+    if (gOppo_paths_shown) {
         RebuildOppoPathModel();
         sprintf(str, "Total %d nodes, %d sections",
             gProgram_state.AI_vehicles.number_of_path_nodes,
             gProgram_state.AI_vehicles.number_of_path_sections);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -1, str);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -1, str);
+    } else {
+        if (gOppo_path_actor != NULL) {
+            gOppo_path_actor->render_style = BR_RSTYLE_NONE;
+        }
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -1, "Not displaying any paths");
     }
     if (ConsistencyCheck()) {
         WriteOutOppoPaths();
