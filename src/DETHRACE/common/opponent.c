@@ -3549,16 +3549,8 @@ void CalcNegativeXVector(br_vector3* pNegative_x_vector, br_vector3* pStart, br_
     br_vector3 path_vector;
 
     BrVector3Set(&positive_y_vector, 0, 1.0, 0.0);
-    // positive_y_vector.v[0] = pFinish->v[0] - pStart->v[0];
-    // positive_y_vector.v[1] = pFinish->v[1] - pStart->v[1];
-    // positive_y_vector.v[2] = pFinish->v[2] - pStart->v[2];
     BrVector3Sub(&path_vector, pFinish, pStart);
-    // pNegative_x_vector->v[0] = 1.0 * positive_y_vector.v[2] - positive_y_vector.v[1] * 0.0;
-    // pNegative_x_vector->v[1] = 0.0 * positive_y_vector.v[0] - positive_y_vector.v[2] * 0.0;
-    // pNegative_x_vector->v[2] = positive_y_vector.v[1] * 0.0 - 1.0 * positive_y_vector.v[0];
-
     BrVector3Cross(pNegative_x_vector, &positive_y_vector, &path_vector);
-
     BrVector3Normalise(pNegative_x_vector, pNegative_x_vector);
     BrVector3Scale(pNegative_x_vector, pNegative_x_vector, pLength);
 }
@@ -3607,13 +3599,17 @@ void MakeSection(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* p
             height = .3f;
             BrVector3Set(&offset_v, 0.f, 0.f, 0.f);
             the_material_finish_lt = pMaterial_centre_lt;
-            the_material_start_lt = pMaterial_centre_lt;
+            the_material_start_lt = the_material_finish_lt;
             the_material_finish_dk = pMaterial_centre_dk;
-            the_material_start_dk = pMaterial_centre_dk;
+            the_material_start_dk = the_material_finish_dk;
         }
-        centre_length_v.v[0] = pStart->v[0] + (pFinish->v[0] - pStart->v[0]) / 2.f;
-        centre_length_v.v[1] = pStart->v[1] + (pFinish->v[1] - pStart->v[1]) / 2.f;
-        centre_length_v.v[2] = pStart->v[2] + (pFinish->v[2] - pStart->v[2]) / 2.f;
+        BrVector3Sub(&centre_length_v, pFinish, pStart);
+        BrVector3InvScale(&centre_length_v, &centre_length_v, 2);
+        BrVector3Accumulate(&centre_length_v, pStart);
+
+        // centre_length_v.v[0] = pStart->v[0] + (pFinish->v[0] - pStart->v[0]) / 2.f;
+        // centre_length_v.v[1] = pStart->v[1] + (pFinish->v[1] - pStart->v[1]) / 2.f;
+        // centre_length_v.v[2] = pStart->v[2] + (pFinish->v[2] - pStart->v[2]) / 2.f;
 
         MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 6 * i + 0, pStart->v[0], pStart->v[1], pStart->v[2], &offset_v);
         MakeVertexAndOffsetIt(gOppo_path_model, pFirst_vertex + 6 * i + 1, pStart->v[0], pStart->v[1] + height, pStart->v[2], &offset_v);
