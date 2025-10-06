@@ -4031,32 +4031,31 @@ void WriteOutOppoPaths(void) {
         for (i = 0; 1; i++) {
 #ifdef DETHRACE_FIX_BUGS
             sprintf(str, "OPATH%03d.TXT", i);
-#else
-            sprintf(str, "OPATH%0.3d.TXT", i);
-#endif
             PathCat(the_path, gApplication_path, str);
-#ifdef DETHRACE_FIX_BUGS
             // OldDRfopen refuses to open unknown .TXT files
             f = fopen(the_path, "r");
 #else
+            sprintf(str, "OPATH%0.3d.TXT", i);
+            PathCat(the_path, gApplication_path, str);
             f = DRfopen(the_path, "r+");
 #endif
-            if (f == NULL) {
+            if (!f) {
+                strcpy(gOppo_path_filename, the_path);
+                gMade_path_filename = 1;
                 break;
             }
             fclose(f);
         }
-        strcpy(gOppo_path_filename, the_path);
-        gMade_path_filename = 1;
     }
 #ifdef DETHRACE_FIX_BUGS
     f = fopen(gOppo_path_filename, "w");
-#else
-    f = DRfopen(gOppo_path_filename, "wt");
-#endif
     if (f == NULL) {
         printf("f is NULL, errno=%d, msg=\"%s\"\n", errno, strerror(errno));
     }
+#else
+    f = DRfopen(gOppo_path_filename, "wt");
+#endif
+
     fprintf(f, "%s\n", "START OF OPPONENT PATHS");
     fprintf(f, "\n%-3d                             // Number of path nodes\n",
         gProgram_state.AI_vehicles.number_of_path_nodes);
@@ -4090,7 +4089,7 @@ void WriteOutOppoPaths(void) {
             gProgram_state.AI_vehicles.cop_start_points[i].v[2],
             0.f, 0.f, 0.f, i);
     }
-    fprintf(f, "END OF OPPONENT PATHS");
+    fprintf(f, "\n%s\n", "END OF OPPONENT PATHS");
     fclose(f);
 }
 
@@ -4103,7 +4102,10 @@ int NewNodeOKHere(void) {
         BrVector3Sub(&last_node_to_this,
             &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]].p,
             &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[0]].p);
-        return BrVector3Length(&last_node_to_this) != 0.f;
+
+        if (BrVector3Length(&last_node_to_this) == 0.f) {
+            return 0;
+        }
     }
     return 1;
 }
