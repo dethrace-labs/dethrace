@@ -4135,6 +4135,8 @@ void DropElasticateyNode(void) {
     tPath_section_type_enum original_type;
 
     all_the_same_type = 1;
+    section_type = ePST_normal;
+
     if (!NewNodeOKHere()) {
         return;
     }
@@ -4142,7 +4144,7 @@ void DropElasticateyNode(void) {
         old_node = gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1];
         BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[old_node].p,
             &gProgram_state.current_car.car_master_actor->t.t.translate.t);
-        original_type = gProgram_state.AI_vehicles.path_sections[gMobile_section].type;
+        section_type = gProgram_state.AI_vehicles.path_sections[gMobile_section].type;
         one_wayness = gProgram_state.AI_vehicles.path_sections[gMobile_section].one_way;
         new_node = ReallocExtraPathNodes(1);
         gMobile_section = ReallocExtraPathSections(1);
@@ -4154,27 +4156,29 @@ void DropElasticateyNode(void) {
         if (gProgram_state.AI_vehicles.number_of_path_nodes == 0) {
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not implemented yet. Go away.");
             return;
-        }
-        old_node = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
-        if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any nodes close enough");
-            return;
-        }
-        original_type = 0;
-        if (gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections != 0) {
-            for (section_no_index = 1; section_no_index < gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections; section_no_index++) {
-                if (gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[section_no_index]].type != gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[0]].type) {
-                    all_the_same_type = 0;
+        } else {
+            old_node = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
+            if (distance > 10.f) {
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any nodes close enough");
+                return;
+            }
+
+            if (gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections >= 1) {
+                original_type = gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[0]].type;
+                for (section_no_index = 1; section_no_index < gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections; section_no_index++) {
+                    if (gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[section_no_index]].type != original_type) {
+                        all_the_same_type = 0;
+                    }
+                }
+                if (all_the_same_type) {
+                    section_type = original_type;
                 }
             }
-            if (all_the_same_type) {
-                original_type = gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[0]].type;
-            }
+            gAlready_elasticating = 1;
+            new_node = ReallocExtraPathNodes(1);
+            gMobile_section = ReallocExtraPathSections(1);
+            one_wayness = 0;
         }
-        gAlready_elasticating = 1;
-        new_node = ReallocExtraPathNodes(1);
-        gMobile_section = ReallocExtraPathSections(1);
-        one_wayness = 0;
     }
     gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[0] = old_node;
     gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1] = new_node;
@@ -4182,18 +4186,18 @@ void DropElasticateyNode(void) {
     gProgram_state.AI_vehicles.path_sections[gMobile_section].min_speed[1] = 0;
     gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[0] = 255;
     gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[1] = 255;
-    gProgram_state.AI_vehicles.path_sections[gMobile_section].type = original_type;
+    gProgram_state.AI_vehicles.path_sections[gMobile_section].type = section_type;
     gProgram_state.AI_vehicles.path_sections[gMobile_section].one_way = one_wayness;
-    if (gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections == 0) {
-        gProgram_state.AI_vehicles.path_sections[gMobile_section].width = 1.f;
-    } else {
+    if (gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections != 0) {
         gProgram_state.AI_vehicles.path_sections[gMobile_section].width = gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[old_node].sections[0]].width;
+    } else {
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].width = 1.f;
     }
     gProgram_state.AI_vehicles.path_nodes[new_node].number_of_sections = 0;
     gProgram_state.AI_vehicles.path_nodes[new_node].sections[gProgram_state.AI_vehicles.path_nodes[new_node].number_of_sections] = gMobile_section;
-    gProgram_state.AI_vehicles.path_nodes[new_node].number_of_sections += 1;
+    gProgram_state.AI_vehicles.path_nodes[new_node].number_of_sections++;
     gProgram_state.AI_vehicles.path_nodes[old_node].sections[gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections] = gMobile_section;
-    gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections += 1;
+    gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections++;
     ShowOppoPaths();
     sprintf(str, "New section #%d, new node #%d", gMobile_section, new_node);
     NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
