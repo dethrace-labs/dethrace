@@ -4293,31 +4293,32 @@ void InsertAndDontElasticate(void) {
     char str[256];
 
     not_perp = 0;
-    if (NewNodeOKHere()) {
-        section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
-        BrVector3Sub(&wank, &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p, &intersect);
-        if (BrVector3Length(&wank) == 0.f) {
-            not_perp = 1;
-        }
-        BrVector3Sub(&wank, &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p, &intersect);
-        if (BrVector3Length(&wank) == 0.f) {
-            not_perp = 1;
-        }
-        if (not_perp || distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Get nearer to the section");
+    if (!NewNodeOKHere()) {
+        return;
+    }
+    section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
+    BrVector3Sub(&wank, &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p, &intersect);
+    if (BrVector3Length(&wank) == 0.f) {
+        not_perp = 1;
+    }
+    BrVector3Sub(&wank, &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p, &intersect);
+    if (BrVector3Length(&wank) == 0.f) {
+        not_perp = 1;
+    }
+    if (not_perp || distance > 10.f) {
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Get nearer to the section");
+    } else {
+        if (gAlready_elasticating) {
+            gAlready_elasticating = 0;
+            inserted_node = gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1];
         } else {
-            if (gAlready_elasticating) {
-                gAlready_elasticating = 0;
-                inserted_node = gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1];
-            } else {
-                inserted_node = ReallocExtraPathNodes(1);
-                gProgram_state.AI_vehicles.path_nodes[inserted_node].number_of_sections = 0;
-            }
-            InsertThisNodeInThisSectionHere(inserted_node, section_no, &gSelf->t.t.translate.t);
-            ShowOppoPaths();
-            sprintf(str, "New node #%d inserted into section #%d", inserted_node, section_no);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+            inserted_node = ReallocExtraPathNodes(1);
+            gProgram_state.AI_vehicles.path_nodes[inserted_node].number_of_sections = 0;
         }
+        InsertThisNodeInThisSectionHere(inserted_node, section_no, &gSelf->t.t.translate.t);
+        ShowOppoPaths();
+        sprintf(str, "New node #%d inserted into section #%d", inserted_node, section_no);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
     }
 }
 
@@ -4439,20 +4440,22 @@ void PullOppoPoint(void) {
     tS16 node_no;
     br_scalar distance;
 
-    if (gOppo_paths_shown) {
-        if (gAlready_elasticating) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not while you're elasticating");
-        } else {
-            node_no = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
-            if (distance > 10.f) {
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any paths close enough");
-            } else {
-                BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[node_no].p, &gSelf->t.t.translate.t);
-                ShowOppoPaths();
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Bing!");
-            }
-        }
+    if (!gOppo_paths_shown) {
+        return;
     }
+    if (gAlready_elasticating) {
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not while you're elasticating");
+        return;
+    } else {
+        node_no = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
+        if (distance > 10.f) {
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any paths close enough");
+            return;
+        }
+        BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[node_no].p, &gSelf->t.t.translate.t);
+    }
+    ShowOppoPaths();
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Bing!");
 }
 
 // IDA: void __cdecl ShowNodeInfo()
