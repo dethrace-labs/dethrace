@@ -4529,10 +4529,10 @@ void ShowSectionInfo2(void) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
         sprintf(str, "Towards start - min %d max %d, finish - min %d, max %d mph",
-            (int)(2.2f * gProgram_state.AI_vehicles.path_sections[gMobile_section].min_speed[0]),
-            (int)(2.2f * gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[0]),
-            (int)(2.2f * gProgram_state.AI_vehicles.path_sections[gMobile_section].min_speed[1]),
-            (int)(2.2f * gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[1]));
+            (int)(2.2 * gProgram_state.AI_vehicles.path_sections[gMobile_section].min_speed[0]),
+            (int)(2.2 * gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[0]),
+            (int)(2.2 * gProgram_state.AI_vehicles.path_sections[gMobile_section].min_speed[1]),
+            (int)(2.2 * gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[1]));
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
     } else {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
@@ -4540,10 +4540,10 @@ void ShowSectionInfo2(void) {
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any sections close enough");
         } else {
             sprintf(str, "Towards start - min %d max %d, finish - min %d, max %d mph",
-                (int)(2.2f * gProgram_state.AI_vehicles.path_sections[section_no].min_speed[0]),
-                (int)(2.2f * gProgram_state.AI_vehicles.path_sections[section_no].max_speed[0]),
-                (int)(2.2f * gProgram_state.AI_vehicles.path_sections[section_no].min_speed[1]),
-                (int)(2.2f * gProgram_state.AI_vehicles.path_sections[section_no].max_speed[1]));
+                (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].min_speed[0]),
+                (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].max_speed[0]),
+                (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].min_speed[1]),
+                (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].max_speed[1]));
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
         }
     }
