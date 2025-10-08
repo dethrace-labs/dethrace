@@ -4710,10 +4710,10 @@ void ToggleOneWayNess(void) {
         if (distance > 10.f) {
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any sections close enough");
         } else {
-            if (gProgram_state.AI_vehicles.path_sections[section_no].one_way) {
-                gProgram_state.AI_vehicles.path_sections[section_no].one_way = 0;
-            } else {
+            if (!gProgram_state.AI_vehicles.path_sections[section_no].one_way) {
                 gProgram_state.AI_vehicles.path_sections[section_no].one_way = 1;
+            } else {
+                gProgram_state.AI_vehicles.path_sections[section_no].one_way = 0;
             }
             ShowOppoPaths();
             if (gProgram_state.AI_vehicles.path_sections[section_no].one_way) {
