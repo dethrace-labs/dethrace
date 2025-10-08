@@ -4325,17 +4325,21 @@ void InsertAndDontElasticate(void) {
 void DropDeadEndNode(void) {
     char str[256];
 
-    if (NewNodeOKHere() && gAlready_elasticating) {
-        gAlready_elasticating = 0;
-        BrVector3Copy(
-            &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]].p,
-            &gSelf->t.t.translate.t);
-        ShowOppoPaths();
-        sprintf(str, "New section #%d, finish node #%d",
-            gMobile_section,
-            gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 4000, -1, str);
+    if (!NewNodeOKHere()) {
+        return;
     }
+    if (!gAlready_elasticating) {
+        return;
+    }
+    gAlready_elasticating = 0;
+    BrVector3Copy(
+        &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]].p,
+        &gSelf->t.t.translate.t);
+    ShowOppoPaths();
+    sprintf(str, "New section #%d, finish node #%d",
+        gMobile_section,
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 4000, -1, str);
 }
 
 // IDA: void __cdecl DropNodeOnNodeAndStopElasticating()
