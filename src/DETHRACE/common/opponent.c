@@ -4612,10 +4612,13 @@ void DeleteOppoPathNodeAndJoin(void) {
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any nodes close enough");
         } else if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections != 2) {
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Node must have exactly 2 sections attached");
-        } else if ((gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[0]].node_indices[0] == node_no
-                       && gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[1]].node_indices[1] == node_no)
-            || (gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[1]].node_indices[0] == node_no
-                && gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[0]].node_indices[1] == node_no)) {
+        } else if ((gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[0]].node_indices[0] != node_no
+                       || gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[1]].node_indices[1] != node_no)
+            && (gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[1]].node_indices[0] != node_no
+                || gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[0]].node_indices[1] != node_no)) {
+
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Sections must point in same direction");
+        } else {
             ConsistencyCheck();
             DeleteNode(node_no, 0);
             ConsistencyCheck();
@@ -4623,8 +4626,6 @@ void DeleteOppoPathNodeAndJoin(void) {
             ConsistencyCheck();
             ShowOppoPaths();
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Blam!");
-        } else {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Sections must point in same direction");
         }
     }
 }
