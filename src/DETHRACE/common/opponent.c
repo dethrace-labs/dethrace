@@ -4741,10 +4741,10 @@ void CopStartPointInfo(void) {
     } else {
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
             BrVector3Sub(&car_to_point, &gSelf->t.t.translate.t, &gProgram_state.AI_vehicles.cop_start_points[i]);
-            distance = BrVector3LengthSquared(&car_to_point);
+            distance = BrVector3Length(&car_to_point);
             if (distance < closest_distance) {
-                closest = i;
                 closest_distance = distance;
+                closest = i;
             }
         }
         if (closest < 0 || closest_distance > 10.f) {
