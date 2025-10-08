@@ -4349,25 +4349,26 @@ void DropNodeOnNodeAndStopElasticating(void) {
     char str[256];
     br_scalar distance;
 
-    if (gAlready_elasticating) {
-        node_no = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
-        if (gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[0] == node_no || distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any nodes close enough");
-        } else if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections >= COUNT_OF(gProgram_state.AI_vehicles.path_nodes[node_no].sections)) {
-            sprintf(str, "Sorry, node #%d already has %d sections attached", node_no, (int)COUNT_OF(gProgram_state.AI_vehicles.path_nodes[node_no].sections));
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
-        } else {
-            gAlready_elasticating = 0;
-            gProgram_state.AI_vehicles.number_of_path_nodes -= 1;
-            gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1] = node_no;
-            gProgram_state.AI_vehicles.path_nodes[node_no].sections[gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections] = gMobile_section;
-            gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections += 1;
-            ShowOppoPaths();
-            sprintf(str, "New section #%d, attached to existing node #%d",
-                gMobile_section,
-                gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 4000, -1, str);
-        }
+    if (!gAlready_elasticating) {
+        return;
+    }
+    node_no = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
+    if (gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[0] == node_no || distance > 10.f) {
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any nodes close enough");
+    } else if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections >= COUNT_OF(gProgram_state.AI_vehicles.path_nodes[node_no].sections)) {
+        sprintf(str, "Sorry, node #%d already has %d sections attached", node_no, (int)COUNT_OF(gProgram_state.AI_vehicles.path_nodes[node_no].sections));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+    } else {
+        gAlready_elasticating = 0;
+        gProgram_state.AI_vehicles.number_of_path_nodes--;
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1] = node_no;
+        gProgram_state.AI_vehicles.path_nodes[node_no].sections[gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections] = gMobile_section;
+        gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections++;
+        ShowOppoPaths();
+        sprintf(str, "New section #%d, attached to existing node #%d",
+            gMobile_section,
+            gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 4000, -1, str);
     }
 }
 
