@@ -4219,60 +4219,63 @@ void InsertAndElasticate(void) {
     tPath_section_type_enum section_type;
 
     not_perp = 0;
-    if (NewNodeOKHere()) {
-        section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
-        BrVector3Sub(&wank,
-            &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p,
-            &intersect);
-        if (BrVector3Length(&wank) == 0.f) {
-            not_perp = 1;
-        }
-        BrVector3Sub(&wank,
-            &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p,
-            &intersect);
-        if (BrVector3Length(&wank) == 0.f) {
-            not_perp = 1;
-        }
-        if (not_perp || distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Get nearer to the section");
+    section_type = ePST_normal;
+
+    if (!NewNodeOKHere()) {
+        return;
+    }
+    section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
+    BrVector3Sub(&wank,
+        &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p,
+        &intersect);
+    if (BrVector3Length(&wank) == 0.f) {
+        not_perp = 1;
+    }
+    BrVector3Sub(&wank,
+        &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p,
+        &intersect);
+    if (BrVector3Length(&wank) == 0.f) {
+        not_perp = 1;
+    }
+    if (not_perp || distance > 10.f) {
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Get nearer to the section");
+    } else {
+        new_section = ReallocExtraPathSections(1);
+        if (gAlready_elasticating) {
+            inserted_node = gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1];
+            section_type = gProgram_state.AI_vehicles.path_sections[gMobile_section].type;
+            one_wayness = gProgram_state.AI_vehicles.path_sections[gMobile_section].one_way;
+            elasticatey_node = ReallocExtraPathNodes(1);
+            gProgram_state.AI_vehicles.path_nodes[elasticatey_node].number_of_sections = 0;
+            gProgram_state.AI_vehicles.path_sections[new_section].width = gProgram_state.AI_vehicles.path_sections[gMobile_section].width;
         } else {
-            new_section = ReallocExtraPathSections(1);
-            if (gAlready_elasticating) {
-                inserted_node = gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1];
-                section_type = gProgram_state.AI_vehicles.path_sections[gMobile_section].type;
-                one_wayness = gProgram_state.AI_vehicles.path_sections[gMobile_section].one_way;
-                elasticatey_node = ReallocExtraPathNodes(1);
-                gProgram_state.AI_vehicles.path_nodes[elasticatey_node].number_of_sections = 0;
-                gProgram_state.AI_vehicles.path_sections[new_section].width = gProgram_state.AI_vehicles.path_sections[gMobile_section].width;
-            } else {
-                inserted_node = ReallocExtraPathNodes(2);
-                gProgram_state.AI_vehicles.path_nodes[inserted_node].number_of_sections = 0;
-                elasticatey_node = inserted_node + 1;
-                gProgram_state.AI_vehicles.path_nodes[elasticatey_node].number_of_sections = 0;
-                gProgram_state.AI_vehicles.path_sections[new_section].width = gProgram_state.AI_vehicles.path_sections[section_no].width;
-                section_type = gProgram_state.AI_vehicles.path_sections[section_no].type;
-                one_wayness = gProgram_state.AI_vehicles.path_sections[section_no].one_way;
-            }
-            InsertThisNodeInThisSectionHere(inserted_node, section_no, &gSelf->t.t.translate.t);
-            gMobile_section = new_section;
-            gProgram_state.AI_vehicles.path_sections[new_section].node_indices[0] = inserted_node;
-            gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1] = elasticatey_node;
-            gProgram_state.AI_vehicles.path_sections[gMobile_section].min_speed[0] = 0;
-            gProgram_state.AI_vehicles.path_sections[gMobile_section].min_speed[1] = 0;
-            gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[0] = 255;
-            gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[1] = 255;
-            gProgram_state.AI_vehicles.path_sections[gMobile_section].type = section_type;
-            gProgram_state.AI_vehicles.path_sections[gMobile_section].one_way = one_wayness;
-            gProgram_state.AI_vehicles.path_nodes[inserted_node].sections[gProgram_state.AI_vehicles.path_nodes[inserted_node].number_of_sections] = gMobile_section;
-            gProgram_state.AI_vehicles.path_nodes[inserted_node].number_of_sections += 1;
-            gProgram_state.AI_vehicles.path_nodes[elasticatey_node].sections[gProgram_state.AI_vehicles.path_nodes[elasticatey_node].number_of_sections] = gMobile_section;
-            gProgram_state.AI_vehicles.path_nodes[elasticatey_node].number_of_sections += 1;
-            gAlready_elasticating = 1;
-            ShowOppoPaths();
-            sprintf(str, "New section %d, new node #%d inserted into section #%d",
-                gMobile_section, inserted_node, section_no);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+            inserted_node = ReallocExtraPathNodes(2);
+            gProgram_state.AI_vehicles.path_nodes[inserted_node].number_of_sections = 0;
+            elasticatey_node = inserted_node + 1;
+            gProgram_state.AI_vehicles.path_nodes[elasticatey_node].number_of_sections = 0;
+            gProgram_state.AI_vehicles.path_sections[new_section].width = gProgram_state.AI_vehicles.path_sections[section_no].width;
+            section_type = gProgram_state.AI_vehicles.path_sections[section_no].type;
+            one_wayness = gProgram_state.AI_vehicles.path_sections[section_no].one_way;
         }
+        InsertThisNodeInThisSectionHere(inserted_node, section_no, &gSelf->t.t.translate.t);
+        gMobile_section = new_section;
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[0] = inserted_node;
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1] = elasticatey_node;
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].min_speed[0] = 0;
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].min_speed[1] = 0;
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[0] = 255;
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[1] = 255;
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].type = section_type;
+        gProgram_state.AI_vehicles.path_sections[gMobile_section].one_way = one_wayness;
+        gProgram_state.AI_vehicles.path_nodes[inserted_node].sections[gProgram_state.AI_vehicles.path_nodes[inserted_node].number_of_sections] = gMobile_section;
+        gProgram_state.AI_vehicles.path_nodes[inserted_node].number_of_sections++;
+        gProgram_state.AI_vehicles.path_nodes[elasticatey_node].sections[gProgram_state.AI_vehicles.path_nodes[elasticatey_node].number_of_sections] = gMobile_section;
+        gProgram_state.AI_vehicles.path_nodes[elasticatey_node].number_of_sections++;
+        gAlready_elasticating = 1;
+        ShowOppoPaths();
+        sprintf(str, "New section %d, new node #%d inserted into section #%d",
+            gMobile_section, inserted_node, section_no);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
     }
 }
 
