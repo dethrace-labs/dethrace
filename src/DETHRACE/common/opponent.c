@@ -3459,7 +3459,8 @@ void RecalcNearestPathSectionSpeed(int pMax_not_min, int pAdjustment) {
     if (!gOppo_paths_shown) {
         return;
     }
-    if (!gAlready_elasticating) {
+    if (gAlready_elasticating) {
+    } else {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
         if (distance > 10.f) {
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any paths close enough");
@@ -4377,54 +4378,60 @@ void DropNodeOnNodeAndStopElasticating(void) {
 // FUNCTION: CARM95 0x004103c5
 void WidenOppoPathSection(void) {
 
-    if (gOppo_paths_shown) {
-        RecalcNearestPathSectionWidth(.05f);
+    if (!gOppo_paths_shown) {
+        return;
     }
+    RecalcNearestPathSectionWidth(.05f);
 }
 
 // IDA: void __cdecl NarrowOppoPathSection()
 // FUNCTION: CARM95 0x00410573
 void NarrowOppoPathSection(void) {
 
-    if (gOppo_paths_shown) {
-        RecalcNearestPathSectionWidth(-.05f);
+    if (!gOppo_paths_shown) {
+        return;
     }
+    RecalcNearestPathSectionWidth(-.05f);
 }
 
 // IDA: void __cdecl IncreaseSectionMinSpeed()
 // FUNCTION: CARM95 0x0041059d
 void IncreaseSectionMinSpeed(void) {
 
-    if (gOppo_paths_shown) {
-        RecalcNearestPathSectionSpeed(0, 1);
+    if (!gOppo_paths_shown) {
+        return;
     }
+    RecalcNearestPathSectionSpeed(0, 1);
 }
 
 // IDA: void __cdecl DecreaseSectionMinSpeed()
 // FUNCTION: CARM95 0x00410a7f
 void DecreaseSectionMinSpeed(void) {
 
-    if (gOppo_paths_shown) {
-        RecalcNearestPathSectionSpeed(0, -1);
+    if (!gOppo_paths_shown) {
+        return;
     }
+    RecalcNearestPathSectionSpeed(0, -1);
 }
 
 // IDA: void __cdecl IncreaseSectionMaxSpeed()
 // FUNCTION: CARM95 0x00410aa8
 void IncreaseSectionMaxSpeed(void) {
 
-    if (gOppo_paths_shown) {
-        RecalcNearestPathSectionSpeed(1, 1);
+    if (!gOppo_paths_shown) {
+        return;
     }
+    RecalcNearestPathSectionSpeed(1, 1);
 }
 
 // IDA: void __cdecl DecreaseSectionMaxSpeed()
 // FUNCTION: CARM95 0x00410ad1
 void DecreaseSectionMaxSpeed(void) {
 
-    if (gOppo_paths_shown) {
-        RecalcNearestPathSectionSpeed(1, -1);
+    if (!gOppo_paths_shown) {
+        return;
     }
+    RecalcNearestPathSectionSpeed(1, -1);
 }
 
 // IDA: void __cdecl PullOppoPoint()
