@@ -149,7 +149,9 @@ int SameEthernetAddress(struct sockaddr_in* pAddr_1, struct sockaddr_in* pAddr_2
 
 // added by dethrace
 int SameEthernetAddress2(tCopyable_sockaddr_in* pAddr_1, struct sockaddr_in* pAddr_2) {
-    return pAddr_1->port == pAddr_2->sin_port && pAddr_1->address == pAddr_2->sin_addr.s_addr;
+    struct sockaddr_in someaddr;
+    PDNetCopyToNative(&someaddr, pAddr_1);
+    return SameEthernetAddress(&someaddr, pAddr_2);
 }
 
 /*SOCKADDR_IPX_* */ void GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id) {
