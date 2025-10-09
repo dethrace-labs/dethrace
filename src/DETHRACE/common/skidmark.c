@@ -33,10 +33,10 @@ void AdjustSkid(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
 // IDA: br_material* __usercall MaterialFromIndex@<EAX>(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x00401088
 br_material* MaterialFromIndex(int pIndex) {
-    if (pIndex > -2) {
-        return gCurrent_race.material_modifiers[pIndex].skid_mark_material;
-    } else {
+    if (pIndex <= -2) {
         return gMaterial[-2 - pIndex];
+    } else {
+        return gCurrent_race.material_modifiers[pIndex].skid_mark_material;
     }
 }
 
