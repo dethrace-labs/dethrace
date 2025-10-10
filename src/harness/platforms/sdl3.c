@@ -310,7 +310,7 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
         }
     }
 
-    SDL3_ShowCursor();
+    SDL3_HideCursor();
 
     viewport.x = 0;
     viewport.y = 0;
