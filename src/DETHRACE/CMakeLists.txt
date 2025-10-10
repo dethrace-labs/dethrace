@@ -129,8 +129,6 @@ target_sources(dethrace_obj PRIVATE
     common/oil.h
     common/oppocar.c
     common/oppocar.h
-    common/opponent.c
-    common/opponent.h
     common/oppoproc.c
     common/oppoproc.h
     common/options.c
