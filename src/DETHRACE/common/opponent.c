@@ -917,17 +917,12 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
             ShiftOpponentsProjectedRoute(pOpponent_spec, pOpponent_spec->follow_path_data.section_no - 20000);
             pOpponent_spec->follow_path_data.section_no = 20000;
         }
-        if (pOpponent_spec->nnext_sections != 0) {
-            res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0);
-            if (res != eFPR_end_of_path) {
-                goto skip_new_objective;
-            }
+
+        if (!pOpponent_spec->nnext_sections
+            || (res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0)) == eFPR_end_of_path) {
+            dr_dprintf("%s: Giving up following race path because ran out of race path", pOpponent_spec->car_spec->driver_name);
+            NewObjective(pOpponent_spec, eOOT_get_near_player);
         }
-
-        dr_dprintf("%s: Giving up following race path because ran out of race path", pOpponent_spec->car_spec->driver_name);
-        NewObjective(pOpponent_spec, eOOT_get_near_player);
-
-    skip_new_objective:
 
         if (res != eFPR_OK) {
             if (res == eFPR_given_up) {
