@@ -33,10 +33,10 @@ void AdjustSkid(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
 // IDA: br_material* __usercall MaterialFromIndex@<EAX>(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x00401088
 br_material* MaterialFromIndex(int pIndex) {
-    if (pIndex > -2) {
-        return gCurrent_race.material_modifiers[pIndex].skid_mark_material;
-    } else {
+    if (pIndex <= -2) {
         return gMaterial[-2 - pIndex];
+    } else {
+        return gCurrent_race.material_modifiers[pIndex].skid_mark_material;
     }
 }
 
@@ -306,7 +306,7 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     to_pt.v[0] = BR_SUB(pPt->v[0], pL2->v[0]);
     to_pt.v[1] = BR_SUB(pPt->v[2], pL2->v[2]);
 
-    cross = -(line.v[0]) * to_pt.v[1] + to_pt.v[0] * line.v[1];
+    cross = (-line.v[0]) * to_pt.v[1] + to_pt.v[0] * line.v[1];
     line_len = BrVector2Length(&line);
     if (fabs(cross) > line_len * 0.05f) {
         return 1;
