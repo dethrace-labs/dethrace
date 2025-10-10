@@ -55,14 +55,23 @@
         (V2) = (T);                         \
     } while (0)
 
-#define ReadThreeFloats(pF, a, b, c)          \
-    do {                                      \
-        float x_0, x_1, x_2;                  \
-        GetThreeFloats(pF, &x_0, &x_1, &x_2); \
-        a = x_0;                              \
-        b = x_1;                              \
-        c = x_2;                              \
-                                              \
+#define ReadVector3(pF, a, b, c)                 \
+    do {                                         \
+        float x[3];                              \
+        GetThreeFloats(pF, &x[2], &x[1], &x[0]); \
+        a = x[2];                                \
+        b = x[1];                                \
+        c = x[0];                                \
+                                                 \
+    } while (0)
+
+#define ReadVector32(pF, a, b, c)                \
+    do {                                         \
+        float x[3];                              \
+        GetThreeFloats(pF, &x[2], &x[1], &x[0]); \
+        b = x[2];                                \
+        c = x[1];                                \
+        a = x[0];                                \
     } while (0)
 
 #define ReadPairOfFloats(pF, a, b)         \
@@ -71,6 +80,13 @@
         GetPairOfFloats(pF, &x[1], &x[0]); \
         a = x[1];                          \
         b = x[0];                          \
+    } while (0)
+
+#define DRVector3Scale(v1, v2, s)           \
+    do {                                    \
+        (v1)->v[0] = BR_MUL((v2)->v[0], s); \
+        (v1)->v[1] = BR_MUL((v2)->v[1], s); \
+        (v1)->v[2] = BR_MUL((v2)->v[2], s); \
     } while (0)
 
 #endif

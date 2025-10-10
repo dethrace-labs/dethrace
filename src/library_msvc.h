@@ -214,7 +214,7 @@
 // __loctotime_t
 
 // LIBRARY: CARM95 0x004EA9E0
-// $$$00001(1)
+// __chkstk
 
 // GLOBAL: CARM95 0x0052D39C
 // __mb_cur_max
@@ -224,12 +224,3 @@
 
 // GLOBAL: CARM95 0x0052D190
 // _pctype
-
-// GLOBAL: CARM95 0x004EAB82
-// __CIpow
-
-// GLOBAL: CARM95 0x004EA8DA
-// __CIatan2
-
-// GLOBAL: CARM95 0x004EA8C2
-// __CIasin
