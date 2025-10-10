@@ -236,18 +236,20 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
     to_camera.v[1] = gCamera_to_world.m[3][1] - pOld_pos->v[1];
     to_camera.v[2] = gCamera_to_world.m[3][2] - pOld_pos->v[2];
     dist = BrVector3Length(&to_camera);
-    if (dist > BR_SCALAR_EPSILON) {
-        factor = BrVector3Dot(pGround_normal, &to_camera) / dist;
-        if (fabs(factor) <= 0.01f) {
-            s = 0.01f;
-        } else {
-            s = 0.01f / factor;
-            if (s > 0.1f) {
-                s = 0.1f;
-            }
-        }
-        Vector3Interpolate(pNew_pos, pOld_pos, (br_vector3*)gCamera_to_world.m[3], s);
+    if (dist <= BR_SCALAR_EPSILON) {
+        return;
     }
+    s = BrVector3Dot(pGround_normal, &to_camera);
+    s /= dist;
+    if (BR_ABS(s) > 0.01f) {
+        factor = 0.01f / s;
+        if (factor > 0.1f) {
+            factor = 0.1f;
+        }
+    } else {
+        factor = 0.01f;
+    }
+    Vector3Interpolate(pNew_pos, pOld_pos, (br_vector3*)gCamera_to_world.m[3], factor);
 }
 
 // IDA: void __usercall MungeOilsHeightAboveGround(tOil_spill_info *pOil@<EAX>)
