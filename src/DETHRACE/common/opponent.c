@@ -1684,10 +1684,12 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
                 } else {
                     pursuit_percentage = 0;
                 }
-                if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec) && PercentageChance(20)) {
-                    dr_dprintf("%s: Decided to run away", pOpponent_spec->car_spec->driver_name);
-                    NewObjective(pOpponent_spec, eOOT_run_away);
-                    return;
+                if (CAR_SPEC_IS_ROZZER(pOpponent_spec->car_spec)) {
+                    if (PercentageChance(20)) {
+                        dr_dprintf("%s: Decided to run away", pOpponent_spec->car_spec->driver_name);
+                        NewObjective(pOpponent_spec, eOOT_run_away);
+                        return;
+                    }
                 } else if (PercentageChance((pursuit_percentage + 60) - pOpponent_spec->nastiness * 50.0f)) {
                     dr_dprintf("%s: Decided to run away", pOpponent_spec->car_spec->driver_name);
                     NewObjective(pOpponent_spec, eOOT_run_away);
