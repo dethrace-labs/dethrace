@@ -195,10 +195,8 @@ if(MSVC_42_FOR_RECCMP)
     set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
     target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
 
-    set_source_files_properties(common/skidmark.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/oil.c PROPERTIES COMPILE_FLAGS "/FAs")
 
-    # set_source_files_properties(common/brucetrk.c PROPERTIES COMPILE_FLAGS "/G5")
-    set_source_files_properties(common/opponent.c PROPERTIES COMPILE_FLAGS "/FAs /G5")
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()
 else()
