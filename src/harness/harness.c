@@ -22,16 +22,22 @@ extern void Harness_Platform_Init(tHarness_platform* platform);
 
 extern const tPlatform_bootstrap SDL1_bootstrap;
 extern const tPlatform_bootstrap SDL2_bootstrap;
+extern const tPlatform_bootstrap SDL3_bootstrap;
 
 static const tPlatform_bootstrap* platform_bootstraps[] = {
-#if defined(DETHRACE_PLATFORM_SDL2) && defined(DETHRACE_PLATFORM_SDL1)
+#if defined(DETHRACE_PLATFORM_SDL2)
     &SDL2_bootstrap,
-    &SDL1_bootstrap
-#elif defined(DETHRACE_PLATFORM_SDL2)
-    &SDL2_bootstrap
-#elif defined(DETHRACE_PLATFORM_SDL1)
-    &SDL1_bootstrap
-#else
+#define HAS_PLATFORM_BOOTSTRAP
+#endif
+#if defined(DETHRACE_PLATFORM_SDL3)
+    &SDL3_bootstrap,
+#define HAS_PLATFORM_BOOTSTRAP
+#endif
+#if defined(DETHRACE_PLATFORM_SDL1)
+    &SDL1_bootstrap,
+#define HAS_PLATFORM_BOOTSTRAP
+#endif
+#ifndef HAS_PLATFORM_BOOTSTRAP
     // This is the case for MSVC 4.20 builds
     NULL
 #endif
@@ -180,6 +186,9 @@ static void Harness_DetectGameMode(void) {
         } else if (strstr(buffer, "NOWA GRA") != NULL) {
             harness_game_info.localization = eGameLocalization_polish;
             LOG_INFO2("Language: \"%s\"", "Polish");
+        } else if (strstr(buffer, "NOUVELLE PARTIE") != NULL) {
+            harness_game_info.localization = eGameLocalization_french;
+            LOG_INFO2("Language: \"%s\"", "French");
         } else {
             LOG_INFO("Language: unrecognized");
         }
@@ -536,6 +545,14 @@ int Harness_Hook_isalnum(int c) {
     if (harness_game_info.localization == eGameLocalization_polish) {
         // Polish diacritic letters in Windows-1250
         unsigned char letters[] = { 140, 143, 156, 159, 163, 165, 175, 179, 185, 191, 198, 202, 209, 211, 230, 234, 241, 243 };
+        for (i = 0; i < (int)sizeof(letters); i++) {
+            if ((unsigned char)c == letters[i]) {
+                return 1;
+            }
+        }
+    } if (harness_game_info.localization == eGameLocalization_french) {
+        // French diacritic letters in Windows-1252
+        unsigned char letters[] = { 140, 156, 159, 192, 194, 198, 199, 200, 201, 202, 203, 206, 207, 212, 217, 219, 220, 224, 226, 230, 231, 232, 233, 234, 235, 238, 239, 244, 249, 251, 252, 255 };
         for (i = 0; i < (int)sizeof(letters); i++) {
             if ((unsigned char)c == letters[i]) {
                 return 1;

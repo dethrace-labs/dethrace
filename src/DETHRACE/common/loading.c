@@ -140,8 +140,25 @@ int gAllow_open_to_fail = 1;
 // GLOBAL: CARM95 0x0050a5c8
 int gDecode_thing = '@';
 
+#define DECODE_STRING_SECRET 50
+
 // GLOBAL: CARM95 0x0050a5d0
-char gDecode_string[] = { 0x9B, 0x52, 0x93, 0x9F, 0x52, 0x98, 0x9B, 0x96, 0x96, 0x9E, 0x9B, 0xA0, 0x99, 0x0 };
+char gDecode_string[] = {
+    'i' + DECODE_STRING_SECRET,
+    ' ' + DECODE_STRING_SECRET,
+    'a' + DECODE_STRING_SECRET,
+    'm' + DECODE_STRING_SECRET,
+    ' ' + DECODE_STRING_SECRET,
+    'f' + DECODE_STRING_SECRET,
+    'i' + DECODE_STRING_SECRET,
+    'd' + DECODE_STRING_SECRET,
+    'd' + DECODE_STRING_SECRET,
+    'l' + DECODE_STRING_SECRET,
+    'i' + DECODE_STRING_SECRET,
+    'n' + DECODE_STRING_SECRET,
+    'g' + DECODE_STRING_SECRET,
+    '\0'
+};
 
 // GLOBAL: CARM95 0x00531f00
 int gFunk_groove_flags[30];
@@ -400,7 +417,7 @@ void LoadGeneralParameters(void) {
         fgets(s, sizeof(s) - 1, f);
         fclose(f);
         for (i = 0; i < strlen(gDecode_string); i++) {
-            gDecode_string[i] -= 50;
+            gDecode_string[i] -= DECODE_STRING_SECRET;
         }
 
         // trim trailing CRLF etc
@@ -413,7 +430,7 @@ void LoadGeneralParameters(void) {
         }
 
         for (i = 0; i < strlen(gDecode_string); i++) {
-            gDecode_string[i] += 50;
+            gDecode_string[i] += DECODE_STRING_SECRET;
         }
     }
     PathCat(the_path, gApplication_path, "GENERAL.TXT");

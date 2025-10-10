@@ -298,6 +298,12 @@ if(DETHRACE_INSTALL)
                     OPTIONAL
                 )
             endif()
+            if(DETHRACE_PLATFORM_SDL3)
+                install(FILES "$<TARGET_FILE:SDL3::SDL3>"
+                    DESTINATION "."
+                    OPTIONAL
+                )
+            endif()
         endif()
     endif()
 endif()
