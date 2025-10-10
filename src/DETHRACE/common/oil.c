@@ -125,10 +125,11 @@ void QueueOilSpill(tCar_spec* pCar) {
         if (gOily_spills[i].car == NULL) {
             oily_index = i;
             break;
-        }
-        if (gOily_spills[i].spill_time < oldest_time) {
-            oldest_time = gOily_spills[i].spill_time;
-            oldest_one = i;
+        } else {
+            if (gOily_spills[i].spill_time < oldest_time) {
+                oldest_time = gOily_spills[i].spill_time;
+                oldest_one = i;
+            }
         }
     }
 
