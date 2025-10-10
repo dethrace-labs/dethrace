@@ -263,29 +263,14 @@ void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTe
     br_scalar len;
     br_model* model;
 
-    on_ground = pCar->susp_height[pWheel_num >> 1] > pCar->oldd[pWheel_num];
-    if (!on_ground) {
-        pCar->special_start[pWheel_num].v[0] = FLT_MAX;
-    }
-}
+    rows = (br_vector3*)&pMark->actor->t.t.mat;
+    BrVector3Sub(&temp, pTo, pFrom);
+    len = BrVector3Length(&temp);
 
-// IDA: int __usercall FarFromLine2D@<EAX>(br_vector3 *pPt@<EAX>, br_vector3 *pL1@<EDX>, br_vector3 *pL2@<EBX>)
-// FUNCTION: CARM95 0x004020dc
-int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
-    br_vector2 line;
-    br_vector2 to_pt;
-    br_scalar line_len;
-    br_scalar cross;
-
-    line.v[0] = BR_SUB(pL2->v[0], pL1->v[0]);
-    line.v[1] = BR_SUB(pL2->v[2], pL1->v[2]);
-    to_pt.v[0] = BR_SUB(pPt->v[0], pL2->v[0]);
-    to_pt.v[1] = BR_SUB(pPt->v[2], pL2->v[2]);
-
-    cross = (-line.v[0]) * to_pt.v[1] + to_pt.v[0] * line.v[1];
-    line_len = BrVector2Length(&line);
-    if (fabs(cross) > line_len * 0.05f) {
-        return 1;
+    if (len < BR_SCALAR_EPSILON) {
+        rows[2].v[0] = pMark->normal.v[2] * temp.v[1] - pMark->normal.v[1] * temp.v[2];
+        rows[2].v[1] = pMark->normal.v[0] * temp.v[2] - pMark->normal.v[2] * temp.v[0];
+        rows[2].v[2] = pMark->normal.v[1] * temp.v[0] - pMark->normal.v[0] * temp.v[1];
     } else {
         rows[2].v[0] = pMark->normal.v[2] * temp.v[1] - pMark->normal.v[1] * temp.v[2];
         rows[2].v[1] = pMark->normal.v[0] * temp.v[2] - pMark->normal.v[2] * temp.v[0];
@@ -321,7 +306,7 @@ int FarFromLine2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
     to_pt.v[0] = BR_SUB(pPt->v[0], pL2->v[0]);
     to_pt.v[1] = BR_SUB(pPt->v[2], pL2->v[2]);
 
-    cross = -(line.v[0]) * to_pt.v[1] + to_pt.v[0] * line.v[1];
+    cross = (-line.v[0]) * to_pt.v[1] + to_pt.v[0] * line.v[1];
     line_len = BrVector2Length(&line);
     if (fabs(cross) > line_len * 0.05f) {
         return 1;
