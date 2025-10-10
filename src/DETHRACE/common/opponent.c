@@ -905,6 +905,11 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
     car_actor = pOpponent_spec->car_spec->car_master_actor;
     data = &pOpponent_spec->complete_race_data;
 
+#ifdef DETHRACE_FIX_BUGS
+    // fix use uninitialized error
+    res = eFPR_OK;
+#endif
+
     switch (pCommand) {
     case ePOC_start:
         dr_dprintf("%s: ProcessCompleteRace() - new objective started", pOpponent_spec->car_spec->driver_name);
@@ -918,7 +923,7 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
             pOpponent_spec->follow_path_data.section_no = 20000;
         }
 
-        if (!pOpponent_spec->nnext_sections
+        if (pOpponent_spec->nnext_sections == 0
             || (res = ProcessFollowPath(pOpponent_spec, ePOC_run, 0, 0, 0)) == eFPR_end_of_path) {
             dr_dprintf("%s: Giving up following race path because ran out of race path", pOpponent_spec->car_spec->driver_name);
             NewObjective(pOpponent_spec, eOOT_get_near_player);
@@ -940,6 +945,11 @@ void ProcessCompleteRace(tOpponent_spec* pOpponent_spec, tProcess_objective_comm
             CalcRaceRoute(pOpponent_spec);
         }
         break;
+
+#ifdef DETHRACE_FIX_BUGS
+    default:
+        break;
+#endif
     }
 }
 
@@ -2848,6 +2858,11 @@ char* GetDriverName(tVehicle_type pCategory, int pIndex) {
         return gDrone_name;
     case eVehicle_not_really:
         return NULL;
+
+#ifdef DETHRACE_FIX_BUGS
+    default:
+        break;
+#endif
     }
     return NULL;
 }
@@ -3454,6 +3469,10 @@ void RecalcNearestPathSectionSpeed(int pMax_not_min, int pAdjustment) {
         return;
     }
     if (gAlready_elasticating) {
+#ifdef DETHRACE_FIX_BUGS
+        // section_no is used uninitialized otherwise. Perhaps this should `return` here instead?
+        section_no = 0;
+#endif
     } else {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
         if (distance > 10.f) {
