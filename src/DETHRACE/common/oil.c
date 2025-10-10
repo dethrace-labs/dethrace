@@ -324,7 +324,7 @@ void ProcessOilSpills(tU32 pFrame_period) {
                         gOily_spills[i].stop_time = 0;
                         SetInitialOilStuff(&gOily_spills[i], the_model);
                         if (gNet_mode != eNet_mode_none) {
-                            message = NetBuildMessage(30, 0);
+                            message = NetBuildMessage(NETMSGID_OILSPILL, 0);
                             message->contents.data.oil_spill.player = NetPlayerFromCar(gOily_spills[i].car)->ID;
                             message->contents.data.oil_spill.full_size = gOily_spills[i].full_size;
                             message->contents.data.oil_spill.grow_rate = gOily_spills[i].grow_rate;

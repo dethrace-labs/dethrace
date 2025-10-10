@@ -186,4 +186,10 @@ void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent);
 
 void BlendifyMaterial(br_material* pMaterial, int pPercent);
 
+void EncodeLine_DEMO(char* pS);
+
+void EncodeLine2_DEMO(char* pS);
+
+void DecodeLine2_DEMO(char* pS);
+
 #endif
