@@ -1490,7 +1490,7 @@ void ReceivedStartRace(tNet_contents* pContents) {
     int i;
     int index;
 
-    if (pContents->data.player_list.number_of_players == -1) {
+    if (pContents->data.start_race.car_count == -1) {
         if (gProgram_state.racing) {
             index = pContents->data.start_race.car_list[0].index;
             BrMatrix34Copy(&gNet_players[index].car->car_master_actor->t.t.mat, &pContents->data.start_race.car_list[0].mat);
@@ -1512,7 +1512,7 @@ void ReceivedStartRace(tNet_contents* pContents) {
             gNet_players[pContents->data.start_race.car_list[i].index].next_car_index = pContents->data.start_race.car_list[i].next_car_index;
         }
     } else {
-        for (i = 0; i < pContents->data.player_list.number_of_players; i++) {
+        for (i = 0; i < pContents->data.start_race.car_count; i++) {
             gCurrent_race.number_of_racers = i + 1;
             gCurrent_race.opponent_list[i].index = -1;
             gCurrent_race.opponent_list[i].ranking = -1;
@@ -1526,10 +1526,10 @@ void ReceivedStartRace(tNet_contents* pContents) {
             }
             gNet_players[pContents->data.start_race.car_list[i].index].next_car_index = pContents->data.start_race.car_list[i].next_car_index;
         }
-        gPending_race = pContents->data.player_list.batch_number;
-        gCurrent_race.number_of_racers = pContents->data.player_list.number_of_players;
+        gPending_race = pContents->data.start_race.next_race;
+        gCurrent_race.number_of_racers = pContents->data.start_race.car_count;
         gSynch_race_start = 1;
-        if (!pContents->data.player_list.this_index || gProgram_state.racing) {
+        if (!pContents->data.start_race.racing || gProgram_state.racing) {
             gWait_for_it = 0;
         }
     }
