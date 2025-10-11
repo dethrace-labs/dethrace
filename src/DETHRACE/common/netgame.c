@@ -194,10 +194,10 @@ void SendCarData(tU32 pNext_frame_time) {
 void ReceivedRecover(tNet_contents* pContents) {
     int i;
 
-    if (gNet_players[gThis_net_player_index].ID != pContents->data.player_list.number_of_players) {
+    if (gNet_players[gThis_net_player_index].ID != pContents->data.recover.ID) {
         for (i = 0; i < gNumber_of_net_players; i++) {
-            if (gNet_players[i].ID == pContents->data.player_list.number_of_players) {
-                gNet_players[i].car->time_to_recover = pContents->data.mech.time;
+            if (gNet_players[i].ID == pContents->data.recover.ID) {
+                gNet_players[i].car->time_to_recover = pContents->data.recover.time_to_recover;
             }
         }
     }
@@ -437,7 +437,7 @@ void ReceivedNonCar(tNet_contents* pContents) {
             c->doing_nothing_flag = 0;
         }
     } else {
-        GetExpandedMatrix(&actor->t.t.mat, &pContents->data.mech.mat);
+        GetExpandedMatrix(&actor->t.t.mat, &pContents->data.non_car.mat);
         BrVector3InvScale(&actor->t.t.translate.t, &actor->t.t.translate.t, WORLD_SCALE);
         XZToColumnXZ(&cx, &cz, actor->t.t.translate.t.v[0], actor->t.t.translate.t.v[2], track_spec);
         if (track_spec->columns[cz][cx] != actor->parent) {
