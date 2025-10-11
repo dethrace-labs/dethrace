@@ -59,6 +59,10 @@ if(DETHRACE_REPLAY_DEBUG)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_REPLAY_DEBUG)
 endif()
 
+if (MINGW)
+    target_compile_options(dethrace_obj PRIVATE -Wno-error=incompatible-pointer-types)
+endif()
+
 target_sources(dethrace_obj PRIVATE
     common/skidmark.c
     common/opponent.c
