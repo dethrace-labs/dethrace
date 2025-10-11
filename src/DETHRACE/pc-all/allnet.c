@@ -144,7 +144,7 @@ int GetMessageTypeFromMessage(char* pMessage_str) {
 }
 
 int SameEthernetAddress(struct sockaddr_in* pAddr_1, struct sockaddr_in* pAddr_2) {
-    return memcmp(pAddr_1, pAddr_2, sizeof(struct sockaddr_in)) == 0;
+    return pAddr_1->sin_family == pAddr_2->sin_family && pAddr_1->sin_port == pAddr_2->sin_port && pAddr_1->sin_addr.s_addr == pAddr_2->sin_addr.s_addr;
 }
 
 // added by dethrace
