@@ -99,6 +99,27 @@ void RaceCompleted(tRace_over_reason pReason) {
             ToggleMap();
         }
         switch (gRace_over_reason) {
+        case eRace_over_network_victory:
+            ChangeAmbientPratcam(34);
+            DoFancyHeadup(kFancyHeadupNetworkVictory);
+            break;
+
+        case eRace_over_network_loss:
+            ChangeAmbientPratcam(36);
+            DoFancyHeadup(kFancyHeadupNetworkRaceOverNetworkLoss);
+            break;
+
+        case eRace_over_out_of_time:
+            ChangeAmbientPratcam(35);
+            DoFancyHeadup(kFancyHeadupOutOfTime);
+            DRS3StartSound(gPedestrians_outlet, 8010);
+            break;
+
+        case eRace_over_demo:
+            ChangeAmbientPratcam(35);
+            DoFancyHeadup(kFancyHeadupDemoTimeout);
+            break;
+
         case eRace_over_laps:
         case eRace_over_peds:
         case eRace_over_opponents:
@@ -106,29 +127,14 @@ void RaceCompleted(tRace_over_reason pReason) {
             DoFancyHeadup(kFancyHeadupRaceCompleted);
             DRS3StartSound(gPedestrians_outlet, 8011);
             break;
+
         case eRace_over_abandoned:
             if (gNet_mode == eNet_mode_client) {
                 gHost_abandon_game = 1;
                 NetFullScreenMessage(kMiscString_HOST_ABANDONED_RACE, 0);
             }
-            break;
-        case eRace_over_out_of_time:
-            ChangeAmbientPratcam(35);
-            DoFancyHeadup(kFancyHeadupOutOfTime);
-            DRS3StartSound(gPedestrians_outlet, 8010);
-            break;
-        case eRace_over_demo:
-            ChangeAmbientPratcam(35);
-            DoFancyHeadup(kFancyHeadupDemoTimeout);
-            break;
-        case eRace_over_network_victory:
-            ChangeAmbientPratcam(34);
-            DoFancyHeadup(kFancyHeadupNetworkVictory);
-            break;
-        case eRace_over_network_loss:
-            ChangeAmbientPratcam(36);
-            DoFancyHeadup(kFancyHeadupNetworkRaceOverNetworkLoss);
-            break;
+            // break;
+
         default:
             break;
         }
