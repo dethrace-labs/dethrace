@@ -656,6 +656,7 @@ void DoGame(void) {
 // IDA: void __cdecl InitialiseProgramState()
 // FUNCTION: CARM95 0x00414ca8
 void InitialiseProgramState(void) {
+    gProgram_state.prog_status = eProg_intro;
     gProgram_state.loaded = 0;
     gProgram_state.last_slot = 0;
     gProgram_state.frank_or_anniness = eFrankie;
@@ -669,10 +670,9 @@ void InitialiseProgramState(void) {
     gProgram_state.dont_save_or_load = 0;
     gProgram_state.dont_load = 0;
     gProgram_state.mirror_on = gMirror_on__structur;
-    gProgram_state.prog_status = eProg_intro;
     if (gAusterity_mode) {
-        gProgram_state.prat_cam_on = 0;
         gPratcam_on = 0;
+        gProgram_state.prat_cam_on = gPratcam_on;
     } else {
         gProgram_state.prat_cam_on = gPratcam_on;
     }
