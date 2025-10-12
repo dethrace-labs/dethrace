@@ -427,6 +427,8 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
         if (pCurrent_race >= gNumber_of_races) {
             pCurrent_race = 0;
         }
+        return pCurrent_race;
+
     } else {
         most_seldom_seen = 10000;
         for (i = 0; i < gNumber_of_races; i++) {
@@ -441,11 +443,11 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
                 races_count++;
             }
         }
-        new_index = IRandomBetween(0, races_count - 1);
-        pCurrent_race = races_to_pick_from[new_index];
-        gRace_list[pCurrent_race].been_there_done_that++;
+        new_index = races_to_pick_from[IRandomBetween(0, races_count - 1)];
+        gRace_list[new_index].been_there_done_that++;
+
+        return new_index;
     }
-    return pCurrent_race;
 }
 
 // IDA: void __cdecl SwapNetCarsLoad()
