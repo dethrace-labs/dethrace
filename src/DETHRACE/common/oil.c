@@ -297,24 +297,20 @@ void ProcessOilSpills(tU32 pFrame_period) {
 
     time = GetTotalTime();
     for (i = 0; i < COUNT_OF(gOily_spills); i++) {
-        if (gOily_spills[i].car == NULL) {
-            gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
-        } else {
+        if (gOily_spills[i].car != NULL) {
             the_model = gOily_spills[i].actor->model;
-            if (gOily_spills[i].actor->render_style == BR_RSTYLE_NONE && gOily_spills[i].spill_time <= time && fabs(gOily_spills[i].car->v.v[0]) < .01f && fabs(gOily_spills[i].car->v.v[1]) < .01f && fabs(gOily_spills[i].car->v.v[2]) < .01f) {
+            if (gOily_spills[i].actor->render_style == BR_RSTYLE_NONE && gOily_spills[i].spill_time <= time && BR_ABS(gOily_spills[i].car->v.v[0]) < .01f && BR_ABS(gOily_spills[i].car->v.v[1]) < .01f && BR_ABS(gOily_spills[i].car->v.v[2]) < .01f) {
                 if (gAction_replay_mode) {
                     SetInitialOilStuff(&gOily_spills[i], the_model);
                 } else {
-                    if (!OKToSpillOil(&gOily_spills[i])) {
-                        gOily_spills[i].car = NULL;
-                    } else {
+                    if (OKToSpillOil(&gOily_spills[i])) {
                         gOily_spills[i].spill_time = time;
                         gOily_spills[i].actor->material->colour_map = gOil_pixies[gNext_oil_pixie];
                         gNext_oil_pixie++;
                         if (gNext_oil_pixie >= COUNT_OF(gOil_pixies)) {
                             gNext_oil_pixie = 0;
                         }
-                        BrVector3Copy(&gOily_spills[i].original_pos, &gOily_spills[i].car->pos);
+                        memcpy(&gOily_spills[i].original_pos, &gOily_spills[i].car->pos, sizeof(gOily_spills[i].original_pos));
                         PipeSingleOilSpill(i,
                             &gOily_spills[i].actor->t.t.mat,
                             gOily_spills[i].full_size,
@@ -334,47 +330,52 @@ void ProcessOilSpills(tU32 pFrame_period) {
                             message->contents.data.oil_spill.current_size = gOily_spills[i].current_size;
                             NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, message, NULL);
                         }
+                    } else {
+                        gOily_spills[i].car = NULL;
                     }
                 }
             } else {
                 if (gOily_spills[i].actor->render_style == BR_RSTYLE_FACES && (gOily_spills[i].stop_time == 0 || time < gOily_spills[i].stop_time)) {
                     BrVector3Sub(&v, &gOily_spills[i].original_pos, &gOily_spills[i].car->pos);
-                    grow_amount = BrVector3LengthSquared(&v);
-                    if (gOily_spills[i].stop_time != 0 || grow_amount <= 0.2f) {
-                        this_size = 0.1f + (time - gOily_spills[i].spill_time) * gOily_spills[i].grow_rate;
-                        if (this_size >= 0.1f) {
-                            gOily_spills[i].actor->render_style = BR_RSTYLE_FACES;
-                            if (this_size <= gOily_spills[i].full_size) {
-                                the_model->vertices[0].p.v[0] = -this_size;
-                                the_model->vertices[0].p.v[2] = -this_size;
-                                the_model->vertices[1].p.v[0] = this_size;
-                                the_model->vertices[1].p.v[2] = -this_size;
-                                the_model->vertices[2].p.v[0] = this_size;
-                                the_model->vertices[2].p.v[2] = this_size;
-                                the_model->vertices[3].p.v[0] = -this_size;
-                                the_model->vertices[3].p.v[2] = this_size;
-                                gOily_spills[i].current_size = this_size;
-                            } else {
-                                the_model->vertices[0].p.v[0] = -gOily_spills[i].full_size;
-                                the_model->vertices[0].p.v[2] = -gOily_spills[i].full_size;
-                                the_model->vertices[1].p.v[0] = gOily_spills[i].full_size;
-                                the_model->vertices[1].p.v[2] = -gOily_spills[i].full_size;
-                                the_model->vertices[2].p.v[0] = gOily_spills[i].full_size;
-                                the_model->vertices[2].p.v[2] = gOily_spills[i].full_size;
-                                the_model->vertices[3].p.v[0] = -gOily_spills[i].full_size;
-                                the_model->vertices[3].p.v[2] = gOily_spills[i].full_size;
-                                gOily_spills[i].current_size = gOily_spills[i].full_size;
-                            }
-                            BrModelUpdate(the_model, BR_MODU_ALL);
-                        } else {
-                            gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
+
+                    if (gOily_spills[i].stop_time == 0) {
+                        if (BrVector3LengthSquared(&v) > 0.2f) {
+                            gOily_spills[i].stop_time = time;
+                            continue;
                         }
+                    }
+                    this_size = (int)(time - gOily_spills[i].spill_time) * gOily_spills[i].grow_rate + 0.1f;
+                    if (this_size < 0.1f) {
+                        gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
                     } else {
-                        gOily_spills[i].stop_time = time;
-                        continue;
+                        gOily_spills[i].actor->render_style = BR_RSTYLE_FACES;
+                        if (this_size > gOily_spills[i].full_size) {
+                            the_model->vertices[0].p.v[0] = -gOily_spills[i].full_size;
+                            the_model->vertices[0].p.v[2] = -gOily_spills[i].full_size;
+                            the_model->vertices[1].p.v[0] = gOily_spills[i].full_size;
+                            the_model->vertices[1].p.v[2] = -gOily_spills[i].full_size;
+                            the_model->vertices[2].p.v[0] = gOily_spills[i].full_size;
+                            the_model->vertices[2].p.v[2] = gOily_spills[i].full_size;
+                            the_model->vertices[3].p.v[0] = -gOily_spills[i].full_size;
+                            the_model->vertices[3].p.v[2] = gOily_spills[i].full_size;
+                            gOily_spills[i].current_size = gOily_spills[i].full_size;
+                        } else {
+                            the_model->vertices[0].p.v[0] = -this_size;
+                            the_model->vertices[0].p.v[2] = -this_size;
+                            the_model->vertices[1].p.v[0] = this_size;
+                            the_model->vertices[1].p.v[2] = -this_size;
+                            the_model->vertices[2].p.v[0] = this_size;
+                            the_model->vertices[2].p.v[2] = this_size;
+                            the_model->vertices[3].p.v[0] = -this_size;
+                            the_model->vertices[3].p.v[2] = this_size;
+                            gOily_spills[i].current_size = this_size;
+                        }
+                        BrModelUpdate(the_model, BR_MODU_ALL);
                     }
                 }
             }
+        } else {
+            gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
         }
         if (gOily_spills[i].actor->render_style == BR_RSTYLE_FACES) {
             MungeOilsHeightAboveGround(&gOily_spills[i]);
