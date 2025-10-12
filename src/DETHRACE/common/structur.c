@@ -207,10 +207,10 @@ int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pN
     br_scalar rt;
 
     the_face.material = NULL;
-    BrVector3Copy(&the_face.v[0], pV0);
-    BrVector3Copy(&the_face.v[1], pV1);
-    BrVector3Copy(&the_face.v[2], pV2);
-    BrVector3Copy(&the_face.normal, pNormal);
+    memcpy(&the_face.v[0], pV0, sizeof(br_vector3));
+    memcpy(&the_face.v[1], pV1, sizeof(br_vector3));
+    memcpy(&the_face.v[2], pV2, sizeof(br_vector3));
+    memcpy(&the_face.normal, pNormal, sizeof(br_vector3));
     CheckSingleFace(&the_face, pStart, pDir, &the_face.normal, &rt);
     return rt >= 0.f && rt <= 1.f;
 }
