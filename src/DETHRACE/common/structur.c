@@ -220,15 +220,14 @@ int RayHitFace(br_vector3* pV0, br_vector3* pV1, br_vector3* pV2, br_vector3* pN
 void WrongCheckpoint(int pCheckpoint_index) {
 
     if ((pCheckpoint_index == gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 20000) || (pCheckpoint_index != gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 2000)) {
-        if (gNet_mode == eNet_mode_none) {
-            if (gCheckpoint == ((gCurrent_race.check_point_count < pCheckpoint_index + 2) ? ((gLap == 1) ? -1 : 1) : (pCheckpoint_index + 2))) {
-                return;
-            }
+
+        if (gNet_mode != eNet_mode_none || (gCheckpoint != ((pCheckpoint_index + 2 > gCurrent_race.check_point_count) ? ((gLap == 1) ? -1 : 1) : (pCheckpoint_index + 2)))) {
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_WrongCheckpoint));
+            DRS3StartSound(gPedestrians_outlet, 8013);
+            gLast_checkpoint_time = GetTotalTime();
+            gLast_wrong_checkpoint = pCheckpoint_index;
         }
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_WrongCheckpoint));
-        DRS3StartSound(gPedestrians_outlet, 8013);
-        gLast_checkpoint_time = GetTotalTime();
-        gLast_wrong_checkpoint = pCheckpoint_index;
+        // }
     }
 }
 
