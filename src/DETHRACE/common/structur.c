@@ -167,21 +167,20 @@ void IncrementCheckpoint(void) {
         return;
     }
     gLast_checkpoint_time = GetTotalTime();
-    if (gCheckpoint < gCheckpoint_count) {
-        gCheckpoint++;
-    } else {
+    if (gCheckpoint >= gCheckpoint_count) {
         gCheckpoint = 1;
-        gLap++;
-        if (gLap == gTotal_laps) {
-            PratcamEvent(33); // FIXME: or PratcamEventNow
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_FinalLap));
-            DRS3StartSound(gPedestrians_outlet, 8014);
-            done_voice = 1;
-        } else if (gLap > gTotal_laps) {
+        if (gLap++ >= gTotal_laps) {
             gLap = gTotal_laps;
             gCheckpoint = gCheckpoint_count;
             RaceCompleted(eRace_over_laps);
+        } else if (gLap == gTotal_laps) {
+            PratcamEvent(33);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_FinalLap));
+            DRS3StartSound(gPedestrians_outlet, 8014);
+            done_voice = 1;
         }
+    } else {
+        gCheckpoint++;
     }
     if (!gRace_finished) {
         Checkpoint(gCheckpoint, !done_voice);
