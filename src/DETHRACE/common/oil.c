@@ -165,7 +165,7 @@ int OKToSpillOil(tOil_spill_info* pOil) {
     tFace_ref* face_ref;
 
     car = pOil->car;
-    if (car->driver >= eDriver_net_human && car->damage_units[eDamage_engine].damage_level <= 98 && car->damage_units[eDamage_transmission].damage_level <= 98) {
+    if (car->driver >= eDriver_net_human && car->damage_units[eDamage_engine].damage_level < 99 && car->damage_units[eDamage_transmission].damage_level < 99) {
         return 0;
     }
     angle_to_rotate_by = IRandomBetween(0, 0xffff);
@@ -181,38 +181,38 @@ int OKToSpillOil(tOil_spill_info* pOil) {
     BrVector3Set(&v, .0f, .2f, .0f);
     BrMatrix34ApplyP(&ray_pos, &v, &car->car_master_actor->t.t.mat);
     BrVector3Set(&ray_dir, 0.f, kev_bounds.original_bounds.min.v[1] - kev_bounds.original_bounds.max.v[1], 0.f);
-    if (face_count == 0) {
-        return 0;
-    }
-    found_one = 0;
-    for (i = 0; i < face_count; i++) {
-        face_ref = &the_list[i];
-        if (!found_one) {
-            CheckSingleFace(face_ref, &ray_pos, &ray_dir, &normal, &distance);
-            if (distance < 100.f) {
-                found_one = 1;
-                BrVector3Copy((br_vector3*)pOil->actor->t.t.mat.m[1], &normal);
-                BrVector3Set(&v, 0.f, 0.f, 1.f);
-                BrVector3Cross((br_vector3*)pOil->actor->t.t.mat.m[0], &normal, &v);
-                BrVector3Set(&v, 1.f, 0.f, 0.f);
-                BrVector3Cross((br_vector3*)pOil->actor->t.t.mat.m[2], &normal, &v);
-                BrVector3Scale(&v, &ray_dir, distance);
-                BrVector3Add(&pOil->pos, &ray_pos, &v);
-                BrMatrix34PreRotateY(&pOil->actor->t.t.mat, angle_to_rotate_by);
+    if (face_count != 0) {
+        found_one = 0;
+        for (i = 0, face_ref = the_list; i < face_count; i++, face_ref++) {
+            if (!found_one) {
+                CheckSingleFace(face_ref, &ray_pos, &ray_dir, &normal, &distance);
+                if (distance < 100.f) {
+                    found_one = 1;
+                    BrVector3Copy((br_vector3*)pOil->actor->t.t.mat.m[1], &normal);
+                    BrVector3Set(&v, 0.f, 0.f, 1.f);
+                    BrVector3Cross((br_vector3*)pOil->actor->t.t.mat.m[0], &normal, &v);
+                    BrVector3Set(&v, 1.f, 0.f, 0.f);
+                    BrVector3Cross((br_vector3*)pOil->actor->t.t.mat.m[2], &v, &normal);
+                    BrVector3Scale(&v, &ray_dir, distance);
+                    BrVector3Add(&pOil->pos, &ray_pos, &v);
+                    BrMatrix34PreRotateY(&pOil->actor->t.t.mat, angle_to_rotate_by);
+                }
             }
         }
-    }
-    if (!found_one || normal.v[1] < .97f) {
+        if (!found_one || normal.v[1] < .97f) {
+            return 0;
+        } else {
+            for (i = 0, face_ref = the_list; i < face_count; i++, face_ref++) {
+                mr_dotty = BrVector3Dot(&face_ref->normal, &normal);
+                if (mr_dotty < .98f && (mr_dotty > .8f || !NormalSideOfPlane(&pOil->actor->t.t.translate.t, &face_ref->normal, face_ref->d))) {
+                    return 0;
+                }
+            }
+            return 1;
+        }
+    } else {
         return 0;
     }
-    for (i = 0; i < face_count; i++) {
-        face_ref = &the_list[i];
-        mr_dotty = BrVector3Dot(&face_ref->normal, &normal);
-        if (mr_dotty < .98f && (mr_dotty > .8f || !NormalSideOfPlane(&pOil->actor->t.t.translate.t, &face_ref->normal, face_ref->d))) {
-            return 0;
-        }
-    }
-    return 1;
 }
 
 // IDA: void __usercall Vector3Interpolate(br_vector3 *pDst@<EAX>, br_vector3 *pFrom@<EDX>, br_vector3 *pTo@<EBX>, br_scalar pP)
