@@ -62,6 +62,7 @@ endif()
 target_sources(dethrace_obj PRIVATE
     common/skidmark.c
     common/opponent.c
+    common/oil.c
 
     common/brucetrk.c
     common/brucetrk.h
@@ -125,8 +126,7 @@ target_sources(dethrace_obj PRIVATE
     common/network.h
     common/newgame.c
     common/newgame.h
-    common/oil.c
-    common/oil.h
+
     common/oppocar.c
     common/oppocar.h
     common/oppoproc.c
