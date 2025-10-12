@@ -244,10 +244,7 @@ void CheckCheckpoints(void) {
     int car_index;
     tNet_game_player_info* net_player;
 
-    if (gNet_mode == eNet_mode_client) {
-        return;
-    }
-    if (gNet_mode == eNet_mode_host && gCurrent_net_game->type != eNet_game_type_checkpoint && gCurrent_net_game->type != eNet_game_type_sudden_death) {
+    if (gNet_mode == eNet_mode_client || (gNet_mode == eNet_mode_host && gCurrent_net_game->type != eNet_game_type_checkpoint && gCurrent_net_game->type != eNet_game_type_sudden_death)) {
         return;
     }
     // in single-player mode (=eNet_mode_none), only the player will be checked,
@@ -264,7 +261,8 @@ void CheckCheckpoints(void) {
             } else {
                 car = GetCarSpec(cat, car_index);
             }
-            BrVector3Copy(&orig, (br_vector3*)car->old_frame_mat.m[3]);
+
+            memcpy(&orig, car->old_frame_mat.m[3], sizeof(br_vector3));
             BrVector3Sub(&dir, &car->car_master_actor->t.t.translate.t, &orig);
             for (i = 0; i < gCurrent_race.check_point_count; i++) {
                 for (j = 0; j < gCurrent_race.checkpoints[i].quad_count; j++) {
@@ -280,13 +278,7 @@ void CheckCheckpoints(void) {
                             &gCurrent_race.checkpoints[i].normal[j],
                             &orig,
                             &dir)) {
-                        if (gNet_mode == eNet_mode_none) {
-                            if (i + 1 == gCheckpoint) {
-                                IncrementCheckpoint();
-                            } else {
-                                WrongCheckpoint(i);
-                            }
-                        } else {
+                        if (gNet_mode != eNet_mode_none) {
                             net_player = NetPlayerFromCar(car);
                             if (gCurrent_net_game->type == eNet_game_type_checkpoint) {
                                 if (net_player->score & (1 << i)) {
@@ -301,13 +293,19 @@ void CheckCheckpoints(void) {
                             } else {
                                 SendGameplay(net_player->ID, eNet_gameplay_wrong_checkpoint, i, 0, 0, 0);
                             }
+                        } else {
+                            if (i + 1 == gCheckpoint) {
+                                IncrementCheckpoint();
+                            } else {
+                                WrongCheckpoint(i);
+                            }
                         }
                         break;
                     }
                 }
             }
+            car->old_frame_mat = car->car_master_actor->t.t.mat;
         }
-        car->old_frame_mat = car->car_master_actor->t.t.mat;
     }
 }
 
