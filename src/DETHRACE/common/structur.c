@@ -382,6 +382,8 @@ void SelectOpponents(tRace_info* pRace_info) {
     int nastiness;
     int had_scum;
 
+#ifdef DETHRACE_FIX_BUGS
+    // Adds support for the demo behavior
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         pRace_info->number_of_racers = OPPONENT_COUNT;
         for (i = 0; i < OPPONENT_COUNT; i++) {
@@ -390,6 +392,7 @@ void SelectOpponents(tRace_info* pRace_info) {
         }
         return;
     }
+#endif
 
     had_scum = 0;
     if (gNet_mode == eNet_mode_none) {
@@ -397,10 +400,10 @@ void SelectOpponents(tRace_info* pRace_info) {
         for (i = 0; i < gNumber_of_racers; ++i) {
             gOpponents[i].picked = 0;
         }
-        if (gRace_list[gProgram_state.current_race_index].suggested_rank < 0) {
-            rank_band = 0;
-        } else {
+        if (gRace_list[gProgram_state.current_race_index].suggested_rank >= 0) {
             rank_band = gRace_list[gProgram_state.current_race_index].suggested_rank / 10;
+        } else {
+            rank_band = 0;
         }
         for (i = 0; i < OPPONENT_COUNT; i++) {
             nastiness = gOpponent_mix[rank_band][i];
