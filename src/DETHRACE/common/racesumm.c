@@ -311,8 +311,8 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
                 S3StopOutletSound(gEffects_outlet);
                 gSumm_sound = 0;
                 gTemp_earned = 0;
-                gCredits_per_ms = 0.1f;
                 last_change_time = the_time;
+                gCredits_per_ms = 0.1f;
             }
         } else if (gTemp_lost != 0) {
             ResetInterfaceTimeout();
@@ -338,7 +338,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
                 rank_delta = (the_time - last_time) * gRank_per_ms;
                 old_temp_increase = gTemp_rank_increase;
                 gTemp_rank_increase -= rank_delta;
-                if ((int)(old_temp_increase + 0.5f) != (int)(gTemp_rank_increase + 0.5f)) {
+                if ((int)(old_temp_increase + 0.5) != (int)(gTemp_rank_increase + 0.5)) {
                     if (gTemp_rank > 1) {
                         gTemp_rank -= 1;
                     }
@@ -356,6 +356,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
             gSumm_sound = 0;
         }
     } else {
+        last_time = the_time;
         last_change_time = the_time;
     }
     DrawSummaryItems();
