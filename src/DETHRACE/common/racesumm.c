@@ -377,9 +377,9 @@ void SetUpTemps(void) {
 
     gTemp_earned = gProgram_state.credits_earned;
     gTemp_lost = gProgram_state.credits_lost;
+    gTemp_credits = gProgram_state.credits;
     gTemp_rank_increase = gRank_increase;
     gTemp_rank = gProgram_state.rank;
-    gTemp_credits = gProgram_state.credits;
 }
 
 // IDA: int __usercall Summ1GoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
