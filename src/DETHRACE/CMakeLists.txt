@@ -63,6 +63,7 @@ target_sources(dethrace_obj PRIVATE
     common/skidmark.c
     common/opponent.c
     common/oil.c
+    common/racesumm.c
 
     common/brucetrk.c
     common/brucetrk.h
@@ -126,7 +127,6 @@ target_sources(dethrace_obj PRIVATE
     common/network.h
     common/newgame.c
     common/newgame.h
-
     common/oppocar.c
     common/oppocar.h
     common/oppoproc.c
@@ -143,13 +143,10 @@ target_sources(dethrace_obj PRIVATE
     common/pratcam.h
     common/racestrt.c
     common/racestrt.h
-    common/racesumm.c
-    common/racesumm.h
     common/raycast.c
     common/raycast.h
     common/replay.c
     common/replay.h
-
     common/sound.c
     common/sound.h
     common/spark.c
@@ -196,6 +193,7 @@ if(MSVC_42_FOR_RECCMP)
     target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
 
     set_source_files_properties(common/structur.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/racesumm.c PROPERTIES COMPILE_FLAGS "/FAs")
 
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()

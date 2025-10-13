@@ -125,10 +125,10 @@ void MungeRankEtc(tProgram_state* pThe_state) {
         gRank_etc_munged = 1;
         gRace_list[pThe_state->current_race_index].been_there_done_that++;
         pThe_state->rank -= gRank_increase;
-        if (pThe_state->rank <= 0) {
+        if (pThe_state->rank < 1) {
             pThe_state->rank = 1;
             for (i = 0; i < gNumber_of_races; i++) {
-                if (gRace_list[i].best_rank < 2 && !gRace_list[i].been_there_done_that) {
+                if (gRace_list[i].best_rank <= 1 && !gRace_list[i].been_there_done_that) {
                     not_done_yet = 1;
                     break;
                 }
