@@ -399,37 +399,38 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     tS3_sound_tag sound_tag;
 
-    if (gTemp_credits > 0) {
+    if (gTemp_credits <= 0) {
+        S3StopOutletSound(gEffects_outlet);
+        RemoveTransientBitmaps(1);
+        for (i = 0; i < 7; i++) {
+            DrawInBox(
+                gCurrent_graf_data->summ1_credits_box_left,
+                gCurrent_graf_data->summ1_credits_left,
+                gCurrent_graf_data->summ1_total_top,
+                gCurrent_graf_data->summ1_credits_right,
+                gCurrent_graf_data->summ1_total_bottom,
+                2, -1);
+            ProcessFlicQueue(gFrame_period);
+            PDScreenBufferSwap(0);
+            SoundService();
+            WaitFor(300);
+            DrawInBox(
+                gCurrent_graf_data->summ1_credits_box_left,
+                gCurrent_graf_data->summ1_credits_left,
+                gCurrent_graf_data->summ1_total_top,
+                gCurrent_graf_data->summ1_credits_right,
+                gCurrent_graf_data->summ1_total_bottom,
+                2, 0);
+            ProcessFlicQueue(gFrame_period);
+            PDScreenBufferSwap(0);
+            SoundService();
+            WaitFor(300);
+        }
+        S3StopAllOutletSounds();
+        return 1;
+    } else {
         return 0;
     }
-    S3StopOutletSound(gEffects_outlet);
-    RemoveTransientBitmaps(1);
-    for (i = 0; i < 7; i++) {
-        DrawInBox(
-            gCurrent_graf_data->summ1_credits_box_left,
-            gCurrent_graf_data->summ1_credits_left,
-            gCurrent_graf_data->summ1_total_top,
-            gCurrent_graf_data->summ1_credits_right,
-            gCurrent_graf_data->summ1_total_bottom,
-            2, -1);
-        ProcessFlicQueue(gFrame_period);
-        PDScreenBufferSwap(0);
-        SoundService();
-        WaitFor(300);
-        DrawInBox(
-            gCurrent_graf_data->summ1_credits_box_left,
-            gCurrent_graf_data->summ1_credits_left,
-            gCurrent_graf_data->summ1_total_top,
-            gCurrent_graf_data->summ1_credits_right,
-            gCurrent_graf_data->summ1_total_bottom,
-            2, 0);
-        ProcessFlicQueue(gFrame_period);
-        PDScreenBufferSwap(0);
-        SoundService();
-        WaitFor(300);
-    }
-    S3StopAllOutletSounds();
-    return 1;
 }
 
 // IDA: tSO_result __cdecl DoEndRaceSummary1()
