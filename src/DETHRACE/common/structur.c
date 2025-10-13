@@ -688,7 +688,7 @@ void InitialiseProgramState(void) {
 // FUNCTION: CARM95 0x00414d8a
 void DoProgram(void) {
     InitialiseProgramState();
-    while (gProgram_state.prog_status != eProg_quit) {
+    do {
         switch (gProgram_state.prog_status) {
         case eProg_intro:
             DisposeGameIfNecessary();
@@ -700,10 +700,10 @@ void DoProgram(void) {
             break;
         case eProg_idling:
             DisposeGameIfNecessary();
-            if (gGame_to_load < 0) {
-                DoMainMenuScreen(30000u, 0, 0);
-            } else {
+            if (gGame_to_load >= 0) {
                 DoLoadGame();
+            } else {
+                DoMainMenuScreen(30000u, 0, 0);
             }
             break;
         case eProg_demo:
@@ -711,11 +711,11 @@ void DoProgram(void) {
             break;
         case eProg_game_starting:
             DoGame();
-            break;
+            // fallthrough
         default:
             break;
         }
-    }
+    } while (gProgram_state.prog_status != eProg_quit);
 }
 
 // IDA: void __cdecl JumpTheStart()
