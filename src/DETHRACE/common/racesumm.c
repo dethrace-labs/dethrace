@@ -153,13 +153,13 @@ void MungeRankEtc(tProgram_state* pThe_state) {
 // FUNCTION: CARM95 0x0041631f
 void CalcRankIncrease(void) {
 
-    if (gNet_mode == eNet_mode_none) {
+    if (gNet_mode != eNet_mode_none) {
+        gRank_increase = 1;
+    } else {
         gRank_increase = gProgram_state.credits_earned / gProgram_state.credits_per_rank;
         if (gRank_increase > 5) {
             gRank_increase = 5;
         }
-    } else {
-        gRank_increase = 1;
     }
 }
 
