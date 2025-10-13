@@ -448,6 +448,8 @@ tSO_result DoEndRaceSummary1(void) {
     static tMouse_area mouse_areas[1] = {
         { { 218, 436 }, { 147, 353 }, { 281, 562 }, { 167, 401 }, 0, 0, 0, NULL },
     };
+
+    // GLOBAL: CARM95 0x00509C38
     static tInterface_spec interface_spec = {
         0,
         310,
@@ -519,20 +521,18 @@ tSO_result DoEndRaceSummary1(void) {
     if (result < 0) {
         DRS3StartSound(gEffects_outlet, 3007);
         RunFlic(311);
-        result = eSO_main_menu_invoked;
+        return eSO_main_menu_invoked;
     } else if (gTemp_credits <= 0) {
         FadePaletteDown();
-        result = eSO_game_over;
+        return eSO_game_over;
     } else if (gProgram_state.game_completed && !completed_already) {
         FadePaletteDown();
-        result = eSO_game_completed;
+        return eSO_game_completed;
     } else {
         DRS3StartSound(gEffects_outlet, 3007);
         FadePaletteDown();
-        result = eSO_continue;
+        return eSO_continue;
     }
-
-    return result;
 }
 
 // IDA: void __usercall PrepareBoundingRadius(br_model *model@<EAX>)
