@@ -270,13 +270,13 @@ void DrawSummaryItems(void) {
 // FUNCTION: CARM95 0x00415f72
 void RampUpRate(float* pRate, tU32 pTime) {
 
-    if (pTime >= 6000) {
+    if (pTime > 6000) {
         *pRate = 10.f;
-    } else if (pTime >= 4000) {
+    } else if (pTime > 4000) {
         *pRate = 5.f;
-    } else if (pTime >= 3000) {
+    } else if (pTime > 3000) {
         *pRate = 1.f;
-    } else if (pTime >= 2000) {
+    } else if (pTime > 2000) {
         *pRate = 0.5f;
     } else {
         *pRate = 0.1f;
