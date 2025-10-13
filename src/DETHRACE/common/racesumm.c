@@ -783,44 +783,35 @@ int CastSelectionRay(int* pCurrent_choice, int* pCurrent_mode) {
     int result;
     br_scalar inv_wreck_pick_scale_factor;
 
-    if (!gMouse_in_use) {
-        return 0;
-    }
-    if (*pCurrent_choice != 0) {
-        return 0;
-    }
-    if (*pCurrent_mode != 0) {
-        return 0;
-    }
-    if (gWreck_zoomed_in >= 0) {
-        return 0;
-    }
-    if (gWreck_zoom_out >= 0) {
-        return 0;
-    }
-    if (gWreck_zoom_in >= 0) {
-        return 0;
-    }
+    if (gMouse_in_use
+        && *pCurrent_choice == 0
+        && *pCurrent_mode == 0
+        && gWreck_zoomed_in < 0
+        && gWreck_zoom_out < 0
+        && gWreck_zoom_in < 0) {
 
-    inv_wreck_pick_scale_factor = 0.5f;
-    GetMousePosition(&mouse_x, &mouse_y);
-    if (gReal_graf_data_index != 0) {
-        mouse_x = 2 * mouse_x;
-        mouse_y = 2 * mouse_y + HIRES_Y_OFFSET;
+        inv_wreck_pick_scale_factor = 0.5f;
+        GetMousePosition(&mouse_x, &mouse_y);
+        if (gReal_graf_data_index != 0) {
+            mouse_x = 2 * mouse_x;
+            mouse_y = 2 * mouse_y + HIRES_Y_OFFSET;
+        }
+        for (i = 0; i < gWreck_count; i++) {
+            BrMatrix34PreScale(&gWreck_array[i].actor->t.t.mat, 2.f, 2.f, 2.f);
+        }
+        result = DRScenePick2DXY(gWreck_root, gWreck_camera, gRender_screen,
+            mouse_x - gBack_screen->width / 2,
+            mouse_y - gBack_screen->height / 2,
+            WreckPick,
+            NULL);
+        for (i = 0; i < gWreck_count; i++) {
+            BrMatrix34PreScale(&gWreck_array[i].actor->t.t.mat,
+                inv_wreck_pick_scale_factor, inv_wreck_pick_scale_factor, inv_wreck_pick_scale_factor);
+        }
+        return result;
+    } else {
+        return 0;
     }
-    for (i = 0; i < gWreck_count; i++) {
-        BrMatrix34PreScale(&gWreck_array[i].actor->t.t.mat, 2.f, 2.f, 2.f);
-    }
-    result = DRScenePick2DXY(gWreck_root, gWreck_camera, gRender_screen,
-        mouse_x - gBack_screen->width / 2,
-        mouse_y - gBack_screen->height / 2,
-        WreckPick,
-        NULL);
-    for (i = 0; i < gWreck_count; i++) {
-        BrMatrix34PreScale(&gWreck_array[i].actor->t.t.mat,
-            inv_wreck_pick_scale_factor, inv_wreck_pick_scale_factor, inv_wreck_pick_scale_factor);
-    }
-    return result;
 }
 
 // IDA: int __usercall DamageScrnExit@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
