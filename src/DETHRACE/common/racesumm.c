@@ -168,11 +168,12 @@ void CalcRankIncrease(void) {
 int RaceSummaryDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
 
     if (pTimed_out) {
-        pCurrent_choice = 0;
+        return 0;
     } else if (pEscaped) {
-        pCurrent_choice = -1;
+        return -1;
+    } else {
+        return pCurrent_choice;
     }
-    return pCurrent_choice;
 }
 
 // IDA: void __usercall DrawInBox(int pBox_left@<EAX>, int pText_left@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour, int pAmount)
