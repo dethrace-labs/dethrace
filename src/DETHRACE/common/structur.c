@@ -507,7 +507,9 @@ void DoGame(void) {
     StartLoadingScreen();
     gProgram_state.prog_status = eProg_game_ongoing;
     second_select_race = 0;
-    if (gNet_mode == gNet_mode_of_last_game) {
+    if (gNet_mode != gNet_mode_of_last_game) {
+        gProgram_state.prog_status = eProg_idling;
+    } else {
         PrintMemoryDump(0, "BEFORE START RACE SCREEN");
         SelectOpponents(&gCurrent_race);
         if (gNet_mode != eNet_mode_none) {
@@ -535,18 +537,20 @@ void DoGame(void) {
             PrintMemoryDump(0, "AFTER START RACE SCREEN");
             DoNewGameAnimation();
             StartLoadingScreen();
-            if (gNet_mode != eNet_mode_none) {
+            if (gNet_mode == eNet_mode_none) {
+                LoadOpponentsCars(&gCurrent_race);
+            } else {
                 if (gCurrent_net_game->options.random_car_choice
                     && (gCurrent_net_game->options.car_choice == eNet_car_all || gCurrent_net_game->options.car_choice == eNet_car_both)
                     && !gNo_races_yet) {
                     SwapNetCarsLoad();
                 }
-            } else {
-                LoadOpponentsCars(&gCurrent_race);
             }
             PrintMemoryDump(0, "AFTER LOADING OPPONENTS IN");
             InitRace();
-            if (gNet_mode_of_last_game == gNet_mode) {
+            if (gNet_mode_of_last_game != gNet_mode) {
+                gProgram_state.prog_status = eProg_idling;
+            } else {
                 if (gProgram_state.prog_status == eProg_game_starting
                     || gProgram_state.prog_status == eProg_quit
                     || gProgram_state.prog_status == eProg_idling
@@ -604,7 +608,7 @@ void DoGame(void) {
                         DisposeRace();
                         if (gNet_mode != eNet_mode_none) {
                             gProgram_state.current_race_index = gPending_race;
-                            gCurrent_net_game->start_race = gPending_race;
+                            gCurrent_net_game->start_race = gProgram_state.current_race_index;
                             gPending_race = -1;
                         }
                         if (race_result == eRace_completed || race_result == eRace_timed_out) {
@@ -624,32 +628,31 @@ void DoGame(void) {
                         } else {
                             TotallyRepairCar();
                         }
-                        if (gNet_mode) {
+                        if (gNet_mode == eNet_mode_none) {
+                            DisposeOpponentsCars(&gCurrent_race);
+                        } else {
                             if (gCurrent_net_game->options.random_car_choice
                                 && (gCurrent_net_game->options.car_choice == eNet_car_all
                                     || gCurrent_net_game->options.car_choice == eNet_car_both)
                                 && !gNo_races_yet) {
                                 SwapNetCarsDispose();
                             }
-                        } else {
-                            DisposeOpponentsCars(&gCurrent_race);
                         }
                         DisposeTrack();
+#ifdef DETHRACE_FIX_BUGS
+                        // demo behavior
                         if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
                             DoFullVersionPowerpoint();
                         }
+#endif
                         gProgram_state.loaded = 0;
                         if (gProgram_state.prog_status == eProg_game_ongoing) {
                             gProgram_state.prog_status = eProg_game_starting;
                         }
                     }
                 }
-            } else {
-                gProgram_state.prog_status = eProg_idling;
             }
         }
-    } else {
-        gProgram_state.prog_status = eProg_idling;
     }
 }
 
