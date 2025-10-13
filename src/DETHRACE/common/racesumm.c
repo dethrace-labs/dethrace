@@ -862,30 +862,32 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
         if (gWreck_start_zoom == 0) {
             gWreck_start_zoom = the_time;
         }
-        finished = the_time - gWreck_start_zoom > 1000;
-        if (finished) {
+
+        if (the_time - gWreck_start_zoom > 1000) {
             the_time = gWreck_start_zoom + 1000;
-        }
-        if (gWreck_zoom_out < 0) {
-            camera_movement.v[0] = (1.f - (the_time - gWreck_start_zoom) / 1000.f) * gWreck_array[gWreck_zoom_in].actor->t.t.translate.t.v[0];
-            camera_movement.v[1] = (1.f - (the_time - gWreck_start_zoom) / 1000.f) * gWreck_array[gWreck_zoom_in].actor->t.t.translate.t.v[1];
-            camera_movement.v[2] = (1.f - (the_time - gWreck_start_zoom) / 1000.f) * -1.45f;
-            if (finished) {
-                gWreck_zoom_in = -1;
-                gWreck_zoomed_in = -1;
-            }
+            finished = 1;
         } else {
-            camera_movement.v[0] = (the_time - gWreck_start_zoom) / 1000.f * gWreck_array[gWreck_zoom_out].actor->t.t.translate.t.v[0];
-            camera_movement.v[1] = (the_time - gWreck_start_zoom) / 1000.f * gWreck_array[gWreck_zoom_out].actor->t.t.translate.t.v[1];
-            camera_movement.v[2] = (the_time - gWreck_start_zoom) / 1000.f * -1.45f;
+            finished = 0;
+        }
+        if (gWreck_zoom_out >= 0) {
+            memcpy(&camera_movement, &gWreck_array[gWreck_zoom_out].actor->t.t.translate.t, sizeof(br_vector3));
+            camera_movement.v[2] = -1.45f;
+            BrVector3Scale(&camera_movement, &camera_movement, (the_time - gWreck_start_zoom) / 1000.f);
             if (finished) {
                 gWreck_zoomed_in = gWreck_zoom_out;
                 gWreck_zoom_out = -1;
             }
+        } else {
+            memcpy(&camera_movement, &gWreck_array[gWreck_zoom_in].actor->t.t.translate.t, sizeof(br_vector3));
+            camera_movement.v[2] = -1.45f;
+            BrVector3Scale(&camera_movement, &camera_movement, 1.f - (the_time - gWreck_start_zoom) / 1000.f);
+            if (finished) {
+                gWreck_zoom_in = -1;
+                gWreck_zoomed_in = -1;
+            }
         }
-        gWreck_camera->t.t.translate.t.v[0] = camera_movement.v[0];
-        gWreck_camera->t.t.translate.t.v[1] = camera_movement.v[1];
-        gWreck_camera->t.t.translate.t.v[2] = camera_movement.v[2] + 2.2f;
+        camera_movement.v[2] += 2.2f;
+        memcpy(&gWreck_camera->t.t.translate.t, &camera_movement, sizeof(br_vector3));
     }
     EnsureRenderPalette();
     EnsurePaletteUp();
@@ -894,22 +896,22 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
 #endif
         BrPixelmapFill(gWreck_z_buffer, 0xffffffff);
         BrPixelmapFill(gWreck_render_area, BR_COLOUR_RGBA(0xb0, 0xb0, 0xb0, 0xb0));
-
-        rows = gWreck_render_area->height / 15.f;
-        columns = gWreck_render_area->width / 15.f;
+        spacing = 15.f;
+        rows = gWreck_render_area->height / spacing;
+        columns = gWreck_render_area->width / spacing;
         for (v = 0; v <= rows; v++) {
             BrPixelmapLine(gWreck_render_area,
                 -gWreck_render_area->origin_x,
-                gWreck_render_area->height / 2.f - 15.f * (rows / 2.f - v) - gWreck_render_area->origin_y,
+                gWreck_render_area->height / 2.0 - spacing * (rows / 2.0 - v) - gWreck_render_area->origin_y,
                 gWreck_render_area->width - gWreck_render_area->origin_x,
-                gWreck_render_area->height / 2.f - 15.f * (rows / 2.f - v) - gWreck_render_area->origin_y,
+                gWreck_render_area->height / 2.0 - spacing * (rows / 2.0 - v) - gWreck_render_area->origin_y,
                 8);
         }
         for (h = 0; h <= columns; h++) {
             BrPixelmapLine(gWreck_render_area,
-                gWreck_render_area->width / 2.f - 15.f * (columns / 2.f - h) - gWreck_render_area->origin_x,
+                gWreck_render_area->width / 2.0 - spacing * (columns / 2.0 - h) - gWreck_render_area->origin_x,
                 -gWreck_render_area->origin_y,
-                gWreck_render_area->width / 2.f - 15.f * (columns / 2.f - h) - gWreck_render_area->origin_x,
+                gWreck_render_area->width / 2.0 - spacing * (columns / 2.0 - h) - gWreck_render_area->origin_x,
                 gWreck_render_area->height - gWreck_render_area->origin_y,
                 8);
         }
