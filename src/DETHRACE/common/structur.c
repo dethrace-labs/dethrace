@@ -726,16 +726,17 @@ void DoProgram(void) {
 void JumpTheStart(void) {
     char s[256];
 
-    if (gNet_mode == eNet_mode_none
-        || gProgram_state.credits_earned - gProgram_state.credits_lost >= gJump_start_fine[gProgram_state.skill_level]) {
-        WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(gCountdown);
-        gCountdown = 0;
-        DRS3StopOutletSound(gPedestrians_outlet);
-        DRS3StartSound(gPedestrians_outlet, 8016);
-        SpendCredits(gJump_start_fine[gProgram_state.skill_level]);
-        sprintf(s, "%s %d %s", GetMiscString(gProgram_state.frank_or_anniness == eFrankie ? kMiscString_BadBoy : kMiscString_BadGirl), gJump_start_fine[gProgram_state.skill_level], GetMiscString(kMiscString_CreditFine));
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, s);
+    if (gNet_mode != eNet_mode_none
+        && gProgram_state.credits_earned - gProgram_state.credits_lost < gJump_start_fine[gProgram_state.skill_level]) {
+        return;
     }
+    WakeUpOpponentsToTheFactThatTheStartHasBeenJumped(gCountdown);
+    gCountdown = 0;
+    DRS3StopOutletSound(gPedestrians_outlet);
+    DRS3StartSound(gPedestrians_outlet, 8016);
+    SpendCredits(gJump_start_fine[gProgram_state.skill_level]);
+    sprintf(s, "%s %d %s", GetMiscString(gProgram_state.frank_or_anniness == eFrankie ? kMiscString_BadBoy : kMiscString_BadGirl), gJump_start_fine[gProgram_state.skill_level], GetMiscString(kMiscString_CreditFine));
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, s);
 }
 
 // IDA: void __cdecl GoingToInterfaceFromRace()
