@@ -1012,15 +1012,15 @@ int DamageScrnLeft(int* pCurrent_choice, int* pCurrent_mode) {
     if (*pCurrent_mode == 0 && gWreck_zoomed_in < 0) {
         if (gWreck_selected < 0) {
             gWreck_selected = gWreck_count - 1;
-        } else if (gWreck_selected != 0 && gWreck_array[gWreck_selected - 1].pos_y == gWreck_array[gWreck_selected].pos_y) {
-            gWreck_selected--;
-        } else {
+        } else if (gWreck_selected == 0 || gWreck_array[gWreck_selected - 1].pos_y != gWreck_array[gWreck_selected].pos_y) {
             for (i = gWreck_count - 1; i >= 0; i--) {
                 if (gWreck_array[i].pos_y == gWreck_array[gWreck_selected].pos_y) {
                     gWreck_selected = i;
                     break;
                 }
             }
+        } else {
+            gWreck_selected--;
         }
     } else if (gWreck_zoomed_in >= 0) {
         *pCurrent_choice = *pCurrent_choice + 1;
