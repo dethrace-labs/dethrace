@@ -707,9 +707,9 @@ void SpinWrecks(tU32 pFrame_period) {
 
     for (i = 0; i < gWreck_count; i++) {
         if (gWreck_array[i].customised == 0) {
-            BrMatrix34RotateY(&gWreck_array[i].rotation, BR_ANGLE_DEG(.05f * pFrame_period));
+            BrMatrix34RotateY(&gWreck_array[i].rotation, BrDegreeToAngle(0.05 * pFrame_period));
         }
-        BrVector3Copy(&translation, &gWreck_array[i].actor->t.t.translate.t);
+        memcpy(&translation, &gWreck_array[i].actor->t.t.translate.t, sizeof(br_vector3));
         BrVector3Set(&gWreck_array[i].actor->t.t.translate.t, 0.f, 0.f, 0.f);
         BrMatrix34Post(&gWreck_array[i].actor->t.t.mat, &gWreck_array[i].rotation);
         if (!MatrixIsIdentity(&gWreck_array[i].actor->t.t.mat)) {
@@ -718,7 +718,7 @@ void SpinWrecks(tU32 pFrame_period) {
             BrMatrix34PostScale(&gWreck_array[i].actor->t.t.mat,
                 gWreck_array[i].scaling_factor, gWreck_array[i].scaling_factor, gWreck_array[i].scaling_factor);
         }
-        BrVector3Copy(&gWreck_array[i].actor->t.t.translate.t, &translation);
+        memcpy(&gWreck_array[i].actor->t.t.translate.t, &translation, sizeof(br_vector3));
     }
 }
 
