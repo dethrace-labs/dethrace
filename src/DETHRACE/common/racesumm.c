@@ -1170,15 +1170,16 @@ int DamageScrnGoHead(int* pCurrent_choice, int* pCurrent_mode) {
     gDone_initial = 1;
     if (*pCurrent_choice == 2) {
         return 1;
-    } else if (gWreck_zoomed_in < 0) {
+    } else if (gWreck_zoomed_in >= 0) {
+        if (*pCurrent_choice == 1) {
+            ZoomInTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
+        }
+    } else if (*pCurrent_choice == 1) {
         if (*pCurrent_choice == 0 && gWreck_selected >= 0) {
             ZoomOutTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
             gUser_interacted = 1;
         }
-    } else if (*pCurrent_choice == 1) {
-        ZoomInTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
     }
-    gDone_initial = 1;
     return 0;
 }
 
@@ -1195,15 +1196,8 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
     old_mouse_y = 0; // Fixes warning caused by -Wsometimes-uninitialized
 #endif
     GetMousePosition(&old_mouse_x, &old_mouse_y);
-    if (gWreck_zoomed_in < 0) {
-        if (CastSelectionRay(pCurrent_choice, pCurrent_mode)) {
-            gUser_interacted = 1;
-            return 1;
-        } else {
-            return 0;
-        }
-    } else {
-        while (1) {
+    if (gWreck_zoomed_in >= 0) {
+        do {
             GetMousePosition(&mouse_x, &mouse_y);
             BrMatrix34RollingBall(&gWreck_array[gWreck_zoomed_in].rotation, mouse_x - old_mouse_x, old_mouse_y - mouse_y, 50);
             old_mouse_x = mouse_x;
@@ -1215,11 +1209,15 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
             DoMouseCursor();
             PDScreenBufferSwap(0);
             ServiceGame();
-            if (!EitherMouseButtonDown()) {
-                break;
-            }
-        }
+        } while (EitherMouseButtonDown());
         return 0;
+    } else {
+        if (CastSelectionRay(pCurrent_choice, pCurrent_mode)) {
+            gUser_interacted = 1;
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
 
