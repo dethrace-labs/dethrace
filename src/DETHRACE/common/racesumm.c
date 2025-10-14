@@ -1141,18 +1141,19 @@ int DamageScrnDown(int* pCurrent_choice, int* pCurrent_mode) {
             *pCurrent_mode = 1;
             *pCurrent_choice = 2;
         } else {
-            new_difference = 1000;
+            difference = 1000;
             new_selection = gWreck_selected;
             for (i = 0; i < gWreck_count; i++) {
                 if (gWreck_array[gWreck_selected].pos_y + 1.f == gWreck_array[i].pos_y) {
                     if (gWreck_array[i].pos_x == gWreck_array[gWreck_selected].pos_x) {
                         new_selection = i;
                         break;
-                    }
-                    difference = abs((int)(gWreck_array[i].pos_x - gWreck_array[gWreck_selected].pos_x));
-                    if (difference < new_difference) {
-                        new_selection = i;
-                        new_difference = difference;
+                    } else {
+                        new_difference = abs((int)(gWreck_array[i].pos_x - gWreck_array[gWreck_selected].pos_x));
+                        if (new_difference < difference) {
+                            difference = new_difference;
+                            new_selection = i;
+                        }
                     }
                 }
             }
