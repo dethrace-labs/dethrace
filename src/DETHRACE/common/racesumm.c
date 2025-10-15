@@ -1226,9 +1226,10 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
 int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
 
     if (pTimed_out) {
-        pCurrent_choice = 2;
+        return 2;
+    } else {
+        return pCurrent_choice;
     }
-    return pCurrent_choice;
 }
 
 // IDA: tSO_result __cdecl DoEndRaceSummary2()
