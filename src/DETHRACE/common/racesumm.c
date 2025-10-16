@@ -545,15 +545,13 @@ void PrepareBoundingRadius__racesumm(br_model* model) {
     br_vertex* vp;
 
     max = 0.f;
-    for (v = 0; v < model->nvertices; v++) {
-        vp = &model->vertices[v];
+    for (v = 0, vp = model->vertices; v < model->nvertices; v++, vp++) {
         d = BrVector3LengthSquared(&vp->p);
         if (d > max) {
             max = d;
         }
     }
-    d = sqrt(max);
-    model->radius = d;
+    model->radius = sqrt(max);
 }
 
 // IDA: void __cdecl BuildWrecks()
