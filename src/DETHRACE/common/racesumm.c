@@ -1250,11 +1250,15 @@ tSO_result DoEndRaceSummary2(void) {
         { 324, { 9, 18 }, { 174, 418 } },
         { 323, { 247, 494 }, { 174, 418 } },
     };
+
+    // GLOBAL: CARM95 0x00509E28
     static tMouse_area mouse_areas[3] = {
         { { 11, 22 }, { 20, 48 }, { 309, 618 }, { 169, 406 }, 0, 0, 0, ClickDamage },
         { { 9, 18 }, { 174, 418 }, { 72, 144 }, { 194, 466 }, 1, 1, 0, NULL },
         { { 247, 494 }, { 174, 418 }, { 310, 620 }, { 194, 466 }, 2, 1, 0, NULL },
     };
+
+    // GLOBAL: CARM95 0x00509EB8
     static tInterface_spec interface_spec = {
         1, 320, 0, -1, -1, -1, -1,
         { -1, -1 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { DamageScrnLeft, DamageScrnLeft },
@@ -1277,7 +1281,7 @@ tSO_result DoEndRaceSummary2(void) {
     }
     NetPlayerStatusChanged(ePlayer_status_wrecks_gallery);
     gBack_button_ptr = &mouse_areas[1];
-    memcpy(&gOld_back_button, &mouse_areas[1], sizeof(tMouse_area));
+    memcpy(&gOld_back_button, gBack_button_ptr, sizeof(tMouse_area));
     gOld_back_button.new_choice = 1;
     gOld_back_button.new_mode = 1;
     memcpy(gBack_button_ptr, &gOld_back_button, sizeof(tMouse_area));
@@ -1297,8 +1301,9 @@ tSO_result DoEndRaceSummary2(void) {
     DisposeWrecks();
     if (result < 0) {
         return eSO_main_menu_invoked;
+    } else {
+        return eSO_continue;
     }
-    return eSO_continue;
 }
 
 // IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
