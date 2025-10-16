@@ -574,10 +574,10 @@ void BuildWrecks(void) {
     BrActorAdd(gWreck_root, gWreck_camera);
     memcpy(gWreck_camera->type_data, gCamera_list[1]->type_data, sizeof(br_camera));
     ((br_camera*)gWreck_camera->type_data)->aspect = 2.f;
-    ((br_camera*)gWreck_camera->type_data)->field_of_view = BR_ANGLE_DEG(55);
+    ((br_camera*)gWreck_camera->type_data)->field_of_view = BrDegreeToAngle(55);
     BrMatrix34Identity(&gWreck_camera->t.t.mat);
     BrVector3SetFloat(&gWreck_camera->t.t.translate.t, 0.f, 0.f, 2.2f);
-    for (cat = eVehicle_self; cat < eVehicle_rozzer; cat++) {
+    for (cat = eVehicle_self; cat <= eVehicle_opponent; cat++) {
         if (cat == eVehicle_self) {
             car_count = 1;
         } else {
@@ -597,10 +597,10 @@ void BuildWrecks(void) {
             gWreck_array[gWreck_count].actor = this_car;
             PrepareBoundingRadius__racesumm(this_car->model);
             gWreck_array[gWreck_count].scaling_factor = .47f / this_car->model->radius;
-            gWreck_array[gWreck_count].pos_x = (position % 3) - 1.0f;
-            gWreck_array[gWreck_count].pos_y = (position / 3) - 0.5f;
-            this_car->t.t.translate.t.v[0] = 1.5f * gWreck_array[gWreck_count].pos_x;
-            this_car->t.t.translate.t.v[1] = -1.2f * gWreck_array[gWreck_count].pos_y;
+            gWreck_array[gWreck_count].pos_x = (position % 3) - 1.0;
+            gWreck_array[gWreck_count].pos_y = (position / 3) - 0.5;
+            this_car->t.t.translate.t.v[0] = 1.5 * gWreck_array[gWreck_count].pos_x;
+            this_car->t.t.translate.t.v[1] = -(1.2 * gWreck_array[gWreck_count].pos_y);
             this_car->t.t.translate.t.v[2] = 0.f;
             gWreck_array[gWreck_count].car_type = cat;
             gWreck_array[gWreck_count].car_index = i;
