@@ -654,7 +654,7 @@ void DisposeWrecks(void) {
     br_actor* this_car;
     tCar_spec* the_car;
 
-    for (cat = eVehicle_self; cat < eVehicle_rozzer; cat++) {
+    for (cat = eVehicle_self; cat <= eVehicle_opponent; cat++) {
         if (cat == eVehicle_self) {
             car_count = 1;
         } else {
@@ -679,13 +679,17 @@ void DisposeWrecks(void) {
     BrActorFree(gWreck_root);
     BrActorFree(gWreck_camera);
     gWreck_render_area->pixels = NULL;
-    BrPixelmapFree(gWreck_render_area);
 
 #ifdef DETHRACE_3DFX_PATCH
     if (gScreen->type == BR_PMT_INDEX_8) {
+        BrPixelmapFree(gWreck_render_area);
         gWreck_z_buffer->pixels = NULL;
         BrPixelmapFree(gWreck_z_buffer);
     }
+#else
+    gWreck_z_buffer->pixels = NULL;
+    BrPixelmapFree(gWreck_render_area);
+    BrPixelmapFree(gWreck_z_buffer);
 #endif
 }
 
