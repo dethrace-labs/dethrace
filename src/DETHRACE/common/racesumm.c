@@ -1503,40 +1503,44 @@ void DoNetRaceSummary(void) {
 tSO_result DoEndRaceSummary(int* pFirst_summary_done, tRace_result pRace_result) {
     tSO_result result;
 
+#ifdef DETHRACE_FIX_BUGS
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         gRank_etc_munged = 1;
         DoEndRaceSummary2();
         return eSO_continue;
     }
+#endif
+
     gRank_etc_munged = 0;
-    if (!*pFirst_summary_done && pRace_result != eRace_timed_out) {
+    if (*pFirst_summary_done || pRace_result == eRace_timed_out) {
+        result = eSO_continue;
+    } else {
         if (gNet_mode != eNet_mode_none) {
             CalcRankIncrease();
             MungeRankEtc(&gProgram_state);
             DoNetRaceSummary();
             return eSO_continue;
+        } else {
+            result = DoEndRaceSummary1();
         }
-        result = DoEndRaceSummary1();
-    } else {
-        result = eSO_continue;
     }
     *pFirst_summary_done = 1;
     if (result == eSO_game_over) {
         DoGameOverAnimation();
         gProgram_state.prog_status = eProg_opening;
-        result = eSO_continue;
+        return eSO_continue;
     } else if (result == eSO_main_menu_invoked) {
         *pFirst_summary_done = 0;
-        result = eSO_main_menu_invoked;
+        return eSO_main_menu_invoked;
     } else {
         if (result == eSO_game_completed) {
             DoGameCompletedAnimation();
         }
-        result = DoEndRaceSummary2();
-        if (result != eSO_main_menu_invoked) {
+        if (DoEndRaceSummary2() == eSO_main_menu_invoked) {
+            return eSO_main_menu_invoked;
+        } else {
             TotallyRepairCar();
-            result = eSO_continue;
+            return eSO_continue;
         }
     }
-    return result;
 }
