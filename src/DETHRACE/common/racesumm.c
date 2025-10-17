@@ -1415,6 +1415,8 @@ void DoNetRaceSummary(void) {
     static tFlicette flicker_off[1] = { { 322, { 219, 112 }, { 172, 362 } } };
     static tFlicette push[1] = { { 323, { 219, 112 }, { 172, 362 } } };
     static tMouse_area mouse_areas[1] = { { { 219, 112 }, { 172, 362 }, { 282, 182 }, { 192, 379 }, 0, 0, 0, NULL } };
+
+    // GLOBAL: CARM95 0x0050A060
     static tInterface_spec interface_spec = {
         0,              // initial_imode
         63,             // first_opening_flic
@@ -1476,17 +1478,18 @@ void DoNetRaceSummary(void) {
     while (!gReceived_game_scores && PDGetTotalTime() - start_time < 20000) {
         NetService(0);
     }
-    if (gReceived_game_scores) {
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            gPlayer_lookup[i] = i;
-        }
-        SortGameScores();
-        TurnOnPaletteConversion();
-        DoInterfaceScreen(&interface_spec, 0, 0);
-        NetPlayerStatusChanged(ePlayer_status_loading);
-        TurnOffPaletteConversion();
-        FadePaletteDown();
+    if (!gReceived_game_scores) {
+        return;
     }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        gPlayer_lookup[i] = i;
+    }
+    SortGameScores();
+    TurnOnPaletteConversion();
+    result = DoInterfaceScreen(&interface_spec, 0, 0);
+    NetPlayerStatusChanged(ePlayer_status_loading);
+    TurnOffPaletteConversion();
+    FadePaletteDown();
 }
 
 // IDA: tSO_result __usercall DoEndRaceSummary@<EAX>(int *pFirst_summary_done@<EAX>, tRace_result pRace_result@<EDX>)
