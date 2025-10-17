@@ -59,8 +59,16 @@ if(DETHRACE_REPLAY_DEBUG)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_REPLAY_DEBUG)
 endif()
 
+if (MINGW)
+    target_compile_options(dethrace_obj PRIVATE -Wno-error=incompatible-pointer-types)
+endif()
+
 target_sources(dethrace_obj PRIVATE
     common/skidmark.c
+    common/opponent.c
+    common/oil.c
+    common/racesumm.c
+
     common/brucetrk.c
     common/brucetrk.h
     common/car.c
@@ -123,12 +131,8 @@ target_sources(dethrace_obj PRIVATE
     common/network.h
     common/newgame.c
     common/newgame.h
-    common/oil.c
-    common/oil.h
     common/oppocar.c
     common/oppocar.h
-    common/opponent.c
-    common/opponent.h
     common/oppoproc.c
     common/oppoproc.h
     common/options.c
@@ -143,13 +147,10 @@ target_sources(dethrace_obj PRIVATE
     common/pratcam.h
     common/racestrt.c
     common/racestrt.h
-    common/racesumm.c
-    common/racesumm.h
     common/raycast.c
     common/raycast.h
     common/replay.c
     common/replay.h
-
     common/sound.c
     common/sound.h
     common/spark.c
@@ -190,14 +191,14 @@ endif()
 if(MSVC_42_FOR_RECCMP)
     add_executable(dethrace WIN32)
     set(CMAKE_C_FLAGS_DEBUG "/Od /Oi /Zi /MLd /G5")
+
+    add_compile_definitions(_DEBUG)
     set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
     target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
 
-    set_source_files_properties(common/skidmark.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/structur.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/racesumm.c PROPERTIES COMPILE_FLAGS "/FAs")
 
-    # set_source_files_properties(common/brucetrk.c PROPERTIES COMPILE_FLAGS "/G5")
-
-    # set_source_files_properties(common/car.c PROPERTIES COMPILE_FLAGS "/GB")
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()
 else()

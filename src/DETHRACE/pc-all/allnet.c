@@ -117,11 +117,10 @@ void SockAddrToString(char* pString, struct sockaddr_in* pSock_addr) {
 
 // added by dethrace
 void CopyableSockAddrToString(char* pString, tCopyable_sockaddr_in* pSock_addr) {
-    char portbuf[10];
+    struct sockaddr_in someaddr;
 
-    inet_ntop(AF_INET, &pSock_addr->address, pString, 32);
-    sprintf(portbuf, ":%d", ntohs(pSock_addr->port));
-    strcat(pString, portbuf);
+    PDNetCopyToNative(&someaddr, pSock_addr);
+    SockAddrToString(pString, &someaddr);
 }
 
 // IDA: int __usercall GetMessageTypeFromMessage@<EAX>(char *pMessage_str@<EAX>)
@@ -145,12 +144,14 @@ int GetMessageTypeFromMessage(char* pMessage_str) {
 }
 
 int SameEthernetAddress(struct sockaddr_in* pAddr_1, struct sockaddr_in* pAddr_2) {
-    return memcmp(pAddr_1, pAddr_2, sizeof(struct sockaddr_in)) == 0;
+    return pAddr_1->sin_family == pAddr_2->sin_family && pAddr_1->sin_port == pAddr_2->sin_port && pAddr_1->sin_addr.s_addr == pAddr_2->sin_addr.s_addr;
 }
 
 // added by dethrace
 int SameEthernetAddress2(tCopyable_sockaddr_in* pAddr_1, struct sockaddr_in* pAddr_2) {
-    return pAddr_1->port == pAddr_2->sin_port && pAddr_1->address == pAddr_2->sin_addr.s_addr;
+    struct sockaddr_in someaddr;
+    PDNetCopyToNative(&someaddr, pAddr_1);
+    return SameEthernetAddress(&someaddr, pAddr_2);
 }
 
 /*SOCKADDR_IPX_* */ void GetIPXAddrFromPlayerID(tPlayer_ID pPlayer_id) {

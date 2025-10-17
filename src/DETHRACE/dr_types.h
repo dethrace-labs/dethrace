@@ -589,14 +589,14 @@ typedef struct tJoystick {
     tS32 dec;
 } tJoystick;
 
-typedef struct tPursuee_trail {
-    br_vector3 trail_nodes[25];
-    br_vector3 base_heading;
-    tU32 time_of_next_recording;
-    tU32 end_of_deviation;
-    tU8 number_of_nodes;
-    tU8 has_deviated_recently;
-    tU8 nodes_shifted_this_frame;
+typedef struct tPursuee_trail {   // size: 0x144
+    br_vector3 trail_nodes[25];   // @0x0
+    br_vector3 base_heading;      // @0x12c
+    tU32 time_of_next_recording;  // @0x138
+    tU32 end_of_deviation;        // @0x13c
+    tU8 number_of_nodes;          // @0x140
+    tU8 has_deviated_recently;    // @0x141
+    tU8 nodes_shifted_this_frame; // @0x142
 } tPursuee_trail;
 
 typedef struct tCar_spec_struct {              // size: 0x1a9c
@@ -1659,71 +1659,71 @@ typedef struct tOpponent {
     tText_chunk* text_chunks;
 } tOpponent;
 
-typedef struct tProgram_state {
-    tS32 credits;
-    tS32 credits_earned;
-    tS32 credits_lost;
-    tU32 view_change_start;
-    tU32 pratcam_move_start;
-    int peds_killed;
-    int sausage_eater_mode;
-    int rank;
-    int loaded;
-    int last_slot;
-    int skill_level;
-    int parts_shop_visited;
-    int racing;
-    int cut_scene;
-    int saving;
-    int loading;
-    int dont_save_or_load;
-    int dont_load;
-    int mirror_on;
-    int prat_cam_on;
-    int cockpit_on;
-    int cockpit_image_index;
-    int current_render_left;
-    int current_render_top;
-    int current_render_right;
-    int current_render_bottom;
-    int frame_rate_headup;
-    int revs;
-    int music_volume;
-    int effects_volume;
-    int current_race_index;
-    int redo_race_index;
-    int credits_per_rank;
-    int game_completed;
-    int number_of_cars;
-    int current_car_index;
-    tWhich_view which_view;
-    tWhich_view new_view;
-    tWhich_view pending_view;
-    tWhich_view old_view;
-    tRace_sel_view_type view_type;
-    tProg_status prog_status;
-    tFrank_anne frank_or_anniness;
-    tAuto_parts_reply auto_parts_reply;
-    tCar_spec current_car;
-    char player_name[2][14];
-    char track_file_name[14];
-    char car_name[14];
-    int cars_available[60];
-    br_vector3 initial_position;
-    br_scalar initial_yaw;
-    tTrack_spec track_spec;
-    tDepth_effect default_depth_effect;
-    tDepth_effect current_depth_effect;
-    int special_volume_count;
-    tSpecial_volume* special_volumes;
-    br_material* standard_screen;
-    br_material* standard_screen_dark;
-    br_material* standard_screen_fog;
-    int special_screens_count;
-    tSpecial_screen* special_screens;
-    tIntelligent_vehicles AI_vehicles;
-    tNon_car_spec* non_cars;
-    int num_non_car_spaces;
+typedef struct tProgram_state {         // size: 0x356c
+    tS32 credits;                       // @0x0
+    tS32 credits_earned;                // @0x4
+    tS32 credits_lost;                  // @0x8
+    tU32 view_change_start;             // @0xc
+    tU32 pratcam_move_start;            // @0x10
+    int peds_killed;                    // @0x14
+    int sausage_eater_mode;             // @0x18
+    int rank;                           // @0x1c
+    int loaded;                         // @0x20
+    int last_slot;                      // @0x24
+    int skill_level;                    // @0x28
+    int parts_shop_visited;             // @0x2c
+    int racing;                         // @0x30
+    int cut_scene;                      // @0x34
+    int saving;                         // @0x38
+    int loading;                        // @0x3c
+    int dont_save_or_load;              // @0x40
+    int dont_load;                      // @0x44
+    int mirror_on;                      // @0x48
+    int prat_cam_on;                    // @0x4c
+    int cockpit_on;                     // @0x50
+    int cockpit_image_index;            // @0x54
+    int current_render_left;            // @0x58
+    int current_render_top;             // @0x5c
+    int current_render_right;           // @0x60
+    int current_render_bottom;          // @0x64
+    int frame_rate_headup;              // @0x68
+    int revs;                           // @0x6c
+    int music_volume;                   // @0x70
+    int effects_volume;                 // @0x74
+    int current_race_index;             // @0x78
+    int redo_race_index;                // @0x7c
+    int credits_per_rank;               // @0x80
+    int game_completed;                 // @0x84
+    int number_of_cars;                 // @0x88
+    int current_car_index;              // @0x8c
+    tWhich_view which_view;             // @0x90
+    tWhich_view new_view;               // @0x94
+    tWhich_view pending_view;           // @0x98
+    tWhich_view old_view;               // @0x9c
+    tRace_sel_view_type view_type;      // @0xa0
+    tProg_status prog_status;           // @0xa4
+    tFrank_anne frank_or_anniness;      // @0xa8
+    tAuto_parts_reply auto_parts_reply; // @0xac
+    tCar_spec current_car;              // @0xb0
+    char player_name[2][14];            // @0x1b4c
+    char track_file_name[14];           // @0x1b68
+    char car_name[14];                  // @0x1b76
+    int cars_available[60];             // @0x1b84
+    br_vector3 initial_position;        // @0x1c74
+    br_scalar initial_yaw;              // @0x1c80
+    tTrack_spec track_spec;             // @0x1c84
+    tDepth_effect default_depth_effect; // @0x1cb0
+    tDepth_effect current_depth_effect; // @0x1cc0
+    int special_volume_count;           // @0x1cd0
+    tSpecial_volume* special_volumes;   // @0x1cd4
+    br_material* standard_screen;       // @0x1cd8
+    br_material* standard_screen_dark;  // @0x1cdc
+    br_material* standard_screen_fog;   // @0x1ce0
+    int special_screens_count;          // @0x1ce4
+    tSpecial_screen* special_screens;   // @0x1ce8
+    tIntelligent_vehicles AI_vehicles;  // @0x1cec
+    tNon_car_spec* non_cars;            // @0x3564
+    int num_non_car_spaces;             // @0x3568
 } tProgram_state;
 
 typedef struct tDR_font {
