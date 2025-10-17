@@ -1357,6 +1357,11 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_3);
     DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_4);
     DrawColumnHeading__racesumm(kMiscString_SCORE, gCurrent_graf_data->net_sum_x_5);
+    goto next;
+    // looks like leftover code from a previous version..
+    DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_4);
+    DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_5);
+next:
     BrPixelmapLine(gBack_screen,
         gCurrent_graf_data->net_sum_x_1,
         gCurrent_graf_data->net_sum_headings_y + 1 + gFont_7->glyph_y - gCurrent_graf_data->net_sum_y_pitch,
@@ -1377,10 +1382,20 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
         DRPixelmapRectangleMaskedCopy(gBack_screen,
             gCurrent_graf_data->net_sum_x_1,
             gCurrent_graf_data->net_sum_headings_y + 1 + i * gCurrent_graf_data->net_sum_y_pitch,
-            gIcons_pix_low_res, /* DOS version uses low res, Windows version uses normal res */
+#ifdef DETHRACE_FIX_BUGS
+            /* DOS version uses low res, Windows version uses normal res */
+            gIcons_pix_low_res,
+#else
+            gIcons_pix,
+#endif
             0,
             gCurrent_graf_data->net_head_icon_height * player->car_index,
-            gIcons_pix_low_res->width, /* DOS version uses low res, Windows version uses normal res */
+#ifdef DETHRACE_FIX_BUGS
+            /* DOS version uses low res, Windows version uses normal res */
+            gIcons_pix_low_res->width,
+#else
+            gIcons_pix->width,
+#endif
             gCurrent_graf_data->net_head_icon_height);
         TurnOnPaletteConversion();
         DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_2, i, 83, s);
