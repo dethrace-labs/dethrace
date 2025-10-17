@@ -1338,7 +1338,11 @@ void DrawColumnHeading__racesumm(int pStr_index, int pX) {
 // FUNCTION: CARM95 0x0041853a
 int SortScores(const void* pFirst_one, const void* pSecond_one) {
 
-    return gNet_players[*(int*)pSecond_one].games_score - gNet_players[*(int*)pFirst_one].games_score;
+    if (1) {
+        return gNet_players[*(int*)pSecond_one].games_score - gNet_players[*(int*)pFirst_one].games_score;
+    } else {
+        return gNet_players[*(int*)pSecond_one].won - gNet_players[*(int*)pFirst_one].won;
+    }
 }
 
 // IDA: void __cdecl SortGameScores()
@@ -1354,14 +1358,16 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     char s[256];
     tNet_game_player_info* player;
 
-    DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_3);
-    DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_4);
-    DrawColumnHeading__racesumm(kMiscString_SCORE, gCurrent_graf_data->net_sum_x_5);
-    goto next;
-    // looks like leftover code from a previous version..
-    DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_4);
-    DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_5);
-next:
+    if (1) {
+        DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_3);
+        DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_4);
+        DrawColumnHeading__racesumm(kMiscString_SCORE, gCurrent_graf_data->net_sum_x_5);
+    } else {
+        // looks like leftover code from a previous version..
+        DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_4);
+        DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_5);
+    }
+
     BrPixelmapLine(gBack_screen,
         gCurrent_graf_data->net_sum_x_1,
         gCurrent_graf_data->net_sum_headings_y + 1 + gFont_7->glyph_y - gCurrent_graf_data->net_sum_y_pitch,
