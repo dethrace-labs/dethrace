@@ -711,7 +711,7 @@ void SpinWrecks(tU32 pFrame_period) {
         if (gWreck_array[i].customised == 0) {
             BrMatrix34RotateY(&gWreck_array[i].rotation, BrDegreeToAngle(0.05 * pFrame_period));
         }
-        memcpy(&translation, &gWreck_array[i].actor->t.t.translate.t, sizeof(br_vector3));
+        translation = gWreck_array[i].actor->t.t.translate.t;
         BrVector3Set(&gWreck_array[i].actor->t.t.translate.t, 0.f, 0.f, 0.f);
         BrMatrix34Post(&gWreck_array[i].actor->t.t.mat, &gWreck_array[i].rotation);
         if (!MatrixIsIdentity(&gWreck_array[i].actor->t.t.mat)) {
@@ -720,7 +720,7 @@ void SpinWrecks(tU32 pFrame_period) {
             BrMatrix34PostScale(&gWreck_array[i].actor->t.t.mat,
                 gWreck_array[i].scaling_factor, gWreck_array[i].scaling_factor, gWreck_array[i].scaling_factor);
         }
-        memcpy(&gWreck_array[i].actor->t.t.translate.t, &translation, sizeof(br_vector3));
+        gWreck_array[i].actor->t.t.translate.t = translation;
     }
 }
 
@@ -872,7 +872,7 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
             finished = 0;
         }
         if (gWreck_zoom_out >= 0) {
-            memcpy(&camera_movement, &gWreck_array[gWreck_zoom_out].actor->t.t.translate.t, sizeof(br_vector3));
+            camera_movement = gWreck_array[gWreck_zoom_out].actor->t.t.translate.t;
             camera_movement.v[2] = -1.45f;
             BrVector3Scale(&camera_movement, &camera_movement, (the_time - gWreck_start_zoom) / 1000.f);
             if (finished) {
@@ -880,7 +880,7 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
                 gWreck_zoom_out = -1;
             }
         } else {
-            memcpy(&camera_movement, &gWreck_array[gWreck_zoom_in].actor->t.t.translate.t, sizeof(br_vector3));
+            camera_movement = gWreck_array[gWreck_zoom_in].actor->t.t.translate.t;
             camera_movement.v[2] = -1.45f;
             BrVector3Scale(&camera_movement, &camera_movement, 1.f - (the_time - gWreck_start_zoom) / 1000.f);
             if (finished) {
@@ -889,7 +889,7 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
             }
         }
         camera_movement.v[2] += 2.2f;
-        memcpy(&gWreck_camera->t.t.translate.t, &camera_movement, sizeof(br_vector3));
+        gWreck_camera->t.t.translate.t = camera_movement;
     }
     EnsureRenderPalette();
     EnsurePaletteUp();
@@ -1338,9 +1338,8 @@ void DrawColumnHeading__racesumm(int pStr_index, int pX) {
 // FUNCTION: CARM95 0x0041853a
 int SortScores(const void* pFirst_one, const void* pSecond_one) {
 
-    if (1) {
-        return gNet_players[*(int*)pSecond_one].games_score - gNet_players[*(int*)pFirst_one].games_score;
-    } else {
+    return gNet_players[*(int*)pSecond_one].games_score - gNet_players[*(int*)pFirst_one].games_score;
+    if (0) {
         return gNet_players[*(int*)pSecond_one].won - gNet_players[*(int*)pFirst_one].won;
     }
 }
@@ -1358,11 +1357,10 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     char s[256];
     tNet_game_player_info* player;
 
-    if (1) {
-        DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_3);
-        DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_4);
-        DrawColumnHeading__racesumm(kMiscString_SCORE, gCurrent_graf_data->net_sum_x_5);
-    } else {
+    DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_3);
+    DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_4);
+    DrawColumnHeading__racesumm(kMiscString_SCORE, gCurrent_graf_data->net_sum_x_5);
+    if (0) {
         // looks like leftover code from a previous version..
         DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_4);
         DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_5);
@@ -1389,7 +1387,7 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
             gCurrent_graf_data->net_sum_x_1,
             gCurrent_graf_data->net_sum_headings_y + 1 + i * gCurrent_graf_data->net_sum_y_pitch,
 #ifdef DETHRACE_FIX_BUGS
-            /* DOS version uses low res, Windows version uses normal res */
+            // menu renders in low res, should always use low-res icon
             gIcons_pix_low_res,
 #else
             gIcons_pix,
@@ -1397,7 +1395,7 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
             0,
             gCurrent_graf_data->net_head_icon_height * player->car_index,
 #ifdef DETHRACE_FIX_BUGS
-            /* DOS version uses low res, Windows version uses normal res */
+            // menu renders in low res, should always use low-res icon
             gIcons_pix_low_res->width,
 #else
             gIcons_pix->width,
