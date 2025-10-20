@@ -1,5 +1,12 @@
 // Based on https://gist.github.com/jvranish/4441299
 
+#ifdef __TINYC__
+/* tcc does potentially not have __int128_t, used in /usr/include/bits/link.h:99 */
+#define SUPPORT_TRACEBACK 0
+#else
+#define SUPPORT_TRACEBACK 1
+#endif
+
 #define _GNU_SOURCE
 #include "harness/config.h"
 #include "harness/os.h"
@@ -9,12 +16,10 @@
 #include <dirent.h>
 #include <err.h>
 #include <errno.h>
-#include <execinfo.h>
 #include <fcntl.h>
 #include <ifaddrs.h>
 #include <libgen.h>
 #include <limits.h>
-#include <link.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -28,10 +33,13 @@
 #include <time.h>
 #include <unistd.h>
 
+#if SUPPORT_TRACEBACK
+#include <execinfo.h>
+#include <link.h>
+#endif
+
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof(A[0]))
 #define MAX_STACK_FRAMES 64
-#define TRACER_PID_STRING "TracerPid:"
-
 static int stack_nbr = 0;
 static char _program_name[1024];
 
@@ -44,6 +52,7 @@ struct dl_iterate_callback_data {
     intptr_t start;
 } dethrace_dl_data;
 
+#if SUPPORT_TRACEBACK
 static int dl_iterate_callback(struct dl_phdr_info* info, size_t size, void* data) {
     struct dl_iterate_callback_data* callback_data = data;
 
@@ -92,6 +101,7 @@ static void print_stack_trace(void) {
         free(messages);
     }
 }
+#endif
 
 static void signal_handler(int sig, siginfo_t* siginfo, void* context) {
     (void)context;
@@ -176,7 +186,9 @@ static void signal_handler(int sig, siginfo_t* siginfo, void* context) {
         break;
     }
     fputs("******************\n", stderr);
+#if SUPPORT_TRACEBACK
     print_stack_trace();
+#endif
     exit(1);
 }
 
