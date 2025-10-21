@@ -255,10 +255,6 @@ static void SDL1_Harness_Swap(br_pixelmap* back_buffer) {
         SDL1_GL_SwapBuffers();
     } else {
         SDL1_Renderer_Present(back_buffer);
-
-        if (harness_game_config.fps != 0) {
-            limit_fps();
-        }
     }
 }
 
