@@ -10,6 +10,15 @@ target_include_directories(dethrace_obj
     pd
 )
 
+# Android-specific includes
+if(DETHRACE_ANDROID)
+    target_include_directories(dethrace_obj
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/android
+        ${SDL2_INCLUDE_DIRS}
+    )
+endif()
+
 if(DETHRACE_ASAN)
     target_compile_options(dethrace_obj PUBLIC -fsanitize=address)
     target_link_options(dethrace_obj PUBLIC -fsanitize=address)
@@ -180,6 +189,13 @@ target_sources(dethrace_obj PRIVATE
     # pc-dos/dossys.c
 )
 
+# Android-specific sources
+if(DETHRACE_ANDROID)
+    target_sources(dethrace_obj PRIVATE
+        main.c
+    )
+endif()
+
 if(DETHRACE_NET_ENABLED)
     # dethrace-added cross platform sys and network implementation
     target_sources(dethrace_obj PRIVATE pc-all/allnet.c)
@@ -187,8 +203,24 @@ else()
     target_sources(dethrace_obj PRIVATE pc-none/nonet.c)
 endif()
 
-# Create our main game binary.
-if(MSVC_42_FOR_RECCMP)
+# Create our main game binary or shared library
+if(DETHRACE_ANDROID)
+    # For Android, build as shared library
+    add_library(dethrace SHARED)
+
+    # Android-specific link libraries
+    target_link_libraries(dethrace PRIVATE
+        dethrace_obj
+        compile_with_werror
+        SDL2::SDL2
+        Threads::Threads  # Ensure threading support for Android
+        ${LOG_LIB}
+        ${ANDROID_LIB}
+        ${EGL_LIB}
+        ${GLES_LIB}
+    )
+
+elseif(MSVC_42_FOR_RECCMP)
     add_executable(dethrace WIN32)
     set(CMAKE_C_FLAGS_DEBUG "/Od /Oi /Zi /MLd /G5")
 
@@ -201,6 +233,9 @@ if(MSVC_42_FOR_RECCMP)
 
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()
+
+    target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
+    target_sources(dethrace PRIVATE main.c)
 else()
     add_executable(dethrace
         WIN32
@@ -215,10 +250,10 @@ else()
         target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
         target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
     endif()
-endif()
 
-target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
-target_sources(dethrace PRIVATE main.c)
+    target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
+    target_sources(dethrace PRIVATE main.c)
+endif()
 
 if(DETHRACE_IDE_ROOT_DIR)
     set_target_properties(dethrace PROPERTIES
@@ -236,71 +271,80 @@ if(DETHRACE_IDE_ARGUMENTS)
 endif()
 
 if(DETHRACE_INSTALL)
-    install(TARGETS dethrace
-        BUNDLE DESTINATION . COMPONENT Runtime
-        RUNTIME DESTINATION . COMPONENT Runtime
-    )
-
-    if(APPLE)
-        set_target_properties(dethrace PROPERTIES
-            BUNDLE True
-            MACOSX_BUNDLE True
-            MACOSX_BUNDLE_DISPLAY_NAME "Deth Race"
-            OUTPUT_NAME "Deth Race"
-            MACOSX_BUNDLE_BUNDLE_VERSION ${DETHRACE_VERSION}
-            MACOSX_BUNDLE_SHORT_VERSION_STRING ${DETHRACE_VERSION}
-            MACOSX_BUNDLE_ICON_FILE dethrace.icns
+    if(DETHRACE_ANDROID)
+        # Android installation
+        install(TARGETS dethrace
+            LIBRARY DESTINATION lib/${ANDROID_ABI}
+            ARCHIVE DESTINATION lib/${ANDROID_ABI}
         )
-        set_source_files_properties(${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns PROPERTIES
-            MACOSX_PACKAGE_LOCATION "Resources"
-        )
-        target_sources(dethrace_obj PRIVATE
-            ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
+    else()
+        # Desktop installation
+        install(TARGETS dethrace
+            BUNDLE DESTINATION . COMPONENT Runtime
+            RUNTIME DESTINATION . COMPONENT Runtime
         )
 
-        install(CODE "
-            include(BundleUtilities)
-            fixup_bundle(\"${CMAKE_BINARY_DIR}/Deth Race.app\" \"\" \"/Library/Frameworks\")
-            execute_process(COMMAND
-                codesign -s - -f \"${CMAKE_BINARY_DIR}/Deth Race.app/Contents/Frameworks/SDL2.framework\"
+        if(APPLE)
+            set_target_properties(dethrace PROPERTIES
+                BUNDLE True
+                MACOSX_BUNDLE True
+                MACOSX_BUNDLE_DISPLAY_NAME "Deth Race"
+                OUTPUT_NAME "Deth Race"
+                MACOSX_BUNDLE_BUNDLE_VERSION ${DETHRACE_VERSION}
+                MACOSX_BUNDLE_SHORT_VERSION_STRING ${DETHRACE_VERSION}
+                MACOSX_BUNDLE_ICON_FILE dethrace.icns
             )
-            "
-            COMPONENT RUNTIME
-        )
-    endif()
+            set_source_files_properties(${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns PROPERTIES
+                MACOSX_PACKAGE_LOCATION "Resources"
+            )
+            target_sources(dethrace_obj PRIVATE
+                ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
+            )
 
-    if(MSVC)
-        install(FILES $<TARGET_PDB_FILE:dethrace>
-            DESTINATION "."
-            OPTIONAL
-        )
+            install(CODE "
+                include(BundleUtilities)
+                fixup_bundle(\"${CMAKE_BINARY_DIR}/Deth Race.app\" \"\" \"/Library/Frameworks\")
+                execute_process(COMMAND
+                    codesign -s - -f \"${CMAKE_BINARY_DIR}/Deth Race.app/Contents/Frameworks/SDL2.framework\"
+                )
+                "
+                COMPONENT RUNTIME
+            )
+        endif()
 
-        if(DETHRACE_PLATFORM_SDL_DYNAMIC)
-            if(DETHRACE_PLATFORM_SDL1)
-                get_filename_component(sdl1_lib_dir "${SDL_LIBRARY}" DIRECTORY)
-                get_filename_component(sdl1_root_dir "${SDL_LIBRARY}" PATH)
-                set(sdl1_bin_dir "${sdl1_root_dir}/bin" PATH)
-                find_file(SDL1DLL_PATH NAMES "SDL.dll" PATHS ${sdl1_lib_dir} ${sdl1_root_dir} PATH_SUFFIXES "bin" REQUIRED)
+        if(MSVC)
+            install(FILES $<TARGET_PDB_FILE:dethrace>
+                DESTINATION "."
+                OPTIONAL
+            )
 
-                if(SDL1DLL_PATH)
-                    install(FILES "${SDL1DLL_PATH}"
+            if(DETHRACE_PLATFORM_SDL_DYNAMIC)
+                if(DETHRACE_PLATFORM_SDL1)
+                    get_filename_component(sdl1_lib_dir "${SDL_LIBRARY}" DIRECTORY)
+                    get_filename_component(sdl1_root_dir "${SDL_LIBRARY}" PATH)
+                    set(sdl1_bin_dir "${sdl1_root_dir}/bin" PATH)
+                    find_file(SDL1DLL_PATH NAMES "SDL.dll" PATHS ${sdl1_lib_dir} ${sdl1_root_dir} PATH_SUFFIXES "bin" REQUIRED)
+
+                    if(SDL1DLL_PATH)
+                        install(FILES "${SDL1DLL_PATH}"
+                            DESTINATION "."
+                            OPTIONAL
+                        )
+                    endif()
+                endif()
+
+                if(DETHRACE_PLATFORM_SDL2)
+                    install(FILES "$<TARGET_FILE:SDL2::SDL2>"
                         DESTINATION "."
                         OPTIONAL
                     )
                 endif()
-            endif()
-
-            if(DETHRACE_PLATFORM_SDL2)
-                install(FILES "$<TARGET_FILE:SDL2::SDL2>"
-                    DESTINATION "."
-                    OPTIONAL
-                )
-            endif()
-            if(DETHRACE_PLATFORM_SDL3)
-                install(FILES "$<TARGET_FILE:SDL3::SDL3>"
-                    DESTINATION "."
-                    OPTIONAL
-                )
+                if(DETHRACE_PLATFORM_SDL3)
+                    install(FILES "$<TARGET_FILE:SDL3::SDL3>"
+                        DESTINATION "."
+                        OPTIONAL
+                    )
+                endif()
             endif()
         endif()
     endif()

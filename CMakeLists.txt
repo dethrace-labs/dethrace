@@ -17,6 +17,21 @@ include(CheckCCompilerFlag)
 include(CMakeDependentOption)
 include(TestBigEndian)
 
+# Android-specific setup
+if(ANDROID)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+
+    # Android-specific compile definitions
+    add_compile_definitions(ANDROID __ANDROID__ DETHRACE_ANDROID)
+
+    # Find Android NDK libraries
+    find_library(LOG_LIB log)
+    find_library(ANDROID_LIB android)
+    set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+    find_package(Threads REQUIRED)
+endif()
+
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
     file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" DETHRACE_VERSION)
     string(STRIP "${DETHRACE_VERSION}" DETHRACE_VERSION)
@@ -45,6 +60,10 @@ option(DETHRACE_NET_ENABLED "Include net support" ON)
 option(DETHRACE_PLATFORM_SDL1 "Support SDL 1.2 platform driver" OFF)
 option(DETHRACE_PLATFORM_SDL2 "Support SDL 2 platform driver" ON)
 option(DETHRACE_PLATFORM_SDL3 "Support SDL 3 platform driver" OFF)
+
+# Android-specific options
+option(DETHRACE_ANDROID "Build for Android" OFF)
+option(DETHRACE_ANDROID_SDL "Use SDL for Android platform" ON)
 
 option(MSVC_42_FOR_RECCMP "Build with MSVC 4.2 to match assembly" OFF)
 
@@ -115,6 +134,18 @@ if(DETHRACE_PLATFORM_SDL3)
     math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
 endif()
 
+# Android platform setup
+if(DETHRACE_ANDROID)
+    if(DETHRACE_ANDROID_SDL)
+        # Use SDL2 for Android
+        find_package(SDL2 REQUIRED)
+        list(APPEND DETHRACE_PLATFORMS ANDROID_SDL2)
+    else()
+        # Use native Android
+        list(APPEND DETHRACE_PLATFORMS ANDROID_NATIVE)
+    endif()
+endif()
+
 if(count_sdl_platforms GREATER 1)
     # Force dynamic SDL when enabling 2 (or more) SDL platform backends
     set(dynamic_sdl_force TRUE)
@@ -143,6 +174,15 @@ add_library(compile_with_werror INTERFACE)
 add_subdirectory(src/harness)
 add_subdirectory(src/S3)
 add_subdirectory(src/smackw32)
+
+# Modified DETHRACE subdirectory to support Android
+if(DETHRACE_ANDROID)
+    # For Android, we'll build the main target as a shared library
+    set(DETHRACE_BUILD_SHARED ON)
+else()
+    set(DETHRACE_BUILD_SHARED OFF)
+endif()
+
 add_subdirectory(src/DETHRACE)
 
 if(DETHRACE_WERROR)
@@ -184,7 +224,11 @@ if(DETHRACE_INSTALL)
 
     set(CPACK_PACKAGE_DIRECTORY dist)
 
-    if(APPLE)
+    if(ANDROID)
+        # For Android, create an AAR or APK package
+        set(CPACK_GENERATOR TGZ)
+        set(ext ".tar.gz")
+    elseif(APPLE)
         set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK "ON")
         set(CPACK_GENERATOR "DragNDrop")
         set(ext ".dmg")
@@ -201,4 +245,13 @@ if(DETHRACE_INSTALL)
     endif()
 
     include(CPack)
+endif()
+
+# Android-specific installation
+if(DETHRACE_ANDROID AND DETHRACE_INSTALL)
+    install(TARGETS dethrace
+        LIBRARY DESTINATION lib/${ANDROID_ABI}
+        ARCHIVE DESTINATION lib/${ANDROID_ABI}
+        RUNTIME DESTINATION bin/${ANDROID_ABI}
+    )
 endif()

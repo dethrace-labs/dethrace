@@ -7,6 +7,11 @@
 #include <windows.h>
 #endif
 
+
+#if defined(ANDROID) || defined(__ANDROID__)
+#include <SDL2/SDL_main.h>
+#endif
+
 #include "brender.h"
 
 extern int Harness_Init(int* argc, char* argv[]);
@@ -28,8 +33,12 @@ void BR_CALLBACK _BrBeginHook(void) {
 
 void BR_CALLBACK _BrEndHook(void) {
 }
-
-int main(int argc, char* argv[]) {
+#ifdef ANDROID
+int SDL_main(int argc, char** argv)
+#else
+int main(int argc, char** argv)
+#endif
+{
     int result;
 
 #ifdef _WIN32

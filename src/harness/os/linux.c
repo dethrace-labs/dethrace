@@ -73,6 +73,8 @@ int addr2line(char const* const program_name, void const* const addr) {
 }
 
 static void print_stack_trace(void) {
+#if !defined(__ANDROID__)
+    // Original implementation for non-Android
     int i, trace_size = 0;
     char** messages = (char**)NULL;
 
@@ -91,6 +93,9 @@ static void print_stack_trace(void) {
     if (messages) {
         free(messages);
     }
+#else
+    fputs("  Stack tracing not available on Android\n", stderr);
+#endif
 }
 
 static void signal_handler(int sig, siginfo_t* siginfo, void* context) {

@@ -297,7 +297,9 @@ int Harness_Init(int* argc, char* argv[]) {
     harness_game_config.verbose = 0;
 
     // install signal handler
+#if !defined(__ANDROID__)
     harness_game_config.install_signalhandler = 1;
+#endif
 
     if (Harness_ProcessCommandLine(&argument_config, argc, argv) != 0) {
         fprintf(stderr, "Failed to parse harness command line\n");
