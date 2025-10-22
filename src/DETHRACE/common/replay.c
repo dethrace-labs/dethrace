@@ -136,108 +136,113 @@ void StopSaving(void) {
 void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
     int x;
-    tU16 played_col1;
-    tU16 played_col2;
-    tU16 to_play_col1;
-    tU16 to_play_col2;
+    // dethrace: these are unused, present in DOS build but removed in the windows build
+    // tU16 played_col1;
+    // tU16 played_col2;
+    // tU16 to_play_col1;
+    // tU16 to_play_col2;
 
     the_time = PDGetTotalTime();
-    if (gSave_file || PDKeyDown(KEY_SHIFT_ANY)) {
-        return;
-    }
-    if ((the_time / 400) % 2) {
-        DRMaskedStamp(gCurrent_graf_data->action_replay_R_x,
-            gCurrent_graf_data->action_replay_R_y,
-            gReplay_pixies[0]);
-    }
-    DRMaskedStamp(gCurrent_graf_data->action_replay_controls_x,
-        gCurrent_graf_data->action_replay_controls_y,
-        gReplay_pixies[1]);
-    if (pSpecial_zappy_bastard < 0) {
-        DRMaskedStamp(gCurrent_graf_data->action_replay_rew_start_x,
-            gCurrent_graf_data->action_replay_hilite_y,
-            gReplay_pixies[2]);
-    } else if (pSpecial_zappy_bastard == 0) {
-        if (gReplay_rate < -1.f) {
-            DRMaskedStamp(gCurrent_graf_data->action_replay_rew_x,
-                gCurrent_graf_data->action_replay_hilite_y,
-                gReplay_pixies[3]);
-        } else if (gReplay_rate > 1.f) {
-            DRMaskedStamp(gCurrent_graf_data->action_replay_ffwd_x,
-                gCurrent_graf_data->action_replay_hilite_y,
-                gReplay_pixies[7]);
-        } else if (gReplay_rate == 1.f) {
-            DRMaskedStamp(gCurrent_graf_data->action_replay_play_x,
-                gCurrent_graf_data->action_replay_hilite_y,
-                gReplay_pixies[6]);
-        } else if (gReplay_rate == -1.f) {
-            DRMaskedStamp(gCurrent_graf_data->action_replay_rev_play_x,
-                gCurrent_graf_data->action_replay_hilite_y,
-                gReplay_pixies[4]);
-        } else {
-            DRMaskedStamp(gCurrent_graf_data->action_replay_pause_x,
-                gCurrent_graf_data->action_replay_hilite_y,
-                gReplay_pixies[5]);
-        }
-    } else {
-        DRMaskedStamp(gCurrent_graf_data->action_replay_fwd_end_x,
-            gCurrent_graf_data->action_replay_hilite_y,
-            gReplay_pixies[8]);
-    }
+    if (!gSave_file && !PDKeyDown(KEY_SHIFT_ANY)) {
 
-    x = gProgress_line_left[gGraf_data_index] + (float)(gProgress_line_right[gGraf_data_index] - gProgress_line_left[gGraf_data_index]) * (gLast_replay_frame_time - gAction_replay_start_time) / (gAction_replay_end_time - gAction_replay_start_time);
-    if (x > gProgress_line_left[gGraf_data_index]) {
+        if ((the_time / 400) % 2) {
+            DRMaskedStamp(gCurrent_graf_data->action_replay_R_x,
+                gCurrent_graf_data->action_replay_R_y,
+                gReplay_pixies[0]);
+        }
+        DRMaskedStamp(gCurrent_graf_data->action_replay_controls_x,
+            gCurrent_graf_data->action_replay_controls_y,
+            gReplay_pixies[1]);
+        if (pSpecial_zappy_bastard < 0) {
+            DRMaskedStamp(gCurrent_graf_data->action_replay_rew_start_x,
+                gCurrent_graf_data->action_replay_hilite_y,
+                gReplay_pixies[2]);
+        } else if (pSpecial_zappy_bastard > 0) {
+            DRMaskedStamp(gCurrent_graf_data->action_replay_fwd_end_x,
+                gCurrent_graf_data->action_replay_hilite_y,
+                gReplay_pixies[8]);
+        } else {
+            if (gReplay_rate < -1.f) {
+                DRMaskedStamp(gCurrent_graf_data->action_replay_rew_x,
+                    gCurrent_graf_data->action_replay_hilite_y,
+                    gReplay_pixies[3]);
+            } else if (gReplay_rate > 1.f) {
+                DRMaskedStamp(gCurrent_graf_data->action_replay_ffwd_x,
+                    gCurrent_graf_data->action_replay_hilite_y,
+                    gReplay_pixies[7]);
+            } else if (gReplay_rate == 1.f) {
+                DRMaskedStamp(gCurrent_graf_data->action_replay_play_x,
+                    gCurrent_graf_data->action_replay_hilite_y,
+                    gReplay_pixies[6]);
+            } else if (gReplay_rate == -1.f) {
+                DRMaskedStamp(gCurrent_graf_data->action_replay_rev_play_x,
+                    gCurrent_graf_data->action_replay_hilite_y,
+                    gReplay_pixies[4]);
+            } else {
+                DRMaskedStamp(gCurrent_graf_data->action_replay_pause_x,
+                    gCurrent_graf_data->action_replay_hilite_y,
+                    gReplay_pixies[5]);
+            }
+        }
+
+        x = (int)((gLast_replay_frame_time - gAction_replay_start_time)
+                / (double)(gAction_replay_end_time - gAction_replay_start_time)
+                * (gProgress_line_right[gGraf_data_index] - gProgress_line_left[gGraf_data_index]))
+            + gProgress_line_left[gGraf_data_index];
+
+        if (x > gProgress_line_left[gGraf_data_index]) {
+            BrPixelmapLine(gBack_screen,
+                gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index],
+                x - 1, gProgress_line_top[gGraf_data_index],
+                2);
+            BrPixelmapLine(gBack_screen,
+                gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 1,
+                x - 1, gProgress_line_top[gGraf_data_index] + 1,
+                4);
+            BrPixelmapLine(gBack_screen,
+                gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 2,
+                x - 1, gProgress_line_top[gGraf_data_index] + 2,
+                2);
+        }
+        if (x < gProgress_line_right[gGraf_data_index]) {
+            BrPixelmapLine(gBack_screen,
+                x, gProgress_line_top[gGraf_data_index],
+                gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index],
+                81);
+            BrPixelmapLine(gBack_screen,
+                x, gProgress_line_top[gGraf_data_index] + 1,
+                gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 1,
+                82);
+            BrPixelmapLine(gBack_screen,
+                x, gProgress_line_top[gGraf_data_index] + 2,
+                gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 2,
+                81);
+        }
         BrPixelmapLine(gBack_screen,
-            gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index],
-            x - 1, gProgress_line_top[gGraf_data_index],
+            gProgress_line_left[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index],
+            gProgress_line_left[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 2,
             2);
         BrPixelmapLine(gBack_screen,
-            gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 1,
-            x - 1, gProgress_line_top[gGraf_data_index] + 1,
-            4);
-        BrPixelmapLine(gBack_screen,
-            gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 2,
-            x - 1, gProgress_line_top[gGraf_data_index] + 2,
-            2);
-    }
-    if (x < gProgress_line_right[gGraf_data_index]) {
-        BrPixelmapLine(gBack_screen,
-            x, gProgress_line_top[gGraf_data_index],
-            gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index],
+            gProgress_line_right[gGraf_data_index], gProgress_line_top[gGraf_data_index],
+            gProgress_line_right[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 2,
             81);
-        BrPixelmapLine(gBack_screen,
-            x, gProgress_line_top[gGraf_data_index] + 1,
-            gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 1,
-            82);
-        BrPixelmapLine(gBack_screen,
-            x, gProgress_line_top[gGraf_data_index] + 2,
-            gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 2,
-            81);
+        if (gCam_change_button_down) {
+            DRMaskedStamp(gCurrent_graf_data->action_replay_camera_x,
+                gCurrent_graf_data->action_replay_hilite_y,
+                gReplay_pixies[9]);
+        }
+        if (the_time - gCam_change_time < 2000) {
+            TransDRPixelmapText(gBack_screen,
+                gCurrent_graf_data->action_replay_cam_text_x - DRTextWidth(&gFonts[kFont_ORANGHED], GetMiscString(kMiscString_StandardCamera + gAction_replay_camera_mode)),
+                gCurrent_graf_data->action_replay_cam_text_y,
+                &gFonts[kFont_ORANGHED],
+                GetMiscString(kMiscString_StandardCamera + gAction_replay_camera_mode),
+                2 * gCurrent_graf_data->action_replay_cam_text_x);
+        }
+        TurnOnPaletteConversion();
+        DoMouseCursor();
+        TurnOffPaletteConversion();
     }
-    BrPixelmapLine(gBack_screen,
-        gProgress_line_left[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index],
-        gProgress_line_left[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 2,
-        2);
-    BrPixelmapLine(gBack_screen,
-        gProgress_line_right[gGraf_data_index], gProgress_line_top[gGraf_data_index],
-        gProgress_line_right[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 2,
-        81);
-    if (gCam_change_button_down) {
-        DRMaskedStamp(gCurrent_graf_data->action_replay_camera_x,
-            gCurrent_graf_data->action_replay_hilite_y,
-            gReplay_pixies[9]);
-    }
-    if (the_time - gCam_change_time < 2000) {
-        TransDRPixelmapText(gBack_screen,
-            gCurrent_graf_data->action_replay_cam_text_x - DRTextWidth(&gFonts[kFont_ORANGHED], GetMiscString(gAction_replay_camera_mode ? kMiscString_PanningCamera : kMiscString_StandardCamera)),
-            gCurrent_graf_data->action_replay_cam_text_y,
-            &gFonts[kFont_ORANGHED],
-            GetMiscString(gAction_replay_camera_mode ? kMiscString_PanningCamera : kMiscString_StandardCamera),
-            2 * gCurrent_graf_data->action_replay_cam_text_x);
-    }
-    TurnOnPaletteConversion();
-    DoMouseCursor();
-    TurnOffPaletteConversion();
 }
 
 // IDA: void __cdecl DoActionReplayPostSwap()
