@@ -85,7 +85,6 @@ function(add_compile_flags_if_supported TARGET)
     endforeach()
 endfunction()
 
-#test_big_endian(IS_BIGENDIAN)
 if(CMAKE_C_BYTE_ORDER STREQUAL "BIG_ENDIAN")
     set(WORDS_BIGENDIAN TRUE)
     add_definitions(-DBR_ENDIAN_BIG=1 -DBR_ENDIAN_LITTLE=0)
