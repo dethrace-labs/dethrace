@@ -286,23 +286,20 @@ void MoveReplayBuffer(tS32 pMove_amount) {
 
     old_play_ptr = NULL;
     gLast_replay_zappy_screen = 0;
-    old_play_ptr2 = GetPipePlayPtr();
-    play_ptr = old_play_ptr2;
+    play_ptr = GetPipePlayPtr();
+    old_play_ptr2 = play_ptr;
     old_time = GetTotalTime();
-    for (i = 0; i < abs(pMove_amount) && play_ptr != old_play_ptr; i++) {
-        if (KeyIsDown(KEYMAP_ESCAPE)) {
-            break;
-        }
+    for (i = 0; i < abs(pMove_amount) && play_ptr != old_play_ptr && !KeyIsDown(KEYMAP_ESCAPE); i++) {
         if (SomeReplayLeft()) {
             PipingFrameReset();
         }
         old_play_ptr = play_ptr;
-        if (pMove_amount >= 1) {
+        if (pMove_amount > 0) {
             while (!ApplyPipedSession(&play_ptr)) {
                 DoZappyActionReplayHeadups(pMove_amount);
             }
             SetPipePlayPtr(play_ptr);
-        } else if (pMove_amount <= -1) {
+        } else if (pMove_amount < 0) {
             while (!UndoPipedSession(&play_ptr)) {
                 DoZappyActionReplayHeadups(pMove_amount);
             }
