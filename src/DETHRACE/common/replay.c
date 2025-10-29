@@ -404,7 +404,7 @@ void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
 // IDA: int __cdecl FindUniqueFile()
 // FUNCTION: CARM95 0x0041b819
 int FindUniqueFile(void) {
-    int index;
+    int index = 0;
     FILE* f;
     tPath_name the_path;
 
