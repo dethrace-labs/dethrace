@@ -351,48 +351,48 @@ void MoveToStartOfReplay(void) {
 // FUNCTION: CARM95 0x0041b661
 void ToggleReplay(void) {
 
-    if (!IsActionReplayAvailable()) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_ACTION_REPLAY_UNAVAILABLE));
-        return;
-    }
-    if (!gAction_replay_mode) {
-        if (gMap_mode) {
-            ToggleMap();
+    if (IsActionReplayAvailable()) {
+        if (!gAction_replay_mode) {
+            if (gMap_mode) {
+                ToggleMap();
+            }
+            if (gNet_mode == eNet_mode_host) {
+                SendGameplayToAllPlayers(eNet_gameplay_host_paused, 0, 0, 0, 0);
+            }
+            gReplay_rate = 1.f;
+            gPaused = 1;
+            gStopped_time = PDGetTotalTime();
+            gPlay_direction = 1;
+            gAction_replay_end_time = GetTotalTime();
+            gLast_replay_frame_time = gAction_replay_end_time;
+            gAction_replay_start_time = GetARStartTime();
+            ResetPipePlayToEnd();
+            LoadInterfaceStuff(1);
+            StartMouseCursor();
+            gKey_down = KEY_KP_ENTER;
+            gPending_replay_rate = 0;
+            gCam_change_time = PDGetTotalTime();
+            if (!gRace_finished) {
+                SaveCameraPosition(0);
+            }
+        } else {
+            MoveToEndOfReplay();
+            EndMouseCursor();
+            S3RegisterSampleFilters(NULL, NULL);
+            UnlockInterfaceStuff();
+            AddLostTime(PDGetTotalTime() - gStopped_time);
+            if (!gRace_finished) {
+                RestoreCameraPosition(0);
+            }
+            if (gNet_mode == eNet_mode_host) {
+                SendGameplayToAllPlayers(eNet_gameplay_host_unpaused, 0, 0, 0, 0);
+            }
         }
-        if (gNet_mode == eNet_mode_host) {
-            SendGameplayToAllPlayers(eNet_gameplay_host_paused, 0, 0, 0, 0);
-        }
-        gReplay_rate = 1.f;
-        gPaused = 1;
-        gStopped_time = PDGetTotalTime();
-        gPlay_direction = 1;
-        gAction_replay_end_time = GetTotalTime();
-        gLast_replay_frame_time = gAction_replay_end_time;
-        gAction_replay_start_time = GetARStartTime();
-        ResetPipePlayToEnd();
-        LoadInterfaceStuff(1);
-        StartMouseCursor();
-        gKey_down = KEY_KP_ENTER;
-        gPending_replay_rate = 0;
-        gCam_change_time = PDGetTotalTime();
-        if (!gRace_finished) {
-            SaveCameraPosition(0);
-        }
+        gAction_replay_mode = !gAction_replay_mode;
+        ForceRebuildActiveCarList();
     } else {
-        MoveToEndOfReplay();
-        EndMouseCursor();
-        S3SetEffects(NULL, NULL);
-        UnlockInterfaceStuff();
-        AddLostTime(PDGetTotalTime() - gStopped_time);
-        if (!gRace_finished) {
-            RestoreCameraPosition(0);
-        }
-        if (gNet_mode == eNet_mode_host) {
-            SendGameplayToAllPlayers(eNet_gameplay_host_unpaused, 0, 0, 0, 0);
-        }
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_ACTION_REPLAY_UNAVAILABLE));
     }
-    gAction_replay_mode = !gAction_replay_mode;
-    ForceRebuildActiveCarList();
 }
 
 // IDA: void __usercall ReverseSound(tS3_effect_tag pEffect_index@<EAX>, tS3_sound_tag pSound_tag@<EDX>)
@@ -602,9 +602,9 @@ void PollActionReplayControls(tU32 pFrame_period) {
     last_real_time = fabs(gReplay_rate) >= 1.2f ? real_time : 0;
 
     if (old_replay_rate <= 0.f && gReplay_rate > 0.f) {
-        S3SetEffects(NULL, NULL);
+        S3RegisterSampleFilters(NULL, NULL);
     } else if (old_replay_rate >= 0.f && gReplay_rate < 0.f) {
-        S3SetEffects(ReverseSound, ReverseSound);
+        S3RegisterSampleFilters(ReverseSound, ReverseSound);
     }
 }
 
