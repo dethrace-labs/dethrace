@@ -606,7 +606,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
     if (old_replay_rate != 0.f) {
         gFrame_period = gFrame_period * (gReplay_rate / old_replay_rate);
     }
-    // last_real_time = fabs(gReplay_rate) < 1.2 ? 0 : real_time;
+
     if (fabs(gReplay_rate) < 1.2) {
         last_real_time = 0;
     } else {
@@ -623,7 +623,6 @@ void PollActionReplayControls(tU32 pFrame_period) {
 // IDA: void __cdecl CheckReplayTurnOn()
 // FUNCTION: CARM95 0x0041c03b
 void CheckReplayTurnOn(void) {
-
     if (!gAction_replay_mode) {
         if (KeyIsDown(KEYMAP_REPLAYMODE) && !gEntering_message) {
             if (gKey_down == -1) {
@@ -663,10 +662,7 @@ void SynchronizeActionReplay(void) {
     // GLOBAL: CARM95 0x50a328
     static tU32 gLast_synch_time;
 
-    while (gReplay_rate != 0.f) {
-        if (PDGetTotalTime() - gLast_synch_time >= gFrame_period / fabs(gReplay_rate)) {
-            break;
-        }
+    while (gReplay_rate != 0.f && PDGetTotalTime() - gLast_synch_time < gFrame_period / fabs(gReplay_rate)) {
         ServiceGameInRace();
     }
     gLast_synch_time = PDGetTotalTime();
@@ -678,12 +674,11 @@ void SynchronizeActionReplay(void) {
     if (gSave_file) {
         PathCat(the_path, gApplication_path, "BMPFILES");
         strcat(the_path, gDir_separator);
-        sprintf(&the_path[strlen(the_path)], "%03d_%04d.BMP", gSave_bunch_ID, gSave_frame_number);
+        sprintf(&the_path[strlen(the_path)], "%03d_%04d.BMP", gSave_bunch_ID, gSave_frame_number++);
         f = DRfopen(the_path, "wb");
         if (f != NULL) {
             PrintScreenFile(f);
             fclose(f);
         }
-        gSave_frame_number++;
     }
 }
