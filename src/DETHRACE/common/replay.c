@@ -625,10 +625,12 @@ void PollActionReplayControls(tU32 pFrame_period) {
 void CheckReplayTurnOn(void) {
 
     if (!gAction_replay_mode) {
-        if (!KeyIsDown(KEYMAP_REPLAYMODE) || gEntering_message) {
+        if (KeyIsDown(KEYMAP_REPLAYMODE) && !gEntering_message) {
+            if (gKey_down == -1) {
+                ToggleReplay();
+            }
+        } else {
             gKey_down = -1;
-        } else if (gKey_down == -1) {
-            ToggleReplay();
         }
     }
 }
