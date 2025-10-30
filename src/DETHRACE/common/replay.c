@@ -431,8 +431,11 @@ void PollActionReplayControls(tU32 pFrame_period) {
     int y_coord;
     int i;
     tU32 real_time;
+
     // GLOBAL: CARM95 0x50a200
     static tU32 last_real_time = 0;
+
+    // GLOBAL: CARM95 0x0050A208
     static int psuedo_mouse_keys[8] = {
         KEY_KP_7,
         KEY_KP_4,
@@ -443,7 +446,9 @@ void PollActionReplayControls(tU32 pFrame_period) {
         KEY_KP_9,
         KEY_KP_MULTIPLY,
     };
+
     /* clang-format off */
+    // GLOBAL: CARM95 0x0050A228
     static tRectangle mouse_areas[2][8] = {
         {
             {  63, 182,  92, 198, },
@@ -472,23 +477,26 @@ void PollActionReplayControls(tU32 pFrame_period) {
     old_replay_rate = gReplay_rate;
     old_key_down = gKey_down == KEY_CAPSLOCK ? -1 : gKey_down;
     gKey_down = PDAnyKeyDown();
-    if (KeyIsDown(KEYMAP_REPLAYMODE) && old_key_down == -1) {
+    if (old_key_down == -1 && KeyIsDown(KEYMAP_REPLAYMODE)) {
         ToggleReplay();
         return;
     }
 
-    if (gKey_down == -1) {
+    if (gKey_down != -1) {
+        gMouse_in_use = 0;
+    } else {
         if ((old_key_down == -1 || old_key_down == KEY_KP_4 || old_key_down == KEY_KP_6 || old_key_down == KEY_KP_MULTIPLY) && EitherMouseButtonDown()) {
             GetMousePosition(&x_coord, &y_coord);
             for (i = 0; i < COUNT_OF(mouse_areas[0]); i++) {
-                if (mouse_areas[gGraf_data_index][i].left <= x_coord && mouse_areas[gGraf_data_index][i].top <= y_coord && mouse_areas[gGraf_data_index][i].right >= x_coord && mouse_areas[gGraf_data_index][i].bottom >= y_coord) {
+                if (mouse_areas[gGraf_data_index][i].left <= x_coord
+                    && mouse_areas[gGraf_data_index][i].top <= y_coord
+                    && mouse_areas[gGraf_data_index][i].right > x_coord
+                    && mouse_areas[gGraf_data_index][i].bottom > y_coord) {
                     gKey_down = psuedo_mouse_keys[i];
                     break;
                 }
             }
         }
-    } else {
-        gMouse_in_use = 0;
     }
 
     if (gKey_down == KEY_KP_DIVIDE && old_key_down != KEY_KP_DIVIDE) {
@@ -507,10 +515,8 @@ void PollActionReplayControls(tU32 pFrame_period) {
         gCam_change_button_down = 1;
         if (old_key_down != KEY_KP_MULTIPLY) {
             gCam_change_time = PDGetTotalTime();
-            if (gAction_replay_camera_mode == eAction_replay_action) {
+            if (gAction_replay_camera_mode++ == eAction_replay_action) {
                 gAction_replay_camera_mode = eAction_replay_standard;
-            } else {
-                gAction_replay_camera_mode++;
             }
         }
     } else {
@@ -535,21 +541,21 @@ void PollActionReplayControls(tU32 pFrame_period) {
         gPlay_direction = 1;
         gSingle_frame_mode = 1;
     } else if (gKey_down == KEY_KP_4 || gKey_down == KEY_PAGEUP) {
-        if (gReplay_rate > -1.2f) {
+        if (gReplay_rate > -1.2) {
             gReplay_rate = -1.2f;
         }
         if (last_real_time != 0) {
-            gReplay_rate -= 0.002f * (real_time - last_real_time);
+            gReplay_rate -= 0.002 * (real_time - last_real_time);
         }
         if (gReplay_rate < -8.f) {
             gReplay_rate = -8.f;
         }
     } else if (gKey_down == KEY_KP_6 || gKey_down == KEY_PAGEDOWN) {
-        if (gReplay_rate < 1.2f) {
+        if (gReplay_rate < 1.2) {
             gReplay_rate = 1.2f;
         }
         if (last_real_time != 0) {
-            gReplay_rate += 0.002f * (real_time - last_real_time);
+            gReplay_rate += 0.002 * (real_time - last_real_time);
         }
         if (gReplay_rate > 8.f) {
             gReplay_rate = 8.f;
@@ -588,18 +594,24 @@ void PollActionReplayControls(tU32 pFrame_period) {
 
     if (gPending_replay_rate != 0.f) {
         gReplay_rate = gPending_replay_rate;
+        gPending_replay_rate = 0;
     }
-    if (old_replay_rate * gReplay_rate >= 0.f) {
-        gPending_replay_rate = 0.f;
-    } else {
+    if (old_replay_rate * gReplay_rate < 0.f) {
         gPending_replay_rate = gReplay_rate;
         gReplay_rate = 0.f;
+    } else {
+        gPending_replay_rate = 0.f;
     }
 
     if (old_replay_rate != 0.f) {
-        gFrame_period = gFrame_period * gReplay_rate / old_replay_rate;
+        gFrame_period = gFrame_period * (gReplay_rate / old_replay_rate);
     }
-    last_real_time = fabs(gReplay_rate) >= 1.2f ? real_time : 0;
+    // last_real_time = fabs(gReplay_rate) < 1.2 ? 0 : real_time;
+    if (fabs(gReplay_rate) < 1.2) {
+        last_real_time = 0;
+    } else {
+        last_real_time = real_time;
+    }
 
     if (old_replay_rate <= 0.f && gReplay_rate > 0.f) {
         S3RegisterSampleFilters(NULL, NULL);
