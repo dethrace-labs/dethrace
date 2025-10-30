@@ -8,9 +8,6 @@ extern int harness_debug_level;
 
 void debug_printf(const char* fmt, const char* fn, const char* fmt2, ...);
 void panic_printf(const char* fmt, const char* fn, const char* fmt2, ...);
-void debug_print_vector3(const char* fmt, const char* fn, char* msg, br_vector3* v);
-void debug_print_matrix34(const char* fmt, const char* fn, char* name, br_matrix34* m);
-void debug_print_matrix4(const char* fmt, const char* fn, char* name, br_matrix4* m);
 
 #define BLUE
 
