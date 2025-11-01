@@ -37,7 +37,7 @@ Cutscenes = 0
 ; "hires" mode is 640x480, otherwise default 320x200
 Hires = 1
 
-; Only used in 'demo' mode. Default demo time out is 240s (5 mins)
+; Only used in 'demo' mode. Default demo time out is 240s (4 mins)
 DemoTimeout = 240
 
 ; Which directory in the [Games] section to run

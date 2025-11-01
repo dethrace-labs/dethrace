@@ -110,6 +110,10 @@ if(DETHRACE_PLATFORM_SDL2)
     else()
         target_link_libraries(harness PRIVATE SDL2::SDL2)
     endif()
+
+    if(CMAKE_C_COMPILER_ID MATCHES "TinyCC")
+        set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/platforms/sdl2.c" APPEND PROPERTY COMPILE_DEFINITIONS "SDL_DISABLE_IMMINTRIN_H")
+    endif()
 endif()
 
 if(DETHRACE_PLATFORM_SDL3)
