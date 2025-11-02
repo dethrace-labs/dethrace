@@ -704,7 +704,6 @@ void DRLoadPixelmaps(char* pPath_name) {
     br_pixelmap* pixelmap_array[100];
     int number_of_pixelmaps;
 
-    int i;
     PossibleService();
     number_of_pixelmaps = DRPixelmapLoadMany(pPath_name, pixelmap_array, COUNT_OF(pixelmap_array));
 
