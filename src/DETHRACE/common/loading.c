@@ -352,11 +352,7 @@ tU16 MemReadU16(char** pPtr) {
 // IDA: tU8 __usercall MemReadU8@<AL>(char **pPtr@<EAX>)
 // FUNCTION: CARM95 0x0041c50e
 tU8 MemReadU8(char** pPtr) {
-    tU8 raw_byte;
-
-    memcpy(&raw_byte, *pPtr, sizeof(raw_byte));
-    *pPtr += sizeof(raw_byte);
-    return raw_byte;
+    return *(*pPtr)++;
 }
 
 // IDA: tS32 __usercall MemReadS32@<EAX>(char **pPtr@<EAX>)
@@ -389,9 +385,7 @@ tS16 MemReadS16(char** pPtr) {
 tS8 MemReadS8(char** pPtr) {
     tS8 raw_byte;
 
-    memcpy(&raw_byte, *pPtr, sizeof(raw_byte));
-    *pPtr += sizeof(raw_byte);
-    return raw_byte;
+    return *(*pPtr)++;
 }
 
 // IDA: void __usercall MemSkipBytes(char **pPtr@<EAX>, int pBytes_to_skip@<EDX>)
