@@ -617,18 +617,21 @@ br_pixelmap* LoadShadeTable(char* pName) {
 // FUNCTION: CARM95 0x0041d4c8
 br_material* LoadMaterial(char* pName) {
     tPath_name the_path;
+#ifdef DETHRACE_3DFX_PATCH
     br_material* result;
+#endif
 
     PossibleService();
     PathCat(the_path, gApplication_path, "MATERIAL");
     PathCat(the_path, the_path, pName);
-    result = BrMaterialLoad(the_path);
+    return BrMaterialLoad(the_path);
 #ifdef DETHRACE_3DFX_PATCH
+    result = BrMaterialLoad(the_path);
     if (result != NULL) {
         GlorifyMaterial(&result, 1);
     }
-#endif
     return result;
+#endif
 }
 
 // IDA: br_model* __usercall LoadModel@<EAX>(char *pName@<EAX>)
