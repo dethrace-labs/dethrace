@@ -690,9 +690,7 @@ void DRLoadShadeTable(char* pPath_name) {
 // IDA: void __usercall RezeroPixelmaps(br_pixelmap **pPixelmap_array@<EAX>, int pCount@<EDX>)
 // FUNCTION: CARM95 0x0041d7b6
 void RezeroPixelmaps(br_pixelmap** pPixelmap_array, int pCount) {
-
-    while (pCount != 0) {
-        pCount--;
+    while (--pCount >= 0) {
         pPixelmap_array[pCount]->origin_x = 0;
         pPixelmap_array[pCount]->origin_y = 0;
     }
