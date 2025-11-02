@@ -555,7 +555,7 @@ void FinishLoadingGeneral(void) {
 // FUNCTION: CARM95 0x0041d22d
 br_pixelmap* LoadPixelmap(char* pName) {
     tPath_name the_path;
-    br_pixelmap* pm = NULL;
+    br_pixelmap* pm;
     char* end;
 
     end = strrchr(pName, '.');
@@ -563,7 +563,7 @@ br_pixelmap* LoadPixelmap(char* pName) {
         end = &pName[strlen(pName)];
     }
 
-    if (end - pName == 4 && memcmp(pName, "none", end - pName) == 0) {
+    if (end - pName == 4 && memcmp(pName, "none", 4) == 0) {
         return NULL;
     }
 
@@ -573,6 +573,7 @@ br_pixelmap* LoadPixelmap(char* pName) {
     PathCat(the_path, the_path, pName);
     AllowOpenToFail();
     pm = DRPixelmapLoad(the_path);
+    DoNotAllowOpenToFail();
     if (pm == NULL) {
         PathCat(the_path, gApplication_path, "PIXELMAP");
         PathCat(the_path, the_path, pName);
@@ -3482,9 +3483,11 @@ void AllowOpenToFail(void) {
 }
 
 // IDA: void __cdecl DoNotAllowOpenToFail()
+// FUNCTION: CARM95 0x00426578
 void DoNotAllowOpenToFail(void) {
 
-    gAllow_open_to_fail = 0;
+    // this function has an empty body in retail executables
+    // gAllow_open_to_fail = 0;
 }
 
 // IDA: FILE* __usercall DRfopen@<EAX>(char *pFilename@<EAX>, char *pMode@<EDX>)
