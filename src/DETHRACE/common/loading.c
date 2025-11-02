@@ -594,6 +594,7 @@ br_uint_32 LoadPixelmaps(char* pFile_name, br_pixelmap** pPixelmaps, br_uint_16 
     PathCat(path, path, pFile_name);
     AllowOpenToFail();
     count = DRPixelmapLoadMany(path, pPixelmaps, pNum);
+    DoNotAllowOpenToFail();
     if (count == 0) {
         PathCat(path, gApplication_path, "PIXELMAP");
         PathCat(path, path, pFile_name);
