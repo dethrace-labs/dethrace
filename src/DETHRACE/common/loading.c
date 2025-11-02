@@ -801,6 +801,8 @@ void LoadInRegisteeDir(char* pThe_dir_path) {
 // IDA: void __cdecl LoadInRegistees()
 // FUNCTION: CARM95 0x0041d5df
 void LoadInRegistees(void) {
+    tPath_name the_path;
+
     LoadInRegisteeDir(gApplication_path);
 }
 
