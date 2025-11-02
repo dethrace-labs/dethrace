@@ -624,13 +624,15 @@ br_material* LoadMaterial(char* pName) {
     PossibleService();
     PathCat(the_path, gApplication_path, "MATERIAL");
     PathCat(the_path, the_path, pName);
-    return BrMaterialLoad(the_path);
+
 #ifdef DETHRACE_3DFX_PATCH
     result = BrMaterialLoad(the_path);
     if (result != NULL) {
         GlorifyMaterial(&result, 1);
     }
     return result;
+#else
+    return BrMaterialLoad(the_path);
 #endif
 }
 
@@ -638,16 +640,20 @@ br_material* LoadMaterial(char* pName) {
 // FUNCTION: CARM95 0x0041d525
 br_model* LoadModel(char* pName) {
     tPath_name the_path;
+#ifdef DETHRACE_3DFX_PATCH
     br_model* model;
+#endif
 
     PossibleService();
     PathCat(the_path, gApplication_path, "MODELS");
     PathCat(the_path, the_path, pName);
-    model = BrModelLoad(the_path);
 #ifdef DETHRACE_3DFX_PATCH
+    model = BrModelLoad(the_path);
     WhitenVertexRGB(&model, 1);
-#endif
     return model;
+#else
+    return BrModelLoad(the_path);
+#endif
 }
 
 // IDA: br_actor* __usercall LoadActor@<EAX>(char *pName@<EAX>)
