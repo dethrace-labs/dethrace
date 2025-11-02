@@ -883,8 +883,12 @@ void UnlockInterfaceStuff(void) {
 // IDA: void __cdecl InitInterfaceLoadState()
 // FUNCTION: CARM95 0x0041dcc7
 void InitInterfaceLoadState(void) {
+    int i;
 
-    memset(gCursors, 0, sizeof(gCursors));
+    // original code uses 4, not BR_ASIZE(gCursors). Bug?
+    for (i = 0; i < 4; i++) {
+        gCursors[i] = NULL;
+    }
 }
 
 // IDA: tS8* __usercall ConvertPixTo16BitStripMap@<EAX>(br_pixelmap *pBr_map@<EAX>)
