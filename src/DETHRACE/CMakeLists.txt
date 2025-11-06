@@ -199,6 +199,7 @@ if(MSVC_42_FOR_RECCMP)
     set_source_files_properties(common/structur.c PROPERTIES COMPILE_FLAGS "/FAs")
     set_source_files_properties(common/racesumm.c PROPERTIES COMPILE_FLAGS "/FAs")
     set_source_files_properties(common/replay.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/loading.c PROPERTIES COMPILE_FLAGS "/FAs")
 
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()

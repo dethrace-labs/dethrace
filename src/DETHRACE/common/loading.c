@@ -964,7 +964,6 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
     return (tS8*)strip_image;
 }
 
-// IDA: tS8* __usercall ConvertPixToStripMap@<EAX>(br_pixelmap *pThe_br_map@<EAX>)
 // Jeff: This appears to be used only for dashboard views, either to save memory storage or pixel copies.
 // See also: `CopyStripImage`
 // It is a simple RLE algorithm, but only targets runs of blank pixels.
@@ -974,6 +973,7 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
 //    chunk_count (1 byte)
 //    for each chunk:
 //      chunk_length (1 signed byte). If positive, skip this number of blank pixels. If negative, copy the following `length` bytes
+// IDA: tS8* __usercall ConvertPixToStripMap@<EAX>(br_pixelmap *pThe_br_map@<EAX>)
 // FUNCTION: CARM95 0x0041dd01
 tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     int i;
@@ -989,63 +989,93 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     tU8* temp_strip_image;
     tU8 new_line[800];
     tU8 the_byte;
-    int total;
 
-    temp_strip_image = BrMemAllocate(pThe_br_map->row_bytes * pThe_br_map->height, kMem_strip_image);
+    the_strip_image = BrMemAllocate(pThe_br_map->row_bytes * pThe_br_map->height, kMem_strip_image);
+    current_strip_pointer = the_strip_image;
     current_size = 2;
-
-    *(tU16*)temp_strip_image = pThe_br_map->height;
-    current_strip_pointer = temp_strip_image;
+    *(tU16*)current_strip_pointer = pThe_br_map->height;
+    current_strip_pointer += 2;
 
     for (i = 0; i < pThe_br_map->height; i++) {
         next_byte = (tU8*)pThe_br_map->pixels + i * pThe_br_map->row_bytes; // points to start of this line
-        new_line_length = 2;                                                // leave space at the start of the line to store number of chunks and first chunk length
-        j = 0;
-        counter = 0;
-        total = 0;
+
+        new_line_length = 2;
         counting_blanks = *next_byte == 0;
+        counter = 0;
         chunk_counter = 0;
-        the_byte = 0; // Added to keep compiler happy
-        while (1) {
-            while (counter <= 126) {
-                if (j == pThe_br_map->width) {
-                    break;
-                }
+        j = 0;
+
+        // do {
+        //     if (counter <= 126 && j != pThe_br_map->width) {
+        //         the_byte = *next_byte;
+        //         if ((the_byte == 0) != counting_blanks) {
+        //             goto linex;
+        //         }
+        //     }
+        //     if (counting_blanks) {
+        //         new_line[new_line_length - 1] = counter;
+        //     } else {
+        //         new_line[new_line_length - counter - 1] = ~counter + 1;
+        //     }
+
+        //     counting_blanks = the_byte == 0;
+        //     counter = 0;
+        //     chunk_counter++;
+        //     if (j == pThe_br_map->width) {
+        //         break;
+        //     } else {
+        //         new_line_length++;
+        //     }
+        //     continue;
+        // linex:
+        //     if (!counting_blanks) {
+        //         new_line[new_line_length++] = the_byte;
+        //     }
+        //     next_byte++;
+        //     counter++;
+        //     j++;
+        // } while (1);
+
+        do {
+            if (counter <= 126 && j != pThe_br_map->width) {
                 the_byte = *next_byte;
-                if ((the_byte == 0 && !counting_blanks) || (the_byte != 0 && counting_blanks)) {
-                    break;
+                if ((the_byte == 0) != counting_blanks) {
+                    goto linex;
                 }
-                if (!counting_blanks) {
-                    new_line[new_line_length] = the_byte;
-                    new_line_length++;
-                }
-                counter++;
-                j++;
-                next_byte++;
             }
             if (counting_blanks) {
                 new_line[new_line_length - 1] = counter;
             } else {
-                new_line[new_line_length - counter - 1] = -counter;
+                new_line[new_line_length - counter - 1] = ~counter + 1;
             }
+
             counting_blanks = the_byte == 0;
-            chunk_counter++;
-            total += counter;
             counter = 0;
+            chunk_counter++;
             if (j == pThe_br_map->width) {
                 break;
+            } else {
+                new_line_length++;
             }
-            new_line_length++;
-        }
+            continue;
+        linex:
+            if (!counting_blanks) {
+                new_line[new_line_length++] = the_byte;
+            }
+            next_byte++;
+            counter++;
+            j++;
+        } while (1);
+
         new_line[0] = chunk_counter;
-        current_strip_pointer = &temp_strip_image[current_size];
+        current_strip_pointer = &the_strip_image[current_size];
         memcpy(current_strip_pointer, new_line, new_line_length);
         current_size += new_line_length;
     }
-    the_strip_image = BrMemAllocate(current_size, kMem_strip_image_perm);
-    memcpy(the_strip_image, temp_strip_image, current_size);
-    BrMemFree(temp_strip_image);
-    return (tS8*)the_strip_image;
+    temp_strip_image = BrMemAllocate(current_size, kMem_strip_image_perm);
+    memcpy(temp_strip_image, the_strip_image, current_size);
+    BrMemFree(the_strip_image);
+    return (tS8*)temp_strip_image;
 }
 
 // IDA: void __usercall KillWindscreen(br_model *pModel@<EAX>, br_material *pMaterial@<EDX>)
