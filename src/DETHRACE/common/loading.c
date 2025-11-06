@@ -1005,37 +1005,6 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
         chunk_counter = 0;
         j = 0;
 
-        // do {
-        //     if (counter <= 126 && j != pThe_br_map->width) {
-        //         the_byte = *next_byte;
-        //         if ((the_byte == 0) != counting_blanks) {
-        //             goto linex;
-        //         }
-        //     }
-        //     if (counting_blanks) {
-        //         new_line[new_line_length - 1] = counter;
-        //     } else {
-        //         new_line[new_line_length - counter - 1] = ~counter + 1;
-        //     }
-
-        //     counting_blanks = the_byte == 0;
-        //     counter = 0;
-        //     chunk_counter++;
-        //     if (j == pThe_br_map->width) {
-        //         break;
-        //     } else {
-        //         new_line_length++;
-        //     }
-        //     continue;
-        // linex:
-        //     if (!counting_blanks) {
-        //         new_line[new_line_length++] = the_byte;
-        //     }
-        //     next_byte++;
-        //     counter++;
-        //     j++;
-        // } while (1);
-
         do {
             if (counter <= 126 && j != pThe_br_map->width) {
                 the_byte = *next_byte;
@@ -1084,16 +1053,15 @@ void KillWindscreen(br_model* pModel, br_material* pMaterial) {
     br_face* face;
     int i;
 
-    if (pModel == NULL || pModel->nfaces == 0) {
-        return;
-    }
-    for (i = 0; i < pModel->nfaces; i++) {
-        face = &pModel->faces[i];
-        if (face->material == pMaterial) {
-            face->material = NULL;
+    if (pModel != NULL && pModel->nfaces != 0) {
+
+        for (i = 0, face = pModel->faces; i < pModel->nfaces; i++, face++) {
+            if (face->material == pMaterial) {
+                face->material = NULL;
+            }
         }
+        BrModelUpdate(pModel, BR_MODU_ALL);
     }
-    BrModelUpdate(pModel, BR_MODU_ALL);
 }
 
 // IDA: void __usercall DropOffDyingPeds(tCar_spec *pCar@<EAX>)
