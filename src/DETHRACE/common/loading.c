@@ -1465,94 +1465,97 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
     br_scalar force;
 
     GetALineAndDontArgue(pF, s);
-    for (i = strlen(s) - 1; s[i] == ' '; --i) {
-        ;
+    i = strlen(s) - 1;
+    while (s[i] == ' ') {
+        i--;
     }
     version = s[i];
-    for (i = 0; i < 4; ++i) {
-        GetThreeFloats(pF, &c->wpos[i].v[0], &c->wpos[i].v[1], &c->wpos[i].v[2]);
+    for (i = 0; i < COUNT_OF(c->wpos); i++) {
+        ReadThreeFloats(pF, c->wpos[i].v[0], c->wpos[i].v[1], c->wpos[i].v[2]);
     }
     actor_offset = &c->car_model_actors[c->principal_car_actor].actor->t.t.translate.t;
-    GetThreeFloats(pF, &c->cmpos.v[0], &c->cmpos.v[1], &c->cmpos.v[2]);
+    ReadThreeFloats(pF, c->cmpos.v[0], c->cmpos.v[1], c->cmpos.v[2]);
     if (version < '3') {
         c->extra_point_num = 0;
         i = GetAnInt(pF);
     }
-    GetThreeFloats(pF, &c->bounds[1].min.v[0], &c->bounds[1].min.v[1], &c->bounds[1].min.v[2]);
-    GetThreeFloats(pF, &c->bounds[1].max.v[0], &c->bounds[1].max.v[1], &c->bounds[1].max.v[2]);
-    c->bounds[1].min.v[0] = c->bounds[1].min.v[0] + actor_offset->v[0];
-    c->bounds[1].min.v[1] = c->bounds[1].min.v[1] + actor_offset->v[1];
-    c->bounds[1].min.v[2] = c->bounds[1].min.v[2] + actor_offset->v[2];
-    c->bounds[1].max.v[0] = c->bounds[1].max.v[0] + actor_offset->v[0];
-    c->bounds[1].max.v[1] = c->bounds[1].max.v[1] + actor_offset->v[1];
-    c->bounds[1].max.v[2] = c->bounds[1].max.v[2] + actor_offset->v[2];
+    ReadThreeFloats(pF, c->bounds[1].min.v[0], c->bounds[1].min.v[1], c->bounds[1].min.v[2]);
+    ReadThreeFloats(pF, c->bounds[1].max.v[0], c->bounds[1].max.v[1], c->bounds[1].max.v[2]);
+    BrVector3Accumulate(&c->bounds[1].min, actor_offset);
+    BrVector3Accumulate(&c->bounds[1].max, actor_offset);
+
     if (version >= '3') {
         c->extra_point_num = GetAnInt(pF);
         if (c->extra_point_num > 6) {
             sprintf(s, "%d", c->index);
             FatalError(kFatalError_TooManyExtraPointsForCar_S, s);
         }
-        for (i = 0; c->extra_point_num > i; ++i) {
-            GetThreeFloats(pF, &c->extra_points[i].v[0], &c->extra_points[i].v[1], &c->extra_points[i].v[2]);
+        for (i = 0; i < c->extra_point_num; i++) {
+            ReadThreeFloats(pF, c->extra_points[i].v[0], c->extra_points[i].v[1], c->extra_points[i].v[2]);
             c->extra_points[i].v[0] = c->extra_points[i].v[0] + actor_offset->v[0];
             c->extra_points[i].v[1] = c->extra_points[i].v[1] + actor_offset->v[1];
             c->extra_points[i].v[2] = c->extra_points[i].v[2] + actor_offset->v[2];
         }
     }
     c->maxcurve = 1.0 / GetAFloat(pF);
-    GetPairOfFloats(pF, &c->susp_give[1], &c->susp_give[0]);
+    ReadPairOfFloats(pF, c->susp_give[1], c->susp_give[0]);
     c->ride_height = GetAFloat(pF);
     c->ride_height = c->bounds[1].min.v[1] + 0.01;
     c->damping = GetAFloat(pF);
     c->M = GetAFloat(pF);
     c->freduction = GetAFloat(pF);
-    if (version >= '4') {
-        GetThreeFloats(pF, &theta_front, &theta_back, &theta_comp);
-    } else {
-        GetPairOfFloats(pF, &theta_front, &theta_back);
+    if (version < '4') {
+        ReadPairOfFloats(pF, theta_front, theta_back);
         theta_comp = theta_back;
+    } else {
+        ReadThreeFloats(pF, theta_front, theta_back, theta_comp);
     }
-    GetThreeFloats(pF, &wid, &het, &len);
-    c->rolling_r_front = 0.050000001;
-    c->rolling_r_back = 0.050000001;
+    ReadThreeFloats(pF, wid, het, len);
+    c->rolling_r_front = 0.05;
+    c->rolling_r_back = 0.05;
     c->max_gear = 6;
     speed = 200.0;
     force = 4.0;
     c->friction_elipticity = 1.0;
     c->down_force_speed = 2000.0;
-    c->initial_brake = c->M * 12.0;
-    c->brake_increase = c->M * 12.0;
-    if (version >= '2' && version <= '4') {
-        c->friction_elipticity = GetAFloat(pF); // 2, 3, 4
+    c->initial_brake = c->M * 12.0f;
+    c->brake_increase = c->M * 12.0f;
+
+    switch (version) {
+    case '2':
+    case '3':
+    case '4':
+        c->friction_elipticity = GetAFloat(pF);
         c->down_force_speed = GetAFloat(pF);
-        c->initial_brake = GetAFloat(pF) * c->M * 12.0;
-        c->brake_increase = GetAFloat(pF) * c->M * 12.0;
-    }
-    if (version >= '1' && version <= '4') {
-        GetPairOfFloats(pF, &c->rolling_r_front, &c->rolling_r_back); // 1, 2, 3, 4
+        c->initial_brake = GetAFloat(pF) * c->M * 12.0f;
+        c->brake_increase = GetAFloat(pF) * c->M * 12.0f;
+    case '1':
+        ReadPairOfFloats(pF, c->rolling_r_front, c->rolling_r_back);
         c->max_gear = GetAnInt(pF);
         speed = GetAFloat(pF);
         force = GetAFloat(pF);
+        break;
     }
 
-    speed = speed * 4.0 / 9.0;
-    c->speed_revs_ratio = speed / (double)c->max_gear / 6000.0;
-    c->force_torque_ratio = (double)c->max_gear * c->M * force;
+    speed = speed * 4.0f / 9.0f;
+    c->speed_revs_ratio = speed / c->max_gear / 6000.0f;
+    c->force_torque_ratio = c->max_gear * c->M * force;
     c->mu[1] = tan(theta_front * 3.14 / 180.0) / 4.0;
     c->mu[0] = tan(theta_back * 3.14 / 180.0) / 4.0;
     c->mu[2] = tan(theta_comp * 3.14 / 180.0) / 4.0;
 
-    c->mu[0] *= sqrt((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]) * (c->M * 5.0));
-    c->mu[1] *= sqrt((c->wpos[0].v[2] - c->cmpos.v[2]) / (c->wpos[0].v[2] - c->wpos[2].v[2]) * (c->M * 5.0));
-    c->mu[2] *= sqrt((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]) * (c->M * 5.0));
+    c->mu[0] *= sqrt((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]) * (c->M * 5.0f));
+    c->mu[1] *= sqrt((c->wpos[0].v[2] - c->cmpos.v[2]) / (c->wpos[0].v[2] - c->wpos[2].v[2]) * (c->M * 5.0f));
+    c->mu[2] *= sqrt((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]) * (c->M * 5.0f));
 
-    for (i = 0; i < 4; ++i) {
+    for (i = 0; i < COUNT_OF(c->wpos); i++) {
         c->wpos[i].v[1] = c->ride_height;
     }
-    c->bounds[0].min = c->bounds[1].min;
-    c->bounds[0].max = c->bounds[1].max;
-    for (i = 0; c->extra_point_num > i; ++i) {
-        for (j = 0; j < 3; ++j) {
+    BrVector3Copy(&c->bounds[0].min, &c->bounds[1].min);
+    BrVector3Copy(&c->bounds[0].max, &c->bounds[1].max);
+
+    for (i = 0; i < c->extra_point_num; i++) {
+        for (j = 0; j < 3; j++) {
             if (c->extra_points[i].v[j] < c->bounds[0].min.v[j]) {
                 c->bounds[0].min.v[j] = c->extra_points[i].v[j];
             }
@@ -1561,47 +1564,38 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
             }
         }
     }
-    memcpy(&c->bounds[2], &c->bounds[0], sizeof(br_bounds));
-    c->I.v[2] = (het * het + wid * wid) * c->M / 12.0;
-    c->I.v[1] = (wid * wid + len * len) * c->M / 12.0;
-    c->I.v[0] = (het * het + len * len) * c->M / 12.0;
+    c->bounds[2] = c->bounds[0];
+    ts1 = het * het + wid * wid;
+    c->I.v[2] = ts1 * c->M / 12.0f;
+    ts1 = BR_SQR2(len, wid);
+    c->I.v[1] = ts1 * c->M / 12.0f;
+    ts1 = BR_SQR2(len, het);
+    c->I.v[0] = ts1 * c->M / 12.0f;
 
-    for (i = 0; i < 4; ++i) {
-        c->wpos[i].v[0] = c->wpos[i].v[0] * 6.9;
-        c->wpos[i].v[1] = c->wpos[i].v[1] * 6.9;
-        c->wpos[i].v[2] = c->wpos[i].v[2] * 6.9;
+    for (i = 0; i < COUNT_OF(c->wpos); i++) {
+        BrVector3Scale(&c->wpos[i], &c->wpos[i], WORLD_SCALE_D);
     }
-    c->cmpos.v[0] = c->cmpos.v[0] * 6.9000001;
-    c->cmpos.v[1] = c->cmpos.v[1] * 6.9000001;
-    c->cmpos.v[2] = c->cmpos.v[2] * 6.9000001;
-    c->I.v[0] = c->I.v[0] * 47.610001;
-    c->I.v[1] = c->I.v[1] * 47.610001;
-    c->I.v[2] = c->I.v[2] * 47.610001;
+    BrVector3Scale(&c->cmpos, &c->cmpos, WORLD_SCALE);
+    BrVector3Scale(&c->I, &c->I, 47.61f);
+    BrVector3Scale(&c->bounds[1].min, &c->bounds[1].min, WORLD_SCALE);
+    BrVector3Scale(&c->bounds[1].max, &c->bounds[1].max, WORLD_SCALE);
+    for (i = 0; c->extra_point_num > i; ++i) {
+        BrVector3Scale(&c->extra_points[i], &c->extra_points[i], WORLD_SCALE);
+    }
 
-    c->bounds[1].min.v[0] = c->bounds[1].min.v[0] * 6.9000001;
-    c->bounds[1].min.v[1] = c->bounds[1].min.v[1] * 6.9000001;
-    c->bounds[1].min.v[2] = c->bounds[1].min.v[2] * 6.9000001;
-    c->bounds[1].max.v[0] = c->bounds[1].max.v[0] * 6.9000001;
-    c->bounds[1].max.v[1] = c->bounds[1].max.v[1] * 6.9000001;
-    c->bounds[1].max.v[2] = c->bounds[1].max.v[2] * 6.9000001;
-    for (i = 0; c->extra_point_num > i; ++i) {
-        c->extra_points[i].v[0] = c->extra_points[i].v[0] * 6.9000001;
-        c->extra_points[i].v[1] = c->extra_points[i].v[1] * 6.9000001;
-        c->extra_points[i].v[2] = c->extra_points[i].v[2] * 6.9000001;
-    }
-    memcpy(c->max_bounds, c->bounds, sizeof(br_bounds));
-    memcpy(&c->max_bounds[1], &c->bounds[1], sizeof(br_bounds));
-    for (i = 0; c->extra_point_num > i; ++i) {
+    c->max_bounds[0] = c->bounds[0];
+    c->max_bounds[1] = c->bounds[1];
+    for (i = 0; i < c->extra_point_num; i++) {
         c->original_extra_points_z[i] = c->extra_points[i].v[2];
     }
-    c->maxcurve = c->maxcurve / 6.9;
-    c->ride_height = c->ride_height * 6.9;
+    c->maxcurve = c->maxcurve / WORLD_SCALE_D;
+    c->ride_height = c->ride_height * WORLD_SCALE_D;
 
     // JeffH this seems to do nothing since these fields are not yet initialized
-    for (i = 0; i < 2; ++i) {
-        c->susp_height[i] = c->susp_height[i] * 6.9;
-        c->sk[i] = c->sk[i] / 6.9;
-        c->sb[i] = c->sb[i] / sqrt(c->sb[i]);
+    for (i = 0; i < COUNT_OF(c->susp_height); i++) {
+        c->susp_height[i] *= WORLD_SCALE_D;
+        c->sk[i] /= WORLD_SCALE_D;
+        c->sb[i] /= sqrt(WORLD_SCALE_D);
     }
     GetAString(pF, s);
     SetCarSuspGiveAndHeight(c, 1.0, 1.0, 1.0, 0.0, 0.0);
