@@ -1793,20 +1793,19 @@ int RemoveDoubleSided(br_model* pModel) {
     if (pModel && pModel->nfaces) {
         num_double_sided_faces = 0;
 
-        for (i = 0; i < pModel->nfaces; i++) {
-            face = &pModel->faces[i];
+        for (i = 0, face = pModel->faces; i < pModel->nfaces; i++, face++) {
             if (face->material) {
                 if (face->material->user == DOUBLESIDED_USER_FLAG) {
                     num_double_sided_faces++;
                 }
             }
         }
-        if (num_double_sided_faces > 0) {
+        if (num_double_sided_faces != 0) {
             faces = BrResAllocate(pModel, sizeof(br_face) * (num_double_sided_faces + pModel->nfaces), kMem_misc);
             memcpy(faces, pModel->faces, sizeof(br_face) * pModel->nfaces);
             orig_nfaces = pModel->nfaces;
-            face = pModel->faces;
-            for (i = 0; i < orig_nfaces; i++) {
+
+            for (i = 0, face = pModel->faces; i < orig_nfaces; i++, face++) {
                 if (face->material && face->material->user == DOUBLESIDED_USER_FLAG) {
                     faces[pModel->nfaces].vertices[0] = face->vertices[1];
                     faces[pModel->nfaces].vertices[1] = face->vertices[0];
@@ -1815,7 +1814,6 @@ int RemoveDoubleSided(br_model* pModel) {
                     faces[pModel->nfaces].material = face->material;
                     pModel->nfaces++;
                 }
-                face++;
             }
             BrResFree(pModel->faces);
             pModel->faces = faces;
