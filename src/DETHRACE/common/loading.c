@@ -1703,11 +1703,10 @@ intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
             if (pModel_pool->model_array[i]->identifier
                 && !strcmp(pModel_pool->model_array[i]->identifier, pActor->model->identifier)) {
                 pActor->model = pModel_pool->model_array[i];
-                return 0;
+                break;
             }
         }
     }
-    // LOG_WARN("failed to link model %s", pActor->model->identifier);
     return 0;
 }
 
