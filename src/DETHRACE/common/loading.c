@@ -1647,24 +1647,19 @@ void GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_l
     strcpy(delim, "\t ,/");
     strcat(delim, "&");
 
-    for (i = 0; i < count; i++) {
-        the_clause = &pCar_spec->damage_programs[pImpact_location].clauses[i];
+    for (i = 0, the_clause = &pCar_spec->damage_programs[pImpact_location].clauses; i < count; i++, the_clause++) {
         the_clause->condition_count = 0;
         GetALineAndDontArgue(pF, s);
         str = strtok(s, delim);
         do {
-            switch (str[0]) {
-            case 'x':
+            if (str[0] == 'x') {
                 the_clause->conditions[the_clause->condition_count].axis_comp = 0;
-                break;
-            case 'y':
+            } else if (str[0] == 'y') {
                 the_clause->conditions[the_clause->condition_count].axis_comp = 1;
-                break;
-            case 'z':
+            } else if (str[0] == 'z') {
                 the_clause->conditions[the_clause->condition_count].axis_comp = 2;
+            } else {
                 break;
-            default:
-                goto LABEL_17;
             }
             if (str[1] == '>') {
                 the_clause->conditions[the_clause->condition_count].condition_operator = 1;
@@ -1695,7 +1690,6 @@ void GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_l
             str = strtok(NULL, "\t ,/");
             sscanf(str, "%f", &the_clause->effects[j].weakness_factor);
         }
-        ++the_clause;
     }
 }
 
