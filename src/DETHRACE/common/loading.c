@@ -1332,14 +1332,14 @@ void LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
         str = strtok(NULL, "\t ,/");
         strcpy(s, str);
         switch (s[0]) {
-        case 'c':
-            pCar_spec->headup_slots[pIndex][j].justification = 2;
-            break;
         case 'l':
-            pCar_spec->headup_slots[pIndex][j].justification = 0;
+            pCar_spec->headup_slots[pIndex][j].justification = eJust_left;
             break;
         case 'r':
-            pCar_spec->headup_slots[pIndex][j].justification = 1;
+            pCar_spec->headup_slots[pIndex][j].justification = eJust_right;
+            break;
+        case 'c':
+            pCar_spec->headup_slots[pIndex][j].justification = eJust_centre;
             break;
         }
         if (s[1] == 'c') {
@@ -1347,9 +1347,7 @@ void LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
         }
         str = strtok(NULL, "\t ,/");
         sscanf(str, "%d", &pCar_spec->headup_slots[pIndex][j].dim_left);
-        if (pCar_spec->headup_slots[pIndex][j].dim_left < 0) {
-            pCar_spec->headup_slots[pIndex][j].dimmed_background = 0;
-        } else {
+        if (pCar_spec->headup_slots[pIndex][j].dim_left >= 0) {
             pCar_spec->headup_slots[pIndex][j].dimmed_background = 1;
             str = strtok(NULL, "\t ,/");
             sscanf(str, "%d", &pCar_spec->headup_slots[pIndex][j].dim_top);
@@ -1357,6 +1355,8 @@ void LoadHeadups(FILE* pF, int pIndex, tCar_spec* pCar_spec) {
             sscanf(str, "%d", &pCar_spec->headup_slots[pIndex][j].dim_right);
             str = strtok(NULL, "\t ,/");
             sscanf(str, "%d", &pCar_spec->headup_slots[pIndex][j].dim_bottom);
+        } else {
+            pCar_spec->headup_slots[pIndex][j].dimmed_background = 0;
         }
     }
 }
