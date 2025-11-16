@@ -1823,14 +1823,12 @@ void MungeWindscreen(br_model* pModel) {
     int i;
 
     if (pModel && pModel->nfaces) {
-        face = pModel->faces;
-        for (i = 0; i < pModel->nfaces; i++) {
-            if (!face->material
+        for (i = 0, face = pModel->faces; i < pModel->nfaces; i++, face++) {
+            if (face->material == NULL
                 || (face->material->identifier
                     && gSource_screen_mat != NULL && !strcmp(face->material->identifier, gSource_screen_mat->identifier))) {
                 face->material = gDestn_screen_mat;
             }
-            face++;
         }
         BrModelUpdate(pModel, BR_MODU_ALL);
     }
