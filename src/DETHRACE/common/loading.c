@@ -1719,7 +1719,7 @@ void FreeUpBonnetModels(br_model** pModel_array, int pModel_count) {
     // TODO: this causes a use-after-free somewhere...
     for (i = 0; i < pModel_count; i++) {
         if (pModel_array[i]) {
-            if (strcmp("Ebonnet.DAT", pModel_array[i]->identifier) == 0 || strcmp("FIN.DAT", pModel_array[i]->identifier) == 0) {
+            if (strcmp(pModel_array[i]->identifier, "Ebonnet.DAT") == 0 || strcmp(pModel_array[i]->identifier, "FIN.DAT") == 0) {
                 BrModelRemove(pModel_array[i]);
                 BrModelFree(pModel_array[i]);
                 pModel_array[i] = NULL;
