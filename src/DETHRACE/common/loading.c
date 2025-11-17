@@ -1840,10 +1840,13 @@ void SetModelFlags(br_model* pModel, int pOwner) {
 
     if (pModel != NULL && pModel->nfaces != 0) {
 #if defined(DETHRACE_FIX_BUGS) /* Show Squad Car in the wreck gallery. */
-        if (gAusterity_mode) {
+        if (!gAusterity_mode) {
 #else
-        if (pOwner == OPPONENT_APC_IDX || gAusterity_mode) {
+        if (pOwner != OPPONENT_APC_IDX && !gAusterity_mode) {
 #endif
+            pModel->flags |= BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE;
+            BrModelUpdate(pModel, BR_MODU_ALL);
+        } else {
 #ifdef DETHRACE_3DFX_PATCH
             if (!gMaterial_fogging)
 #endif
@@ -1852,11 +1855,8 @@ void SetModelFlags(br_model* pModel, int pOwner) {
                     pModel->flags &= ~(BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE);
                     BrModelUpdate(pModel, BR_MODU_ALL);
                 }
-                return;
             }
         }
-        pModel->flags |= BR_MODF_DONT_WELD | BR_MODF_KEEP_ORIGINAL | BR_MODF_UPDATEABLE;
-        BrModelUpdate(pModel, BR_MODU_ALL);
     }
 }
 
