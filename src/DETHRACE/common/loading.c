@@ -1008,7 +1008,7 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
         do {
             if (counter <= 126 && j != pThe_br_map->width) {
                 the_byte = *next_byte;
-                if ((the_byte == 0) != counting_blanks) {
+                if ((the_byte == 0) == counting_blanks) {
                     goto linex;
                 }
             }
@@ -1647,7 +1647,7 @@ void GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_l
     strcpy(delim, "\t ,/");
     strcat(delim, "&");
 
-    for (i = 0, the_clause = &pCar_spec->damage_programs[pImpact_location].clauses; i < count; i++, the_clause++) {
+    for (i = 0, the_clause = pCar_spec->damage_programs[pImpact_location].clauses; i < count; i++, the_clause++) {
         the_clause->condition_count = 0;
         GetALineAndDontArgue(pF, s);
         str = strtok(s, delim);
@@ -1672,7 +1672,7 @@ void GetDamageProgram(FILE* pF, tCar_spec* pCar_spec, tImpact_location pImpact_l
             the_clause->condition_count++;
             str = strtok(NULL, delim);
         } while (the_clause->condition_count < 2);
-    LABEL_17:
+
         the_clause->effect_count = GetAnInt(pF);
         for (j = 0; j < the_clause->effect_count; j++) {
             the_clause->effects[j].type = -1;
@@ -2594,57 +2594,61 @@ void LoadRaces(tRace_list_spec* pRace_list, int* pCount, int pRace_type_index) {
     int j;
     int k;
     int number_of_racers;
-    int last_race = 0;
+    int last_race;
     char s[256];
     char* str;
 
     gCurrent_race_file_index = pRace_type_index + 1;
     f = OpenRaceFile();
-    number_of_racers = 0;
-    for (i = 0; !last_race; i++) {
-        GetALineAndDontArgue(f, s);
-        if (strcmp(s, "END") == 0) {
+    i = 0;
+
+    do {
+        GetALineAndDontArgue(f, pRace_list[i].name);
+        if (strcmp(pRace_list[i].name, "END") == 0) {
             last_race = 1;
         } else {
-            strcpy(pRace_list[i].name, s);
             SkipRestOfRace(f);
-            // s = (s + 48);
-            number_of_racers++;
+            i++;
+            last_race = 0;
         }
-    }
+    } while (!last_race);
 
-    *pCount = number_of_racers;
+    *pCount = i;
     fclose(f);
-    j = 0;
+
+#ifdef DETHRACE_FIX_BUGS
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         j = 99;
     }
-    for (i = 0; i < number_of_racers; i++) {
+#endif
+    for (i = 0; i < *pCount; i++) {
+#ifdef DETHRACE_FIX_BUGS
         if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
             pRace_list[i].suggested_rank = gDemo_rank;
             pRace_list[i].rank_required = j;
             j -= 3;
-        } else {
-            pRace_list[i].suggested_rank = 99 - j / (number_of_racers - 3);
+        } else
+#endif
+        {
+            pRace_list[i].suggested_rank = 99 - 100 * i / (*pCount - 3);
             if (i >= 3) {
                 pRace_list[i].rank_required = pRace_list[i - 2].suggested_rank;
             } else {
                 pRace_list[i].rank_required = 99;
             }
-            j += 100;
         }
     }
 
-    pRace_list[number_of_racers - 1].rank_required = 1;
-    if (pRace_list[number_of_racers - 2].rank_required == 1) {
+    pRace_list[*pCount - 1].rank_required = 1;
+    if (pRace_list[*pCount - 2].rank_required == 1) {
         --*pCount;
     }
 
-    for (i = 0; i < number_of_racers; i++) {
-        if (i < *pCount - 3) {
-            pRace_list[i].best_rank = pRace_list[i + 3].suggested_rank;
-        } else {
+    for (i = 0; i < *pCount; i++) {
+        if (i >= *pCount - 3) {
             pRace_list[i].best_rank = 1;
+        } else {
+            pRace_list[i].best_rank = pRace_list[i + 3].suggested_rank + 1;
         }
     }
 }
