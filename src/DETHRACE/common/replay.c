@@ -136,108 +136,113 @@ void StopSaving(void) {
 void ActualActionReplayHeadups(int pSpecial_zappy_bastard) {
     tU32 the_time;
     int x;
-    tU16 played_col1;
-    tU16 played_col2;
-    tU16 to_play_col1;
-    tU16 to_play_col2;
+    // dethrace: these are unused, present in DOS build but removed in the windows build
+    // tU16 played_col1;
+    // tU16 played_col2;
+    // tU16 to_play_col1;
+    // tU16 to_play_col2;
 
     the_time = PDGetTotalTime();
-    if (gSave_file || PDKeyDown(KEY_SHIFT_ANY)) {
-        return;
-    }
-    if ((the_time / 400) % 2) {
-        DRMaskedStamp(gCurrent_graf_data->action_replay_R_x,
-            gCurrent_graf_data->action_replay_R_y,
-            gReplay_pixies[0]);
-    }
-    DRMaskedStamp(gCurrent_graf_data->action_replay_controls_x,
-        gCurrent_graf_data->action_replay_controls_y,
-        gReplay_pixies[1]);
-    if (pSpecial_zappy_bastard < 0) {
-        DRMaskedStamp(gCurrent_graf_data->action_replay_rew_start_x,
-            gCurrent_graf_data->action_replay_hilite_y,
-            gReplay_pixies[2]);
-    } else if (pSpecial_zappy_bastard == 0) {
-        if (gReplay_rate < -1.f) {
-            DRMaskedStamp(gCurrent_graf_data->action_replay_rew_x,
-                gCurrent_graf_data->action_replay_hilite_y,
-                gReplay_pixies[3]);
-        } else if (gReplay_rate > 1.f) {
-            DRMaskedStamp(gCurrent_graf_data->action_replay_ffwd_x,
-                gCurrent_graf_data->action_replay_hilite_y,
-                gReplay_pixies[7]);
-        } else if (gReplay_rate == 1.f) {
-            DRMaskedStamp(gCurrent_graf_data->action_replay_play_x,
-                gCurrent_graf_data->action_replay_hilite_y,
-                gReplay_pixies[6]);
-        } else if (gReplay_rate == -1.f) {
-            DRMaskedStamp(gCurrent_graf_data->action_replay_rev_play_x,
-                gCurrent_graf_data->action_replay_hilite_y,
-                gReplay_pixies[4]);
-        } else {
-            DRMaskedStamp(gCurrent_graf_data->action_replay_pause_x,
-                gCurrent_graf_data->action_replay_hilite_y,
-                gReplay_pixies[5]);
-        }
-    } else {
-        DRMaskedStamp(gCurrent_graf_data->action_replay_fwd_end_x,
-            gCurrent_graf_data->action_replay_hilite_y,
-            gReplay_pixies[8]);
-    }
+    if (!gSave_file && !PDKeyDown(KEY_SHIFT_ANY)) {
 
-    x = gProgress_line_left[gGraf_data_index] + (float)(gProgress_line_right[gGraf_data_index] - gProgress_line_left[gGraf_data_index]) * (gLast_replay_frame_time - gAction_replay_start_time) / (gAction_replay_end_time - gAction_replay_start_time);
-    if (x > gProgress_line_left[gGraf_data_index]) {
+        if ((the_time / 400) % 2) {
+            DRMaskedStamp(gCurrent_graf_data->action_replay_R_x,
+                gCurrent_graf_data->action_replay_R_y,
+                gReplay_pixies[0]);
+        }
+        DRMaskedStamp(gCurrent_graf_data->action_replay_controls_x,
+            gCurrent_graf_data->action_replay_controls_y,
+            gReplay_pixies[1]);
+        if (pSpecial_zappy_bastard < 0) {
+            DRMaskedStamp(gCurrent_graf_data->action_replay_rew_start_x,
+                gCurrent_graf_data->action_replay_hilite_y,
+                gReplay_pixies[2]);
+        } else if (pSpecial_zappy_bastard > 0) {
+            DRMaskedStamp(gCurrent_graf_data->action_replay_fwd_end_x,
+                gCurrent_graf_data->action_replay_hilite_y,
+                gReplay_pixies[8]);
+        } else {
+            if (gReplay_rate < -1.f) {
+                DRMaskedStamp(gCurrent_graf_data->action_replay_rew_x,
+                    gCurrent_graf_data->action_replay_hilite_y,
+                    gReplay_pixies[3]);
+            } else if (gReplay_rate > 1.f) {
+                DRMaskedStamp(gCurrent_graf_data->action_replay_ffwd_x,
+                    gCurrent_graf_data->action_replay_hilite_y,
+                    gReplay_pixies[7]);
+            } else if (gReplay_rate == 1.f) {
+                DRMaskedStamp(gCurrent_graf_data->action_replay_play_x,
+                    gCurrent_graf_data->action_replay_hilite_y,
+                    gReplay_pixies[6]);
+            } else if (gReplay_rate == -1.f) {
+                DRMaskedStamp(gCurrent_graf_data->action_replay_rev_play_x,
+                    gCurrent_graf_data->action_replay_hilite_y,
+                    gReplay_pixies[4]);
+            } else {
+                DRMaskedStamp(gCurrent_graf_data->action_replay_pause_x,
+                    gCurrent_graf_data->action_replay_hilite_y,
+                    gReplay_pixies[5]);
+            }
+        }
+
+        x = (int)((gLast_replay_frame_time - gAction_replay_start_time)
+                / (double)(gAction_replay_end_time - gAction_replay_start_time)
+                * (gProgress_line_right[gGraf_data_index] - gProgress_line_left[gGraf_data_index]))
+            + gProgress_line_left[gGraf_data_index];
+
+        if (x > gProgress_line_left[gGraf_data_index]) {
+            BrPixelmapLine(gBack_screen,
+                gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index],
+                x - 1, gProgress_line_top[gGraf_data_index],
+                2);
+            BrPixelmapLine(gBack_screen,
+                gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 1,
+                x - 1, gProgress_line_top[gGraf_data_index] + 1,
+                4);
+            BrPixelmapLine(gBack_screen,
+                gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 2,
+                x - 1, gProgress_line_top[gGraf_data_index] + 2,
+                2);
+        }
+        if (x < gProgress_line_right[gGraf_data_index]) {
+            BrPixelmapLine(gBack_screen,
+                x, gProgress_line_top[gGraf_data_index],
+                gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index],
+                81);
+            BrPixelmapLine(gBack_screen,
+                x, gProgress_line_top[gGraf_data_index] + 1,
+                gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 1,
+                82);
+            BrPixelmapLine(gBack_screen,
+                x, gProgress_line_top[gGraf_data_index] + 2,
+                gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 2,
+                81);
+        }
         BrPixelmapLine(gBack_screen,
-            gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index],
-            x - 1, gProgress_line_top[gGraf_data_index],
+            gProgress_line_left[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index],
+            gProgress_line_left[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 2,
             2);
         BrPixelmapLine(gBack_screen,
-            gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 1,
-            x - 1, gProgress_line_top[gGraf_data_index] + 1,
-            4);
-        BrPixelmapLine(gBack_screen,
-            gProgress_line_left[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 2,
-            x - 1, gProgress_line_top[gGraf_data_index] + 2,
-            2);
-    }
-    if (x < gProgress_line_right[gGraf_data_index]) {
-        BrPixelmapLine(gBack_screen,
-            x, gProgress_line_top[gGraf_data_index],
-            gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index],
+            gProgress_line_right[gGraf_data_index], gProgress_line_top[gGraf_data_index],
+            gProgress_line_right[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 2,
             81);
-        BrPixelmapLine(gBack_screen,
-            x, gProgress_line_top[gGraf_data_index] + 1,
-            gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 1,
-            82);
-        BrPixelmapLine(gBack_screen,
-            x, gProgress_line_top[gGraf_data_index] + 2,
-            gProgress_line_right[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 2,
-            81);
+        if (gCam_change_button_down) {
+            DRMaskedStamp(gCurrent_graf_data->action_replay_camera_x,
+                gCurrent_graf_data->action_replay_hilite_y,
+                gReplay_pixies[9]);
+        }
+        if (the_time - gCam_change_time < 2000) {
+            TransDRPixelmapText(gBack_screen,
+                gCurrent_graf_data->action_replay_cam_text_x - DRTextWidth(&gFonts[kFont_ORANGHED], GetMiscString(kMiscString_StandardCamera + gAction_replay_camera_mode)),
+                gCurrent_graf_data->action_replay_cam_text_y,
+                &gFonts[kFont_ORANGHED],
+                GetMiscString(kMiscString_StandardCamera + gAction_replay_camera_mode),
+                2 * gCurrent_graf_data->action_replay_cam_text_x);
+        }
+        TurnOnPaletteConversion();
+        DoMouseCursor();
+        TurnOffPaletteConversion();
     }
-    BrPixelmapLine(gBack_screen,
-        gProgress_line_left[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index],
-        gProgress_line_left[gGraf_data_index] - 1, gProgress_line_top[gGraf_data_index] + 2,
-        2);
-    BrPixelmapLine(gBack_screen,
-        gProgress_line_right[gGraf_data_index], gProgress_line_top[gGraf_data_index],
-        gProgress_line_right[gGraf_data_index], gProgress_line_top[gGraf_data_index] + 2,
-        81);
-    if (gCam_change_button_down) {
-        DRMaskedStamp(gCurrent_graf_data->action_replay_camera_x,
-            gCurrent_graf_data->action_replay_hilite_y,
-            gReplay_pixies[9]);
-    }
-    if (the_time - gCam_change_time < 2000) {
-        TransDRPixelmapText(gBack_screen,
-            gCurrent_graf_data->action_replay_cam_text_x - DRTextWidth(&gFonts[kFont_ORANGHED], GetMiscString(gAction_replay_camera_mode ? kMiscString_PanningCamera : kMiscString_StandardCamera)),
-            gCurrent_graf_data->action_replay_cam_text_y,
-            &gFonts[kFont_ORANGHED],
-            GetMiscString(gAction_replay_camera_mode ? kMiscString_PanningCamera : kMiscString_StandardCamera),
-            2 * gCurrent_graf_data->action_replay_cam_text_x);
-    }
-    TurnOnPaletteConversion();
-    DoMouseCursor();
-    TurnOffPaletteConversion();
 }
 
 // IDA: void __cdecl DoActionReplayPostSwap()
@@ -281,23 +286,20 @@ void MoveReplayBuffer(tS32 pMove_amount) {
 
     old_play_ptr = NULL;
     gLast_replay_zappy_screen = 0;
-    old_play_ptr2 = GetPipePlayPtr();
-    play_ptr = old_play_ptr2;
+    play_ptr = GetPipePlayPtr();
+    old_play_ptr2 = play_ptr;
     old_time = GetTotalTime();
-    for (i = 0; i < abs(pMove_amount) && play_ptr != old_play_ptr; i++) {
-        if (KeyIsDown(KEYMAP_ESCAPE)) {
-            break;
-        }
+    for (i = 0; i < abs(pMove_amount) && play_ptr != old_play_ptr && !KeyIsDown(KEYMAP_ESCAPE); i++) {
         if (SomeReplayLeft()) {
             PipingFrameReset();
         }
         old_play_ptr = play_ptr;
-        if (pMove_amount >= 1) {
+        if (pMove_amount > 0) {
             while (!ApplyPipedSession(&play_ptr)) {
                 DoZappyActionReplayHeadups(pMove_amount);
             }
             SetPipePlayPtr(play_ptr);
-        } else if (pMove_amount <= -1) {
+        } else if (pMove_amount < 0) {
             while (!UndoPipedSession(&play_ptr)) {
                 DoZappyActionReplayHeadups(pMove_amount);
             }
@@ -349,48 +351,48 @@ void MoveToStartOfReplay(void) {
 // FUNCTION: CARM95 0x0041b661
 void ToggleReplay(void) {
 
-    if (!IsActionReplayAvailable()) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_ACTION_REPLAY_UNAVAILABLE));
-        return;
-    }
-    if (!gAction_replay_mode) {
-        if (gMap_mode) {
-            ToggleMap();
+    if (IsActionReplayAvailable()) {
+        if (!gAction_replay_mode) {
+            if (gMap_mode) {
+                ToggleMap();
+            }
+            if (gNet_mode == eNet_mode_host) {
+                SendGameplayToAllPlayers(eNet_gameplay_host_paused, 0, 0, 0, 0);
+            }
+            gReplay_rate = 1.f;
+            gPaused = 1;
+            gStopped_time = PDGetTotalTime();
+            gPlay_direction = 1;
+            gAction_replay_end_time = GetTotalTime();
+            gLast_replay_frame_time = gAction_replay_end_time;
+            gAction_replay_start_time = GetARStartTime();
+            ResetPipePlayToEnd();
+            LoadInterfaceStuff(1);
+            StartMouseCursor();
+            gKey_down = KEY_KP_ENTER;
+            gPending_replay_rate = 0;
+            gCam_change_time = PDGetTotalTime();
+            if (!gRace_finished) {
+                SaveCameraPosition(0);
+            }
+        } else {
+            MoveToEndOfReplay();
+            EndMouseCursor();
+            S3RegisterSampleFilters(NULL, NULL);
+            UnlockInterfaceStuff();
+            AddLostTime(PDGetTotalTime() - gStopped_time);
+            if (!gRace_finished) {
+                RestoreCameraPosition(0);
+            }
+            if (gNet_mode == eNet_mode_host) {
+                SendGameplayToAllPlayers(eNet_gameplay_host_unpaused, 0, 0, 0, 0);
+            }
         }
-        if (gNet_mode == eNet_mode_host) {
-            SendGameplayToAllPlayers(eNet_gameplay_host_paused, 0, 0, 0, 0);
-        }
-        gReplay_rate = 1.f;
-        gPaused = 1;
-        gStopped_time = PDGetTotalTime();
-        gPlay_direction = 1;
-        gAction_replay_end_time = GetTotalTime();
-        gLast_replay_frame_time = gAction_replay_end_time;
-        gAction_replay_start_time = GetARStartTime();
-        ResetPipePlayToEnd();
-        LoadInterfaceStuff(1);
-        StartMouseCursor();
-        gKey_down = KEY_KP_ENTER;
-        gPending_replay_rate = 0;
-        gCam_change_time = PDGetTotalTime();
-        if (!gRace_finished) {
-            SaveCameraPosition(0);
-        }
+        gAction_replay_mode = !gAction_replay_mode;
+        ForceRebuildActiveCarList();
     } else {
-        MoveToEndOfReplay();
-        EndMouseCursor();
-        S3SetEffects(NULL, NULL);
-        UnlockInterfaceStuff();
-        AddLostTime(PDGetTotalTime() - gStopped_time);
-        if (!gRace_finished) {
-            RestoreCameraPosition(0);
-        }
-        if (gNet_mode == eNet_mode_host) {
-            SendGameplayToAllPlayers(eNet_gameplay_host_unpaused, 0, 0, 0, 0);
-        }
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_ACTION_REPLAY_UNAVAILABLE));
     }
-    gAction_replay_mode = !gAction_replay_mode;
-    ForceRebuildActiveCarList();
 }
 
 // IDA: void __usercall ReverseSound(tS3_effect_tag pEffect_index@<EAX>, tS3_sound_tag pSound_tag@<EDX>)
@@ -402,7 +404,7 @@ void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
 // IDA: int __cdecl FindUniqueFile()
 // FUNCTION: CARM95 0x0041b819
 int FindUniqueFile(void) {
-    int index;
+    int index = 0;
     FILE* f;
     tPath_name the_path;
 
@@ -429,8 +431,11 @@ void PollActionReplayControls(tU32 pFrame_period) {
     int y_coord;
     int i;
     tU32 real_time;
+
     // GLOBAL: CARM95 0x50a200
     static tU32 last_real_time = 0;
+
+    // GLOBAL: CARM95 0x0050A208
     static int psuedo_mouse_keys[8] = {
         KEY_KP_7,
         KEY_KP_4,
@@ -441,7 +446,9 @@ void PollActionReplayControls(tU32 pFrame_period) {
         KEY_KP_9,
         KEY_KP_MULTIPLY,
     };
+
     /* clang-format off */
+    // GLOBAL: CARM95 0x0050A228
     static tRectangle mouse_areas[2][8] = {
         {
             {  63, 182,  92, 198, },
@@ -470,23 +477,26 @@ void PollActionReplayControls(tU32 pFrame_period) {
     old_replay_rate = gReplay_rate;
     old_key_down = gKey_down == KEY_CAPSLOCK ? -1 : gKey_down;
     gKey_down = PDAnyKeyDown();
-    if (KeyIsDown(KEYMAP_REPLAYMODE) && old_key_down == -1) {
+    if (old_key_down == -1 && KeyIsDown(KEYMAP_REPLAYMODE)) {
         ToggleReplay();
         return;
     }
 
-    if (gKey_down == -1) {
+    if (gKey_down != -1) {
+        gMouse_in_use = 0;
+    } else {
         if ((old_key_down == -1 || old_key_down == KEY_KP_4 || old_key_down == KEY_KP_6 || old_key_down == KEY_KP_MULTIPLY) && EitherMouseButtonDown()) {
             GetMousePosition(&x_coord, &y_coord);
             for (i = 0; i < COUNT_OF(mouse_areas[0]); i++) {
-                if (mouse_areas[gGraf_data_index][i].left <= x_coord && mouse_areas[gGraf_data_index][i].top <= y_coord && mouse_areas[gGraf_data_index][i].right >= x_coord && mouse_areas[gGraf_data_index][i].bottom >= y_coord) {
+                if (mouse_areas[gGraf_data_index][i].left <= x_coord
+                    && mouse_areas[gGraf_data_index][i].top <= y_coord
+                    && mouse_areas[gGraf_data_index][i].right > x_coord
+                    && mouse_areas[gGraf_data_index][i].bottom > y_coord) {
                     gKey_down = psuedo_mouse_keys[i];
                     break;
                 }
             }
         }
-    } else {
-        gMouse_in_use = 0;
     }
 
     if (gKey_down == KEY_KP_DIVIDE && old_key_down != KEY_KP_DIVIDE) {
@@ -505,10 +515,8 @@ void PollActionReplayControls(tU32 pFrame_period) {
         gCam_change_button_down = 1;
         if (old_key_down != KEY_KP_MULTIPLY) {
             gCam_change_time = PDGetTotalTime();
-            if (gAction_replay_camera_mode == eAction_replay_action) {
+            if (gAction_replay_camera_mode++ == eAction_replay_action) {
                 gAction_replay_camera_mode = eAction_replay_standard;
-            } else {
-                gAction_replay_camera_mode++;
             }
         }
     } else {
@@ -533,21 +541,21 @@ void PollActionReplayControls(tU32 pFrame_period) {
         gPlay_direction = 1;
         gSingle_frame_mode = 1;
     } else if (gKey_down == KEY_KP_4 || gKey_down == KEY_PAGEUP) {
-        if (gReplay_rate > -1.2f) {
+        if (gReplay_rate > -1.2) {
             gReplay_rate = -1.2f;
         }
         if (last_real_time != 0) {
-            gReplay_rate -= 0.002f * (real_time - last_real_time);
+            gReplay_rate -= 0.002 * (real_time - last_real_time);
         }
         if (gReplay_rate < -8.f) {
             gReplay_rate = -8.f;
         }
     } else if (gKey_down == KEY_KP_6 || gKey_down == KEY_PAGEDOWN) {
-        if (gReplay_rate < 1.2f) {
+        if (gReplay_rate < 1.2) {
             gReplay_rate = 1.2f;
         }
         if (last_real_time != 0) {
-            gReplay_rate += 0.002f * (real_time - last_real_time);
+            gReplay_rate += 0.002 * (real_time - last_real_time);
         }
         if (gReplay_rate > 8.f) {
             gReplay_rate = 8.f;
@@ -586,35 +594,42 @@ void PollActionReplayControls(tU32 pFrame_period) {
 
     if (gPending_replay_rate != 0.f) {
         gReplay_rate = gPending_replay_rate;
+        gPending_replay_rate = 0;
     }
-    if (old_replay_rate * gReplay_rate >= 0.f) {
-        gPending_replay_rate = 0.f;
-    } else {
+    if (old_replay_rate * gReplay_rate < 0.f) {
         gPending_replay_rate = gReplay_rate;
         gReplay_rate = 0.f;
+    } else {
+        gPending_replay_rate = 0.f;
     }
 
     if (old_replay_rate != 0.f) {
-        gFrame_period = gFrame_period * gReplay_rate / old_replay_rate;
+        gFrame_period = gFrame_period * (gReplay_rate / old_replay_rate);
     }
-    last_real_time = fabs(gReplay_rate) >= 1.2f ? real_time : 0;
+
+    if (fabs(gReplay_rate) < 1.2) {
+        last_real_time = 0;
+    } else {
+        last_real_time = real_time;
+    }
 
     if (old_replay_rate <= 0.f && gReplay_rate > 0.f) {
-        S3SetEffects(NULL, NULL);
+        S3RegisterSampleFilters(NULL, NULL);
     } else if (old_replay_rate >= 0.f && gReplay_rate < 0.f) {
-        S3SetEffects(ReverseSound, ReverseSound);
+        S3RegisterSampleFilters(ReverseSound, ReverseSound);
     }
 }
 
 // IDA: void __cdecl CheckReplayTurnOn()
 // FUNCTION: CARM95 0x0041c03b
 void CheckReplayTurnOn(void) {
-
     if (!gAction_replay_mode) {
-        if (!KeyIsDown(KEYMAP_REPLAYMODE) || gEntering_message) {
+        if (KeyIsDown(KEYMAP_REPLAYMODE) && !gEntering_message) {
+            if (gKey_down == -1) {
+                ToggleReplay();
+            }
+        } else {
             gKey_down = -1;
-        } else if (gKey_down == -1) {
-            ToggleReplay();
         }
     }
 }
@@ -647,10 +662,7 @@ void SynchronizeActionReplay(void) {
     // GLOBAL: CARM95 0x50a328
     static tU32 gLast_synch_time;
 
-    while (gReplay_rate != 0.f) {
-        if (PDGetTotalTime() - gLast_synch_time >= gFrame_period / fabs(gReplay_rate)) {
-            break;
-        }
+    while (gReplay_rate != 0.f && PDGetTotalTime() - gLast_synch_time < gFrame_period / fabs(gReplay_rate)) {
         ServiceGameInRace();
     }
     gLast_synch_time = PDGetTotalTime();
@@ -662,12 +674,11 @@ void SynchronizeActionReplay(void) {
     if (gSave_file) {
         PathCat(the_path, gApplication_path, "BMPFILES");
         strcat(the_path, gDir_separator);
-        sprintf(&the_path[strlen(the_path)], "%03d_%04d.BMP", gSave_bunch_ID, gSave_frame_number);
+        sprintf(&the_path[strlen(the_path)], "%03d_%04d.BMP", gSave_bunch_ID, gSave_frame_number++);
         f = DRfopen(the_path, "wb");
         if (f != NULL) {
             PrintScreenFile(f);
             fclose(f);
         }
-        gSave_frame_number++;
     }
 }
