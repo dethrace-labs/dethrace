@@ -2724,7 +2724,9 @@ void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
     tText_chunk* the_chunk;
 
     f = OpenRaceFile();
-    for (temp_index = pRace_index; temp_index != 0; temp_index--) {
+    temp_index = pRace_index;
+
+    while (temp_index--) {
         PossibleService();
         GetALineAndDontArgue(f, s);
         SkipRestOfRace(f);
@@ -2762,14 +2764,13 @@ void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
     pRace_info->text_chunk_count = GetAnInt(f);
     pRace_info->text_chunks = BrMemAllocate(sizeof(tText_chunk) * pRace_info->text_chunk_count, kMem_race_text_chunk);
 
-    the_chunk = pRace_info->text_chunks;
-    for (i = 0; i < pRace_info->text_chunk_count; i++) {
+    for (j = 0, the_chunk = pRace_info->text_chunks; j < pRace_info->text_chunk_count; j++, the_chunk++) {
         PossibleService();
         GetPairOfInts(f, &the_chunk->x_coord, &the_chunk->y_coord);
         GetPairOfInts(f, &the_chunk->frame_cue, &the_chunk->frame_end);
         the_chunk->line_count = GetAnInt(f);
         while (the_chunk->line_count > 8) {
-            --the_chunk->line_count;
+            the_chunk->line_count--;
             GetALineAndDontArgue(f, s);
         }
         for (k = 0; k < the_chunk->line_count; k++) {
@@ -2777,7 +2778,6 @@ void LoadRaceInfo(int pRace_index, tRace_info* pRace_info) {
             the_chunk->text[k] = BrMemAllocate(strlen(s) + 1, kMem_race_text_str);
             strcpy(the_chunk->text[k], s);
         }
-        the_chunk++;
     }
     fclose(f);
 }
