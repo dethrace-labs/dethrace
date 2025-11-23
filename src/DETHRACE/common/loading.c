@@ -2791,15 +2791,13 @@ void DisposeRaceInfo(tRace_info* pRace_info) {
     tText_chunk* the_chunk;
 
     if (gNet_mode == eNet_mode_none) {
-        the_chunk = pRace_info->text_chunks;
-        for (i = 0; i < pRace_info->text_chunk_count; i++) {
+        for (j = 0, the_chunk = pRace_info->text_chunks; j < pRace_info->text_chunk_count; j++, the_chunk++) {
             PossibleService();
-            for (j = 0; j < the_chunk->line_count; j++) {
-                if (the_chunk->text[j]) {
-                    BrMemFree(the_chunk->text[j]);
+            for (k = 0; k < the_chunk->line_count; k++) {
+                if (the_chunk->text[k]) {
+                    BrMemFree(the_chunk->text[k]);
                 }
             }
-            the_chunk++;
         }
         if (pRace_info->text_chunks) {
             BrMemFree(pRace_info->text_chunks);
@@ -2814,8 +2812,8 @@ void DisposeRaceInfo(tRace_info* pRace_info) {
         if (pRace_info->info_image_data) {
             BrMemFree(pRace_info->info_image_data);
         }
-        for (k = 0; k < pRace_info->number_of_racers; k++) {
-            UnlockOpponentMugshot(pRace_info->opponent_list[k].index);
+        for (i = 0; i < pRace_info->number_of_racers; i++) {
+            UnlockOpponentMugshot(pRace_info->opponent_list[i].index);
         }
         PossibleService();
     }
