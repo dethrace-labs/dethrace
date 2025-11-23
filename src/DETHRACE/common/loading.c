@@ -2945,21 +2945,19 @@ br_font* LoadBRFont(char* pName) {
     the_font->flags = BrSwap32(the_font->flags);
 
     // swap endianness
-    the_font->glyph_x = the_font->glyph_x >> 8 | the_font->glyph_x << 8;
-    the_font->glyph_y = the_font->glyph_y >> 8 | the_font->glyph_y << 8;
-    the_font->spacing_x = the_font->spacing_x >> 8 | the_font->spacing_x << 8;
-    the_font->spacing_y = the_font->spacing_y >> 8 | the_font->spacing_y << 8;
+    the_font->glyph_x = the_font->glyph_x >> 8 | (the_font->glyph_x & 0xff) << 8;
+    the_font->glyph_y = the_font->glyph_y >> 8 | (the_font->glyph_y & 0xff) << 8;
+    the_font->spacing_x = the_font->spacing_x >> 8 | (the_font->spacing_x & 0xff) << 8;
+    the_font->spacing_y = the_font->spacing_y >> 8 | (the_font->spacing_y & 0xff) << 8;
 #endif
 
-    data_size = sizeof(br_int_8) * 256;
-    the_font->width = BrMemAllocate(data_size, kMem_br_font_wid);
-    fread(the_font->width, data_size, 1, f);
-    data_size = sizeof(br_uint_16) * 256;
-    the_font->encoding = BrMemAllocate(data_size, kMem_br_font_enc);
-    fread(the_font->encoding, data_size, 1u, f);
+    the_font->width = BrMemAllocate(sizeof(br_int_8) * 256, kMem_br_font_wid);
+    fread(the_font->width, sizeof(br_int_8) * 256, 1, f);
+    the_font->encoding = BrMemAllocate(sizeof(br_uint_16) * 256, kMem_br_font_enc);
+    fread(the_font->encoding, sizeof(br_uint_16) * 256, 1u, f);
 #if !BR_ENDIAN_BIG
     for (i = 0; i < 256; i++) {
-        the_font->encoding[i] = the_font->encoding[i] >> 8 | the_font->encoding[i] << 8;
+        the_font->encoding[i] = ((the_font->encoding[i] & 0xff) << 8) | ((the_font->encoding[i] >> 8));
     }
 #endif
     PossibleService();
