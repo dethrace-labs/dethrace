@@ -3352,12 +3352,12 @@ void LoadMiscStrings(void) {
         FatalError(kFatalError_OpenTextTxt);
     }
     for (i = 0; i < 250; i++) {
-        GetALineAndDontArgue(f, s);
-        gMisc_strings[i] = BrMemAllocate(strlen(s) + 1, kMem_misc_string);
-        strcpy(gMisc_strings[i], s);
         if (feof(f)) {
             break;
         }
+        GetALineAndDontArgue(f, s);
+        gMisc_strings[i] = BrMemAllocate(strlen(s) + 1, kMem_misc_string);
+        strcpy(gMisc_strings[i], s);
     }
     fclose(f);
 }
