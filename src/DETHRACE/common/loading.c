@@ -2675,6 +2675,7 @@ void LoadOpponentMugShot(int pIndex) {
                 &gOpponents[pIndex].mug_shot_image_data,
                 &gOpponents[pIndex].mug_shot_image_data_length)) {
             FatalError(kFatalError_LoadOpponentMugShotFile);
+            return;
         }
         MAMSLock((void**)&gOpponents[pIndex].mug_shot_image_data);
     }
