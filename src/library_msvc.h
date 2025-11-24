@@ -236,3 +236,6 @@
 
 // GLOBAL: CARM95 0x004EA8C2
 // __CIasin
+
+// LIBRARY: CARM95 0x004EC160
+// _filbuf

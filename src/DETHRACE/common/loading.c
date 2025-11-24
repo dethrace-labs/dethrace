@@ -3383,96 +3383,124 @@ FILE* OldDRfopen(char* pFilename, char* pMode) {
     // GLOBAL: CARM95 0x50a5e0
     static int source_exists = 1;
     int len;
-    char ch;
 
+#ifdef DETHRACE_FIX_BUGS
     fp = Harness_Hook_fopen(pFilename, pMode);
+#else
+    fp = fopen(pFilename, pMode);
+#endif
 
-    if (fp != NULL) {
+    if (fp == NULL) {
+        if (gCD_fully_installed) {
+            return NULL;
+        }
+        // source_exists = 1 means we haven't checked the CD yet
+        if (source_exists == 1) {
+            source_check[0] = '\0';
+            strcpy(source_check, "DATA");
+            strcat(source_check, gDir_separator);
+            strcat(source_check, "GENERAL.TXT");
 
+            path_file[0] = '\0';
+            strcpy(path_file, gApplication_path);
+            strcat(path_file, gDir_separator);
+            strcat(path_file, "PATHS.TXT");
+
+            if (!PDCheckDriveExists(path_file)) {
+                source_exists = 0;
+                LOG_WARN("PATHS.TXT not found");
+                return NULL;
+            }
+            test1 = fopen(path_file, "rt");
+            if (!test1) {
+                source_exists = 0;
+                LOG_WARN("PATHS.TXT couldnt be opened");
+                return NULL;
+            }
+
+            CD_dir[0] = '\0';
+            GetALineAndDontArgue(test1, CD_dir);
+            if (!strchr(gDir_separator, CD_dir[strlen(CD_dir) - 1])) {
+                strcat(CD_dir, gDir_separator);
+            }
+            strcat(CD_dir, source_check);
+            fclose(test1);
+
+            if (!PDCheckDriveExists(CD_dir)) {
+                PDFatalError("Carmageddon CD not in drive.");
+                if (gCD_fully_installed) {
+                    source_exists = 0;
+                }
+            } else {
+                source_exists++;
+            }
+        }
+        if (source_exists) {
+            data_dir = strstr(pFilename, "DATA");
+            if (data_dir == NULL) {
+                return NULL;
+            }
+            if (GetCDPathFromPathsTxtFile(CD_dir) == 0) {
+                return NULL;
+            }
+            if (!strchr(gDir_separator, CD_dir[strlen(CD_dir) - 1])) {
+                strcat(CD_dir, gDir_separator);
+            }
+            strcat(CD_dir, data_dir);
+            if (PDCheckDriveExists(CD_dir) == 0) {
+                return NULL;
+            }
+            fp = fopen(CD_dir, pMode);
+            if (!fp) {
+            }
+        }
+    } else {
+
+#ifdef DETHRACE_FIX_BUGS
         // Demo does not check gDecode_thing ("i am fiddling" in PROG.ACT)
         // If the text file starts with a '@' character, it will be decoded, otherwise used as-is.
         if (harness_game_info.mode == eGame_carmageddon_demo) {
             return fp;
-        } else {
-            len = strlen(pFilename);
-            if (gDecode_thing != 0) {
-                if (strcmp(&pFilename[len - 4], ".TXT") == 0
-                    && strcmp(&pFilename[len - 12], "DKEYMAP0.TXT") != 0
-                    && strcmp(&pFilename[len - 12], "DKEYMAP1.TXT") != 0
-                    && strcmp(&pFilename[len - 12], "DKEYMAP2.TXT") != 0
-                    && strcmp(&pFilename[len - 12], "DKEYMAP3.TXT") != 0
-                    && strcmp(&pFilename[len - 12], "KEYMAP_0.TXT") != 0
-                    && strcmp(&pFilename[len - 12], "KEYMAP_1.TXT") != 0
-                    && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
-                    && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
-                    && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
-                    && strcmp(&pFilename[len - 12], "KEYNAMES.TXT") != 0
-                    && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
-                    && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
-                    && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {
-                    ch = fgetc(fp);
-                    if (ch != gDecode_thing) {
-                        fclose(fp);
-                        return NULL;
-                    }
-                    ungetc(ch, fp);
-                    return fp;
+        }
+#endif
+        len = strlen(pFilename);
+        if (gDecode_thing != 0) {
+            if (strcmp(&pFilename[len - 4], ".TXT") == 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP0.TXT") != 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP1.TXT") != 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP2.TXT") != 0
+                && strcmp(&pFilename[len - 12], "DKEYMAP3.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_0.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_1.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_2.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYMAP_3.TXT") != 0
+                && strcmp(&pFilename[len - 11], "OPTIONS.TXT") != 0
+                && strcmp(&pFilename[len - 12], "KEYNAMES.TXT") != 0
+                && strcmp(&pFilename[len - 10], "KEYMAP.TXT") != 0
+                && strcmp(&pFilename[len - 9], "PATHS.TXT") != 0
+                && strcmp(&pFilename[len - 11], "PRATCAM.TXT") != 0) {
+
+                char ch;
+
+                // Not sure if this was an artifact of a "/Oi" codepath or a macro directly used here (and only here..!) by Stainess
+#if _MSC_VER == 1020
+                if (--fp->_cnt >= 0) {
+                    ch = *fp->_ptr++;
+                } else {
+                    ch = _filbuf(fp);
                 }
+#else
+                ch = fgetc(fp);
+#endif
+                if (ch != gDecode_thing) {
+                    fclose(fp);
+                    return NULL;
+                }
+                ungetc(ch, fp);
             }
         }
     }
 
-    if (gCD_fully_installed) {
-        return fp;
-    }
-    // source_exists = 1 means we haven't checked the CD yet
-    if (source_exists == 1) {
-        strcpy(path_file, "DATA");
-        strcat(path_file, gDir_separator);
-        strcat(path_file, "PATHS.TXT");
-
-        if (!PDCheckDriveExists(path_file)) {
-            source_exists = 0;
-            LOG_WARN("PATHS.TXT not found");
-            return NULL;
-        }
-        test1 = fopen(path_file, "rt");
-        if (!test1) {
-            source_exists = 0;
-            LOG_WARN("PATHS.TXT couldnt be opened");
-            return NULL;
-        }
-
-        GetALineAndDontArgue(test1, source_check);
-        strcat(source_check, gDir_separator);
-        strcat(source_check, "DATA");
-        strcat(source_check, gDir_separator);
-        strcat(source_check, "GENERAL.TXT");
-
-        fclose(test1);
-        if (PDCheckDriveExists(source_check)) {
-            source_exists++;
-        } else {
-            PDFatalError("Carmageddon CD not in drive.");
-            if (gCD_fully_installed) {
-                source_exists = 0;
-            }
-        }
-    }
-    if (!source_exists) {
-        return fp;
-    }
-
-    data_dir = strstr(pFilename, "DATA");
-    if (data_dir != NULL) {
-        if (GetCDPathFromPathsTxtFile(CD_dir)) {
-            strcat(CD_dir, gDir_separator);
-            strcat(CD_dir, data_dir);
-            if (PDCheckDriveExists(CD_dir)) {
-                fp = fopen(CD_dir, pMode);
-            }
-        }
-    }
     return fp;
 }
 
