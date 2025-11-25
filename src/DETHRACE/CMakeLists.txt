@@ -69,6 +69,7 @@ target_sources(dethrace_obj PRIVATE
     common/oil.c
     common/racesumm.c
     common/replay.c
+    common/loading.c
 
     common/brucetrk.c
     common/brucetrk.h
@@ -116,8 +117,7 @@ target_sources(dethrace_obj PRIVATE
     common/input.h
     common/intrface.c
     common/intrface.h
-    common/loading.c
-    common/loading.h
+
     common/loadsave.c
     common/loadsave.h
     common/main.c
