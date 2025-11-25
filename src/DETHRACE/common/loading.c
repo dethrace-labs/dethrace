@@ -3571,66 +3571,115 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
 int TestForOriginalCarmaCDinDrive(void) {
     // The symbol dump didn't include any local variable information.
     // These names are not necessarily the original names.
-    tPath_name cd_pathname;
-    tPath_name cd_data_pathname;
-    tPath_name cutscene_pathname;
-    FILE* paths_txt_fp;
-    tPath_name paths_txt;
-    int paths_txt_first_char;
+    char CD_dir[512];        // [esp+Ch] [ebp-608h] BYREF
+    char ch;                 // [esp+20Ch] [ebp-408h]
+    tPath_name path_file;    // [esp+210h] [ebp-404h] BYREF
+    char CD_data_dir[512];   // [esp+310h] [ebp-304h] BYREF
+    FILE* fp;                // [esp+510h] [ebp-104h]
+    tPath_name cutscene_dir; // [esp+514h] [ebp-100h] BYREF
 
+#ifdef DETHRACE_FIX_BUGS
     if (harness_game_config.enable_cd_check == 0) {
         return 1;
     }
+#endif
 
-    paths_txt[0] = 0;
-    strcat(paths_txt, gApplication_path);
-    strcat(paths_txt, gDir_separator);
-    strcat(paths_txt, "PATHS.TXT");
-
-    if (!PDCheckDriveExists(paths_txt)) {
+    path_file[0] = 0;
+    strcpy(path_file, gApplication_path);
+    strcat(path_file, gDir_separator);
+    strcat(path_file, "PATHS.TXT");
+    if (!PDCheckDriveExists(path_file)) {
         return 0;
     }
-
-    paths_txt_fp = fopen(paths_txt, "rt");
-    if (!paths_txt_fp) {
+    fp = fopen(path_file, "rt");
+    if (!fp) {
         return 0;
     }
-    paths_txt_first_char = fgetc(paths_txt_fp);
-    ungetc(paths_txt_first_char, paths_txt_fp);
-    GetALineAndDontArgue(paths_txt_fp, cd_pathname);
-    fclose(paths_txt_fp);
-    strcpy(cd_data_pathname, cd_pathname);
-    strcat(cd_data_pathname, gDir_separator);
-    strcat(cd_data_pathname, "DATA");
-
-    if (DRStricmp(cd_pathname, gApplication_path) == 0) {
+    ch = fgetc(fp);
+    ungetc(ch, fp);
+    CD_dir[0] = 0;
+    GetALineAndDontArgue(fp, CD_dir);
+    fclose(fp);
+    strcpy(CD_data_dir, CD_dir);
+    if (!strchr(gDir_separator, CD_data_dir[strlen(CD_data_dir) - 1])) {
+        strcat(CD_data_dir, gDir_separator);
+    }
+    strcat(CD_data_dir, "DATA");
+    if (!DRStricmp(CD_data_dir, gApplication_path)) {
         return 0;
     }
-
-    strcpy(cutscene_pathname, cd_data_pathname);
-    strcat(cutscene_pathname, gDir_separator);
-    strcat(cutscene_pathname, "CUTSCENE");
-
-    if (!PDCheckDriveExists2(cd_data_pathname, "GENERAL.TXT", 100)) {
+    strcpy(cutscene_dir, CD_data_dir);
+    if (!strchr(gDir_separator, cutscene_dir[strlen(cutscene_dir) - 1])) {
+        strcat(cutscene_dir, gDir_separator);
+    }
+    strcat(cutscene_dir, "CUTSCENE");
+    if (!PDCheckDriveExists2(CD_data_dir, "GENERAL.TXT", 100)
+        || (!PDCheckDriveExists2(CD_dir, "CARMA.EXE", 0xF4240)
+            && !PDCheckDriveExists2(CD_dir, "CARMAG.EXE", 1000000)
+            && !PDCheckDriveExists2(CD_dir, "MAINPROG.EXE", 1000000)
+            && !PDCheckDriveExists2(CD_dir, "CARMSPLT.EXE", 1000000)
+            && !PDCheckDriveExists2(CD_dir, "CARMGSPL.EXE", 1000000))
+#ifdef DETHRACE_FIX_BUGS
+        || !PDCheckDriveExists2(cutscene_dir, harness_game_info.defines.INTRO_SMK_FILE, 2000000)) {
+#else
+        || !PDCheckDriveExists2(cutscene_dir, "SPLINTRO.SMK", 2000000)) {
+#endif
         return 0;
     }
-    if (!PDCheckDriveExists2(cd_pathname, "CARMA.EXE", 1000000)
-        && !PDCheckDriveExists2(cd_pathname, "CARMAG.EXE", 1000000)
-        && !PDCheckDriveExists2(cd_pathname, "MAINPROG.EXE", 1000000)
-        && !PDCheckDriveExists2(cd_pathname, "CARMSPLT.EXE", 1000000)
-        && !PDCheckDriveExists2(cd_pathname, "CARMGSPL.EXE", 1000000)) {
-        return 0;
-    }
-
-    // changed from static file reference to handle all game modes
-    if (!PDCheckDriveExists2(cutscene_pathname, harness_game_info.defines.INTRO_SMK_FILE, 2000000)) {
-        return 0;
-    }
-
-    if (paths_txt_first_char != '@') {
-        EncodeFile(paths_txt);
+    if (ch != '@') {
+        EncodeFile(path_file);
     }
     return 1;
+
+    // paths_txt[0] = 0;
+    // strcat(paths_txt, gApplication_path);
+    // strcat(paths_txt, gDir_separator);
+    // strcat(paths_txt, "PATHS.TXT");
+
+    // if (!PDCheckDriveExists(paths_txt)) {
+    //     return 0;
+    // }
+
+    // paths_txt_fp = fopen(paths_txt, "rt");
+    // if (!paths_txt_fp) {
+    //     return 0;
+    // }
+    // paths_txt_first_char = fgetc(paths_txt_fp);
+    // ungetc(paths_txt_first_char, paths_txt_fp);
+    // GetALineAndDontArgue(paths_txt_fp, cd_pathname);
+    // fclose(paths_txt_fp);
+    // strcpy(cd_data_pathname, cd_pathname);
+    // strcat(cd_data_pathname, gDir_separator);
+    // strcat(cd_data_pathname, "DATA");
+
+    // if (DRStricmp(cd_pathname, gApplication_path) == 0) {
+    //     return 0;
+    // }
+
+    // strcpy(cutscene_pathname, cd_data_pathname);
+    // strcat(cutscene_pathname, gDir_separator);
+    // strcat(cutscene_pathname, "CUTSCENE");
+
+    // if (!PDCheckDriveExists2(cd_data_pathname, "GENERAL.TXT", 100)) {
+    //     return 0;
+    // }
+    // if (!PDCheckDriveExists2(cd_pathname, "CARMA.EXE", 1000000)
+    //     && !PDCheckDriveExists2(cd_pathname, "CARMAG.EXE", 1000000)
+    //     && !PDCheckDriveExists2(cd_pathname, "MAINPROG.EXE", 1000000)
+    //     && !PDCheckDriveExists2(cd_pathname, "CARMSPLT.EXE", 1000000)
+    //     && !PDCheckDriveExists2(cd_pathname, "CARMGSPL.EXE", 1000000)) {
+    //     return 0;
+    // }
+
+    // // changed from static file reference to handle all game modes
+    // if (!PDCheckDriveExists2(cutscene_pathname, harness_game_info.defines.INTRO_SMK_FILE, 2000000)) {
+    //     return 0;
+    // }
+
+    // if (paths_txt_first_char != '@') {
+    //     EncodeFile(paths_txt);
+    // }
+    // return 1;
 }
 
 // IDA: int __cdecl OriginalCarmaCDinDrive()
@@ -3645,9 +3694,8 @@ int CarmaCDinDriveOrFullGameInstalled(void) {
 
     if (gCD_fully_installed) {
         return 1;
-    } else {
-        return OriginalCarmaCDinDrive();
     }
+    return OriginalCarmaCDinDrive();
 }
 
 // IDA: void __usercall ReadNetworkSettings(FILE *pF@<EAX>, tNet_game_options *pOptions@<EDX>)
