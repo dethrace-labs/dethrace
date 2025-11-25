@@ -1,6 +1,5 @@
 [Desktop Entry]
 Type=Application
-Version=0.9.0
 Name=dethrace
 Comment=Reverse engineering the 1997 game "Carmageddon"
 Exec=dethrace
