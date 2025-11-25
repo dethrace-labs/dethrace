@@ -416,7 +416,8 @@ int S3SyncSampleRate(tS3_channel* chan) {
     return 1;
 }
 
-int S3SetEffects(tS3_sample_filter* filter1, tS3_sample_filter* filter2) {
+// FUNCTION: CARM95 0x004C946D
+int S3RegisterSampleFilters(tS3_sample_filter* filter1, tS3_sample_filter* filter2) {
     STUB_ONCE();
     return 0;
 }

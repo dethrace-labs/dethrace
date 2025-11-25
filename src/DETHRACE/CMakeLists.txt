@@ -59,7 +59,7 @@ if(DETHRACE_REPLAY_DEBUG)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_REPLAY_DEBUG)
 endif()
 
-if (MINGW)
+if(MINGW)
     target_compile_options(dethrace_obj PRIVATE -Wno-error=incompatible-pointer-types)
 endif()
 
@@ -68,6 +68,7 @@ target_sources(dethrace_obj PRIVATE
     common/opponent.c
     common/oil.c
     common/racesumm.c
+    common/replay.c
 
     common/brucetrk.c
     common/brucetrk.h
@@ -149,8 +150,7 @@ target_sources(dethrace_obj PRIVATE
     common/racestrt.h
     common/raycast.c
     common/raycast.h
-    common/replay.c
-    common/replay.h
+
     common/sound.c
     common/sound.h
     common/spark.c
@@ -198,6 +198,7 @@ if(MSVC_42_FOR_RECCMP)
 
     set_source_files_properties(common/structur.c PROPERTIES COMPILE_FLAGS "/FAs")
     set_source_files_properties(common/racesumm.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/replay.c PROPERTIES COMPILE_FLAGS "/FAs")
 
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()
@@ -296,6 +297,7 @@ if(DETHRACE_INSTALL)
                     OPTIONAL
                 )
             endif()
+
             if(DETHRACE_PLATFORM_SDL3)
                 install(FILES "$<TARGET_FILE:SDL3::SDL3>"
                     DESTINATION "."
