@@ -3747,54 +3747,43 @@ int SaveOptions(void) {
     gMap_render_y = 6.f;
     gMap_render_width = 64.f;
     gMap_render_height = 40.f;
-    if (f == NULL) {
+
+    if (f == NULL
+        || fprintf(f, "YonFactor %f\n", GetYonFactor()) < 0
+        || fprintf(f, "SkyTextureOn %d\n", GetSkyTextureOn()) < 0
+        || fprintf(f, "CarTexturingLevel %d\n", GetCarTexturingLevel()) < 0
+        || fprintf(f, "RoadTexturingLevel %d\n", GetRoadTexturingLevel()) < 0
+        || fprintf(f, "WallTexturingLevel %d\n", GetWallTexturingLevel()) < 0
+        || fprintf(f, "ShadowLevel %d\n", GetShadowLevel()) < 0
+        || fprintf(f, "DepthCueingOn %d\n", GetDepthCueingOn()) < 0
+        || fprintf(f, "Yon %f\n", GetYon()) < 0
+        || fprintf(f, "CarSimplificationLevel %d\n", GetCarSimplificationLevel()) < 0
+        || fprintf(f, "AccessoryRendering %d\n", GetAccessoryRendering()) < 0
+        || fprintf(f, "SmokeOn %d\n", GetSmokeOn()) < 0
+        || fprintf(f, "SoundDetailLevel %d\n", GetSoundDetailLevel()) < 0
+        || fprintf(f, "ScreenSize %d\n", GetScreenSize()) < 0
+        || fprintf(f, "MapRenderX %f\n", gMap_render_x) < 0
+        || fprintf(f, "MapRenderY %f\n", gMap_render_y) < 0
+        || fprintf(f, "MapRenderWidth %f\n", gMap_render_width) < 0
+        || fprintf(f, "MapRenderHeight %f\n", gMap_render_height) < 0
+        || fprintf(f, "PlayerName 0\n%s\n", (gProgram_state.player_name[0][0] != '\0') ? gProgram_state.player_name[0] : "MAX DAMAGE") < 0
+        || fprintf(f, "PlayerName 1\n%s\n", (gProgram_state.player_name[1][0] != '\0') ? gProgram_state.player_name[1] : "DIE ANNA") < 0
+        || fprintf(f, "NetName 0\n%s\n", (gNet_player_name[0] != '\0') ? gNet_player_name : "RON TURN") < 0
+        || fprintf(f, "EVolume %d\n", gProgram_state.effects_volume) < 0
+        || fprintf(f, "MVolume %d\n", gProgram_state.music_volume) < 0
+        || fprintf(f, "KeyMapIndex %d\n", gKey_map_index) < 0
+        || fprintf(f, "NETGAMETYPE %d\n", gLast_game_type) < 0
+        || PrintNetOptions(f, 0) < 0
+        || PrintNetOptions(f, 1) < 0
+        || PrintNetOptions(f, 2) < 0
+        || PrintNetOptions(f, 3) < 0
+        || PrintNetOptions(f, 4) < 0
+        || PrintNetOptions(f, 5) < 0
+        || PrintNetOptions(f, 6) < 0
+        || PrintNetOptions(f, 7) < 0
+        || fclose(f) != 0) {
         return 0;
     }
-
-#define BAIL_IF_NEGATIVE(VAL)       \
-    if ((VAL) < 0) {                \
-        LOG_WARN(#VAL " FAILED\n"); \
-        return 0;                   \
-    }
-
-    BAIL_IF_NEGATIVE(fprintf(f, "YonFactor %f\n", GetYonFactor()));
-    BAIL_IF_NEGATIVE(fprintf(f, "SkyTextureOn %d\n", GetSkyTextureOn()));
-    BAIL_IF_NEGATIVE(fprintf(f, "CarTexturingLevel %d\n", GetCarTexturingLevel()));
-    BAIL_IF_NEGATIVE(fprintf(f, "RoadTexturingLevel %d\n", GetRoadTexturingLevel()));
-    BAIL_IF_NEGATIVE(fprintf(f, "WallTexturingLevel %d\n", GetWallTexturingLevel()));
-    BAIL_IF_NEGATIVE(fprintf(f, "ShadowLevel %d\n", GetShadowLevel()));
-    BAIL_IF_NEGATIVE(fprintf(f, "DepthCueingOn %d\n", GetDepthCueingOn()));
-    BAIL_IF_NEGATIVE(fprintf(f, "Yon %f\n", GetYon()));
-    BAIL_IF_NEGATIVE(fprintf(f, "CarSimplificationLevel %d\n", GetCarSimplificationLevel()));
-    BAIL_IF_NEGATIVE(fprintf(f, "AccessoryRendering %d\n", GetAccessoryRendering()));
-    BAIL_IF_NEGATIVE(fprintf(f, "SmokeOn %d\n", GetSmokeOn()));
-    BAIL_IF_NEGATIVE(fprintf(f, "SoundDetailLevel %d\n", GetSoundDetailLevel()));
-    BAIL_IF_NEGATIVE(fprintf(f, "ScreenSize %d\n", GetScreenSize()));
-    BAIL_IF_NEGATIVE(fprintf(f, "MapRenderX %f\n", gMap_render_x));
-    BAIL_IF_NEGATIVE(fprintf(f, "MapRenderY %f\n", gMap_render_y));
-    BAIL_IF_NEGATIVE(fprintf(f, "MapRenderWidth %f\n", gMap_render_width));
-    BAIL_IF_NEGATIVE(fprintf(f, "MapRenderHeight %f\n", gMap_render_height));
-    BAIL_IF_NEGATIVE(fprintf(f, "PlayerName 0\n%s\n", (gProgram_state.player_name[0][0] == '\0') ? "MAX DAMAGE" : gProgram_state.player_name[0]));
-    BAIL_IF_NEGATIVE(fprintf(f, "PlayerName 1\n%s\n", (gProgram_state.player_name[1][0] == '\0') ? "DIE ANNA" : gProgram_state.player_name[1]));
-    BAIL_IF_NEGATIVE(fprintf(f, "NetName 0\n%s\n", (gNet_player_name[0] == '\0') ? "RON TURN" : gNet_player_name));
-    BAIL_IF_NEGATIVE(fprintf(f, "EVolume %d\n", gProgram_state.effects_volume));
-    BAIL_IF_NEGATIVE(fprintf(f, "MVolume %d\n", gProgram_state.music_volume));
-    BAIL_IF_NEGATIVE(fprintf(f, "KeyMapIndex %d\n", gKey_map_index));
-
-    BAIL_IF_NEGATIVE(fprintf(f, "NETGAMETYPE %d\n", gLast_game_type));
-    BAIL_IF_NEGATIVE(PrintNetOptions(f, 0));
-    BAIL_IF_NEGATIVE(PrintNetOptions(f, 1));
-    BAIL_IF_NEGATIVE(PrintNetOptions(f, 2));
-    BAIL_IF_NEGATIVE(PrintNetOptions(f, 3));
-    BAIL_IF_NEGATIVE(PrintNetOptions(f, 4));
-    BAIL_IF_NEGATIVE(PrintNetOptions(f, 5));
-    BAIL_IF_NEGATIVE(PrintNetOptions(f, 6));
-    BAIL_IF_NEGATIVE(PrintNetOptions(f, 7));
-
-#undef BAIL_IF_NEGATIVE
-
-    fclose(f);
-
     return 1;
 }
 
