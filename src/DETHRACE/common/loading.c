@@ -3853,7 +3853,10 @@ int RestoreOptions(void) {
                 gProgram_state.music_volume = (int)arg;
             } else if (!strcmp(token, "KeyMapIndex")) {
                 gKey_map_index = (int)arg;
-            } else if (!strcmp(token, "Joystick_min1x")) {
+            }
+#ifdef __DOS__
+            // this code only exists in the DOS build
+            else if (!strcmp(token, "Joystick_min1x")) {
                 gJoystick_min1x = (int)arg;
             } else if (!strcmp(token, "Joystick_min1y")) {
                 gJoystick_min1y = (int)arg;
@@ -3869,7 +3872,9 @@ int RestoreOptions(void) {
                 gJoystick_range2x = (int)arg;
             } else if (!strcmp(token, "Joystick_range2y")) {
                 gJoystick_range2y = (int)arg;
-            } else if (!strcmp(token, "NetName")) {
+            }
+#endif
+            else if (!strcmp(token, "NetName")) {
                 fgets(line, 80, f);
                 s = strtok(line, "\n\r");
                 strcpy(gNet_player_name, s);
