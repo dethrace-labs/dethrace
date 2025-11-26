@@ -176,9 +176,10 @@ tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)
 // FUNCTION: CARM95 0x00427ed0
 void GetReducedPos(br_vector3* v, tReduced_pos* p) {
 
-    v->v[0] = p->v[0] / 800.f;
-    v->v[1] = p->v[1] / 800.f;
-    v->v[2] = p->v[2] / 800.f;
+    // v->v[0] = p->v[0] / 800.0;
+    // v->v[1] = p->v[1] / 800.0;
+    // v->v[2] = p->v[2] / 800.0;
+    BrVector3InvScale(v, p, 800.0);
     BrVector3Accumulate(v, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
 }
 
