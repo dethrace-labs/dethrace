@@ -175,10 +175,6 @@ tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)
 // IDA: void __usercall GetReducedPos(br_vector3 *v@<EAX>, tReduced_pos *p@<EDX>)
 // FUNCTION: CARM95 0x00427ed0
 void GetReducedPos(br_vector3* v, tReduced_pos* p) {
-
-    // v->v[0] = p->v[0] / 800.0;
-    // v->v[1] = p->v[1] / 800.0;
-    // v->v[2] = p->v[2] / 800.0;
     BrVector3InvScale(v, p, 800.0);
     BrVector3Accumulate(v, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
 }
@@ -197,18 +193,16 @@ void SaveReducedPos(tReduced_pos* p, br_vector3* v) {
 // IDA: int __cdecl PipeSearchForwards()
 // FUNCTION: CARM95 0x00427fdf
 int PipeSearchForwards(void) {
-
     if (gPipe_play_ptr == gPipe_record_ptr) {
         return 0;
     }
     if (gPipe_play_ptr == gPipe_buffer_oldest) {
         return 1;
     }
-    if (GetReplayRate() == 0.f) {
-        return GetReplayDirection() > 0;
-    } else {
+    if (GetReplayRate() != 0.f) {
         return GetReplayRate() > 0.f;
     }
+    return GetReplayDirection() > 0 ? 1 : 0;
 }
 
 // IDA: int __cdecl IsActionReplayAvailable()
