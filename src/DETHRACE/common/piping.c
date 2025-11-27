@@ -216,7 +216,7 @@ int IsActionReplayAvailable(void) {
 // FUNCTION: CARM95 0x004280a1
 int SomeReplayLeft(void) {
 
-    return ((GetReplayDirection() >= 1 && gPipe_play_ptr != gPipe_record_ptr) || (GetReplayDirection() <= -1 && gPipe_play_ptr != gPipe_buffer_oldest));
+    return ((GetReplayDirection() > 0 && gPipe_play_ptr != gPipe_record_ptr) || (GetReplayDirection() < 0 && gPipe_play_ptr != gPipe_buffer_oldest));
 }
 
 // IDA: void __cdecl DisablePipedSounds()
