@@ -412,14 +412,13 @@ void EndPipingSession2(int pMunge_reentrancy) {
     if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
         // Each session ends with a tU16, containing the session size
         *(tU16*)&gLocal_buffer[gLocal_buffer_size] = gLocal_buffer_size;
-        a = gLocal_buffer_size;
         gLocal_buffer_size += sizeof(tU16);
         REPLAY_DEBUG_ASSERT(LengthOfSession((tPipe_session*)gLocal_buffer) == gLocal_buffer_size);
 #if defined(DETHRACE_FIX_BUGS)
         gLocal_buffer_size = PIPE_ALIGN(gLocal_buffer_size);
         *(tU16*)&gLocal_buffer[gLocal_buffer_size - sizeof(tU16)] = gLocal_buffer_size - sizeof(tU16);
 #endif
-        if (((tPipe_session*)gLocal_buffer)->number_of_chunks != 0 && (gLocal_buffer_size < LOCAL_BUFFER_SIZE || a == LOCAL_BUFFER_SIZE - 2)) {
+        if (((tPipe_session*)gLocal_buffer)->number_of_chunks != 0 && gLocal_buffer_size <= LOCAL_BUFFER_SIZE) {
             if (gPipe_buffer_phys_end < gPipe_record_ptr + gLocal_buffer_size) {
                 // Put session at begin of pipe, as no place at end
                 gPipe_buffer_working_end = gPipe_record_ptr;
