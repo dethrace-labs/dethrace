@@ -386,13 +386,14 @@ void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
             }
             gReentrancy_count++;
         }
+        gLocal_buffer_size = 0;
         ((tPipe_session*)gLocal_buffer)->chunk_type = pThe_type;
         ((tPipe_session*)gLocal_buffer)->number_of_chunks = 0;
 #if defined(DETHRACE_REPLAY_DEBUG)
         ((tPipe_session*)gLocal_buffer)->pipe_magic1 = REPLAY_DEBUG_SESSION_MAGIC1;
 #endif
-        gLocal_buffer_size = offsetof(tPipe_session, chunks);
-        gMr_chunky = &((tPipe_session*)gLocal_buffer)->chunks;
+        gLocal_buffer_size = (tU8*)&((tPipe_session*)gLocal_buffer)->chunks - gLocal_buffer;
+        gMr_chunky = gLocal_buffer + gLocal_buffer_size;
     }
 }
 

@@ -2415,13 +2415,13 @@ typedef struct tPipe_chunk {            // size: 0x58
     } chunk_data;                                            // @0x4
 } tPipe_chunk;
 
-typedef struct tPipe_session {
-    tPipe_chunk_type chunk_type;
-    tU8 number_of_chunks;
+typedef struct tPipe_session {   // size: 0x60
+    tPipe_chunk_type chunk_type; // @0x0
+    tU8 number_of_chunks;        // @0x4
 #if defined(DETHRACE_REPLAY_DEBUG)
     int pipe_magic1;
 #endif
-    tPipe_chunk chunks;
+    tPipe_chunk chunks; // @0x8
 } tPipe_session;
 
 typedef struct tCollison_data {
