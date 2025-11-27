@@ -2231,15 +2231,15 @@ typedef struct tPipe_smudge_data {
     tSmudged_vertex vertex_changes[1];
 } tPipe_smudge_data;
 
-typedef struct tPipe_pedestrian_data {
-    tU8 action_and_frame_index;
-    tS8 hit_points;
-    tU16 parent;
-    br_vector3 new_translation;
-    float spin_period;
-    br_actor* parent_actor;
-    br_vector3 offset;
-    br_scalar jump_magnitude;
+typedef struct tPipe_pedestrian_data { // size: 0x28
+    tU8 action_and_frame_index;        // @0x0
+    tS8 hit_points;                    // @0x1
+    tU16 parent;                       // @0x2
+    br_vector3 new_translation;        // @0x4
+    float spin_period;                 // @0x10
+    br_actor* parent_actor;            // @0x14
+    br_vector3 offset;                 // @0x18
+    br_scalar jump_magnitude;          // @0x24
 } tPipe_pedestrian_data;
 
 typedef struct tPipe_frame_boundary_data {

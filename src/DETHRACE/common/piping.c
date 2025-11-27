@@ -245,6 +245,8 @@ tU32 LengthOfSession(tPipe_session* pSession) {
 
     REPLAY_DEBUG_ASSERT(pSession->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
 
+    running_total = 0;
+
     switch (pSession->chunk_type) {
     case ePipe_chunk_actor_rstyle:
         running_total = SIZEOF_CHUNK(actor_rstyle_data) * pSession->number_of_chunks;
@@ -287,11 +289,8 @@ tU32 LengthOfSession(tPipe_session* pSession) {
         running_total = 0;
         for (i = 0; i < pSession->number_of_chunks; i++) {
             the_chunk = (tPipe_chunk*)&(((tU8*)&pSession->chunks)[running_total]);
-            if (the_chunk->chunk_data.pedestrian_data.hit_points <= 0) {
-                running_total += SIZEOF_CHUNK(pedestrian_data);
-            } else {
-                running_total += offsetof(tPipe_pedestrian_data, spin_period) + offsetof(tPipe_chunk, chunk_data);
-            }
+            running_total = running_total + (the_chunk->chunk_data.pedestrian_data.hit_points <= 0 ? sizeof(tPipe_pedestrian_data) : offsetof(tPipe_pedestrian_data, spin_period))
+                + offsetof(tPipe_chunk, chunk_data);
         }
         break;
     case ePipe_chunk_frame_boundary:
@@ -322,11 +321,8 @@ tU32 LengthOfSession(tPipe_session* pSession) {
         running_total = 0;
         for (i = 0; i < pSession->number_of_chunks; i++) {
             the_chunk = (tPipe_chunk*)&((tU8*)&pSession->chunks)[running_total];
-            if (the_chunk->subject_index & 0x8000) {
-                running_total += SIZEOF_CHUNK(shrapnel_data);
-            } else {
-                running_total += offsetof(tPipe_shrapnel_data, age) + offsetof(tPipe_chunk, chunk_data);
-            }
+            running_total = running_total + ((the_chunk->subject_index & 0x8000) == 0 ? offsetof(tPipe_shrapnel_data, age) : sizeof(tPipe_shrapnel_data))
+                + offsetof(tPipe_chunk, chunk_data);
         }
         break;
     case ePipe_chunk_screen_shake:
@@ -354,7 +350,8 @@ tU32 LengthOfSession(tPipe_session* pSession) {
         running_total = 0;
         for (i = 0; i < pSession->number_of_chunks; i++) {
             the_chunk = (tPipe_chunk*)&((tU8*)&pSession->chunks)[running_total];
-            running_total += the_chunk->chunk_data.smudge_data.vertex_count * sizeof(tSmudged_vertex) + offsetof(tPipe_smudge_data, vertex_changes) + offsetof(tPipe_chunk, chunk_data);
+            running_total += the_chunk->chunk_data.smudge_data.vertex_count * sizeof(tSmudged_vertex) + offsetof(tPipe_smudge_data, vertex_changes)
+                + offsetof(tPipe_chunk, chunk_data);
         }
         break;
     case ePipe_chunk_splash:
