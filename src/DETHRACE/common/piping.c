@@ -471,19 +471,21 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
     int variable_for_breaking_on;
 
     if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
-        temp_buffer_size = gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data) + pData_length;
-        if (temp_buffer_size >= LOCAL_BUFFER_SIZE) {
-            return;
-        }
-        REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
-        ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
-        gMr_chunky->subject_index = pSubject_index;
+        temp_buffer_size = pData_length + gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data);
+        if (temp_buffer_size < LOCAL_BUFFER_SIZE) {
+            REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
+            ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
+            gMr_chunky->subject_index = pSubject_index;
+            gMr_chunky = &gMr_chunky->chunk_data;
 #if defined(DETHRACE_REPLAY_DEBUG)
-        gMr_chunky->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
+            gMr_chunky->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
 #endif
-        memcpy(&gMr_chunky->chunk_data, pData, pData_length);
-        gMr_chunky = (tPipe_chunk*)(((tU8*)&gMr_chunky->chunk_data) + pData_length);
-        gLocal_buffer_size = temp_buffer_size;
+            memcpy(gMr_chunky, pData, pData_length);
+            (tU8*)gMr_chunky += pData_length;
+            gLocal_buffer_size = temp_buffer_size;
+        } else {
+            variable_for_breaking_on = 1;
+        }
     }
 }
 
