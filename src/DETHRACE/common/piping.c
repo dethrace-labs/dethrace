@@ -1472,7 +1472,7 @@ void ApplySound(tPipe_chunk** pChunk) {
                 1,
                 -1,
                 -1,
-                65535.f * GetReplayRate(),
+                fabs(GetReplayRate()) * 65536.0,
                 0x10000);
         } else if (BrVector3LengthSquared(&(*pChunk)->chunk_data.sound_data.position) == 0) {
             DRS3StartSound2(GetOutletFromIndex((*pChunk)->chunk_data.sound_data.outlet_index),
