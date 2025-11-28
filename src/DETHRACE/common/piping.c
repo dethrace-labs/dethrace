@@ -1424,7 +1424,7 @@ void ApplyFlame(tPipe_chunk** pChunk) {
 void ApplySplash(tPipe_chunk** pChunk) {
     tCar_spec* c;
 
-    if (((*pChunk)->subject_index & 0xff00) == 0) {
+    if (((*pChunk)->subject_index >> 8) == 0) {
         c = &gProgram_state.current_car;
     } else {
         c = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
