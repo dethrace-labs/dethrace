@@ -624,7 +624,8 @@ void AddSmokeColumnToPipingSession(int pIndex, tCar_spec* pCar, int pVertex, int
 
     data.car_ID = pCar->car_ID;
     data.vertex = pVertex;
-    AddDataToSession(pColour << 14 | pIndex, &data, sizeof(tPipe_smoke_column_data));
+    pIndex += (pColour << 14);
+    AddDataToSession(pIndex, &data, sizeof(tPipe_smoke_column_data));
 }
 
 // IDA: void __usercall AddFlameToPipingSession(int pIndex@<EAX>, int pFrame_count@<EDX>, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z)
