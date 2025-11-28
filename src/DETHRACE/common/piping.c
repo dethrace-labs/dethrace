@@ -394,7 +394,7 @@ void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
         ((tPipe_session*)gLocal_buffer)->pipe_magic1 = REPLAY_DEBUG_SESSION_MAGIC1;
 #endif
         gLocal_buffer_size = (tU8*)&((tPipe_session*)gLocal_buffer)->chunks - gLocal_buffer;
-        gMr_chunky = gLocal_buffer + gLocal_buffer_size;
+        gMr_chunky = (tPipe_chunk*)(gLocal_buffer + gLocal_buffer_size);
     }
 }
 
@@ -477,12 +477,12 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
             REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
             ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
             gMr_chunky->subject_index = pSubject_index;
-            gMr_chunky = &gMr_chunky->chunk_data;
+            gMr_chunky = (tPipe_chunk*)((tU8*)gMr_chunky + sizeof(tPipe_chunk*));
 #if defined(DETHRACE_REPLAY_DEBUG)
             gMr_chunky->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
 #endif
             memcpy(gMr_chunky, pData, pData_length);
-            (tU8*)gMr_chunky += pData_length;
+            gMr_chunky = (tPipe_chunk*)((tU8*)gMr_chunky + pData_length);
             gLocal_buffer_size = temp_buffer_size;
         } else {
             variable_for_breaking_on = 1;
@@ -983,7 +983,7 @@ void InitialisePiping(void) {
         PDAllocateActionReplayBuffer((char**)&gPipe_buffer_start, &gPipe_buffer_size);
         gPipe_buffer_phys_end = gPipe_buffer_start + gPipe_buffer_size;
         gModel_geometry_space = BrMemAllocate(offsetof(tPipe_smudge_data, vertex_changes) + sizeof(tSmudged_vertex) * 2400, kMem_pipe_model_geometry);
-        gSmudge_space = gModel_geometry_space;
+        gSmudge_space = (tPipe_smudge_data*)gModel_geometry_space;
         gLocal_buffer_record_ptr = NULL;
         gZero_vector.v[0] = 0;
         gZero_vector.v[1] = 0;
@@ -1620,7 +1620,7 @@ int ApplyPipedSession(tU8** pPtr) {
     if (*pPtr == gPipe_record_ptr) {
         return 1;
     }
-    gEnd_of_session = *pPtr + (LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16));
+    gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
     REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
     chunk_ptr = (tPipe_chunk*)(*pPtr + offsetof(tPipe_session, chunks));
     return_value = 0;
@@ -1694,8 +1694,11 @@ int ApplyPipedSession(tU8** pPtr) {
         case ePipe_chunk_skid_adjustment:
             ApplySkidAdjustment(&chunk_ptr);
             break;
+#ifdef DETHRACE_FIX_BUGS
         default:
             break;
+
+#endif
         }
     }
 #if defined(DETHRACE_FIX_BUGS)
