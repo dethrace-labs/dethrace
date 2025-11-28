@@ -1717,9 +1717,10 @@ int MoveSessionPointerBackOne(tU8** pPtr) {
 
     if (*pPtr == gPipe_buffer_oldest && *pPtr != gPipe_record_ptr) {
         return 1;
-    }
-    if (*pPtr == gPipe_buffer_start) {
-        *pPtr = gPipe_buffer_working_end;
+    } else {
+        if (*pPtr == gPipe_buffer_start) {
+            *pPtr = gPipe_buffer_working_end;
+        }
     }
     *pPtr -= sizeof(tU16);
     REPLAY_DEBUG_ASSERT(*(tU16*)*pPtr != 0);
