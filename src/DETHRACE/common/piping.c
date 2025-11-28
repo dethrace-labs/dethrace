@@ -1555,21 +1555,19 @@ void ApplyDamage(tPipe_chunk** pChunk) {
 void ApplySpecial(tPipe_chunk** pChunk) {
 
     switch ((*pChunk)->subject_index) {
-    case 0:
+    case ePipe_special_fade:
         if (fabs(GetReplayRate()) <= 1.f) {
             FadePaletteDown();
         }
         break;
-    case 1:
+    case ePipe_special_giant_ped_on:
         gPed_scale_factor = 2.0f;
         break;
-    case 2:
-        gPed_scale_factor = 1.0f;
-        break;
-    case 3:
+    case ePipe_special_min_ped_on:
         gPed_scale_factor = 0.5f;
         break;
-    case 4:
+    case ePipe_special_giant_ped_off:
+    case ePipe_special_min_ped_off:
         gPed_scale_factor = 1.0f;
         break;
     }
