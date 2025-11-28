@@ -1386,8 +1386,8 @@ void ApplySmoke(tPipe_chunk** pChunk) {
     AdjustSmoke((*pChunk)->subject_index,
         (*pChunk)->chunk_data.smoke_data.type,
         &pos,
-        (*pChunk)->chunk_data.smoke_data.radius / 1024.f,
-        (*pChunk)->chunk_data.smoke_data.strength / 256.f);
+        (float)(*pChunk)->chunk_data.smoke_data.radius / 1024.f,
+        (float)(*pChunk)->chunk_data.smoke_data.strength / 256.f);
     AdvanceChunkPtr(pChunk, ePipe_chunk_smoke);
 }
 
