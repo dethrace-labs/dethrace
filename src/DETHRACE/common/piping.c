@@ -1279,6 +1279,7 @@ void DoSmudge(tPipe_chunk** pChunk, int pDir) {
     tCar_spec* car;
     int group;
 
+    group = 0;
     if (((*pChunk)->subject_index & 0xff00) == 0) {
         car = &gProgram_state.current_car;
     } else {
@@ -1288,10 +1289,12 @@ void DoSmudge(tPipe_chunk** pChunk, int pDir) {
     for (i = 0; i < (*pChunk)->chunk_data.smudge_data.vertex_count; i++) {
         v = (*pChunk)->chunk_data.smudge_data.vertex_changes[i].vertex_index;
         inc = (*pChunk)->chunk_data.smudge_data.vertex_changes[i].light_index * pDir;
-        V11MODEL(model_ptr)->groups->vertex_colours[v] = ((V11MODEL(model_ptr)->groups->vertex_colours[v] >> 24) + inc) << 24;
+        // this is slightly different due to using BRender 1.3.2
+        V11MODEL(model_ptr)->groups->vertex_colours[v] = (BR_ALPHA(V11MODEL(model_ptr)->groups->vertex_colours[v]) + inc) << 24;
         if (model_ptr->flags & BR_MODF_UPDATEABLE) {
-            model_ptr->vertices[V11MODEL(model_ptr)->groups->vertex_user[v]].index = (V11MODEL(model_ptr)->groups->vertex_colours[v] >> 24) + inc;
+            model_ptr->vertices[V11MODEL(model_ptr)->groups->vertex_user[v]].index = BR_ALPHA(V11MODEL(model_ptr)->groups->vertex_colours[v]) + inc;
         }
+        //
     }
 }
 
