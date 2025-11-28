@@ -501,7 +501,7 @@ void AddModelGeometryToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex
         data_size = offsetof(tPipe_model_geometry_data, vertex_changes) + pVertex_count * sizeof(tChanged_vertex);
         gModel_geometry_space->vertex_count = pVertex_count;
         gModel_geometry_space->model_index = pModel_index;
-        memcpy(gModel_geometry_space->vertex_changes, pCoordinates, pVertex_count * sizeof(tChanged_vertex));
+        memcpy(gModel_geometry_space->vertex_changes, pCoordinates, data_size);
         AddDataToSession(pCar_ID, gModel_geometry_space, data_size);
     }
 }
