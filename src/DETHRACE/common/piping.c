@@ -133,6 +133,7 @@ tU32 gYoungest_time;
 // GLOBAL: CARM95 0x0053208c
 tU8* gPipe_buffer_phys_end;
 
+// GLOBAL: CARM95 0x00532008
 tU8* gLocal_buffer_record_ptr;
 
 // GLOBAL: CARM95 0x00532018
@@ -973,19 +974,21 @@ void ResetPiping(void) {
 // FUNCTION: CARM95 0x00429596
 void InitialisePiping(void) {
 
-    if (!gAusterity_mode && gNet_mode == eNet_mode_none) {
-        PDAllocateActionReplayBuffer((char**)&gPipe_buffer_start, &gPipe_buffer_size);
-        gPipe_buffer_phys_end = gPipe_buffer_start + gPipe_buffer_size;
-        gSmudge_space = BrMemAllocate(offsetof(tPipe_smudge_data, vertex_changes) + sizeof(tSmudged_vertex) * 2400, kMem_pipe_model_geometry);
-        // DAT_00532008 = 0;
-        BrVector3SetFloat(&gZero_vector, 0.f, 0.f, 0.f);
-        gModel_geometry_space = (tPipe_model_geometry_data*)gSmudge_space;
-        gLocal_buffer = BrMemAllocate(LOCAL_BUFFER_SIZE, kMem_pipe_model_geometry);
-    } else {
+    if (gAusterity_mode || gNet_mode != eNet_mode_none) {
         gPipe_buffer_start = NULL;
         gLocal_buffer = NULL;
         gModel_geometry_space = NULL;
         gSmudge_space = NULL;
+    } else {
+        PDAllocateActionReplayBuffer((char**)&gPipe_buffer_start, &gPipe_buffer_size);
+        gPipe_buffer_phys_end = gPipe_buffer_start + gPipe_buffer_size;
+        gModel_geometry_space = BrMemAllocate(offsetof(tPipe_smudge_data, vertex_changes) + sizeof(tSmudged_vertex) * 2400, kMem_pipe_model_geometry);
+        gSmudge_space = gModel_geometry_space;
+        gLocal_buffer_record_ptr = NULL;
+        gZero_vector.v[0] = 0;
+        gZero_vector.v[1] = 0;
+        gZero_vector.v[2] = 0;
+        gLocal_buffer = BrMemAllocate(LOCAL_BUFFER_SIZE, kMem_pipe_model_geometry);
     }
     ResetPiping();
 }
