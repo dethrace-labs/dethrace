@@ -753,7 +753,7 @@ void AddCarIncidentToPipingSession(float pSeverity, tCar_spec* pCar, br_vector3*
 
     data.severity = pSeverity;
     data.info.car_info.car_ID = pCar->car_ID;
-    BrVector3Copy(&data.info.car_info.impact_point, pImpact_point);
+    data.info.car_info.impact_point = *pImpact_point;
     AddDataToSession(1, &data, sizeof(tPipe_incident_data));
 }
 
