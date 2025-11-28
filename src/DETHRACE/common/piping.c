@@ -1255,7 +1255,7 @@ void ApplyModelGeometry(tPipe_chunk** pChunk) {
     br_model* model_ptr;
     tCar_spec* car;
 
-    if (((*pChunk)->subject_index & 0xff00) == 0) {
+    if (((*pChunk)->subject_index >> 8) == 0) {
         car = &gProgram_state.current_car;
     } else {
         car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
