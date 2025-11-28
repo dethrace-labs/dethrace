@@ -529,23 +529,18 @@ void AddPedestrianToPipingSession(int pPedestrian_index, br_matrix34* pTrans, tU
     tPipe_pedestrian_data data;
     tU32 data_size;
 
-    if (pFrame_index == 0xff) {
-        pFrame_index = 0;
-    }
-    data.action_and_frame_index = (pDone_initial ? 1 : 0) << 7 | pAction_index << 4 | pFrame_index;
+    data.action_and_frame_index = (pDone_initial == 0 ? 0 : 0x80) | ((pFrame_index != 255 ? pFrame_index : 0) + 16 * pAction_index);
     data.hit_points = pHit_points;
-    data.new_translation.v[0] = pTrans->m[3][0];
-    data.new_translation.v[1] = pTrans->m[3][1];
-    data.new_translation.v[2] = pTrans->m[3][2];
+    memcpy(&data.new_translation, &pTrans->m[3], sizeof(data.new_translation));
     data.parent = pParent_ID;
-    if (pHit_points <= 0) {
+    if (data.hit_points > 0) {
+        data_size = offsetof(tPipe_pedestrian_data, spin_period);
+    } else {
         data.spin_period = pSpin_period;
         data.parent_actor = GetPedestrianActor(pPedestrian_index)->parent;
-        BrVector3Copy(&data.offset, pOffset);
+        memcpy(&data.offset, pOffset, sizeof(data.offset));
         data.jump_magnitude = pJump_magnitude;
         data_size = sizeof(tPipe_pedestrian_data);
-    } else {
-        data_size = offsetof(tPipe_pedestrian_data, spin_period);
     }
     AddDataToSession(pPedestrian_index, &data, data_size);
 }
