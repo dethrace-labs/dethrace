@@ -1455,8 +1455,9 @@ void ApplyOilSpill(tPipe_chunk** pChunk, tU32 pStop_time) {
 void ApplyFrameBoundary(tPipe_chunk** pChunk) {
     tU32 result;
 
-    gLast_replay_frame_time = (*pChunk)->chunk_data.frame_boundary_data.time;
-    // DAT_0054b244 = PDGetTotalTime();
+    result = (*pChunk)->chunk_data.frame_boundary_data.time;
+    gLast_replay_frame_time = result;
+    gFrame_start_time = PDGetTotalTime();
     AdvanceChunkPtr(pChunk, ePipe_chunk_frame_boundary);
 }
 
