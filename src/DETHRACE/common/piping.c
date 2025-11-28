@@ -1079,7 +1079,7 @@ void PipeCarPositions(void) {
     tS8 damage_deltas[12];
 
     StartPipingSession(ePipe_chunk_car);
-    for (cat = eVehicle_self; cat < eVehicle_not_really; cat++) {
+    for (cat = eVehicle_self; cat <= eVehicle_drone; cat++) {
         if (cat == eVehicle_self) {
             car_count = 1;
         } else {
@@ -1091,7 +1091,7 @@ void PipeCarPositions(void) {
             } else {
                 car = GetCarSpec(cat, i);
             }
-            AddCarToPipingSession((cat << 8) | i,
+            AddCarToPipingSession((cat << 8) + i,
                 &car->car_master_actor->t.t.mat, &car->v, car->speedo_speed,
                 car->lf_sus_position, car->rf_sus_position, car->lr_sus_position, car->rr_sus_position,
                 car->steering_angle, car->revs, car->gear, car->frame_collision_flag);
@@ -1099,7 +1099,7 @@ void PipeCarPositions(void) {
     }
     EndPipingSession();
     session_started = 0;
-    for (cat = eVehicle_self; cat < eVehicle_net_player; cat++) {
+    for (cat = eVehicle_self; cat <= eVehicle_self; cat++) {
         if (cat == eVehicle_self) {
             car_count = 1;
         } else {
@@ -1111,20 +1111,21 @@ void PipeCarPositions(void) {
             } else {
                 car = GetCarSpec(cat, i);
             }
-            if (car->active) {
-                difference_found = 0;
-                for (j = 0; j < COUNT_OF(car->damage_units); j++) {
-                    damage_deltas[j] = car->damage_units[j].damage_level - car->frame_start_damage[j];
-                    difference_found |= damage_deltas[j];
-                    car->frame_start_damage[j] = car->damage_units[j].damage_level;
+            if (!car->active) {
+                continue;
+            }
+            difference_found = 0;
+            for (j = 0; j < COUNT_OF(car->damage_units); j++) {
+                damage_deltas[j] = car->damage_units[j].damage_level - car->frame_start_damage[j];
+                difference_found |= damage_deltas[j];
+                car->frame_start_damage[j] = car->damage_units[j].damage_level;
+            }
+            if (difference_found) {
+                if (!session_started) {
+                    StartPipingSession(ePipe_chunk_damage);
+                    session_started = 1;
                 }
-                if (difference_found) {
-                    if (!session_started) {
-                        StartPipingSession(ePipe_chunk_damage);
-                        session_started = 1;
-                    }
-                    AddDamageToPipingSession((cat << 8) | i, damage_deltas);
-                }
+                AddDamageToPipingSession((cat << 8) + i, damage_deltas);
             }
         }
     }
