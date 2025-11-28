@@ -794,7 +794,7 @@ void AddProxRayToPipingSession(int pRay_index, tCar_spec* pCar, tU16 pPed_index,
 void AddSkidAdjustmentToPipingSession(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
     tPipe_skid_adjustment adjustment;
 
-    BrMatrix34Copy(&adjustment.matrix, pMatrix);
+    adjustment.matrix = *pMatrix;
     adjustment.material_index = pMaterial_index;
     AddDataToSession(pSkid_num, &adjustment, sizeof(tPipe_skid_adjustment));
 }
