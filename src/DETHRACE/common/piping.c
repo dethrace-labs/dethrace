@@ -1503,33 +1503,33 @@ void ApplyCar(tPipe_chunk** pChunk) {
     br_vector3 com_offset_c;
     br_vector3 com_offset_w;
 
-    if (((*pChunk)->subject_index & 0xff00) == 0) {
+    if (((*pChunk)->subject_index >> 8) == 0) {
         car = &gProgram_state.current_car;
     } else {
         car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0x00ff);
     }
-    BrMatrix34Copy(&car->car_master_actor->t.t.mat, &(*pChunk)->chunk_data.car_data.transformation);
-    BrVector3Copy(&car->v, &(*pChunk)->chunk_data.car_data.velocity);
+    car->car_master_actor->t.t.mat = (*pChunk)->chunk_data.car_data.transformation;
+    car->v = (*pChunk)->chunk_data.car_data.velocity;
     BrMatrix34TApplyV(&car->velocity_car_space, &car->v, &car->car_master_actor->t.t.mat);
-    BrVector3InvScale(&car->velocity_car_space, &car->velocity_car_space, WORLD_SCALE);
-    if (BrVector3LengthSquared(&car->velocity_car_space) >= .0001f) {
-        BrVector3Normalise(&car->direction, &car->v);
-    } else {
+    BrVector3InvScale(&car->velocity_car_space, &car->velocity_car_space, WORLD_SCALE * 1000);
+    if (BrVector3LengthSquared(&car->velocity_car_space) < .0001) {
         BrVector3Negate(&car->direction, (br_vector3*)car->car_master_actor->t.t.mat.m[2]);
+    } else {
+        BrVector3Normalise(&car->direction, &car->v);
     }
-    BrVector3Copy(&car->pos, &car->car_master_actor->t.t.translate.t);
+    car->pos = car->car_master_actor->t.t.translate.t;
     BrVector3InvScale(&com_offset_c, &car->cmpos, WORLD_SCALE);
     BrMatrix34ApplyV(&com_offset_w, &com_offset_c, &car->car_master_actor->t.t.mat);
     BrVector3Accumulate(&car->pos, &com_offset_w);
-    car->speedo_speed = .07f * (*pChunk)->chunk_data.car_data.speedo_speed / 32767.f;
-    car->lf_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.lf_sus_position / 127.f;
-    car->rf_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.rf_sus_position / 127.f;
-    car->lr_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.lr_sus_position / 127.f;
-    car->rr_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.rr_sus_position / 127.f;
-    car->steering_angle = 60.f * (*pChunk)->chunk_data.car_data.steering_angle / 32767.f;
+    car->speedo_speed = .07 * (*pChunk)->chunk_data.car_data.speedo_speed / 32767.0;
+    car->lf_sus_position = 0.15 * (*pChunk)->chunk_data.car_data.lf_sus_position / 127.0;
+    car->rf_sus_position = 0.15 * (*pChunk)->chunk_data.car_data.rf_sus_position / 127.0;
+    car->lr_sus_position = 0.15 * (*pChunk)->chunk_data.car_data.lr_sus_position / 127.0;
+    car->rr_sus_position = 0.15 * (*pChunk)->chunk_data.car_data.rr_sus_position / 127.0;
+    car->steering_angle = 60.0 * (*pChunk)->chunk_data.car_data.steering_angle / 32767.0;
     car->revs = 10 * ((*pChunk)->chunk_data.car_data.revs_and_gear & 0x7ff);
     car->gear = ((*pChunk)->chunk_data.car_data.revs_and_gear >> 12) - 1;
-    car->frame_collision_flag = ((*pChunk)->chunk_data.car_data.revs_and_gear >> 11) & 0x1;
+    car->frame_collision_flag = ((*pChunk)->chunk_data.car_data.revs_and_gear & 0x800) >> 11;
     AdvanceChunkPtr(pChunk, ePipe_chunk_car);
 }
 
