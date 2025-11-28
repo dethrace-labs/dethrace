@@ -646,11 +646,12 @@ void AddFlameToPipingSession(int pIndex, int pFrame_count, br_scalar pScale_x, b
 void AddSplashToPipingSession(tCollision_info* pCar) {
     tPipe_splash_data data;
 
-    if (pCar->driver >= eDriver_oppo) {
-        data.d = pCar->water_d;
-        BrVector3Copy(&data.normal, &pCar->water_normal);
-        AddDataToSession(pCar->car_ID, &data, sizeof(tPipe_splash_data));
+    if (pCar->driver <= eDriver_non_car) {
+        return;
     }
+    data.d = pCar->water_d;
+    BrVector3Copy(&data.normal, &pCar->water_normal);
+    AddDataToSession(pCar->car_ID, &data, sizeof(tPipe_splash_data));
 }
 
 // IDA: void __usercall AddOilSpillToPipingSession(int pIndex@<EAX>, br_matrix34 *pMat@<EDX>, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap)
