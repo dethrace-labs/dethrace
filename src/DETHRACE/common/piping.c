@@ -899,7 +899,7 @@ void PipeSingleWallIncident(float pSeverity, br_vector3* pImpact_point) {
 
     if (pSeverity > gWall_severity) {
         gWall_severity = pSeverity;
-        BrVector3Copy(&gWall_impact_point, pImpact_point);
+        gWall_impact_point = *pImpact_point;
     }
 }
 
