@@ -515,11 +515,11 @@ void AddSmudgeToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count,
         if (pVertex_count > 600) {
             pVertex_count = 600;
         }
+        data_size = pVertex_count * sizeof(tSmudged_vertex);
         gSmudge_space->vertex_count = pVertex_count;
         gSmudge_space->model_index = pModel_index;
-        memcpy(gSmudge_space->vertex_changes, pCoordinates, pVertex_count * sizeof(tSmudged_vertex));
-        data_size = offsetof(tPipe_smudge_data, vertex_changes) + pVertex_count * sizeof(tSmudged_vertex);
-        AddDataToSession(pCar_ID, gSmudge_space, data_size);
+        memcpy(gSmudge_space->vertex_changes, pCoordinates, data_size);
+        AddDataToSession(pCar_ID, gSmudge_space, data_size + offsetof(tPipe_smudge_data, vertex_changes));
     }
 }
 
