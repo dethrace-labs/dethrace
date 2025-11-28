@@ -742,7 +742,7 @@ void AddPedGibToPipingSession(int pIndex, br_matrix34* pTrans, int pSize, int pG
     data.ped_parent_index = pPed_index;
     data.size = pSize;
     data.gib_index = pGib_index;
-    BrMatrix34Copy(&data.transform, pTrans);
+    data.transform = *pTrans;
     AddDataToSession(pIndex, &data, sizeof(tPipe_ped_gib_data));
 }
 
