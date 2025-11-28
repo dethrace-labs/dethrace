@@ -774,7 +774,7 @@ void AddWallIncidentToPipingSession(float pSeverity, br_vector3* pImpact_point) 
     tPipe_incident_data data;
 
     data.severity = pSeverity;
-    BrVector3Copy(&data.info.wall_info.pos, pImpact_point);
+    data.info.wall_info.pos = *pImpact_point;
     AddDataToSession(2, &data, sizeof(tPipe_incident_data));
 }
 
