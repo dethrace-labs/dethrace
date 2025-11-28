@@ -705,11 +705,11 @@ void AddSoundToPipingSession(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volum
 
     data.pitch = pPitch;
     if (pPos != NULL) {
-        BrVector3Copy(&data.position, pPos);
+        data.position = *pPos;
     } else {
         BrVector3Set(&data.position, 0.f, 0.f, 0.f);
     }
-    data.volume = (pR_volume << 8) | (pL_volume << 0);
+    data.volume = (pR_volume << 8) + pL_volume;
     data.outlet_index = GetIndexFromOutlet(pOutlet);
     AddDataToSession(pSound_index, &data, sizeof(tPipe_sound_data));
 }
