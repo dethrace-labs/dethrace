@@ -2086,8 +2086,8 @@ int UndoPipedSession(tU8** pPtr) {
     gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
     chunk_ptr = &((tPipe_session*)*pPtr)->chunks;
     chunk_type = ((tPipe_session*)*pPtr)->chunk_type;
-    pushed_end_of_session = gEnd_of_session;
     for (i = 0; i < ((tPipe_session*)*pPtr)->number_of_chunks; i++) {
+        pushed_end_of_session = gEnd_of_session;
         if (!(chunk_type == ePipe_chunk_model_geometry || chunk_type == ePipe_chunk_sound || chunk_type == ePipe_chunk_damage || chunk_type == ePipe_chunk_special || chunk_type == ePipe_chunk_incident || chunk_type == ePipe_chunk_prox_ray || chunk_type == ePipe_chunk_smudge)) {
             prev_chunk = FindPreviousChunk(*pPtr, ((tPipe_session*)*pPtr)->chunk_type, chunk_ptr->subject_index);
         }
@@ -2160,8 +2160,11 @@ int UndoPipedSession(tU8** pPtr) {
         case ePipe_chunk_skid_adjustment:
             UndoSkidAdjustment(&chunk_ptr, prev_chunk);
             break;
+#ifdef DETHRACE_FIX_BUGS
         default:
+            LOG_PANIC2("enum not handling %d", chunk_type);
             break;
+#endif
         }
     }
     temp_ptr = *pPtr;
