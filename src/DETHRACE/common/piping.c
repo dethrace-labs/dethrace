@@ -538,7 +538,7 @@ void AddPedestrianToPipingSession(int pPedestrian_index, br_matrix34* pTrans, tU
     } else {
         data.spin_period = pSpin_period;
         data.parent_actor = GetPedestrianActor(pPedestrian_index)->parent;
-        memcpy(&data.offset, pOffset, sizeof(data.offset));
+        data.offset = *pOffset;
         data.jump_magnitude = pJump_magnitude;
         data_size = sizeof(tPipe_pedestrian_data);
     }
@@ -684,15 +684,17 @@ void AddFrameFinishToPipingSession(tU32 pThe_time) {
 void AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag) {
     tPipe_car_data data;
 
-    BrMatrix34Copy(&data.transformation, pCar_mat);
-    BrVector3Copy(&data.velocity, pCar_velocity);
-    data.speedo_speed = pSpeedo_speed * 32767.f / 0.07f;
-    data.lf_sus_position = pLf_sus_position * 127.f / .15f;
-    data.rf_sus_position = pRf_sus_position * 127.f / .15f;
-    data.lr_sus_position = pLr_sus_position * 127.f / .15f;
-    data.rr_sus_position = pRr_sus_position * 127.f / .15f;
-    data.steering_angle = pSteering_angle * 32767.f / 60.f;
-    data.revs_and_gear = (pGear + 1) << 12 | (pFrame_coll_flag ? 0 : 1) << 11 | ((((int)pRevs) / 10) & 0x7ff);
+    memcpy(&data.transformation, pCar_mat, sizeof(data.transformation));
+    data.velocity = *pCar_velocity;
+    data.speedo_speed = pSpeedo_speed * 32767.0 / 0.07;
+    data.lf_sus_position = pLf_sus_position * 127.f / .15;
+    data.rf_sus_position = pRf_sus_position * 127.f / .15;
+    data.lr_sus_position = pLr_sus_position * 127.f / .15;
+    data.rr_sus_position = pRr_sus_position * 127.f / .15;
+    data.steering_angle = pSteering_angle * 32767.0 / 60.0;
+    data.revs_and_gear = ((pGear + 1) << 12)
+        + (pFrame_coll_flag == 0 ? 0 : 0x800)
+        + (((int)pRevs / 10) & 0x7ff);
     AddDataToSession(pCar_ID, &data, sizeof(tPipe_car_data));
 }
 
@@ -702,10 +704,10 @@ void AddSoundToPipingSession(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volum
     tPipe_sound_data data;
 
     data.pitch = pPitch;
-    if (pPos == NULL) {
-        BrVector3Set(&data.position, 0.f, 0.f, 0.f);
-    } else {
+    if (pPos != NULL) {
         BrVector3Copy(&data.position, pPos);
+    } else {
+        BrVector3Set(&data.position, 0.f, 0.f, 0.f);
     }
     data.volume = (pR_volume << 8) | (pL_volume << 0);
     data.outlet_index = GetIndexFromOutlet(pOutlet);
