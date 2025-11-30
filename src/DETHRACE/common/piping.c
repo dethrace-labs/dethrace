@@ -1758,27 +1758,30 @@ tPipe_chunk* FindPreviousChunk(tU8* pPtr, tPipe_chunk_type pType, tChunk_subject
     ptr = pPtr;
     chunk_counter = 0;
     masked_index = pIndex & 0x0fff;
-    while (1) {
-        if (!MoveSessionPointerBackOne(&ptr)) {
-            reached_end = chunk_counter >= gMax_rewind_chunks;
-            chunk_counter++;
-        } else {
+    do {
+        if (MoveSessionPointerBackOne(&ptr) != 0 || gMax_rewind_chunks <= chunk_counter++) {
             reached_end = 1;
+        } else {
+            reached_end = 0;
         }
+
         if (!reached_end) {
             gEnd_of_session = ptr + LengthOfSession((tPipe_session*)ptr) - sizeof(tU16);
             mr_chunky = &((tPipe_session*)ptr)->chunks;
-            for (i = 0; i < ((tPipe_session*)ptr)->number_of_chunks && ((tPipe_session*)ptr)->chunk_type == pType; i++) {
-                if ((mr_chunky->subject_index & 0xfff) == masked_index) {
-                    return mr_chunky;
+            for (i = 0; i < ((tPipe_session*)ptr)->number_of_chunks; i++) {
+                if (((tPipe_session*)ptr)->chunk_type == pType) {
+                    if ((mr_chunky->subject_index & 0xfff) == masked_index) {
+                        return mr_chunky;
+                    } else {
+                        AdvanceChunkPtr(&mr_chunky, pType);
+                    }
+                } else {
+                    break;
                 }
-                AdvanceChunkPtr(&mr_chunky, pType);
             }
         }
-        if (reached_end) {
-            return NULL;
-        }
-    }
+    } while (!reached_end);
+    return NULL;
 }
 
 // IDA: void __usercall UndoModelGeometry(tPipe_chunk **pChunk@<EAX>)
