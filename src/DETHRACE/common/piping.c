@@ -1955,10 +1955,10 @@ void UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
-    if (pPrev_chunk == NULL) {
-        SetScreenWobble(0, 0);
-    } else {
+    if (pPrev_chunk != NULL) {
         ApplyScreenWobble(&temp_prev_chunk);
+    } else {
+        SetScreenWobble(0, 0);
     }
     gDisable_advance = 0;
     AdvanceChunkPtr(pChunk, ePipe_chunk_screen_shake);
@@ -2011,6 +2011,7 @@ void UndoSmoke(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 void UndoSmokeColumn(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
 
+    temp_prev_chunk = pPrev_chunk;
     ApplySmokeColumn(pChunk);
 }
 
