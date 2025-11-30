@@ -1872,7 +1872,7 @@ void UndoDamage(tPipe_chunk** pChunk) {
     tCar_spec* car;
     int i;
 
-    if (((*pChunk)->subject_index & 0xff00) == 0) {
+    if (((*pChunk)->subject_index >> 8) == 0) {
         car = &gProgram_state.current_car;
     } else {
         car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
