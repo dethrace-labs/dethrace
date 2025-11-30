@@ -1849,13 +1849,13 @@ void UndoCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
 
     temp_prev_chunk = pPrev_chunk;
-    if (pPrev_chunk == NULL) {
-        ApplyCar(pChunk);
-    } else {
+    if (pPrev_chunk != NULL) {
         gDisable_advance = 1;
         ApplyCar(&temp_prev_chunk);
         gDisable_advance = 0;
         AdvanceChunkPtr(pChunk, ePipe_chunk_car);
+    } else {
+        ApplyCar(pChunk);
     }
 }
 
