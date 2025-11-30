@@ -2029,10 +2029,15 @@ void UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
-    if (pPrev_chunk == NULL) {
-        ((((*pChunk)->subject_index & 0xff00) == 0) ? &gProgram_state.current_car : GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff))->water_d = 10000.f;
-    } else {
+    if (pPrev_chunk != NULL) {
         ApplySplash(&temp_prev_chunk);
+    } else {
+        // if (((*pChunk)->subject_index >> 8) == 0) {
+        //     gProgram_state.current_car.water_d = 10000.f;
+        // } else {
+        //     GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff)->water_d = 10000.f;
+        // }
+        ((((*pChunk)->subject_index >> 8) == 0) ? &gProgram_state.current_car : GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff))->water_d = 10000.f;
     }
     gDisable_advance = 0;
     AdvanceChunkPtr(pChunk, ePipe_chunk_splash);
