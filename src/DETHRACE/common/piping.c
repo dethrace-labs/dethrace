@@ -1891,16 +1891,14 @@ void UndoSpecial(tPipe_chunk** pChunk) {
         ApplySpecial(pChunk);
     } else {
         switch ((*pChunk)->subject_index) {
-        case 1:
-            gPed_scale_factor = 1.0f;
-            break;
-        case 2:
+        case ePipe_special_giant_ped_off:
             gPed_scale_factor = 2.0f;
             break;
-        case 3:
+        case ePipe_special_giant_ped_on:
+        case ePipe_special_min_ped_on:
             gPed_scale_factor = 1.0f;
             break;
-        case 4:
+        case ePipe_special_min_ped_off:
             gPed_scale_factor = 0.5f;
             break;
         }
