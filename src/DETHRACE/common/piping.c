@@ -1823,13 +1823,13 @@ void UndoPedestrian(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
 
     temp_prev_chunk = pPrev_chunk;
-    if (pPrev_chunk == NULL) {
-        ApplyPedestrian(pChunk);
-    } else {
+    if (pPrev_chunk != NULL) {
         gDisable_advance = 1;
         ApplyPedestrian(&temp_prev_chunk);
         gDisable_advance = 0;
         AdvanceChunkPtr(pChunk, ePipe_chunk_pedestrian);
+    } else {
+        ApplyPedestrian(pChunk);
     }
 }
 
@@ -1838,6 +1838,7 @@ void UndoPedestrian(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 void UndoFrameBoundary(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
 
+    temp_prev_chunk = pPrev_chunk;
     ApplyFrameBoundary(pChunk);
     AdvanceChunkPtr(pChunk, ePipe_chunk_frame_boundary);
 }
