@@ -2032,11 +2032,6 @@ void UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     if (pPrev_chunk != NULL) {
         ApplySplash(&temp_prev_chunk);
     } else {
-        // if (((*pChunk)->subject_index >> 8) == 0) {
-        //     gProgram_state.current_car.water_d = 10000.f;
-        // } else {
-        //     GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff)->water_d = 10000.f;
-        // }
         ((((*pChunk)->subject_index >> 8) == 0) ? &gProgram_state.current_car : GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff))->water_d = 10000.f;
     }
     gDisable_advance = 0;
@@ -2069,10 +2064,10 @@ void UndoProxRay(tPipe_chunk** pChunk) {
 void UndoSkidAdjustment(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
     gDisable_advance = 1;
-    if (pPrev_chunk == NULL) {
-        HideSkid((*pChunk)->subject_index);
-    } else {
+    if (pPrev_chunk != NULL) {
         ApplySkidAdjustment(&pPrev_chunk);
+    } else {
+        HideSkid((*pChunk)->subject_index);
     }
     gDisable_advance = 0;
     AdvanceChunkPtr(pChunk, ePipe_chunk_skid_adjustment);
