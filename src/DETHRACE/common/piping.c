@@ -2198,24 +2198,28 @@ void ScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, int (*pC
     tU32 the_time;
 
     the_time = pDefault_time;
-    while (1) {
-        if (PipeSearchForwards() ? MoveSessionPointerForwardOne(pPtr) : MoveSessionPointerBackOne(pPtr)) {
+
+    do {
+        if (gPipe_play_ptr == gPipe_record_ptr          ? 0
+                : gPipe_play_ptr == gPipe_buffer_oldest ? 1
+                                                        : (GetReplayRate() != 0.0f ? GetReplayRate() > 0.0f : GetReplayDirection() > 0)) {
+
+            if (MoveSessionPointerForwardOne(pPtr)) {
+                return;
+            }
+        } else if (MoveSessionPointerBackOne(pPtr)) {
             return;
         }
         gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
+
         if (((tPipe_session*)*pPtr)->chunk_type == ePipe_chunk_frame_boundary) {
             the_time = ((tPipe_session*)*pPtr)->chunks.chunk_data.frame_boundary_data.time;
         } else if (((tPipe_session*)*pPtr)->chunk_type == pType) {
             if (pCall_back(&((tPipe_session*)*pPtr)->chunks, ((tPipe_session*)*pPtr)->number_of_chunks, the_time)) {
-                return;
+                break;
             }
         }
-        if (pTime_check != NULL) {
-            if (!pTime_check(the_time)) {
-                return;
-            }
-        }
-    }
+    } while (pTime_check == NULL || pTime_check(the_time));
 }
 
 // IDA: int __usercall CheckSound@<EAX>(tPipe_chunk *pChunk_ptr@<EAX>, int pChunk_count@<EDX>, tU32 pTime@<EBX>)
