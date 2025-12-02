@@ -15,6 +15,7 @@ int S3CreateTypeStructs(tS3_channel* chan);
 int S3ReleaseTypeStructs(tS3_channel* chan);
 int S3StopSample(tS3_channel* chan);
 int S3ExecuteSampleFilterFuncs(tS3_channel* chan);
+int S3GetSampleLength(tS3_sound_tag tag);
 int S3SyncSampleVolumeAndPan(tS3_channel* chan);
 int S3SyncSampleRate(tS3_channel* chan);
 
