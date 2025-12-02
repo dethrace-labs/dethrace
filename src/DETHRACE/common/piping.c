@@ -2229,8 +2229,19 @@ int CheckSound(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     int sound_length;
     tPipe_chunk* temp_ptr;
 
-    STUB_ONCE();
-    return 1;
+    temp_ptr = pChunk_ptr;
+    for (i = 0; i < pChunk_count; i++) {
+        sound_length = S3GetSampleLength(temp_ptr->subject_index);
+        if (temp_ptr->chunk_data.sound_data.pitch > 1) {
+            sound_length = (double)sound_length / ((double)temp_ptr->chunk_data.sound_data.pitch / 65536.0);
+        }
+        if (pTime + sound_length >= gYoungest_time && pTime + sound_length < gOldest_time) {
+            ApplySound(&temp_ptr);
+        } else {
+            AdvanceChunkPtr(&temp_ptr, ePipe_chunk_sound);
+        }
+    }
+    return 0;
 }
 
 // IDA: int __usercall SoundTimeout@<EAX>(tU32 pTime@<EAX>)
