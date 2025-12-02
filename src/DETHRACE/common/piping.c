@@ -2247,7 +2247,8 @@ int CheckSound(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 // IDA: int __usercall SoundTimeout@<EAX>(tU32 pTime@<EAX>)
 // FUNCTION: CARM95 0x0042c132
 int SoundTimeout(tU32 pTime) {
-    NOT_IMPLEMENTED();
+
+    return gYoungest_time < pTime || gYoungest_time - pTime < gLast_time;
 }
 
 // IDA: void __usercall ScanAndPlaySoundsToBe(tU8 *pPtr@<EAX>, tU32 pOldest_time@<EDX>, tU32 pYoungest_time@<EBX>)
