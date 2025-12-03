@@ -173,6 +173,9 @@ tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)
 #define PIPE_ALIGN(V) (((V) + sizeof(void*) - 1) & ~(sizeof(void*) - 1))
 #endif
 
+#define SHOULD_SCAN_FORWARDS() gPipe_play_ptr == gPipe_record_ptr ? 0 : gPipe_play_ptr == gPipe_buffer_oldest ? 1 \
+                                                                                                              : (GetReplayRate() != 0.0f ? GetReplayRate() > 0.0f : GetReplayDirection() > 0)
+
 // IDA: void __usercall GetReducedPos(br_vector3 *v@<EAX>, tReduced_pos *p@<EDX>)
 // FUNCTION: CARM95 0x00427ed0
 void GetReducedPos(br_vector3* v, tReduced_pos* p) {
@@ -2200,9 +2203,7 @@ void ScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, int (*pC
     the_time = pDefault_time;
 
     do {
-        if (gPipe_play_ptr == gPipe_record_ptr          ? 0
-                : gPipe_play_ptr == gPipe_buffer_oldest ? 1
-                                                        : (GetReplayRate() != 0.0f ? GetReplayRate() > 0.0f : GetReplayDirection() > 0)) {
+        if (SHOULD_SCAN_FORWARDS()) {
 
             if (MoveSessionPointerForwardOne(pPtr)) {
                 return;
@@ -2334,10 +2335,10 @@ void ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_
     temp_ptr = gPipe_play_ptr;
     gTrigger_time = 0;
     gMax_distance = pMax_distance_sqr;
-    BrVector3Copy(&gReference_pos, pSource_pos);
+    gReference_pos = *pSource_pos;
     gCar_ptr = pCar;
 
-    if (PipeSearchForwards()) {
+    if (SHOULD_SCAN_FORWARDS()) {
         gEnd_time = GetTotalTime() + pOffset_time;
         gLoop_abort_time = gEnd_time + pTime_period;
     } else {
@@ -2346,9 +2347,9 @@ void ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_
     }
 
     ScanBuffer(&temp_ptr, ePipe_chunk_car, GetTotalTime(), CheckCar, CarTimeout);
-    BrVector3Copy(pCar_pos, &gCar_pos);
+    *pCar_pos = gCar_pos;
     if (pCar_pos->v[0] > 500.f) {
-        Vector3AddFloats(pCar_pos, pCar_pos, -1000.f, -1000.f, -1000.f);
+        BrVector3Sub(pCar_pos, pCar_pos, &gDisabled_vector);
     }
     *pTime_returned = gTrigger_time;
 }
