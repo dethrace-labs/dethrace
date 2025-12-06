@@ -2277,17 +2277,16 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     tPipe_chunk* temp_ptr;
 
     temp_ptr = pChunk_ptr;
-    if (PipeSearchForwards()) {
-        if (pTime <= gEnd_time) {
+    if (SHOULD_SCAN_FORWARDS()) {
+        if (gEnd_time >= pTime) {
             return 0;
         }
-    } else {
-        if (pTime >= gEnd_time) {
-            return 0;
-        }
+    } else if (gEnd_time <= pTime) {
+        return 0;
     }
+
     for (i = 0; i < pChunk_count; i++) {
-        if ((temp_ptr->subject_index & 0xff00) == 0) {
+        if ((temp_ptr->subject_index >> 8) == 0) {
             car = &gProgram_state.current_car;
         } else {
             car = GetCarSpec(temp_ptr->subject_index >> 8, temp_ptr->subject_index & 0xff);
@@ -2297,14 +2296,12 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
             BrVector3InvScale(&com_offset_c, &car->cmpos, WORLD_SCALE);
             BrMatrix34ApplyV(&com_offset_w, &com_offset_c, &temp_ptr->chunk_data.car_data.transformation);
             BrVector3Accumulate(&gCar_pos, &com_offset_w);
+            gTrigger_time = pTime;
             BrVector3Sub(&difference, &gCar_pos, &gReference_pos);
-            if (BrVector3LengthSquared(&difference) <= gMax_distance) {
-                gTrigger_time = pTime;
-                return 0;
-            } else {
-                gTrigger_time = pTime;
+            if (BrVector3LengthSquared(&difference) > gMax_distance) {
                 return 1;
             }
+            break;
         }
         AdvanceChunkPtr(&temp_ptr, ePipe_chunk_car);
     }
