@@ -59,7 +59,7 @@ if(DETHRACE_REPLAY_DEBUG)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_REPLAY_DEBUG)
 endif()
 
-if (MINGW)
+if(MINGW)
     target_compile_options(dethrace_obj PRIVATE -Wno-error=incompatible-pointer-types)
 endif()
 
@@ -68,6 +68,8 @@ target_sources(dethrace_obj PRIVATE
     common/opponent.c
     common/oil.c
     common/racesumm.c
+    common/replay.c
+    common/loading.c
 
     common/brucetrk.c
     common/brucetrk.h
@@ -115,8 +117,7 @@ target_sources(dethrace_obj PRIVATE
     common/input.h
     common/intrface.c
     common/intrface.h
-    common/loading.c
-    common/loading.h
+
     common/loadsave.c
     common/loadsave.h
     common/main.c
@@ -149,8 +150,7 @@ target_sources(dethrace_obj PRIVATE
     common/racestrt.h
     common/raycast.c
     common/raycast.h
-    common/replay.c
-    common/replay.h
+
     common/sound.c
     common/sound.h
     common/spark.c
@@ -190,7 +190,7 @@ endif()
 # Create our main game binary.
 if(MSVC_42_FOR_RECCMP)
     add_executable(dethrace WIN32)
-    set(CMAKE_C_FLAGS_DEBUG "/Od /Oi /Zi /MLd /G5")
+    set(CMAKE_C_FLAGS_DEBUG "/Oi /Zi /MLd /G5")
 
     add_compile_definitions(_DEBUG)
     set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
@@ -198,6 +198,8 @@ if(MSVC_42_FOR_RECCMP)
 
     set_source_files_properties(common/structur.c PROPERTIES COMPILE_FLAGS "/FAs")
     set_source_files_properties(common/racesumm.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/replay.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/loading.c PROPERTIES COMPILE_FLAGS "/FAs")
 
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()
@@ -296,6 +298,7 @@ if(DETHRACE_INSTALL)
                     OPTIONAL
                 )
             endif()
+
             if(DETHRACE_PLATFORM_SDL3)
                 install(FILES "$<TARGET_FILE:SDL3::SDL3>"
                     DESTINATION "."
