@@ -2312,12 +2312,12 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 // FUNCTION: CARM95 0x0042c5b2
 int CarTimeout(tU32 pTime) {
 
-    if (PipeSearchForwards()) {
-        if (pTime > gLoop_abort_time) {
+    if (SHOULD_SCAN_FORWARDS()) {
+        if (gLoop_abort_time < pTime) {
             return 0;
         }
     } else {
-        if (pTime < gLoop_abort_time) {
+        if (gLoop_abort_time > pTime) {
             return 0;
         }
     }
