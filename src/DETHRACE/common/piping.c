@@ -82,8 +82,11 @@ tU32 gOldest_time;
 
 int gCurrent_snapshot_registration_index;
 
-// GLOBAL: CARM95 0x00531fa0
+// GLOBAL: CARM95 0x0053203C
 tPipe_chunk* gMr_chunky;
+
+// GLOBAL: CARM95 0x00531fa0
+tPipe_chunk* gMr_chunky2;
 
 // GLOBAL: CARM95 0x00532040
 tCar_spec* gCar_ptr;
@@ -156,7 +159,6 @@ tU8* gLocal_buffer;
 
 // GLOBAL: CARM95 0x00532090
 tU32 gLocal_buffer_size;
-tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)
 
 #define LOCAL_BUFFER_SIZE 15000
 
@@ -397,7 +399,7 @@ void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
         ((tPipe_session*)gLocal_buffer)->pipe_magic1 = REPLAY_DEBUG_SESSION_MAGIC1;
 #endif
         gLocal_buffer_size = (tU8*)&((tPipe_session*)gLocal_buffer)->chunks - gLocal_buffer;
-        gMr_chunky = (tPipe_chunk*)(gLocal_buffer + gLocal_buffer_size);
+        gMr_chunky2 = (tPipe_chunk*)(gLocal_buffer + gLocal_buffer_size);
     }
 }
 
@@ -475,17 +477,17 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
     int variable_for_breaking_on;
 
     if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
-        temp_buffer_size = pData_length + gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data);
+        temp_buffer_size = pData_length + (gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data));
         if (temp_buffer_size < LOCAL_BUFFER_SIZE) {
             REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
             ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
-            gMr_chunky->subject_index = pSubject_index;
-            gMr_chunky = (tPipe_chunk*)((tU8*)gMr_chunky + sizeof(tPipe_chunk*));
+            gMr_chunky2->subject_index = pSubject_index;
+            gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + sizeof(tPipe_chunk*));
 #if defined(DETHRACE_REPLAY_DEBUG)
-            gMr_chunky->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
+            gMr_chunky2->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
 #endif
-            memcpy(gMr_chunky, pData, pData_length);
-            gMr_chunky = (tPipe_chunk*)((tU8*)gMr_chunky + pData_length);
+            memcpy(gMr_chunky2, pData, pData_length);
+            gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + pData_length);
             gLocal_buffer_size = temp_buffer_size;
         } else {
             variable_for_breaking_on = 1;
@@ -2355,8 +2357,8 @@ void ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_
 // FUNCTION: CARM95 0x0042c90d
 int CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 
-    if (PipeSearchForwards()) {
-        if (pTime <= gEnd_time) {
+    if (SHOULD_SCAN_FORWARDS()) {
+        if (gEnd_time >= pTime) {
             return 0;
         }
     } else {
@@ -2364,8 +2366,9 @@ int CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
             return 0;
         }
     }
-    gIncidentChunk = pChunk_ptr;
     gTrigger_time = pTime;
+    gMr_chunky = pChunk_ptr;
+
     return 1;
 }
 
@@ -2376,7 +2379,7 @@ int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pS
 
     temp_ptr = gPipe_play_ptr;
     gTrigger_time = 0;
-    if (PipeSearchForwards()) {
+    if (SHOULD_SCAN_FORWARDS()) {
         gEnd_time = GetTotalTime() + pOffset_time;
     } else {
         gEnd_time = GetTotalTime() - pOffset_time;
@@ -2384,21 +2387,21 @@ int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pS
     ScanBuffer(&temp_ptr, ePipe_chunk_incident, GetTotalTime(), CheckIncident, NULL);
     if (gTrigger_time != 0) {
         *pTime_away = gTrigger_time - GetTotalTime();
-        *pIncident_type = gIncidentChunk->subject_index;
-        *pSeverity = gIncidentChunk->chunk_data.incident_data.severity;
+        *pIncident_type = gMr_chunky->subject_index;
+        *pSeverity = gMr_chunky->chunk_data.incident_data.severity;
         if (*pIncident_type == eIncident_ped) {
-            pInfo->ped_info.ped_actor = GetPedestrianActor(gIncidentChunk->chunk_data.incident_data.info.ped_info.ped_index);
-            pInfo->ped_info.murderer_actor = gIncidentChunk->chunk_data.incident_data.info.ped_info.actor;
+            pInfo->ped_info.ped_actor = GetPedestrianActor(gMr_chunky->chunk_data.incident_data.info.ped_info.ped_index);
+            pInfo->ped_info.murderer_actor = gMr_chunky->chunk_data.incident_data.info.ped_info.actor;
         } else if (*pIncident_type == eIncident_car) {
-            if ((gIncidentChunk->chunk_data.incident_data.info.car_info.car_ID & 0xff00) == 0) {
+            if ((gMr_chunky->chunk_data.incident_data.info.car_info.car_ID & 0xff00) == 0) {
                 pInfo->car_info.car = &gProgram_state.current_car;
             } else {
-                pInfo->car_info.car = GetCarSpec(gIncidentChunk->chunk_data.incident_data.info.car_info.car_ID >> 8,
-                    gIncidentChunk->chunk_data.incident_data.info.car_info.car_ID & 0xff);
+                pInfo->car_info.car = GetCarSpec(gMr_chunky->chunk_data.incident_data.info.car_info.car_ID >> 8,
+                    gMr_chunky->chunk_data.incident_data.info.car_info.car_ID & 0xff);
             }
-            BrVector3Copy(&pInfo->car_info.impact_point, &gIncidentChunk->chunk_data.incident_data.info.car_info.impact_point);
+            BrVector3Copy(&pInfo->car_info.impact_point, &gMr_chunky->chunk_data.incident_data.info.car_info.impact_point);
         } else if (*pIncident_type == eIncident_wall) {
-            BrVector3Copy(&pInfo->wall_info.pos, &gIncidentChunk->chunk_data.incident_data.info.wall_info.pos);
+            BrVector3Copy(&pInfo->wall_info.pos, &gMr_chunky->chunk_data.incident_data.info.wall_info.pos);
         }
     }
     return gTrigger_time;
