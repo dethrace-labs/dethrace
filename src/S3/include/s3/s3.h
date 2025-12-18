@@ -58,6 +58,7 @@ int S3SetOutletVolume(tS3_outlet_ptr pOutlet, tS3_volume pVolume);
 void S3UpdateSoundSource(tS3_outlet_ptr outlet, tS3_sound_tag tag, tS3_sound_source_ptr src, float pMax_distance_squared, int pPeriod, tS3_repeats pAmbient_repeats, tS3_volume pVolume, int pPitch, tS3_speed pSpeed);
 
 int S3RegisterSampleFilters(tS3_sample_filter* filter1, tS3_sample_filter* filter2);
+int S3GetSampleLength(tS3_sound_tag tag);
 
 // CDA
 int S3CDAEnabled(void);
