@@ -31,6 +31,8 @@
 int gDOSGfx_initialized;
 int gExtra_mem;
 int gReplay_override;
+
+// GLOBAL: CARM95 0x0051D608
 tGraf_spec gGraf_specs[2] = {
     { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "MCGA,W:320,H:200,B:8", 320, 320, 200, NULL },
     { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 640, 640, 480, NULL }
