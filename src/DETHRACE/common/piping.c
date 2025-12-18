@@ -2419,10 +2419,12 @@ tU32 GetARStartTime(void) {
     tU8* temp_ptr;
 
     temp_ptr = gPipe_buffer_oldest;
-    do {
+    while (1) {
         if (MoveSessionPointerForwardOne(&temp_ptr)) {
             return 0;
         }
-    } while (((tPipe_session*)temp_ptr)->chunk_type != ePipe_chunk_frame_boundary);
-    return ((tPipe_session*)temp_ptr)->chunks.chunk_data.frame_boundary_data.time;
+        if (((tPipe_session*)temp_ptr)->chunk_type == ePipe_chunk_frame_boundary) {
+            return ((tPipe_session*)temp_ptr)->chunks.chunk_data.frame_boundary_data.time;
+        }
+    }
 }
