@@ -2389,19 +2389,25 @@ int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pS
         *pTime_away = gTrigger_time - GetTotalTime();
         *pIncident_type = gMr_chunky->subject_index;
         *pSeverity = gMr_chunky->chunk_data.incident_data.severity;
-        if (*pIncident_type == eIncident_ped) {
-            pInfo->ped_info.ped_actor = GetPedestrianActor(gMr_chunky->chunk_data.incident_data.info.ped_info.ped_index);
-            pInfo->ped_info.murderer_actor = gMr_chunky->chunk_data.incident_data.info.ped_info.actor;
-        } else if (*pIncident_type == eIncident_car) {
-            if ((gMr_chunky->chunk_data.incident_data.info.car_info.car_ID & 0xff00) == 0) {
+        switch (*pIncident_type) {
+
+        case eIncident_car:
+            if ((gMr_chunky->chunk_data.incident_data.info.car_info.car_ID >> 8) == 0) {
                 pInfo->car_info.car = &gProgram_state.current_car;
             } else {
                 pInfo->car_info.car = GetCarSpec(gMr_chunky->chunk_data.incident_data.info.car_info.car_ID >> 8,
                     gMr_chunky->chunk_data.incident_data.info.car_info.car_ID & 0xff);
             }
             BrVector3Copy(&pInfo->car_info.impact_point, &gMr_chunky->chunk_data.incident_data.info.car_info.impact_point);
-        } else if (*pIncident_type == eIncident_wall) {
+            break;
+
+        case eIncident_ped:
+            pInfo->ped_info.ped_actor = GetPedestrianActor(gMr_chunky->chunk_data.incident_data.info.ped_info.ped_index);
+            pInfo->ped_info.murderer_actor = gMr_chunky->chunk_data.incident_data.info.ped_info.actor;
+            break;
+        case eIncident_wall:
             BrVector3Copy(&pInfo->wall_info.pos, &gMr_chunky->chunk_data.incident_data.info.wall_info.pos);
+            break;
         }
     }
     return gTrigger_time;
