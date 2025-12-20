@@ -62,7 +62,8 @@ jobs:
         with:
           add-to-environment: true
           build-type: Release
-          #cmake-arguments: ${{ matrix.platform.cmake-args }}
+          install-linux-dependencies: true
+          cmake-arguments: ${{ matrix.platform.cmake-args }}
           cmake-generator: Ninja
           cmake-toolchain-file: ${{ matrix.platform.cmake-toolchain-file }}
           discriminator: ${{ matrix.platform.arch }}
