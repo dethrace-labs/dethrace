@@ -127,7 +127,7 @@ static void Harness_DetectGameMode(void) {
         // All splatpack edition have the castle track
         if (access("DATA/RACES/CASTLE2.TXT", F_OK) != -1) {
             // Only the full splat release has the castle2 track
-            harness_game_info.defines.INTRO_SMK_FILE = "SPLINTRO.SMK";
+            harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
             harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
             harness_game_info.mode = eGame_splatpack;
             printf("Game mode: Splat Pack\n");
