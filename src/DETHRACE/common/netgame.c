@@ -1586,7 +1586,7 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
                 break;
             case eNet_gameplay_suddenly_death:
                 DoFancyHeadup(kFancyHeadupNetworkRaceOverNetworkLoss);
-                ChangeAmbientPratcam(36);
+                ChangeAmbientPratcam(kPratcam_network_timeout);
                 gRace_finished = 1;
                 break;
             default:

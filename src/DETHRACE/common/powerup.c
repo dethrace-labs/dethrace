@@ -1123,7 +1123,7 @@ void ResetInstantHandbrake(tPowerup* pPowerup, tCar_spec* pCar) {
 void DoBouncey(tPowerup* pPowerup, tU32 pPeriod) {
 
     if (gProgram_state.current_car.bounce_rate <= GetTotalTime() - gProgram_state.current_car.last_bounce && gProgram_state.current_car.number_of_wheels_on_ground > 2) {
-        PratcamEvent(42);
+        PratcamEvent(kPratcam_bouncey_bouncey);
         gProgram_state.current_car.last_bounce = GetTotalTime();
         gProgram_state.current_car.v.v[1] += gProgram_state.current_car.bounce_amount;
         DRS3StartSound(gCar_outlet, 9010);

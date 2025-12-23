@@ -689,15 +689,15 @@ void DoPratcamHit(br_vector3* pHit_vector) {
     }
     if (fabs(pHit_vector->v[2]) >= fabs(pHit_vector->v[0])) {
         if (pHit_vector->v[2] >= 0.f) {
-            PratcamEvent(14 + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_front + strength_modifier);
         } else {
-            PratcamEvent(13 + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_behind + strength_modifier);
         }
     } else {
         if (pHit_vector->v[0] >= 0.f) {
-            PratcamEvent(15 + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_left + strength_modifier);
         } else {
-            PratcamEvent(16 + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_right + strength_modifier);
         }
     }
 }
@@ -1187,7 +1187,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                     NetGuaranteedSendMessageToEverybody(gCurrent_net_game, message, NULL);
                     NetEarnCredits(NetPlayerFromCar(culprit), credits);
                 } else {
-                    PratcamEvent(32);
+                    PratcamEvent(kPratcam_opponent_wasted);
                     DoFancyHeadup(kFancyHeadupYouWastedEm);
                     credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
                     credits = 100 * (int)(credits_squared / 100.0);
