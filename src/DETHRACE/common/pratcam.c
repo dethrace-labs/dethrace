@@ -13,6 +13,7 @@
 #include "loading.h"
 #include "pd/sys.h"
 #include "sound.h"
+#include "structur.h"
 #include "utility.h"
 #include <stdlib.h>
 
@@ -513,6 +514,30 @@ void DoPratcam(tU32 pThe_time) {
     DontLetFlicFuckWithPalettes();
     DisableTranslationText();
     for (i = 0; i < (old_last_time != 0 ? ((pThe_time - old_last_time) / gPrat_flic.frame_period) : 1); i++) {
+#ifdef DETHRACE_FIX_BUGS
+        if (gPrat_flic.data == NULL) {
+            switch (gRace_over_reason) {
+            case eRace_over_laps:
+            case eRace_over_peds:
+            case eRace_over_opponents:
+                ChangeAmbientPratcamNow(kPratcam_race_complete, 0);
+                break;
+            case eRace_over_demo:
+            case eRace_over_out_of_time:
+                ChangeAmbientPratcamNow(kPratcam_out_of_time, 0);
+                break;
+            case eRace_over_abandoned:
+            case eRace_over_network_victory:
+            case eRace_over_network_loss:
+                ChangeAmbientPratcamNow(kPratcam_network_timeout, 0);
+                break;
+            default:
+            case eRace_not_over_yet:
+                ChangeAmbientPratcamNow(kPratcam_stationary_or_below_25mph, 0);
+                break;
+            }
+        }
+#endif
         if (PlayNextFlicFrame(&gPrat_flic)) {
             NextPratcamChunk();
             break;
