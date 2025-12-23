@@ -7303,12 +7303,14 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
 // FUNCTION: CARM95 0x00492ff8
 int TestForNan(float* f) {
     tU32 i;
-    // i = *f;
-    // return isnan(*f);
-    // return (~i & 0x7F800000) == 0;
 
-    i = *(unsigned long*)f;
-    return ((i & 0x7F800000) == 0x7F800000) && ((i & 0x007FFFFF) != 0);
+#ifdef DETHRACE_FIX_BUGS
+    return isnan(*f);
+#else
+    memcpy(&i, f, sizeof i);
+    i = ~i & 0x7F800000;
+    return i == 0;
+#endif
 }
 
 // IDA: void __cdecl CheckCameraHither()

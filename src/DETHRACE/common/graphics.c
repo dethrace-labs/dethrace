@@ -2074,6 +2074,11 @@ void RenderAFrame(int pDepth_mask_on) {
         }
         gRearview_screen->base_x = gScreen_wobble_x + gProgram_state.current_car.mirror_left;
         gRearview_screen->base_y = gScreen_wobble_y + gProgram_state.current_car.mirror_top;
+#ifdef DETHRACE_FIX_BUGS
+        gRearview_screen->base_x = MAX(0, gRearview_screen->base_x);
+        gRearview_screen->base_y = MAX(0, gRearview_screen->base_y);
+#endif
+
 #endif
         BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
         gRendering_mirror = 1;
