@@ -51,7 +51,7 @@ ELF_NOTE_DLOPEN(
     "Platform-specific operations such as creating windows and handling events",
     ELF_NOTE_DLOPEN_PRIORITY_SUGGESTED,
     "libSDL-1.2.so.0",
-    "libSDL-1.2.so",
+    "libSDL-1.2.so"
 );
 #endif
 static const char* const possible_locations[] = {
