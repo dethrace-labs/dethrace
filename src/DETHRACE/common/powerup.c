@@ -230,7 +230,7 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
     char* s2;
     tNet_message* the_message;
 
-    if (pIndex < 0 || pIndex >= gNumber_of_powerups) {
+    if (pIndex >= gNumber_of_powerups || pIndex < 0) {
         return -1;
     }
     the_powerup = &gPowerup_array[pIndex];
