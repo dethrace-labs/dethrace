@@ -1560,11 +1560,19 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
     if (*test) {
         test2 = *test;
     }
+#ifdef DETHRACE_FIX_BUGS
+    // The demos only have a single race and menud ata for a single car.
+#define ENABLE_KEVWOZEAR !(harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo)
+#else
+#define ENABLE_KEVWOZEAR 1
+#endif
     if (test[0] == 0x27645433 && test[1] == 0x758f0015) {
-        // cheat code: "KEVWOZEAR"
-        gProgram_state.game_completed = 1;
-        DRS3StartSound(gEffects_outlet, 3202);
-        DRS3StartSound(gEffects_outlet, 3202);
+        if (ENABLE_KEVWOZEAR) {
+            // cheat code: "KEVWOZEAR"
+            gProgram_state.game_completed = 1;
+            DRS3StartSound(gEffects_outlet, 3202);
+            DRS3StartSound(gEffects_outlet, 3202);
+        }
     }
     if (test[0] == 0x33f75455 && test[1] == 0xC10AAAF2) {
         // cheat code: "IWANTTOFIDDLE"
