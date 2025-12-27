@@ -1724,7 +1724,7 @@ void ReceivedWasted(tNet_contents* pContents) {
         last_culprit = culprit;
         last_victim = victim;
         if (pContents->data.wasted.culprit == gLocal_net_ID) {
-            PratcamEvent(32);
+            PratcamEvent(kPratcam_opponent_wasted);
             last_wasted_em_time = PDGetTotalTime();
             if (last_wasted_em_time - last_got_wasted_time > 1000) {
                 DoFancyHeadup(kFancyHeadupYouWastedEm);

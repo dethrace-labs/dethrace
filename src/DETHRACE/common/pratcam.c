@@ -13,6 +13,7 @@
 #include "loading.h"
 #include "pd/sys.h"
 #include "sound.h"
+#include "structur.h"
 #include "utility.h"
 #include <stdlib.h>
 
@@ -513,6 +514,30 @@ void DoPratcam(tU32 pThe_time) {
     DontLetFlicFuckWithPalettes();
     DisableTranslationText();
     for (i = 0; i < (old_last_time != 0 ? ((pThe_time - old_last_time) / gPrat_flic.frame_period) : 1); i++) {
+#ifdef DETHRACE_FIX_BUGS
+        if (gPrat_flic.data == NULL) {
+            switch (gRace_over_reason) {
+            case eRace_over_laps:
+            case eRace_over_peds:
+            case eRace_over_opponents:
+                ChangeAmbientPratcamNow(kPratcam_race_complete, 0);
+                break;
+            case eRace_over_demo:
+            case eRace_over_out_of_time:
+                ChangeAmbientPratcamNow(kPratcam_out_of_time, 0);
+                break;
+            case eRace_over_abandoned:
+            case eRace_over_network_victory:
+            case eRace_over_network_loss:
+                ChangeAmbientPratcamNow(kPratcam_network_timeout, 0);
+                break;
+            default:
+            case eRace_not_over_yet:
+                ChangeAmbientPratcamNow(kPratcam_stationary_or_below_25mph, 0);
+                break;
+            }
+        }
+#endif
         if (PlayNextFlicFrame(&gPrat_flic)) {
             NextPratcamChunk();
             break;
@@ -626,68 +651,68 @@ void TestPratCam(int pIndex) {
 // FUNCTION: CARM95 0x0044e6c0
 void PratCam0(void) {
 
-    TestPratCam(0);
+    TestPratCam(kPratcam_stationary_or_below_25mph);
 }
 
 // IDA: void __cdecl PratCam1()
 // FUNCTION: CARM95 0x0044e72e
 void PratCam1(void) {
 
-    TestPratCam(1);
+    TestPratCam(kPratcam_between_25_and_67mph);
 }
 
 // IDA: void __cdecl PratCam2()
 // FUNCTION: CARM95 0x0044e743
 void PratCam2(void) {
 
-    TestPratCam(2);
+    TestPratCam(kPratcam_between_67_and_167mph);
 }
 
 // IDA: void __cdecl PratCam3()
 // FUNCTION: CARM95 0x0044e758
 void PratCam3(void) {
 
-    TestPratCam(3);
+    TestPratCam(kPratcam_over_137mph);
 }
 
 // IDA: void __cdecl PratCam4()
 // FUNCTION: CARM95 0x0044e76d
 void PratCam4(void) {
 
-    TestPratCam(4);
+    TestPratCam(kPratcam_accelerating_unused_4);
 }
 
 // IDA: void __cdecl PratCam5()
 // FUNCTION: CARM95 0x0044e782
 void PratCam5(void) {
 
-    TestPratCam(5);
+    TestPratCam(kPratcam_flying);
 }
 
 // IDA: void __cdecl PratCam6()
 // FUNCTION: CARM95 0x0044e797
 void PratCam6(void) {
 
-    TestPratCam(6);
+    TestPratCam(kPratcam_falling);
 }
 
 // IDA: void __cdecl PratCam7()
 // FUNCTION: CARM95 0x0044e7ac
 void PratCam7(void) {
 
-    TestPratCam(7);
+    TestPratCam(kPratcam_rolling_gently);
 }
 
 // IDA: void __cdecl PratCam8()
 // FUNCTION: CARM95 0x0044e7c1
 void PratCam8(void) {
 
-    TestPratCam(8);
+    TestPratCam(kPratcam_rolling_medium);
 }
 
 // IDA: void __cdecl PratCam9()
 // FUNCTION: CARM95 0x0044e7d6
 void PratCam9(void) {
 
-    TestPratCam(9);
+    TestPratCam(kPratcam_rolling_violent);
 }

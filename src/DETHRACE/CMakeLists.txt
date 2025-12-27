@@ -70,6 +70,7 @@ target_sources(dethrace_obj PRIVATE
     common/racesumm.c
     common/replay.c
     common/loading.c
+    common/piping.c
 
     common/brucetrk.c
     common/brucetrk.h
@@ -117,7 +118,6 @@ target_sources(dethrace_obj PRIVATE
     common/input.h
     common/intrface.c
     common/intrface.h
-
     common/loadsave.c
     common/loadsave.h
     common/main.c
@@ -140,8 +140,6 @@ target_sources(dethrace_obj PRIVATE
     common/options.h
     common/pedestrn.c
     common/pedestrn.h
-    common/piping.c
-    common/piping.h
     common/powerup.c
     common/powerup.h
     common/pratcam.c
@@ -200,6 +198,7 @@ if(MSVC_42_FOR_RECCMP)
     set_source_files_properties(common/racesumm.c PROPERTIES COMPILE_FLAGS "/FAs")
     set_source_files_properties(common/replay.c PROPERTIES COMPILE_FLAGS "/FAs")
     set_source_files_properties(common/loading.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/piping.c PROPERTIES COMPILE_FLAGS "/FAs")
 
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()

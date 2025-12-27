@@ -801,7 +801,7 @@ void LookLeft(void) {
     if (gAusterity_mode) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
     } else {
-        PratcamEvent(27);
+        PratcamEvent(kPratcam_cockpit_head_left);
         gProgram_state.old_view = gProgram_state.which_view;
         if (gProgram_state.which_view == eView_left) {
             LookForward();
@@ -822,9 +822,9 @@ void LookLeft(void) {
 void LookForward(void) {
 
     if (gProgram_state.which_view == eView_right) {
-        PratcamEvent(27);
+        PratcamEvent(kPratcam_cockpit_head_left);
     } else if (gProgram_state.which_view == eView_left) {
-        PratcamEvent(28);
+        PratcamEvent(kPratcam_cockpit_head_right);
     }
     if (gProgram_state.which_view != eView_forward) {
         gProgram_state.old_view = gProgram_state.which_view;
@@ -842,7 +842,7 @@ void LookRight(void) {
     if (gAusterity_mode) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
     } else {
-        PratcamEvent(28);
+        PratcamEvent(kPratcam_cockpit_head_right);
         gProgram_state.old_view = gProgram_state.which_view;
         if (gProgram_state.which_view == eView_right) {
             LookForward();
@@ -1132,7 +1132,7 @@ void ConcussMe(void) {
 
     SufferFromConcussion(1.f);
     NewScreenWobble(IRandomPosNeg(15), IRandomPosNeg(10), IRandomBetween(10, 60));
-    PratcamEvent(3);
+    PratcamEvent(kPratcam_over_137mph);
 }
 
 // IDA: void __cdecl CheckHelp()
@@ -1954,7 +1954,7 @@ void BrakeInstantly(void) {
 
     gProgram_state.current_car.revs = 0.f;
     if (gProgram_state.current_car.number_of_wheels_on_ground != 0 && BrVector3LengthSquared(&gProgram_state.current_car.v) > 0.0001f) {
-        PratcamEvent(41);
+        PratcamEvent(kPratcam_instant_handbrake);
         for (i = 0; i < 5; i++) {
             DRS3StartSound(gCar_outlet, 9000 + i);
         }

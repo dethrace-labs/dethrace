@@ -2064,7 +2064,7 @@ void HideStoredOpaqueTextures(tBrender_storage* pStorage) {
             if (!DRPixelmapHasZeros(pStorage->materials[i]->colour_map)) {
                 pStorage->saved_colour_maps[i] = pStorage->materials[i]->colour_map;
                 pStorage->materials[i]->colour_map = NULL;
-                pStorage->materials[i]->flags &= 0xFDu;
+                pStorage->materials[i]->flags &= ~BR_MATF_PRELIT;
                 BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
             }
         }
@@ -2098,7 +2098,7 @@ void HideStoredTextures(tBrender_storage* pStorage) {
             if (StorageContainsPixelmap(pStorage, pStorage->materials[i]->colour_map)) {
                 pStorage->saved_colour_maps[i] = pStorage->materials[i]->colour_map;
                 pStorage->materials[i]->colour_map = NULL;
-                pStorage->materials[i]->flags &= 0xFDu;
+                pStorage->materials[i]->flags &= ~BR_MATF_PRELIT;
                 BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
             }
         }

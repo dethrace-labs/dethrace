@@ -2042,7 +2042,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
         BrVector3Set(&up, 0.f, 1.f, 0.f);
         if (billiards_shot) {
             credits_value *= 4;
-            PratcamEvent(30);
+            PratcamEvent(kPratcam_killed_lots_of_peds);
             DoFancyHeadup(kFancyHeadupNiceShotSir);
         } else if (fabs(the_car->omega.v[X]) <= 5.0f
             && fabs(the_car->omega.v[Z]) <= 5.0f
@@ -2055,10 +2055,10 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
                 if (gCurrent_ped_multiplier >= 2) {
                     DoFancyHeadup(gCurrent_ped_multiplier + kFancyHeadup2xComboBonus - 2);
                 } else {
-                    PratcamEvent(30);
+                    PratcamEvent(kPratcam_killed_lots_of_peds);
                     if (exploded) {
                         DoFancyHeadup(kFancyHeadupSplatterBonus);
-                        PratcamEvent(30);
+                        PratcamEvent(kPratcam_killed_lots_of_peds);
                     }
                 }
             } else {
@@ -2067,10 +2067,10 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
             }
         } else {
             credits_value *= 4;
-            PratcamEvent(30);
+            PratcamEvent(kPratcam_killed_lots_of_peds);
             DoFancyHeadup(kFancyHeadupBonusForArtisticImpression);
         }
-        PratcamEvent(29);
+        PratcamEvent(kPratcam_killed_one_ped);
         EarnCredits(credits_value);
     }
     if (the_car->driver == eDriver_local_human && gProgram_state.cockpit_on) {

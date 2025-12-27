@@ -191,6 +191,7 @@ br_font* gHeadup_font;
 // GLOBAL: CARM95 0x005454b8
 tU32 gRace_finished;
 
+// GLOBAL: CARM95 0x0054B244
 tU32 gFrame_start_time;
 
 // GLOBAL: CARM95 0x00546930

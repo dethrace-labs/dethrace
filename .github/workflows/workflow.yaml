@@ -3,30 +3,45 @@ name: Workflow
 on:
   push:
     branches:
-      - 'main'
-      - 'ci-*'
+      - "main"
+      - "ci-*"
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
 
 jobs:
-
   ci:
     strategy:
       matrix:
         platform:
-          - { name: 'Linux',    arch: 'x64',          os: ubuntu-latest,  werror: true }
-          - { name: 'Linux',    arch: 'arm64',        os: ubuntu-24.04-arm,  werror: true }
-          - { name: 'MacOS',    arch: 'arm64-x64',    os: macos-latest,   werror: true, cmake-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"' }
-          - { name: 'Windows',  arch: 'x86',          os: windows-latest, msvc-arch: 'Win32' }
-          - { name: 'Windows',  arch: 'x64',          os: windows-latest, msvc-arch: 'x64' }
-#          - { name: 'Windows',  arch: 'arm64',        os: windows-latest, msvc-arch: 'amd64_arm64', cross: true }
+          - { name: "Linux", arch: "x64", os: ubuntu-latest, werror: true }
+          - { name: "Linux", arch: "arm64", os: ubuntu-24.04-arm, werror: true }
+          - {
+              name: "MacOS",
+              arch: "arm64-x64",
+              os: macos-latest,
+              werror: true,
+              cmake-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"',
+            }
+          - {
+              name: "Windows",
+              arch: "x86",
+              os: windows-latest,
+              msvc-arch: "Win32",
+            }
+          - {
+              name: "Windows",
+              arch: "x64",
+              os: windows-latest,
+              msvc-arch: "x64",
+            }
+    #          - { name: 'Windows',  arch: 'arm64',        os: windows-latest, msvc-arch: 'amd64_arm64', cross: true }
 
     defaults:
       run:
         shell: sh
-    runs-on: '${{ matrix.platform.os }}'
-    name: 'CI ${{ matrix.platform.name }} ${{ matrix.platform.arch }}'
+    runs-on: "${{ matrix.platform.os }}"
+    name: "CI ${{ matrix.platform.name }} ${{ matrix.platform.arch }}"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,6 +62,7 @@ jobs:
         with:
           add-to-environment: true
           build-type: Release
+          install-linux-dependencies: true
           cmake-arguments: ${{ matrix.platform.cmake-args }}
           cmake-generator: Ninja
           cmake-toolchain-file: ${{ matrix.platform.cmake-toolchain-file }}
@@ -54,11 +70,11 @@ jobs:
           version: 3-latest
           version-sdl2-compat: 2-head
           version-sdl12-compat: 1-head
-      - name: 'Prepare sources for release'
+      - name: "Prepare sources for release"
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: |
           echo "${{ github.ref_name }}" >VERSION
-      - name: 'Configure (CMake)'
+      - name: "Configure (CMake)"
         id: configure
         run: |
           cmake -B build -GNinja \
@@ -75,22 +91,22 @@ jobs:
             -DDETHRACE_PLATFORM_SDL3=ON \
             -DDETHRACE_PLATFORM_SDL_DYNAMIC=ON \
             ${{ matrix.platform.cmake-args }}
-      - name: 'Build (CMake)'
+      - name: "Build (CMake)"
         run: |
           cmake --build build
-      - name: 'Test (CTest)'
+      - name: "Test (CTest)"
         if: ${{ !matrix.platform.cross }}
         run: |
           ctest --test-dir build --verbose
-      - name: 'Package (CPack)'
+      - name: "Package (CPack)"
         run: |
           cd build
           cpack .
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: '${{ steps.configure.outputs.filename }}'
-          path: 'build/dist/${{ steps.configure.outputs.filename }}'
+          name: "${{ steps.configure.outputs.filename }}"
+          path: "build/dist/${{ steps.configure.outputs.filename }}"
           if-no-files-found: error
 
   create-release:
@@ -122,52 +138,52 @@ jobs:
     name: Verify decomp
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      name: Checkout
-      with:
-        submodules: recursive
-    - name: Fetch latest report
-      run: |
-        curl -Lo reccmp-report-report.json https://raw.githubusercontent.com/dethrace-labs/reccmp-report/refs/heads/main/report.json
-    - uses: dethrace-labs/reccmp-action@main
-      name: Build
-      with:
-        cmake_flags: -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on
-        build_only: true
-    - uses: dethrace-labs/reccmp-action@main
-      name: Run reccmp
-      with:
-        cmake_flags: -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on
-        target: CARM95
-        diff_report_filename: ${{ github.workspace}}/reccmp-report-report.json
-        report_filename: ${{ github.workspace}}/new-reccmp-report.json
-        original_binary_url: https://archive.org/download/carm-95/CARM95.EXE
-        original_binary_filename: CARM95.EXE
-        reccmp_output_filename: ${{ github.workspace}}/reccmp-output.txt
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: reccmp-output.txt
-        path: ${{ github.workspace}}/reccmp-output.txt
-        if-no-files-found: error
-    - name: Validate correctness
-      run: |
-        if grep -q "Decreased" ${{ github.workspace}}/reccmp-output.txt; then
-          echo "::warning file=reccmp-output.txt::Decomp correctness decreased"
-        fi
-    - name: Checkout reccmp-report repo
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: actions/checkout@v4
-      with:
-        repository: dethrace-labs/reccmp-report
-        token: ${{ secrets.RECCMP_REPORT_TOKEN }}
-        path: reccmp-report
-    - name: Update report in reccmp-report repo
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: |
-        cp new-reccmp-report.json reccmp-report/report.json
-        cd reccmp-report
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git commit -am "Update report from ${GITHUB_SHA::7}" || echo "No changes to commit"
-        git push
+      - uses: actions/checkout@v4
+        name: Checkout
+        with:
+          submodules: recursive
+      - name: Fetch latest report
+        run: |
+          curl -Lo reccmp-report-report.json https://raw.githubusercontent.com/dethrace-labs/reccmp-report/refs/heads/main/report.json
+      - uses: dethrace-labs/reccmp-action@main
+        name: Build
+        with:
+          cmake_flags: -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on
+          build_only: true
+      - uses: dethrace-labs/reccmp-action@main
+        name: Run reccmp
+        with:
+          cmake_flags: -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMSVC_42_FOR_RECCMP=on
+          target: CARM95
+          diff_report_filename: ${{ github.workspace}}/reccmp-report-report.json
+          report_filename: ${{ github.workspace}}/new-reccmp-report.json
+          original_binary_url: https://archive.org/download/carm-95/CARM95.EXE
+          original_binary_filename: CARM95.EXE
+          reccmp_output_filename: ${{ github.workspace}}/reccmp-output.txt
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reccmp-output.txt
+          path: ${{ github.workspace}}/reccmp-output.txt
+          if-no-files-found: error
+      - name: Validate correctness
+        run: |
+          if grep -q "Decreased" ${{ github.workspace}}/reccmp-output.txt; then
+            echo "::warning file=reccmp-output.txt::Decomp correctness decreased"
+          fi
+      - name: Checkout reccmp-report repo
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/checkout@v4
+        with:
+          repository: dethrace-labs/reccmp-report
+          token: ${{ secrets.RECCMP_REPORT_TOKEN }}
+          path: reccmp-report
+      - name: Update report in reccmp-report repo
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          cp new-reccmp-report.json reccmp-report/report.json
+          cd reccmp-report
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -am "Update report from ${GITHUB_SHA::7}" || echo "No changes to commit"
+          git push
