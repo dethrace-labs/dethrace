@@ -1957,7 +1957,7 @@ void RotateCarFirstOrder(tCollision_info* c, br_scalar dt) {
     rad_rate = BrVector3Length(&c->omega);
     rad = rad_rate * dt;
 
-    if (rad < .0001f) {
+    if (rad < .0001) {
         return;
     }
     BrVector3InvScale(&axis, &c->omega, rad_rate);
@@ -2029,11 +2029,11 @@ void SteeringSelfCentre(tCar_spec* c, br_scalar dt, br_vector3* n) {
         if (c->susp_height[1] > c->oldd[2] || c->susp_height[1] > c->oldd[3]) {
             ts = -((c->omega.v[2] * n->v[2] + c->omega.v[1] * n->v[1] + c->omega.v[0] * n->v[0]) * (dt / (c->wpos[0].v[2] - c->wpos[2].v[2])));
             ts2 = -(c->curvature * dt);
-            if (fabs(ts) < fabs(ts2) || (ts * ts2 < 0.0)) {
+            if (fabs(ts) < fabs(ts2) || (ts * ts2 < 0.0f)) {
                 ts = ts2;
             }
             c->curvature = c->curvature + ts;
-            if (c->curvature * ts > 0.0) {
+            if (c->curvature * ts > 0.0f) {
                 c->curvature = 0.0;
             }
         }
@@ -2103,7 +2103,7 @@ void AddDrag(tCar_spec* c, br_scalar dt) {
     drag_multiplier = -(dt * TIME_CONV_THING);
     if (vol != NULL) {
         if (c->underwater_ability) {
-            drag_multiplier = vol->viscosity_multiplier * drag_multiplier * .6f;
+            drag_multiplier = vol->viscosity_multiplier * drag_multiplier * .6;
         } else {
             drag_multiplier = vol->viscosity_multiplier * drag_multiplier;
         }
@@ -3419,7 +3419,7 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
         return;
     }
 
-    last_skid_vol[i] = pV * 10.0;
+    last_skid_vol[i] = pV * 10.0f;
     if ((pWheel_num & 1) != 0) {
         pos.v[0] = pC->bounds[1].max.v[0];
     } else {
@@ -3448,7 +3448,7 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
         BrVector3Scale(&wvw, &pC->road_normal, ts);
         BrVector3Add(&wv, &wv, &wvw);
         BrMatrix34ApplyV(&wvw, &wv, &pC->car_master_actor->t.t.mat);
-        CreatePuffOfSmoke(&world_pos, &wvw, pV / 25.0, 1.0, 4, pC);
+        CreatePuffOfSmoke(&world_pos, &wvw, pV / 25.0f, 1.0, 4, pC);
     }
 }
 
@@ -4895,7 +4895,7 @@ void SetPanningFieldOfView(void) {
 
     camera_ptr = gCamera->type_data;
     if (gPanning_camera_angle == 0) {
-        gPanning_camera_angle = BrDegreeToAngle(gCamera_angle) * 0.7f;
+        gPanning_camera_angle = BrDegreeToAngle(gCamera_angle) * 0.7;
     }
     camera_ptr->field_of_view = gPanning_camera_angle;
 }
@@ -5396,7 +5396,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
 
     m1 = &gCamera->t.t.mat;
     m2 = &c->car_master_actor->t.t.mat;
-    swoop = gCountdown && c->pos.v[1] + 0.001f < gCamera_height;
+    swoop = gCountdown && c->pos.v[1] + 0.001 < gCamera_height;
     manual_swing = gOld_yaw__car != gCamera_yaw || swoop;
     manual_zoom = (double)gOld_zoom != gCamera_zoom;
     BrVector3Copy(&old_camera_pos, &gCamera->t.t.translate.t);
@@ -5406,7 +5406,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
             gCamera_yaw = 0;
             manual_swing = 1;
         }
-        if (fabs(c->speedo_speed) > 0.0006f && gCamera_mode > 0) {
+        if (fabs(c->speedo_speed) > 0.0006 && gCamera_mode > 0) {
             gCamera_mode = -1;
             gCamera_sign = BrVector3Dot((br_vector3*)m2->m[2], &c->direction) > 0.0f;
         }
@@ -6876,10 +6876,10 @@ void MungeCarsMass(tCollision_info* pCar, br_scalar pFactor) {
 // FUNCTION: CARM95 0x0048fb97
 void ModifyCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
 
-    if (pCar_1->driver > eDriver_non_car && ((tCar_spec*)pCar_1)->collision_mass_multiplier != 1.0f) {
+    if (pCar_1->driver > eDriver_non_car && ((tCar_spec*)pCar_1)->collision_mass_multiplier != 1.0) {
         MungeCarsMass(pCar_1, ((tCar_spec*)pCar_1)->collision_mass_multiplier);
     }
-    if (pCar_2->driver > eDriver_non_car && ((tCar_spec*)pCar_2)->collision_mass_multiplier != 1.0f) {
+    if (pCar_2->driver > eDriver_non_car && ((tCar_spec*)pCar_2)->collision_mass_multiplier != 1.0) {
         MungeCarsMass(pCar_2, ((tCar_spec*)pCar_2)->collision_mass_multiplier);
     }
 }
@@ -6888,11 +6888,11 @@ void ModifyCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
 // FUNCTION: CARM95 0x0048fc7b
 void ResetCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
 
-    if (pCar_1->driver > eDriver_non_car && ((tCar_spec*)pCar_1)->collision_mass_multiplier != 1.0f) {
-        MungeCarsMass(pCar_1, 1.0f / ((tCar_spec*)pCar_1)->collision_mass_multiplier);
+    if (pCar_1->driver > eDriver_non_car && ((tCar_spec*)pCar_1)->collision_mass_multiplier != 1.0) {
+        MungeCarsMass(pCar_1, 1.0 / ((tCar_spec*)pCar_1)->collision_mass_multiplier);
     }
-    if (pCar_2->driver > eDriver_non_car && ((tCar_spec*)pCar_2)->collision_mass_multiplier != 1.0f) {
-        MungeCarsMass(pCar_2, 1.0f / ((tCar_spec*)pCar_2)->collision_mass_multiplier);
+    if (pCar_2->driver > eDriver_non_car && ((tCar_spec*)pCar_2)->collision_mass_multiplier != 1.0) {
+        MungeCarsMass(pCar_2, 1.0 / ((tCar_spec*)pCar_2)->collision_mass_multiplier);
     }
 }
 

@@ -245,7 +245,7 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
             old_vector = *target_point;
             for (bend_axis = 0; bend_axis < 3; bend_axis++) {
                 target_point->v[bend_axis] += (1.0f - the_neighbour->factor / 256.0f) * movement.v[bend_axis];
-                
+
                 if (the_neighbour->factor <= 128) {
                     v12 = the_neighbour->factor / 128.0f;
                 } else {
@@ -661,10 +661,10 @@ tImpact_location CalcModifiedLocation(tCar_spec* pCar) {
     if (pCar->last_impact_location != eImpact_left && pCar->last_impact_location != eImpact_right && pCar->last_impact_location != eImpact_top && pCar->last_impact_location != eImpact_bottom) {
         return pCar->last_impact_location;
     }
-    if (pCar->last_col_prop_z < 0.25f) {
+    if (pCar->last_col_prop_z < 0.25) {
         return eImpact_front;
     }
-    if (pCar->last_col_prop_z > 0.75f) {
+    if (pCar->last_col_prop_z > 0.75) {
         return eImpact_back;
     } else {
         return pCar->last_impact_location;
@@ -742,9 +742,9 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
         return;
     }
 
-    energy_magnitude = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor * pure_energy_magnitude / 0.7f;
-    BrVector3InvScale(&crushed_car_bounds.min, &pCar->bounds[1].min, WORLD_SCALE);
-    BrVector3InvScale(&crushed_car_bounds.max, &pCar->bounds[1].max, WORLD_SCALE);
+    energy_magnitude = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor * pure_energy_magnitude / 0.7;
+    BrVector3InvScale(&crushed_car_bounds.min, &pCar->bounds[1].min, WORLD_SCALE_D);
+    BrVector3InvScale(&crushed_car_bounds.max, &pCar->bounds[1].max, WORLD_SCALE_D);
 
     x1 = pImpact_point->v[0] - crushed_car_bounds.min.v[0];
     x2 = crushed_car_bounds.max.v[0] - pImpact_point->v[0];

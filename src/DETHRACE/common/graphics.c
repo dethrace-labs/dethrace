@@ -1336,7 +1336,7 @@ void MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vector3* p1, br_vect
     BrMatrix34ApplyP(&v2, p2, &pCar->car_master_actor->t.t.mat);
     BrVector3Sub(&v3, p2, p1);
     BrVector3Cross(&v4, &v3, pLight);
-    if (fabs(v4.v[0]) >= 0.01f || fabs(v4.v[1]) >= 0.01f || fabs(v4.v[2]) >= 0.01f) {
+    if (fabs(v4.v[0]) >= 0.01 || fabs(v4.v[1]) >= 0.01 || fabs(v4.v[2]) >= 0.01) {
         BrVector3Copy(&v3, p1);
         v3.v[1] -= pY_offset;
         if (BrVector3Dot(&v3, &v4) > 0.f) {
