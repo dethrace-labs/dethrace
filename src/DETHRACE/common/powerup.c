@@ -444,37 +444,41 @@ void DrawPowerups(tU32 pTime) {
     br_pixelmap* fizzle_pix;
 
     y = gCurrent_graf_data->power_up_icon_y;
-    for (i = 0; i < gNumber_of_icons && i < 5; i++) {
-        the_icon = &gIcon_list[i];
+    for (i = 0, the_icon = gIcon_list; i < gNumber_of_icons; i++, the_icon++) {
+        if (i >= 5) {
+            break;
+        }
         the_powerup = the_icon->powerup;
         if (the_powerup->icon == NULL) {
             continue;
         }
         y += gCurrent_graf_data->power_up_icon_y_pitch;
         if (the_icon->fizzle_stage < 4) {
-            if (the_icon->fizzle_direction >= 0) {
-                the_icon->fizzle_stage = (pTime - the_icon->fizzle_start) / 100;
-            } else {
+            if (the_icon->fizzle_direction < 0) {
                 the_icon->fizzle_stage = 3 - (pTime - the_icon->fizzle_start) / 100;
+            } else {
+                the_icon->fizzle_stage = (pTime - the_icon->fizzle_start) / 100;
             }
-            if (the_icon->fizzle_stage >= 5) {
+            if (the_icon->fizzle_stage > 4) {
                 the_icon->fizzle_stage = 4;
             } else if (the_icon->fizzle_stage < 0) {
+#ifdef DETHRACE_FIX_BUGS
                 memmove(the_icon, the_icon + 1, sizeof(tHeadup_icon) * (gNumber_of_icons - i - 1));
+#else
+                memcpy(the_icon, the_icon + 1, sizeof(tHeadup_icon) * (gNumber_of_icons - i - 1));
+#endif
                 gNumber_of_icons--;
                 continue;
             }
         }
+
         if (the_icon->fizzle_stage >= 4) {
             DRPixelmapRectangleMaskedCopy(gBack_screen,
                 gCurrent_graf_data->power_up_icon_x, y,
                 the_powerup->icon, 0, 0, the_powerup->icon->width, the_powerup->icon->height);
             if (the_powerup->type == ePowerup_timed) {
                 timer = the_powerup->lose_time - pTime;
-                if (timer <= 0) {
-                    timer = 0;
-                }
-                TimerString(timer, s, 0, 0);
+                TimerString(MAX(timer, 0), s, 0, 0);
                 TransDRPixelmapText(gBack_screen,
                     gCurrent_graf_data->power_up_icon_countdown_x,
                     y + gCurrent_graf_data->power_up_icon_countdown_y_offset,
