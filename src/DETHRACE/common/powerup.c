@@ -356,38 +356,38 @@ void LoadPowerups(void) {
     }
     gNumber_of_powerups = GetAnInt(f);
     gPowerup_array = BrMemAllocate(sizeof(tPowerup) * gNumber_of_powerups, kMem_powerup_array);
-    for (i = 0; i < gNumber_of_powerups; i++) {
-        the_powerup = &gPowerup_array[i];
-
+    for (i = 0, the_powerup = gPowerup_array; i < gNumber_of_powerups; i++, the_powerup++) {
         GetALineAndDontArgue(f, the_powerup->message);
         if (strcmp(the_powerup->message, "dummy") == 0) {
             the_powerup->type = 0;
+            continue;
         } else {
             if (strcmp(the_powerup->message, "n/a") == 0) {
                 the_powerup->message[0] = 0;
             }
-            GetAString(f, s);
-            the_powerup->icon = LoadPixelmap(s);
-            the_powerup->fizzle_type = GetAnInt(f);
-            time = 1000 * GetAnInt(f);
-            the_powerup->duration = time;
-            if (time > 0) {
-                the_powerup->type = ePowerup_timed;
-            } else if (time == 0) {
-                the_powerup->type = ePowerup_whole_race;
-            } else {
-                the_powerup->type = ePowerup_instantaneous;
-            }
         }
+        GetAString(f, s);
+        the_powerup->icon = LoadPixelmap(s);
+        the_powerup->fizzle_type = GetAnInt(f);
+        time = 1000 * GetAnInt(f);
+        the_powerup->duration = time;
+        if (time < 0) {
+            the_powerup->type = ePowerup_instantaneous;
+        } else if (time == 0) {
+            the_powerup->type = ePowerup_whole_race;
+        } else {
+            the_powerup->type = ePowerup_timed;
+        }
+
         action_index = GetAnInt(f);
-        if (action_index >= 0) {
+        if (action_index < 0) {
+            the_powerup->got_proc = NULL;
+            the_powerup->lose_proc = NULL;
+            the_powerup->periodic_proc = NULL;
+        } else {
             the_powerup->got_proc = gGot_procs[action_index];
             the_powerup->lose_proc = gLose_procs[action_index];
             the_powerup->periodic_proc = gPeriodic_procs[action_index];
-        } else {
-            the_powerup->lose_proc = NULL;
-            the_powerup->periodic_proc = NULL;
-            the_powerup->got_proc = NULL;
         }
         the_powerup->number_of_float_params = GetAnInt(f);
         the_powerup->float_params = BrMemAllocate(sizeof(float) * the_powerup->number_of_float_params, kMem_powerup_float_parms);
