@@ -1257,7 +1257,12 @@ void ReceivedPowerup(tNet_contents* pContents) {
     tPowerup* powerup;
     tCar_spec* car;
 
-    if (gProgram_state.racing && pContents->data.powerup.powerup_index >= 0 && pContents->data.powerup.powerup_index < gNumber_of_powerups) {
+    if (gProgram_state.racing) {
+
+        if (pContents->data.powerup.powerup_index >= gNumber_of_powerups || pContents->data.powerup.powerup_index < 0) {
+            return;
+        }
+
         powerup = &gPowerup_array[pContents->data.powerup.powerup_index];
         if (pContents->data.powerup.event == ePowerup_gained || pContents->data.powerup.event == ePowerup_ongoing) {
             if (powerup->net_type == eNet_powerup_global) {
@@ -1268,13 +1273,13 @@ void ReceivedPowerup(tNet_contents* pContents) {
                 if (car != NULL) {
                     powerup->got_proc(powerup, car);
                     switch (powerup->type) {
+                    case ePowerup_instantaneous:
+                        break;
                     case ePowerup_timed:
                         car->powerups[pContents->data.powerup.powerup_index] = GetTotalTime() + pContents->data.powerup.time_left;
                         break;
                     case ePowerup_whole_race:
                         car->powerups[pContents->data.powerup.powerup_index] = -1;
-                        break;
-                    default:
                         break;
                     }
                 }
