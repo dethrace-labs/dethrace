@@ -804,7 +804,7 @@ int DoInstantRepair(tPowerup* pPowerup, tCar_spec* pCar) {
     if (pCar->driver == eDriver_local_human) {
         TotallyRepairCar();
     }
-    return GET_POWERUP_INDEX(gPowerup_array);
+    return GET_POWERUP_INDEX(pPowerup);
 }
 
 // IDA: void __usercall ResetPedSpeed(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
