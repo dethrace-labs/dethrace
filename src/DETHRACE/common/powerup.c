@@ -291,6 +291,10 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
         the_powerup->got_time = GetTotalTime();
         gProgram_state.current_car.powerups[pIndex] = -1;
         break;
+#ifdef DETHRACE_FIX_BUGS
+    default:
+        break;
+#endif
     }
 
     if (the_powerup->prat_cam_event >= 0) {
@@ -1281,6 +1285,10 @@ void ReceivedPowerup(tNet_contents* pContents) {
                     case ePowerup_whole_race:
                         car->powerups[pContents->data.powerup.powerup_index] = -1;
                         break;
+#ifdef DETHRACE_FIX_BUGS
+                    default:
+                        break;
+#endif
                     }
                 }
             }
@@ -1375,6 +1383,8 @@ void GetPowerupMessage(int pN, char* pMessage) {
         break;
     default:
         strcpy(pMessage, gPowerup_array[pN].message);
+#ifdef DETHRACE_FIX_BUGS
         break;
+#endif
     }
 }
