@@ -182,9 +182,10 @@ void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {
         the_message = NetBuildMessage(NETMSGID_POWERUP, 0);
         the_message->contents.data.powerup.event = ePowerup_lost;
         the_message->contents.data.powerup.player = gLocal_net_ID;
-        the_message->contents.data.powerup.event = GET_POWERUP_INDEX(pThe_powerup);
+        the_message->contents.data.powerup.powerup_index = GET_POWERUP_INDEX(pThe_powerup);
         NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
     }
+    gProgram_state.current_car.powerups[GET_POWERUP_INDEX(pThe_powerup)] = 0;
     for (i = 0; i < gNumber_of_icons; i++) {
         if (gIcon_list[i].powerup == pThe_powerup) {
             gIcon_list[i].fizzle_stage = 3;
