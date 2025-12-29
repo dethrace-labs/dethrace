@@ -169,6 +169,8 @@ tPowerup* gPowerup_array;
 
 #define GET_POWERUP_INDEX(POWERUP) ((POWERUP) - gPowerup_array)
 
+#define MAX_POWER_UP_LEVEL 4
+
 // IDA: void __usercall LosePowerupX(tPowerup *pThe_powerup@<EAX>, int pTell_net_players@<EDX>)
 // FUNCTION: CARM95 0x0042cff6
 void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {
@@ -644,20 +646,18 @@ int GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
     int not_allowed_power;
     char s[256];
 
-    if (gNet_mode == eNet_mode_none) {
-        if (pCar->driver == eDriver_local_human) {
-            time = IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]);
-            AwardTime(time);
-        }
-    } else {
+    if (gNet_mode != eNet_mode_none) {
         not_allowed_power = (gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox)
             || (gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox);
-        if (pCar->power_up_levels[0] < 4 || (pCar->power_up_levels[1] < 4 && !not_allowed_power) || pCar->power_up_levels[2] < 4) {
+        if (pCar->power_up_levels[eParts_armour] < MAX_POWER_UP_LEVEL
+            || (pCar->power_up_levels[eParts_power] < MAX_POWER_UP_LEVEL && !not_allowed_power)
+            || pCar->power_up_levels[eParts_offensive] < MAX_POWER_UP_LEVEL) {
+
             for (i = 0; i < 50; i++) {
                 if (not_allowed_power) {
-                    index = PercentageChance(50) ? 0 : 2;
+                    index = PercentageChance(50) ? eParts_armour : eParts_offensive;
                 } else {
-                    index = IRandomBetween(0, 2);
+                    index = IRandomBetween(eParts_armour, eParts_offensive);
                 }
                 if (pCar->power_up_levels[index] < 4) {
                     ImprovePSPowerup(pCar, index);
@@ -666,6 +666,11 @@ int GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
             }
         } else {
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
+        }
+    } else {
+        if (pCar->driver == eDriver_local_human) {
+            time = IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]);
+            AwardTime(time);
         }
     }
     return GET_POWERUP_INDEX(pPowerup);
