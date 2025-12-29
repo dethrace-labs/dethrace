@@ -1175,11 +1175,13 @@ int DamageScrnGoHead(int* pCurrent_choice, int* pCurrent_mode) {
     } else if (gWreck_zoomed_in >= 0) {
         if (*pCurrent_choice == 1) {
             ZoomInTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
+            return 0;
         }
-    } else if (*pCurrent_choice == 1) {
+    } else {
         if (*pCurrent_choice == 0 && gWreck_selected >= 0) {
             ZoomOutTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
             gUser_interacted = 1;
+            return 0;
         }
     }
     return 0;
