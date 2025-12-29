@@ -618,9 +618,10 @@ int GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
     char s[256];
 
     if (pCar->driver == eDriver_local_human) {
+        credits = 100 * (IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]) / 100);
         strcpy(s, pPowerup->message);
         strcat(s, " ");
-        EarnCredits2((IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]) / 100) * 100, s);
+        EarnCredits2(credits, s);
     }
     return GET_POWERUP_INDEX(pPowerup);
 }
