@@ -416,6 +416,7 @@ void InitPowerups(void) {
         the_powerup->got_time = 0;
         the_powerup->current_value = -1;
     }
+    gNumber_of_icons = 0;
 }
 
 // IDA: void __cdecl CloseDownPowerUps()
