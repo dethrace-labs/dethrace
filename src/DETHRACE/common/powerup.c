@@ -525,15 +525,18 @@ void DoPowerupPeriodics(tU32 pFrame_period) {
 void GotPowerupN(int pN) {
     int modifiers;
 
-    modifiers = 0;
     if (PDKeyDown(KEY_SHIFT_ANY) != 0) {
-        modifiers += 10;
+        modifiers = 10;
+    } else {
+        modifiers = 0;
     }
     if (PDKeyDown(KEY_ALT_ANY) != 0) {
         modifiers += 20;
+    } else {
     }
     if (PDKeyDown(KEY_CTRL_ANY) != 0) {
         modifiers += 40;
+    } else {
     }
     GotPowerup(&gProgram_state.current_car, modifiers + pN);
 }
