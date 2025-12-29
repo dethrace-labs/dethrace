@@ -1,0 +1,5 @@
+DIAGNOSTIC OUTPUT
+Date / time : Mon Mar 24 16 : 32 : 33 1997
+
+
+      0.00: FATAL ERROR: This .exe must have KEYBOARD.COK in the DATA folder.

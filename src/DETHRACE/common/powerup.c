@@ -291,6 +291,7 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
         the_powerup->got_time = GetTotalTime();
         gProgram_state.current_car.powerups[pIndex] = -1;
         break;
+
 #ifdef DETHRACE_FIX_BUGS
     default:
         break;
