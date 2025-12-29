@@ -705,28 +705,19 @@ int SetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
     br_scalar old_scale;
 
     old_scale = gPed_scale_factor;
-    if (old_scale != pPowerup->float_params[0]) {
-        if (gPed_scale_factor > 1.f) {
-            gPed_scale_factor = pPowerup->float_params[0];
+    gPed_scale_factor = pPowerup->float_params[0];
+    if (old_scale != gPed_scale_factor) {
+        if (old_scale > 1.f) {
             PipeSingleSpecial(ePipe_special_giant_ped_off);
-        } else {
-            gPed_scale_factor = pPowerup->float_params[0];
-            if (old_scale < 1.f) {
-                PipeSingleSpecial(ePipe_special_min_ped_off);
-            }
+        } else if (old_scale < 1.f) {
+            PipeSingleSpecial(ePipe_special_min_ped_off);
         }
         if (gPed_scale_factor > 1.f) {
             PipeSingleSpecial(ePipe_special_giant_ped_on);
-            old_scale = gPed_scale_factor;
-        } else {
-            old_scale = gPed_scale_factor;
-            if (gPed_scale_factor < 1.f) {
-                PipeSingleSpecial(ePipe_special_min_ped_on);
-                old_scale = gPed_scale_factor;
-            }
+        } else if (gPed_scale_factor < 1.f) {
+            PipeSingleSpecial(ePipe_special_min_ped_on);
         }
     }
-    gPed_scale_factor = old_scale;
     return GET_POWERUP_INDEX(pPowerup);
 }
 
