@@ -1152,15 +1152,15 @@ int HitMine(tPowerup* pPowerup, tCar_spec* pCar) {
     float fudge_multiplier;
 
     pCar->v.v[1] = FRandomBetween(pPowerup->float_params[0], pPowerup->float_params[1]) / pCar->M + pCar->v.v[1];
-    pCar->omega.v[2] = FRandomPosNeg(pPowerup->float_params[2]) * TAU / pCar->M + pCar->omega.v[2];
-    pCar->omega.v[0] = FRandomPosNeg(pPowerup->float_params[3]) * TAU / pCar->M + pCar->omega.v[0];
-    if (pCar->driver != eDriver_non_car_unused_slot && !pCar->invulnerable) {
-        fudge_multiplier = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor / .7f;
+    pCar->omega.v[2] += FRandomPosNeg(pPowerup->float_params[2]) * TAU / pCar->M;
+    pCar->omega.v[0] += FRandomPosNeg(pPowerup->float_params[3]) * TAU / pCar->M;
+
+    if (pCar->driver > eDriver_non_car && !pCar->invulnerable) {
         for (i = 0; i < pCar->car_actor_count; i++) {
-            TotallySpamTheModel(pCar, i, pCar->car_model_actors[i].actor,
-                &pCar->car_model_actors[i].crush_data, fudge_multiplier * .1f);
+            fudge_multiplier = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor / 0.7;
+            TotallySpamTheModel(pCar, i, pCar->car_model_actors[i].actor, &pCar->car_model_actors[i].crush_data, fudge_multiplier * .1f);
         }
-        for (i = 0; i < 12; i++) {
+        for (i = 0; i < COUNT_OF(pCar->damage_units); i++) {
             DamageUnit(pCar, i, IRandomBetween(0, fudge_multiplier * 15.f));
         }
     }
