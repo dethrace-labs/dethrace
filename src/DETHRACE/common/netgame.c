@@ -197,11 +197,12 @@ void SendCarData(tU32 pNext_frame_time) {
 void ReceivedRecover(tNet_contents* pContents) {
     int i;
 
-    if (gNet_players[gThis_net_player_index].ID != pContents->data.recover.ID) {
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            if (gNet_players[i].ID == pContents->data.recover.ID) {
-                gNet_players[i].car->time_to_recover = pContents->data.recover.time_to_recover;
-            }
+    if (gNet_players[gThis_net_player_index].ID == pContents->data.recover.ID) {
+        return;
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pContents->data.recover.ID) {
+            gNet_players[i].car->time_to_recover = pContents->data.recover.time_to_recover;
         }
     }
 }
