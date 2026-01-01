@@ -54,6 +54,16 @@ static const char * const possible_locations[] = {
     SDL3_LIBNAME /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
+#include "elfdlopennote.h"
+#ifdef ELF_NOTE_DLOPEN
+ELF_NOTE_DLOPEN(
+    "SDL3",
+    "Platform-specific operations such as creating windows and handling events",
+    ELF_NOTE_DLOPEN_PRIORITY_RECOMMENDED,
+    "libSDL3.so.0",
+    "libSDL3.so"
+);
+#endif
 static const char * const possible_locations[] = {
     "libSDL3.so.0",
     "libSDL3.so",
