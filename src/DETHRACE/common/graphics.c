@@ -1561,7 +1561,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
         for (i = 0; i < face_count; i++) {
             v1 = &list_ptr->v[1];
             v2 = &list_ptr->v[2];
-            if (list_ptr->normal.v[1] >= -0.1 || (list_ptr->material && (list_ptr->material->flags & 0x1000) != 0)) {
+            if (list_ptr->normal.v[1] >= -0.1 || (list_ptr->material && (list_ptr->material->flags & BR_MATF_TWO_SIDED) != 0)) {
                 if (list_ptr->normal.v[1] < 0.0 || (list_ptr->material && ((list_ptr->material->identifier && list_ptr->material->identifier[0] == '!') || list_ptr->material->index_blend))) {
                     list_ptr->d = SHADOW_D_IGNORE_FLAG;
                 } else if ((list_ptr->v[0].v[1] > pCar->pos.v[1] || v1->v[1] > pCar->pos.v[1] || v2->v[1] > pCar->pos.v[1]) && list_ptr->normal.v[1] < 0.1) {
@@ -2072,8 +2072,15 @@ void RenderAFrame(int pDepth_mask_on) {
         if (gVoodoo_rush_mode >= 1) {
             gRearview_screen->pixels = gBack_screen->pixels;
         }
+
+#ifdef DETHRACE_FIX_BUGS
+        gRearview_screen->base_x = MAX(0, gScreen_wobble_x + gProgram_state.current_car.mirror_left);
+        gRearview_screen->base_y = MAX(0, gScreen_wobble_y + gProgram_state.current_car.mirror_top);
+#else
         gRearview_screen->base_x = gScreen_wobble_x + gProgram_state.current_car.mirror_left;
         gRearview_screen->base_y = gScreen_wobble_y + gProgram_state.current_car.mirror_top;
+#endif
+
 #endif
         BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
         gRendering_mirror = 1;

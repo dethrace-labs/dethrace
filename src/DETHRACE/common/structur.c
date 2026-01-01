@@ -90,9 +90,9 @@ void RaceCompleted(tRace_over_reason pReason) {
             NetFinishRace(gCurrent_net_game, pReason);
         }
         if (pReason == eRace_over_out_of_time || pReason == eRace_over_demo) {
-            ChangeAmbientPratcam(35);
+            ChangeAmbientPratcam(kPratcam_out_of_time);
         } else if (pReason < eRace_over_abandoned) {
-            ChangeAmbientPratcam(34);
+            ChangeAmbientPratcam(kPratcam_race_complete);
         }
         gRace_over_reason = pReason;
         if (gMap_mode) {
@@ -100,30 +100,30 @@ void RaceCompleted(tRace_over_reason pReason) {
         }
         switch (gRace_over_reason) {
         case eRace_over_network_victory:
-            ChangeAmbientPratcam(34);
+            ChangeAmbientPratcam(kPratcam_race_complete);
             DoFancyHeadup(kFancyHeadupNetworkVictory);
             break;
 
         case eRace_over_network_loss:
-            ChangeAmbientPratcam(36);
+            ChangeAmbientPratcam(kPratcam_network_timeout);
             DoFancyHeadup(kFancyHeadupNetworkRaceOverNetworkLoss);
             break;
 
         case eRace_over_out_of_time:
-            ChangeAmbientPratcam(35);
+            ChangeAmbientPratcam(kPratcam_out_of_time);
             DoFancyHeadup(kFancyHeadupOutOfTime);
             DRS3StartSound(gPedestrians_outlet, 8010);
             break;
 
         case eRace_over_demo:
-            ChangeAmbientPratcam(35);
+            ChangeAmbientPratcam(kPratcam_out_of_time);
             DoFancyHeadup(kFancyHeadupDemoTimeout);
             break;
 
         case eRace_over_laps:
         case eRace_over_peds:
         case eRace_over_opponents:
-            ChangeAmbientPratcam(34);
+            ChangeAmbientPratcam(kPratcam_race_complete);
             DoFancyHeadup(kFancyHeadupRaceCompleted);
             DRS3StartSound(gPedestrians_outlet, 8011);
             break;
@@ -150,7 +150,7 @@ void RaceCompleted(tRace_over_reason pReason) {
 // FUNCTION: CARM95 0x004141ca
 void Checkpoint(int pCheckpoint_index, int pDo_sound) {
 
-    PratcamEvent(33);
+    PratcamEvent(kPratcam_checkpoint);
     DoFancyHeadup(kFancyHeadupCheckpoint);
     if (pDo_sound) {
         DRS3StartSound(gPedestrians_outlet, 8012);
@@ -174,7 +174,7 @@ void IncrementCheckpoint(void) {
             gCheckpoint = gCheckpoint_count;
             RaceCompleted(eRace_over_laps);
         } else if (gLap == gTotal_laps) {
-            PratcamEvent(33);
+            PratcamEvent(kPratcam_checkpoint);
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_FinalLap));
             DRS3StartSound(gPedestrians_outlet, 8014);
             done_voice = 1;

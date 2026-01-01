@@ -4387,35 +4387,35 @@ void SetAmbientPratCam(tCar_spec* pCar) {
     abs_omega_z = fabs(pCar->omega.v[2]);
 
     if (abs_omega_x > 4.5f || abs_omega_z > 4.5f) {
-        ChangeAmbientPratcam(9);
+        ChangeAmbientPratcam(kPratcam_rolling_violent);
     } else if (abs_omega_y > 4.5f) {
-        ChangeAmbientPratcam(12);
+        ChangeAmbientPratcam(kPratcam_spinning_violent);
     } else if (abs_omega_x > 3.f || abs_omega_z > 3.f) {
-        ChangeAmbientPratcam(8);
+        ChangeAmbientPratcam(kPratcam_rolling_medium);
     } else if (abs_omega_y > 3.f) {
-        ChangeAmbientPratcam(11);
+        ChangeAmbientPratcam(kPratcam_spinning_medium);
     } else if (pCar->car_master_actor->t.t.mat.m[1][1] < 0.1f) {
-        ChangeAmbientPratcam(44);
+        ChangeAmbientPratcam(kPratcam_upside_down);
     } else if (abs_vcs_y > abs_vcs_z && abs_vcs_y > abs_vcs_x && vcs_y < -.004f) {
-        ChangeAmbientPratcam(6);
+        ChangeAmbientPratcam(kPratcam_falling);
     } else if (the_time - last_time_on_ground > 500) {
-        ChangeAmbientPratcam(5);
+        ChangeAmbientPratcam(kPratcam_flying);
     } else if (abs_vcs_x > abs_vcs_z && vcs_x > .001f) {
-        ChangeAmbientPratcam(26);
+        ChangeAmbientPratcam(kPratcam_skidding_right);
     } else if (abs_vcs_x > abs_vcs_z && vcs_x < -.001f) {
-        ChangeAmbientPratcam(25);
+        ChangeAmbientPratcam(kPratcam_skidding_left);
     } else if (abs_omega_x > 1.5f || abs_omega_z > 1.5f) {
-        ChangeAmbientPratcam(7);
+        ChangeAmbientPratcam(kPratcam_rolling_gently);
     } else if (abs_omega_y > 1.5f) {
-        ChangeAmbientPratcam(10);
+        ChangeAmbientPratcam(kPratcam_spinning_gently);
     } else if (abs_vcs_z > .01f) {
-        ChangeAmbientPratcam(3);
+        ChangeAmbientPratcam(kPratcam_over_137mph);
     } else if (abs_vcs_z > .004f) {
-        ChangeAmbientPratcam(2);
+        ChangeAmbientPratcam(kPratcam_between_67_and_167mph);
     } else if (abs_vcs_z > .0015f) {
-        ChangeAmbientPratcam(1);
+        ChangeAmbientPratcam(kPratcam_between_25_and_67mph);
     } else {
-        ChangeAmbientPratcam(0);
+        ChangeAmbientPratcam(kPratcam_stationary_or_below_25mph);
     }
 }
 
@@ -7303,12 +7303,14 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
 // FUNCTION: CARM95 0x00492ff8
 int TestForNan(float* f) {
     tU32 i;
-    // i = *f;
-    // return isnan(*f);
-    // return (~i & 0x7F800000) == 0;
 
-    i = *(unsigned long*)f;
-    return ((i & 0x7F800000) == 0x7F800000) && ((i & 0x007FFFFF) != 0);
+#ifdef DETHRACE_FIX_BUGS
+    return isnan(*f);
+#else
+    memcpy(&i, f, sizeof i);
+    i = ~i & 0x7F800000;
+    return i == 0;
+#endif
 }
 
 // IDA: void __cdecl CheckCameraHither()

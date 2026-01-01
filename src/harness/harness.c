@@ -25,12 +25,12 @@ extern const tPlatform_bootstrap SDL2_bootstrap;
 extern const tPlatform_bootstrap SDL3_bootstrap;
 
 static const tPlatform_bootstrap* platform_bootstraps[] = {
-#if defined(DETHRACE_PLATFORM_SDL2)
-    &SDL2_bootstrap,
-#define HAS_PLATFORM_BOOTSTRAP
-#endif
 #if defined(DETHRACE_PLATFORM_SDL3)
     &SDL3_bootstrap,
+#define HAS_PLATFORM_BOOTSTRAP
+#endif
+#if defined(DETHRACE_PLATFORM_SDL2)
+    &SDL2_bootstrap,
 #define HAS_PLATFORM_BOOTSTRAP
 #endif
 #if defined(DETHRACE_PLATFORM_SDL1)
@@ -511,6 +511,8 @@ int Harness_ProcessIniFile(void) {
 
     strcat(path, "dethrace.ini");
 
+    LOG_INFO2("Loading ini file %s", path);
+
     if (ini_parse(path, Harness_Ini_Callback, NULL) < 0) {
         LOG_DEBUG2("Failed to load config file %s", path);
         return 1;
@@ -550,7 +552,8 @@ int Harness_Hook_isalnum(int c) {
                 return 1;
             }
         }
-    } if (harness_game_info.localization == eGameLocalization_french) {
+    }
+    if (harness_game_info.localization == eGameLocalization_french) {
         // French diacritic letters in Windows-1252
         unsigned char letters[] = { 140, 156, 159, 192, 194, 198, 199, 200, 201, 202, 203, 206, 207, 212, 217, 219, 220, 224, 226, 230, 231, 232, 233, 234, 235, 238, 239, 244, 249, 251, 252, 255 };
         for (i = 0; i < (int)sizeof(letters); i++) {
