@@ -470,14 +470,7 @@ void SignalToStartRace2(int pIndex) {
     gStart_race_sent = 1;
     the_message = NetBuildMessage(NETMSGID_STARTRACE, 0);
     the_message->contents.data.start_race.racing = gProgram_state.racing;
-    if (pIndex >= 0) {
-        gNet_players[pIndex].last_waste_message = 0;
-        gNet_players[pIndex].wasteage_attributed = 0;
-        the_message->contents.data.start_race.car_count = -1;
-        the_message->contents.data.start_race.car_list[0].index = pIndex;
-        BrMatrix34Copy(&the_message->contents.data.start_race.car_list[0].mat,
-            &gCurrent_race.opponent_list[gNet_players[pIndex].opponent_list_index].car_spec->car_master_actor->t.t.mat);
-    } else {
+    if (pIndex < 0) {
         the_message->contents.data.start_race.car_count = gCurrent_race.number_of_racers;
         for (i = 0; i < gCurrent_race.number_of_racers; i++) {
             BrMatrix34Copy(&the_message->contents.data.start_race.car_list[i].mat,
@@ -501,6 +494,14 @@ void SignalToStartRace2(int pIndex) {
                 gCurrent_net_game->options.race_sequence_type);
         }
         the_message->contents.data.start_race.next_race = gPending_race;
+
+    } else {
+        gNet_players[pIndex].last_waste_message = 0;
+        gNet_players[pIndex].wasteage_attributed = 0;
+        the_message->contents.data.start_race.car_count = -1;
+        the_message->contents.data.start_race.car_list[0].index = pIndex;
+        BrMatrix34Copy(&the_message->contents.data.start_race.car_list[0].mat,
+            &gCurrent_race.opponent_list[gNet_players[pIndex].opponent_list_index].car_spec->car_master_actor->t.t.mat);
     }
     NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
     if (gProgram_state.racing) {
