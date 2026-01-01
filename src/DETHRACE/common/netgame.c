@@ -541,6 +541,7 @@ void SetUpNetCarPositions(void) {
         gCurrent_race.opponent_list[i].net_player_index = i;
         gNet_players[i].opponent_list_index = i;
     }
+    racer_count = gNumber_of_net_players;
     if (!gInitialised_grid && gCurrent_net_game->options.grid_start) {
         qsort(gCurrent_race.opponent_list, gNumber_of_net_players, sizeof(tOpp_spec), SortGridFunction);
     }
@@ -548,37 +549,36 @@ void SetUpNetCarPositions(void) {
     for (i = 0; i < gNumber_of_net_players; i++) {
         gNet_players[gCurrent_race.opponent_list[i].net_player_index].opponent_list_index = i;
     }
-    for (i = 0; i < gNumber_of_net_players; i++) {
+    for (i = 0; i < racer_count; i++) {
         if ((gCurrent_race.opponent_list[i].car_spec->driver == eDriver_oppo && !gInitialised_grid)
             || (gCurrent_race.opponent_list[i].car_spec->driver >= eDriver_net_human && !gNet_players[gCurrent_race.opponent_list[i].net_player_index].grid_position_set)) {
             grid_index = -1;
-            racer_count = 0;
-            while (racer_count < 6 && grid_index < 0) {
-                grid_index = racer_count;
-                for (k = 0; k < gNumber_of_net_players; k++) {
+
+            for (j = 0; j < OPPONENT_COUNT + 1 && grid_index < 0; j++) {
+                grid_index = j;
+                for (k = 0; k < racer_count; k++) {
                     if (k != i
                         && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_position_set
-                        && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_index == racer_count) {
+                        && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_index == j) {
                         grid_index = -1;
                         break;
                     }
                 }
-                racer_count++;
             }
             if (grid_index < 0) {
                 FatalError(kFatalError_NetworkCodeSelfCheck);
             }
             SetInitialPosition(&gCurrent_race, i, grid_index);
             gNet_players[gCurrent_race.opponent_list[i].net_player_index].grid_index = grid_index;
-            if (gInitialised_grid) {
-                InitialiseCar2(gCurrent_race.opponent_list[i].car_spec, 0);
-            } else {
+            if (!gInitialised_grid) {
                 gCurrent_race.number_of_racers = i + 1;
+            } else {
+                InitialiseCar2(gCurrent_race.opponent_list[i].car_spec, 0);
             }
             gNet_players[gCurrent_race.opponent_list[i].net_player_index].grid_position_set = 1;
         }
     }
-    gCurrent_race.number_of_racers = gNumber_of_net_players;
+    gCurrent_race.number_of_racers = racer_count;
     gInitialised_grid = 1;
     ReenableNetService();
 }
