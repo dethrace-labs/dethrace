@@ -319,14 +319,18 @@ void ReceivedCopInfo(tNet_contents* pContents) {
     if (gNet_mode != eNet_mode_client) {
         return;
     }
-    if (pContents->data.cop_info.ID & 0xffffff00) {
-        c = GetCarSpec(pContents->data.cop_info.ID >> 8, pContents->data.cop_info.ID & 0xff);
-    } else {
+    if (pContents->data.cop_info.ID >> 8 == 0) {
         c = &gProgram_state.current_car;
+    } else {
+        c = GetCarSpec(pContents->data.cop_info.ID >> 8, pContents->data.cop_info.ID & 0xff);
     }
-    if (c == NULL || c->message.time > pContents->data.cop_info.time) {
+    if (c == NULL) {
         return;
     }
+    if (pContents->data.cop_info.time > c->message.time) {
+        return;
+    }
+
     c->message.time = pContents->data.cop_info.time;
     if (c->active) {
         c->message.type = NETMSGID_MECHANICS;
@@ -342,7 +346,7 @@ void ReceivedCopInfo(tNet_contents* pContents) {
         }
     } else {
         GetExpandedMatrix(&c->car_master_actor->t.t.mat, &pContents->data.cop_info.mat);
-        BrVector3InvScale(&c->car_master_actor->t.t.translate.t, &c->car_master_actor->t.t.translate.t, WORLD_SCALE);
+        BrVector3Scale(&c->car_master_actor->t.t.translate.t, &c->car_master_actor->t.t.translate.t, 1 / WORLD_SCALE);
         for (i = 0; i < COUNT_OF(c->damage_units); i++) {
             c->damage_units[i].damage_level = pContents->data.cop_info.damage[i];
         }
