@@ -634,9 +634,7 @@ void DisableCar(tCar_spec* pCar) {
             ForceRebuildActiveCarList();
         }
         if (pCar->car_master_actor->t.t.mat.m[3][0] < 500.0f) {
-            pCar->car_master_actor->t.t.mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0] + 1000.0f;
-            pCar->car_master_actor->t.t.mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1] + 1000.0f;
-            pCar->car_master_actor->t.t.mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2] + 1000.0f;
+            BrVector3Accumulate(&pCar->car_master_actor->t.t.translate.t, &gDisabled_vector);
             pCar->old_frame_mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0];
             pCar->old_frame_mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1];
             pCar->old_frame_mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2];
