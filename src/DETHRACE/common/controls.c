@@ -955,7 +955,7 @@ void TDamageRRWheel(void) {
 // FUNCTION: CARM95 0x004a13a6
 void MoveBonnetForward(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[2] -= .005f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[2] -= .005;
 }
 
 // IDA: void __cdecl SaveBonnet()
@@ -973,77 +973,77 @@ void SaveBonnet(void) {
 // FUNCTION: CARM95 0x004a142f
 void MoveBonnetBackward(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[2] += .005f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[2] += .005;
 }
 
 // IDA: void __cdecl MoveBonnetLeft()
 // FUNCTION: CARM95 0x004a1466
 void MoveBonnetLeft(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[0] -= .005f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[0] -= .005;
 }
 
 // IDA: void __cdecl ShrinkBonnetX()
 // FUNCTION: CARM95 0x004a149d
 void ShrinkBonnetX(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[0][0] *= .98f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[0][0] *= .98;
 }
 
 // IDA: void __cdecl SwellBonnetX()
 // FUNCTION: CARM95 0x004a14d4
 void SwellBonnetX(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[0][0] *= 1.02f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[0][0] *= 1.02;
 }
 
 // IDA: void __cdecl ShrinkBonnetY()
 // FUNCTION: CARM95 0x004a150b
 void ShrinkBonnetY(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[1][1] *= .98f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[1][1] *= .98;
 }
 
 // IDA: void __cdecl SwellBonnetY()
 // FUNCTION: CARM95 0x004a1542
 void SwellBonnetY(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[1][1] *= 1.02f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[1][1] *= 1.02;
 }
 
 // IDA: void __cdecl ShrinkBonnetZ()
 // FUNCTION: CARM95 0x004a1579
 void ShrinkBonnetZ(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[2][2] *= .98f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[2][2] *= .98;
 }
 
 // IDA: void __cdecl SwellBonnetZ()
 // FUNCTION: CARM95 0x004a15b0
 void SwellBonnetZ(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[2][2] *= 1.02f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat.m[2][2] *= 1.02;
 }
 
 // IDA: void __cdecl MoveBonnetDown()
 // FUNCTION: CARM95 0x004a15e7
 void MoveBonnetDown(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[1] += .005f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[1] += .005;
 }
 
 // IDA: void __cdecl MoveBonnetRight()
 // FUNCTION: CARM95 0x004a161e
 void MoveBonnetRight(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[0] += .005f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[0] += .005;
 }
 
 // IDA: void __cdecl MoveBonnetUp()
 // FUNCTION: CARM95 0x004a1655
 void MoveBonnetUp(void) {
 
-    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[1] -= .005f;
+    gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.translate.t.v[1] -= .005;
 }
 
 // IDA: void __cdecl TiltBonnetDownX()
@@ -1808,7 +1808,7 @@ void FlipUpCar(tCar_spec* car) {
         tv.v[0] = car->car_master_actor->t.t.mat.m[3][0] - car->last_safe_positions[0].m[3][0];
         tv.v[1] = car->car_master_actor->t.t.mat.m[3][1] - car->last_safe_positions[0].m[3][1];
         tv.v[2] = car->car_master_actor->t.t.mat.m[3][2] - car->last_safe_positions[0].m[3][2];
-        if (BrVector3LengthSquared(&tv) > 8.3015966) {
+        if (BrVector3LengthSquared(&tv) > 8.3015966f) {
             new_pos = 0;
         }
         BrMatrix34Copy(&car->car_master_actor->t.t.mat, &car->last_safe_positions[new_pos]);
@@ -1821,7 +1821,7 @@ void FlipUpCar(tCar_spec* car) {
         dir.v[1] = 0.28985506;
         dir.v[2] = 0.0;
         FindFace(&car->car_master_actor->t.t.euler.t, &dir, &tv, &t, &material);
-        if (t > 1.0) {
+        if (t > 1.0f) {
             car->car_master_actor->t.t.mat.m[3][0] += dir.v[0];
             car->car_master_actor->t.t.mat.m[3][1] += dir.v[1];
             car->car_master_actor->t.t.mat.m[3][2] += dir.v[2];
@@ -2077,7 +2077,7 @@ void PollCameraControls(tU32 pTime_difference) {
     flag = 0;
     swirl_mode = gRace_finished && !gAction_replay_mode && (&gProgram_state.current_car == gCar_to_view || gCar_to_view->knackered);
     up_and_down_mode = swirl_mode && !gCamera_has_collided;
-    going_up = gCamera_zoom > 1.0;
+    going_up = gCamera_zoom > 1.0f;
     if (last_swirl_mode != swirl_mode) {
         if (swirl_mode) {
             SaveCameraPosition(0);
@@ -2088,7 +2088,7 @@ void PollCameraControls(tU32 pTime_difference) {
     }
     if (!gMap_mode && !gProgram_state.cockpit_on && (!gAction_replay_mode || gAction_replay_camera_mode <= eAction_replay_standard)) {
         if (KeyIsDown(31) || (up_and_down_mode && !going_up)) {
-            gCamera_zoom = (double)pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1) + gCamera_zoom;
+            gCamera_zoom = pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1) + gCamera_zoom;
             if (gCamera_zoom > 2.0f) {
                 gCamera_zoom = 2.0f;
             }
@@ -2097,9 +2097,9 @@ void PollCameraControls(tU32 pTime_difference) {
             }
         }
         if (KeyIsDown(30) || (up_and_down_mode && going_up)) {
-            gCamera_zoom = gCamera_zoom - (double)pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1);
-            if (gCamera_zoom < 0.1) {
-                gCamera_zoom = 0.1;
+            gCamera_zoom = gCamera_zoom - pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1);
+            if (gCamera_zoom < 0.1f) {
+                gCamera_zoom = 0.1f;
                 if (up_and_down_mode) {
                     if (gCamera_zoom < 1.0f) {
                         gCamera_zoom = 1.0f;

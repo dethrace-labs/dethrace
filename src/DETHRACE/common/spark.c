@@ -941,9 +941,9 @@ void MungeShrapnel(tU32 pTime) {
             DrMatrix34Rotate(mat, 182 * gShrapnel[i].age, &gShrapnel[i].axis);
             BrMatrix34PreShearX(mat, gShrapnel[i].shear1, gShrapnel[i].shear2);
             // bug: should this be using "&gShrapnel[i].v"??
-            ts = 1.0 - BrVector3Length(&gSparks[i].v) / 1.4 * pTime / 1000.0;
-            if (ts < 0.1) {
-                ts = 0.1;
+            ts = 1.0f - BrVector3Length(&gSparks[i].v) / 1.4f * pTime / 1000.0f;
+            if (ts < 0.1f) {
+                ts = 0.1f;
             }
             BrVector3Scale(&gShrapnel[i].v, &gShrapnel[i].v, ts);
             AddShrapnelToPipingSession(i + ((gShrapnel[i].age > 1000 || gShrapnel[i].age < pTime) << 15), (br_vector3*)mat->m[3], gShrapnel[i].age - pTime, gShrapnel[i].actor->material);
@@ -1360,7 +1360,7 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
         decay_factor = 1.0f;
     }
     BrVector3InvScale(&tv, &pCar->wpos[wheel], WORLD_SCALE);
-    tv.v[1] -= pCar->oldd[wheel] / WORLD_SCALE;
+    tv.v[1] -= pCar->oldd[wheel] / WORLD_SCALE_D;
 
     alpha = -1000.0f;
     if (vcs.v[2] > 0.0f) {
@@ -1450,10 +1450,10 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
         if ((gSmoke_flags & (1u << i)) != 0) {
             if (gSmoke[i].strength > 0.0) {
                 if (gSmoke[i].time_sync) {
-                    BrVector3Scale(&tv, &gSmoke[i].v, gSmoke[i].time_sync / 1000.0);
+                    BrVector3Scale(&tv, &gSmoke[i].v, gSmoke[i].time_sync / 1000.0f);
                     gSmoke[i].time_sync = 0;
                 } else {
-                    BrVector3Scale(&tv, &gSmoke[i].v, pTime / 1000.0);
+                    BrVector3Scale(&tv, &gSmoke[i].v, pTime / 1000.0f);
                 }
                 BrVector3Accumulate(&gSmoke[i].pos, &tv);
             } else {
@@ -1480,7 +1480,7 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
             if (((1u << i) & not_lonely) == 0) {
                 gSmoke[i].strength = gSmoke[i].strength / 2.0;
             }
-            aspect = (gSmoke[i].radius - 0.05f) / 0.25f * 0.5f + 1.0f;
+            aspect = (gSmoke[i].radius - 0.05f) / 0.25f * 0.5 + 1.0;
             if ((gSmoke[i].type & 0x10) != 0) {
                 SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius / aspect, gSmoke[i].strength, 1.0, pRender_screen, pDepth_buffer, gShade_list[gSmoke[i].type & 0xf], pCamera);
             } else {
@@ -1489,13 +1489,13 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
             if (gSmoke[i].pipe_me) {
                 AddSmokeToPipingSession(i, gSmoke[i].type, &gSmoke[i].pos, gSmoke[i].radius, gSmoke[i].strength);
             }
-            gSmoke[i].radius = (double)pTime / 1000.0 * gSmoke[i].strength * 0.5 + gSmoke[i].radius;
-            gSmoke[i].strength = gSmoke[i].strength - (double)pTime * gSmoke[i].decay_factor / 1000.0;
+            gSmoke[i].radius = pTime / 1000.0f * gSmoke[i].strength * 0.5 + gSmoke[i].radius;
+            gSmoke[i].strength = gSmoke[i].strength - pTime * gSmoke[i].decay_factor / 1000.0f;
             if (gSmoke[i].radius > 0.3f) {
                 gSmoke[i].radius = 0.3f;
             }
-            if (gSmoke[i].strength > 0.0) {
-                ts = 1.0f - (double)pTime * 0.002f;
+            if (gSmoke[i].strength > 0.0f) {
+                ts = 1.0f - pTime * 0.002f;
                 if (ts < 0.5f) {
                     ts = 0.5f;
                 }
