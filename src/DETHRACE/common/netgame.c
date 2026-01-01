@@ -55,7 +55,7 @@ int gInitialised_grid;
 // GLOBAL: CARM95 0x00551d80
 int gIt_or_fox;
 
-#define PACK_POWERUPS(car) (car->power_up_levels[0] & 0xff) + ((car->power_up_levels[2] & 0xff) << 6) + ((car->power_up_levels[1] & 0xff) << 3);
+#define PACK_POWERUPS(car) car->power_up_levels[0] + (car->power_up_levels[1] << 3) + (car->power_up_levels[2] << 6);
 
 // IDA: void __usercall SendCarData(tU32 pNext_frame_time@<EAX>)
 // FUNCTION: CARM95 0x0042f2d0
@@ -71,7 +71,10 @@ void SendCarData(tU32 pNext_frame_time) {
     int damaged_wheels;
 
     time = GetRaceTime();
-    if (gNet_mode == eNet_mode_none || (time > last_time && last_time + 80 > time)) {
+    if (gNet_mode == eNet_mode_none) {
+        return;
+    }
+    if (time > last_time && last_time + 80 > time) {
         return;
     }
     last_time = time;
@@ -93,8 +96,8 @@ void SendCarData(tU32 pNext_frame_time) {
             BrVector3Copy(&contents->data.mech.v, &car->v);
             contents->data.mech.curvature = (car->curvature / car->maxcurve * 32767.0f);
             contents->data.mech.keys = car->keys;
-            contents->data.mech.keys.joystick_acc = (tU8)(car->joystick.acc >> 9);
-            contents->data.mech.keys.joystick_dec = (tU8)(car->joystick.dec >> 9);
+            contents->data.mech.keys.joystick_acc = (car->joystick.acc >> 9) & 0xff;
+            contents->data.mech.keys.joystick_dec = (car->joystick.dec >> 9) & 0xff;
             contents->data.mech.revs = car->revs;
             for (j = 0; j < COUNT_OF(contents->data.mech.d); j++) {
                 contents->data.mech.d[j] = (int)(car->oldd[j] / car->susp_height[j >> 1] * 255.0f);
@@ -154,7 +157,7 @@ void SendCarData(tU32 pNext_frame_time) {
         }
         damaged_wheels = car->damage_units[eDamage_lf_wheel].damage_level > 30 || car->damage_units[eDamage_rf_wheel].damage_level > 30 || car->damage_units[eDamage_lr_wheel].damage_level > 30 || car->damage_units[eDamage_rr_wheel].damage_level > 30;
         contents = NetGetToHostContents(NETMSGID_MECHANICS, damaged_wheels);
-        GetReducedMatrix(&contents->data.mech.mat, &gProgram_state.current_car.car_master_actor->t.t.mat);
+        GetReducedMatrix(&contents->data.mech.mat, &car->car_master_actor->t.t.mat);
         contents->data.mech.ID = gNet_players[gThis_net_player_index].ID;
         contents->data.mech.time = pNext_frame_time;
         BrVector3Copy(&contents->data.mech.omega, &car->omega);
@@ -162,8 +165,8 @@ void SendCarData(tU32 pNext_frame_time) {
 
         contents->data.mech.curvature = (car->curvature / car->maxcurve * 32767.0f);
         contents->data.mech.keys = car->keys;
-        contents->data.mech.keys.joystick_acc = (tU8)(car->joystick.acc >> 9);
-        contents->data.mech.keys.joystick_dec = (tU8)(car->joystick.dec >> 9);
+        contents->data.mech.keys.joystick_acc = (car->joystick.acc >> 9) & 0xff;
+        contents->data.mech.keys.joystick_dec = (car->joystick.dec >> 9) & 0xff;
         contents->data.mech.revs = car->revs;
         contents->data.mech.cc_coll_time = car->last_car_car_collision;
         for (j = 0; j < COUNT_OF(contents->data.mech.d); j++) {
@@ -181,10 +184,10 @@ void SendCarData(tU32 pNext_frame_time) {
                 contents->data.mech.wheel_dam_offset[j] = car->wheel_dam_offset[j];
             }
         }
-        if (car->time_to_recover > 0 && car->time_to_recover - 500 < pNext_frame_time) {
+        if (car->time_to_recover != 0 && car->time_to_recover - 500 < pNext_frame_time) {
             contents = NetGetToHostContents(NETMSGID_RECOVER, 0);
             contents->data.recover.ID = gNet_players[gThis_net_player_index].ID;
-            contents->data.recover.time_to_recover = gProgram_state.current_car.time_to_recover;
+            contents->data.recover.time_to_recover = car->time_to_recover;
         }
     }
 }
