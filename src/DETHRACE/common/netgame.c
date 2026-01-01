@@ -234,17 +234,14 @@ void ReceivedMechanics(tNet_contents* pContents) {
             break;
         }
     }
-    if (car == NULL || car->message.time >= pContents->data.mech.time) {
+    if (car == NULL || car->message.time > pContents->data.mech.time) {
         return;
     }
     if (car->disabled) {
         EnableCar(car);
         GetExpandedMatrix(&car->car_master_actor->t.t.mat, &pContents->data.mech.mat);
         BrMatrix34Copy(&car->oldmat, &car->car_master_actor->t.t.mat);
-        BrVector3InvScale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
-        // car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * 0.14492753;
-        // car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * 0.14492753;
-        // car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * 0.14492753;
+        BrVector3Scale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, 1 / WORLD_SCALE);
         car->box_face_ref = gFace_num__car - 2;
         car->message.time = pContents->data.mech.time;
         car->message.type = NETMSGID_NONE;
@@ -261,54 +258,53 @@ void ReceivedMechanics(tNet_contents* pContents) {
         return;
     }
     if (gNet_mode == eNet_mode_host) {
-        if (gThis_net_player_index == i) {
-            return;
-        }
-        if (car->last_car_car_collision <= pContents->data.mech.cc_coll_time) {
-            CopyMechanics(car, pContents);
-        }
-        car->power_up_levels[0] = pContents->data.mech.powerups & 7;
-        car->power_up_levels[1] = (pContents->data.mech.powerups >> 3) & 7;
-        car->power_up_levels[2] = (pContents->data.mech.powerups >> 6) & 7;
-        car->keys = car->message.keys;
-        if (car->message.keys.joystick_acc < 0) {
-            car->joystick.acc = -1;
-        } else {
-            car->joystick.acc = car->message.keys.joystick_acc << 9;
-        }
-        if (car->message.keys.joystick_dec < 0) {
-            car->joystick.dec = -1;
-        } else {
-            car->joystick.dec = car->message.keys.joystick_dec << 9;
-        }
-    } else if (gNet_mode == eNet_mode_client) {
-        if (gThis_net_player_index == i) {
-            if (car->last_car_car_collision < pContents->data.mech.cc_coll_time) {
+        if (gThis_net_player_index != i) {
+            if (car->last_car_car_collision <= pContents->data.mech.cc_coll_time) {
                 CopyMechanics(car, pContents);
             }
-        } else {
+            car->power_up_levels[0] = pContents->data.mech.powerups & 7;
+            car->power_up_levels[1] = (pContents->data.mech.powerups >> 3) & 7;
+            car->power_up_levels[2] = (pContents->data.mech.powerups >> 6) & 7;
+            car->keys = car->message.keys;
+            if (car->message.keys.joystick_acc >= 0) {
+                car->joystick.acc = car->message.keys.joystick_acc << 9;
+            } else {
+                car->joystick.acc = -1;
+            }
+            if (car->message.keys.joystick_dec >= 0) {
+                car->joystick.dec = car->message.keys.joystick_dec << 9;
+            } else {
+                car->joystick.dec = -1;
+            }
+        }
+    } else if (gNet_mode == eNet_mode_client) {
+        if (gThis_net_player_index != i) {
             CopyMechanics(car, pContents);
             car->power_up_levels[0] = pContents->data.mech.powerups & 7;
             car->power_up_levels[1] = (pContents->data.mech.powerups >> 3) & 7;
             car->power_up_levels[2] = (pContents->data.mech.powerups >> 6) & 7;
             car->keys = car->message.keys;
-            if (car->message.keys.joystick_acc < 0) {
-                car->joystick.acc = -1;
-            } else {
+            if (car->message.keys.joystick_acc >= 0) {
                 car->joystick.acc = car->message.keys.joystick_acc << 9;
-            }
-            if (car->message.keys.joystick_dec < 0) {
-                car->joystick.dec = -1;
             } else {
+                car->joystick.acc = -1;
+            }
+            if (car->message.keys.joystick_dec >= 0) {
                 car->joystick.dec = car->message.keys.joystick_dec << 9;
+            } else {
+                car->joystick.dec = -1;
             }
             if (!car->active) {
                 GetExpandedMatrix(&car->car_master_actor->t.t.mat, &pContents->data.mech.mat);
                 BrMatrix34Copy(&car->oldmat, &car->car_master_actor->t.t.mat);
                 BrMatrix34ApplyP(&car->pos, &car->cmpos, &car->car_master_actor->t.t.mat);
-                BrVector3InvScale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
-                BrVector3InvScale(&car->pos, &car->pos, WORLD_SCALE);
+                BrVector3Scale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, 1 / WORLD_SCALE);
+                BrVector3Scale(&car->pos, &car->pos, 1 / WORLD_SCALE);
                 car->box_face_ref = gFace_num__car - 2;
+            }
+        } else {
+            if (car->last_car_car_collision < pContents->data.mech.cc_coll_time) {
+                CopyMechanics(car, pContents);
             }
         }
     }
