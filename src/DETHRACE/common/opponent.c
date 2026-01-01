@@ -697,7 +697,7 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
         pTemp_store[pDepth].section_no = section_no;
         pTemp_store[pDepth].direction = direction;
         distance_so_far = gProgram_state.AI_vehicles.path_sections[section_no].length + pDistance_so_far;
-        if (pTarget_section == section_no && distance_so_far <= shortest_dist) {
+        if (pTarget_section == section_no && distance_so_far < shortest_dist) {
             shortest_dist = distance_so_far;
             *pNum_of_perm_store_sections = pDepth + 1;
             memcpy(pPerm_store, pTemp_store, sizeof(tRoute_section) * *pNum_of_perm_store_sections);
