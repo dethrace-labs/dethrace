@@ -579,9 +579,9 @@ void CalcGrafDataIndex(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        if (gGraf_specs[gGraf_spec_index].total_width == gGraf_data[i].width && gGraf_specs[gGraf_spec_index].total_height == gGraf_data[i].height) {
-            gReal_graf_data_index = i;
+        if (gGraf_data[i].width == gGraf_specs[gGraf_spec_index].total_width && gGraf_data[i].height == gGraf_specs[gGraf_spec_index].total_height) {
             gGraf_data_index = i;
+            gReal_graf_data_index = gGraf_data_index;
             gCurrent_graf_data = &gGraf_data[i];
             return;
         }

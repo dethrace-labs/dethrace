@@ -1423,26 +1423,26 @@ typedef struct tWav_header {
     tU32 data_length;
 } tWav_header;
 
-typedef struct tPowerup {
-    tPowerup_type type;
-    tU32 got_time;
-    tU32 duration;
-    tU32 lose_time;
-    tU16 group_inclusion;
-    br_pixelmap* icon;
-    int fizzle_type;
-    int number_of_float_params;
-    int number_of_integer_params;
-    int* integer_params;
-    int current_value;
-    int prat_cam_event;
-    tNet_powerup_type net_type;
-    tGot_proc* got_proc;
-    tLose_proc* lose_proc;
-    tPeriodic_proc* periodic_proc;
-    float* float_params;
-    tCar_spec* car;
-    char message[64];
+typedef struct tPowerup {          // size: 0x88
+    tPowerup_type type;            // @0x0
+    tU32 got_time;                 // @0x4
+    tU32 duration;                 // @0x8
+    tU32 lose_time;                // @0xc
+    tU16 group_inclusion;          // @0x10
+    br_pixelmap* icon;             // @0x14
+    int fizzle_type;               // @0x18
+    int number_of_float_params;    // @0x1c
+    int number_of_integer_params;  // @0x20
+    int* integer_params;           // @0x24
+    int current_value;             // @0x28
+    int prat_cam_event;            // @0x2c
+    tNet_powerup_type net_type;    // @0x30
+    tGot_proc* got_proc;           // @0x34
+    tLose_proc* lose_proc;         // @0x38
+    tPeriodic_proc* periodic_proc; // @0x3c
+    float* float_params;           // @0x40
+    tCar_spec* car;                // @0x44
+    char message[64];              // @0x48
 } tPowerup;
 
 typedef struct tDepth_effect {
