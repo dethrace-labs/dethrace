@@ -382,11 +382,12 @@ void ReceivedNonCarPosition(tNet_contents* pContents) {
     br_actor* actor;
 
     actor = gProgram_state.track_spec.non_car_list[pContents->data.non_car_position.ID];
-    if (actor != NULL && gNet_mode != eNet_mode_none) {
-        BrMatrix34Copy(&actor->t.t.mat, &pContents->data.non_car_position.mat);
-        if (pContents->data.non_car_position.flags) {
-            actor->identifier[3] = '!';
-        }
+    if (actor == NULL || gNet_mode == eNet_mode_host) {
+        return;
+    }
+    BrMatrix34Copy(&actor->t.t.mat, &pContents->data.non_car_position.mat);
+    if (pContents->data.non_car_position.flags) {
+        actor->identifier[3] = '!';
     }
 }
 
