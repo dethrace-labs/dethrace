@@ -403,10 +403,10 @@ void ReceivedNonCar(tNet_contents* pContents) {
     tCollision_info* c;
 
     track_spec = &gProgram_state.track_spec;
-    if (pContents->data.non_car.ID >= track_spec->ampersand_digits) {
+    if (pContents->data.non_car.ID >= gProgram_state.track_spec.ampersand_digits) {
         return;
     }
-    actor = track_spec->non_car_list[pContents->data.non_car.ID];
+    actor = gProgram_state.track_spec.non_car_list[pContents->data.non_car.ID];
     if (actor == NULL) {
         return;
     }
@@ -426,7 +426,17 @@ void ReceivedNonCar(tNet_contents* pContents) {
             ncar = (tNon_car_spec*)actor->type_data;
         }
     }
-    if (ncar != NULL) {
+    if (ncar == NULL) {
+        GetExpandedMatrix(&actor->t.t.mat, &pContents->data.non_car.mat);
+        BrVector3Scale(&actor->t.t.translate.t, &actor->t.t.translate.t, 1 / WORLD_SCALE);
+        XZToColumnXZ(&cx, &cz, actor->t.t.translate.t.v[0], actor->t.t.translate.t.v[2], track_spec);
+        if (track_spec->columns[cz][cx] != actor->parent) {
+            if (track_spec->columns[cz][cx] != NULL) {
+                BrActorRemove(actor);
+                BrActorAdd(track_spec->columns[cz][cx], actor);
+            }
+        }
+    } else {
         c = &ncar->collision_info;
         if ((pContents->data.non_car.flags & 2) != 0) {
             GetExpandedMatrix(&c->car_master_actor->t.t.mat, &pContents->data.non_car.mat);
@@ -440,16 +450,6 @@ void ReceivedNonCar(tNet_contents* pContents) {
             c->message.time = pContents->data.non_car.time;
             c->message.type = NETMSGID_NONCAR_INFO;
             c->doing_nothing_flag = 0;
-        }
-    } else {
-        GetExpandedMatrix(&actor->t.t.mat, &pContents->data.non_car.mat);
-        BrVector3InvScale(&actor->t.t.translate.t, &actor->t.t.translate.t, WORLD_SCALE);
-        XZToColumnXZ(&cx, &cz, actor->t.t.translate.t.v[0], actor->t.t.translate.t.v[2], track_spec);
-        if (track_spec->columns[cz][cx] != actor->parent) {
-            if (track_spec->columns[cz][cx] != NULL) {
-                BrActorRemove(actor);
-                BrActorAdd(track_spec->columns[cz][cx], actor);
-            }
         }
     }
 }
