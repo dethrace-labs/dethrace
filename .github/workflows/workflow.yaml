@@ -172,14 +172,14 @@ jobs:
             echo "::warning file=reccmp-output.txt::Decomp correctness decreased"
           fi
       - name: Checkout reccmp-report repo
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !github.event.repository.fork
         uses: actions/checkout@v4
         with:
           repository: dethrace-labs/reccmp-report
           token: ${{ secrets.RECCMP_REPORT_TOKEN }}
           path: reccmp-report
       - name: Update report in reccmp-report repo
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !github.event.repository.fork
         run: |
           cp new-reccmp-report.json reccmp-report/report.json
           cd reccmp-report
