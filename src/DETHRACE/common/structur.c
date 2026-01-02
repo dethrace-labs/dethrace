@@ -62,6 +62,13 @@ tU32 gLast_checkpoint_time;
 // GLOBAL: CARM95 0x00551dbc
 tRace_over_reason gRace_over_reason;
 
+#ifdef DETHRACE_FIX_BUGS
+// This avoids the main menu fading out and reappearing when starting the game with -nocutscenes
+#define MAIN_MENU_TIMEOUT (gCut_scene_override ? 0 : 30000u)
+#else
+#define MAIN_MENU_TIMEOUT 30000u
+#endif
+
 // IDA: int __cdecl NumberOfOpponentsLeft()
 // FUNCTION: CARM95 0x00413f90
 int NumberOfOpponentsLeft(void) {
@@ -706,7 +713,7 @@ void DoProgram(void) {
             if (gGame_to_load >= 0) {
                 DoLoadGame();
             } else {
-                DoMainMenuScreen(30000u, 0, 0);
+                DoMainMenuScreen(MAIN_MENU_TIMEOUT, 0, 0);
             }
             break;
         case eProg_demo:
