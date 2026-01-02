@@ -926,30 +926,30 @@ void MungeShrapnel(tU32 pTime) {
         }
         if (gShrapnel[i].age == -1) {
             KillShrapnel(i);
+            continue;
+        }
+        if (gShrapnel[i].time_sync) {
+            BrVector3Scale(&disp, &gShrapnel[i].v, gShrapnel[i].time_sync / 1000.0f);
+            gShrapnel[i].time_sync = 0;
         } else {
-            if (gShrapnel[i].time_sync) {
-                BrVector3Scale(&disp, &gShrapnel[i].v, gShrapnel[i].time_sync / 1000.0f);
-                gShrapnel[i].time_sync = 0;
-            } else {
-                BrVector3Scale(&disp, &gShrapnel[i].v, pTime / 1000.0f);
-                gShrapnel[i].age += pTime;
-            }
-            mat->m[3][0] = mat->m[3][0] + disp.v[0];
-            mat->m[3][1] = mat->m[3][1] + disp.v[1];
-            mat->m[3][2] = mat->m[3][2] + disp.v[2];
-            gShrapnel[i].v.v[1] -= (10 * pTime) * 0.00014492753f;
-            DrMatrix34Rotate(mat, 182 * gShrapnel[i].age, &gShrapnel[i].axis);
-            BrMatrix34PreShearX(mat, gShrapnel[i].shear1, gShrapnel[i].shear2);
-            // bug: should this be using "&gShrapnel[i].v"??
-            ts = 1.0f - BrVector3Length(&gSparks[i].v) / 1.4f * pTime / 1000.0f;
-            if (ts < 0.1f) {
-                ts = 0.1f;
-            }
-            BrVector3Scale(&gShrapnel[i].v, &gShrapnel[i].v, ts);
-            AddShrapnelToPipingSession(i + ((gShrapnel[i].age > 1000 || gShrapnel[i].age < pTime) << 15), (br_vector3*)mat->m[3], gShrapnel[i].age - pTime, gShrapnel[i].actor->material);
-            if (gShrapnel[i].age > 1000) {
-                gShrapnel[i].age = -1;
-            }
+            BrVector3Scale(&disp, &gShrapnel[i].v, pTime / 1000.0f);
+            gShrapnel[i].age += pTime;
+        }
+        mat->m[3][0] = mat->m[3][0] + disp.v[0];
+        mat->m[3][1] = mat->m[3][1] + disp.v[1];
+        mat->m[3][2] = mat->m[3][2] + disp.v[2];
+        gShrapnel[i].v.v[1] -= (10 * pTime) * 0.00014492753f;
+        DrMatrix34Rotate(mat, 182 * gShrapnel[i].age, &gShrapnel[i].axis);
+        BrMatrix34PreShearX(mat, gShrapnel[i].shear1, gShrapnel[i].shear2);
+        // bug: should this be using "&gShrapnel[i].v"??
+        ts = 1.0f - BrVector3Length(&gSparks[i].v) / 1.4f * pTime / 1000.0f;
+        if (ts < 0.1f) {
+            ts = 0.1f;
+        }
+        BrVector3Scale(&gShrapnel[i].v, &gShrapnel[i].v, ts);
+        AddShrapnelToPipingSession(i + ((gShrapnel[i].age > 1000 || gShrapnel[i].age < pTime) << 15), (br_vector3*)mat->m[3], gShrapnel[i].age - pTime, gShrapnel[i].actor->material);
+        if (gShrapnel[i].age > 1000) {
+            gShrapnel[i].age = -1;
         }
     }
     EndPipingSession();
