@@ -8,6 +8,7 @@
 #include "errors.h"
 #include "globvars.h"
 #include "globvrbm.h"
+#include "globvrkm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
@@ -40,10 +41,10 @@ int gPed_target;
 // GLOBAL: CARM95 0x00532210
 int gNot_shown_race_type_headup;
 
-// GLOBAL: CARM95 0x00532208
+// GLOBAL: CARM95 0x00532204
 tU32 gLast_it_change;
 
-// GLOBAL: CARM95 0x00532204
+// GLOBAL: CARM95 0x00532208
 tU32 gTime_for_punishment;
 
 // GLOBAL: CARM95 0x00532200
@@ -689,16 +690,20 @@ void DoNetworkHeadups(int pCredits) {
         case eNet_game_type_foxy:
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_THAT_HALVED_YOUR_TIME));
             break;
+#ifdef DETHRACE_FIX_BUGS
         default:
             break;
+#endif
         }
     }
-    if (gNet_mode == eNet_mode_none || gNet_recovery_cost[gCurrent_net_game->type] <= gProgram_state.credits_earned - gProgram_state.credits_lost || Flash(200, &last_flash, &flash_state)) {
+
+    if (!gNet_mode || ((gNet_mode ? gNet_recovery_cost[gCurrent_net_game->type] : gRecovery_cost[gProgram_state.skill_level]) <= (gProgram_state.credits_earned - gProgram_state.credits_lost) || Flash(200, &last_flash, &flash_state))) {
         sprintf(s, "\xf8%d\xfa %s", pCredits, GetMiscString(kMiscString_CREDITS));
         ChangeHeadupText(gNet_cash_headup, s);
     } else {
         ChangeHeadupText(gNet_cash_headup, "");
     }
+
     switch (gCurrent_net_game->type) {
     case eNet_game_type_carnage:
         sprintf(s, "%s \xf8%d\xfa", GetMiscString(kMiscString_TARGET_180), gPed_target);
@@ -716,7 +721,7 @@ void DoNetworkHeadups(int pCredits) {
         break;
     default:
         s[0] = '\0';
-        break;
+        // break;
     }
     ChangeHeadupText(gNet_ped_headup, s);
 }
