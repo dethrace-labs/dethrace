@@ -954,10 +954,12 @@ void InitNetHeadups(void) {
 // FUNCTION: CARM95 0x0043221f
 void DisposeNetHeadups(void) {
 
+#ifdef DETHRACE_FIX_BUGS
     /* Windows version does not use gIcons_pix_low_res. */
     if (gIcons_pix_low_res != NULL && gIcons_pix_low_res != gIcons_pix) {
         BrPixelmapFree(gIcons_pix_low_res);
     }
+#endif
 
     if (gIcons_pix != NULL) {
         BrMapRemove(gIcons_pix);
@@ -1073,15 +1075,29 @@ int FarEnoughAway(tNet_game_player_info* pPlayer_1, tNet_game_player_info* pPlay
 // FUNCTION: CARM95 0x004327a5
 void CarInContactWithItOrFox(tNet_game_player_info* pPlayer) {
 
-    if (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) {
-        if (PDGetTotalTime() - gLast_it_change > 500) {
-            gLast_it_change = PDGetTotalTime();
-            if (gIt_or_fox >= 0) {
-                gLast_lepper = &gNet_players[gIt_or_fox];
+    switch (gCurrent_net_game->type) {
+    case eNet_game_type_tag:
+    case eNet_game_type_foxy:
+        if ((int)(PDGetTotalTime() - gLast_it_change) > 500) {
+            if (pPlayer != gLast_lepper) {
+                gLast_it_change = PDGetTotalTime();
+                if (gIt_or_fox >= 0) {
+                    gLast_lepper = &gNet_players[gIt_or_fox];
+                }
+                PlayerIsIt(pPlayer);
             }
-            PlayerIsIt(pPlayer);
         }
+        break;
     }
+    // if (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) {
+    //     if (PDGetTotalTime() - gLast_it_change > 500) {
+    //         gLast_it_change = PDGetTotalTime();
+    //         if (gIt_or_fox >= 0) {
+    //             gLast_lepper = &gNet_players[gIt_or_fox];
+    //         }
+    //         PlayerIsIt(pPlayer);
+    //     }
+    // }
 }
 
 // IDA: void __usercall SelectRandomItOrFox(int pNot_this_one@<EAX>)
