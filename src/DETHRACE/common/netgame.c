@@ -938,6 +938,7 @@ void InitNetHeadups(void) {
     if (gDigits_pix != NULL) {
         BrMapAdd(gDigits_pix);
     }
+#ifdef DETHRACE_FIX_BUGS
     /* The Windows version does not use gIcons_pix_low_res. */
     if (gGraf_data_index != 0) {
         SwitchToLoresMode();
@@ -946,6 +947,7 @@ void InitNetHeadups(void) {
     } else {
         gIcons_pix_low_res = gIcons_pix;
     }
+#endif
 }
 
 // IDA: void __cdecl DisposeNetHeadups()
