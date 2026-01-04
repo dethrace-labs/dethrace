@@ -690,10 +690,8 @@ void DoNetworkHeadups(int pCredits) {
         case eNet_game_type_foxy:
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_THAT_HALVED_YOUR_TIME));
             break;
-#ifdef DETHRACE_FIX_BUGS
-        default:
-            break;
-#endif
+
+            DETHRACE_DEFAULT_BREAK
         }
     }
 
@@ -1088,10 +1086,8 @@ void CarInContactWithItOrFox(tNet_game_player_info* pPlayer) {
             }
         }
         break;
-#ifdef DETHRACE_FIX_BUGS
-    default:
-        break;
-#endif
+
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -1178,11 +1174,9 @@ void CalcPlayerScores(void) {
         }
         break;
 
-#ifdef DETHRACE_FIX_BUGS
-    default:
-        break;
-#endif
+        DETHRACE_DEFAULT_BREAK
     }
+
     lowest_score = 9999;
     lowest_score_player = NULL;
     cars_left = 0;
@@ -1258,10 +1252,8 @@ void CalcPlayerScores(void) {
                     SelectRandomItOrFox(i);
                 }
                 break;
-#ifdef DETHRACE_FIX_BUGS
-            default:
-                break;
-#endif
+
+                DETHRACE_DEFAULT_BREAK
             }
         }
         switch (gCurrent_net_game->type) {
@@ -1342,10 +1334,8 @@ void CalcPlayerScores(void) {
                 }
             }
             break;
-#ifdef DETHRACE_FIX_BUGS
-        default:
-            continue;
-#endif
+
+            DETHRACE_DEFAULT_BREAK
         }
     }
     if ((gCurrent_net_game->type == eNet_game_type_sudden_death || gCurrent_net_game->type == eNet_game_type_tag)
@@ -1399,10 +1389,8 @@ void SendPlayerScores(void) {
     case eNet_game_type_foxy:
         the_contents->data.scores.general_score = gNet_players[gIt_or_fox].ID;
         break;
-#ifdef DETHRACE_FIX_BUGS
-    default:
-        break;
-#endif
+
+        DETHRACE_DEFAULT_BREAK
     }
     for (i = 0; i < gNumber_of_net_players; i++) {
         the_contents->data.scores.scores[i] = gNet_players[i].score;
@@ -1443,10 +1431,8 @@ void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
     case eNet_game_type_sudden_death:
         pPlayer->score = 0;
         break;
-#ifdef DETHRACE_FIX_BUGS
-    default:
-        break;
-#endif
+
+        DETHRACE_DEFAULT_BREAK
     }
     pPlayer->credits = gInitial_net_credits[gCurrent_net_game->options.starting_money_index];
     pPlayer->wasted = 0;
@@ -1528,18 +1514,27 @@ void BuyOffense(void) {
 void UseGeneralScore(int pScore) {
     int i;
 
-    if (gCurrent_net_game->type == eNet_game_type_carnage) {
+    switch (gCurrent_net_game->type) {
+
+    case eNet_game_type_carnage:
         gPed_target = pScore;
-    } else if ((gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) && gNet_players[gIt_or_fox].ID != pScore) {
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            StopCarBeingIt(gNet_players[i].car);
-        }
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            if (gNet_players[i].ID == pScore) {
-                MakeCarIt(gNet_players[i].car);
-                gIt_or_fox = i;
+        break;
+    case eNet_game_type_tag:
+    case eNet_game_type_foxy:
+        if (gNet_players[gIt_or_fox].ID != pScore) {
+            for (i = 0; i < gNumber_of_net_players; i++) {
+                StopCarBeingIt(gNet_players[i].car);
+            }
+            for (i = 0; i < gNumber_of_net_players; i++) {
+                if (gNet_players[i].ID == pScore) {
+                    MakeCarIt(gNet_players[i].car);
+                    gIt_or_fox = i;
+                }
             }
         }
+        break;
+
+        DETHRACE_DEFAULT_BREAK
     }
 }
 

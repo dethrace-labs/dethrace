@@ -1,14 +1,18 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+/*
+ * All macros contained in this file were created as part of the reverse engineering effort
+ * and may or may not exist (or use the same names) in the retail code.
+ *
+ */
+
 #define DR_JOIN2(A, B) A##B
 #define DR_JOIN(A, B) DR_JOIN2(A, B)
 #define DR_STATIC_ASSERT(V) typedef int DR_JOIN(dr_static_assert_, __COUNTER__)[(V) ? 1 : -1]
 
 #define VEHICLE_TYPE_FROM_ID(id) ((tVehicle_type)(id >> 8))
 #define VEHICLE_INDEX_FROM_ID(id) ((id) & 0x00ff)
-
-// #define VEC3_TRANSLATE(mat) (*(br_vector3*)(&mat->m[3][0]))
 
 #define SLOBYTE(x) (*((signed char*)&(x)))
 
@@ -73,4 +77,13 @@
         b = x[0];                          \
     } while (0)
 
+#endif
+
+// Many switches in the original code did not include handling all values, causing warnings in modern compilers
+#ifdef DETHRACE_FIX_BUGS
+#define DETHRACE_DEFAULT_BREAK \
+    default:                   \
+        break;
+#else
+#define DETHRACE_DEFAULT_BREAK
 #endif
