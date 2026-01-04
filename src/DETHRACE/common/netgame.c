@@ -1690,6 +1690,10 @@ void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, in
 // IDA: void __cdecl InitNetGameplayStuff()
 // FUNCTION: CARM95 0x004342a4
 void InitNetGameplayStuff(void) {
+
+    switch (gCurrent_net_game->type) {
+        DETHRACE_DEFAULT_BREAK;
+    }
 }
 
 // IDA: void __cdecl DefaultNetName()
