@@ -1382,10 +1382,14 @@ void SendPlayerScores(void) {
     int i;
 
     the_contents = NetGetBroadcastContents(NETMSGID_SCORES, 0);
-    if (gCurrent_net_game->type == eNet_game_type_carnage) {
+    switch (gCurrent_net_game->type) {
+    case eNet_game_type_carnage:
         the_contents->data.scores.general_score = gPed_target;
-    } else if (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) {
+        break;
+    case eNet_game_type_tag:
+    case eNet_game_type_foxy:
         the_contents->data.scores.general_score = gNet_players[gIt_or_fox].ID;
+        break;
     }
     for (i = 0; i < gNumber_of_net_players; i++) {
         the_contents->data.scores.scores[i] = gNet_players[i].score;
