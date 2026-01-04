@@ -1719,22 +1719,25 @@ void RecievedCrushPoint(tNet_contents* pContents) {
     tCar_spec* car;
 
     car = NetCarFromPlayerID(pContents->data.crush.id);
-    if (car == NULL || gNet_mode == eNet_mode_host || car->active || gArrow_mode) {
-        return;
-    }
-    if (car->car_model_actors[car->principal_car_actor].crush_data.number_of_crush_points == 0) {
-        return;
-    }
 
-    CrushModelPoint(
-        car,
-        car->principal_car_actor,
-        car->car_model_actors[car->principal_car_actor].actor->model,
-        pContents->data.crush.vertex,
-        &pContents->data.crush.energy_vector,
-        BrVector3Length(&pContents->data.crush.energy_vector) + 0.06f,
-        &car->car_model_actors[car->principal_car_actor].crush_data);
-    SetModelForUpdate(car->car_model_actors[car->principal_car_actor].actor->model, car, 0);
+    if (!car
+        || gNet_mode == eNet_mode_host
+        || car->active
+        || gArrow_mode
+        || car->car_model_actors[car->principal_car_actor].crush_data.number_of_crush_points == 0) {
+
+        // do nothing
+    } else {
+        CrushModelPoint(
+            car,
+            car->principal_car_actor,
+            car->car_model_actors[car->principal_car_actor].actor->model,
+            pContents->data.crush.vertex,
+            &pContents->data.crush.energy_vector,
+            BrVector3Length(&pContents->data.crush.energy_vector) + 0.06,
+            &car->car_model_actors[car->principal_car_actor].crush_data);
+        SetModelForUpdate(car->car_model_actors[car->principal_car_actor].actor->model, car, 0);
+    }
 }
 
 // IDA: void __usercall GetReducedMatrix(tReduced_matrix *m1@<EAX>, br_matrix34 *m2@<EDX>)
