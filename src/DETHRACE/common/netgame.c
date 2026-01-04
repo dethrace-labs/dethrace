@@ -1461,13 +1461,13 @@ void InitPlayers(void) {
     for (i = 0; i < gNumber_of_net_players; i++) {
         InitialisePlayerScore(&gNet_players[i]);
     }
+    gIt_or_fox = -1;
     if (gNet_mode == eNet_mode_host) {
         gLast_it_change = 0;
         gLast_lepper = NULL;
     }
-    gTime_for_punishment = 0;
     gNot_shown_race_type_headup = 1;
-    gIt_or_fox = -1;
+    gTime_for_punishment = 0;
 }
 
 // IDA: void __usercall BuyPSPowerup(int pIndex@<EAX>)
