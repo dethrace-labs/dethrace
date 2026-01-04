@@ -1088,6 +1088,10 @@ void CarInContactWithItOrFox(tNet_game_player_info* pPlayer) {
             }
         }
         break;
+#ifdef DETHRACE_FIX_BUGS
+    default:
+        break;
+#endif
     }
 }
 
@@ -1173,6 +1177,11 @@ void CalcPlayerScores(void) {
             gLast_lepper = NULL;
         }
         break;
+
+#ifdef DETHRACE_FIX_BUGS
+    default:
+        break;
+#endif
     }
     lowest_score = 9999;
     lowest_score_player = NULL;
@@ -1390,6 +1399,10 @@ void SendPlayerScores(void) {
     case eNet_game_type_foxy:
         the_contents->data.scores.general_score = gNet_players[gIt_or_fox].ID;
         break;
+#ifdef DETHRACE_FIX_BUGS
+    default:
+        break;
+#endif
     }
     for (i = 0; i < gNumber_of_net_players; i++) {
         the_contents->data.scores.scores[i] = gNet_players[i].score;
@@ -1409,7 +1422,6 @@ void DoNetGameManagement(void) {
 // IDA: void __usercall InitialisePlayerScore(tNet_game_player_info *pPlayer@<EAX>)
 // FUNCTION: CARM95 0x0043385c
 void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
-
     PossibleService();
     switch (gCurrent_net_game->type) {
     case eNet_game_type_fight_to_death:
@@ -1422,17 +1434,19 @@ void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
     case eNet_game_type_checkpoint:
         pPlayer->score = 0xffff;
         break;
-    case eNet_game_type_sudden_death:
-        pPlayer->score = 0;
-        break;
     case eNet_game_type_tag:
         pPlayer->score = 0;
         break;
     case eNet_game_type_foxy:
         pPlayer->score = 0;
         break;
+    case eNet_game_type_sudden_death:
+        pPlayer->score = 0;
+        break;
+#ifdef DETHRACE_FIX_BUGS
     default:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
+        break;
+#endif
     }
     pPlayer->credits = gInitial_net_credits[gCurrent_net_game->options.starting_money_index];
     pPlayer->wasted = 0;
