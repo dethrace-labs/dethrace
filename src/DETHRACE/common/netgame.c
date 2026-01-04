@@ -1476,20 +1476,23 @@ void BuyPSPowerup(int pIndex) {
     char s[256];
     char s2[256];
 
-    if (gNet_mode == eNet_mode_none) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_ONLY_AVAILABLE_IN_NET_GAMES));
-    } else if (gProgram_state.current_car.power_up_levels[pIndex] < 4) {
-        if (gNet_mode == eNet_mode_none || gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]] <= (gProgram_state.credits_earned - gProgram_state.credits_lost)) {
-            SpendCredits(gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
-            ImprovePSPowerup(&gProgram_state.current_car, pIndex);
+    if (gNet_mode != eNet_mode_none) {
+        if (gProgram_state.current_car.power_up_levels[pIndex] < 4) {
+            if (gNet_mode != eNet_mode_none && gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]] > (gProgram_state.credits_earned - gProgram_state.credits_lost)) {
+                strcpy(s, GetMiscString(kMiscString_CANNOT_AFFORD_IT));
+                sprintf(s2, "%d", gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
+                SubsStringJob(s, s2);
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, s);
+            } else {
+                SpendCredits(gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
+                ImprovePSPowerup(&gProgram_state.current_car, pIndex);
+            }
         } else {
-            strcpy(s, GetMiscString(kMiscString_CANNOT_AFFORD_IT));
-            sprintf(s2, "%d", gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
-            SubsStringJob(s, s2);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3008, -4, s);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
         }
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_ONLY_AVAILABLE_IN_NET_GAMES));
+        // NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
     }
 }
 
