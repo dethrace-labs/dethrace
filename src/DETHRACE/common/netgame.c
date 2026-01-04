@@ -761,11 +761,11 @@ int SortNetHeadDescending(void* pFirst_one, void* pSecond_one) {
         }
     } else if (HEADUP2->out_of_game) {
         return -INT_MAX;
-    } else if (HEADUP2->score == HEADUP1->score) {
+    } else if (HEADUP2->score != HEADUP1->score) {
+        return HEADUP2->score - HEADUP1->score;
+    } else {
         return gNet_players[HEADUP1->player_index].last_score_index
             - gNet_players[HEADUP2->player_index].last_score_index;
-    } else {
-        return HEADUP2->score - HEADUP1->score;
     }
 }
 
