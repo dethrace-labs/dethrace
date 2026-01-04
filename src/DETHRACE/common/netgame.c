@@ -1573,8 +1573,7 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
     // GLOBAL: CARM95 0x50c61c
     static int pause_semaphore;
 
-    switch (pContents->data.gameplay.mess) {
-    case eNet_gameplay_host_paused:
+    if (pContents->data.gameplay.mess == eNet_gameplay_host_paused) {
         if (!pause_semaphore) {
             gPixel_buffer_size = gBack_screen->row_bytes * gBack_screen->height;
             gPixels_copy = BrMemAllocate(gPixel_buffer_size, kMem_quit_vfy_pixels);
@@ -1599,28 +1598,29 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
             FadePaletteDown();
             memcpy(gBack_screen->pixels, gPixels_copy, gPixel_buffer_size);
             memcpy(gCurrent_palette_pixels, gPalette_copy, 1024);
+#ifdef DETHRACE_3DFX_PATCH
             g16bit_palette_valid = 0;
+#endif
             BrMemFree(gPixels_copy);
             BrMemFree(gPalette_copy);
             PDScreenBufferSwap(0);
             FadePaletteUp();
             pause_semaphore = 0;
         }
-        break;
-    case eNet_gameplay_earn_credits:
+    } else if (pContents->data.gameplay.mess == eNet_gameplay_earn_credits) {
         EarnCredits(pContents->data.gameplay.param_1);
-        break;
-    case eNet_gameplay_host_unpaused:
+    } else if (pContents->data.gameplay.mess == eNet_gameplay_host_unpaused) {
         gWaiting_for_unpause = 0;
-        break;
-    case eNet_gameplay_suicide:
+    } else if (pContents->data.gameplay.mess == eNet_gameplay_suicide) {
         KnackerThisCar(NetCarFromPlayerID(pMessage->sender));
-        break;
-    case eNet_gameplay_go_for_it:
+    } else if (pContents->data.gameplay.mess == eNet_gameplay_go_for_it) {
         gWait_for_it = 0;
-        break;
-    default:
-        if (gCurrent_net_game->type == eNet_game_type_checkpoint || gCurrent_net_game->type == eNet_game_type_sudden_death || gCurrent_net_game->type == eNet_game_type_tag) {
+    } else {
+        switch (gCurrent_net_game->type) {
+        case eNet_game_type_checkpoint:
+        case eNet_game_type_sudden_death:
+        case eNet_game_type_tag:
+
             switch (pContents->data.gameplay.mess) {
             case eNet_gameplay_checkpoint:
                 Checkpoint(pContents->data.gameplay.param_1, 1);
@@ -1633,11 +1633,13 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
                 ChangeAmbientPratcam(kPratcam_network_timeout);
                 gRace_finished = 1;
                 break;
-            default:
-                break;
+
+                DETHRACE_DEFAULT_BREAK;
             }
+            break;
+
+            DETHRACE_DEFAULT_BREAK;
         }
-        break;
     }
 }
 
