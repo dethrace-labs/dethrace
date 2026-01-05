@@ -13,9 +13,9 @@ Windows (x86-64)
 ```
 
 ## Binary accuracy
-We aims to be as accurate as possible, matching the recompiled instructions to the original machine code as much as possible. The goal is to provide a workable codebase that can be modified, improved, and ported to other platforms later on. We are using [reccmp](https://github.com/isledecomp/reccmp?tab=readme-ov-file) to diff the recompiled code with the original Windows 95 code.
+We aims to be as accurate as possible, matching the recompiled instructions to the original machine code as much as possible. The goal is to provide a workable codebase that can be modified, improved, and ported to other platforms later on. We are using [reccmp](https://github.com/isledecomp/reccmp?tab=readme-ov-file) to diff the recompiled code with the original Windows 95 Splatpack binary (originally compiled with MSVC 4.2).
 
-See: [reccmp](https://github.com/dethrace-labs/dethrace/blob/main/reccmp/README.md)
+See: [details](https://github.com/dethrace-labs/dethrace/blob/main/reccmp/README.md) of how we are using reccmp.
 
 ## Project goals
 
