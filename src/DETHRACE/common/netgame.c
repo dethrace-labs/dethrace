@@ -1480,7 +1480,6 @@ void BuyPSPowerup(int pIndex) {
         }
     } else {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_ONLY_AVAILABLE_IN_NET_GAMES));
-        // NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
     }
 }
 
