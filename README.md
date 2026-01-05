@@ -8,7 +8,7 @@ Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](h
 
 ## Status
 
-<img width="752" src="https://raw.githubusercontent.com/dethrace-labs/reccmp-report/refs/heads/main/progress.svg">
+<img width="50%" src="https://raw.githubusercontent.com/dethrace-labs/reccmp-report/refs/heads/main/progress.svg">
 
 ## Building
 
@@ -100,6 +100,7 @@ No, well, I don't think so at least. The original files according to the symbol 
 
 - CrayzKirk (did the first manual matching up functions and data structures in the DOS executable to the debugging symbols and proved it was possible!)
 - The developer at Stainless Software who left an old debugging .SYM file on the Splat Pack CD ;)
+- https://github.com/isledecomp/reccmp tooling
 
 ## Legal
 
