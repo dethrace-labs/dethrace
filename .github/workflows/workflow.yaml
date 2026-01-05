@@ -160,6 +160,8 @@ jobs:
           original_binary_url: https://archive.org/download/carm-95/CARM95.EXE
           original_binary_filename: CARM95.EXE
           reccmp_output_filename: ${{ github.workspace}}/reccmp-output.txt
+          status_png_icon_filename: ${{ github.workspace}}/reccmp/carma_32x32_4.png
+          status_svg_filename: ${{ github.workspace}}/new-reccmp-progress.svg
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -182,6 +184,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !github.event.repository.fork
         run: |
           cp new-reccmp-report.json reccmp-report/report.json
+          cp new-reccmp-progress.svg reccmp-report/progress.svg
           cd reccmp-report
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
