@@ -1,7 +1,7 @@
 #ifndef NETWORK_ENDIAN_H
 #define NETWORK_ENDIAN_H
 
-#ifdef BR_ENDIAN_BIG
+#if BR_ENDIAN_BIG
 
 #include "dr_types.h"
 
