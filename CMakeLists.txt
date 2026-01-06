@@ -57,6 +57,9 @@ if(MSVC_42_FOR_RECCMP)
     set(DETHRACE_PLATFORM_SDL3 OFF)
     set(BRENDER_BUILD_DRIVERS OFF)
 
+    # Allow us to explicitly set "/MLd"
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "" CACHE STRING "" FORCE)
+
     set(CMAKE_C_FLAGS_DEBUG "/Od /Oi /Zi /MLd")
 
     include("reccmp")

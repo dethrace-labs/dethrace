@@ -187,6 +187,7 @@ endif()
 # Create our main game binary.
 if(MSVC_42_FOR_RECCMP)
     add_executable(dethrace WIN32)
+
     set(CMAKE_C_FLAGS_DEBUG "/Oi /Zi /MLd /G5")
 
     add_compile_definitions(_DEBUG)
