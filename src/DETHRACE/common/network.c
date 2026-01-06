@@ -26,7 +26,9 @@
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
+#if BR_ENDIAN_BIG
 #include "network_endian.h"
+#endif
 #include <stdlib.h>
 
 tU32 gMess_max_flags;
