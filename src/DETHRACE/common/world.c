@@ -265,28 +265,28 @@ void DisposeStorageSpace(tBrender_storage* pStorage_space) {
 void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     int i;
 
-    for (i = 0; pStorage_space->pixelmaps_count > i; ++i) {
-        if (pStorage_space->pixelmaps[i] != NULL) {
+    for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
+        if (pStorage_space->pixelmaps[i]) {
             BrMapRemove(pStorage_space->pixelmaps[i]);
             BrPixelmapFree(pStorage_space->pixelmaps[i]);
         }
     }
     pStorage_space->pixelmaps_count = 0;
-    for (i = 0; pStorage_space->shade_tables_count > i; ++i) {
+    for (i = 0; i < pStorage_space->shade_tables_count; i++) {
         if (pStorage_space->shade_tables[i] != NULL) {
             BrTableRemove(pStorage_space->shade_tables[i]);
             BrPixelmapFree(pStorage_space->shade_tables[i]);
         }
     }
     pStorage_space->shade_tables_count = 0;
-    for (i = 0; pStorage_space->materials_count > i; ++i) {
+    for (i = 0; i < pStorage_space->materials_count; i++) {
         if (pStorage_space->materials[i] != NULL) {
             BrMaterialRemove(pStorage_space->materials[i]);
             BrMaterialFree(pStorage_space->materials[i]);
         }
     }
     pStorage_space->materials_count = 0;
-    for (i = 0; pStorage_space->models_count > i; ++i) {
+    for (i = 0; i < pStorage_space->models_count; i++) {
         if (pStorage_space->models[i] != NULL) {
             BrModelRemove(pStorage_space->models[i]);
             BrModelFree(pStorage_space->models[i]);
@@ -301,20 +301,20 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
 tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm) {
     int i;
 
-    if (pStorage_space->pixelmaps_count >= pStorage_space->max_pixelmaps) {
+    if (pStorage_space->pixelmaps_count < pStorage_space->max_pixelmaps) {
+        for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
+            if (pStorage_space->pixelmaps[i]->identifier
+                && ((br_pixelmap*)pThe_pm)->identifier
+                && strcmp(pStorage_space->pixelmaps[i]->identifier, ((br_pixelmap*)pThe_pm)->identifier) == 0) {
+                return eStorage_duplicate;
+            }
+        }
+        pStorage_space->pixelmaps[pStorage_space->pixelmaps_count] = (br_pixelmap*)pThe_pm;
+        pStorage_space->pixelmaps_count++;
+        return eStorage_allocated;
+    } else {
         return eStorage_not_enough_room;
     }
-
-    for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
-        if (pStorage_space->pixelmaps[i]->identifier
-            && ((br_pixelmap*)pThe_pm)->identifier
-            && strcmp(pStorage_space->pixelmaps[i]->identifier, ((br_pixelmap*)pThe_pm)->identifier) == 0) {
-            return eStorage_duplicate;
-        }
-    }
-    pStorage_space->pixelmaps[pStorage_space->pixelmaps_count] = (br_pixelmap*)pThe_pm;
-    pStorage_space->pixelmaps_count++;
-    return eStorage_allocated;
 }
 
 // IDA: tAdd_to_storage_result __usercall AddShadeTableToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_pixelmap *pThe_st@<EDX>)
