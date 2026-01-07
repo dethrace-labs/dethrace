@@ -181,7 +181,7 @@ float MapSawToTriangle(float pNumber) {
 // IDA: void __cdecl SetSightDistance(br_scalar pYon)
 // FUNCTION: CARM95 0x00434b10
 void SetSightDistance(br_scalar pYon) {
-    gSight_distance_squared = pYon * 1.02f * (pYon * 1.02f);
+    gSight_distance_squared = BR_SQR(pYon * 1.02);
 }
 
 // IDA: br_actor* __usercall FindActorInArray@<EAX>(char *pThe_name@<EAX>)

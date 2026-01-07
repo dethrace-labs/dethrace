@@ -72,6 +72,8 @@ target_sources(dethrace_obj PRIVATE
     common/loading.c
     common/piping.c
     common/powerup.c
+    common/netgame.c
+    common/world.c
 
     common/brucetrk.c
     common/brucetrk.h
@@ -127,8 +129,7 @@ target_sources(dethrace_obj PRIVATE
     common/mainloop.h
     common/mainmenu.c
     common/mainmenu.h
-    common/netgame.c
-    common/netgame.h
+
     common/network.c
     common/network.h
     common/newgame.c
@@ -158,8 +159,7 @@ target_sources(dethrace_obj PRIVATE
     common/trig.h
     common/utility.c
     common/utility.h
-    common/world.c
-    common/world.h
+
     constants.h
     dr_types.h
     pd/net.h
@@ -194,8 +194,7 @@ if(MSVC_42_FOR_RECCMP)
     set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
     target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
 
-    set_source_files_properties(common/powerup.c PROPERTIES COMPILE_FLAGS "/FAs")
-    set_source_files_properties(common/netgame.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/world.c PROPERTIES COMPILE_FLAGS "/FAs")
 
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()
