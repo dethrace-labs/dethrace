@@ -395,7 +395,7 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char* str;
     br_pixelmap* temp_array[200];
 
-    new_ones = 0;
+    total = 0;
     for (i = 0; i < pCount; ++i) {
         PossibleService();
         GetALineAndDontArgue(pF, s);
@@ -404,33 +404,34 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         PathCat(the_path, the_path, "PIXELMAP");
         PathCat(the_path, the_path, str);
         AllowOpenToFail();
-        total = DRPixelmapLoadMany(the_path, temp_array, COUNT_OF(temp_array));
-        if (total == 0) {
+        new_ones = DRPixelmapLoadMany(the_path, temp_array, COUNT_OF(temp_array));
+        DoNotAllowOpenToFail();
+        if (new_ones == 0) {
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, str);
-            total = DRPixelmapLoadMany(the_path, temp_array, COUNT_OF(temp_array));
-            if (total == 0) {
+            new_ones = DRPixelmapLoadMany(the_path, temp_array, COUNT_OF(temp_array));
+            if (new_ones == 0) {
                 FatalError(kFatalError_LoadPixelmapFile_S, str);
             }
         }
-        for (j = 0; j < total; j++) {
+        for (j = 0; j < new_ones; j++) {
             if (temp_array[j] != NULL) {
                 switch (AddPixelmapToStorage(pStorage_space, (br_pixelmap**)temp_array[j])) {
-                case eStorage_not_enough_room:
-                    FatalError(kFatalError_InsufficientPixelmapSlots);
+                case eStorage_allocated:
+                    BrMapAdd(temp_array[j]);
+                    total++;
                     break;
                 case eStorage_duplicate:
                     BrPixelmapFree(temp_array[j]);
                     break;
-                case eStorage_allocated:
-                    BrMapAdd(temp_array[j]);
-                    ++new_ones;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientPixelmapSlots);
                     break;
                 }
             }
         }
     }
-    return new_ones;
+    return total;
 }
 
 // IDA: br_pixelmap* __usercall LoadSinglePixelmap@<EAX>(tBrender_storage *pStorage_space@<EAX>, char *pName@<EDX>)
