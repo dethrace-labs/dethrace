@@ -445,17 +445,17 @@ br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
     }
 
     switch (AddPixelmapToStorage(pStorage_space, (br_pixelmap**)temp)) {
-    case eStorage_not_enough_room:
-        FatalError(kFatalError_InsufficientPixelmapSlots);
-        break;
-
-    case eStorage_duplicate:
-        BrPixelmapFree(temp);
-        return BrMapFind(pName);
-
     case eStorage_allocated:
         BrMapAdd(temp);
         return temp;
+        break;
+    case eStorage_duplicate:
+        BrPixelmapFree(temp);
+        return BrMapFind(pName);
+        break;
+    case eStorage_not_enough_room:
+        FatalError(kFatalError_InsufficientPixelmapSlots);
+        return NULL;
     }
 
     return NULL;
