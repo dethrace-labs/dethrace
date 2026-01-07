@@ -322,19 +322,20 @@ tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br
 tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_st) {
     int i;
 
-    if (pStorage_space->shade_tables_count >= pStorage_space->max_shade_tables) {
+    if (pStorage_space->shade_tables_count < pStorage_space->max_shade_tables) {
+        for (i = 0; i < pStorage_space->shade_tables_count; i++) {
+            if (pStorage_space->shade_tables[i]->identifier
+                && pThe_st->identifier
+                && !strcmp(pStorage_space->shade_tables[i]->identifier, pThe_st->identifier)) {
+                return eStorage_duplicate;
+            }
+        }
+        pStorage_space->shade_tables[pStorage_space->shade_tables_count] = pThe_st;
+        pStorage_space->shade_tables_count++;
+        return eStorage_allocated;
+    } else {
         return eStorage_not_enough_room;
     }
-
-    for (i = 0; i < pStorage_space->shade_tables_count; i++) {
-        if (pStorage_space->shade_tables[i]->identifier
-            && pThe_st->identifier
-            && !strcmp(pStorage_space->shade_tables[i]->identifier, pThe_st->identifier)) {
-            return eStorage_duplicate;
-        }
-    }
-    pStorage_space->shade_tables[pStorage_space->shade_tables_count++] = pThe_st;
-    return eStorage_allocated;
 }
 
 // IDA: tAdd_to_storage_result __usercall AddMaterialToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_material *pThe_mat@<EDX>)
@@ -342,19 +343,21 @@ tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, 
 tAdd_to_storage_result AddMaterialToStorage(tBrender_storage* pStorage_space, br_material* pThe_mat) {
     int i;
 
-    if (pStorage_space->materials_count >= pStorage_space->max_materials) {
+    if (pStorage_space->materials_count < pStorage_space->max_materials) {
+        for (i = 0; i < pStorage_space->materials_count; i++) {
+            if (pStorage_space->materials[i]->identifier
+                && pThe_mat->identifier
+                && !strcmp(pStorage_space->materials[i]->identifier, pThe_mat->identifier)) {
+                return eStorage_duplicate;
+            }
+        }
+        pStorage_space->saved_colour_maps[pStorage_space->materials_count] = NULL;
+        pStorage_space->materials[pStorage_space->materials_count] = pThe_mat;
+        pStorage_space->materials_count++;
+        return eStorage_allocated;
+    } else {
         return eStorage_not_enough_room;
     }
-    for (i = 0; i < pStorage_space->materials_count; i++) {
-        if (pStorage_space->materials[i]->identifier
-            && pThe_mat->identifier
-            && !strcmp(pStorage_space->materials[i]->identifier, pThe_mat->identifier)) {
-            return eStorage_duplicate;
-        }
-    }
-    pStorage_space->saved_colour_maps[pStorage_space->materials_count] = 0;
-    pStorage_space->materials[pStorage_space->materials_count++] = pThe_mat;
-    return eStorage_allocated;
 }
 
 // IDA: tAdd_to_storage_result __usercall AddModelToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_model *pThe_mod@<EDX>)
@@ -362,20 +365,22 @@ tAdd_to_storage_result AddMaterialToStorage(tBrender_storage* pStorage_space, br
 tAdd_to_storage_result AddModelToStorage(tBrender_storage* pStorage_space, br_model* pThe_mod) {
     int i;
 
-    if (pStorage_space->materials_count >= pStorage_space->max_models) {
+    if (pStorage_space->models_count < pStorage_space->max_models) {
+
+        for (i = 0; i < pStorage_space->models_count; i++) {
+            if (pStorage_space->models[i]
+                && pStorage_space->models[i]->identifier
+                && pThe_mod->identifier
+                && !strcmp(pStorage_space->models[i]->identifier, pThe_mod->identifier)) {
+                return eStorage_duplicate;
+            }
+        }
+        pStorage_space->models[pStorage_space->models_count] = pThe_mod;
+        pStorage_space->models_count++;
+        return eStorage_allocated;
+    } else {
         return eStorage_not_enough_room;
     }
-    for (i = 0; i < pStorage_space->models_count; i++) {
-        if (pStorage_space->models[i]
-            && pStorage_space->models[i]->identifier
-            && pThe_mod->identifier
-            && !strcmp(pStorage_space->models[i]->identifier, pThe_mod->identifier)) {
-            return eStorage_duplicate;
-        }
-    }
-    pStorage_space->models[pStorage_space->models_count] = pThe_mod;
-    pStorage_space->models_count++;
-    return eStorage_allocated;
 }
 
 // IDA: int __usercall LoadNPixelmaps@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
