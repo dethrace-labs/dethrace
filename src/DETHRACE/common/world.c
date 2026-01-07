@@ -500,36 +500,35 @@ int LoadNShadeTables(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char* str;
     br_pixelmap* temp_array[50];
 
-    new_ones = 0;
+    total = 0;
     for (i = 0; i < pCount; i++) {
         PossibleService();
         GetALineAndDontArgue(pF, s);
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "SHADETAB");
         PathCat(the_path, the_path, str);
-        total = DRPixelmapLoadMany(the_path, temp_array, 50);
-        if (total == 0) {
+        new_ones = DRPixelmapLoadMany(the_path, temp_array, 50);
+        if (new_ones == 0) {
             FatalError(kFatalError_LoadShadeTableFile_S, str);
         }
-        for (j = 0; j < total; j++) {
+        for (j = 0; j < new_ones; j++) {
             if (temp_array[j]) {
                 switch (AddShadeTableToStorage(pStorage_space, temp_array[j])) {
-                case eStorage_not_enough_room:
-                    FatalError(kFatalError_InsufficientShadeTableSlots);
+                case eStorage_allocated:
+                    BrTableAdd(temp_array[j]);
+                    total++;
                     break;
-
                 case eStorage_duplicate:
                     BrPixelmapFree(temp_array[j]);
                     break;
-                case eStorage_allocated:
-                    BrTableAdd(temp_array[j]);
-                    new_ones++;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientShadeTableSlots);
                     break;
                 }
             }
         }
     }
-    return new_ones;
+    return total;
 }
 
 // IDA: br_pixelmap* __usercall LoadSingleShadeTable@<EAX>(tBrender_storage *pStorage_space@<EAX>, char *pName@<EDX>)
