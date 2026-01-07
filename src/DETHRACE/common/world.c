@@ -472,17 +472,17 @@ br_material* LoadSingleMaterial(tBrender_storage* pStorage_space, char* pName) {
     }
 
     switch (AddMaterialToStorage(pStorage_space, temp)) {
-    case eStorage_not_enough_room:
-        FatalError(kFatalError_InsufficientMaterialSlots);
-        break;
-
-    case eStorage_duplicate:
-        BrMaterialFree(temp);
-        return BrMaterialFind(pName);
-
     case eStorage_allocated:
         BrMaterialAdd(temp);
         return temp;
+        break;
+    case eStorage_duplicate:
+        BrMaterialFree(temp);
+        return BrMaterialFind(pName);
+        break;
+    case eStorage_not_enough_room:
+        FatalError(kFatalError_InsufficientMaterialSlots);
+        return NULL;
     }
 
     return NULL;
