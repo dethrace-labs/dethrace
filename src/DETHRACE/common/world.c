@@ -542,17 +542,17 @@ br_pixelmap* LoadSingleShadeTable(tBrender_storage* pStorage_space, char* pName)
     }
 
     switch (AddShadeTableToStorage(pStorage_space, temp)) {
-    case eStorage_not_enough_room:
-        FatalError(kFatalError_InsufficientShadeTableSlots);
-        break;
-
-    case eStorage_duplicate:
-        BrPixelmapFree(temp);
-        return BrTableFind(pName);
-
     case eStorage_allocated:
         BrTableAdd(temp);
         return temp;
+        break;
+    case eStorage_duplicate:
+        BrPixelmapFree(temp);
+        return BrTableFind(pName);
+        break;
+    case eStorage_not_enough_room:
+        FatalError(kFatalError_InsufficientShadeTableSlots);
+        return NULL;
     }
 
     return NULL;
