@@ -570,37 +570,38 @@ int LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char* str;
     br_material* temp_array[200];
 
-    new_ones = 0;
+    total = 0;
     for (i = 0; i < pCount; ++i) {
         PossibleService();
         GetALineAndDontArgue(pF, s);
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "MATERIAL");
         PathCat(the_path, the_path, str);
-        total = BrMaterialLoadMany(the_path, temp_array, 200);
-        if (total == 0) {
+        new_ones = BrMaterialLoadMany(the_path, temp_array, 200);
+        if (new_ones == 0) {
             FatalError(kFatalError_LoadMaterialFile_S, str);
         }
 #ifdef DETHRACE_3DFX_PATCH
         GlorifyMaterial(temp_array, total);
 #endif
-        for (j = 0; j < total; j++) {
+        for (j = 0; j < new_ones; j++) {
             if (temp_array[j]) {
                 switch (AddMaterialToStorage(pStorage_space, temp_array[j])) {
-                case eStorage_not_enough_room:
-                    FatalError(kFatalError_InsufficientMaterialSlots);
+                case eStorage_allocated:
+                    BrMaterialAdd(temp_array[j]);
+                    total++;
                     break;
                 case eStorage_duplicate:
                     BrMaterialFree(temp_array[j]);
                     break;
-                case eStorage_allocated:
-                    BrMaterialAdd(temp_array[j]);
-                    new_ones++;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientMaterialSlots);
+                    break;
                 }
             }
         }
     }
-    return new_ones;
+    return total;
 }
 
 // IDA: int __usercall LoadNModels@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
