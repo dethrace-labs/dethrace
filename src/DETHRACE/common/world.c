@@ -615,44 +615,44 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char s[256];
     char* str;
     br_model* temp_array[2000];
-    struct v11model* prepared;
-    int group;
+    // struct v11model* prepared;
+    // int group;
 
-    new_ones = 0;
+    total = 0;
     for (i = 0; i < pCount; i++) {
         PossibleService();
         GetALineAndDontArgue(pF, s);
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "MODELS");
         PathCat(the_path, the_path, str);
-        total = BrModelLoadMany(the_path, temp_array, 2000);
+        new_ones = BrModelLoadMany(the_path, temp_array, 2000);
 #ifdef DETHRACE_3DFX_PATCH
-        WhitenVertexRGB(temp_array, total);
+        WhitenVertexRGB(temp_array, new_ones);
 #endif
-        if (total == 0) {
+        if (new_ones == 0) {
             FatalError(kFatalError_LoadModelFile_S, str);
         }
-        for (j = 0; j < total; j++) {
+        for (j = 0; j < new_ones; j++) {
             if (temp_array[j]) {
                 switch (AddModelToStorage(pStorage_space, temp_array[j])) {
-                case eStorage_not_enough_room:
-                    FatalError(kFatalError_InsufficientModelSlots);
+                case eStorage_allocated:
+                    temp_array[j]->flags |= BR_MODF_UPDATEABLE;
+                    RemoveDoubleSided(temp_array[j]);
+                    BrModelAdd(temp_array[j]);
+                    total++;
                     break;
                 case eStorage_duplicate:
                     BrModelFree(temp_array[j]);
                     break;
-                case eStorage_allocated:
-                    temp_array[j]->flags |= 0x80u;
-                    RemoveDoubleSided(temp_array[j]);
-                    BrModelAdd(temp_array[j]);
-                    ++new_ones;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientModelSlots);
                     break;
                 }
             }
         }
     }
 
-    return new_ones;
+    return total;
 }
 
 // IDA: void __usercall DodgyModelUpdate(br_model *pM@<EAX>)
