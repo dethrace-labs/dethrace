@@ -676,13 +676,13 @@ br_material* SuffixedMaterial(br_material* pOld, char* pSuffix) {
     new_id = BrMemAllocate(strlen(pOld->identifier) + strlen(pSuffix) + 1, kMem_new_mat_id);
     sprintf(new_id, "%s%s", pOld->identifier, pSuffix);
     new_mat = BrMaterialFind(new_id);
-    if (new_mat == NULL) {
+    if (new_mat) {
+        BrMemFree(new_id);
+    } else {
         new_mat = BrMaterialAllocate(NULL);
         MaterialCopy(new_mat, pOld);
         new_mat->identifier = new_id;
         BrMaterialAdd(new_mat);
-    } else {
-        BrMemFree(new_id);
     }
     return new_mat;
 }
@@ -743,19 +743,20 @@ br_material* WallPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* new_mat;
 
     old_mat = pModel->faces[pFace].material;
-    if (old_mat->colour_map == NULL || FaceIsRoad(pModel, pFace)) {
-        return NULL;
+    if (old_mat->colour_map != NULL && FaceIsRoad(pModel, pFace)) {
+
+        if (old_mat->flags & BR_MATF_PERSPECTIVE) {
+            new_mat = SuffixedMaterial(old_mat, ".pwall");
+        } else {
+            new_mat = SuffixedMaterial(old_mat, ".lwall");
+        }
+        if (new_mat->colour_map != NULL) {
+            new_mat->colour_map = NULL;
+            BrMaterialUpdate(new_mat, BR_MATU_ALL);
+        }
+        return new_mat;
     }
-    if (old_mat->flags & BR_MATF_PERSPECTIVE) {
-        new_mat = SuffixedMaterial(old_mat, ".pwall");
-    } else {
-        new_mat = SuffixedMaterial(old_mat, ".lwall");
-    }
-    if (new_mat->colour_map != NULL) {
-        new_mat->colour_map = NULL;
-        BrMaterialUpdate(new_mat, BR_MATU_ALL);
-    }
-    return new_mat;
+    return NULL;
 }
 
 // IDA: void __usercall ProcessModelFaceMaterials2(br_model *pModel@<EAX>, tPMFM2CB pCallback@<EDX>)
@@ -822,51 +823,49 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     br_model* temp_array[2000];
     struct v11model* prepared;
 
-    new_ones = 0;
+    total = 0;
     for (i = 0; i < pCount; i++) {
         GetALineAndDontArgue(pF, s);
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "MODELS");
         PathCat(the_path, the_path, str);
-        total = BrModelLoadMany(the_path, temp_array, 2000);
-        if (total == 0) {
+        new_ones = BrModelLoadMany(the_path, temp_array, 2000);
+        if (new_ones == 0) {
             FatalError(kFatalError_LoadModelFile_S, str);
         }
 #ifdef DETHRACE_3DFX_PATCH
-        WhitenVertexRGB(temp_array, total);
+        WhitenVertexRGB(temp_array, new_ones);
 #endif
-        for (j = 0; j < total; j++) {
+        for (j = 0; j < new_ones; j++) {
             if (temp_array[j]) {
                 switch (AddModelToStorage(pStorage_space, temp_array[j])) {
-                case eStorage_not_enough_room:
-                    FatalError(kFatalError_InsufficientModelSlots);
-                    break;
-                case eStorage_duplicate:
-                    BrModelFree(temp_array[j]);
-                    break;
                 case eStorage_allocated:
                     temp_array[j]->flags |= BR_MODF_UPDATEABLE;
                     if (gRoad_texturing_level == eRTL_none) {
                         ProcessModelFaceMaterials(temp_array[j], RoadPerspToUntex);
                     }
-                    switch (gWall_texturing_level) {
-                    case eWTL_none:
-                        ProcessModelFaceMaterials(temp_array[j], WallPerspToUntex);
-                        break;
-                    case eWTL_linear:
+                    if (gWall_texturing_level == eWTL_linear) {
                         ProcessModelFaceMaterials(temp_array[j], WallPerspToLinear);
-                        break;
-                    default:
-                        break;
+                    }
+                    if (gWall_texturing_level == eWTL_none) {
+                        ProcessModelFaceMaterials(temp_array[j], WallPerspToUntex);
                     }
                     RemoveDoubleSided(temp_array[j]);
                     BrModelAdd(temp_array[j]);
-                    new_ones++;
+                    total++;
+                    break;
+
+                case eStorage_duplicate:
+                    BrModelFree(temp_array[j]);
+                    break;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientModelSlots);
+                    break;
                 }
             }
         }
     }
-    return new_ones;
+    return total;
 }
 
 // IDA: void __usercall LoadSomePixelmaps(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>)
