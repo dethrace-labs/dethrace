@@ -725,15 +725,15 @@ br_material* WallPerspToLinear(br_model* pModel, tU16 pFace) {
     br_material* new_mat;
 
     old_mat = pModel->faces[pFace].material;
-    if (old_mat->colour_map == NULL || !(old_mat->flags & BR_MATF_PERSPECTIVE) || FaceIsRoad(pModel, pFace)) {
-        return NULL;
+    if (old_mat->colour_map != NULL && (old_mat->flags & BR_MATF_PERSPECTIVE) && !FaceIsRoad(pModel, pFace)) {
+        new_mat = SuffixedMaterial(old_mat, ".pwall");
+        if (new_mat->flags & BR_MATF_PERSPECTIVE) {
+            new_mat->flags &= ~BR_MATF_PERSPECTIVE;
+            BrMaterialUpdate(new_mat, BR_MATU_ALL);
+        }
+        return new_mat;
     }
-    new_mat = SuffixedMaterial(old_mat, ".pwall");
-    if (new_mat->flags & BR_MATF_PERSPECTIVE) {
-        new_mat->flags &= ~BR_MATF_PERSPECTIVE;
-        BrMaterialUpdate(new_mat, BR_MATU_ALL);
-    }
-    return new_mat;
+    return NULL;
 }
 
 // IDA: br_material* __usercall WallPerspToUntex@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
