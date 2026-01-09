@@ -707,15 +707,16 @@ br_material* RoadPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* new_mat;
 
     old_mat = pModel->faces[pFace].material;
-    if (old_mat->colour_map == NULL || !FaceIsRoad(pModel, pFace)) {
-        return NULL;
+    if (old_mat->colour_map != NULL && FaceIsRoad(pModel, pFace)) {
+
+        new_mat = SuffixedMaterial(old_mat, ".road");
+        if (new_mat->colour_map != NULL) {
+            new_mat->colour_map = NULL;
+            BrMaterialUpdate(new_mat, BR_MATU_ALL);
+        }
+        return new_mat;
     }
-    new_mat = SuffixedMaterial(old_mat, ".road");
-    if (new_mat->colour_map != NULL) {
-        new_mat->colour_map = NULL;
-        BrMaterialUpdate(new_mat, BR_MATU_ALL);
-    }
-    return new_mat;
+    return NULL;
 }
 
 // IDA: br_material* __usercall WallPerspToLinear@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
