@@ -1095,8 +1095,7 @@ br_uint_32 CalcProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spe
         if (pThe_funk->material == pMat) {
             pThe_funk->proximity_count += 8;
         } else {
-            for (i = 0; i < pActor->model->nfaces; i++) {
-                the_face = &pActor->model->faces[i];
+            for (i = 0, the_face = pActor->model->faces; i < pActor->model->nfaces; i++, the_face++) {
                 if (pThe_funk->material == the_face->material) {
                     pThe_funk->proximity_count += 3;
                 }
