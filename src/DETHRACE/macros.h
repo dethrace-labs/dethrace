@@ -77,6 +77,14 @@
         b = x[0];                          \
     } while (0)
 
+#define ReadPairOfInts(pF, a, b)         \
+    do {                                 \
+        int d[2];                        \
+        GetPairOfInts(pF, &d[1], &d[0]); \
+        a = d[1];                        \
+        b = d[0];                        \
+    } while (0)
+
 #endif
 
 // Many switches in the original code did not include handling all values, causing warnings in modern compilers

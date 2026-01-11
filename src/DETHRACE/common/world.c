@@ -1186,6 +1186,8 @@ void Adjust2FloatsForExceptions(float* pVictim1, float* pVictim2, br_pixelmap* p
     }
 }
 
+#define GTEMP_DIV (gTemp != 0.0f ? 1000.0 / gTemp : 0.0)
+
 // IDA: void __usercall AddFunkotronics(FILE *pF@<EAX>, int pOwner@<EDX>, int pRef_offset@<EBX>)
 // FUNCTION: CARM95 0x00436b8b
 void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
@@ -1205,10 +1207,10 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
     float s_max;
     void* the_pixels;
     br_pixelmap* the_pixelmap;
-    float x_0;
-    float x_1;
-    int d_0;
-    int d_1;
+    // float x_0;
+    // float x_1;
+    // int d_0;
+    // int d_1;
 
     first_time = 1;
     while (!feof(pF)) {
@@ -1221,14 +1223,14 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
         if (!first_time) {
             if (strcmp(s, "NEXT FUNK") != 0) {
                 FatalError(kFatalError_FunkotronicFile);
+            } else {
+                GetALineAndDontArgue(pF, s);
             }
-            GetALineAndDontArgue(pF, s);
         }
         first_time = 0;
-
+        str = strtok(s, "\t ,/");
         the_funk = AddNewFunkotronic();
         the_funk->owner = pOwner;
-        str = strtok(s, "\t ,/");
         the_funk->material = BrMaterialFind(str);
         if (the_funk->material == NULL) {
             FatalError(kFatalError_FindMaterialUsedByFunkotronicFile_S, str);
@@ -1241,29 +1243,34 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
         switch (the_funk->matrix_mod_type) {
         case eMatrix_mod_spin:
             if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
-                i = GetAnInt(pF);
-                AddFunkGrooveBinding(i + pRef_offset, &the_funk->matrix_mod_data.spin_info.period);
+                AddFunkGrooveBinding(GetAnInt(pF) + pRef_offset, &the_funk->matrix_mod_data.spin_info.period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_funk->matrix_mod_data.spin_info.period = (x_0 == 0.0f) ? 0.0f : 1000.0f / x_0;
+                gTemp = GetAFloat(pF);
+                the_funk->matrix_mod_data.spin_info.period = (gTemp != 0.0f ? 1000.0 / gTemp : 0.0);
             }
             break;
-        case eMatrix_mod_rock: // rock
+
+        case eMatrix_mod_rock:
             if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
-                d_0 = GetAnInt(pF);
-                AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.rock_info.period);
+                AddFunkGrooveBinding(GetAnInt(pF) + pRef_offset, &the_funk->matrix_mod_data.rock_info.period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_funk->matrix_mod_data.rock_info.period = (x_0 == 0.0f) ? 0.0f : 1000.0f / x_0;
+                gTemp = GetAFloat(pF);
+                the_funk->matrix_mod_data.rock_info.period = GTEMP_DIV;
             }
 
             the_funk->matrix_mod_data.rock_info.rock_angle = GetAFloat(pF);
-            GetPairOfFloats(pF, &x_0, &x_1);
-            the_funk->matrix_mod_data.rock_info.x_centre = x_0 / 100.0f;
-            the_funk->matrix_mod_data.rock_info.y_centre = x_1 / 100.0f;
+
+            {
+                float x_0, x_1;
+                GetPairOfFloats(pF, &x_0, &x_1);
+                the_funk->matrix_mod_data.rock_info.x_centre = x_0 / 100.f;
+                the_funk->matrix_mod_data.rock_info.y_centre = x_1 / 100.f;
+            }
             break;
-        case eMatrix_mod_throb: // throb
+
+        case eMatrix_mod_throb:
             if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
+                int d_0, d_1;
                 GetPairOfInts(pF, &d_0, &d_1);
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.throb_info.x_period);
@@ -1272,18 +1279,25 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                     AddFunkGrooveBinding(d_1 + pRef_offset, &the_funk->matrix_mod_data.throb_info.y_period);
                 }
             } else {
-                GetPairOfFloats(pF, &speed1, &speed2);
-                the_funk->matrix_mod_data.throb_info.x_period = (speed1 == 0.0f) ? 0.0f : 1000.0f / speed1;
-                the_funk->matrix_mod_data.throb_info.y_period = (speed2 == 0.0f) ? 0.0f : 1000.0f / speed2;
+                float x_0, x_1;
+                GetPairOfFloats(pF, &x_0, &x_1);
+                gTemp = x_0;
+                the_funk->matrix_mod_data.throb_info.x_period = GTEMP_DIV;
+                gTemp = x_1;
+                the_funk->matrix_mod_data.throb_info.y_period = GTEMP_DIV;
             }
             GetPairOfFloatPercents(
                 pF,
                 &the_funk->matrix_mod_data.throb_info.x_magnitude,
                 &the_funk->matrix_mod_data.throb_info.y_magnitude);
-            GetPairOfFloats(pF, &x_0, &x_1);
-            the_funk->matrix_mod_data.throb_info.x_centre = x_0 / 100.0f;
-            the_funk->matrix_mod_data.throb_info.y_centre = x_1 / 100.0f;
-            if (the_funk->matrix_mode != eMove_controlled) {
+            {
+                float x_0, x_1;
+                GetPairOfFloats(pF, &x_0, &x_1);
+                the_funk->matrix_mod_data.throb_info.x_centre = x_0 / 100.0f;
+                the_funk->matrix_mod_data.throb_info.y_centre = x_1 / 100.0f;
+            }
+            // likely bug: the second conditional should be eMove_absolute
+            if (the_funk->matrix_mode != eMove_controlled && the_funk->matrix_mode != eMove_controlled) {
                 if (the_funk->matrix_mod_data.throb_info.x_period == 0.0f) {
                     the_funk->matrix_mod_data.throb_info.x_period = 1.0f;
                     the_funk->matrix_mod_data.throb_info.x_magnitude = 0.0f;
@@ -1294,8 +1308,10 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 }
             }
             break;
-        case eMatrix_mod_slither: // slither
+
+        case eMatrix_mod_slither:
             if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
+                int d_0, d_1;
                 GetPairOfInts(pF, &d_0, &d_1);
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.slither_info.x_period);
@@ -1304,15 +1320,18 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                     AddFunkGrooveBinding(d_1 + pRef_offset, &the_funk->matrix_mod_data.slither_info.y_period);
                 }
             } else {
-                GetPairOfFloats(pF, &speed1, &speed2);
-                the_funk->matrix_mod_data.slither_info.x_period = (speed1 == 0.0f) ? 0.0f : 1000.0f / speed1;
-                the_funk->matrix_mod_data.slither_info.y_period = (speed2 == 0.0f) ? 0.0f : 1000.0f / speed2;
+                float x_0, x_1;
+                GetPairOfFloats(pF, &x_0, &x_1);
+                gTemp = x_0;
+                the_funk->matrix_mod_data.slither_info.x_period = GTEMP_DIV;
+                gTemp = x_1;
+                the_funk->matrix_mod_data.slither_info.y_period = GTEMP_DIV;
             }
             GetPairOfFloatPercents(
                 pF,
                 &the_funk->matrix_mod_data.slither_info.x_magnitude,
                 &the_funk->matrix_mod_data.slither_info.y_magnitude);
-            if (the_funk->matrix_mode != eMove_controlled) {
+            if (the_funk->matrix_mode != eMove_controlled && the_funk->matrix_mode != eMove_controlled) {
                 if (the_funk->matrix_mod_data.slither_info.x_period == 0.0f) {
                     the_funk->matrix_mod_data.slither_info.x_period = 1.0f;
                     the_funk->matrix_mod_data.slither_info.x_magnitude = 0.0f;
@@ -1323,36 +1342,39 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 }
             }
             break;
-        case eMatrix_mod_roll: // roll
+
+        case eMatrix_mod_roll:
             if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
+                int d_0, d_1;
                 GetPairOfInts(pF, &d_0, &d_1);
                 if (d_0 >= 0) {
-                    AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.roll_info.x_period);
+                    AddFunkGrooveBinding(pRef_offset + d_0, &the_funk->matrix_mod_data.roll_info.x_period);
                 }
                 if (d_1 >= 0) {
-                    AddFunkGrooveBinding(d_1 + pRef_offset, &the_funk->matrix_mod_data.roll_info.y_period);
+                    AddFunkGrooveBinding(pRef_offset + d_1, &the_funk->matrix_mod_data.roll_info.y_period);
                 }
             } else {
-                GetPairOfFloats(pF, &speed1, &speed2);
-                the_funk->matrix_mod_data.roll_info.x_period = speed1 == 0.0f ? 0.0f : 1000.0f / speed1;
-                the_funk->matrix_mod_data.roll_info.y_period = speed2 == 0.0f ? 0.0f : 1000.0f / speed2;
+                float x_0, x_1;
+                GetPairOfFloats(pF, &x_0, &x_1);
+                gTemp = x_0;
+                the_funk->matrix_mod_data.roll_info.x_period = GTEMP_DIV;
+                gTemp = x_1;
+                the_funk->matrix_mod_data.roll_info.y_period = GTEMP_DIV;
             }
 #ifdef DETHRACE_3DFX_PATCH
             Adjust2FloatsForExceptions(&the_funk->matrix_mod_data.roll_info.x_period, &the_funk->matrix_mod_data.roll_info.y_period, the_funk->material->colour_map);
-
 #endif
             break;
-        default:
-            break;
+
+            DETHRACE_DEFAULT_BREAK
         }
         the_funk->lighting_animation_type = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
         if (the_funk->lighting_animation_type != eMove_none) {
             if (the_funk->lighting_animation_type == eMove_controlled || the_funk->lighting_animation_type == eMove_absolute) {
-                d_0 = GetAnInt(pF);
-                AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->lighting_animation_period);
+                AddFunkGrooveBinding(GetAnInt(pF) + pRef_offset, &the_funk->lighting_animation_period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_funk->lighting_animation_period = (x_0 == 0.0f) ? 0.0f : 1000.0f / x_0;
+                gTemp = GetAFloat(pF);
+                the_funk->lighting_animation_period = GTEMP_DIV;
             }
             GetThreeFloatPercents(pF, &a_min, &d_min, &s_min);
             GetThreeFloatPercents(pF, &a_max, &d_max, &s_max);
@@ -1373,13 +1395,33 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
         }
         the_funk->last_frame = 0.0f;
 
-        if (the_funk->texture_animation_type == eTexture_animation_flic) {
+        switch (the_funk->texture_animation_type) {
+        case eTexture_animation_frames:
+            the_funk->texture_animation_data.frames_info.mode = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
+            if (the_funk->texture_animation_data.frames_info.mode == eMove_controlled
+                || the_funk->texture_animation_data.frames_info.mode == eMove_absolute) {
+                AddFunkGrooveBinding(GetAnInt(pF) + pRef_offset, &the_funk->texture_animation_data.frames_info.period);
+            } else {
+                gTemp = GetAFloat(pF);
+                the_funk->texture_animation_data.frames_info.period = GTEMP_DIV;
+            }
+            the_funk->texture_animation_data.frames_info.texture_count = (int)GetAFloat(pF);
+            the_funk->texture_animation_data.frames_info.current_frame = 0;
+            for (i = 0; i < the_funk->texture_animation_data.frames_info.texture_count; i++) {
+                GetAString(pF, s);
+                the_funk->texture_animation_data.frames_info.textures[i] = BrMapFind(s);
+                if (the_funk->texture_animation_data.frames_info.textures[i] == NULL) {
+                    FatalError(kFatalError_AnimationFramePixelmapUsedByFunkotronicFile);
+                }
+            }
+            break;
+
+        case eTexture_animation_flic:
             GetAString(pF, s);
             the_funk->texture_animation_data.flic_info.flic_data = 0;
-            if (LoadFlicData(
-                    s,
-                    &the_funk->texture_animation_data.flic_info.flic_data,
-                    &the_funk->texture_animation_data.flic_info.flic_data_length)) {
+            if (LoadFlicData(s, &the_funk->texture_animation_data.flic_info.flic_data, &the_funk->texture_animation_data.flic_info.flic_data_length) == 0) {
+                the_funk->texture_animation_type = eTexture_animation_none;
+            } else {
                 the_funk->texture_animation_data.flic_info.flic_descriptor.data_start = NULL;
                 StartFlic(
                     s,
@@ -1401,7 +1443,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                         "C:\\Msdev\\Projects\\DethRace\\World.c",
                         1729,
                         "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\World.c",
-                        193);
+                        1729);
                 }
                 the_pixelmap = DRPixelmapAllocate(
 #ifdef DETHRACE_3DFX_PATCH
@@ -1419,30 +1461,12 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 AssertFlicPixelmap(&the_funk->texture_animation_data.flic_info.flic_descriptor, the_pixelmap);
                 the_funk->material->colour_map = the_pixelmap;
                 BrMaterialUpdate(the_funk->material, BR_MATU_ALL);
-            } else {
-                the_funk->texture_animation_type = eTexture_animation_none;
             }
-        } else if (the_funk->texture_animation_type == eTexture_animation_frames) {
-            i = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
-            the_funk->texture_animation_data.frames_info.mode = i;
-            if (the_funk->texture_animation_data.frames_info.mode == eMove_controlled
-                || the_funk->texture_animation_data.frames_info.mode == eMove_absolute) {
-                d_0 = GetAnInt(pF);
-                AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->texture_animation_data.frames_info.period);
-            } else {
-                x_0 = GetAFloat(pF);
-                the_funk->texture_animation_data.frames_info.period = (x_0 == 0.0f) ? 0.0f : 1000.0F / x_0;
-            }
+            break;
 
-            the_funk->texture_animation_data.frames_info.texture_count = (int)GetAFloat(pF);
-            for (i = 0; i < the_funk->texture_animation_data.frames_info.texture_count; i++) {
-                GetAString(pF, s);
-                the_funk->texture_animation_data.frames_info.textures[i] = BrMapFind(s);
-                if (the_funk->texture_animation_data.frames_info.textures[i] == NULL) {
-                    FatalError(kFatalError_AnimationFramePixelmapUsedByFunkotronicFile);
-                }
-            }
+            DETHRACE_DEFAULT_BREAK
         }
+
         the_funk->proximity_count = 0;
         the_funk->proximity_array = 0;
         if (the_funk->mode == eFunk_mode_distance) {
@@ -1458,9 +1482,10 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                         memmove(
                             &the_funk->proximity_array[j],
                             &the_funk->proximity_array[j + 1],
-                            sizeof(br_vector3) * (the_funk->proximity_count - j - 1));
-                        the_funk->proximity_count--;
+                            (the_funk->proximity_count - j - 1) * sizeof(br_vector3));
+
                         j--;
+                        the_funk->proximity_count--;
                     }
                 }
             }
