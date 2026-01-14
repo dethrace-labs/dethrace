@@ -1007,8 +1007,8 @@ void ShiftBoundGrooveFunks(char* pStart, char* pEnd, ptrdiff_t pDelta) {
     int i;
 
     for (i = 0; i < COUNT_OF(gGroove_funk_bindings); i++) {
-        if (pStart <= (char*)gGroove_funk_bindings[i] && (char*)gGroove_funk_bindings[i] < pEnd) {
-            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + (pDelta & ~(sizeof(void*) - 1))); // original code is (pDelta & 0xFFFFFFFC) but this caused problems;
+        if ((intptr_t)pStart <= (intptr_t)gGroove_funk_bindings[i] && (intptr_t)gGroove_funk_bindings[i] < (intptr_t)pEnd) {
+            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + (pDelta & ~(sizeof(void*) - 1)));
         }
     }
 }
