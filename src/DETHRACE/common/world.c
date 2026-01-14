@@ -1157,8 +1157,7 @@ br_uint_32 AddProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec
                 pActor->model->bounds.max.v[2],
                 pThe_funk);
         } else {
-            for (i = 0; i < pActor->model->nfaces; i++) {
-                the_face = &pActor->model->faces[i];
+            for (i = 0, the_face = pActor->model->faces; i < pActor->model->nfaces; i++, the_face++) {
                 if (pThe_funk->material == the_face->material) {
                     AddProximityVertex(&pActor->model->vertices[the_face->vertices[0]].p, pThe_funk);
                     AddProximityVertex(&pActor->model->vertices[the_face->vertices[1]].p, pThe_funk);
