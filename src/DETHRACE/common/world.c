@@ -167,6 +167,9 @@ br_actor* gStandard_lamp;
 // GLOBAL: CARM95 0x00534abc
 br_scalar gSight_distance_squared;
 
+#define FUNK_BUFFER_SIZE_INCREASE 16
+#define NO_OWNER -999
+
 // IDA: float __cdecl MapSawToTriangle(float pNumber)
 // FUNCTION: CARM95 0x0043f377
 float MapSawToTriangle(float pNumber) {
@@ -1017,26 +1020,26 @@ tFunkotronic_spec* AddNewFunkotronic(void) {
     int i;
 
     for (i = 0; i < gFunkotronics_array_size; i++) {
-        if (gFunkotronics_array[i].owner == -999) {
+        if (gFunkotronics_array[i].owner == NO_OWNER) {
             memset(&gFunkotronics_array[i], 0, sizeof(tFunkotronic_spec));
             return &gFunkotronics_array[i];
         }
     }
-    gFunkotronics_array_size += 16;
+    gFunkotronics_array_size += FUNK_BUFFER_SIZE_INCREASE;
     new_array = BrMemCalloc(gFunkotronics_array_size, sizeof(tFunkotronic_spec), kMem_funk_spec);
     if (gFunkotronics_array != NULL) {
-        memcpy(new_array, gFunkotronics_array, (gFunkotronics_array_size - 16) * sizeof(tFunkotronic_spec));
+        memcpy(new_array, gFunkotronics_array, (gFunkotronics_array_size - FUNK_BUFFER_SIZE_INCREASE) * sizeof(tFunkotronic_spec));
         ShiftBoundGrooveFunks(
             (char*)gFunkotronics_array,
-            (char*)&gFunkotronics_array[gFunkotronics_array_size - 16],
+            (char*)(gFunkotronics_array + gFunkotronics_array_size - FUNK_BUFFER_SIZE_INCREASE),
             (char*)new_array - (char*)gFunkotronics_array);
         BrMemFree(gFunkotronics_array);
     }
     gFunkotronics_array = new_array;
-    for (i = 0; i < 16; i++) {
-        gFunkotronics_array[gFunkotronics_array_size - 16 + i].owner = -999;
+    for (i = 0; i < FUNK_BUFFER_SIZE_INCREASE; i++) {
+        gFunkotronics_array[gFunkotronics_array_size + i - FUNK_BUFFER_SIZE_INCREASE].owner = NO_OWNER;
     }
-    return &gFunkotronics_array[gFunkotronics_array_size - 16];
+    return gFunkotronics_array + gFunkotronics_array_size - FUNK_BUFFER_SIZE_INCREASE;
 }
 
 // IDA: void __usercall DisposeFunkotronics(int pOwner@<EAX>)
@@ -1049,7 +1052,7 @@ void DisposeFunkotronics(int pOwner) {
         for (i = 0, the_funk = gFunkotronics_array; i < gFunkotronics_array_size; i++, the_funk++) {
             PossibleService();
             if (the_funk->owner == pOwner) {
-                the_funk->owner = -999;
+                the_funk->owner = NO_OWNER;
                 if (the_funk->proximity_array != NULL) {
                     BrMemFree(the_funk->proximity_array);
                 }
@@ -1506,7 +1509,7 @@ void DisposeGroovidelics(int pOwner) {
         the_groove = &gGroovidelics_array[i];
         PossibleService();
         if (the_groove->owner == pOwner) {
-            the_groove->owner = -999;
+            the_groove->owner = NO_OWNER;
         }
     }
 }
@@ -1518,7 +1521,7 @@ tGroovidelic_spec* AddNewGroovidelic(void) {
     int i;
 
     for (i = 0; i < gGroovidelics_array_size; i++) {
-        if (gGroovidelics_array[i].owner == -999) {
+        if (gGroovidelics_array[i].owner == NO_OWNER) {
             memset(&gGroovidelics_array[i], 0, sizeof(tGroovidelic_spec));
             return &gGroovidelics_array[i];
         }
@@ -1535,7 +1538,7 @@ tGroovidelic_spec* AddNewGroovidelic(void) {
     }
     gGroovidelics_array = new_array;
     for (i = 0; i < 16; i++) {
-        gGroovidelics_array[i + gGroovidelics_array_size - 16].owner = -999;
+        gGroovidelics_array[i + gGroovidelics_array_size - 16].owner = NO_OWNER;
     }
     return &gGroovidelics_array[gGroovidelics_array_size - 16];
 }
@@ -1777,7 +1780,7 @@ void KillGroovadelic(int pOwner) {
         if (the_groove->object_mode == eMove_absolute) {
             continue;
         }
-        the_groove->owner = -999;
+        the_groove->owner = NO_OWNER;
     }
 }
 
@@ -1810,7 +1813,7 @@ void KillFunkotronic(int pOwner) {
         if (the_funk->texture_animation_data.frames_info.mode == eMove_controlled && the_funk->texture_animation_type == eTexture_animation_frames) {
             continue;
         }
-        the_funk->owner = -999;
+        the_funk->owner = NO_OWNER;
     }
 }
 
@@ -3334,7 +3337,7 @@ void FunkThoseTronics(void) {
     f_the_time = (float)the_time;
     for (i = 0; i < gFunkotronics_array_size; i++) {
         the_funk = &gFunkotronics_array[i];
-        if (the_funk->owner == -999) {
+        if (the_funk->owner == NO_OWNER) {
             continue;
         }
         j = 0;
@@ -4386,7 +4389,7 @@ void GrooveThoseDelics(void) {
 
         for (i = 0; i < gGroovidelics_array_size; i++) {
             the_groove = &gGroovidelics_array[i];
-            if (the_groove->owner != -999 && !the_groove->done_this_frame) {
+            if (the_groove->owner != NO_OWNER && !the_groove->done_this_frame) {
                 GrooveThisDelic(the_groove, f_the_time, 0);
             }
         }
@@ -4824,7 +4827,7 @@ br_uint_32 DelGrooveRef(br_actor* pActor, void* pArg) {
     for (i = 0; i < gGroovidelics_array_size; i++) {
         the_groove = &gGroovidelics_array[i];
         if (the_groove->actor == pActor) {
-            the_groove->owner = -999;
+            the_groove->owner = NO_OWNER;
         }
     }
     return 0;
