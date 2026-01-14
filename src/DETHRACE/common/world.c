@@ -1501,14 +1501,12 @@ void DisposeGroovidelics(int pOwner) {
     int i;
     tGroovidelic_spec* the_groove;
 
-    if (gGroovidelics_array == NULL) {
-        return;
-    }
-    for (i = 0; i < gGroovidelics_array_size; i++) {
-        the_groove = &gGroovidelics_array[i];
-        PossibleService();
-        if (the_groove->owner == pOwner) {
-            the_groove->owner = NO_OWNER;
+    if (gGroovidelics_array != NULL) {
+        for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
+            PossibleService();
+            if (the_groove->owner == pOwner) {
+                the_groove->owner = NO_OWNER;
+            }
         }
     }
 }
