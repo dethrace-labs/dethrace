@@ -2102,26 +2102,24 @@ void RevealStoredTextures(tBrender_storage* pStorage) {
 void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_level pNew, tCar_texturing_level pOld) {
 
     switch (pNew) {
+    case eCTL_full:
+        RevealStoredTextures(pStorage);
+        break;
     case eCTL_none:
         HideStoredTextures(pStorage);
         break;
     case eCTL_transparent:
         switch (pOld) {
-        case eCTL_none:
-            RevealStoredTransparentTextures(pStorage);
-            break;
         case eCTL_full:
             HideStoredOpaqueTextures(pStorage);
             break;
-        default:
-            break;
+        case eCTL_none:
+            RevealStoredTransparentTextures(pStorage);
+
+            DETHRACE_DEFAULT_BREAK
         }
-        break;
-    case eCTL_full:
-        RevealStoredTextures(pStorage);
-        break;
-    default:
-        break;
+
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
