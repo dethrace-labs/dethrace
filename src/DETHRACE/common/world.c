@@ -2205,18 +2205,18 @@ br_material* WallLinearToUntex(br_model* pModel, tU16 pFace) {
             old_mat->colour_map = NULL;
             BrMaterialUpdate(old_mat, BR_MATU_ALL);
         }
+        return old_mat;
     } else {
         if (!FaceIsRoad(pModel, pFace) && old_mat->identifier != NULL && old_mat->colour_map != NULL) {
-            old_mat = SuffixedMaterial(old_mat, ".lwall");
-            if (old_mat->colour_map != NULL) {
-                old_mat->colour_map = NULL;
-                BrMaterialUpdate(old_mat, BR_MATU_ALL);
+            new_mat = SuffixedMaterial(old_mat, ".lwall");
+            if (new_mat->colour_map != NULL) {
+                new_mat->colour_map = NULL;
+                BrMaterialUpdate(new_mat, BR_MATU_ALL);
             }
-        } else {
-            old_mat = NULL;
+            return new_mat;
         }
     }
-    return old_mat;
+    return NULL;
 }
 
 // IDA: br_material* __usercall WallUntexToLinear@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
