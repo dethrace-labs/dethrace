@@ -2023,12 +2023,10 @@ int DRPixelmapHasZeros(br_pixelmap* pm) {
 int StorageContainsPixelmap(tBrender_storage* pStorage, br_pixelmap* pMap) {
     int i;
 
-    for (i = 0; i < pStorage->pixelmaps_count; i++) {
-        if (pMap == pStorage->pixelmaps[i]) {
-            return 1;
-        }
+    for (i = 0; i < pStorage->pixelmaps_count && pMap != pStorage->pixelmaps[i]; i++) {
+        ;
     }
-    return 0;
+    return pStorage->pixelmaps_count != i;
 }
 
 // IDA: void __usercall HideStoredOpaqueTextures(tBrender_storage *pStorage@<EAX>)
