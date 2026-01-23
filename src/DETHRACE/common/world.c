@@ -2157,7 +2157,7 @@ int HasThisSuffix(char* pIdent, char* pSuffix) {
     if (pIdent == NULL) {
         return 0;
     }
-    if (pIdent < pSuffix) {
+    if (len_ident < len_suffix) {
         return 0;
     }
     return strcmp(pIdent + len_ident - len_suffix, pSuffix) == 0;
