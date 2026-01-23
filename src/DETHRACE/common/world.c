@@ -1729,27 +1729,16 @@ void KillGroovadelic(int pOwner) {
     int i;
     tGroovidelic_spec* the_groove;
 
-    if (gGroovidelics_array == NULL) {
-        return;
-    }
-    for (i = 0; i < gGroovidelics_array_size; i++) {
-        the_groove = &gGroovidelics_array[i];
-        if (the_groove->owner != pOwner) {
-            continue;
+    if (gGroovidelics_array != NULL) {
+        for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
+            if (the_groove->owner == pOwner
+                && the_groove->path_mode != eMove_controlled
+                && the_groove->path_mode != eMove_absolute
+                && the_groove->object_mode != eMove_controlled
+                && the_groove->object_mode != eMove_absolute) {
+                the_groove->owner = NO_OWNER;
+            }
         }
-        if (the_groove->path_mode == eMove_controlled) {
-            continue;
-        }
-        if (the_groove->path_mode == eMove_absolute) {
-            continue;
-        }
-        if (the_groove->object_mode == eMove_controlled) {
-            continue;
-        }
-        if (the_groove->object_mode == eMove_absolute) {
-            continue;
-        }
-        the_groove->owner = NO_OWNER;
     }
 }
 
