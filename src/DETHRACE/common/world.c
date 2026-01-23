@@ -1748,30 +1748,18 @@ void KillFunkotronic(int pOwner) {
     int i;
     tFunkotronic_spec* the_funk;
 
-    if (gFunkotronics_array == NULL) {
-        return;
-    }
-    for (i = 0; i < gFunkotronics_array_size; i++) {
-        the_funk = &gFunkotronics_array[i];
-        if (the_funk->owner != pOwner) {
-            continue;
+    if (gFunkotronics_array != NULL) {
+        for (i = 0, the_funk = gFunkotronics_array; i < gFunkotronics_array_size; i++, the_funk++) {
+            if (the_funk->owner == pOwner
+                && the_funk->matrix_mode != eMove_controlled
+                && the_funk->matrix_mode != eMove_absolute
+                && the_funk->lighting_animation_type != eMove_controlled
+                && the_funk->lighting_animation_type != eMove_absolute
+                && (the_funk->texture_animation_data.frames_info.mode != eMove_controlled
+                    || the_funk->texture_animation_type)) {
+                the_funk->owner = NO_OWNER;
+            }
         }
-        if (the_funk->matrix_mode == eMove_controlled) {
-            continue;
-        }
-        if (the_funk->matrix_mode == eMove_absolute) {
-            continue;
-        }
-        if (the_funk->lighting_animation_type == eMove_controlled) {
-            continue;
-        }
-        if (the_funk->lighting_animation_type == eMove_absolute) {
-            continue;
-        }
-        if (the_funk->texture_animation_data.frames_info.mode == eMove_controlled && the_funk->texture_animation_type == eTexture_animation_frames) {
-            continue;
-        }
-        the_funk->owner = NO_OWNER;
     }
 }
 
