@@ -1188,7 +1188,7 @@ void Adjust2FloatsForExceptions(float* pVictim1, float* pVictim2, br_pixelmap* p
     }
 }
 
-#define GTEMP_DIV (gTemp != 0.0f ? 1000.0 / gTemp : 0.0)
+#define SAFE_DIV(val) (gTemp = val, gTemp != 0.0f ? 1000.0 / gTemp : 0.0f)
 
 // IDA: void __usercall AddFunkotronics(FILE *pF@<EAX>, int pOwner@<EDX>, int pRef_offset@<EBX>)
 // FUNCTION: CARM95 0x00436b8b
@@ -1209,10 +1209,6 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
     float s_max;
     void* the_pixels;
     br_pixelmap* the_pixelmap;
-    // float x_0;
-    // float x_1;
-    // int d_0;
-    // int d_1;
 
     first_time = 1;
     while (!feof(pF)) {
@@ -1256,8 +1252,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
             if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
                 AddFunkGrooveBinding(GetAnInt(pF) + pRef_offset, &the_funk->matrix_mod_data.rock_info.period);
             } else {
-                gTemp = GetAFloat(pF);
-                the_funk->matrix_mod_data.rock_info.period = GTEMP_DIV;
+                the_funk->matrix_mod_data.rock_info.period = SAFE_DIV(GetAFloat(pF));
             }
 
             the_funk->matrix_mod_data.rock_info.rock_angle = GetAFloat(pF);
@@ -1283,10 +1278,8 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
             } else {
                 float x_0, x_1;
                 GetPairOfFloats(pF, &x_0, &x_1);
-                gTemp = x_0;
-                the_funk->matrix_mod_data.throb_info.x_period = GTEMP_DIV;
-                gTemp = x_1;
-                the_funk->matrix_mod_data.throb_info.y_period = GTEMP_DIV;
+                the_funk->matrix_mod_data.throb_info.x_period = SAFE_DIV(x_0);
+                the_funk->matrix_mod_data.throb_info.y_period = SAFE_DIV(x_1);
             }
             GetPairOfFloatPercents(
                 pF,
@@ -1324,10 +1317,8 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
             } else {
                 float x_0, x_1;
                 GetPairOfFloats(pF, &x_0, &x_1);
-                gTemp = x_0;
-                the_funk->matrix_mod_data.slither_info.x_period = GTEMP_DIV;
-                gTemp = x_1;
-                the_funk->matrix_mod_data.slither_info.y_period = GTEMP_DIV;
+                the_funk->matrix_mod_data.slither_info.x_period = SAFE_DIV(x_0);
+                the_funk->matrix_mod_data.slither_info.y_period = SAFE_DIV(x_1);
             }
             GetPairOfFloatPercents(
                 pF,
@@ -1358,10 +1349,8 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
             } else {
                 float x_0, x_1;
                 GetPairOfFloats(pF, &x_0, &x_1);
-                gTemp = x_0;
-                the_funk->matrix_mod_data.roll_info.x_period = GTEMP_DIV;
-                gTemp = x_1;
-                the_funk->matrix_mod_data.roll_info.y_period = GTEMP_DIV;
+                the_funk->matrix_mod_data.roll_info.x_period = SAFE_DIV(x_0);
+                the_funk->matrix_mod_data.roll_info.y_period = SAFE_DIV(x_1);
             }
 #ifdef DETHRACE_3DFX_PATCH
             Adjust2FloatsForExceptions(&the_funk->matrix_mod_data.roll_info.x_period, &the_funk->matrix_mod_data.roll_info.y_period, the_funk->material->colour_map);
@@ -1375,8 +1364,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
             if (the_funk->lighting_animation_type == eMove_controlled || the_funk->lighting_animation_type == eMove_absolute) {
                 AddFunkGrooveBinding(GetAnInt(pF) + pRef_offset, &the_funk->lighting_animation_period);
             } else {
-                gTemp = GetAFloat(pF);
-                the_funk->lighting_animation_period = GTEMP_DIV;
+                the_funk->lighting_animation_period = SAFE_DIV(GetAFloat(pF));
             }
             GetThreeFloatPercents(pF, &a_min, &d_min, &s_min);
             GetThreeFloatPercents(pF, &a_max, &d_max, &s_max);
@@ -1404,8 +1392,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 || the_funk->texture_animation_data.frames_info.mode == eMove_absolute) {
                 AddFunkGrooveBinding(GetAnInt(pF) + pRef_offset, &the_funk->texture_animation_data.frames_info.period);
             } else {
-                gTemp = GetAFloat(pF);
-                the_funk->texture_animation_data.frames_info.period = GTEMP_DIV;
+                the_funk->texture_animation_data.frames_info.period = SAFE_DIV(GetAFloat(pF));
             }
             the_funk->texture_animation_data.frames_info.texture_count = (int)GetAFloat(pF);
             the_funk->texture_animation_data.frames_info.current_frame = 0;
@@ -1549,12 +1536,6 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
     int i;
     int j;
     tGroovidelic_spec* the_groove;
-    float x_0;
-    float x_1;
-    float x_2;
-    int d_0;
-    int d_1;
-    int d_2;
 
     first_time = 1;
 
@@ -1568,8 +1549,9 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
         if (!first_time) {
             if (strcmp(s, "NEXT GROOVE") != 0) {
                 FatalError(kFatalError_GroovidelicFile);
+            } else {
+                GetALineAndDontArgue(pF, s);
             }
-            GetALineAndDontArgue(pF, s);
         }
         first_time = 0;
         str = strtok(s, "\t ,/");
@@ -1578,16 +1560,17 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
         the_groove->actor = DRActorFindRecurse(pParent_actor, str);
 
         if (the_groove->actor == NULL) {
-            if (!pAllowed_to_be_absent && !gAusterity_mode) {
+            if (pAllowed_to_be_absent || gAusterity_mode) {
+                if (gGroove_by_proxy_actor == NULL) {
+                    gGroove_by_proxy_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+                    gGroove_by_proxy_actor->model = LoadModel("PROXY.DAT");
+                    BrModelAdd(gGroove_by_proxy_actor->model);
+                    BrActorAdd(gDont_render_actor, gGroove_by_proxy_actor);
+                }
+                the_groove->actor = gGroove_by_proxy_actor;
+            } else {
                 FatalError(kFatalError_FindActorUsedByGroovidelicFile_S, str);
             }
-            if (gGroove_by_proxy_actor == NULL) {
-                gGroove_by_proxy_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-                gGroove_by_proxy_actor->model = LoadModel("PROXY.DAT");
-                BrModelAdd(gGroove_by_proxy_actor->model);
-                BrActorAdd(gDont_render_actor, gGroove_by_proxy_actor);
-            }
-            the_groove->actor = gGroove_by_proxy_actor;
         }
         the_groove->lollipop_mode = GetALineAndInterpretCommand(pF, gLollipop_names, COUNT_OF(gLollipop_names));
         the_groove->mode = GetALineAndInterpretCommand(pF, gGroove_nature_names, COUNT_OF(gGroove_nature_names));
@@ -1599,64 +1582,50 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
             the_groove->path_mode = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
         }
 
-        if (the_groove->path_type == eGroove_path_circular) {
-            TELL_ME_IF_WE_PASS_THIS_WAY();
-            // GetThreeFloats(pF, &v90, &v89, &v88);
-            // the_groove->path_data.circular_info.centre.v[0] = v90;
-            // the_groove->path_data.circular_info.centre.v[1] = v89;
-            // the_groove->path_data.circular_info.centre.v[2] = v88;
-            // if (the_groove->path_data.circular_info.centre.v[2] == 0.0
-            //     && *(float*)&the_groove->path_data.circular_info.axis == 0.0
-            //     && *((float*)&the_groove->path_data.circular_info + 6) == 0.0) {
-            //     v25 = (_DWORD*)the_groove->actor->t.t.translate.t.v;
-            //     v26 = (_DWORD*)&the_groove->path_data.circular_info.centre.v[2];
-            //     *v26 = *v25;
-            //     v26[1] = v25[1];
-            //     v26[2] = v25[2];
-            // }
-            // if (the_groove->path_mode != 3 && the_groove->path_mode != 4) {
-            //     v29 = GetAFloat(pF);
-            //     x_0 = v29;
-            //     if (v31) {
-            //         v62 = 0.0;
-            //     } else {
-            //         v62 = 1000.0 / x_0;
-            //     }
-            //     the_groove->path_data.circular_info.period = v62;
-            // } else {
-            //     v27 = &the_groove->path_data.circular_info.period;
-            //     v28 = GetAnInt(pF);
-            //     AddFunkGrooveBinding(v28 + pRef_offset, v27);
-            // }
-            // v32 = GetAFloat(pF);
-            // the_groove->path_data.circular_info.radius = v32;
-            // v33 = GetALineAndInterpretCommand(pF, gAxis_names, 3);
-            // the_groove->path_data.circular_info.axis = v33;
+        switch (the_groove->path_type) {
 
-        } else if (the_groove->path_type == eGroove_path_straight) {
-            GetThreeFloats(pF,
-                &the_groove->path_data.straight_info.centre.v[0],
-                &the_groove->path_data.straight_info.centre.v[1],
-                &the_groove->path_data.straight_info.centre.v[2]);
+        case eGroove_path_straight:
+            ReadThreeFloats(pF,
+                the_groove->path_data.straight_info.centre.v[0],
+                the_groove->path_data.straight_info.centre.v[1],
+                the_groove->path_data.straight_info.centre.v[2]);
 
             if (Vector3IsZero(&the_groove->path_data.straight_info.centre)) {
-                BrVector3Copy(&the_groove->path_data.straight_info.centre,
-                    &the_groove->actor->t.t.translate.t);
+                the_groove->path_data.straight_info.centre = the_groove->actor->t.t.translate.t;
             }
             if (the_groove->path_mode == eMove_controlled || the_groove->path_mode == eMove_absolute) {
                 AddFunkGrooveBinding(pRef_offset + GetAnInt(pF), &the_groove->path_data.straight_info.period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_groove->path_data.straight_info.period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
+                the_groove->path_data.straight_info.period = SAFE_DIV(GetAFloat(pF));
             }
             GetThreeFloats(
                 pF,
                 &the_groove->path_data.straight_info.x_delta,
                 &the_groove->path_data.straight_info.y_delta,
                 &the_groove->path_data.straight_info.z_delta);
+            break;
+
+        case eGroove_path_circular:
+            ReadThreeFloats(pF,
+                the_groove->path_data.circular_info.centre.v[0],
+                the_groove->path_data.circular_info.centre.v[1],
+                the_groove->path_data.circular_info.centre.v[2]);
+
+            if (Vector3IsZero(&the_groove->path_data.straight_info.centre)) {
+                the_groove->path_data.straight_info.centre = the_groove->actor->t.t.translate.t;
+            }
+            if (the_groove->path_mode == eMove_controlled || the_groove->path_mode == eMove_absolute) {
+                AddFunkGrooveBinding(pRef_offset + GetAnInt(pF), &the_groove->path_data.circular_info.period);
+            } else {
+                the_groove->path_data.circular_info.period = SAFE_DIV(GetAFloat(pF));
+            }
+            the_groove->path_data.circular_info.radius = GetAFloat(pF);
+            the_groove->path_data.circular_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
+            break;
         }
+
         the_groove->object_type = GetALineAndInterpretCommand(pF, gGroove_object_names, COUNT_OF(gGroove_object_names));
-        BrVector3Copy(&the_groove->object_position, &the_groove->actor->t.t.translate.t);
+        the_groove->object_position = the_groove->actor->t.t.translate.t;
         if (the_groove->object_type != eGroove_object_none) {
             the_groove->object_mode = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
         }
@@ -1665,31 +1634,35 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
             if (the_groove->object_mode == eMove_controlled || the_groove->object_mode == eMove_absolute) {
                 AddFunkGrooveBinding(pRef_offset + GetAnInt(pF), &the_groove->object_data.spin_info.period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_groove->object_data.spin_info.period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
+                the_groove->object_data.spin_info.period = SAFE_DIV(GetAFloat(pF));
             }
-            GetThreeFloats(pF,
-                &the_groove->object_centre.v[0],
-                &the_groove->object_centre.v[1],
-                &the_groove->object_centre.v[2]);
+
+            ReadThreeFloats(pF,
+                the_groove->object_centre.v[0],
+                the_groove->object_centre.v[1],
+                the_groove->object_centre.v[2]);
+
             the_groove->object_data.spin_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
             break;
+
         case eGroove_object_rock:
             if (the_groove->object_mode == eMove_controlled || the_groove->object_mode == eMove_absolute) {
                 AddFunkGrooveBinding(pRef_offset + GetAnInt(pF), &the_groove->object_data.rock_info.period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_groove->object_data.rock_info.period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
+                the_groove->object_data.rock_info.period = SAFE_DIV(GetAFloat(pF));
             }
-            GetThreeFloats(pF,
-                &the_groove->object_centre.v[0],
-                &the_groove->object_centre.v[1],
-                &the_groove->object_centre.v[2]);
+            ReadThreeFloats(pF,
+                the_groove->object_centre.v[0],
+                the_groove->object_centre.v[1],
+                the_groove->object_centre.v[2]);
+
             the_groove->object_data.rock_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
             the_groove->object_data.rock_info.max_angle = GetAFloat(pF);
             break;
+
         case eGroove_object_throb:
             if (the_groove->object_mode == eMove_controlled || the_groove->object_mode == eMove_absolute) {
+                int d_0, d_1, d_2;
                 GetThreeInts(pF, &d_0, &d_1, &d_2);
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(pRef_offset + d_0, &the_groove->object_data.throb_info.x_period);
@@ -1701,23 +1674,25 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                     AddFunkGrooveBinding(pRef_offset + d_2, &the_groove->object_data.throb_info.z_period);
                 }
             } else {
+                float x_0, x_1, x_2;
                 GetThreeFloats(pF, &x_0, &x_1, &x_2);
-                the_groove->object_data.throb_info.x_period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
-                the_groove->object_data.throb_info.y_period = (x_1 == 0.0f) ? 0.0f : (1000.0f / x_1);
-                the_groove->object_data.throb_info.z_period = (x_2 == 0.0f) ? 0.0f : (1000.0f / x_2);
+                the_groove->object_data.throb_info.x_period = SAFE_DIV(x_0);
+                the_groove->object_data.throb_info.y_period = SAFE_DIV(x_1);
+                the_groove->object_data.throb_info.z_period = SAFE_DIV(x_2);
             }
-            GetThreeFloats(pF,
-                &the_groove->object_centre.v[0],
-                &the_groove->object_centre.v[1],
-                &the_groove->object_centre.v[2]);
-            GetThreeFloatPercents(
-                pF,
+            ReadThreeFloats(pF,
+                the_groove->object_centre.v[0],
+                the_groove->object_centre.v[1],
+                the_groove->object_centre.v[2]);
+            GetThreeFloatPercents(pF,
                 &the_groove->object_data.throb_info.x_magnitude,
                 &the_groove->object_data.throb_info.y_magnitude,
                 &the_groove->object_data.throb_info.z_magnitude);
             break;
+
         case eGroove_object_shear:
             if (the_groove->object_mode == eMove_controlled || the_groove->object_mode == eMove_absolute) {
+                int d_0, d_1, d_2;
                 GetThreeInts(pF, &d_0, &d_1, &d_2);
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(pRef_offset + d_0, &the_groove->object_data.shear_info.x_period);
@@ -1729,23 +1704,20 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                     AddFunkGrooveBinding(pRef_offset + d_2, &the_groove->object_data.shear_info.z_period);
                 }
             } else {
+                float x_0, x_1, x_2;
                 GetThreeFloats(pF, &x_0, &x_1, &x_2);
-                the_groove->object_data.shear_info.x_period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
-                the_groove->object_data.shear_info.y_period = x_1 == 0.0f ? 0.0f : 1000.0 / x_1;
-                the_groove->object_data.shear_info.z_period = x_2 == 0.0f ? 0.0f : 1000.0 / x_2;
+                the_groove->object_data.shear_info.x_period = SAFE_DIV(x_0);
+                the_groove->object_data.shear_info.y_period = SAFE_DIV(x_1);
+                the_groove->object_data.shear_info.z_period = SAFE_DIV(x_2);
             }
-            GetThreeFloats(pF,
-                &the_groove->object_centre.v[0],
-                &the_groove->object_centre.v[1],
-                &the_groove->object_centre.v[2]);
-            GetThreeFloatPercents(
-                pF,
+            ReadThreeFloats(pF,
+                the_groove->object_centre.v[0],
+                the_groove->object_centre.v[1],
+                the_groove->object_centre.v[2]);
+            GetThreeFloatPercents(pF,
                 &the_groove->object_data.shear_info.x_magnitude,
                 &the_groove->object_data.shear_info.y_magnitude,
                 &the_groove->object_data.shear_info.z_magnitude);
-
-            break;
-        default:
             break;
         }
     }

@@ -85,7 +85,9 @@
         b = d[0];                        \
     } while (0)
 
-#endif
+#define mGetThreeFloats(pF) \
+    float x_0, x_1, x_2;    \
+    GetThreeFloats(pF, &x_0, &x_1, &x_2);
 
 // Many switches in the original code did not include handling all values, causing warnings in modern compilers
 #ifdef DETHRACE_FIX_BUGS
@@ -94,4 +96,7 @@
         break;
 #else
 #define DETHRACE_DEFAULT_BREAK
+#endif
+
+// MACROS_H
 #endif
