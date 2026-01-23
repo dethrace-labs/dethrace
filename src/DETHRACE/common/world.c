@@ -167,7 +167,7 @@ br_actor* gStandard_lamp;
 // GLOBAL: CARM95 0x00534abc
 br_scalar gSight_distance_squared;
 
-#define FUNK_BUFFER_SIZE_INCREASE 16
+#define GROOVE_FUNK_BUFFER_SIZE_INCREASE 16
 #define NO_OWNER -999
 
 // IDA: float __cdecl MapSawToTriangle(float pNumber)
@@ -1025,21 +1025,21 @@ tFunkotronic_spec* AddNewFunkotronic(void) {
             return &gFunkotronics_array[i];
         }
     }
-    gFunkotronics_array_size += FUNK_BUFFER_SIZE_INCREASE;
+    gFunkotronics_array_size += GROOVE_FUNK_BUFFER_SIZE_INCREASE;
     new_array = BrMemCalloc(gFunkotronics_array_size, sizeof(tFunkotronic_spec), kMem_funk_spec);
     if (gFunkotronics_array != NULL) {
-        memcpy(new_array, gFunkotronics_array, (gFunkotronics_array_size - FUNK_BUFFER_SIZE_INCREASE) * sizeof(tFunkotronic_spec));
+        memcpy(new_array, gFunkotronics_array, (gFunkotronics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE) * sizeof(tFunkotronic_spec));
         ShiftBoundGrooveFunks(
             (char*)gFunkotronics_array,
-            (char*)(gFunkotronics_array + gFunkotronics_array_size - FUNK_BUFFER_SIZE_INCREASE),
+            (char*)(gFunkotronics_array + gFunkotronics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE),
             (char*)new_array - (char*)gFunkotronics_array);
         BrMemFree(gFunkotronics_array);
     }
     gFunkotronics_array = new_array;
-    for (i = 0; i < FUNK_BUFFER_SIZE_INCREASE; i++) {
-        gFunkotronics_array[gFunkotronics_array_size + i - FUNK_BUFFER_SIZE_INCREASE].owner = NO_OWNER;
+    for (i = 0; i < GROOVE_FUNK_BUFFER_SIZE_INCREASE; i++) {
+        gFunkotronics_array[gFunkotronics_array_size + i - GROOVE_FUNK_BUFFER_SIZE_INCREASE].owner = NO_OWNER;
     }
-    return gFunkotronics_array + gFunkotronics_array_size - FUNK_BUFFER_SIZE_INCREASE;
+    return gFunkotronics_array + gFunkotronics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE;
 }
 
 // IDA: void __usercall DisposeFunkotronics(int pOwner@<EAX>)
@@ -1510,21 +1510,21 @@ tGroovidelic_spec* AddNewGroovidelic(void) {
             return &gGroovidelics_array[i];
         }
     }
-    gGroovidelics_array_size += 16;
+    gGroovidelics_array_size += GROOVE_FUNK_BUFFER_SIZE_INCREASE;
     new_array = BrMemCalloc(gGroovidelics_array_size, sizeof(tGroovidelic_spec), kMem_groove_spec);
     if (gGroovidelics_array != NULL) {
-        memcpy(new_array, gGroovidelics_array, (gGroovidelics_array_size - 16) * sizeof(tGroovidelic_spec));
+        memcpy(new_array, gGroovidelics_array, (gGroovidelics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE) * sizeof(tGroovidelic_spec));
         ShiftBoundGrooveFunks(
             (char*)gGroovidelics_array,
-            (char*)&gGroovidelics_array[gGroovidelics_array_size - 16],
+            (char*)(gGroovidelics_array + gGroovidelics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE),
             (char*)new_array - (char*)gGroovidelics_array);
         BrMemFree(gGroovidelics_array);
     }
     gGroovidelics_array = new_array;
-    for (i = 0; i < 16; i++) {
-        gGroovidelics_array[i + gGroovidelics_array_size - 16].owner = NO_OWNER;
+    for (i = 0; i < GROOVE_FUNK_BUFFER_SIZE_INCREASE; i++) {
+        gGroovidelics_array[gGroovidelics_array_size + i - GROOVE_FUNK_BUFFER_SIZE_INCREASE].owner = NO_OWNER;
     }
-    return &gGroovidelics_array[gGroovidelics_array_size - 16];
+    return gGroovidelics_array + gGroovidelics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE;
 }
 
 // IDA: void __usercall AddGroovidelics(FILE *pF@<EAX>, int pOwner@<EDX>, br_actor *pParent_actor@<EBX>, int pRef_offset@<ECX>, int pAllowed_to_be_absent)
