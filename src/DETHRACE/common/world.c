@@ -1824,7 +1824,7 @@ int FindSpecVolIndex(br_actor* pActor) {
     int i;
     tSpecial_volume* v;
 
-    for (i = 0; i < gProgram_state.special_volume_count; i++) {
+    for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
         if (gSpec_vol_actors[i] == pActor) {
             return i;
         }
