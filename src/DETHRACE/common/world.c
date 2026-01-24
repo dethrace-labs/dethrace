@@ -1982,7 +1982,7 @@ void ChangeSubdivToPersp(void) {
 br_uintptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
 
     if (pActor->identifier != NULL && pActor->identifier[0] == '&') {
-        return 0;
+        return NULL;
     }
     if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL) {
         ProcessModelFaceMaterials(pActor->model, pCallback);
@@ -2186,10 +2186,9 @@ br_material* RoadUntexToPersp(br_model* pModel, tU16 pFace) {
     old_mat = pModel->faces[pFace].material;
     if (HasThisSuffix(old_mat->identifier, ".road")) {
         new_mat = UnsuffixedMaterial(old_mat->identifier, ".road");
-    } else {
-        new_mat = NULL;
+        return new_mat;
     }
-    return new_mat;
+    return NULL;
 }
 
 // IDA: br_material* __usercall WallLinearToUntex@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
