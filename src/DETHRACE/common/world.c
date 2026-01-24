@@ -1981,14 +1981,13 @@ void ChangeSubdivToPersp(void) {
 // FUNCTION: CARM95 0x00439ddd
 br_uintptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
 
-    if (pActor->identifier == NULL || pActor->identifier[0] != '&') {
-        if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL) {
-            ProcessModelFaceMaterials(pActor->model, pCallback);
-        }
-        return BrActorEnum(pActor, (br_actor_enum_cbfn*)ProcessFaceMaterials, pCallback);
-    } else {
+    if (pActor->identifier != NULL && pActor->identifier[0] == '&') {
         return 0;
     }
+    if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL) {
+        ProcessModelFaceMaterials(pActor->model, pCallback);
+    }
+    return BrActorEnum(pActor, (br_actor_enum_cbfn*)ProcessFaceMaterials, pCallback);
 }
 
 // IDA: int __usercall DRPixelmapHasZeros@<EAX>(br_pixelmap *pm@<EAX>)
