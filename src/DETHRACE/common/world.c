@@ -2287,7 +2287,7 @@ void SetRoadTexturingLevel(tRoad_texturing_level pLevel) {
 void ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel) {
 
     if (pLevel != gRoad_texturing_level) {
-        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, (pLevel == eRTL_none) ? RoadUntexToPersp : RoadPerspToUntex);
+        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, (pLevel != eRTL_none) ? RoadUntexToPersp : RoadPerspToUntex);
     }
 }
 
