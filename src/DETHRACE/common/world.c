@@ -2248,13 +2248,13 @@ br_material* WallUntexToPersp(br_model* pModel, tU16 pFace) {
 
     old_mat = pModel->faces[pFace].material;
     if (HasThisSuffix(old_mat->identifier, ".lwall")) {
-        new_mat = UnsuffixedMaterial(old_mat->identifier, ".lwall");
-    } else if (HasThisSuffix(old_mat->identifier, ".pwall")) {
-        new_mat = UnsuffixedMaterial(old_mat->identifier, ".pwall");
-    } else {
-        new_mat = NULL;
+        return UnsuffixedMaterial(old_mat->identifier, ".lwall");
     }
-    return new_mat;
+    if (HasThisSuffix(old_mat->identifier, ".pwall")) {
+        return UnsuffixedMaterial(old_mat->identifier, ".pwall");
+    }
+
+    return NULL;
 }
 
 // IDA: br_material* __usercall WallLinearToPersp@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
