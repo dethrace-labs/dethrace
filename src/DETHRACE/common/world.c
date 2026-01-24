@@ -2265,11 +2265,9 @@ br_material* WallLinearToPersp(br_model* pModel, tU16 pFace) {
 
     old_mat = pModel->faces[pFace].material;
     if (HasThisSuffix(old_mat->identifier, ".pwall")) {
-        new_mat = UnsuffixedMaterial(old_mat->identifier, ".pwall");
-    } else {
-        new_mat = NULL;
+        return UnsuffixedMaterial(old_mat->identifier, ".pwall");
     }
-    return new_mat;
+    return NULL;
 }
 
 // IDA: tRoad_texturing_level __cdecl GetRoadTexturingLevel()
