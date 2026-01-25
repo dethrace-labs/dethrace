@@ -27,6 +27,7 @@
 #include "trig.h"
 #include "utility.h"
 
+#include <ctype.h>
 #include <float.h>
 #include <string.h>
 
@@ -585,7 +586,7 @@ int LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
             FatalError(kFatalError_LoadMaterialFile_S, str);
         }
 #ifdef DETHRACE_3DFX_PATCH
-        GlorifyMaterial(temp_array, total);
+        GlorifyMaterial(temp_array, new_ones);
 #endif
         for (j = 0; j < new_ones; j++) {
             if (temp_array[j]) {
@@ -1622,6 +1623,8 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
             the_groove->path_data.circular_info.radius = GetAFloat(pF);
             the_groove->path_data.circular_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
             break;
+
+            DETHRACE_DEFAULT_BREAK;
         }
 
         the_groove->object_type = GetALineAndInterpretCommand(pF, gGroove_object_names, COUNT_OF(gGroove_object_names));
@@ -1719,6 +1722,8 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                 &the_groove->object_data.shear_info.y_magnitude,
                 &the_groove->object_data.shear_info.z_magnitude);
             break;
+
+            DETHRACE_DEFAULT_BREAK;
         }
     }
 }
@@ -1982,7 +1987,7 @@ void ChangeSubdivToPersp(void) {
 br_uintptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
 
     if (pActor->identifier != NULL && pActor->identifier[0] == '&') {
-        return NULL;
+        return 0;
     }
     if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL) {
         ProcessModelFaceMaterials(pActor->model, pCallback);
@@ -2306,6 +2311,7 @@ void SetWallTexturingLevel(tWall_texturing_level pLevel) {
 // IDA: void __usercall ReallySetWallTexturingLevel(tWall_texturing_level pLevel@<EAX>)
 // FUNCTION: CARM95 0x00439ee9
 void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
+    // GLOBAL: CARM95 0x0050C7E8
     static tPMFMCB* tweaker[3][3] = {
         {
             NULL,
@@ -2324,7 +2330,7 @@ void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
         },
     };
 
-    if (gWall_texturing_level != pLevel) {
+    if (pLevel != gWall_texturing_level) {
         ProcessFaceMaterials(gProgram_state.track_spec.the_actor, tweaker[gWall_texturing_level][pLevel]);
     }
 }
@@ -2495,13 +2501,13 @@ void LoadExceptionsFile(char* pName) {
             if (DRStricmp(tok, "end") == 0) {
                 break;
             }
-            e = BrMemAllocate(sizeof(tException_list), kMem_misc);
+            e = BrMemAllocate(sizeof(tException_node), kMem_misc);
             e->name = BrMemAllocate(strlen(tok) + 1, kMem_misc_string);
             strcpy(e->name, tok);
             e->flags = 0;
             while (1) {
                 tok = strtok(NULL, delimiters);
-                if (tok == NULL /*|| (IsTable[(unsigned __int8)(*v11 + 1)] & 0xE0) == 0*/) {
+                if (tok == NULL || !isalpha(tok[0])) {
                     break;
                 }
                 if (DRStricmp(tok, "mipmap") == 0) {
@@ -2581,7 +2587,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     int skid_mark_cnt = 0;
 #endif
     tPath_name the_path;
+#ifdef DETHRACE_3DFX_PATCH
     tPath_name general_file_path;
+#endif
     char s[256];
     char* str;
     float temp_float;
@@ -2604,7 +2612,8 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     PathCat(the_path, gApplication_path, "RACES");
     PathCat(the_path, the_path, pFile_name);
 #ifdef DETHRACE_3DFX_PATCH
-    LoadExceptionsFileForTrack(the_path);
+    PathCat(general_file_path, gApplication_path, "RACES");
+    LoadExceptionsFileForTrack(general_file_path);
 #endif
     f = DRfopen(the_path, "rt");
     if (f == NULL) {
@@ -2612,7 +2621,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     }
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
-    if (strcmp(str, "VERSION") == 0) {
+    if (strcmp(s, "VERSION") == 0) {
         str = strtok(NULL, "\t ,/");
         sscanf(str, "%d", &gRace_file_version);
         GetALineAndDontArgue(f, s);
@@ -2662,55 +2671,57 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             GetALineAndDontArgue(f, s);
         }
         pRace_info->checkpoints[i].quad_count = GetAnInt(f);
-        for (j = 0; j < pRace_info->checkpoints[i].quad_count; j++) {
-            for (k = 0; k < 4; ++k) {
+        for (k = 0; k < pRace_info->checkpoints[i].quad_count; k++) {
+            for (j = 0; j < 4; j++) {
                 GetThreeScalars(
                     f,
-                    &pRace_info->checkpoints[i].vertices[j][k].v[0],
-                    &pRace_info->checkpoints[i].vertices[j][k].v[1],
-                    &pRace_info->checkpoints[i].vertices[j][k].v[2]);
+                    pRace_info->checkpoints[i].vertices[k][j].v,
+                    pRace_info->checkpoints[i].vertices[k][j].v + 1,
+                    pRace_info->checkpoints[i].vertices[k][j].v + 2);
             }
-            p[0] = pRace_info->checkpoints[i].vertices[j][0];
-            p[1] = pRace_info->checkpoints[i].vertices[j][1];
-            p[2] = pRace_info->checkpoints[i].vertices[j][2];
-            pRace_info->checkpoints[i].normal[j].v[0] = (p[2].v[2] - p[0].v[2]) * (p[1].v[1] - p[0].v[1]) - (p[1].v[2] - p[0].v[2]) * (p[2].v[1] - p[0].v[1]);
-            pRace_info->checkpoints[i].normal[j].v[1] = (p[1].v[2] - p[0].v[2]) * (p[2].v[0] - p[0].v[0]) - (p[2].v[2] - p[0].v[2]) * (p[1].v[0] - p[0].v[0]);
-            pRace_info->checkpoints[i].normal[j].v[2] = (p[2].v[1] - p[0].v[1]) * (p[1].v[0] - p[0].v[0]) - (p[1].v[1] - p[0].v[1]) * (p[2].v[0] - p[0].v[0]);
+
+            BrVector3Sub(&a, &pRace_info->checkpoints[i].vertices[k][1], &pRace_info->checkpoints[i].vertices[k][0]);
+            BrVector3Sub(&b, &pRace_info->checkpoints[i].vertices[k][2], &pRace_info->checkpoints[i].vertices[k][0]);
+            BrVector3Cross(&pRace_info->checkpoints[i].normal[k], &a, &b);
         }
         if (gRace_file_version > 0) {
-            if (gRace_file_version == 1) {
-                GetPairOfInts(f, pRace_info->checkpoints[i].map_left, &pRace_info->checkpoints[i].map_left[1]);
-                GetPairOfInts(f, pRace_info->checkpoints[i].map_top, &pRace_info->checkpoints[i].map_top[1]);
-                GetPairOfInts(f, pRace_info->checkpoints[i].map_right, &pRace_info->checkpoints[i].map_right[1]);
-                GetPairOfInts(f, pRace_info->checkpoints[i].map_bottom, &pRace_info->checkpoints[i].map_bottom[1]);
-            } else {
+            if (gRace_file_version > 1) {
                 GetPairOfInts(f, pRace_info->checkpoints[i].map_left, &pRace_info->checkpoints[i].map_left[1]);
                 GetPairOfInts(f, pRace_info->checkpoints[i].map_top, &pRace_info->checkpoints[i].map_top[1]);
                 pRace_info->checkpoints[i].map_right[0] = cp_rect_w[0] + pRace_info->checkpoints[i].map_left[0];
                 pRace_info->checkpoints[i].map_right[1] = cp_rect_w[0] + pRace_info->checkpoints[i].map_left[1];
                 pRace_info->checkpoints[i].map_bottom[0] = cp_rect_h[0] + pRace_info->checkpoints[i].map_top[0];
                 pRace_info->checkpoints[i].map_bottom[1] = cp_rect_h[0] + pRace_info->checkpoints[i].map_top[1];
+            } else {
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_left, &pRace_info->checkpoints[i].map_left[1]);
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_top, &pRace_info->checkpoints[i].map_top[1]);
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_right, &pRace_info->checkpoints[i].map_right[1]);
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_bottom, &pRace_info->checkpoints[i].map_bottom[1]);
             }
         }
     }
-    if (gRace_file_version <= 3) {
-        LoadSomePixelmaps(&gTrack_storage_space, f);
-    } else if (gAusterity_mode) {
-        SkipNLines(f);
-        LoadSomePixelmaps(&gTrack_storage_space, f);
+    if (gRace_file_version > 3) {
+        if (gAusterity_mode) {
+            SkipNLines(f);
+            LoadSomePixelmaps(&gTrack_storage_space, f);
+        } else {
+            LoadSomePixelmaps(&gTrack_storage_space, f);
+            SkipNLines(f);
+        }
     } else {
         LoadSomePixelmaps(&gTrack_storage_space, f);
-        SkipNLines(f);
     }
     LoadSomeShadeTables(&gTrack_storage_space, f);
-    if (gRace_file_version <= 3) {
-        LoadSomeMaterials(&gTrack_storage_space, f);
-    } else if (gAusterity_mode) {
-        SkipNLines(f);
-        LoadSomeMaterials(&gTrack_storage_space, f);
+    if (gRace_file_version > 3) {
+        if (gAusterity_mode) {
+            SkipNLines(f);
+            LoadSomeMaterials(&gTrack_storage_space, f);
+        } else {
+            LoadSomeMaterials(&gTrack_storage_space, f);
+            SkipNLines(f);
+        }
     } else {
         LoadSomeMaterials(&gTrack_storage_space, f);
-        SkipNLines(f);
     }
 #ifdef DETHRACE_3DFX_PATCH
     if (!gShade_tables_do_not_work)
@@ -2728,53 +2739,58 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             }
         }
     }
-    if (gRace_file_version <= 5) {
-        LoadSomeTrackModels(&gTrack_storage_space, f);
-    } else if (gAusterity_mode) {
-        SkipNLines(f);
-        LoadSomeTrackModels(&gTrack_storage_space, f);
+    if (gRace_file_version > 5) {
+        if (gAusterity_mode) {
+            SkipNLines(f);
+            LoadSomeTrackModels(&gTrack_storage_space, f);
+        } else {
+            LoadSomeTrackModels(&gTrack_storage_space, f);
+            SkipNLines(f);
+        }
     } else {
         LoadSomeTrackModels(&gTrack_storage_space, f);
-        SkipNLines(f);
     }
 
     PrintMemoryDump(0, "JUST LOADED IN TEXTURES/MATS/MODELS FOR TRACK");
-    if (gRace_file_version <= 5) {
-        GetALineAndDontArgue(f, s);
-        str = strtok(s, "\t ,/");
-        PathCat(the_path, gApplication_path, "ACTORS");
-        PathCat(the_path, the_path, str);
-    } else if (gAusterity_mode) {
-        GetALineAndDontArgue(f, s);
-        GetALineAndDontArgue(f, s);
-        str = strtok(s, "\t ,/");
-        PathCat(the_path, gApplication_path, "ACTORS");
-        PathCat(the_path, the_path, str);
+    if (gRace_file_version > 5) {
+        if (gAusterity_mode) {
+            GetALineAndDontArgue(f, s);
+            GetALineAndDontArgue(f, s);
+            str = strtok(s, "\t ,/");
+            PathCat(the_path, gApplication_path, "ACTORS");
+            PathCat(the_path, the_path, str);
+        } else {
+            GetALineAndDontArgue(f, s);
+            str = strtok(s, "\t ,/");
+            PathCat(the_path, gApplication_path, "ACTORS");
+            PathCat(the_path, the_path, str);
+            GetALineAndDontArgue(f, s);
+        }
     } else {
         GetALineAndDontArgue(f, s);
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "ACTORS");
         PathCat(the_path, the_path, str);
-        GetALineAndDontArgue(f, s);
     }
     pTrack_spec->the_actor = BrActorLoad(the_path);
-    if (gRace_file_version <= 6) {
-        gDefault_blend_pc = 75;
-    } else {
+    if (gRace_file_version > 6) {
         GetAString(f, s);
         if (!sscanf(s, "%d", &gDefault_blend_pc) || gDefault_blend_pc < 0 || gDefault_blend_pc > 100) {
             PDFatalError("Wanted a default blend percentage. Didn't get one. Old data file?");
         }
+    } else {
+        gDefault_blend_pc = 75;
     }
     PossibleService();
     ExtractColumns(pTrack_spec);
     for (i = 0; gTrack_storage_space.models_count > i; ++i) {
         PossibleService();
-        if (gTrack_storage_space.models[i] && gTrack_storage_space.models[i]->flags & 0x82) {
-            gTrack_storage_space.models[i]->flags &= 0xFF7Du;
+        needs_updating = 0;
+        if (gTrack_storage_space.models[i] && gTrack_storage_space.models[i]->flags & (BR_MODF_UPDATEABLE | BR_MODF_KEEP_ORIGINAL)) {
+            gTrack_storage_space.models[i]->flags &= 0xFFFFFF7Du;
+            // Minor asm differences here due to using open-sourced BRender 1.3.2
             for (group = 0; group < V11MODEL(gTrack_storage_space.models[i])->ngroups; group++) {
-                int f = V11MODEL(gTrack_storage_space.models[i])->groups[group].face_user[0];
-                material = gTrack_storage_space.models[i]->faces[f].material;
+                material = gTrack_storage_space.models[i]->faces[V11MODEL(gTrack_storage_space.models[i])->groups[group].face_user[0]].material;
                 V11MODEL(gTrack_storage_space.models[i])->groups[group].user = material;
                 if (material && !material->index_shade) {
                     material->index_shade = BrTableFind("DRRENDER.TAB");
@@ -2787,8 +2803,8 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     PrintMemoryDump(0, "JUST LOADED IN TRACK ACTOR AND PROCESSED COLUMNS");
     gTrack_actor = pTrack_spec->the_actor;
     if (!gRendering_accessories && !gNet_mode) {
-        PossibleService();
         style = BR_RSTYLE_NONE;
+        PossibleService();
         DRActorEnumRecurse(gTrack_actor, (br_actor_enum_cbfn*)SetAccessoryRenderingCB, &style);
     }
     BrActorAdd(gUniverse_actor, pTrack_spec->the_actor);
@@ -2832,10 +2848,11 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     }
     PossibleService();
 
-    gSky_image_width = BrDegreeToAngle(360.0 / GetAnInt(f));
+    gSky_image_width = BrDegreeToAngle(360.0f / GetAnInt(f));
     gSky_image_height = BrDegreeToAngle(GetAScalar(f));
     gSky_image_underground = gSky_image_height * (sky_pixels_high - GetAnInt(f)) / sky_pixels_high;
 
+    MungeForwardSky();
     MungeRearviewSky();
     PossibleService();
 
@@ -2868,9 +2885,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     gProgram_state.special_volume_count = GetAnInt(f);
     if (gProgram_state.special_volume_count) {
         gProgram_state.special_volumes = BrMemAllocate(sizeof(tSpecial_volume) * gProgram_state.special_volume_count, kMem_special_volume);
-        i = 0;
-        spec = gProgram_state.special_volumes;
-        for (i = 0; i < gProgram_state.special_volume_count; i++) {
+        for (i = 0, spec = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, spec++) {
             PossibleService();
             spec->no_mat = 0;
             GetALineAndDontArgue(f, s);
@@ -2892,7 +2907,6 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 gDefault_water_spec_vol = spec;
                 spec->no_mat = 1;
             } else {
-                TELL_ME_IF_WE_PASS_THIS_WAY();
                 spec->no_mat = 0;
                 str = strtok(s, "\t ,/");
                 sscanf(str, "%f", &spec->bounds.min.v[0]);
@@ -2902,14 +2916,12 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 sscanf(str, "%f", &spec->bounds.min.v[2]);
                 GetThreeScalars(f, &spec->bounds.max.v[0], &spec->bounds.max.v[1], &spec->bounds.max.v[2]);
                 BrMatrix34Identity(&spec->mat);
-                for (k = 0; k < 3; ++k) {
-                    // FIXME: not 100% sure this is correct
-                    spec->mat.m[3][k] = (spec->bounds.max.v[k] + spec->bounds.min.v[k]) / 2.f;
-                    spec->mat.m[k][k] = spec->bounds.max.v[k] - spec->bounds.min.v[k];
+                for (j = 0; j < 3; j++) {
+                    spec->mat.m[3][j] = (temp_bounds.max.v[j] + temp_bounds.min.v[j]) / 2.0f;
+                    MAT(&spec->mat.m, j, j) = temp_bounds.max.v[j] - spec->mat.m[3][j];
                 }
                 ParseSpecialVolume(f, spec, NULL);
             }
-            spec++;
         }
     }
     GetAString(f, s);
@@ -2929,8 +2941,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 &gProgram_state.special_screens[i].max_x,
                 &gProgram_state.special_screens[i].max_z);
             GetAString(f, s);
-            material = BrMaterialFind(s);
-            gProgram_state.special_screens[i].material = material;
+            gProgram_state.special_screens[i].material = BrMaterialFind(s);
         }
     }
     PossibleService();
@@ -2951,22 +2962,22 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     PossibleService();
     PrintMemoryDump(0, "JUST LOADING IN FUNKS AND GROOVES");
     ped_subs = NULL;
-    count = 0;
+    line_count = 0;
     if (gRace_file_version > 3) {
-        line_count = GetAnInt(f);
+        ped_subs_index = GetAnInt(f);
         if (gAusterity_mode) {
-            if (line_count >= 0) {
+            if (ped_subs_index >= 0) {
                 PathCat(the_path, gApplication_path, "PEDSUBS.TXT");
                 g = DRfopen(the_path, "rt");
                 if (g == NULL) {
                     FatalError(kFatalError_OpenRacesFile);
                 }
-                for (i = 0; i < line_count; ++i) {
+                for (i = 0; i < ped_subs_index; i++) {
                     SkipNLines(g);
                 }
-                count = GetAnInt(g);
-                ped_subs = BrMemAllocate(sizeof(tPed_subs) * count, kMem_misc);
-                for (ped_subs_index = 0; ped_subs_index < count; ped_subs_index++) {
+                line_count = GetAnInt(g);
+                ped_subs = BrMemAllocate(sizeof(tPed_subs) * line_count, kMem_misc);
+                for (i = 0; i < line_count; i++) {
                     GetPairOfInts(g, &ped_subs[i].orig, &ped_subs[i].subs);
                 }
                 fclose(g);
@@ -2974,7 +2985,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         }
     }
     PossibleService();
-    LoadInPedestrians(f, count, ped_subs);
+    LoadInPedestrians(f, line_count, ped_subs);
     if (ped_subs != NULL) {
         BrMemFree(ped_subs);
     }
@@ -3004,8 +3015,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             LoadSinglePixelmap(&gTrack_storage_space, str);
             str[sl] = 0;
             strcat(str, ".MAT");
-            material = LoadSingleMaterial(&gTrack_storage_space, str);
-            pRace_info->material_modifiers[i].skid_mark_material = material;
+            pRace_info->material_modifiers[i].skid_mark_material = LoadSingleMaterial(&gTrack_storage_space, str);
 #ifdef DETHRACE_3DFX_PATCH
             if (material != NULL) {
                 GlorifyMaterial(&material, 1);
@@ -3062,12 +3072,10 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     for (i = 0; i < COUNT_OF(gNon_car_spec_list); ++i) {
         gNon_car_spec_list[i] = '\0';
     }
-    for (i = 0; i < NONCAR_UNUSED_SLOTS; i++) {
+    for (i = 0; i < NONCAR_UNUSED_SLOTS; i++, non_car++) {
         non_car->collision_info.driver = eDriver_non_car_unused_slot;
-        non_car++;
     }
-    i = 0;
-    for (i = 0; i < num_non_cars; i++) {
+    for (i = 0; i < num_non_cars; i++, non_car++) {
         PossibleService();
         GetAString(f, s);
         PathCat(the_path, gApplication_path, "NONCARS");
@@ -3081,7 +3089,6 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         ReadShrapnelMaterials(non_car_f, &non_car->collision_info);
         gNon_car_spec_list[non_car->collision_info.index] = i + 1;
         fclose(non_car_f);
-        non_car++;
     }
     GetSmokeShadeTables(f);
     pRace_info->number_of_net_start_points = GetAnInt(f);
@@ -3093,15 +3100,15 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             &pRace_info->net_starts[i].pos.v[2]);
         pRace_info->net_starts[i].yaw = GetAScalar(f);
     }
-    if (gRace_file_version <= 2) {
-        LoadInKevStuff(NULL);
-    } else {
+    if (gRace_file_version > 2) {
         LoadInKevStuff(f);
-    }
-    if (gRace_file_version < 5) {
-        gYon_multiplier = 1.0;
     } else {
+        LoadInKevStuff(NULL);
+    }
+    if (gRace_file_version >= 5) {
         gYon_multiplier = GetAScalar(f);
+    } else {
+        gYon_multiplier = 1.0;
     }
     GetAString(f, s);
     if (strcmp(s, pFile_name) != 0) {

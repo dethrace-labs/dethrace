@@ -25,6 +25,8 @@
 #define COUNT_OF(array) (int)(sizeof((array)) / sizeof((array)[0]))
 #define LEN(array) (sizeof((array)) / sizeof((array)[0]))
 
+#define MAT(m, row, col) (*((br_scalar*)(m) + (row) * 3 + (col)))
+
 #define DEG_TO_RAD(degrees) ((degrees) * 3.141592653589793 / 180.0)
 
 #define V11MODEL(model) (((struct v11model*)model->prepared))
