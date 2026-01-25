@@ -206,26 +206,31 @@ void FrankAnneDraw(int pCurrent_choice, int pCurrent_mode) {
 // IDA: int __cdecl FrankieOrAnnie()
 // FUNCTION: CARM95 0x004b03cd
 int FrankieOrAnnie(void) {
+    // GLOBAL: CARM95 0x0051ea88
     static tFlicette flicker_on[3] = {
         { 83, { 61, 122 }, { 52, 125 } },
         { 83, { 184, 398 }, { 52, 125 } },
         { 43, { 215, 430 }, { 158, 379 } }
     };
+    // GLOBAL: CARM95 0x0051eac8
     static tFlicette flicker_off[3] = {
         { 82, { 61, 122 }, { 52, 125 } },
         { 82, { 184, 398 }, { 52, 125 } },
         { 42, { 215, 430 }, { 158, 379 } }
     };
+    // GLOBAL: CARM95 0x0051eb08
     static tFlicette push[3] = {
         { 83, { 61, 122 }, { 52, 125 } },
         { 83, { 184, 398 }, { 52, 125 } },
         { 45, { 215, 430 }, { 158, 379 } }
     };
+    // GLOBAL: CARM95 0x0051eb48
     static tMouse_area mouse_areas[3] = {
         { { 55, 110 }, { 52, 125 }, { 161, 322 }, { 154, 370 }, 0, 0, 0, NULL },
         { { 178, 356 }, { 52, 125 }, { 295, 596 }, { 154, 370 }, 1, 0, 0, NULL },
         { { 215, 430 }, { 158, 379 }, { 278, 556 }, { 179, 430 }, 2, 1, 1, NULL }
     };
+    // GLOBAL: CARM95 0x0051ebd8
     static tRectile recopy_areas[2] = {
         { { 55, 110 }, { 132, 317 }, { 161, 322 }, { 154, 370 } },
         { { 178, 356 }, { 132, 317 }, { 295, 590 }, { 154, 370 } }
@@ -298,6 +303,7 @@ int FrankieOrAnnie(void) {
 // IDA: int __cdecl SelectSkillLevel()
 // FUNCTION: CARM95 0x004b0436
 int SelectSkillLevel(void) {
+    // GLOBAL: CARM95 0x0051ed48
     static tFlicette flicker_on[4] = {
         { 116, { 38, 76 }, { 55, 132 } },
         { 119, { 36, 72 }, { 83, 199 } },
@@ -305,6 +311,7 @@ int SelectSkillLevel(void) {
         { 43, { 227, 454 }, { 158, 379 } }
     };
 
+    // GLOBAL: CARM95 0x0051ed98
     static tFlicette flicker_off[4] = {
         { 115, { 38, 76 }, { 55, 132 } },
         { 118, { 36, 72 }, { 83, 199 } },
@@ -312,12 +319,14 @@ int SelectSkillLevel(void) {
         { 42, { 227, 454 }, { 158, 379 } }
     };
 
+    // GLOBAL: CARM95 0x0051ede8
     static tFlicette push[4] = {
         { 117, { 38, 76 }, { 55, 132 } },
         { 117, { 36, 72 }, { 83, 199 } },
         { 117, { 38, 76 }, { 111, 266 } },
         { 45, { 227, 454 }, { 158, 379 } }
     };
+    // GLOBAL: CARM95 0x0051ee38
     static tMouse_area mouse_areas[4] = {
         { { 38, 76 }, { 55, 132 }, { 205, 410 }, { 69, 166 }, 0, 0, 0, NULL },
         { { 36, 72 }, { 83, 199 }, { 205, 410 }, { 98, 235 }, 1, 0, 0, NULL },
@@ -325,6 +334,7 @@ int SelectSkillLevel(void) {
         { { 227, 454 }, { 158, 379 }, { 290, 580 }, { 178, 427 }, 3, 0, 0, NULL }
     };
 
+    // GLOBAL: CARM95 0x0051eef8
     static tInterface_spec interface_spec = {
         0,              // initial_imode
         110,            // first_opening_flic
@@ -752,23 +762,28 @@ int NewNetGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: tJoin_or_host_result __usercall JoinOrHostGame@<EAX>(tNet_game_details **pGame_to_join@<EAX>)
 // FUNCTION: CARM95 0x004b1113
 tJoin_or_host_result JoinOrHostGame(tNet_game_details** pGame_to_join) {
+    // GLOBAL: CARM95 0x0051f028
     static tFlicette flicker_on[2] = {
         { 43, { 41, 122 }, { 164, 370 } },
         { 43, { 230, 440 }, { 164, 370 } },
     };
+    // GLOBAL: CARM95 0x0051f050
     static tFlicette flicker_off[2] = {
         { 42, { 41, 122 }, { 164, 370 } },
         { 42, { 230, 440 }, { 164, 370 } },
     };
+    // GLOBAL: CARM95 0x0051f078
     static tFlicette push[2] = {
         { 90, { 41, 122 }, { 164, 370 } },
         { 45, { 230, 440 }, { 164, 370 } },
     };
+    // GLOBAL: CARM95 0x0051f0a0
     static tMouse_area mouse_areas[3] = {
         { { 41, 122 }, { 164, 370 }, { 104, 326 }, { 184, 422 }, 0, 0, 1, NULL },
         { { 230, 440 }, { 164, 370 }, { 293, 568 }, { 184, 422 }, 1, 0, 1, NULL },
         { { 42, 94 }, { 57, 137 }, { 290, 556 }, { 150, 341 }, 2, 1, 1, NULL },
     };
+    // GLOBAL: CARM95 0x0051f130
     static tRectile recopy_areas[1] = {
         {
             { 124, 110 },
@@ -777,6 +792,7 @@ tJoin_or_host_result JoinOrHostGame(tNet_game_details** pGame_to_join) {
             { 180, 370 },
         },
     };
+    // GLOBAL: CARM95 0x0051f150
     static tInterface_spec interface_spec = {
         0,
         100,
@@ -1222,6 +1238,7 @@ void DrawNetOptBox(int pCurrent_choice, int pCurrent_mode) {
 // IDA: void __usercall DoNetOptions(tNet_game_options *pGame_options@<EAX>)
 // FUNCTION: CARM95 0x004b2d37
 void DoNetOptions(tNet_game_options* pGame_options) {
+    // GLOBAL: CARM95 0x0051f280
     static tFlicette flicker_on[14] = {
         { 43, { 169, 90 }, { 156, 398 } },
         { 43, { 236, 440 }, { 156, 398 } },
@@ -1238,6 +1255,7 @@ void DoNetOptions(tNet_game_options* pGame_options) {
         { 139, { 81, 98 }, { 130, 310 } },
         { 143, { 81, 98 }, { 141, 331 } },
     };
+    // GLOBAL: CARM95 0x0051f398
     static tFlicette flicker_off[14] = {
         { 42, { 169, 90 }, { 156, 398 } },
         { 42, { 236, 440 }, { 156, 398 } },
@@ -1254,6 +1272,7 @@ void DoNetOptions(tNet_game_options* pGame_options) {
         { 142, { 81, 98 }, { 130, 310 } },
         { 148, { 81, 98 }, { 141, 331 } },
     };
+    // GLOBAL: CARM95 0x0051f4b0
     static tFlicette push[14] = {
         { 154, { 169, 90 }, { 156, 398 } },
         { 45, { 236, 440 }, { 156, 398 } },
@@ -1270,6 +1289,7 @@ void DoNetOptions(tNet_game_options* pGame_options) {
         { 139, { 81, 98 }, { 130, 310 } },
         { 143, { 81, 98 }, { 141, 331 } },
     };
+    // GLOBAL: CARM95 0x0051f5c8
     static tMouse_area mouse_areas[14] = {
         { { 169, 90 }, { 156, 396 }, { 232, 214 }, { 176, 444 }, 0, 0, 0, NULL },
         { { 236, 440 }, { 156, 396 }, { 299, 552 }, { 176, 444 }, 1, 0, 0, NULL },
@@ -1286,6 +1306,7 @@ void DoNetOptions(tNet_game_options* pGame_options) {
         { { 61, 98 }, { 128, 329 }, { 270, 322 }, { 138, 348 }, 12, 1, 0, NetRadioClick },
         { { 61, 98 }, { 139, 358 }, { 270, 322 }, { 149, 377 }, 13, 1, 0, NetRadioClick },
     };
+    // GLOBAL: CARM95 0x0051f868
     static tInterface_spec interface_spec = {
         0, 65, 0, 66, 66, 66, -1,
         { -1, 0 }, { -1, 0 }, { 0, 3 }, { 2, 13 }, { NULL, NetOptLeft },
@@ -1499,6 +1520,7 @@ void SetGameTarget(tNet_game_type* pGame_type, tNet_game_options* pGame_options)
 // IDA: int __usercall NetGameChoices@<EAX>(tNet_game_type *pGame_type@<EAX>, tNet_game_options *pGame_options@<EDX>, int *pRace_index@<EBX>)
 // FUNCTION: CARM95 0x004b2ba3
 int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options, int* pRace_index) {
+    // GLOBAL: CARM95 0x0051f998
     static tFlicette flicker_on[11] = {
         { 43, { 226, 90 }, { 117, 398 } },
         { 43, { 226, 440 }, { 148, 398 } },
@@ -1512,6 +1534,7 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
         { 167, { 74, 98 }, { 123, 266 } },
         { 168, { 74, 98 }, { 133, 288 } },
     };
+    // GLOBAL: CARM95 0x0051fa78
     static tFlicette flicker_off[11] = {
         { 42, { 226, 90 }, { 117, 398 } },
         { 42, { 226, 440 }, { 148, 398 } },
@@ -1525,6 +1548,7 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
         { 187, { 74, 98 }, { 123, 266 } },
         { 188, { 74, 98 }, { 133, 288 } },
     };
+    // GLOBAL: CARM95 0x0051fb58
     static tFlicette push[11] = {
         { 88, { 227, 90 }, { 117, 398 } },
         { 45, { 226, 440 }, { 148, 398 } },
@@ -1538,6 +1562,7 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
         { 167, { 74, 98 }, { 123, 266 } },
         { 168, { 74, 98 }, { 133, 288 } },
     };
+    // GLOBAL: CARM95 0x0051fc38
     static tMouse_area mouse_areas[11] = {
         { { 226, 90 }, { 117, 396 }, { 290, 214 }, { 137, 444 }, 0, 0, 0, NULL },
         { { 226, 440 }, { 148, 396 }, { 290, 552 }, { 168, 444 }, 1, 0, 0, NULL },
@@ -1556,7 +1581,7 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
     static tInterface_spec interface_spec = {
         0, 122, 0, 0, 0, 0, -1,
         { 1, 0 }, { 4, -10 }, { 4, 0 }, { 4, 0 }, { NetChooseLR, NULL },
-        { 1, 0 }, { 3, -10 }, { 4, 0 }, { 4, 0 }, { NetChooseLR, NULL },
+        { 1, 0 }, { 4, -10 }, { 4, 0 }, { 4, 0 }, { NetChooseLR, NULL },
         { -1, -1 }, { -1, -1 }, { 0, 4 }, { 3, 10 }, { NULL, NULL },
         { -1, -1 }, { 1, 1 }, { 0, 4 }, { 3, 10 }, { NULL, NULL },
         { 1, 1 }, { NetChooseGoAhead, NetChooseGoAhead }, { 1, 1 }, { NULL, NULL },

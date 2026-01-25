@@ -467,13 +467,18 @@ int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 // IDA: int __usercall DoVerifyQuit@<EAX>(int pReplace_background@<EAX>)
 // FUNCTION: CARM95 0x0044b25a
 int DoVerifyQuit(int pReplace_background) {
+    // GLOBAL: CARM95 0x0050db90
     static tFlicette flicker_on[2] = { { 43, { 181, 362 }, { 124, 298 } }, { 43, { 84, 168 }, { 124, 298 } } };
+    // GLOBAL: CARM95 0x0050dbb8
     static tFlicette flicker_off[2] = { { 42, { 181, 362 }, { 124, 298 } }, { 42, { 84, 168 }, { 124, 298 } } };
+    // GLOBAL: CARM95 0x0050dbe0
     static tFlicette push[2] = { { 135, { 181, 362 }, { 124, 298 } }, { 45, { 84, 168 }, { 124, 298 } } };
+    // GLOBAL: CARM95 0x0050dc08
     static tMouse_area mouse_areas[2] = {
         { { 181, 362 }, { 124, 298 }, { 244, 488 }, { 144, 346 }, 0, 0, 0, NULL },
         { { 84, 168 }, { 124, 298 }, { 147, 294 }, { 144, 346 }, 1, 0, 0, NULL }
     };
+    // GLOBAL: CARM95 0x0050dc68
     static tInterface_spec interface_spec = {
         0,                 // initial_imode
         0,                 // first_opening_flic
