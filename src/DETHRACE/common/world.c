@@ -3171,11 +3171,14 @@ void FreeTrack(tTrack_spec* pTrack_spec) {
     if (gCurrent_race.map_image != NULL) {
         BrPixelmapFree(gCurrent_race.map_image);
     }
+    if (gProgram_state.special_volume_count != 0) {
+        BrMemFree(gProgram_state.special_volumes);
+    }
     if (gProgram_state.special_screens_count != 0) {
         BrMemFree(gProgram_state.special_screens);
     }
     PossibleService();
-    for (i = 0, non_car = gProgram_state.non_cars; i < gProgram_state.num_non_car_spaces; i++, non_car++) {
+    for (non_car = gProgram_state.non_cars, i = 0; i < gProgram_state.num_non_car_spaces; i++, non_car++) {
         PossibleService();
         if (non_car->collision_info.driver == eDriver_non_car && non_car->collision_info.car_master_actor != NULL) {
             BrActorRemove(non_car->collision_info.car_master_actor);
