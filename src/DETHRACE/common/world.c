@@ -1797,7 +1797,7 @@ void DeleteAnyZeroBastards(void) {
 
     gDelete_count = 0;
     DRActorEnumRecurseWithTrans(gAdditional_actors, NULL, DeleteBastards, NULL);
-    for (i = 0; i < gDelete_count; i++) {
+    for (i = gDelete_count - 1; i >= 0; --i) {
         BrActorRemove(gDelete_list[i]);
     }
 }
