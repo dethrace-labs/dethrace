@@ -2369,26 +2369,14 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
 // IDA: void __cdecl DisposeTexturingMaterials()
 // FUNCTION: CARM95 0x0043cd4f
 void DisposeTexturingMaterials(void) {
-
-    switch (gWall_texturing_level) {
-    case eWTL_linear:
+    if (gWall_texturing_level == eWTL_linear) {
         ProcessFaceMaterials(gProgram_state.track_spec.the_actor, WallLinearToPersp);
-        break;
-    case eWTL_none:
+    } else if (gWall_texturing_level == eWTL_none) {
         ProcessFaceMaterials(gProgram_state.track_spec.the_actor, WallUntexToPersp);
-        break;
-    default:
-        break;
     }
-
-    switch (gRoad_texturing_level) {
-    case eRTL_none:
+    if (gRoad_texturing_level == eRTL_none) {
         ProcessFaceMaterials(gProgram_state.track_spec.the_actor, RoadUntexToPersp);
-        break;
-    default:
-        break;
     }
-
     if (gWall_texturing_level != eWTL_full || gRoad_texturing_level != eRTL_full) {
         ProcessFaceMaterials(gProgram_state.track_spec.the_actor, DisposeSuffixedMaterials);
     }
