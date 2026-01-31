@@ -2340,27 +2340,27 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
     size_t max_suffix_len;
     br_material* mat;
     br_material* victim;
+    // GLOBAL: CARM95 0x0050C810
     static char* suffixes[3] = { ".road", ".pwall", ".lwall" };
     int s;
     char* id;
 
     mat = pModel->faces[pFace].material;
-    if (mat->identifier == NULL) {
-        return NULL;
-    }
-    max_suffix_len = 0;
-    for (s = 0; s < BR_ASIZE(suffixes); s++) {
-        if (max_suffix_len < strlen(suffixes[s])) {
-            max_suffix_len = strlen(suffixes[s]);
+    if (mat->identifier != NULL) {
+        max_suffix_len = 0;
+        for (s = 0; s < BR_ASIZE(suffixes); s++) {
+            if (max_suffix_len < strlen(suffixes[s])) {
+                max_suffix_len = strlen(suffixes[s]);
+            }
         }
-    }
-    id = BrMemAllocate(strlen(mat->identifier) + max_suffix_len + 1, kMem_new_mat_id_3);
-    for (s = 0; s < BR_ASIZE(suffixes); s++) {
-        sprintf(id, "%s%s", mat->identifier, suffixes[s]);
-        victim = BrMaterialFind(id);
-        if (victim != NULL) {
-            BrMaterialRemove(victim);
-            BrMaterialFree(victim);
+        id = BrMemAllocate(strlen(mat->identifier) + max_suffix_len + 1, kMem_new_mat_id_3);
+        for (s = 0; s < BR_ASIZE(suffixes); s++) {
+            sprintf(id, "%s%s", mat->identifier, suffixes[s]);
+            victim = BrMaterialFind(id);
+            if (victim != NULL) {
+                BrMaterialRemove(victim);
+                BrMaterialFree(victim);
+            }
         }
     }
     return NULL;
