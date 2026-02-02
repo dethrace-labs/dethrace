@@ -168,15 +168,15 @@ char* gFont_names[21] = {
 
 // GLOBAL: CARM95 0x005201a0
 br_colour gRGB_colours[9] = {
-    0u,
-    16777215u,
-    16711680u,
-    65280u,
-    255u,
-    16776960u,
-    65535u,
-    16711935u,
-    13649666u
+    BR_COLOUR_RGB(0x00 ,0x00, 0x00),
+    BR_COLOUR_RGB(0xff, 0xff, 0xff),
+    BR_COLOUR_RGB(0xff, 0x00, 0x00),
+    BR_COLOUR_RGB(0x00, 0xff, 0x00),
+    BR_COLOUR_RGB(0x00, 0x00, 0xff),
+    BR_COLOUR_RGB(0xff, 0xff, 0x00),
+    BR_COLOUR_RGB(0x00, 0xff, 0xff),
+    BR_COLOUR_RGB(0xff, 0x00, 0xff),
+    BR_COLOUR_RGB(0xd0, 0x47, 0x02)
 };
 
 // GLOBAL: CARM95 0x005201c8
