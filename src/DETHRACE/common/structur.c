@@ -175,7 +175,7 @@ void IncrementCheckpoint(void) {
             RaceCompleted(eRace_over_laps);
         } else if (gLap == gTotal_laps) {
             PratcamEvent(kPratcam_checkpoint);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_FinalLap));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_FinalLap));
             DRS3StartSound(gPedestrians_outlet, 8014);
             done_voice = 1;
         }
@@ -222,7 +222,7 @@ void WrongCheckpoint(int pCheckpoint_index) {
     if ((pCheckpoint_index == gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 20000) || (pCheckpoint_index != gLast_wrong_checkpoint && GetTotalTime() - gLast_checkpoint_time > 2000)) {
 
         if (gNet_mode != eNet_mode_none || (gCheckpoint != ((pCheckpoint_index + 2 > gCurrent_race.check_point_count) ? ((gLap == 1) ? -1 : 1) : (pCheckpoint_index + 2)))) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_WrongCheckpoint));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_WrongCheckpoint));
             DRS3StartSound(gPedestrians_outlet, 8013);
             gLast_checkpoint_time = GetTotalTime();
             gLast_wrong_checkpoint = pCheckpoint_index;
@@ -314,7 +314,7 @@ void CheckCheckpoints(void) {
 void TotalRepair(void) {
 
     TotallyRepairCar();
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_InstantRepair));
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_InstantRepair));
 }
 
 // IDA: void __cdecl DoLogos()
@@ -736,7 +736,7 @@ void JumpTheStart(void) {
     DRS3StartSound(gPedestrians_outlet, 8016);
     SpendCredits(gJump_start_fine[gProgram_state.skill_level]);
     sprintf(s, "%s %d %s", GetMiscString(gProgram_state.frank_or_anniness == eFrankie ? kMiscString_BadBoy : kMiscString_BadGirl), gJump_start_fine[gProgram_state.skill_level], GetMiscString(kMiscString_CreditFine));
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, s);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, s);
 }
 
 // IDA: void __cdecl GoingToInterfaceFromRace()

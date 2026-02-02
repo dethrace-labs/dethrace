@@ -4509,7 +4509,7 @@ void AccessoryHeadup(br_actor* pActor, char* pPrefix) {
     if (pActor->identifier != NULL) {
         strcat(s, pActor->identifier);
     }
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, s);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, s);
 }
 
 // IDA: br_uint_32 __cdecl CalcHighestNonAmID(br_actor *pActor, int *pHighest)
@@ -5019,13 +5019,13 @@ void CycleAccRotate(void) {
     gCurrent_rotate_mode = (gCurrent_rotate_mode == eRotate_mode_z) ? eRotate_mode_x : (gCurrent_rotate_mode + 1);
     switch (gCurrent_rotate_mode) {
     case eRotate_mode_x:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "Rotate mode: X");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "Rotate mode: X");
         break;
     case eRotate_mode_y:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "Rotate mode: Y");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "Rotate mode: Y");
         break;
     case eRotate_mode_z:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "Rotate mode: Z");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "Rotate mode: Z");
         break;
     }
 }
@@ -5037,16 +5037,16 @@ void CycleAccScale(void) {
     gCurrent_scale_mode = (gCurrent_scale_mode == eScale_mode_z) ? eScale_mode_all : (gCurrent_scale_mode + 1);
     switch (gCurrent_scale_mode) {
     case eScale_mode_all:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "Scale mode: ALL");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "Scale mode: ALL");
         break;
     case eScale_mode_x:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "Scale mode: X");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "Scale mode: X");
         break;
     case eScale_mode_y:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "Scale mode: Y");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "Scale mode: Y");
         break;
     case eScale_mode_z:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "Scale mode: Z");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "Scale mode: Z");
         break;
     }
 }
@@ -5393,7 +5393,7 @@ void DropSpecVol(int pIndex) {
     gLast_actor = gSpec_vol_actors[gProgram_state.special_volume_count - 1];
     UpdateSpecVol();
     sprintf(s, "Shat out special volume #%d (type %d)", gProgram_state.special_volume_count - 1, pIndex);
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, s);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, s);
     SaveSpecialVolumes();
     fclose(f);
 }
@@ -5490,10 +5490,10 @@ void IdentifySpecVol(void) {
     }
     if (min_index < 0) {
         gLast_actor = NULL;
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "No special volumes to lock onto");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "No special volumes to lock onto");
     } else {
         sprintf(s, "Locked onto Special Volume #%d", min_index);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, s);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, s);
         gLast_actor = gSpec_vol_actors[min_index];
     }
 }
@@ -5538,7 +5538,7 @@ void DeleteSpecVol(void) {
     memmove(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
     memmove(&gSpec_vol_actors[index], &gSpec_vol_actors[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(br_actor*));
     gProgram_state.special_volume_count--;
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "There's been a special volumes MURDER!!");
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "There's been a special volumes MURDER!!");
     gLast_actor = NULL;
     if (&gProgram_state.special_volumes[index] < gDefault_water_spec_vol) {
         gDefault_water_spec_vol--;

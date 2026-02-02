@@ -522,7 +522,7 @@ void TotallyRepairCar(void) {
 void CheckLastCar(void) {
 
     if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -4, GetMiscString(kMiscString_EveryOpponentWasted));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -kFont_MEDIUMHD, GetMiscString(kMiscString_EveryOpponentWasted));
         RaceCompleted(eRace_over_opponents);
     }
 }
