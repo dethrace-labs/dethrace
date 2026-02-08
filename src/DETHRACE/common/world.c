@@ -4295,9 +4295,9 @@ void GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it) 
         the_mat->m[3][1] = -pGroove->object_centre.v[1];
         the_mat->m[3][2] = -pGroove->object_centre.v[2];
         ObjectGrooveBastard(pGroove, pTime, the_mat, pInterrupt_it);
-        the_actor->t.t.mat.m[3][0] += pGroove->object_position.v[0] + pGroove->object_centre.v[0];
-        the_actor->t.t.mat.m[3][1] += pGroove->object_position.v[1] + pGroove->object_centre.v[1];
-        the_actor->t.t.mat.m[3][2] += pGroove->object_position.v[2] + pGroove->object_centre.v[2];
+        the_mat->m[3][0] += pGroove->object_position.v[0] + pGroove->object_centre.v[0];
+        the_mat->m[3][1] += pGroove->object_position.v[1] + pGroove->object_centre.v[1];
+        the_mat->m[3][2] += pGroove->object_position.v[2] + pGroove->object_centre.v[2];
         if (pGroove->lollipop_mode != eLollipop_none) {
             LollipopizeActor(pGroove->actor, &gCamera_to_world, pGroove->lollipop_mode);
         }
