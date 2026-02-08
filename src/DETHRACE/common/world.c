@@ -3429,28 +3429,53 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
     BrActorToActorMatrix34(&subject_to_world, pSubject_actor, gNon_track_actor);
     BrVector3Sub(&ref_to_subject, (br_vector3*)ref_to_world->m[3], (br_vector3*)subject_to_world.m[3]);
     switch (pWhich_axis) {
-    case eLollipop_none:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
-        break;
     case eLollipop_x_match:
-        BrVector3SetFloat(&vector_a, 1.f, 0.f, 0.f);
+        BrVector3SetFloat(&fixed_axis, 1.f, 0.f, 0.f);
         break;
     case eLollipop_y_match:
-        BrVector3SetFloat(&vector_a, 0.f, 1.f, 0.f);
+        BrVector3SetFloat(&fixed_axis, 0.f, 1.f, 0.f);
         break;
     case eLollipop_z_match:
-        BrVector3SetFloat(&vector_a, 0.f, 0.f, 1.f);
+        BrVector3SetFloat(&fixed_axis, 0.f, 0.f, 1.f);
         break;
-    }
-    BrVector3Cross(&vector_b, &ref_to_subject, &vector_a);
-    BrVector3Normalise(&vector_b, &vector_b);
 
-    BrVector3Cross(&fixed_axis, &vector_a, &vector_b);
+        DETHRACE_DEFAULT_BREAK;
+    }
+    BrVector3Cross(&vector_a, &ref_to_subject, &fixed_axis);
+    BrVector3Normalise(&vector_a, &vector_a);
+
+    BrVector3Cross(&vector_b, &fixed_axis, &vector_a);
 
     switch (pWhich_axis) {
-    case eLollipop_none:
-        break;
     case eLollipop_x_match:
+        mat.m[0][0] = fixed_axis.v[0];
+        mat.m[1][0] = fixed_axis.v[1];
+        mat.m[2][0] = fixed_axis.v[2];
+        mat.m[0][1] = vector_a.v[0];
+        mat.m[1][1] = vector_a.v[1];
+        mat.m[2][1] = vector_a.v[2];
+        mat.m[0][2] = vector_b.v[0];
+        mat.m[1][2] = vector_b.v[1];
+        mat.m[2][2] = vector_b.v[2];
+        mat.m[3][0] = 0.f;
+        mat.m[3][1] = 0.f;
+        mat.m[3][2] = 0.f;
+        break;
+    case eLollipop_y_match:
+        mat.m[0][0] = vector_a.v[0];
+        mat.m[1][0] = vector_a.v[1];
+        mat.m[2][0] = vector_a.v[2];
+        mat.m[0][1] = fixed_axis.v[0];
+        mat.m[1][1] = fixed_axis.v[1];
+        mat.m[2][1] = fixed_axis.v[2];
+        mat.m[0][2] = vector_b.v[0];
+        mat.m[1][2] = vector_b.v[1];
+        mat.m[2][2] = vector_b.v[2];
+        mat.m[3][0] = 0.f;
+        mat.m[3][1] = 0.f;
+        mat.m[3][2] = 0.f;
+        break;
+    case eLollipop_z_match:
         mat.m[0][0] = vector_a.v[0];
         mat.m[1][0] = vector_a.v[1];
         mat.m[2][0] = vector_a.v[2];
@@ -3464,34 +3489,8 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
         mat.m[3][1] = 0.f;
         mat.m[3][2] = 0.f;
         break;
-    case eLollipop_y_match:
-        mat.m[0][0] = vector_b.v[0];
-        mat.m[1][0] = vector_b.v[1];
-        mat.m[2][0] = vector_b.v[2];
-        mat.m[0][1] = vector_a.v[0];
-        mat.m[1][1] = vector_a.v[1];
-        mat.m[2][1] = vector_a.v[2];
-        mat.m[0][2] = fixed_axis.v[0];
-        mat.m[1][2] = fixed_axis.v[1];
-        mat.m[2][2] = fixed_axis.v[2];
-        mat.m[3][0] = 0.f;
-        mat.m[3][1] = 0.f;
-        mat.m[3][2] = 0.f;
-        break;
-    case eLollipop_z_match:
-        mat.m[0][0] = vector_b.v[0];
-        mat.m[1][0] = vector_b.v[1];
-        mat.m[2][0] = vector_b.v[2];
-        mat.m[0][1] = vector_a.v[0];
-        mat.m[1][1] = vector_a.v[1];
-        mat.m[2][1] = vector_a.v[2];
-        mat.m[0][2] = fixed_axis.v[0];
-        mat.m[1][2] = fixed_axis.v[1];
-        mat.m[2][2] = fixed_axis.v[2];
-        mat.m[3][0] = 0.f;
-        mat.m[3][1] = 0.f;
-        mat.m[3][2] = 0.f;
-        break;
+
+        DETHRACE_DEFAULT_BREAK;
     }
     BrMatrix34Pre(&pSubject_actor->t.t.mat, &mat);
 }
