@@ -3519,10 +3519,7 @@ int PointOutOfSight(br_vector3* pPoint, br_scalar pMax_distance) {
         distance_vector.v[0] = pPoint->v[0] - gRearview_camera_to_world.m[3][0];
         distance_vector.v[1] = pPoint->v[1] - gRearview_camera_to_world.m[3][1];
         distance_vector.v[2] = pPoint->v[2] - gRearview_camera_to_world.m[3][2];
-        if (distance_vector.v[0] * distance_vector.v[0]
-                    + distance_vector.v[1] * distance_vector.v[1]
-                    + distance_vector.v[2] * distance_vector.v[2]
-                < pMax_distance
+        if (BrVector3LengthSquared(&distance_vector) < pMax_distance
             && gRearview_camera_to_world.m[2][2] * distance_vector.v[2]
                     + gRearview_camera_to_world.m[2][1] * distance_vector.v[1]
                     + gRearview_camera_to_world.m[2][0] * distance_vector.v[0]
@@ -3533,8 +3530,14 @@ int PointOutOfSight(br_vector3* pPoint, br_scalar pMax_distance) {
     distance_vector.v[0] = pPoint->v[0] - gCamera_to_world.m[3][0];
     distance_vector.v[1] = pPoint->v[1] - gCamera_to_world.m[3][1];
     distance_vector.v[2] = pPoint->v[2] - gCamera_to_world.m[3][2];
-    return distance_vector.v[0] * distance_vector.v[0] + distance_vector.v[1] * distance_vector.v[1] + distance_vector.v[2] * distance_vector.v[2] >= pMax_distance
-        || gCamera_to_world.m[2][2] * distance_vector.v[2] + gCamera_to_world.m[2][1] * distance_vector.v[1] + gCamera_to_world.m[2][0] * distance_vector.v[0] >= 0.0f;
+    if (BrVector3LengthSquared(&distance_vector) >= pMax_distance) {
+        return 1;
+    }
+    if (gCamera_to_world.m[2][2] * distance_vector.v[2] + gCamera_to_world.m[2][1] * distance_vector.v[1] + gCamera_to_world.m[2][0] * distance_vector.v[0] >= 0.0f) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 // IDA: void __usercall PathGrooveBastard(tGroovidelic_spec *pGroove@<EAX>, tU32 pTime@<EDX>, br_matrix34 *pMat@<EBX>, int pInterrupt_it@<ECX>)
