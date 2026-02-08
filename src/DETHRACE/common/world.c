@@ -4368,10 +4368,8 @@ void ResetGrooveFlags(void) {
     int i;
     tGroovidelic_spec* the_groove;
 
-    the_groove = gGroovidelics_array;
-    for (i = 0; i < gGroovidelics_array_size; i++) {
+    for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
         the_groove->done_this_frame = 0;
-        the_groove++;
     }
 }
 
