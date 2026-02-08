@@ -4339,8 +4339,7 @@ void StopGroovidelic(br_actor* pActor) {
     int i;
     tGroovidelic_spec* the_groove;
 
-    for (i = 0; i < gGroovidelics_array_size; i++) {
-        the_groove = &gGroovidelics_array[i];
+    for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
         if (the_groove->actor == pActor) {
             if (the_groove->path_interrupt_status == eInterrupt_none && the_groove->object_interrupt_status == eInterrupt_none) {
                 GrooveThisDelic(the_groove, gPrevious_groove_times[1], 1);
