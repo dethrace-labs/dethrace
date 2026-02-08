@@ -175,10 +175,10 @@ br_scalar gSight_distance_squared;
 // FUNCTION: CARM95 0x0043f377
 float MapSawToTriangle(float pNumber) {
 
-    if (pNumber >= 0.5) {
-        return 3.0 - pNumber * 4.0;
+    if (pNumber < 0.5) {
+        return pNumber * 4.0f - 1.0f;
     } else {
-        return pNumber * 4.0 - 1.0;
+        return 3.0f - pNumber * 4.0f;
     }
 }
 
