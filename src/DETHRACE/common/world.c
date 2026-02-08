@@ -4321,12 +4321,11 @@ void GrooveThoseDelics(void) {
     float f_the_time;
 
     if (gGroovidelics_array != NULL) {
-        f_the_time = (double)GetTotalTime();
+        f_the_time = (float)GetTotalTime();
         gPrevious_groove_times[1] = gPrevious_groove_times[0];
         gPrevious_groove_times[0] = f_the_time;
 
-        for (i = 0; i < gGroovidelics_array_size; i++) {
-            the_groove = &gGroovidelics_array[i];
+        for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
             if (the_groove->owner != NO_OWNER && !the_groove->done_this_frame) {
                 GrooveThisDelic(the_groove, f_the_time, 0);
             }
