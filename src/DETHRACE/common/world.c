@@ -4944,56 +4944,56 @@ void MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift) {
 // FUNCTION: CARM95 0x004445c1
 void RotateAccL(void) {
 
-    RotateAccessory(BrDegreeToAngle(90));
+    RotateAccessory(BR_ANGLE_DEG(90));
 }
 
 // IDA: void __cdecl RotateAccL2()
 // FUNCTION: CARM95 0x0044491e
 void RotateAccL2(void) {
 
-    RotateAccessory(BrDegreeToAngle(15));
+    RotateAccessory(BR_ANGLE_DEG(15));
 }
 
 // IDA: void __cdecl RotateAccL3()
 // FUNCTION: CARM95 0x00444936
 void RotateAccL3(void) {
 
-    RotateAccessory(BrDegreeToAngle(5));
+    RotateAccessory(BR_ANGLE_DEG(5));
 }
 
 // IDA: void __cdecl RotateAccL4()
 // FUNCTION: CARM95 0x0044494e
 void RotateAccL4(void) {
 
-    RotateAccessory(BrDegreeToAngle(1));
+    RotateAccessory(BR_ANGLE_DEG(1));
 }
 
 // IDA: void __cdecl RotateAccR()
 // FUNCTION: CARM95 0x00444966
 void RotateAccR(void) {
 
-    RotateAccessory(BrDegreeToAngle(270));
+    RotateAccessory(BR_ANGLE_DEG(-90));
 }
 
 // IDA: void __cdecl RotateAccR2()
 // FUNCTION: CARM95 0x0044497e
 void RotateAccR2(void) {
 
-    RotateAccessory(BrDegreeToAngle(345));
+    RotateAccessory(BR_ANGLE_DEG(-15));
 }
 
 // IDA: void __cdecl RotateAccR3()
 // FUNCTION: CARM95 0x00444996
 void RotateAccR3(void) {
 
-    RotateAccessory(BrDegreeToAngle(355));
+    RotateAccessory(BR_ANGLE_DEG(-5));
 }
 
 // IDA: void __cdecl RotateAccR4()
 // FUNCTION: CARM95 0x004449ae
 void RotateAccR4(void) {
 
-    RotateAccessory(BrDegreeToAngle(359));
+    RotateAccessory(BR_ANGLE_DEG(-1));
 }
 
 // IDA: void __cdecl CycleAccRotate()
