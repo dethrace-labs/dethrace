@@ -4497,19 +4497,20 @@ br_uint_32 CalcHighestNonAmID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
 
-    if (pActor->identifier == NULL || pActor->identifier[0] == '&') {
-        return 0;
+    if (pActor->identifier != NULL && pActor->identifier[0] == '&') {
+
+        if (strlen(pActor->identifier) != 12) {
+            number = 0;
+        } else {
+            strcpy(s, &pActor->identifier[4]);
+            strtok(s, ".");
+            sscanf(s, "%d", &number);
+        }
+        if (*pHighest < number) {
+            *pHighest = number;
+        }
     }
-    if (strlen(pActor->identifier) == 12) {
-        strcpy(s, &pActor->identifier[4]);
-        strtok(s, ".");
-        sscanf(s, "%d", &number);
-    } else {
-        number = 0;
-    }
-    if (*pHighest < number) {
-        *pHighest = number;
-    }
+
     return 0;
 }
 
