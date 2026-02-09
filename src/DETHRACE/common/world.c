@@ -4742,17 +4742,17 @@ br_uint_32 IdentifyAccCB(br_actor* pActor, void* pArg) {
     char s[256];
     br_vector3 v;
 
-    if (pActor == NULL || pActor->model == NULL) {
-        return 0;
-    }
-    BrVector3Add(&v, &pActor->model->bounds.max, &pActor->model->bounds.min);
-    BrVector3InvScale(&v, &v, 2.f);
-    BrVector3Accumulate(&v, &pActor->t.t.translate.t);
-    BrVector3Sub(&v, &v, gOur_pos);
-    distance = BrVector3LengthSquared(&v);
-    if (distance < gNearest_distance) {
-        gNearest_actor = pActor;
-        gNearest_distance = distance;
+    if (pActor != NULL && pActor->model != NULL) {
+        v.v[0] = (pActor->model->bounds.max.v[0] + pActor->model->bounds.min.v[0]) / 2.0f;
+        v.v[1] = (pActor->model->bounds.max.v[1] + pActor->model->bounds.min.v[1]) / 2.0f;
+        v.v[2] = (pActor->model->bounds.max.v[2] + pActor->model->bounds.min.v[2]) / 2.0f;
+        BrVector3Accumulate(&v, &pActor->t.t.translate.t);
+        BrVector3Sub(&v, &v, gOur_pos);
+        distance = BrVector3LengthSquared(&v);
+        if (distance < gNearest_distance) {
+            gNearest_distance = distance;
+            gNearest_actor = pActor;
+        }
     }
     return 0;
 }
