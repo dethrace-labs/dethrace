@@ -4436,14 +4436,13 @@ br_uint_32 CalcHighestID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
 
-    if (pActor->identifier == NULL || pActor->identifier[0] == '@') {
-        return 0;
-    }
-    strcpy(s, &pActor->identifier[4]);
-    s[4] = '\0';
-    sscanf(s, "%d", &number);
-    if (*pHighest < number) {
-        *pHighest = number;
+    if (pActor->identifier != NULL && pActor->identifier[0] == '@') {
+        strcpy(s, &pActor->identifier[4]);
+        s[4] = '\0';
+        sscanf(s, "%d", &number);
+        if (*pHighest < number) {
+            *pHighest = number;
+        }
     }
     return 0;
 }
