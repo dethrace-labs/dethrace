@@ -4388,11 +4388,26 @@ tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
     br_vector3 p;
 
     for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
-        if (!v->no_mat && v->bounds.min.v[0] < pP->v[0] && pP->v[0] < v->bounds.max.v[0] && v->bounds.min.v[1] < pP->v[1] && pP->v[1] < v->bounds.max.v[1] && v->bounds.min.v[2] < pP->v[2] && pP->v[2] < v->bounds.max.v[2]) {
+        if (v->no_mat) {
+            continue;
+        }
+        if (v->bounds.min.v[0] < pP->v[0]
+            && v->bounds.max.v[0] > pP->v[0]
+            && v->bounds.min.v[2] < pP->v[2]
+            && v->bounds.max.v[2] > pP->v[2]
+            && v->bounds.min.v[1] < pP->v[1]
+            && v->bounds.max.v[1] > pP->v[1]) {
             BrMatrix34ApplyP(&p, pP, &v->inv_mat);
-            if (-1.f < p.v[0] && p.v[0] < 1.f && -1.f < p.v[1] && p.v[1] < 1.f && -1.f < p.v[2] && p.v[2] < 1.f) {
-                return v;
+            if (p.v[0] < -1.f || p.v[0] > 1.f) {
+                continue;
             }
+            if (p.v[1] < -1.f || p.v[1] > 1.f) {
+                continue;
+            }
+            if (p.v[2] < -1.f || p.v[2] > 1.f) {
+                continue;
+            }
+            return v;
         }
     }
     return NULL;
