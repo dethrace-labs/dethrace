@@ -4844,16 +4844,20 @@ void OffsetActor(br_actor* pActor, br_vector3* pOffset) {
 // FUNCTION: CARM95 0x00444803
 void CentreActor(br_actor* pActor, br_vector3* pOffset) {
 
-    if (pActor->model == NULL) {
-        BrVector3Set(pOffset, 0.f, 0.f, 0.f);
-    } else if (gKnown_actor == gLast_actor) {
-        BrVector3Scale(pOffset, &gActor_centre, -1.f);
+    if (pActor->model != NULL) {
+        if (gKnown_actor == gLast_actor) {
+            BrVector3Scale(pOffset, &gActor_centre, -1.f);
+        } else {
+            pOffset->v[0] = (pActor->model->bounds.max.v[0] + pActor->model->bounds.min.v[0]) / -2.0f;
+            pOffset->v[1] = (pActor->model->bounds.max.v[1] + pActor->model->bounds.min.v[1]) / -2.0f;
+            pOffset->v[2] = (pActor->model->bounds.max.v[2] + pActor->model->bounds.min.v[2]) / -2.0f;
+        }
     } else {
-        BrVector3Add(pOffset, &pActor->model->bounds.max, &pActor->model->bounds.min);
-        BrVector3Scale(pOffset, pOffset, -2.f);
+        BrVector3Set(pOffset, 0.f, 0.f, 0.f);
     }
+
     DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)OffsetModel, pOffset);
-    BrVector3Scale(pOffset, pOffset, -1.f);
+    BrVector3Negate(pOffset, pOffset);
 }
 
 // IDA: void __cdecl SnapAccToVertical()
