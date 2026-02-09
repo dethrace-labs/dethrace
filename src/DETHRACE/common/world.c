@@ -270,7 +270,7 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     int i;
 
     for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
-        if (pStorage_space->pixelmaps[i]) {
+        if (pStorage_space->pixelmaps[i] != NULL) {
             BrMapRemove(pStorage_space->pixelmaps[i]);
             BrPixelmapFree(pStorage_space->pixelmaps[i]);
         }
@@ -302,18 +302,18 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
 // IDA: tAdd_to_storage_result __usercall AddPixelmapToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_pixelmap **pThe_pm@<EDX>)
 // This seems like the signature should be `br_pixelmap* pThe_pm`
 // FUNCTION: CARM95 0x00435014
-tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm) {
+tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_pm) {
     int i;
 
     if (pStorage_space->pixelmaps_count < pStorage_space->max_pixelmaps) {
         for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
-            if (pStorage_space->pixelmaps[i]->identifier
-                && ((br_pixelmap*)pThe_pm)->identifier
-                && strcmp(pStorage_space->pixelmaps[i]->identifier, ((br_pixelmap*)pThe_pm)->identifier) == 0) {
+            if (pStorage_space->pixelmaps[i]->identifier != NULL
+                && pThe_pm->identifier != NULL
+                && strcmp(pStorage_space->pixelmaps[i]->identifier, pThe_pm->identifier) == 0) {
                 return eStorage_duplicate;
             }
         }
-        pStorage_space->pixelmaps[pStorage_space->pixelmaps_count] = (br_pixelmap*)pThe_pm;
+        pStorage_space->pixelmaps[pStorage_space->pixelmaps_count] = pThe_pm;
         pStorage_space->pixelmaps_count++;
         return eStorage_allocated;
     } else {
@@ -420,7 +420,7 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         }
         for (j = 0; j < new_ones; j++) {
             if (temp_array[j] != NULL) {
-                switch (AddPixelmapToStorage(pStorage_space, (br_pixelmap**)temp_array[j])) {
+                switch (AddPixelmapToStorage(pStorage_space, temp_array[j])) {
                 case eStorage_allocated:
                     BrMapAdd(temp_array[j]);
                     total++;
@@ -448,7 +448,7 @@ br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
         return BrMapFind(pName);
     }
 
-    switch (AddPixelmapToStorage(pStorage_space, (br_pixelmap**)temp)) {
+    switch (AddPixelmapToStorage(pStorage_space, temp)) {
     case eStorage_allocated:
         BrMapAdd(temp);
         return temp;

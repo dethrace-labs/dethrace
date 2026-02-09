@@ -66,7 +66,7 @@ void DisposeStorageSpace(tBrender_storage* pStorage_space);
 
 void ClearOutStorageSpace(tBrender_storage* pStorage_space);
 
-tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm);
+tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_pm);
 
 tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_st);
 
