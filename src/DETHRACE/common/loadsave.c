@@ -244,6 +244,7 @@ void LoadStart(void) {
 // IDA: int __usercall DoLoadGame@<EAX>(int pSave_allowed@<EAX>)
 // FUNCTION: CARM95 0x0044bf62
 int DoLoadGame(void) {
+    // GLOBAL: CARM95 0x0050dd98
     static tFlicette flicker_on[9] = {
         { 74, { 47, 94 }, { 23, 55 } },
         { 74, { 47, 94 }, { 44, 110 } },
@@ -255,6 +256,7 @@ int DoLoadGame(void) {
         { 74, { 47, 94 }, { 170, 408 } },
         { 57, { 255, 510 }, { 151, 362 } },
     };
+    // GLOBAL: CARM95 0x0050de50
     static tFlicette flicker_off[9] = {
         { 73, { 47, 94 }, { 23, 55 } },
         { 73, { 47, 94 }, { 44, 110 } },
@@ -266,6 +268,7 @@ int DoLoadGame(void) {
         { 73, { 47, 94 }, { 170, 408 } },
         { 56, { 255, 510 }, { 151, 362 } },
     };
+    // GLOBAL: CARM95 0x0050df08
     static tFlicette push[9] = {
         { 74, { 47, 94 }, { 23, 55 } },
         { 74, { 47, 94 }, { 44, 110 } },
@@ -277,6 +280,7 @@ int DoLoadGame(void) {
         { 74, { 47, 94 }, { 170, 408 } },
         { 59, { 255, 510 }, { 151, 362 } },
     };
+    // GLOBAL: CARM95 0x0050dfc0
     static tMouse_area mouse_areas[9] = {
         { { 48, 96 }, { 17, 41 }, { 250, 500 }, { 33, 79 }, 0, 0, 0, NULL },
         { { 48, 96 }, { 39, 94 }, { 250, 500 }, { 55, 132 }, 1, 0, 0, NULL },
@@ -288,6 +292,7 @@ int DoLoadGame(void) {
         { { 48, 96 }, { 164, 394 }, { 250, 500 }, { 180, 432 }, 7, 0, 0, NULL },
         { { 152, 304 }, { 151, 362 }, { 299, 598 }, { 171, 410 }, 8, 1, 0, NULL },
     };
+    // GLOBAL: CARM95 0x0050e170
     static tRectile recopy_areas[24] = {
         {
             { 53, 106 },
@@ -434,6 +439,8 @@ int DoLoadGame(void) {
             { 182, 437 },
         },
     };
+
+    // GLOBAL: CARM95 0x0050e470
     static tInterface_spec interface_spec = {
         0,
         71,
@@ -589,22 +596,27 @@ void SaveTheGame(int pSlot_number) {
 // IDA: int __cdecl ConfirmMidGameSave()
 // FUNCTION: CARM95 0x0044ceb9
 int ConfirmMidGameSave(void) {
+    // GLOBAL: CARM95 0x0050e5a0
     static tFlicette flicker_on[2] = {
         { 43, { 84, 168 }, { 124, 298 } },
         { 43, { 181, 362 }, { 124, 298 } },
     };
+    // GLOBAL: CARM95 0x0050e5c8
     static tFlicette flicker_off[2] = {
         { 42, { 84, 168 }, { 124, 298 } },
         { 42, { 181, 362 }, { 124, 298 } },
     };
+    // GLOBAL: CARM95 0x0050e5f0
     static tFlicette push[2] = {
         { 44, { 84, 168 }, { 124, 298 } },
         { 45, { 181, 362 }, { 124, 298 } },
     };
+    // GLOBAL: CARM95 0x0050e618
     static tMouse_area mouse_areas[2] = {
         { { 84, 168 }, { 124, 298 }, { 147, 294 }, { 144, 346 }, 0, 0, 0, NULL },
         { { 181, 362 }, { 124, 298 }, { 244, 488 }, { 144, 346 }, 1, 0, 0, NULL },
     };
+    // GLOBAL: CARM95 0x0050e678
     static tInterface_spec interface_spec = {
         0, 40, 0, 41, -1, -1, 0,
         { -1, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
@@ -762,6 +774,7 @@ int SaveEscape(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall SaveGameInterface@<EAX>(int pDefault_choice@<EAX>)
 // FUNCTION: CARM95 0x0044ceee
 int SaveGameInterface(int pDefault_choice) {
+    // GLOBAL: CARM95 0x0050e7a8
     static tFlicette flicker_on[9] = {
         { 74, { 47, 94 }, { 23, 55 } },
         { 74, { 47, 94 }, { 44, 106 } },
@@ -773,6 +786,7 @@ int SaveGameInterface(int pDefault_choice) {
         { 74, { 47, 94 }, { 170, 408 } },
         { 57, { 255, 510 }, { 151, 362 } },
     };
+    // GLOBAL: CARM95 0x0050e860
     static tFlicette flicker_off[9] = {
         { 73, { 47, 94 }, { 23, 55 } },
         { 73, { 47, 94 }, { 44, 106 } },
@@ -784,6 +798,7 @@ int SaveGameInterface(int pDefault_choice) {
         { 73, { 47, 94 }, { 170, 408 } },
         { 56, { 255, 510 }, { 151, 362 } },
     };
+    // GLOBAL: CARM95 0x0050e918
     static tFlicette push[9] = {
         { 74, { 47, 94 }, { 23, 55 } },
         { 74, { 47, 94 }, { 44, 106 } },
@@ -795,6 +810,7 @@ int SaveGameInterface(int pDefault_choice) {
         { 74, { 47, 94 }, { 170, 408 } },
         { 59, { 255, 510 }, { 151, 362 } },
     };
+    // GLOBAL: CARM95 0x0050e9d0
     static tMouse_area mouse_areas[9] = {
         { { 48, 96 }, { 17, 41 }, { 250, 500 }, { 33, 79 }, 0, 0, 0, NULL },
         { { 48, 96 }, { 39, 94 }, { 250, 500 }, { 55, 132 }, 1, 0, 0, NULL },
@@ -806,6 +822,7 @@ int SaveGameInterface(int pDefault_choice) {
         { { 48, 96 }, { 164, 394 }, { 250, 500 }, { 180, 432 }, 7, 0, 0, NULL },
         { { 152, 304 }, { 151, 362 }, { 299, 598 }, { 171, 410 }, 8, 1, 0, NULL },
     };
+    // GLOBAL: CARM95 0x0050eb80
     static tRectile recopy_areas[24] = {
         {
             { 53, 106 },

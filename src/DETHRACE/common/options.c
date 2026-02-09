@@ -234,26 +234,31 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 // IDA: void __cdecl DoSoundOptions()
 // FUNCTION: CARM95 0x0049b7bf
 void DoSoundOptions(void) {
+    // GLOBAL: CARM95 0x00519cc0
     static tFlicette flicker_on[3] = {
         { 156, { 26, 52 }, { 21, 50 } },
         { 156, { 155, 310 }, { 88, 211 } },
         { 43, { 38, 76 }, { 153, 367 } },
     };
+    // GLOBAL: CARM95 0x00519d00
     static tFlicette flicker_off[3] = {
         { 155, { 26, 52 }, { 21, 50 } },
         { 155, { 155, 310 }, { 88, 211 } },
         { 42, { 38, 76 }, { 153, 367 } },
     };
+    // GLOBAL: CARM95 0x00519d40
     static tFlicette push[3] = {
         { 156, { 26, 52 }, { 21, 50 } },
         { 156, { 155, 310 }, { 88, 211 } },
         { 43, { 38, 76 }, { 153, 367 } },
     };
+    // GLOBAL: CARM95 0x00519d80
     static tMouse_area mouse_areas[3] = {
         { { 26, 52 }, { 21, 50 }, { 144, 288 }, { 97, 233 }, 0, 0, 0, SoundClick },
         { { 155, 310 }, { 88, 211 }, { 273, 546 }, { 164, 394 }, 1, 0, 0, SoundClick },
         { { 38, 76 }, { 153, 367 }, { 101, 202 }, { 173, 415 }, 2, 0, 0, NULL },
     };
+    // GLOBAL: CARM95 0x00519e10
     static tInterface_spec interface_spec = {
         0,
         150,
@@ -702,6 +707,7 @@ void DrawGraphBox(int pCurrent_choice, int pCurrent_mode) {
 // IDA: void __cdecl DoGraphicsOptions()
 // FUNCTION: CARM95 0x0049b805
 void DoGraphicsOptions(void) {
+    // GLOBAL: CARM95 0x00519f40
     static tFlicette flicker_on[14] = {
         { 43, { 45, 90 }, { 166, 398 } },
         { 43, { 220, 440 }, { 166, 398 } },
@@ -718,6 +724,7 @@ void DoGraphicsOptions(void) {
         { 248, { 49, 98 }, { 138, 331 } },
         { 249, { 49, 98 }, { 150, 360 } },
     };
+    // GLOBAL: CARM95 0x0051a058
     static tFlicette flicker_off[14] = {
         { 42, { 45, 90 }, { 166, 398 } },
         { 42, { 220, 440 }, { 166, 398 } },
@@ -734,6 +741,7 @@ void DoGraphicsOptions(void) {
         { 275, { 49, 98 }, { 138, 331 } },
         { 276, { 49, 98 }, { 150, 360 } },
     };
+    // GLOBAL: CARM95 0x0051a170
     static tFlicette push[14] = {
         { 154, { 45, 90 }, { 166, 398 } },
         { 45, { 220, 440 }, { 166, 398 } },
@@ -750,8 +758,9 @@ void DoGraphicsOptions(void) {
         { 45, { 210, 440 }, { 170, 408 } },
         { 45, { 210, 440 }, { 170, 408 } },
     };
+    // GLOBAL: CARM95 0x0051a288
     static tMouse_area mouse_areas[14] = {
-        { { 45, 90 }, { 165, 396 }, { 104, 214 }, { 185, 444 }, 0, 0, 0, NULL },
+        { { 45, 90 }, { 165, 396 }, { 107, 214 }, { 185, 444 }, 0, 0, 0, NULL },
         { { 220, 440 }, { 165, 396 }, { 276, 552 }, { 185, 444 }, 1, 0, 0, NULL },
         { { 49, 98 }, { 35, 84 }, { 284, 568 }, { 43, 103 }, 2, 1, 0, RadioClick },
         { { 49, 98 }, { 44, 106 }, { 284, 568 }, { 52, 125 }, 3, 1, 0, RadioClick },
@@ -766,6 +775,7 @@ void DoGraphicsOptions(void) {
         { { 49, 98 }, { 137, 329 }, { 284, 322 }, { 145, 348 }, 12, 1, 0, RadioClick },
         { { 49, 98 }, { 149, 358 }, { 284, 322 }, { 157, 377 }, 13, 1, 0, RadioClick },
     };
+    // GLOBAL: CARM95 0x0051a528
     static tInterface_spec interface_spec = {
         0,
         160,
@@ -777,7 +787,7 @@ void DoGraphicsOptions(void) {
         { -1, 0 },
         { -1, 0 },
         { 0, 2 },
-        { 1, 2 },
+        { 1, 13 },
         { NULL, GraphOptLeft },
         { -1, 0 },
         { 1, 0 },
@@ -1362,24 +1372,28 @@ void DrawInitialKMRadios(void) {
 // IDA: void __cdecl DoControlOptions()
 // FUNCTION: CARM95 0x0049be2c
 void DoControlOptions(void) {
+    // GLOBAL: CARM95 0x0051a658
     static tFlicette flicker_on[4] = {
         { 177, { 51, 102 }, { 166, 398 } },
         { 177, { 112, 224 }, { 166, 398 } },
         { 177, { 173, 346 }, { 166, 398 } },
         { 177, { 234, 468 }, { 166, 398 } },
     };
+    // GLOBAL: CARM95 0x0051a6a8
     static tFlicette flicker_off[4] = {
         { 176, { 51, 102 }, { 166, 398 } },
         { 176, { 112, 224 }, { 166, 398 } },
         { 176, { 173, 346 }, { 166, 398 } },
         { 176, { 234, 468 }, { 166, 398 } },
     };
+    // GLOBAL: CARM95 0x0051a6f8
     static tFlicette push[4] = {
         { 172, { 51, 102 }, { 166, 398 } },
         { 175, { 112, 224 }, { 166, 398 } },
         { 174, { 173, 346 }, { 166, 398 } },
         { 173, { 234, 468 }, { 166, 398 } },
     };
+    // GLOBAL: CARM95 0x0051a748
     static tMouse_area mouse_areas[5] = {
         { { 51, 102 }, { 166, 398 }, { 102, 204 }, { 187, 449 }, 0, 0, 0, NULL },
         { { 112, 224 }, { 166, 398 }, { 164, 328 }, { 187, 449 }, 1, 0, 0, NULL },
@@ -1387,6 +1401,7 @@ void DoControlOptions(void) {
         { { 234, 468 }, { 166, 398 }, { 286, 572 }, { 187, 449 }, 3, 0, 0, NULL },
         { { 45, 90 }, { 33, 79 }, { 285, 570 }, { 159, 382 }, 4, 1, 0, MouseyClickBastard },
     };
+    // GLOBAL: CARM95 0x0051a838
     static tInterface_spec interface_spec = {
         0, 170, 179, 0, 0, 0, 1,
         { -1, -1 }, { -1, 0 }, { 0, 4 }, { 3, 4 }, { NULL, KeyAssignLeft },
@@ -1496,30 +1511,35 @@ void DrawDisabledOptions(void) {
 // IDA: void __cdecl DoOptions()
 // FUNCTION: CARM95 0x0049b705
 void DoOptions(void) {
+    // GLOBAL: CARM95 0x0051a968
     static tFlicette flicker_on[4] = {
         { 43, { 57, 114 }, { 41, 98 } },
         { 43, { 57, 114 }, { 78, 187 } },
         { 43, { 57, 114 }, { 114, 274 } },
         { 43, { 57, 114 }, { 154, 370 } }
     };
+    // GLOBAL: CARM95 0x0051a9b8
     static tFlicette flicker_off[4] = {
         { 42, { 57, 114 }, { 41, 98 } },
         { 42, { 57, 114 }, { 78, 187 } },
         { 42, { 57, 114 }, { 114, 274 } },
         { 42, { 57, 114 }, { 154, 370 } },
     };
+    // GLOBAL: CARM95 0x0051aa08
     static tFlicette push[4] = {
         { 144, { 57, 114 }, { 41, 98 } },
         { 146, { 57, 114 }, { 78, 187 } },
         { 145, { 57, 114 }, { 114, 274 } },
         { 45, { 57, 114 }, { 154, 370 } },
     };
+    // GLOBAL: CARM95 0x0051aa58
     static tMouse_area mouse_areas[4] = {
         { { 57, 114 }, { 41, 98 }, { 123, 246 }, { 62, 149 }, 0, 0, 0, NULL },
         { { 57, 114 }, { 78, 187 }, { 123, 246 }, { 99, 238 }, 1, 0, 0, NULL },
         { { 57, 114 }, { 114, 274 }, { 123, 246 }, { 135, 324 }, 2, 0, 0, NULL },
         { { 57, 114 }, { 154, 370 }, { 123, 246 }, { 175, 420 }, 3, 0, 0, NULL },
     };
+    // GLOBAL: CARM95 0x0051ab18
     static tInterface_spec interface_spec = {
         0,
         140,

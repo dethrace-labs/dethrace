@@ -71,6 +71,7 @@ target_sources(dethrace_obj PRIVATE
     common/replay.c
     common/loading.c
     common/piping.c
+    common/powerup.c
 
     common/brucetrk.c
     common/brucetrk.h
@@ -140,8 +141,6 @@ target_sources(dethrace_obj PRIVATE
     common/options.h
     common/pedestrn.c
     common/pedestrn.h
-    common/powerup.c
-    common/powerup.h
     common/pratcam.c
     common/pratcam.h
     common/racestrt.c
@@ -188,17 +187,15 @@ endif()
 # Create our main game binary.
 if(MSVC_42_FOR_RECCMP)
     add_executable(dethrace WIN32)
+
     set(CMAKE_C_FLAGS_DEBUG "/Oi /Zi /MLd /G5")
 
     add_compile_definitions(_DEBUG)
     set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
     target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
 
-    set_source_files_properties(common/structur.c PROPERTIES COMPILE_FLAGS "/FAs")
-    set_source_files_properties(common/racesumm.c PROPERTIES COMPILE_FLAGS "/FAs")
-    set_source_files_properties(common/replay.c PROPERTIES COMPILE_FLAGS "/FAs")
-    set_source_files_properties(common/loading.c PROPERTIES COMPILE_FLAGS "/FAs")
-    set_source_files_properties(common/piping.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/powerup.c PROPERTIES COMPILE_FLAGS "/FAs")
+    set_source_files_properties(common/netgame.c PROPERTIES COMPILE_FLAGS "/FAs")
 
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()

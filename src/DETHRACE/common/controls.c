@@ -1093,21 +1093,25 @@ void TiltBonnetUpZ(void) {
 void ToggleCockpit(void) {
     br_scalar ts;
 
-    if ((&gProgram_state.current_car == gCar_to_view || gProgram_state.cockpit_on) && !gMap_mode) {
-        if (!gAusterity_mode || gProgram_state.cockpit_on) {
+    if (&gProgram_state.current_car != gCar_to_view && !gProgram_state.cockpit_on) {
+        return;
+    }
+
+    if (!gMap_mode) {
+        if (gAusterity_mode && !gProgram_state.cockpit_on) {
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
+            return;
+        } else {
             gProgram_state.cockpit_on = !gProgram_state.cockpit_on;
-            if (gProgram_state.cockpit_on) {
-                gCamera = gCamera_list[0];
-            } else {
-                gCamera = gCamera_list[1];
+            gCamera = gProgram_state.cockpit_on ? gCamera_list[0] : gCamera_list[1];
+
+            if (!gProgram_state.cockpit_on) {
                 InitialiseExternalCamera();
                 PositionExternalCamera(&gProgram_state.current_car, 1);
             }
             AdjustRenderScreenSize();
             AdjustHeadups();
             MungeForwardSky();
-        } else {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_NOT_ENOUGH_MEMORY));
         }
     }
 }

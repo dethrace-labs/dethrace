@@ -169,6 +169,8 @@ tPowerup* gPowerup_array;
 
 #define GET_POWERUP_INDEX(POWERUP) ((POWERUP) - gPowerup_array)
 
+#define MAX_POWER_UP_LEVEL 4
+
 // IDA: void __usercall LosePowerupX(tPowerup *pThe_powerup@<EAX>, int pTell_net_players@<EDX>)
 // FUNCTION: CARM95 0x0042cff6
 void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {
@@ -182,9 +184,10 @@ void LosePowerupX(tPowerup* pThe_powerup, int pTell_net_players) {
         the_message = NetBuildMessage(NETMSGID_POWERUP, 0);
         the_message->contents.data.powerup.event = ePowerup_lost;
         the_message->contents.data.powerup.player = gLocal_net_ID;
-        the_message->contents.data.powerup.event = GET_POWERUP_INDEX(pThe_powerup);
+        the_message->contents.data.powerup.powerup_index = GET_POWERUP_INDEX(pThe_powerup);
         NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
     }
+    gProgram_state.current_car.powerups[GET_POWERUP_INDEX(pThe_powerup)] = 0;
     for (i = 0; i < gNumber_of_icons; i++) {
         if (gIcon_list[i].powerup == pThe_powerup) {
             gIcon_list[i].fizzle_stage = 3;
@@ -230,7 +233,7 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
     char* s2;
     tNet_message* the_message;
 
-    if (pIndex < 0 || pIndex >= gNumber_of_powerups) {
+    if (pIndex >= gNumber_of_powerups || pIndex < 0) {
         return -1;
     }
     the_powerup = &gPowerup_array[pIndex];
@@ -241,11 +244,11 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_UNAVAILABLE_IN_DEMO));
         return -1;
     }
-    original_index = pIndex;
-    if (((gProgram_state.sausage_eater_mode || gTotal_peds < 2)
-            && (strstr(the_powerup->message, "Ped") != NULL
-                || strstr(the_powerup->message, "ped") != NULL
-                || strstr(the_powerup->message, "corpses") != NULL))
+
+    while (((gProgram_state.sausage_eater_mode || gTotal_peds < 2)
+               && (strstr(the_powerup->message, "Ped") != NULL
+                   || strstr(the_powerup->message, "ped") != NULL
+                   || strstr(the_powerup->message, "corpses") != NULL))
         || (gNet_mode != eNet_mode_none && the_powerup->net_type == eNet_powerup_inappropriate)) {
         pIndex = 0;
         the_powerup = &gPowerup_array[pIndex];
@@ -254,8 +257,8 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
     LoseAllSimilarPowerups(the_powerup);
     ps_power = gNet_mode != eNet_mode_none && the_powerup->got_proc == GotTimeOrPower;
     if (the_powerup->message[0] != '\0' && pDisplay_headup && !ps_power) {
-        strcpy(s, the_powerup->message);
         s2 = s;
+        strcpy(s2, the_powerup->message);
         if (the_powerup->got_proc == FreezeTimer) {
             s2 = strtok(s, "/");
             if (gFreeze_timer) {
@@ -264,14 +267,18 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
         }
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, s2);
     }
+    original_index = pIndex;
     the_powerup->car = pCar;
     if (the_powerup->got_proc != NULL) {
         pIndex = the_powerup->got_proc(the_powerup, pCar);
     }
-    if (pCar->driver == eDriver_non_car_unused_slot || pCar->driver == eDriver_non_car) {
+    if (pCar->driver <= eDriver_non_car) {
         return pIndex;
     }
-    if (the_powerup->type == ePowerup_timed) {
+    switch (the_powerup->type) {
+    case ePowerup_instantaneous:
+        break;
+    case ePowerup_timed:
         the_powerup->got_time = GetTotalTime();
         if (pTell_net_players) {
             the_powerup->lose_time = the_powerup->got_time + the_powerup->duration;
@@ -279,10 +286,18 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
             the_powerup->lose_time = the_powerup->got_time + pTime_left;
         }
         gProgram_state.current_car.powerups[pIndex] = the_powerup->lose_time;
-    } else if (the_powerup->type == ePowerup_whole_race) {
+        break;
+    case ePowerup_whole_race:
         the_powerup->got_time = GetTotalTime();
         gProgram_state.current_car.powerups[pIndex] = -1;
+        break;
+
+#ifdef DETHRACE_FIX_BUGS
+    default:
+        break;
+#endif
     }
+
     if (the_powerup->prat_cam_event >= 0) {
         PratcamEvent(the_powerup->prat_cam_event);
     }
@@ -305,13 +320,14 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
                 return pIndex;
             }
         }
-        if (gNumber_of_icons != COUNT_OF(gIcon_list)) {
-            gIcon_list[gNumber_of_icons].powerup = the_powerup;
-            gIcon_list[gNumber_of_icons].fizzle_stage = 0;
-            gIcon_list[gNumber_of_icons].fizzle_direction = 1;
-            gIcon_list[gNumber_of_icons].fizzle_start = GetTotalTime();
-            gNumber_of_icons++;
+        if (gNumber_of_icons == COUNT_OF(gIcon_list)) {
+            return pIndex;
         }
+        gIcon_list[gNumber_of_icons].powerup = the_powerup;
+        gIcon_list[gNumber_of_icons].fizzle_stage = 0;
+        gIcon_list[gNumber_of_icons].fizzle_direction = 1;
+        gIcon_list[gNumber_of_icons].fizzle_start = GetTotalTime();
+        gNumber_of_icons++;
     }
     return pIndex;
 }
@@ -347,38 +363,38 @@ void LoadPowerups(void) {
     }
     gNumber_of_powerups = GetAnInt(f);
     gPowerup_array = BrMemAllocate(sizeof(tPowerup) * gNumber_of_powerups, kMem_powerup_array);
-    for (i = 0; i < gNumber_of_powerups; i++) {
-        the_powerup = &gPowerup_array[i];
-
+    for (i = 0, the_powerup = gPowerup_array; i < gNumber_of_powerups; i++, the_powerup++) {
         GetALineAndDontArgue(f, the_powerup->message);
         if (strcmp(the_powerup->message, "dummy") == 0) {
             the_powerup->type = 0;
+            continue;
         } else {
             if (strcmp(the_powerup->message, "n/a") == 0) {
                 the_powerup->message[0] = 0;
             }
-            GetAString(f, s);
-            the_powerup->icon = LoadPixelmap(s);
-            the_powerup->fizzle_type = GetAnInt(f);
-            time = 1000 * GetAnInt(f);
-            the_powerup->duration = time;
-            if (time > 0) {
-                the_powerup->type = ePowerup_timed;
-            } else if (time == 0) {
-                the_powerup->type = ePowerup_whole_race;
-            } else {
-                the_powerup->type = ePowerup_instantaneous;
-            }
         }
+        GetAString(f, s);
+        the_powerup->icon = LoadPixelmap(s);
+        the_powerup->fizzle_type = GetAnInt(f);
+        time = 1000 * GetAnInt(f);
+        the_powerup->duration = time;
+        if (time < 0) {
+            the_powerup->type = ePowerup_instantaneous;
+        } else if (time == 0) {
+            the_powerup->type = ePowerup_whole_race;
+        } else {
+            the_powerup->type = ePowerup_timed;
+        }
+
         action_index = GetAnInt(f);
-        if (action_index >= 0) {
+        if (action_index < 0) {
+            the_powerup->got_proc = NULL;
+            the_powerup->lose_proc = NULL;
+            the_powerup->periodic_proc = NULL;
+        } else {
             the_powerup->got_proc = gGot_procs[action_index];
             the_powerup->lose_proc = gLose_procs[action_index];
             the_powerup->periodic_proc = gPeriodic_procs[action_index];
-        } else {
-            the_powerup->lose_proc = NULL;
-            the_powerup->periodic_proc = NULL;
-            the_powerup->got_proc = NULL;
         }
         the_powerup->number_of_float_params = GetAnInt(f);
         the_powerup->float_params = BrMemAllocate(sizeof(float) * the_powerup->number_of_float_params, kMem_powerup_float_parms);
@@ -407,6 +423,7 @@ void InitPowerups(void) {
         the_powerup->got_time = 0;
         the_powerup->current_value = -1;
     }
+    gNumber_of_icons = 0;
 }
 
 // IDA: void __cdecl CloseDownPowerUps()
@@ -434,37 +451,41 @@ void DrawPowerups(tU32 pTime) {
     br_pixelmap* fizzle_pix;
 
     y = gCurrent_graf_data->power_up_icon_y;
-    for (i = 0; i < gNumber_of_icons && i < 5; i++) {
-        the_icon = &gIcon_list[i];
+    for (i = 0, the_icon = gIcon_list; i < gNumber_of_icons; i++, the_icon++) {
+        if (i >= 5) {
+            break;
+        }
         the_powerup = the_icon->powerup;
         if (the_powerup->icon == NULL) {
             continue;
         }
         y += gCurrent_graf_data->power_up_icon_y_pitch;
         if (the_icon->fizzle_stage < 4) {
-            if (the_icon->fizzle_direction >= 0) {
-                the_icon->fizzle_stage = (pTime - the_icon->fizzle_start) / 100;
-            } else {
+            if (the_icon->fizzle_direction < 0) {
                 the_icon->fizzle_stage = 3 - (pTime - the_icon->fizzle_start) / 100;
+            } else {
+                the_icon->fizzle_stage = (pTime - the_icon->fizzle_start) / 100;
             }
-            if (the_icon->fizzle_stage >= 5) {
+            if (the_icon->fizzle_stage > 4) {
                 the_icon->fizzle_stage = 4;
             } else if (the_icon->fizzle_stage < 0) {
+#ifdef DETHRACE_FIX_BUGS
                 memmove(the_icon, the_icon + 1, sizeof(tHeadup_icon) * (gNumber_of_icons - i - 1));
+#else
+                memcpy(the_icon, the_icon + 1, sizeof(tHeadup_icon) * (gNumber_of_icons - i - 1));
+#endif
                 gNumber_of_icons--;
                 continue;
             }
         }
+
         if (the_icon->fizzle_stage >= 4) {
             DRPixelmapRectangleMaskedCopy(gBack_screen,
                 gCurrent_graf_data->power_up_icon_x, y,
                 the_powerup->icon, 0, 0, the_powerup->icon->width, the_powerup->icon->height);
             if (the_powerup->type == ePowerup_timed) {
                 timer = the_powerup->lose_time - pTime;
-                if (timer <= 0) {
-                    timer = 0;
-                }
-                TimerString(timer, s, 0, 0);
+                TimerString(MAX(timer, 0), s, 0, 0);
                 TransDRPixelmapText(gBack_screen,
                     gCurrent_graf_data->power_up_icon_countdown_x,
                     y + gCurrent_graf_data->power_up_icon_countdown_y_offset,
@@ -511,15 +532,18 @@ void DoPowerupPeriodics(tU32 pFrame_period) {
 void GotPowerupN(int pN) {
     int modifiers;
 
-    modifiers = 0;
     if (PDKeyDown(KEY_SHIFT_ANY) != 0) {
-        modifiers += 10;
+        modifiers = 10;
+    } else {
+        modifiers = 0;
     }
     if (PDKeyDown(KEY_ALT_ANY) != 0) {
         modifiers += 20;
+    } else {
     }
     if (PDKeyDown(KEY_CTRL_ANY) != 0) {
         modifiers += 40;
+    } else {
     }
     GotPowerup(&gProgram_state.current_car, modifiers + pN);
 }
@@ -601,9 +625,10 @@ int GotCredits(tPowerup* pPowerup, tCar_spec* pCar) {
     char s[256];
 
     if (pCar->driver == eDriver_local_human) {
+        credits = 100 * (IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]) / 100);
         strcpy(s, pPowerup->message);
         strcat(s, " ");
-        EarnCredits2((IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]) / 100) * 100, s);
+        EarnCredits2(credits, s);
     }
     return GET_POWERUP_INDEX(pPowerup);
 }
@@ -626,20 +651,18 @@ int GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
     int not_allowed_power;
     char s[256];
 
-    if (gNet_mode == eNet_mode_none) {
-        if (pCar->driver == eDriver_local_human) {
-            time = IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]);
-            AwardTime(time);
-        }
-    } else {
+    if (gNet_mode != eNet_mode_none) {
         not_allowed_power = (gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox)
             || (gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox);
-        if (pCar->power_up_levels[0] < 4 || (pCar->power_up_levels[1] < 4 && !not_allowed_power) || pCar->power_up_levels[2] < 4) {
+        if (pCar->power_up_levels[eParts_armour] < MAX_POWER_UP_LEVEL
+            || (pCar->power_up_levels[eParts_power] < MAX_POWER_UP_LEVEL && !not_allowed_power)
+            || pCar->power_up_levels[eParts_offensive] < MAX_POWER_UP_LEVEL) {
+
             for (i = 0; i < 50; i++) {
                 if (not_allowed_power) {
-                    index = PercentageChance(50) ? 0 : 2;
+                    index = PercentageChance(50) ? eParts_armour : eParts_offensive;
                 } else {
-                    index = IRandomBetween(0, 2);
+                    index = IRandomBetween(eParts_armour, eParts_offensive);
                 }
                 if (pCar->power_up_levels[index] < 4) {
                     ImprovePSPowerup(pCar, index);
@@ -648,6 +671,11 @@ int GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
             }
         } else {
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
+        }
+    } else {
+        if (pCar->driver == eDriver_local_human) {
+            time = IRandomBetween(pPowerup->integer_params[0], pPowerup->integer_params[1]);
+            AwardTime(time);
         }
     }
     return GET_POWERUP_INDEX(pPowerup);
@@ -682,28 +710,19 @@ int SetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
     br_scalar old_scale;
 
     old_scale = gPed_scale_factor;
-    if (old_scale != pPowerup->float_params[0]) {
-        if (gPed_scale_factor > 1.f) {
-            gPed_scale_factor = pPowerup->float_params[0];
+    gPed_scale_factor = pPowerup->float_params[0];
+    if (old_scale != gPed_scale_factor) {
+        if (old_scale > 1.f) {
             PipeSingleSpecial(ePipe_special_giant_ped_off);
-        } else {
-            gPed_scale_factor = pPowerup->float_params[0];
-            if (old_scale < 1.f) {
-                PipeSingleSpecial(ePipe_special_min_ped_off);
-            }
+        } else if (old_scale < 1.f) {
+            PipeSingleSpecial(ePipe_special_min_ped_off);
         }
         if (gPed_scale_factor > 1.f) {
             PipeSingleSpecial(ePipe_special_giant_ped_on);
-            old_scale = gPed_scale_factor;
-        } else {
-            old_scale = gPed_scale_factor;
-            if (gPed_scale_factor < 1.f) {
-                PipeSingleSpecial(ePipe_special_min_ped_on);
-                old_scale = gPed_scale_factor;
-            }
+        } else if (gPed_scale_factor < 1.f) {
+            PipeSingleSpecial(ePipe_special_min_ped_on);
         }
     }
-    gPed_scale_factor = old_scale;
     return GET_POWERUP_INDEX(pPowerup);
 }
 
@@ -790,7 +809,7 @@ int DoInstantRepair(tPowerup* pPowerup, tCar_spec* pCar) {
     if (pCar->driver == eDriver_local_human) {
         TotallyRepairCar();
     }
-    return GET_POWERUP_INDEX(gPowerup_array);
+    return GET_POWERUP_INDEX(pPowerup);
 }
 
 // IDA: void __usercall ResetPedSpeed(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
@@ -870,12 +889,13 @@ int TakeDrugs(tPowerup* pPowerup, tCar_spec* pCar) {
 void PaletteFuckedUpByDrugs(br_pixelmap* pPixelmap, int pOffset) {
     int i;
 
-    ((tU32*)gRender_palette->pixels)[0] = gReal_render_palette[0];
     for (i = 1; i < 224; i++) {
         ((tU32*)gRender_palette->pixels)[i] = gReal_render_palette[(i + pOffset) & 0xff];
     }
+    ((tU32*)gRender_palette->pixels)[0] = gReal_render_palette[0];
+
     for (i = 224; i < 256; i++) {
-        ((tU32*)gRender_palette->pixels)[i] = gReal_render_palette[i];
+        ((tU32*)gRender_palette->pixels)[i] = gReal_render_palette[i] & 0xff;
     }
 }
 
@@ -1137,15 +1157,15 @@ int HitMine(tPowerup* pPowerup, tCar_spec* pCar) {
     float fudge_multiplier;
 
     pCar->v.v[1] = FRandomBetween(pPowerup->float_params[0], pPowerup->float_params[1]) / pCar->M + pCar->v.v[1];
-    pCar->omega.v[2] = FRandomPosNeg(pPowerup->float_params[2]) * TAU / pCar->M + pCar->omega.v[2];
-    pCar->omega.v[0] = FRandomPosNeg(pPowerup->float_params[3]) * TAU / pCar->M + pCar->omega.v[0];
-    if (pCar->driver != eDriver_non_car_unused_slot && !pCar->invulnerable) {
-        fudge_multiplier = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor / .7f;
+    pCar->omega.v[2] += FRandomPosNeg(pPowerup->float_params[2]) * TAU / pCar->M;
+    pCar->omega.v[0] += FRandomPosNeg(pPowerup->float_params[3]) * TAU / pCar->M;
+
+    if (pCar->driver > eDriver_non_car && !pCar->invulnerable) {
         for (i = 0; i < pCar->car_actor_count; i++) {
-            TotallySpamTheModel(pCar, i, pCar->car_model_actors[i].actor,
-                &pCar->car_model_actors[i].crush_data, fudge_multiplier * .1f);
+            fudge_multiplier = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor / 0.7;
+            TotallySpamTheModel(pCar, i, pCar->car_model_actors[i].actor, &pCar->car_model_actors[i].crush_data, fudge_multiplier * .1f);
         }
-        for (i = 0; i < 12; i++) {
+        for (i = 0; i < COUNT_OF(pCar->damage_units); i++) {
             DamageUnit(pCar, i, IRandomBetween(0, fudge_multiplier * 15.f));
         }
     }
@@ -1242,7 +1262,12 @@ void ReceivedPowerup(tNet_contents* pContents) {
     tPowerup* powerup;
     tCar_spec* car;
 
-    if (gProgram_state.racing && pContents->data.powerup.powerup_index >= 0 && pContents->data.powerup.powerup_index < gNumber_of_powerups) {
+    if (gProgram_state.racing) {
+
+        if (pContents->data.powerup.powerup_index >= gNumber_of_powerups || pContents->data.powerup.powerup_index < 0) {
+            return;
+        }
+
         powerup = &gPowerup_array[pContents->data.powerup.powerup_index];
         if (pContents->data.powerup.event == ePowerup_gained || pContents->data.powerup.event == ePowerup_ongoing) {
             if (powerup->net_type == eNet_powerup_global) {
@@ -1253,14 +1278,18 @@ void ReceivedPowerup(tNet_contents* pContents) {
                 if (car != NULL) {
                     powerup->got_proc(powerup, car);
                     switch (powerup->type) {
+                    case ePowerup_instantaneous:
+                        break;
                     case ePowerup_timed:
                         car->powerups[pContents->data.powerup.powerup_index] = GetTotalTime() + pContents->data.powerup.time_left;
                         break;
                     case ePowerup_whole_race:
                         car->powerups[pContents->data.powerup.powerup_index] = -1;
                         break;
+#ifdef DETHRACE_FIX_BUGS
                     default:
                         break;
+#endif
                     }
                 }
             }
@@ -1355,6 +1384,8 @@ void GetPowerupMessage(int pN, char* pMessage) {
         break;
     default:
         strcpy(pMessage, gPowerup_array[pN].message);
+#ifdef DETHRACE_FIX_BUGS
         break;
+#endif
     }
 }
