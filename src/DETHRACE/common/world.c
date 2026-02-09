@@ -4775,8 +4775,7 @@ br_uint_32 DelGrooveRef(br_actor* pActor, void* pArg) {
     tGroovidelic_spec* the_groove;
     int i;
 
-    for (i = 0; i < gGroovidelics_array_size; i++) {
-        the_groove = &gGroovidelics_array[i];
+    for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
         if (the_groove->actor == pActor) {
             the_groove->owner = NO_OWNER;
         }
