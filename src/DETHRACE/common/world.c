@@ -4793,8 +4793,13 @@ br_uint_32 DelReferencedModels(br_actor* pActor, void* pArg) {
         if (pActor->model == gAdditional_models[i]) {
             BrModelRemove(pActor->model);
             BrModelFree(pActor->model);
-            memmove(&gAdditional_models[i], &gAdditional_models[i + 1], (gNumber_of_additional_models - i - 1) * sizeof(br_model*));
+#ifdef DETHRACE_FIX_BUGS
+            memmove(gAdditional_models + i, gAdditional_models + i + 1, (gNumber_of_additional_models - i - 1) * sizeof(br_model*));
+#else
+            memcpy(gAdditional_models + i, gAdditional_models + i + 1, (gNumber_of_additional_models - i - 1) * 4);
+#endif
             gNumber_of_additional_models--;
+            break;
         }
     }
     return 0;
