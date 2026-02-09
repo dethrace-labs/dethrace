@@ -4470,12 +4470,11 @@ br_uint_32 SetID(br_actor* pActor, void* pArg) {
 void UniquificateActorsName(br_actor* pUniverse_actor, br_actor* pActor) {
     int highest;
 
-    if (pActor->identifier == NULL || pActor->identifier[0] == '@') {
-        return;
+    if (pActor->identifier != NULL && pActor->identifier[0] != '@') {
+        highest = 0;
+        DRActorEnumRecurse(pUniverse_actor, (br_actor_enum_cbfn*)CalcHighestNonAmID, &highest);
+        DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)SetID, (void*)(uintptr_t)(highest + 1));
     }
-    highest = 0;
-    DRActorEnumRecurse(pUniverse_actor, (br_actor_enum_cbfn*)CalcHighestNonAmID, &highest);
-    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)SetID, (void*)(uintptr_t)(highest + 1));
 }
 
 // IDA: void __usercall AccessoryHeadup(br_actor *pActor@<EAX>, char *pPrefix@<EDX>)
