@@ -4859,14 +4859,12 @@ void CentreActor(br_actor* pActor, br_vector3* pOffset) {
 // IDA: void __cdecl SnapAccToVertical()
 // FUNCTION: CARM95 0x00444538
 void SnapAccToVertical(void) {
-
-    if (gLast_actor == NULL) {
-        return;
+    if (gLast_actor != NULL) {
+        BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[0], 1.f, 0.f, 0.f);
+        BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[1], 0.f, 1.f, 0.f);
+        BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[2], 0.f, 0.f, 1.f);
+        SaveAdditionalStuff();
     }
-    BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[0], 1.f, 0.f, 0.f);
-    BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[1], 0.f, 1.f, 0.f);
-    BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[2], 0.f, 0.f, 1.f);
-    SaveAdditionalStuff();
 }
 
 // IDA: void __usercall RotateAccessory(br_angle pAngle@<EAX>)
