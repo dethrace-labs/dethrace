@@ -4592,10 +4592,10 @@ void DropActor(int pIndex) {
     PathCat(the_path, gApplication_path, "ACCESSRY.TXT");
     f = DRfopen(the_path, "rt");
     for (i = 0; i <= pIndex; i++) {
-        if (!feof(f)) {
-            GetAString(f, s);
-        } else {
+        if (feof(f)) {
             s[0] = '\0';
+        } else {
+            GetAString(f, s);
         }
     }
     if (s[0] != '\0') {
@@ -4615,15 +4615,16 @@ void DropActor(int pIndex) {
             face_bastard = -1;
             for (i = 0; i < face_count; i++) {
                 distance_bastard = DistanceFromFace(gOur_pos, &the_list[i]);
-                if (distance_bastard < nearest_bastard) {
+                if (fabs(distance_bastard) < fabs(nearest_bastard)) {
                     nearest_bastard = distance_bastard;
                     face_bastard = i;
                 }
             }
 
             if (face_bastard >= 0) {
-                BrVector3Scale(&gLast_actor->t.t.translate.t, &the_list[face_bastard].normal, -nearest_bastard);
-                BrVector3Accumulate(&gLast_actor->t.t.translate.t, gOur_pos);
+                gLast_actor->t.t.mat.m[3][0] = the_list[face_bastard].normal.v[0] * (-nearest_bastard) + gOur_pos->v[0];
+                gLast_actor->t.t.mat.m[3][1] = the_list[face_bastard].normal.v[1] * (-nearest_bastard) + gOur_pos->v[1];
+                gLast_actor->t.t.mat.m[3][2] = the_list[face_bastard].normal.v[2] * (-nearest_bastard) + gOur_pos->v[2];
                 if (!PDKeyDown(KEY_SHIFT_ANY)) {
                     if (the_list[face_bastard].normal.v[1] > the_list[face_bastard].normal.v[0] && the_list[face_bastard].normal.v[2] > the_list[face_bastard].normal.v[0]) {
                         BrVector3Set(&side_vector, -1.f, 0.f, 0.f);
@@ -4633,27 +4634,29 @@ void DropActor(int pIndex) {
                         BrVector3Set(&side_vector, 0.f, 0.f, -1.f);
                     }
                     new_transform.type = BR_TRANSFORM_LOOK_UP;
-                    BrVector3Cross(&new_transform.t.look_up.look, &the_list[face_bastard].normal, &side_vector);
-                    BrVector3Copy(&new_transform.t.look_up.up, &the_list[face_bastard].normal);
-                    BrVector3Copy(&new_transform.t.look_up.t, &gLast_actor->t.t.translate.t);
+                    BrVector3Cross(&new_transform.t.look_up.look, &side_vector, &the_list[face_bastard].normal);
+                    new_transform.t.look_up.up = the_list[face_bastard].normal;
+                    new_transform.t.look_up.t = gLast_actor->t.t.translate.t;
                     BrTransformToTransform(&gLast_actor->t, &new_transform);
                 }
 
                 gKnown_actor = gLast_actor;
-                BrVector3Copy(&gActor_centre, &gLast_actor->t.t.translate.t);
+                gActor_centre = gLast_actor->t.t.translate.t;
                 DuplicateIfNotAmpersand(gLast_actor);
                 UniquificateActorsName(gUniverse_actor, gLast_actor);
                 gLast_actor->model->flags |= BR_MODF_UPDATEABLE;
-                if (gLast_actor->identifier == NULL || gLast_actor->identifier[0] == '&') {
+                if (gLast_actor->identifier != NULL && gLast_actor->identifier[0] != '&') {
+                    BrActorAdd(gAdditional_actors, gLast_actor);
+                } else {
+                    a = gAdditional_actors->children;
                     last_non_ampersand = gAdditional_actors;
-                    for (a = gAdditional_actors->children; a != NULL; a = a->next) {
-                        if (a->identifier != NULL && a->identifier[0] != '&') {
+                    while (a != NULL) {
+                        if (a->identifier && a->identifier[0] != '&') {
                             last_non_ampersand = a;
                         }
+                        a = a->next;
                     }
                     BrActorAdd(last_non_ampersand, gLast_actor);
-                } else {
-                    BrActorAdd(gAdditional_actors, gLast_actor);
                 }
                 SaveAdditionalStuff();
                 AccessoryHeadup(gLast_actor, "Shat out ");
