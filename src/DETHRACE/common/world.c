@@ -4935,12 +4935,11 @@ void ScaleAccessory(float pScaling_factor) {
 void MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift) {
     br_vector3 v;
 
-    if (gLast_actor == NULL) {
-        return;
+    if (gLast_actor != NULL) {
+        BrVector3Set(&v, pX_shift, pY_shift, pZ_shift);
+        BrVector3Accumulate(&gLast_actor->t.t.translate.t, &v);
+        SaveAdditionalStuff();
     }
-    BrVector3SetFloat(&v, pX_shift, pY_shift, pZ_shift);
-    BrVector3Accumulate(&gLast_actor->t.t.translate.t, &v);
-    SaveAdditionalStuff();
 }
 
 // IDA: void __cdecl RotateAccL()
@@ -5080,7 +5079,7 @@ void ScaleAccDown3(void) {
 // FUNCTION: CARM95 0x00444d53
 void ScaleAccDown4(void) {
 
-    ScaleAccessory(1 / 1.002f);
+    ScaleAccessory(1 / 1.002);
 }
 
 // IDA: void __cdecl MoveXAccL()
