@@ -109,64 +109,64 @@ int gNumber_of_actors;
 // GLOBAL: CARM95 0x0050c7e4
 int gNumber_of_lights;
 
-// GLOBAL: CARM95 0x005514e0
-br_actor* gActor_array[500];
-
-// GLOBAL: CARM95 0x00532af0
-float* gGroove_funk_bindings[960];
+// GLOBAL: CARM95 0x00532218
+float gTemp;
 
 // GLOBAL: CARM95 0x00532220
 br_actor* gDelete_list[500];
 
-// GLOBAL: CARM95 0x00551cb0
-br_actor* gLight_array[50];
-
-// GLOBAL: CARM95 0x00533b18
-br_model* gAdditional_models[1000];
-
-// GLOBAL: CARM95 0x00534ac0
-br_actor* gSpec_vol_actors[100];
-
-// GLOBAL: CARM95 0x00533a00
-tPath_name gAdditional_actor_path;
-
 // GLOBAL: CARM95 0x005329f0
 tPath_name gAdditional_model_path;
 
-// GLOBAL: CARM95 0x00533b00
-tU32 gPrevious_groove_times[2];
-
-// GLOBAL: CARM95 0x00551d78
-int gRace_file_version;
+// GLOBAL: CARM95 0x00532af0
+float* gGroove_funk_bindings[960];
 
 // GLOBAL: CARM95 0x005339f0
 br_vector3 gActor_centre;
 
-// GLOBAL: CARM95 0x00532218
-float gTemp;
+// GLOBAL: CARM95 0x005339fc
+br_scalar gNearest_distance;
 
-// GLOBAL: CARM95 0x00533b0c
-br_actor* gLast_actor;
+// GLOBAL: CARM95 0x00533a00
+tPath_name gAdditional_actor_path;
+
+// GLOBAL: CARM95 0x00533b00
+tU32 gPrevious_groove_times[2];
 
 // GLOBAL: CARM95 0x00533b08
 br_actor* gKnown_actor;
 
-// GLOBAL: CARM95 0x00534ab8
-br_actor* gAdditional_actors;
+// GLOBAL: CARM95 0x00533b0c
+br_actor* gLast_actor;
 
 // GLOBAL: CARM95 0x00533b10
 int gDelete_count;
 
-// GLOBAL: CARM95 0x005339fc
-br_scalar gNearest_distance;
+// GLOBAL: CARM95 0x00533b18
+br_model* gAdditional_models[1000];
+
+// GLOBAL: CARM95 0x00534ab8
+br_actor* gAdditional_actors;
+
+// GLOBAL: CARM95 0x00534abc
+br_scalar gSight_distance_squared;
+
+// GLOBAL: CARM95 0x00534ac0
+br_actor* gSpec_vol_actors[100];
 
 // GLOBAL: CARM95 0x00534c50
 br_actor* gNearest_actor;
 
+// GLOBAL: CARM95 0x005514e0
+br_actor* gActor_array[500];
+
+// GLOBAL: CARM95 0x00551cb0
+br_actor* gLight_array[50];
+
 br_actor* gStandard_lamp;
 
-// GLOBAL: CARM95 0x00534abc
-br_scalar gSight_distance_squared;
+// GLOBAL: CARM95 0x00551d78
+int gRace_file_version;
 
 #define GROOVE_FUNK_BUFFER_SIZE_INCREASE 16
 #define NO_OWNER -999
@@ -5358,33 +5358,30 @@ void DropSpecVol(int pIndex) {
 
     PathCat(the_path, gApplication_path, "SPECVOL.TXT");
     f = DRfopen(the_path, "rt");
-    if (f == NULL) {
-        return;
-    }
-    spec_count = GetAnInt(f);
-    // pIndex = 1 means first special volume
-    if (pIndex > spec_count) {
+    if (f != NULL) {
+        spec_count = GetAnInt(f);
+        // pIndex = 1 means first special volume
+        if (pIndex <= spec_count) {
+            for (i = 0; i < pIndex; i++) {
+                ParseSpecialVolume(f, &spec, NULL);
+            }
+            spec.no_mat = 0;
+            BrMatrix34Copy(&spec.mat, &gProgram_state.current_car.car_master_actor->t.t.mat);
+            new_specs = BrMemAllocate((gProgram_state.special_volume_count + 1) * sizeof(tSpecial_volume), kMem_new_special_vol);
+            memcpy(new_specs, gProgram_state.special_volumes, gProgram_state.special_volume_count * sizeof(tSpecial_volume));
+            memcpy(&new_specs[gProgram_state.special_volume_count], &spec, sizeof(tSpecial_volume));
+            gProgram_state.special_volume_count++;
+            BrMemFree(gProgram_state.special_volumes);
+            gProgram_state.special_volumes = new_specs;
+            BuildSpecVolModel(&spec, gProgram_state.special_volume_count - 1, GetInternalMat(), GetExternalMat());
+            gLast_actor = gSpec_vol_actors[gProgram_state.special_volume_count - 1];
+            UpdateSpecVol();
+            sprintf(s, "Shat out special volume #%d (type %d)", gProgram_state.special_volume_count - 1, pIndex);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, s);
+            SaveSpecialVolumes();
+        }
         fclose(f);
-        return;
     }
-    for (i = 0; i < pIndex; i++) {
-        ParseSpecialVolume(f, &spec, NULL);
-    }
-    spec.no_mat = 0;
-    BrMatrix34Copy(&spec.mat, &gProgram_state.current_car.car_master_actor->t.t.mat);
-    new_specs = BrMemAllocate((gProgram_state.special_volume_count + 1) * sizeof(tSpecial_volume), kMem_new_special_vol);
-    memcpy(new_specs, gProgram_state.special_volumes, gProgram_state.special_volume_count * sizeof(tSpecial_volume));
-    memcpy(&new_specs[gProgram_state.special_volume_count], &spec, sizeof(tSpecial_volume));
-    gProgram_state.special_volume_count++;
-    BrMemFree(gProgram_state.special_volumes);
-    gProgram_state.special_volumes = new_specs;
-    BuildSpecVolModel(&spec, gProgram_state.special_volume_count - 1, GetInternalMat(), GetExternalMat());
-    gLast_actor = gSpec_vol_actors[gProgram_state.special_volume_count - 1];
-    UpdateSpecVol();
-    sprintf(s, "Shat out special volume #%d (type %d)", gProgram_state.special_volume_count - 1, pIndex);
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, s);
-    SaveSpecialVolumes();
-    fclose(f);
 }
 
 // IDA: void __cdecl DropSpecVol0()
