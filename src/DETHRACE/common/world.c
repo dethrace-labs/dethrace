@@ -5519,19 +5519,18 @@ void DeleteSpecVol(void) {
     int index;
 
     index = FindSpecVolIndex(gLast_actor);
-    if (index < 0) {
-        return;
+    if (index >= 0) {
+        DelSpecVolumeGraph(index);
+        memmove(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
+        memmove(&gSpec_vol_actors[index], &gSpec_vol_actors[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(br_actor*));
+        gProgram_state.special_volume_count--;
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "There's been a special volumes MURDER!!");
+        gLast_actor = NULL;
+        if (&gProgram_state.special_volumes[index] < gDefault_water_spec_vol) {
+            gDefault_water_spec_vol--;
+        }
+        SaveSpecialVolumes();
     }
-    DelSpecVolumeGraph(index);
-    memmove(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
-    memmove(&gSpec_vol_actors[index], &gSpec_vol_actors[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(br_actor*));
-    gProgram_state.special_volume_count--;
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "There's been a special volumes MURDER!!");
-    gLast_actor = NULL;
-    if (&gProgram_state.special_volumes[index] < gDefault_water_spec_vol) {
-        gDefault_water_spec_vol--;
-    }
-    SaveSpecialVolumes();
 }
 
 // IDA: void __cdecl RotateSpecVolL()
@@ -5841,12 +5840,11 @@ void ShowSpecialVolumes(void) {
     gSpec_vol_mode = 1;
     internal_mat = GetInternalMat();
     external_mat = GetExternalMat();
-    for (i = 0; i < gProgram_state.special_volume_count; i++) {
-        v = &gProgram_state.special_volumes[i];
-        if (!v->no_mat) {
-            BuildSpecVolModel(v, i, internal_mat, external_mat);
-        } else {
+    for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
+        if (v->no_mat) {
             gSpec_vol_actors[i] = NULL;
+        } else {
+            BuildSpecVolModel(v, i, internal_mat, external_mat);
         }
     }
 }
