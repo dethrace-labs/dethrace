@@ -4904,31 +4904,30 @@ void RotateAccessory(br_angle pAngle) {
 void ScaleAccessory(float pScaling_factor) {
     br_vector3 mr_offset;
 
-    if (gLast_actor == NULL) {
-        return;
+    if (gLast_actor != NULL) {
+        if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
+            CentreActor(gLast_actor, &mr_offset);
+        }
+        switch (gCurrent_scale_mode) {
+        case eScale_mode_all:
+            BrMatrix34PreScale(&gLast_actor->t.t.mat, pScaling_factor, pScaling_factor, pScaling_factor);
+            break;
+        case eScale_mode_x:
+            BrMatrix34PreScale(&gLast_actor->t.t.mat, pScaling_factor, 1.f, 1.f);
+            break;
+        case eScale_mode_y:
+            BrMatrix34PreScale(&gLast_actor->t.t.mat, 1.f, pScaling_factor, 1.f);
+            break;
+        case eScale_mode_z:
+            BrMatrix34PreScale(&gLast_actor->t.t.mat, 1.f, 1.f, pScaling_factor);
+            break;
+        }
+        if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
+            DRActorEnumRecurseWithTrans(gLast_actor, NULL, ApplyTransToModels, NULL);
+            OffsetActor(gLast_actor, &mr_offset);
+        }
+        SaveAdditionalStuff();
     }
-    if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
-        CentreActor(gLast_actor, &mr_offset);
-    }
-    switch (gCurrent_scale_mode) {
-    case eScale_mode_all:
-        BrMatrix34PreScale(&gLast_actor->t.t.mat, pScaling_factor, pScaling_factor, pScaling_factor);
-        break;
-    case eScale_mode_x:
-        BrMatrix34PreScale(&gLast_actor->t.t.mat, pScaling_factor, 1.f, 1.f);
-        break;
-    case eScale_mode_y:
-        BrMatrix34PreScale(&gLast_actor->t.t.mat, 1.f, pScaling_factor, 1.f);
-        break;
-    case eScale_mode_z:
-        BrMatrix34PreScale(&gLast_actor->t.t.mat, 1.f, 1.f, pScaling_factor);
-        break;
-    }
-    if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
-        DRActorEnumRecurseWithTrans(gLast_actor, NULL, ApplyTransToModels, NULL);
-        OffsetActor(gLast_actor, &mr_offset);
-    }
-    SaveAdditionalStuff();
 }
 
 // IDA: void __cdecl MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift)
