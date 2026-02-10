@@ -5464,23 +5464,25 @@ void IdentifySpecVol(void) {
     char s[256];
 
     min_d = FLT_MAX;
-    min_index = -1;
     p = &gProgram_state.current_car.pos;
-    for (i = 0; i < gProgram_state.special_volume_count; i++) {
-        v = &gProgram_state.special_volumes[i];
+    min_index = -1;
+    for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
+        if (v->no_mat) {
+            continue;
+        }
         d = Vector3DistanceSquared((br_vector3*)v->mat.m[3], p);
         if (d < min_d) {
-            min_index = i;
             min_d = d;
+            min_index = i;
         }
     }
-    if (min_index < 0) {
-        gLast_actor = NULL;
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "No special volumes to lock onto");
-    } else {
+    if (min_index >= 0) {
         sprintf(s, "Locked onto Special Volume #%d", min_index);
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, s);
         gLast_actor = gSpec_vol_actors[min_index];
+    } else {
+        gLast_actor = NULL;
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "No special volumes to lock onto");
     }
 }
 
