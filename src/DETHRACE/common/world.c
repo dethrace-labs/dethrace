@@ -5003,8 +5003,9 @@ void RotateAccR4(void) {
 // IDA: void __cdecl CycleAccRotate()
 // FUNCTION: CARM95 0x004449c6
 void CycleAccRotate(void) {
-
-    gCurrent_rotate_mode = (gCurrent_rotate_mode == eRotate_mode_z) ? eRotate_mode_x : (gCurrent_rotate_mode + 1);
+    if (gCurrent_rotate_mode++ == eRotate_mode_z) {
+        gCurrent_rotate_mode = eRotate_mode_x;
+    }
     switch (gCurrent_rotate_mode) {
     case eRotate_mode_x:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "Rotate mode: X");
