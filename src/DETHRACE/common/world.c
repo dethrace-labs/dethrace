@@ -5073,7 +5073,7 @@ void ScaleAccDown2(void) {
 // FUNCTION: CARM95 0x00444d3b
 void ScaleAccDown3(void) {
 
-    ScaleAccessory(1 / 1.05f);
+    ScaleAccessory(1 / 1.05);
 }
 
 // IDA: void __cdecl ScaleAccDown4()
