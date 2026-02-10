@@ -5856,8 +5856,7 @@ void HideSpecialVolumes(void) {
     tSpecial_volume* v;
 
     gSpec_vol_mode = 0;
-    for (i = 0; i < gProgram_state.special_volume_count; i++) {
-        v = &gProgram_state.special_volumes[i];
+    for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
         if (!v->no_mat) {
             DelSpecVolumeGraph(i);
         }
