@@ -454,22 +454,22 @@ typedef struct tCrush_data {
     tCrush_point_spec* crush_points;
 } tCrush_data;
 
-typedef struct tSpecial_volume {
-    br_matrix34 mat;
-    br_matrix34 inv_mat;
-    br_bounds bounds;
-    br_scalar gravity_multiplier;
-    br_scalar viscosity_multiplier;
-    float car_damage_per_ms;
-    float ped_damage_per_ms;
-    int no_mat;
-    int camera_special_effect_index;
-    int sky_col;
-    int entry_noise;
-    int exit_noise;
-    int engine_noise_index;
-    br_material* screen_material;
-    int material_modifier_index;
+typedef struct tSpecial_volume {     // size: 0xa8
+    br_matrix34 mat;                 // @0x0
+    br_matrix34 inv_mat;             // @0x30
+    br_bounds bounds;                // @0x60
+    br_scalar gravity_multiplier;    // @0x78
+    br_scalar viscosity_multiplier;  // @0x7c
+    float car_damage_per_ms;         // @0x80
+    float ped_damage_per_ms;         // @0x84
+    int no_mat;                      // @0x88
+    int camera_special_effect_index; // @0x8c
+    int sky_col;                     // @0x90
+    int entry_noise;                 // @0x94
+    int exit_noise;                  // @0x98
+    int engine_noise_index;          // @0x9c
+    br_material* screen_material;    // @0xa0
+    int material_modifier_index;     // @0xa4
 } tSpecial_volume;
 
 typedef struct tReduced_matrix {
