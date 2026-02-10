@@ -5023,7 +5023,9 @@ void CycleAccRotate(void) {
 // FUNCTION: CARM95 0x00444a82
 void CycleAccScale(void) {
 
-    gCurrent_scale_mode = (gCurrent_scale_mode == eScale_mode_z) ? eScale_mode_all : (gCurrent_scale_mode + 1);
+    if (gCurrent_scale_mode++ == eScale_mode_z) {
+        gCurrent_scale_mode = eScale_mode_all;
+    }
     switch (gCurrent_scale_mode) {
     case eScale_mode_all:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -2, "Scale mode: ALL");
