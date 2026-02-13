@@ -369,5 +369,8 @@ void SkidsPerFrame(void) {
 // IDA: void __cdecl RemoveMaterialsFromSkidmarks()
 void RemoveMaterialsFromSkidmarks(void) {
     int skid;
-    NOT_IMPLEMENTED();
+
+    for (skid = 0; skid < COUNT_OF(gSkids); skid++) {
+        gSkids[skid].actor->material = NULL;
+    }
 }
