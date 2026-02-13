@@ -23,6 +23,7 @@
 #include "pedestrn.h"
 #include "piping.h"
 #include "replay.h"
+#include "skidmark.h"
 #include "spark.h"
 #include "trig.h"
 #include "utility.h"
@@ -1964,7 +1965,6 @@ void SaveAdditionalStuff(void) {
 
 // IDA: br_uint_32 __cdecl ProcessMaterials(br_actor *pActor, tPMFM2CB pCallback)
 br_uint_32 ProcessMaterials(br_actor* pActor, tPMFM2CB pCallback) {
-
     if (pActor->material) {
         pCallback(pActor->material);
     }
@@ -3186,6 +3186,9 @@ void FreeTrack(tTrack_spec* pTrack_spec) {
     PossibleService();
     ClearOutStorageSpace(&gTrack_storage_space);
     PossibleService();
+#ifdef DETHRACE_3DFX_PATCH
+    RemoveMaterialsFromSkidmarks();
+#endif
     DisposeGroovidelics(-2);
     PossibleService();
     DisposeOpponentPaths();
