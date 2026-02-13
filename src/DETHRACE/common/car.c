@@ -1632,19 +1632,19 @@ void ToggleControls(void) {
     }
     switch (gControl__car) {
     case 0:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "Original Controls");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Original Controls");
         break;
     case 1:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "Accelerated steering");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Accelerated steering");
         break;
     case 2:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "0.75 Accelerated");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "0.75 Accelerated");
         break;
     case 3:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "0.5 Accelerated");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "0.5 Accelerated");
         break;
     default:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "New controls");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "New controls");
         break;
     }
 }
@@ -3645,7 +3645,7 @@ int ExpandBoundingBox(tCar_spec* c) {
     c->bounds[1].min.v[2] = min_z;
     c->bounds[1].max.v[2] = max_z;
     if (c->driver == eDriver_local_human) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_RepairObstructed));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_RepairObstructed));
     }
     return 0;
 }
@@ -4775,7 +4775,7 @@ void AmIGettingBoredWatchingCameraSpin(void) {
                     strcat(s, GetMiscString(kMiscString_RACE_LEADER));
                 }
                 headup_timer = GetRaceTime();
-                NewTextHeadupSlot(eHeadupSlot_fancies, 0, 500, -4, s);
+                NewTextHeadupSlot(eHeadupSlot_fancies, 0, 500, -kFont_MEDIUMHD, s);
             }
         }
     }
@@ -4816,13 +4816,13 @@ void ViewOpponent(void) {
             n = 0;
         }
         gCar_to_view = gNet_players[n].car;
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -3, gNet_players[n].player_name);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_GREENHED, gNet_players[n].player_name);
     } else {
         if (n >= gNum_viewable_cars) {
             n = 0;
         }
         gCar_to_view = gViewable_car_list[n];
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -3, gViewable_car_list[n]->driver_name);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_GREENHED, gViewable_car_list[n]->driver_name);
     }
     gCamera_yaw = 0;
     InitialiseExternalCamera();
@@ -4835,9 +4835,9 @@ void ToggleCarToCarCollisions(void) {
 
     gCar_car_collisions = !gCar_car_collisions;
     if (gCar_car_collisions) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Car Car Collisions");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Car Car Collisions");
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Ghost Cars");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Ghost Cars");
     }
 }
 
@@ -4861,7 +4861,7 @@ void AdjustDownForce(void) {
         c->down_force_speed = 2000.0;
     }
     sprintf(s, "DownForceSpeed %f", c->down_force_speed);
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -4, s);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, s);
 }
 
 // IDA: void __cdecl FreezeMechanics()
@@ -4870,9 +4870,9 @@ void FreezeMechanics(void) {
 
     gFreeze_mechanics = !gFreeze_mechanics;
     if (gFreeze_mechanics) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Mechanics Frozen");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Mechanics Frozen");
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Thawed Mechanics");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Thawed Mechanics");
     }
 }
 
@@ -4882,9 +4882,9 @@ void PutOpponentsInNeutral(void) {
 
     gStop_opponents_moving = !gStop_opponents_moving;
     if (gStop_opponents_moving) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Opponents in neutral");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Opponents in neutral");
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Back in gear");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Back in gear");
     }
 }
 

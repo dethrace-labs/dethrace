@@ -522,7 +522,7 @@ void TotallyRepairCar(void) {
 void CheckLastCar(void) {
 
     if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -4, GetMiscString(kMiscString_EveryOpponentWasted));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -kFont_MEDIUMHD, GetMiscString(kMiscString_EveryOpponentWasted));
         RaceCompleted(eRace_over_opponents);
     }
 }
@@ -1176,7 +1176,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                 victim->pre_car_col_knackered = 1;
                 credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
                 credits = 100 * (int)(credits_squared / 100.0f);
-                if (gNet_mode) {
+                if (gNet_mode != eNet_mode_none) {
                     message = NetBuildMessage(NETMSGID_WASTED, 0);
                     message->contents.data.wasted.victim = NetPlayerFromCar(victim)->ID;
                     if (NetPlayerFromCar(culprit)) {
