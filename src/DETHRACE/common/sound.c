@@ -761,14 +761,18 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
                     }
                     gLast_tune = pCDA_id;
 #if defined(DETHRACE_FIX_BUGS)
-                    int tmpCDA_tag = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
-                    if (tmpCDA_tag == 0 && gS3_last_error == eS3_error_bad_id && generated) {
-                        // Retry with a random tune if the CD track is missing, instead of disabling music completely
-                        return DRS3StartCDA(9999);
-                    }
-                    gCDA_tag = tmpCDA_tag;
-#else
+                    int random_track = pCDA_id == 9999;
+                    int retries_remaining = 5;
+retry_start_music:
+#endif
                     gCDA_tag = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
+#if defined(DETHRACE_FIX_BUGS)
+                    if (gCDA_tag == 0 && gS3_last_error == eS3_error_bad_id && random_track && retries_remaining > 0) {
+                        retries_remaining--;
+                        // Retry with a random tune if the CD track is missing, instead of disabling music completely
+                        pCDA_id = 9999;
+                        goto retry_start_music;
+                    }
 #endif
 #if defined(DETHRACE_FIX_BUGS)
                     // Initial CD music volume was not set correctly
