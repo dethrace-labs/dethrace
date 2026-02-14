@@ -98,6 +98,10 @@ br_vector3 gOld_camera_position;
 // GLOBAL: CARM95 0x00550a50
 br_vector3 gCamera_velocity;
 
+#if defined(DETHRACE_FIX_BUGS)
+extern int gS3_last_error;
+#endif
+
 // IDA: void __cdecl UsePathFileToDetermineIfFullInstallation()
 // FUNCTION: CARM95 0x00463fb0
 void UsePathFileToDetermineIfFullInstallation(void) {
@@ -744,13 +748,28 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
                     } else {
                         S3Service(0, 0);
                     }
+#if defined(DETHRACE_FIX_BUGS)
+                    int generated = 0;
                     if (pCDA_id == 9999) {
+                        generated = 1;
+#else
+                    if (pCDA_id == 9999) {
+#endif
                         do {
                             pCDA_id = gRandom_CDA_tunes[IRandomBetween(0, 7)];
                         } while (pCDA_id == gLast_tune);
                     }
                     gLast_tune = pCDA_id;
+#if defined(DETHRACE_FIX_BUGS)
+                    int tmpCDA_tag = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
+                    if (tmpCDA_tag == 0 && gS3_last_error == eS3_error_bad_id && generated) {
+                        // Retry with a random tune if the CD track is missing, instead of disabling music completely
+                        return DRS3StartCDA(9999);
+                    }
+                    gCDA_tag = tmpCDA_tag;
+#else
                     gCDA_tag = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
+#endif
 #if defined(DETHRACE_FIX_BUGS)
                     // Initial CD music volume was not set correctly
                     DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);
