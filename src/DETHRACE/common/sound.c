@@ -749,22 +749,17 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
                         S3Service(0, 0);
                     }
 #if defined(DETHRACE_FIX_BUGS)
-                    int generated = 0;
-                    if (pCDA_id == 9999) {
-                        generated = 1;
-#else
-                    if (pCDA_id == 9999) {
+                    int random_track = pCDA_id == 9999;
+                    int retries_remaining = 5;
+retry_start_music:
 #endif
+                    if (pCDA_id == 9999) {
                         do {
                             pCDA_id = gRandom_CDA_tunes[IRandomBetween(0, 7)];
                         } while (pCDA_id == gLast_tune);
                     }
                     gLast_tune = pCDA_id;
-#if defined(DETHRACE_FIX_BUGS)
-                    int random_track = pCDA_id == 9999;
-                    int retries_remaining = 5;
-retry_start_music:
-#endif
+
                     gCDA_tag = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
 #if defined(DETHRACE_FIX_BUGS)
                     if (gCDA_tag == 0 && gS3_last_error == eS3_error_bad_id && random_track && retries_remaining > 0) {
@@ -782,6 +777,8 @@ retry_start_music:
                     if (gCDA_tag == 0) {
                         gCD_is_disabled = 1;
                         S3DisableCDA();
+                        printf("CD music disabled - no CD or CD drive found.\n");
+                        fflush(stdout);
                     }
                     gSong_repeat_count = 0;
                 }
