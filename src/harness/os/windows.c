@@ -22,6 +22,7 @@
 #include <errno.h> /* errno, strerror */
 #include <io.h>    /* _access_s, F_OK */
 #include <locale.h>
+#include <shlobj.h>
 #include <stddef.h>
 #include <stdio.h>  /* errno_t, FILE, fgets, fopen_s, fprintf*/
 #include <stdlib.h> /* _splitpath */
