@@ -3,10 +3,16 @@
 
 #include "dr_types.h"
 
+#ifdef DETHRACE_FIX_BUGS
+#define MAXIMUM_NUMBER_OF_CARS 140
+#else
+#define MAXIMUM_NUMBER_OF_CARS 60
+#endif
+
 extern tNet_mode gNet_mode;
 extern tNet_game_player_info gNet_players[6];
 extern br_matrix34 gRoot_to_camera;
-extern tCar_detail_info gCar_details[60];
+extern tCar_detail_info gCar_details[MAXIMUM_NUMBER_OF_CARS];
 extern int gThis_net_player_index;
 extern br_scalar gPedestrian_distance_squared;
 extern int gPending_race;

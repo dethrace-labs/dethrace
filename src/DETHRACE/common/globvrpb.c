@@ -10,7 +10,7 @@ tNet_game_player_info gNet_players[6];
 br_matrix34 gRoot_to_camera;
 
 // GLOBAL: CARM95 0x00550af0
-tCar_detail_info gCar_details[60];
+tCar_detail_info gCar_details[MAXIMUM_NUMBER_OF_CARS];
 
 // GLOBAL: CARM95 0x00550ae0
 int gThis_net_player_index;
