@@ -63,7 +63,7 @@ typedef struct tHarness_game_config {
     char network_adapter_name[256];
     char platform_name[256];
 
-    tHarness_game_dir* selected_dir;
+    char selected_dir[MAX_PATH];
     int game_dirs_count;
     tHarness_game_dir game_dirs[10];
     char default_game[256];

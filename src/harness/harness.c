@@ -237,8 +237,8 @@ void Harness_DetectAndSetWorkingDirectory(char* argv0) {
 
     env_var = getenv("DETHRACE_ROOT_DIR");
 
-    if (harness_game_config.selected_dir != NULL) {
-        path = harness_game_config.selected_dir->directory;
+    if (strlen(harness_game_config.selected_dir) > 0) {
+        path = harness_game_config.selected_dir;
     } else if (env_var != NULL) {
         LOG_INFO2("DETHRACE_ROOT_DIR is set to '%s'", env_var);
         path = env_var;
@@ -343,13 +343,18 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
                 val = argv[i + 1];
                 for (i = 0; i < harness_game_config.game_dirs_count; i++) {
                     if (strcmp(harness_game_config.game_dirs[i].name, val) == 0) {
-                        harness_game_config.selected_dir = &harness_game_config.game_dirs[i];
+                        strcpy(harness_game_config.selected_dir, harness_game_config.game_dirs[i].directory);
                         break;
                     }
                 }
                 if (i == harness_game_config.game_dirs_count) {
                     LOG_PANIC2("Failed to find game %s", val);
                 }
+                consumed = 2;
+            }
+        } else if (strcasecmp(argv[i], "--dir") == 0) {
+            if (i < *argc + 1) {
+                strcpy(harness_game_config.selected_dir, argv[i + 1]);
                 consumed = 2;
             }
         } else if (strcasecmp(argv[i], "--cdcheck") == 0) {
@@ -421,7 +426,7 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
                 strcpy(harness_game_config.network_adapter_name, argv[i + 1]);
                 consumed = 2;
             }
-        } else if (strcmp(argv[i], "--platform") == 0) {
+        } else if (strcasecmp(argv[i], "--platform") == 0) {
             if (i < *argc + 1) {
                 strcpy(harness_game_config.platform_name, argv[i + 1]);
                 consumed = 2;
@@ -520,9 +525,8 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
 int Harness_ProcessIniFile(void) {
     int i;
     char path[1024];
-    char* p;
-    OS_GetPrefPath(path, "dethrace");
 
+    OS_GetPrefPath(path, "dethrace");
     strcat(path, "dethrace.ini");
     LOG_INFO2("Loading ini file %s", path);
 
@@ -531,19 +535,20 @@ int Harness_ProcessIniFile(void) {
         return 1;
     }
 
-    // if there is a default specified
-    if (strlen(harness_game_config.default_game) > 0) {
-        for (i = 0; i < harness_game_config.game_dirs_count; i++) {
-            if (strcmp(harness_game_config.game_dirs[i].name, harness_game_config.default_game) == 0) {
-                harness_game_config.selected_dir = &harness_game_config.game_dirs[i];
-                break;
+    // set default game dir
+    if (harness_game_config.game_dirs_count > 0) {
+        if (strlen(harness_game_config.default_game) > 0) {
+            for (i = 0; i < harness_game_config.game_dirs_count; i++) {
+                if (strcmp(harness_game_config.game_dirs[i].name, harness_game_config.default_game) == 0) {
+                    strcpy(harness_game_config.selected_dir, harness_game_config.game_dirs[i].directory);
+                    break;
+                }
+            }
+            // if no default found, and we have some game dirs, default to first one
+            if (i == harness_game_config.game_dirs_count) {
+                strcpy(harness_game_config.selected_dir, harness_game_config.game_dirs[i].directory);
             }
         }
-    }
-
-    // if no default found, and we have some game dirs, default to first one
-    if (harness_game_config.selected_dir == NULL && harness_game_config.game_dirs_count > 0) {
-        harness_game_config.selected_dir = &harness_game_config.game_dirs[0];
     }
 
     return 0;
