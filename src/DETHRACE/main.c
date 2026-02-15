@@ -10,6 +10,7 @@
 #include "brender.h"
 
 extern int Harness_Init(int* argc, char* argv[]);
+extern int Harness_Quit(void);
 extern int original_main(int pArgc, char* pArgv[]);
 
 void BR_CALLBACK _BrBeginHook(void) {
@@ -57,5 +58,9 @@ int main(int argc, char* argv[]) {
         return result;
     }
 
-    return original_main(argc, argv);
+    result = original_main(argc, argv);
+
+    Harness_Quit();
+
+    return result;
 }
