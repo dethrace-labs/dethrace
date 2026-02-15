@@ -61,6 +61,7 @@ typedef struct tHarness_game_config {
     int install_signalhandler;
     int no_bind;
     char network_adapter_name[256];
+    char platform_name[256];
 
     tHarness_game_dir* selected_dir;
     int game_dirs_count;

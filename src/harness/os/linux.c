@@ -364,6 +364,29 @@ char* OS_GetWorkingDirectory(char* argv0) {
     return OS_Dirname(argv0);
 }
 
+int OS_GetPrefPath(char* dest, char* app) {
+    const char* base = NULL;
+    char path[1024];
+    char full[1024];
+
+    base = getenv("XDG_DATA_HOME");
+    if (!base) {
+        const char* home = getenv("HOME");
+        if (home == NULL) {
+            return -1;
+        }
+        snprintf(path, sizeof(path), "%s/.local/share", home);
+        make_dir(path);
+        base = path;
+    }
+
+    snprintf(full, sizeof(full), "%s/%s/", base, app);
+    mkdir(full, 0755);
+
+    strcpy(dest, full);
+    return 0;
+}
+
 int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
     struct ifaddrs *ifaddr, *ifa;
     int found = 0;

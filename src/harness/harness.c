@@ -54,26 +54,28 @@ tHarness_platform gHarness_platform;
 
 static int force_null_platform = 0;
 
-typedef struct {
-    const char* platform_name;
-    unsigned int platform_capabilityies;
-} tArgument_config;
-
-static int Harness_ProcessCommandLine(tArgument_config* argument_config, int* argc, char* argv[]);
+static int Harness_ProcessCommandLine(int* argc, char* argv[]);
 static int Harness_ProcessIniFile(void);
 
-static int Harness_InitPlatform(tArgument_config* argument_config) {
+static int Harness_InitPlatform(void) {
+    int required_caps = 0;
+
     if (force_null_platform) {
         Null_Platform_Init(&gHarness_platform);
     } else {
         const tPlatform_bootstrap* selected_bootstrap = NULL;
 
-        if (argument_config->platform_name != NULL) {
+        if (harness_game_config.opengl_3dfx_mode) {
+            required_caps &= ~ePlatform_cap_video_mask;
+            required_caps |= ePlatform_cap_opengl;
+        }
+
+        if (strlen(harness_game_config.platform_name) != 0) {
             size_t i;
             for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
-                if (strcasecmp(platform_bootstraps[i]->name, argument_config->platform_name) == 0) {
-                    if ((platform_bootstraps[i]->capabilities & argument_config->platform_capabilityies) != argument_config->platform_capabilityies) {
-                        fprintf(stderr, "Platform \"%s\" does not support requested capabilities. Try another video driver and/or add/remove --opengl\n", selected_bootstrap->name);
+                if (strcasecmp(platform_bootstraps[i]->name, harness_game_config.platform_name) == 0) {
+                    if ((platform_bootstraps[i]->capabilities & required_caps) != required_caps) {
+                        fprintf(stderr, "Platform \"%s\" does not support required capabilities. Try another video driver and/or add/remove --opengl\n", selected_bootstrap->name);
                         return 1;
                     }
                     selected_bootstrap = platform_bootstraps[i];
@@ -81,7 +83,7 @@ static int Harness_InitPlatform(tArgument_config* argument_config) {
                 }
             }
             if (selected_bootstrap == NULL) {
-                fprintf(stderr, "Could not find a platform named \"%s\"\n", argument_config->platform_name);
+                fprintf(stderr, "Could not find a platform named \"%s\"\n", harness_game_config.platform_name);
                 return 1;
             }
             if (selected_bootstrap->init(&gHarness_platform) != 0) {
@@ -92,7 +94,7 @@ static int Harness_InitPlatform(tArgument_config* argument_config) {
             size_t i;
             for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
                 LOG_DEBUG2("Attempting video driver \"%s\"", platform_bootstraps[i]->name);
-                if ((platform_bootstraps[i]->capabilities & argument_config->platform_capabilityies) != argument_config->platform_capabilityies) {
+                if ((platform_bootstraps[i]->capabilities & required_caps) != required_caps) {
                     fprintf(stderr, "Skipping platform \"%s\". Does not support required capabilities.\n", platform_bootstraps[i]->name);
                     continue;
                 }
@@ -245,7 +247,7 @@ void Harness_DetectAndSetWorkingDirectory(char* argv0) {
         if (access("DATA/GENERAL.TXT", F_OK) == 0) {
             // good, found
         } else {
-            gHarness_platform.GetPrefPath(pref_path, "dethrace");
+            OS_GetPrefPath(pref_path, "dethrace");
             path = pref_path;
         }
     }
@@ -260,14 +262,8 @@ void Harness_DetectAndSetWorkingDirectory(char* argv0) {
 }
 
 int Harness_Init(int* argc, char* argv[]) {
-    tArgument_config argument_config;
 
     printf("Dethrace version: %s\n", DETHRACE_VERSION);
-
-    // don't require a particular platform
-    argument_config.platform_name = NULL;
-    // request software renderer capability
-    argument_config.platform_capabilityies = ePlatform_cap_software;
 
     memset(&harness_game_info, 0, sizeof(harness_game_info));
 
@@ -299,16 +295,19 @@ int Harness_Init(int* argc, char* argv[]) {
     // install signal handler
     harness_game_config.install_signalhandler = 1;
 
-    if (Harness_ProcessCommandLine(&argument_config, argc, argv) != 0) {
+    // first load ini file if exists
+    Harness_ProcessIniFile();
+
+    // then override any config options with command line args
+    if (Harness_ProcessCommandLine(argc, argv) != 0) {
         fprintf(stderr, "Failed to parse harness command line\n");
         return 1;
     }
 
-    if (Harness_InitPlatform(&argument_config) != 0) {
+    // now resolve the platform
+    if (Harness_InitPlatform() != 0) {
         return 1;
     }
-
-    Harness_ProcessIniFile();
 
     if (harness_game_config.install_signalhandler) {
         OS_InstallSignalHandler(argv[0]);
@@ -333,12 +332,27 @@ void Harness_ForceNullPlatform(void) {
     force_null_platform = 1;
 }
 
-int Harness_ProcessCommandLine(tArgument_config* config, int* argc, char* argv[]) {
+int Harness_ProcessCommandLine(int* argc, char* argv[]) {
     int i, j;
+    char* val;
     for (i = 1; i < *argc;) {
         int consumed = -1;
 
-        if (strcasecmp(argv[i], "--cdcheck") == 0) {
+        if (strcasecmp(argv[i], "--game") == 0) {
+            if (i < *argc + 1) {
+                val = argv[i + 1];
+                for (i = 0; i < harness_game_config.game_dirs_count; i++) {
+                    if (strcmp(harness_game_config.game_dirs[i].name, val) == 0) {
+                        harness_game_config.selected_dir = &harness_game_config.game_dirs[i];
+                        break;
+                    }
+                }
+                if (i == harness_game_config.game_dirs_count) {
+                    LOG_PANIC2("Failed to find game %s", val);
+                }
+                consumed = 2;
+            }
+        } else if (strcasecmp(argv[i], "--cdcheck") == 0) {
             harness_game_config.enable_cd_check = 1;
             consumed = 1;
         } else if (strstr(argv[i], "--debug=") != NULL) {
@@ -394,8 +408,6 @@ int Harness_ProcessCommandLine(tArgument_config* config, int* argc, char* argv[]
             harness_game_config.sound_options = 1;
             consumed = 1;
         } else if (strcasecmp(argv[i], "--opengl") == 0) {
-            config->platform_capabilityies &= ~ePlatform_cap_video_mask;
-            config->platform_capabilityies |= ePlatform_cap_opengl;
             harness_game_config.opengl_3dfx_mode = 1;
             consumed = 1;
         } else if (strcasecmp(argv[i], "--game-completed") == 0) {
@@ -404,13 +416,14 @@ int Harness_ProcessCommandLine(tArgument_config* config, int* argc, char* argv[]
         } else if (strcasecmp(argv[i], "--no-bind") == 0) {
             harness_game_config.no_bind = 1;
             consumed = 1;
-        } else if (strstr(argv[i], "--network-adapter-name=") != NULL) {
-            char* s = strstr(argv[i], "=");
-            strcpy(harness_game_config.network_adapter_name, s + 1);
-            consumed = 1;
+        } else if (strstr(argv[i], "--network-adapter-name") != NULL) {
+            if (i < *argc + 1) {
+                strcpy(harness_game_config.network_adapter_name, argv[i + 1]);
+                consumed = 2;
+            }
         } else if (strcmp(argv[i], "--platform") == 0) {
             if (i < *argc + 1) {
-                config->platform_name = argv[i + 1];
+                strcpy(harness_game_config.platform_name, argv[i + 1]);
                 consumed = 2;
             }
         }
@@ -507,10 +520,10 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
 int Harness_ProcessIniFile(void) {
     int i;
     char path[1024];
-    gHarness_platform.GetPrefPath(path, "dethrace");
+    char* p;
+    OS_GetPrefPath(path, "dethrace");
 
     strcat(path, "dethrace.ini");
-
     LOG_INFO2("Loading ini file %s", path);
 
     if (ini_parse(path, Harness_Ini_Callback, NULL) < 0) {

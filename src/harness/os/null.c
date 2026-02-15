@@ -33,6 +33,10 @@ char* OS_GetWorkingDirectory(char* argv0) {
     return NULL;
 }
 
+char* OS_GetPrefPath(char* app) {
+    return NULL;
+}
+
 int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
     return 0;
 }

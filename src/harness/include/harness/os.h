@@ -39,6 +39,8 @@ char* OS_Basename(const char* path);
 
 char* OS_GetWorkingDirectory(char* argv0);
 
+int OS_GetPrefPath(char* dest, char* name);
+
 int OS_GetAdapterAddress(char* name, void* pSockaddr_in);
 
 int OS_InitSockets(void);

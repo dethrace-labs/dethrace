@@ -406,6 +406,27 @@ char* OS_GetWorkingDirectory(char* argv0) {
     return OS_Dirname(argv0);
 }
 
+int OS_GetPrefPath(char* dest, char* app) {
+    const char* base = NULL;
+    char path[1024];
+    char full[1024];
+
+    static char appdata[MAX_PATH];
+    if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_APPDATA, NULL, 0, appdata))) {
+        base = appdata;
+    }
+
+    if (base == NULL) {
+        return -1;
+    }
+
+    snprintf(full, sizeof(full), "%s/%s/", base, app);
+    mkdir(full, 0755);
+
+    strcpy(dest, full);
+    return 0;
+}
+
 int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
     DWORD ret, bufLen = 15000;
     IP_ADAPTER_ADDRESSES* adapter_addrs = (IP_ADAPTER_ADDRESSES*)malloc(bufLen);
