@@ -751,7 +751,7 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
 #if defined(DETHRACE_FIX_BUGS)
                     int random_track = pCDA_id == 9999;
                     int retries_remaining = 5;
-retry_start_music:
+                retry_start_music:
 #endif
                     if (pCDA_id == 9999) {
                         do {
@@ -777,8 +777,6 @@ retry_start_music:
                     if (gCDA_tag == 0) {
                         gCD_is_disabled = 1;
                         S3DisableCDA();
-                        printf("CD music disabled - no CD or CD drive found.\n");
-                        fflush(stdout);
                     }
                     gSong_repeat_count = 0;
                 }
