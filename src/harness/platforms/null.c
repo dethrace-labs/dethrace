@@ -54,10 +54,6 @@ static br_uint_32 null_getticks(void) {
     return null_time;
 }
 
-static void null_get_pref_path(char* path, char* app_name) {
-    strcpy(path, ".");
-}
-
 void Null_Platform_Init(tHarness_platform* platform) {
     null_time = 0;
     platform->ProcessWindowMessages = null_get_and_handle_message;
