@@ -101,6 +101,23 @@ jobs:
       - name: "Package (CPack)"
         run: |
           cd build
+
+          # DMG creation on macOS occasionally fails, so try multiple times
+          # https://gitlab.kitware.com/cmake/cmake/-/issues/25671
+          success=0
+          max_tries=10
+          for i in $(seq $max_tries); do
+           cpack . && success=1
+           if test $success = 1; then
+            break
+           fi
+           echo "Package creation failed. Sleep 1 second and try again."
+           sleep 1
+          done
+          if test $success = 0; then
+           echo "Package creation failed after $max_tries attempts."
+           exit 1
+          fi
           cpack .
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
