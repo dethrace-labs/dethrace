@@ -1915,7 +1915,7 @@ void MungeSmokeColumn(tU32 pTime) {
                 AddSmokeColumnToPipingSession(i, gSmoke_column[i].car, gSmoke_column[i].vertex_index, gSmoke_column[i].colour);
                 EndPipingSession();
             }
-            gColumn_flags &= ~(1u << i);
+            gColumn_flags &= ~(1 << i);
             if (gSmoke_column[i].colour == 0) {
                 BrActorRemove(gSmoke_column[i].flame_actor);
             }
@@ -1953,7 +1953,7 @@ void MungeSmokeColumn(tU32 pTime) {
             BrVector3Cross(&v, &c->omega, &car_pos);
             BrMatrix34ApplyV(&car_pos, &v, &c->car_master_actor->t.t.mat);
             BrVector3Add(&v, &c->v, &car_pos);
-            v.v[1] = v.v[1] + 2.898550724637681f; // 100 / 34.5 ?
+            v.v[1] = v.v[1] + 2.898550724637681; // 100 / 34.5 ?
             pos.v[0] = SRandomBetween(-0.03f, 0.03f) + gSmoke_column[i].pos.v[0];
             pos.v[1] = (gSmoke_column[i].colour == 0) * 0.05f + gSmoke_column[i].pos.v[1];
             pos.v[2] = SRandomBetween(-0.03f, 0.03f) + gSmoke_column[i].pos.v[2];
