@@ -2761,9 +2761,7 @@ void MungeSplash(tU32 pTime) {
             continue;
         }
         ts = gSplash[i].size * gSplash[i].scale_x;
-        gSplash[i].actor->t.t.mat.m[0][0] = gCamera_to_world.m[0][0] * ts;
-        gSplash[i].actor->t.t.mat.m[0][1] = gCamera_to_world.m[0][1] * ts;
-        gSplash[i].actor->t.t.mat.m[0][2] = gCamera_to_world.m[0][2] * ts;
+        BrVector3Scale((br_vector3*)gSplash[i].actor->t.t.mat.m[0], (br_vector3*)gCamera_to_world.m[0], ts);
         gSplash[i].actor->t.t.mat.m[1][0] = gSplash[i].size * gCamera_to_world.m[1][0];
         gSplash[i].actor->t.t.mat.m[1][1] = gSplash[i].size * gCamera_to_world.m[1][1];
         gSplash[i].actor->t.t.mat.m[1][2] = gSplash[i].size * gCamera_to_world.m[1][2];
