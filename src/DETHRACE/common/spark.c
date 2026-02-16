@@ -791,7 +791,7 @@ void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, b
     }
     ts = .3f;
     if (v->v[1] < 0.f) {
-        ts = .3f - v->v[1];
+        ts -= v->v[1];
     }
     ts2 = pNormal->v[1] * ts;
 
@@ -799,26 +799,26 @@ void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, b
     tv.v[1] = v->v[1] + ts - pNormal->v[1] * ts2;
     tv.v[2] = v->v[2] - pNormal->v[2] * ts2;
 
-    num = (pForce / 10.f) * 3;
+    num = (int)(pForce / 10.f) * 3;
     rnd = ((pForce + 20.f) * 3.f) / 200.f;
     for (i = 0; i < num; i++) {
         if ((gShrapnel_flags & (1u << gNext_shrapnel)) == 0) {
             BrActorAdd(gNon_track_actor, gShrapnel[gNext_shrapnel].actor);
         }
-        gShrapnel_flags |= 1u << gNext_shrapnel;
+        gShrapnel_flags |= 1 << gNext_shrapnel;
         BrVector3Copy(&gShrapnel[gNext_shrapnel].actor->t.t.translate.t, pos);
-        BrVector3SetFloat(&vel, FRandomBetween(-rnd, rnd), FRandomBetween(0.3f - tv.v[1], rnd), FRandomBetween(-rnd, rnd));
+        BrVector3SetFloat(&vel, FRandomBetween(-rnd, rnd), FRandomBetween(-tv.v[1] + 0.3, rnd), FRandomBetween(-rnd, rnd));
         ts2 = BrVector3Dot(pNormal, &vel);
         BrVector3Scale(&tv2, pNormal, ts2);
         BrVector3Sub(&gShrapnel[gNext_shrapnel].v, &vel, &tv2);
         BrVector3Accumulate(&gShrapnel[gNext_shrapnel].v, &tv);
         gShrapnel[gNext_shrapnel].time_sync = gMechanics_time_sync;
         gShrapnel[gNext_shrapnel].age = 0;
-        if (IRandomBetween(0, 2) != 0) {
+        if (IRandomBetween(0, 2) == 0) {
+            gShrapnel[gNext_shrapnel].actor->material = gBlack_material;
+        } else {
             c = (IRandomBetween(0, 1) != 0) ? c1 : c2;
             gShrapnel[gNext_shrapnel].actor->material = c->shrapnel_material[IRandomBetween(0, c->max_shrapnel_material - 1)];
-        } else {
-            gShrapnel[gNext_shrapnel].actor->material = gBlack_material;
         }
         gNext_shrapnel++;
         if (gNext_shrapnel >= COUNT_OF(gShrapnel)) {
