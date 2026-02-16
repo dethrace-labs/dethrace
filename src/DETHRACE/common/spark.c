@@ -2710,7 +2710,7 @@ void MungeSplash(tU32 pTime) {
     if (gNum_splash_types == 0) {
         return;
     }
-    if (gAction_replay_mode && GetReplayRate() != 0.0f) {
+    if (gAction_replay_mode != eNet_mode_none && GetReplayRate() != 0.0f) {
         for (type = eVehicle_net_player; type <= eVehicle_rozzer; type++) {
             for (i = 0; i < (type == eVehicle_self ? 1 : GetCarCount(type)); i++) {
                 if (type == eVehicle_self) {
