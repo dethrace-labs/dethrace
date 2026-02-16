@@ -66,7 +66,9 @@ typedef struct tPlatform_bootstrap {
 
 extern tHarness_platform gHarness_platform;
 
-int Harness_Init(int* argc, char* argv[]);
+extern int Harness_Init(int* argc, char* argv[]);
+
+extern void Harness_Quit(void);
 
 // Hooks are called from original game code.
 

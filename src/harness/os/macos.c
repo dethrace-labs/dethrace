@@ -229,6 +229,45 @@ void OS_InstallSignalHandler(char* program_name) {
     }
 }
 
+void OS_RemoveSignalHandler(void) {
+
+    /* Unregister our signal handlers */
+    {
+        struct sigaction sig_action = {};
+        sig_action.sa_handler = SIG_DFL;
+        sigemptyset(&sig_action.sa_mask);
+
+        if (sigaction(SIGSEGV, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGFPE, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGINT, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGILL, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGTERM, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGABRT, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+    }
+
+    /* remove alternate stack */
+    {
+        stack_t ss = {};
+        ss.ss_flags = SS_DISABLE;
+
+        if (sigaltstack(&ss, NULL) != 0) {
+            err(1, "sigaltstack");
+        }
+    }
+}
+
 char* OS_GetFirstFileInDirectory(char* path) {
     directory_iterator = opendir(path);
     if (directory_iterator == NULL) {
