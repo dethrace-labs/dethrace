@@ -367,7 +367,6 @@ char* OS_GetWorkingDirectory(char* argv0) {
 int OS_GetPrefPath(char* dest, char* app) {
     const char* base = NULL;
     char path[1024];
-    char full[1024];
 
     base = getenv("XDG_DATA_HOME");
     if (!base) {
@@ -376,14 +375,14 @@ int OS_GetPrefPath(char* dest, char* app) {
             return -1;
         }
         snprintf(path, sizeof(path), "%s/.local/share", home);
-        make_dir(path);
+        mkdir(path, 0755);
         base = path;
     }
 
-    snprintf(full, sizeof(full), "%s/%s/", base, app);
-    mkdir(full, 0755);
+    sprintf(name_buf, sizeof(name_buf), "%s/%s/", base, app);
+    mkdir(name_buf, 0755);
 
-    strcpy(dest, full);
+    strcpy(dest, name_buf);
     return 0;
 }
 
