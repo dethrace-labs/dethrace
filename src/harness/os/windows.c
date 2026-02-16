@@ -422,7 +422,7 @@ int OS_GetPrefPath(char* dest, char* app) {
     }
 
     snprintf(full, sizeof(full), "%s/%s/", base, app);
-    mkdir(full, 0755);
+    CreateDirectoryA(full, NULL);
 
     strcpy(dest, full);
     return 0;
