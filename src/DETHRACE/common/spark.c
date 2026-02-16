@@ -2709,7 +2709,7 @@ void MungeSplash(tU32 pTime) {
     if (gNum_splash_types == 0) {
         return;
     }
-    if (gAction_replay_mode && GetReplayRate() != 0.0) {
+    if (gAction_replay_mode && GetReplayRate() != 0.0f) {
         for (type = eVehicle_net_player; type <= eVehicle_rozzer; type++) {
             for (i = 0; i < (type == eVehicle_self ? 1 : GetCarCount(type)); i++) {
                 if (type == eVehicle_self) {
@@ -2717,12 +2717,12 @@ void MungeSplash(tU32 pTime) {
                 } else {
                     car = GetCarSpec(type, i);
                 }
-                if (car->water_d != 10000.0 && car->driver != eDriver_local_human) {
+                if (car->water_d != 10000.0f && car->driver != eDriver_local_human) {
                     CreateSplash(car, pTime);
                 }
             }
         }
-        if (gProgram_state.current_car.water_d != 10000.0) {
+        if (gProgram_state.current_car.water_d != 10000.0f) {
             CreateSplash(&gProgram_state.current_car, 100);
         }
     } else {
@@ -2735,11 +2735,11 @@ void MungeSplash(tU32 pTime) {
                     continue;
                 }
 #endif
-                if (gActive_car_list[i]->water_d != 10000.0 && gActive_car_list[i]->driver != eDriver_local_human) {
+                if (gActive_car_list[i]->water_d != 10000.0f && gActive_car_list[i]->driver != eDriver_local_human) {
                     CreateSplash(gActive_car_list[i], pTime);
                 }
             }
-            if (gProgram_state.current_car.water_d != 10000.0) {
+            if (gProgram_state.current_car.water_d != 10000.0f) {
                 CreateSplash(&gProgram_state.current_car, 100);
             }
         }
