@@ -47,6 +47,8 @@ static void* stack_traces[MAX_STACK_FRAMES];
 static char name_buf[4096];
 static DIR* directory_iterator;
 
+static void* signal_alternative_stack;
+
 struct dl_iterate_callback_data {
     int initialized;
     intptr_t start;
@@ -211,7 +213,8 @@ void OS_InstallSignalHandler(char* program_name) {
     /* setup alternate stack */
     {
         stack_t ss = {};
-        ss.ss_sp = malloc(2 * MINSIGSTKSZ);
+        signal_alternative_stack = malloc(2 * MINSIGSTKSZ + 4096);
+        ss.ss_sp = (void *)((uintptr_t)signal_alternative_stack & ~0xf);
         if (ss.ss_sp == NULL) {
             err(1, "malloc");
         }
@@ -249,6 +252,47 @@ void OS_InstallSignalHandler(char* program_name) {
         if (sigaction(SIGABRT, &sig_action, NULL) != 0) {
             err(1, "sigaction");
         }
+    }
+}
+
+void OS_RemoveSignalHandler(void) {
+
+    /* Unregister our signal handlers */
+    {
+        struct sigaction sig_action = {};
+        sig_action.sa_handler = SIG_DFL;
+        sigemptyset(&sig_action.sa_mask);
+
+        if (sigaction(SIGSEGV, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGFPE, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGINT, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGILL, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGTERM, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGABRT, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+    }
+
+    /* remove alternate stack */
+    {
+        stack_t ss = {};
+        ss.ss_flags = SS_DISABLE;
+
+        if (sigaltstack(&ss, NULL) != 0) {
+            err(1, "sigaltstack");
+        }
+        free(signal_alternative_stack);
+        signal_alternative_stack = NULL;
     }
 }
 
