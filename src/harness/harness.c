@@ -43,6 +43,12 @@ static const tPlatform_bootstrap* platform_bootstraps[] = {
 #endif
 };
 
+#define safe_strcpy(DEST, SRC) \
+    do { \
+        strncpy((DEST), (SRC), sizeof(DEST)); \
+        (DEST)[sizeof(DEST) - 1] = '\0'; \
+    } while (0)
+
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
 tHarness_game_info harness_game_info;
 
@@ -343,7 +349,7 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
                 val = argv[i + 1];
                 for (i = 0; i < harness_game_config.game_dirs_count; i++) {
                     if (strcmp(harness_game_config.game_dirs[i].name, val) == 0) {
-                        strcpy(harness_game_config.selected_dir, harness_game_config.game_dirs[i].directory);
+                        safe_strcpy(harness_game_config.selected_dir, harness_game_config.game_dirs[i].directory);
                         break;
                     }
                 }
@@ -354,7 +360,7 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             }
         } else if (strcasecmp(argv[i], "--dir") == 0) {
             if (i < *argc + 1) {
-                strcpy(harness_game_config.selected_dir, argv[i + 1]);
+                safe_strcpy(harness_game_config.selected_dir, argv[i + 1]);
                 consumed = 2;
             }
         } else if (strcasecmp(argv[i], "--cdcheck") == 0) {
@@ -423,12 +429,12 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             consumed = 1;
         } else if (strstr(argv[i], "--network-adapter-name") != NULL) {
             if (i < *argc + 1) {
-                strcpy(harness_game_config.network_adapter_name, argv[i + 1]);
+                safe_strcpy(harness_game_config.network_adapter_name, argv[i + 1]);
                 consumed = 2;
             }
         } else if (strcasecmp(argv[i], "--platform") == 0) {
             if (i < *argc + 1) {
-                strcpy(harness_game_config.platform_name, argv[i + 1]);
+                safe_strcpy(harness_game_config.platform_name, argv[i + 1]);
                 consumed = 2;
             }
         }
@@ -455,8 +461,8 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
 #define MATCH_NAME(s, n) strcmp(name, s) == 0
 
     if (strcmp(section, "Games") == 0) {
-        strcpy(harness_game_config.game_dirs[harness_game_config.game_dirs_count].name, name);
-        strcpy(harness_game_config.game_dirs[harness_game_config.game_dirs_count].directory, value);
+        safe_strcpy(harness_game_config.game_dirs[harness_game_config.game_dirs_count].name, name);
+        safe_strcpy(harness_game_config.game_dirs[harness_game_config.game_dirs_count].directory, value);
         harness_game_config.game_dirs_count++;
     }
 
@@ -475,7 +481,7 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
     } else if (MATCH("General", "Emulate3DFX")) {
         harness_game_config.opengl_3dfx_mode = (value[0] == '1');
     } else if (MATCH("General", "DefaultGame")) {
-        strcpy(harness_game_config.default_game, value);
+        safe_strcpy(harness_game_config.default_game, value);
     } else if (MATCH("General", "BoringMode")) {
         gSausage_override = (value[0] == '1');
     } else if (MATCH("General", "Hires")) {
@@ -503,7 +509,7 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
     }
 
     else if (MATCH("Network", "AdapterName")) {
-        strcpy(harness_game_config.network_adapter_name, value);
+        safe_strcpy(harness_game_config.network_adapter_name, value);
     }
 
     else if (MATCH("Developers", "Diagnostics")) {
@@ -540,13 +546,13 @@ int Harness_ProcessIniFile(void) {
         if (strlen(harness_game_config.default_game) > 0) {
             for (i = 0; i < harness_game_config.game_dirs_count; i++) {
                 if (strcmp(harness_game_config.game_dirs[i].name, harness_game_config.default_game) == 0) {
-                    strcpy(harness_game_config.selected_dir, harness_game_config.game_dirs[i].directory);
+                    safe_strcpy(harness_game_config.selected_dir, harness_game_config.game_dirs[i].directory);
                     break;
                 }
             }
             // if no default found, and we have some game dirs, default to first one
             if (i == harness_game_config.game_dirs_count) {
-                strcpy(harness_game_config.selected_dir, harness_game_config.game_dirs[i].directory);
+                safe_strcpy(harness_game_config.selected_dir, harness_game_config.game_dirs[i].directory);
             }
         }
     }
