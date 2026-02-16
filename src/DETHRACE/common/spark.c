@@ -2861,12 +2861,12 @@ void DisposeKevStuffCar(tCar_spec* pCar) {
         }
     }
     for (i = 0; i < COUNT_OF(gSparks); i++) {
-        if (!(gSpark_flags & (1u << i))) {
+        if (!(gSpark_flags & (1 << i))) {
             continue;
         }
         if (gSparks[i].car == pCar) {
             gSparks[i].count = 0;
-            gSpark_flags &= ~(1u << i);
+            gSpark_flags &= ~(1 << i);
         }
     }
     if (gCar_to_view == pCar) {
