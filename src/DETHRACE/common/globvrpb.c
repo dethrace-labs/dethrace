@@ -13,7 +13,7 @@ br_matrix34 gRoot_to_camera;
 tCar_detail_info* gCar_details;
 #else
 // GLOBAL: CARM95 0x00550af0
-tCar_detail_info gCar_details[MAXIMUM_NUMBER_OF_CARS];
+tCar_detail_info gCar_details[60];
 #endif
 
 // GLOBAL: CARM95 0x00550ae0
