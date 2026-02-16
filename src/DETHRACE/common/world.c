@@ -1848,6 +1848,12 @@ int FindSpecVolIndex(br_actor* pActor) {
     int i;
     tSpecial_volume* v;
 
+#ifdef DETHRACE_FIX_BUGS
+    if (pActor == NULL) {
+        return -1;
+    }
+#endif
+
     for (i = 0; i < gProgram_state.special_volume_count; i++) {
         if (gSpec_vol_actors[i] == pActor) {
             return i;
