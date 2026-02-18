@@ -4,6 +4,9 @@
 void OS_InstallSignalHandler(char* program_name) {
 }
 
+void OS_RemoveSignalHandler(void) {
+}
+
 char* OS_GetFirstFileInDirectory(char* path) {
     return NULL;
 }
