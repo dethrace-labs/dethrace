@@ -203,30 +203,29 @@ int SoundClick(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_o
 
     x_delta = pX_offset - gCurrent_graf_data->dial__x_centre;
     y_delta = gCurrent_graf_data->dial__y_centre - pY_offset;
-    if (y_delta <= 0.f) {
-        return 0;
-    }
-    angle = x_delta == 0.f ? PI / 2 : atan(y_delta / x_delta);
-    if (angle < 0.f) {
-        angle += PI;
-    }
-    if (angle > ANGLE_RANGE_START && angle < ANGLE_RANGE_END) {
-        the_value = (*pCurrent_choice == 0) ? &gProgram_state.music_volume : &gProgram_state.effects_volume;
-        old_value = *the_value;
-        *the_value = (ANGLE_RANGE_END - angle + 0.233001455141243) / 0.4660029102824859;
-        if (*the_value > 6) {
-            *the_value = 6;
-        } else if (*the_value < 0) {
-            *the_value = 0;
+    if (y_delta > 0.f) {
+        angle = x_delta != 0.f ? atan(y_delta / x_delta) : PI / 2;
+        if (angle < 0.f) {
+            angle += PI;
         }
-        if (*the_value != old_value) {
-            SetSoundVolumes();
-            if (old_value < *the_value) {
-                DRS3StartSound(gEffects_outlet, 3000);
-            } else {
-                DRS3StartSound(gEffects_outlet, 3000);
+        if (angle > ANGLE_RANGE_START && angle < ANGLE_RANGE_END) {
+            the_value = (*pCurrent_choice == 0) ? &gProgram_state.music_volume : &gProgram_state.effects_volume;
+            old_value = *the_value;
+            *the_value = (ANGLE_RANGE_END - angle + 0.23300145514124296) / 0.4660029102824859;
+            if (*the_value > 6) {
+                *the_value = 6;
+            } else if (*the_value < 0) {
+                *the_value = 0;
             }
-            MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
+            if (*the_value != old_value) {
+                SetSoundVolumes();
+                if (old_value < *the_value) {
+                    DRS3StartSound(gEffects_outlet, 3000);
+                } else {
+                    DRS3StartSound(gEffects_outlet, 3000);
+                }
+                MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
+            }
         }
     }
     return 0;

@@ -1908,60 +1908,14 @@ void MungeSmokeColumn(tU32 pTime) {
         if (((1u << i) & gColumn_flags) == 0) {
             continue;
         }
-        if (gSmoke_column[i].lifetime >= pTime) {
-            gSmoke_column[i].lifetime -= pTime;
-            c = gSmoke_column[i].car;
-            DoSmokeColumn(i, pTime, &car_pos);
-            if (gSmoke_column[i].colour == 0) {
-                FlameAnimate(i, &gSmoke_column[i].pos, pTime);
-                if (gSmoke_column[i].smudge_timer >= pTime) {
-                    gSmoke_column[i].smudge_timer -= pTime;
-                } else {
-                    gSmoke_column[i].smudge_timer += 2000;
-                    SmudgeCar(gSmoke_column[i].car, gSmoke_column[i].vertex_index);
-                    if (gSmoke_column[i].car->knackered) {
-                        plane = IRandomBetween(0, COUNT_OF(gSmoke_column[i].car->fire_vertex) - 1);
-                        SmudgeCar(gSmoke_column[i].car, gSmoke_column[i].car->fire_vertex[plane]);
-                    }
-                }
-            }
-            gSmoke_column[i].time += pTime;
-            if (gSmoke_column[i].time > 200) {
-#ifdef DETHRACE_FIX_BUGS
-                gSmoke_column[i].time -= fmaxf(SMOKE_COLUMN_NEW_PUFF_INTERVAL, pTime);
-#else
-                gSmoke_column[i].time -= pTime;
-#endif
-                gSmoke_column[i].count++;
-                BrVector3Cross(&v, &c->omega, &car_pos);
-                BrMatrix34ApplyV(&car_pos, &v, &c->car_master_actor->t.t.mat);
-                BrVector3Add(&v, &c->v, &car_pos);
-                v.v[1] = v.v[1] + 2.898550724637681f; // 100 / 34.5 ?
-                pos.v[0] = SRandomBetween(-0.03f, 0.03f) + gSmoke_column[i].pos.v[0];
-                pos.v[1] = (gSmoke_column[i].colour == 0) * 0.05f + gSmoke_column[i].pos.v[1];
-                pos.v[2] = SRandomBetween(-0.03f, 0.03f) + gSmoke_column[i].pos.v[2];
-                if ((gSmoke_column[i].whiter & 2) == 0 || IRandomBetween(0, 3)) {
-                    if (gSmoke_column[i].whiter < 1) {
-                        gSmoke_column[i].whiter = -1;
-                    } else {
-                        gSmoke_column[i].whiter = 2;
-                    }
-                } else {
-                    gSmoke_column[i].whiter &= 1;
-                }
-                decay_factor = ((gSmoke_column[i].whiter > 0) + 1.0f) / 2.0f;
-                if (gSmoke_column[i].lifetime < 4000) {
-                    decay_factor = gSmoke_column[i].lifetime * decay_factor / 4000.0f;
-                }
-                CreatePuffOfSmoke(&pos, &v, decay_factor, decay_factor, gSmoke_column[i].colour + 16, c);
-            }
-        } else {
+
+        if (gSmoke_column[i].lifetime < pTime) {
             if (gSmoke_column[i].car != NULL) {
                 StartPipingSession(ePipe_chunk_smoke_column);
                 AddSmokeColumnToPipingSession(i, gSmoke_column[i].car, gSmoke_column[i].vertex_index, gSmoke_column[i].colour);
                 EndPipingSession();
             }
-            gColumn_flags &= ~(1u << i);
+            gColumn_flags &= ~(1 << i);
             if (gSmoke_column[i].colour == 0) {
                 BrActorRemove(gSmoke_column[i].flame_actor);
             }
@@ -1970,6 +1924,53 @@ void MungeSmokeColumn(tU32 pTime) {
                     gSmoke_column[i].car->num_smoke_columns--;
                 }
             }
+            continue;
+        } else {
+            gSmoke_column[i].lifetime -= pTime;
+        }
+        c = gSmoke_column[i].car;
+        DoSmokeColumn(i, pTime, &car_pos);
+        if (gSmoke_column[i].colour == 0) {
+            FlameAnimate(i, &gSmoke_column[i].pos, pTime);
+            if (gSmoke_column[i].smudge_timer < pTime) {
+                gSmoke_column[i].smudge_timer += 2000;
+                SmudgeCar(gSmoke_column[i].car, gSmoke_column[i].vertex_index);
+                if (gSmoke_column[i].car->knackered) {
+                    SmudgeCar(gSmoke_column[i].car, gSmoke_column[i].car->fire_vertex[IRandomBetween(0, COUNT_OF(gSmoke_column[i].car->fire_vertex) - 1)]);
+                }
+            } else {
+                gSmoke_column[i].smudge_timer -= pTime;
+            }
+        }
+        gSmoke_column[i].time += pTime;
+        if (gSmoke_column[i].time > 200) {
+#ifdef DETHRACE_FIX_BUGS
+            gSmoke_column[i].time -= fmaxf(SMOKE_COLUMN_NEW_PUFF_INTERVAL, pTime);
+#else
+            gSmoke_column[i].time -= pTime;
+#endif
+            gSmoke_column[i].count++;
+            BrVector3Cross(&v, &c->omega, &car_pos);
+            BrMatrix34ApplyV(&car_pos, &v, &c->car_master_actor->t.t.mat);
+            BrVector3Add(&v, &c->v, &car_pos);
+            v.v[1] = v.v[1] + 2.898550724637681; // 100 / 34.5 ?
+            pos.v[0] = SRandomBetween(-0.03f, 0.03f) + gSmoke_column[i].pos.v[0];
+            pos.v[1] = (gSmoke_column[i].colour == 0) * 0.05f + gSmoke_column[i].pos.v[1];
+            pos.v[2] = SRandomBetween(-0.03f, 0.03f) + gSmoke_column[i].pos.v[2];
+            if ((gSmoke_column[i].whiter & 2) && IRandomBetween(0, 3) == 0) {
+                gSmoke_column[i].whiter &= 1;
+            } else {
+                if (gSmoke_column[i].whiter >= 1) {
+                    gSmoke_column[i].whiter = 2;
+                } else {
+                    gSmoke_column[i].whiter = -1;
+                }
+            }
+            decay_factor = ((gSmoke_column[i].whiter > 0) + 1.0f) / 2.0f;
+            if (gSmoke_column[i].lifetime < 4000) {
+                decay_factor = gSmoke_column[i].lifetime * decay_factor / 4000.0f;
+            }
+            CreatePuffOfSmoke(&pos, &v, decay_factor, decay_factor, gSmoke_column[i].colour + 16, c);
         }
     }
 }
@@ -2709,7 +2710,23 @@ void MungeSplash(tU32 pTime) {
     if (gNum_splash_types == 0) {
         return;
     }
-    if (!gAction_replay_mode || GetReplayRate() == 0.0) {
+    if (gAction_replay_mode != eNet_mode_none && GetReplayRate() != 0.0f) {
+        for (type = eVehicle_net_player; type <= eVehicle_rozzer; type++) {
+            for (i = 0; i < (type == eVehicle_self ? 1 : GetCarCount(type)); i++) {
+                if (type == eVehicle_self) {
+                    car = &gProgram_state.current_car;
+                } else {
+                    car = GetCarSpec(type, i);
+                }
+                if (car->water_d != 10000.0f && car->driver != eDriver_local_human) {
+                    CreateSplash(car, pTime);
+                }
+            }
+        }
+        if (gProgram_state.current_car.water_d != 10000.0f) {
+            CreateSplash(&gProgram_state.current_car, 100);
+        }
+    } else {
         if (!gAction_replay_mode) {
             for (i = 0; i < gNum_cars_and_non_cars; i++) {
 #if defined(DETHRACE_FIX_BUGS)
@@ -2719,61 +2736,42 @@ void MungeSplash(tU32 pTime) {
                     continue;
                 }
 #endif
-                if (gActive_car_list[i]->water_d != 10000.0 && gActive_car_list[i]->driver != eDriver_local_human) {
+                if (gActive_car_list[i]->water_d != 10000.0f && gActive_car_list[i]->driver != eDriver_local_human) {
                     CreateSplash(gActive_car_list[i], pTime);
                 }
             }
-            if (gProgram_state.current_car.water_d != 10000.0) {
+            if (gProgram_state.current_car.water_d != 10000.0f) {
                 CreateSplash(&gProgram_state.current_car, 100);
             }
-        }
-    } else {
-        for (type = eVehicle_net_player; type <= eVehicle_rozzer; type++) {
-            for (i = 0;; i++) {
-                if (i >= type ? GetCarCount(type) : 1) {
-                    break;
-                }
-                if (type) {
-                    car = GetCarSpec(type, i);
-                } else {
-                    car = &gProgram_state.current_car;
-                }
-                if (car->water_d != 10000.0 && car->driver != eDriver_local_human) {
-                    CreateSplash(car, pTime);
-                }
-            }
-        }
-        if (gProgram_state.current_car.water_d != 10000.0) {
-            CreateSplash(&gProgram_state.current_car, 100);
         }
     }
     if (!gSplash_flags) {
         return;
     }
+
+    dt = pTime * 0.001f;
+
     for (i = 0; i < COUNT_OF(gSplash); i++) {
         if (((1u << i) & gSplash_flags) == 0) {
             continue;
         }
-        if (gSplash[i].just_done || (gAction_replay_mode && GetReplayRate() == 0.0f)) {
-            dt = gSplash[i].size * gSplash[i].scale_x;
-            gSplash[i].actor->t.t.mat.m[0][0] = gCamera_to_world.m[0][0] * dt;
-            gSplash[i].actor->t.t.mat.m[0][1] = gCamera_to_world.m[0][1] * dt;
-            gSplash[i].actor->t.t.mat.m[0][2] = gCamera_to_world.m[0][2] * dt;
-            gSplash[i].actor->t.t.mat.m[1][0] = gSplash[i].size * gCamera_to_world.m[1][0];
-            gSplash[i].actor->t.t.mat.m[1][1] = gSplash[i].size * gCamera_to_world.m[1][1];
-            gSplash[i].actor->t.t.mat.m[1][2] = gSplash[i].size * gCamera_to_world.m[1][2];
-            gSplash[i].actor->t.t.mat.m[2][0] = gSplash[i].size * gCamera_to_world.m[2][0];
-            gSplash[i].actor->t.t.mat.m[2][1] = gSplash[i].size * gCamera_to_world.m[2][1];
-            gSplash[i].actor->t.t.mat.m[2][2] = gSplash[i].size * gCamera_to_world.m[2][2];
-            if (gProgram_state.cockpit_on) {
-                ts = sqrt(gCamera_to_world.m[0][2] * gCamera_to_world.m[0][2] + gCamera_to_world.m[0][0] * gCamera_to_world.m[0][0]);
-                DRMatrix34PreRotateZ(&gSplash[i].actor->t.t.mat, -FastScalarArcTan2Angle(gCamera_to_world.m[0][1], ts));
-            }
-            gSplash[i].just_done = 0;
-        } else {
+        if (!gSplash[i].just_done && (!gAction_replay_mode || GetReplayRate() != 0.0f)) {
             gSplash_flags &= ~(1u << i);
             BrActorRemove(gSplash[i].actor);
+            continue;
         }
+        ts = gSplash[i].size * gSplash[i].scale_x;
+        BrVector3Scale((br_vector3*)gSplash[i].actor->t.t.mat.m[0], (br_vector3*)gCamera_to_world.m[0], ts);
+        gSplash[i].actor->t.t.mat.m[1][0] = gSplash[i].size * gCamera_to_world.m[1][0];
+        gSplash[i].actor->t.t.mat.m[1][1] = gSplash[i].size * gCamera_to_world.m[1][1];
+        gSplash[i].actor->t.t.mat.m[1][2] = gSplash[i].size * gCamera_to_world.m[1][2];
+        gSplash[i].actor->t.t.mat.m[2][0] = gSplash[i].size * gCamera_to_world.m[2][0];
+        gSplash[i].actor->t.t.mat.m[2][1] = gSplash[i].size * gCamera_to_world.m[2][1];
+        gSplash[i].actor->t.t.mat.m[2][2] = gSplash[i].size * gCamera_to_world.m[2][2];
+        if (gProgram_state.cockpit_on) {
+            DRMatrix34PreRotateZ(&gSplash[i].actor->t.t.mat, -FastScalarArcTan2Angle(gCamera_to_world.m[0][1], sqrt(gCamera_to_world.m[0][2] * gCamera_to_world.m[0][2] + gCamera_to_world.m[0][0] * gCamera_to_world.m[0][0])));
+        }
+        gSplash[i].just_done = 0;
     }
 }
 
@@ -2861,17 +2859,20 @@ void DisposeKevStuffCar(tCar_spec* pCar) {
         }
     }
     for (i = 0; i < COUNT_OF(gSparks); i++) {
-        if ((gSpark_flags & (1u << i)) && gSparks[i].car == pCar) {
+        if (!(gSpark_flags & (1 << i))) {
+            continue;
+        }
+        if (gSparks[i].car == pCar) {
             gSparks[i].count = 0;
-            gSpark_flags &= ~(1u << i);
+            gSpark_flags &= ~(1 << i);
         }
-        if (gCar_to_view == pCar) {
-            gCamera_yaw = 0;
-            gCar_to_view = &gProgram_state.current_car;
-            InitialiseExternalCamera();
-            PositionExternalCamera(gCar_to_view, 200);
-            gCar_to_view = &gProgram_state.current_car;
-        }
+    }
+    if (gCar_to_view == pCar) {
+        gCamera_yaw = 0;
+        gCar_to_view = &gProgram_state.current_car;
+        InitialiseExternalCamera();
+        PositionExternalCamera(gCar_to_view, 200);
+        gCar_to_view = &gProgram_state.current_car;
     }
 }
 

@@ -333,6 +333,13 @@ int Harness_Init(int* argc, char* argv[]) {
     return 0;
 }
 
+void Harness_Quit(void) {
+
+    if (harness_game_config.install_signalhandler) {
+        OS_RemoveSignalHandler();
+    }
+}
+
 // used by unit tests
 void Harness_ForceNullPlatform(void) {
     force_null_platform = 1;

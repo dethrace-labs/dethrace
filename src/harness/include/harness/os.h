@@ -23,7 +23,9 @@
 #endif
 
 // Optional: install a handler to print stack trace during a crash
-void OS_InstallSignalHandler(char* program_name);
+extern void OS_InstallSignalHandler(char* program_name);
+
+extern void OS_RemoveSignalHandler(void);
 
 char* OS_GetFirstFileInDirectory(char* path);
 

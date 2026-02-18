@@ -45,6 +45,8 @@ static char path_addr2line[1024];
 static char dirname_buf[_MAX_DIR];
 static char fname_buf[_MAX_FNAME];
 
+static LPTOP_LEVEL_EXCEPTION_FILTER prevUnhandledExceptionFilter;
+
 HANDLE directory_handle = NULL;
 char last_found_file[260];
 
@@ -339,7 +341,12 @@ void OS_InstallSignalHandler(char* program_name) {
         }
     }
     strcpy(windows_program_name, program_name);
-    SetUnhandledExceptionFilter(windows_exception_handler);
+    prevUnhandledExceptionFilter = SetUnhandledExceptionFilter(windows_exception_handler);
+}
+
+void OS_RemoveSignalHandler(void) {
+    SetUnhandledExceptionFilter(prevUnhandledExceptionFilter);
+    prevUnhandledExceptionFilter = NULL;
 }
 
 char* OS_GetFirstFileInDirectory(char* path) {

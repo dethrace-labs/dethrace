@@ -260,6 +260,11 @@ int UpRace(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
+#ifdef DETHRACE_FIX_BUGS
+    if (gCurrent_race_index <= 0) {
+        return 0;
+    }
+#endif
     if (gRace_list[gCurrent_race_index - 1].best_rank <= gProgram_state.rank || gProgram_state.game_completed || gChange_race_net_mode) {
         if (gCurrent_race_index != 0) {
             RemoveTransientBitmaps(1);
