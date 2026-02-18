@@ -118,7 +118,6 @@ jobs:
            echo "Package creation failed after $max_tries attempts."
            exit 1
           fi
-          cpack .
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
