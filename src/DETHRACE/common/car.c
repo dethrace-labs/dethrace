@@ -4627,9 +4627,17 @@ void MungeCarGraphics(tU32 pFrame_period) {
                 distance_from_camera = Vector3DistanceSquared(&the_car->car_master_actor->t.t.translate.t,
                                            (br_vector3*)gCamera_to_world.m[3])
                     / gCar_simplification_factor[gGraf_spec_index][gCar_simplification_level];
-                if (gNet_mode != eNet_mode_none && gNet_players[gIt_or_fox].car == the_car) {
+#ifdef DETHRACE_FIX_BUGS
+#define CAR_IS_IT_OR_FOX(CAR) (gIt_or_fox >= 0 && gNet_players[gIt_or_fox].car == (CAR))
+#else
+#define CAR_IS_IT_OR_FOX(CAR) gNet_players[gIt_or_fox].car == (CAR)
+#endif
+                if (gNet_mode != eNet_mode_none && CAR_IS_IT_OR_FOX(the_car)) {
                     distance_from_camera = 0.f;
                 }
+#ifdef DETHRACE_FIX_BUGS
+#undef CAR_IS_IT_OR_FOX
+#endif
                 for (i = 0; i < the_car->car_actor_count; i++) {
                     if (the_car->car_model_actors[i].min_distance_squared <= distance_from_camera) {
                         SwitchCarActor(the_car, i);
