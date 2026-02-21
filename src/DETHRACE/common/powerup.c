@@ -241,7 +241,7 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
         return -1;
     }
     if (the_powerup->got_proc == NULL) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_UNAVAILABLE_IN_DEMO));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, GetMiscString(kMiscString_UNAVAILABLE_IN_DEMO));
         return -1;
     }
 
@@ -265,7 +265,7 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
                 s2 = strtok(NULL, "/");
             }
         }
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, s2);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, s2);
     }
     original_index = pIndex;
     the_powerup->car = pCar;
@@ -639,7 +639,7 @@ void ImprovePSPowerup(tCar_spec* pCar, int pIndex) {
     tNet_message* the_message;
 
     pCar->power_up_levels[pIndex]++;
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_APOGained_START + pIndex));
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, GetMiscString(kMiscString_APOGained_START + pIndex));
 }
 
 // IDA: int __usercall GotTimeOrPower@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
@@ -670,7 +670,7 @@ int GotTimeOrPower(tPowerup* pPowerup, tCar_spec* pCar) {
                 }
             }
         } else {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
         }
     } else {
         if (pCar->driver == eDriver_local_human) {
@@ -895,7 +895,7 @@ void PaletteFuckedUpByDrugs(br_pixelmap* pPixelmap, int pOffset) {
     ((tU32*)gRender_palette->pixels)[0] = gReal_render_palette[0];
 
     for (i = 224; i < 256; i++) {
-        ((tU32*)gRender_palette->pixels)[i] = gReal_render_palette[i] & 0xff;
+        ((tU32*)gRender_palette->pixels)[i] = gReal_render_palette[i & 0xff];
     }
 }
 

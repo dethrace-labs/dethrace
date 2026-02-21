@@ -168,15 +168,15 @@ char* gFont_names[21] = {
 
 // GLOBAL: CARM95 0x005201a0
 br_colour gRGB_colours[9] = {
-    0u,
-    16777215u,
-    16711680u,
-    65280u,
-    255u,
-    16776960u,
-    65535u,
-    16711935u,
-    13649666u
+    BR_COLOUR_RGB(0x00 ,0x00, 0x00),
+    BR_COLOUR_RGB(0xff, 0xff, 0xff),
+    BR_COLOUR_RGB(0xff, 0x00, 0x00),
+    BR_COLOUR_RGB(0x00, 0xff, 0x00),
+    BR_COLOUR_RGB(0x00, 0x00, 0xff),
+    BR_COLOUR_RGB(0xff, 0xff, 0x00),
+    BR_COLOUR_RGB(0x00, 0xff, 0xff),
+    BR_COLOUR_RGB(0xff, 0x00, 0xff),
+    BR_COLOUR_RGB(0xd0, 0x47, 0x02)
 };
 
 // GLOBAL: CARM95 0x005201c8
@@ -2124,7 +2124,7 @@ void RenderAFrame(int pDepth_mask_on) {
     if (gMap_mode) {
         if (gNet_mode == eNet_mode_none) {
             GetTimerString(the_text, 0);
-            map_timer_width = DRTextWidth(&gFonts[2], the_text);
+            map_timer_width = DRTextWidth(&gFonts[kFont_BLUEHEAD], the_text);
             map_timer_x = gCurrent_graf_data->map_timer_text_x - map_timer_width;
             BrPixelmapRectangleFill(
                 gBack_screen,
@@ -3460,16 +3460,16 @@ void ToggleShadow(void) {
     }
     switch (gShadow_level) {
     case eShadow_none:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_NoShadows));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_NoShadows));
         break;
     case eShadow_us_only:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderOwnCar));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ShadowUnderOwnCar));
         break;
     case eShadow_us_and_opponents:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderMainCars));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ShadowUnderMainCars));
         break;
     case eShadow_everyone:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderAllCars));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ShadowUnderAllCars));
         break;
     default:
         return;
@@ -3540,9 +3540,9 @@ void ShadowMode(void) {
 
     gFancy_shadow = !gFancy_shadow;
     if (gFancy_shadow) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, "Translucent shadow");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, "Translucent shadow");
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, "Solid shadow");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, "Solid shadow");
     }
 }
 
