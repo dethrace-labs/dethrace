@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=dethrace
+Comment=Reverse engineering the 1997 game "Carmageddon"
+Exec=dethrace
+Icon=icon_source
+Terminal=false
+Categories=Game;Action;Simulator

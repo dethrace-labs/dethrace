@@ -4,6 +4,9 @@
 void OS_InstallSignalHandler(char* program_name) {
 }
 
+void OS_RemoveSignalHandler(void) {
+}
+
 char* OS_GetFirstFileInDirectory(char* path) {
     return NULL;
 }
@@ -30,6 +33,10 @@ char* OS_Basename(const char* path) {
 }
 
 char* OS_GetWorkingDirectory(char* argv0) {
+    return NULL;
+}
+
+char* OS_GetPrefPath(char* app) {
     return NULL;
 }
 

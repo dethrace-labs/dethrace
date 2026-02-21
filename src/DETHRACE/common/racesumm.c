@@ -436,15 +436,19 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: tSO_result __cdecl DoEndRaceSummary1()
 // FUNCTION: CARM95 0x004161dd
 tSO_result DoEndRaceSummary1(void) {
+    // GLOBAL: CARM95 0x00509bc0
     static tFlicette flicker_on[1] = {
         { 43, { 218, 436 }, { 147, 353 } },
     };
+    // GLOBAL: CARM95 0x00509bd8
     static tFlicette flicker_off[1] = {
         { 42, { 218, 436 }, { 147, 353 } },
     };
+    // GLOBAL: CARM95 0x00509bf0
     static tFlicette push[1] = {
         { 154, { 218, 436 }, { 147, 353 } },
     };
+    // GLOBAL: CARM95 0x00509c08
     static tMouse_area mouse_areas[1] = {
         { { 218, 436 }, { 147, 353 }, { 281, 562 }, { 167, 401 }, 0, 0, 0, NULL },
     };
@@ -1175,11 +1179,13 @@ int DamageScrnGoHead(int* pCurrent_choice, int* pCurrent_mode) {
     } else if (gWreck_zoomed_in >= 0) {
         if (*pCurrent_choice == 1) {
             ZoomInTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
+            return 0;
         }
-    } else if (*pCurrent_choice == 1) {
+    } else {
         if (*pCurrent_choice == 0 && gWreck_selected >= 0) {
             ZoomOutTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
             gUser_interacted = 1;
+            return 0;
         }
     }
     return 0;
@@ -1237,16 +1243,19 @@ int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 // IDA: tSO_result __cdecl DoEndRaceSummary2()
 // FUNCTION: CARM95 0x0041797b
 tSO_result DoEndRaceSummary2(void) {
+    // GLOBAL: CARM95 0x00509d68
     static tFlicette flicker_on[3] = {
         { -1, { 0, 0 }, { 0, 0 } },
         { 321, { 9, 18 }, { 174, 418 } },
         { 321, { 247, 494 }, { 174, 418 } },
     };
+    // GLOBAL: CARM95 0x00509da8
     static tFlicette flicker_off[3] = {
         { -1, { 0, 0 }, { 0, 0 } },
         { 322, { 9, 18 }, { 174, 418 } },
         { 322, { 247, 494 }, { 174, 418 } },
     };
+    // GLOBAL: CARM95 0x00509de8
     static tFlicette push[3] = {
         { -1, { 0, 0 }, { 0, 0 } },
         { 324, { 9, 18 }, { 174, 418 } },
@@ -1415,9 +1424,13 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
 // IDA: void __cdecl DoNetRaceSummary()
 // FUNCTION: CARM95 0x00418452
 void DoNetRaceSummary(void) {
+    // GLOBAL: CARM95 0x00509fe8
     static tFlicette flicker_on[1] = { { 321, { 219, 112 }, { 172, 362 } } };
+    // GLOBAL: CARM95 0x0050a000
     static tFlicette flicker_off[1] = { { 322, { 219, 112 }, { 172, 362 } } };
+    // GLOBAL: CARM95 0x0050a018
     static tFlicette push[1] = { { 323, { 219, 112 }, { 172, 362 } } };
+    // GLOBAL: CARM95 0x0050a030
     static tMouse_area mouse_areas[1] = { { { 219, 112 }, { 172, 362 }, { 282, 182 }, { 192, 379 }, 0, 0, 0, NULL } };
 
     // GLOBAL: CARM95 0x0050A060

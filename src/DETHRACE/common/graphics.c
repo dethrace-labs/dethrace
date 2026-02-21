@@ -168,15 +168,15 @@ char* gFont_names[21] = {
 
 // GLOBAL: CARM95 0x005201a0
 br_colour gRGB_colours[9] = {
-    0u,
-    16777215u,
-    16711680u,
-    65280u,
-    255u,
-    16776960u,
-    65535u,
-    16711935u,
-    13649666u
+    BR_COLOUR_RGB(0x00 ,0x00, 0x00),
+    BR_COLOUR_RGB(0xff, 0xff, 0xff),
+    BR_COLOUR_RGB(0xff, 0x00, 0x00),
+    BR_COLOUR_RGB(0x00, 0xff, 0x00),
+    BR_COLOUR_RGB(0x00, 0x00, 0xff),
+    BR_COLOUR_RGB(0xff, 0xff, 0x00),
+    BR_COLOUR_RGB(0x00, 0xff, 0xff),
+    BR_COLOUR_RGB(0xff, 0x00, 0xff),
+    BR_COLOUR_RGB(0xd0, 0x47, 0x02)
 };
 
 // GLOBAL: CARM95 0x005201c8
@@ -1336,7 +1336,7 @@ void MungeClipPlane(br_vector3* pLight, tCar_spec* pCar, br_vector3* p1, br_vect
     BrMatrix34ApplyP(&v2, p2, &pCar->car_master_actor->t.t.mat);
     BrVector3Sub(&v3, p2, p1);
     BrVector3Cross(&v4, &v3, pLight);
-    if (fabs(v4.v[0]) >= 0.01f || fabs(v4.v[1]) >= 0.01f || fabs(v4.v[2]) >= 0.01f) {
+    if (fabs(v4.v[0]) >= 0.01 || fabs(v4.v[1]) >= 0.01 || fabs(v4.v[2]) >= 0.01) {
         BrVector3Copy(&v3, p1);
         v3.v[1] -= pY_offset;
         if (BrVector3Dot(&v3, &v4) > 0.f) {
@@ -1561,7 +1561,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
         for (i = 0; i < face_count; i++) {
             v1 = &list_ptr->v[1];
             v2 = &list_ptr->v[2];
-            if (list_ptr->normal.v[1] >= -0.1 || (list_ptr->material && (list_ptr->material->flags & 0x1000) != 0)) {
+            if (list_ptr->normal.v[1] >= -0.1 || (list_ptr->material && (list_ptr->material->flags & BR_MATF_TWO_SIDED) != 0)) {
                 if (list_ptr->normal.v[1] < 0.0 || (list_ptr->material && ((list_ptr->material->identifier && list_ptr->material->identifier[0] == '!') || list_ptr->material->index_blend))) {
                     list_ptr->d = SHADOW_D_IGNORE_FLAG;
                 } else if ((list_ptr->v[0].v[1] > pCar->pos.v[1] || v1->v[1] > pCar->pos.v[1] || v2->v[1] > pCar->pos.v[1]) && list_ptr->normal.v[1] < 0.1) {
@@ -2072,8 +2072,15 @@ void RenderAFrame(int pDepth_mask_on) {
         if (gVoodoo_rush_mode >= 1) {
             gRearview_screen->pixels = gBack_screen->pixels;
         }
+
+#ifdef DETHRACE_FIX_BUGS
+        gRearview_screen->base_x = MAX(0, gScreen_wobble_x + gProgram_state.current_car.mirror_left);
+        gRearview_screen->base_y = MAX(0, gScreen_wobble_y + gProgram_state.current_car.mirror_top);
+#else
         gRearview_screen->base_x = gScreen_wobble_x + gProgram_state.current_car.mirror_left;
         gRearview_screen->base_y = gScreen_wobble_y + gProgram_state.current_car.mirror_top;
+#endif
+
 #endif
         BrPixelmapFill(gRearview_depth_buffer, 0xFFFFFFFF);
         gRendering_mirror = 1;
@@ -2117,7 +2124,7 @@ void RenderAFrame(int pDepth_mask_on) {
     if (gMap_mode) {
         if (gNet_mode == eNet_mode_none) {
             GetTimerString(the_text, 0);
-            map_timer_width = DRTextWidth(&gFonts[2], the_text);
+            map_timer_width = DRTextWidth(&gFonts[kFont_BLUEHEAD], the_text);
             map_timer_x = gCurrent_graf_data->map_timer_text_x - map_timer_width;
             BrPixelmapRectangleFill(
                 gBack_screen,
@@ -3453,16 +3460,16 @@ void ToggleShadow(void) {
     }
     switch (gShadow_level) {
     case eShadow_none:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_NoShadows));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_NoShadows));
         break;
     case eShadow_us_only:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderOwnCar));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ShadowUnderOwnCar));
         break;
     case eShadow_us_and_opponents:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderMainCars));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ShadowUnderMainCars));
         break;
     case eShadow_everyone:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_ShadowUnderAllCars));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ShadowUnderAllCars));
         break;
     default:
         return;
@@ -3533,9 +3540,9 @@ void ShadowMode(void) {
 
     gFancy_shadow = !gFancy_shadow;
     if (gFancy_shadow) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, "Translucent shadow");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, "Translucent shadow");
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, "Solid shadow");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, "Solid shadow");
     }
 }
 

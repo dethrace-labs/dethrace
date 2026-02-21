@@ -250,7 +250,7 @@ void NetSendHeadupToEverybody(char* pMessage) {
 
     if (gNet_mode != eNet_mode_none) {
         if (gProgram_state.racing) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pMessage);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, pMessage);
         }
         the_contents = NetGetBroadcastContents(NETMSGID_HEADUP, 0);
         strcpy(the_contents->data.headup.text, pMessage);
@@ -265,7 +265,7 @@ void NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) {
     if (gNet_mode != eNet_mode_none) {
         if (gLocal_net_ID == pPlayer) {
             if (gProgram_state.racing) {
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pMessage);
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, pMessage);
             }
         } else {
             message = NetBuildMessage(NETMSGID_HEADUP, 0);
@@ -1552,7 +1552,7 @@ void ReceivedGuaranteeReply(tNet_contents* pContents) {
 void ReceivedHeadup(tNet_contents* pContents) {
 
     if (gProgram_state.racing) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pContents->data.headup.text);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, pContents->data.headup.text);
     }
 }
 
@@ -1719,12 +1719,12 @@ void ReceivedWasted(tNet_contents* pContents) {
         } else {
             sprintf(s, "%s %s %s", victim->player_name, GetMiscString(kMiscString_WastedBy), culprit ? culprit->player_name : GetMiscString(kMiscString_COP));
         }
-        NewTextHeadupSlot2(eHeadupSlot_misc, 0, 3000, -4, s, 0);
+        NewTextHeadupSlot2(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, s, 0);
         last_wasty_message_time = PDGetTotalTime();
         last_culprit = culprit;
         last_victim = victim;
         if (pContents->data.wasted.culprit == gLocal_net_ID) {
-            PratcamEvent(32);
+            PratcamEvent(kPratcam_opponent_wasted);
             last_wasted_em_time = PDGetTotalTime();
             if (last_wasted_em_time - last_got_wasted_time > 1000) {
                 DoFancyHeadup(kFancyHeadupYouWastedEm);
@@ -1959,7 +1959,7 @@ void CheckForDisappearees(void) {
                 NetSendHeadupToAllPlayers(s);
                 KickPlayerOut(gNet_players[i].ID);
                 if (gProgram_state.racing) {
-                    NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, s);
+                    NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, s);
                 }
             }
         }
@@ -2130,7 +2130,7 @@ int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message*
     pMessage->senders_time_stamp = PDGetTotalTime();
     if (gNext_guarantee >= COUNT_OF(gGuarantee_list)) {
         sprintf(buffer, "Guarantee list full %d", pMessage->contents.header.type);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, buffer);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, buffer);
         pMessage->guarantee_number = 0;
         return 0;
     }

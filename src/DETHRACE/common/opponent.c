@@ -697,7 +697,7 @@ int SearchForSection(tRoute_section* pTemp_store, tRoute_section* pPerm_store, i
         pTemp_store[pDepth].section_no = section_no;
         pTemp_store[pDepth].direction = direction;
         distance_so_far = gProgram_state.AI_vehicles.path_sections[section_no].length + pDistance_so_far;
-        if (pTarget_section == section_no && distance_so_far <= shortest_dist) {
+        if (pTarget_section == section_no && distance_so_far < shortest_dist) {
             shortest_dist = distance_so_far;
             *pNum_of_perm_store_sections = pDepth + 1;
             memcpy(pPerm_store, pTemp_store, sizeof(tRoute_section) * *pNum_of_perm_store_sections);
@@ -1397,7 +1397,7 @@ void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command 
                 pOpponent_spec->levitate_data.time_started = gTime_stamp_for_this_munging;
                 pOpponent_spec->levitate_data.initial_y = pOpponent_spec->car_spec->car_master_actor->t.t.translate.t.v[1];
                 if (pOpponent_spec->car_spec->has_been_stolen) {
-                    NewTextHeadupSlot(eHeadupSlot_misc, 250, 5000, -4, GetMiscString(kMiscString_CarAddedToChangeCarList));
+                    NewTextHeadupSlot(eHeadupSlot_misc, 250, 5000, -kFont_MEDIUMHD, GetMiscString(kMiscString_CarAddedToChangeCarList));
                 }
             } else {
                 pOpponent_spec->car_spec->brake_force = 15.f * pOpponent_spec->car_spec->M;
@@ -3217,7 +3217,7 @@ void ToggleOpponentProcessing(void) {
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
             ObjectiveComplete(&gProgram_state.AI_vehicles.cops[i]);
         }
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "OPPONENTS SWITCHED ON");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "OPPONENTS SWITCHED ON");
     } else {
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
             gProgram_state.AI_vehicles.opponents[i].physics_me = 0;
@@ -3227,7 +3227,7 @@ void ToggleOpponentProcessing(void) {
         }
         gActive_car_list_rebuild_required = 1;
         RebuildActiveCarList();
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "OPPONENTS SWITCHED OFF");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "OPPONENTS SWITCHED OFF");
     }
 }
 
@@ -3238,12 +3238,12 @@ void ToggleMellowOpponents(void) {
 
     gMellow_opponents = !gMellow_opponents;
     if (gMellow_opponents) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -1, "Opponents all nice and fluffy");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_ORANGHED, "Opponents all nice and fluffy");
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_opponents; i++) {
             ObjectiveComplete(&gProgram_state.AI_vehicles.opponents[i]);
         }
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -1, "Opponents hostile again");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_ORANGHED, "Opponents hostile again");
     }
 }
 
@@ -3260,7 +3260,7 @@ void RepairOpponentsSystems(void) {
             gProgram_state.AI_vehicles.opponents[i].knackeredness_detected = 0;
         }
     }
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -1, "Opponents systems repaired (but not bodywork)");
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_ORANGHED, "Opponents systems repaired (but not bodywork)");
 }
 
 // IDA: void __usercall CopyVertex(br_vertex *pDest_vertex@<EAX>, br_vertex *pSrc_vertex@<EDX>)
@@ -3478,7 +3478,7 @@ void RecalcNearestPathSectionSpeed(int pMax_not_min, int pAdjustment) {
     } else {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any paths close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any paths close enough");
             return;
         }
     }
@@ -3524,7 +3524,7 @@ void RecalcNearestPathSectionSpeed(int pMax_not_min, int pAdjustment) {
             (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].max_speed[nearest_end]));
     }
     ShowOppoPaths();
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
 }
 
 // IDA: void __cdecl RecalcNearestPathSectionWidth(br_scalar pAdjustment)
@@ -3544,7 +3544,7 @@ void RecalcNearestPathSectionWidth(br_scalar pAdjustment) {
     } else {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any paths close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any paths close enough");
             return;
         }
     }
@@ -3555,7 +3555,7 @@ void RecalcNearestPathSectionWidth(br_scalar pAdjustment) {
     }
     ShowOppoPaths();
     sprintf(str, "Width %2.1f BRU", 2.0 * gProgram_state.AI_vehicles.path_sections[section_no].width);
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
 }
 
 // IDA: void __usercall CalcNegativeXVector(br_vector3 *pNegative_x_vector@<EAX>, br_vector3 *pStart@<EDX>, br_vector3 *pFinish@<EBX>, br_scalar pLength)
@@ -4022,12 +4022,12 @@ void ShowOppoPaths(void) {
         sprintf(str, "Total %d nodes, %d sections",
             gProgram_state.AI_vehicles.number_of_path_nodes,
             gProgram_state.AI_vehicles.number_of_path_sections);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -1, str);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_ORANGHED, str);
     } else {
         if (gOppo_path_actor != NULL) {
             gOppo_path_actor->render_style = BR_RSTYLE_NONE;
         }
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -1, "Not displaying any paths");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_ORANGHED, "Not displaying any paths");
     }
     if (ConsistencyCheck()) {
         WriteOutOppoPaths();
@@ -4166,16 +4166,16 @@ void DropElasticateyNode(void) {
         gMobile_section = ReallocExtraPathSections(1);
     } else {
         if (!gOppo_paths_shown) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "You must show paths before adding to them (F5)");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "You must show paths before adding to them (F5)");
             return;
         }
         if (gProgram_state.AI_vehicles.number_of_path_nodes == 0) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not implemented yet. Go away.");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Not implemented yet. Go away.");
             return;
         } else {
             old_node = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
             if (distance > 10.f) {
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any nodes close enough");
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any nodes close enough");
                 return;
             }
 
@@ -4216,7 +4216,7 @@ void DropElasticateyNode(void) {
     gProgram_state.AI_vehicles.path_nodes[old_node].number_of_sections++;
     ShowOppoPaths();
     sprintf(str, "New section #%d, new node #%d", gMobile_section, new_node);
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
 }
 
 // IDA: void __cdecl InsertAndElasticate()
@@ -4255,7 +4255,7 @@ void InsertAndElasticate(void) {
         not_perp = 1;
     }
     if (not_perp || distance > 10.f) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Get nearer to the section");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Get nearer to the section");
     } else {
         new_section = ReallocExtraPathSections(1);
         if (gAlready_elasticating) {
@@ -4292,7 +4292,7 @@ void InsertAndElasticate(void) {
         ShowOppoPaths();
         sprintf(str, "New section %d, new node #%d inserted into section #%d",
             gMobile_section, inserted_node, section_no);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
     }
 }
 
@@ -4322,7 +4322,7 @@ void InsertAndDontElasticate(void) {
         not_perp = 1;
     }
     if (not_perp || distance > 10.f) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Get nearer to the section");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Get nearer to the section");
     } else {
         if (gAlready_elasticating) {
             gAlready_elasticating = 0;
@@ -4334,7 +4334,7 @@ void InsertAndDontElasticate(void) {
         InsertThisNodeInThisSectionHere(inserted_node, section_no, &gSelf->t.t.translate.t);
         ShowOppoPaths();
         sprintf(str, "New node #%d inserted into section #%d", inserted_node, section_no);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
     }
 }
 
@@ -4357,7 +4357,7 @@ void DropDeadEndNode(void) {
     sprintf(str, "New section #%d, finish node #%d",
         gMobile_section,
         gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]);
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 4000, -1, str);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 4000, -kFont_ORANGHED, str);
 }
 
 // IDA: void __cdecl DropNodeOnNodeAndStopElasticating()
@@ -4372,10 +4372,10 @@ void DropNodeOnNodeAndStopElasticating(void) {
     }
     node_no = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
     if (gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[0] == node_no || distance > 10.f) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any nodes close enough");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any nodes close enough");
     } else if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections >= COUNT_OF(gProgram_state.AI_vehicles.path_nodes[node_no].sections)) {
         sprintf(str, "Sorry, node #%d already has %d sections attached", node_no, (int)COUNT_OF(gProgram_state.AI_vehicles.path_nodes[node_no].sections));
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
     } else {
         gAlready_elasticating = 0;
         gProgram_state.AI_vehicles.number_of_path_nodes--;
@@ -4386,7 +4386,7 @@ void DropNodeOnNodeAndStopElasticating(void) {
         sprintf(str, "New section #%d, attached to existing node #%d",
             gMobile_section,
             gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 4000, -1, str);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 4000, -kFont_ORANGHED, str);
     }
 }
 
@@ -4460,18 +4460,18 @@ void PullOppoPoint(void) {
         return;
     }
     if (gAlready_elasticating) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not while you're elasticating");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Not while you're elasticating");
         return;
     } else {
         node_no = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any paths close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any paths close enough");
             return;
         }
         BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[node_no].p, &gSelf->t.t.translate.t);
     }
     ShowOppoPaths();
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Bing!");
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Bing!");
 }
 
 // IDA: void __cdecl ShowNodeInfo()
@@ -4482,20 +4482,20 @@ void ShowNodeInfo(void) {
     br_scalar distance;
 
     if (!gOppo_paths_shown) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
         sprintf(str, "Next point will be #%d",
             gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
     } else {
         node_no = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any nodes close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any nodes close enough");
         } else {
             sprintf(str, "Nearest node #%d has %d attached sections",
                 node_no,
                 gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
         }
     }
 }
@@ -4510,23 +4510,23 @@ void ShowSectionInfo1(void) {
     br_vector3 intersect;
 
     if (!gOppo_paths_shown) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
         sprintf(str, "This section will be #%d attached to nodes #%d and #%d",
             gMobile_section,
             gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[0],
             gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
     } else {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any sections close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any sections close enough");
         } else {
             sprintf(str, "Nearest section #%d, start node #%d, finish node #%d",
                 section_no,
                 gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[0],
                 gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1]);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
         }
     }
 }
@@ -4541,25 +4541,25 @@ void ShowSectionInfo2(void) {
     br_vector3 intersect;
 
     if (!gOppo_paths_shown) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
         sprintf(str, "Towards start - min %d max %d, finish - min %d, max %d mph",
             (int)(2.2 * gProgram_state.AI_vehicles.path_sections[gMobile_section].min_speed[0]),
             (int)(2.2 * gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[0]),
             (int)(2.2 * gProgram_state.AI_vehicles.path_sections[gMobile_section].min_speed[1]),
             (int)(2.2 * gProgram_state.AI_vehicles.path_sections[gMobile_section].max_speed[1]));
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
     } else {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any sections close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any sections close enough");
         } else {
             sprintf(str, "Towards start - min %d max %d, finish - min %d, max %d mph",
                 (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].min_speed[0]),
                 (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].max_speed[0]),
                 (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].min_speed[1]),
                 (int)(2.2 * gProgram_state.AI_vehicles.path_sections[section_no].max_speed[1]));
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
         }
     }
 }
@@ -4573,18 +4573,18 @@ void DeleteOppoPathSection(void) {
     tS16 section_no;
 
     if (gOppo_paths_shown == 0) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not while you're creating a new section");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Not while you're creating a new section");
     } else {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any sections close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any sections close enough");
         } else {
             DeleteSection(section_no);
             DeleteOrphanNodes();
             ShowOppoPaths();
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Pop!");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Pop!");
         }
     }
 }
@@ -4596,18 +4596,18 @@ void DeleteOppoPathNodeAndSections(void) {
     tS16 node_no;
 
     if (!gOppo_paths_shown) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not while you're creating a new section");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Not while you're creating a new section");
     } else {
         node_no = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any nodes close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any nodes close enough");
         } else {
             DeleteNode(node_no, 1);
             DeleteOrphanNodes();
             ShowOppoPaths();
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Blam!");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Blam!");
         }
     }
 }
@@ -4619,21 +4619,21 @@ void DeleteOppoPathNodeAndJoin(void) {
     tS16 node_no;
 
     if (!gOppo_paths_shown) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not while you're creating a new section");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Not while you're creating a new section");
     } else {
         node_no = FindNearestPathNode(&gSelf->t.t.translate.t, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any nodes close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any nodes close enough");
         } else if (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections != 2) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Node must have exactly 2 sections attached");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Node must have exactly 2 sections attached");
         } else if ((gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[0]].node_indices[0] != node_no
                        || gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[1]].node_indices[1] != node_no)
             && (gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[1]].node_indices[0] != node_no
                 || gProgram_state.AI_vehicles.path_sections[gProgram_state.AI_vehicles.path_nodes[node_no].sections[0]].node_indices[1] != node_no)) {
 
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Sections must point in same direction");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Sections must point in same direction");
         } else {
             ConsistencyCheck();
             DeleteNode(node_no, 0);
@@ -4641,7 +4641,7 @@ void DeleteOppoPathNodeAndJoin(void) {
             DeleteOrphanNodes();
             ConsistencyCheck();
             ShowOppoPaths();
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Blam!");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Blam!");
         }
     }
 }
@@ -4657,13 +4657,13 @@ void ReverseSectionDirection(void) {
     tS16 section_no;
 
     if (!gOppo_paths_shown) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not while you're creating a new section");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Not while you're creating a new section");
     } else {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any sections close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any sections close enough");
         } else {
             temp = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0];
             gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0] = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1];
@@ -4692,18 +4692,18 @@ void CycleSectionType(void) {
     char str[256];
 
     if (!gOppo_paths_shown) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not while you're creating a new section");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Not while you're creating a new section");
     } else {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any sections close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any sections close enough");
         } else {
             gProgram_state.AI_vehicles.path_sections[section_no].type = (gProgram_state.AI_vehicles.path_sections[section_no].type + 1) % 3;
             sprintf(str, "%s section", gPath_section_type_names[gProgram_state.AI_vehicles.path_sections[section_no].type]);
             ShowOppoPaths();
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
         }
     }
 }
@@ -4717,13 +4717,13 @@ void ToggleOneWayNess(void) {
     tS16 section_no;
 
     if (!gOppo_paths_shown) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not while you're creating a new section");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Not while you're creating a new section");
     } else {
         section_no = FindNearestPathSection(&gSelf->t.t.translate.t, &direction_v, &intersect, &distance);
         if (distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Can't find any sections close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Can't find any sections close enough");
         } else {
             if (!gProgram_state.AI_vehicles.path_sections[section_no].one_way) {
                 gProgram_state.AI_vehicles.path_sections[section_no].one_way = 1;
@@ -4732,9 +4732,9 @@ void ToggleOneWayNess(void) {
             }
             ShowOppoPaths();
             if (gProgram_state.AI_vehicles.path_sections[section_no].one_way) {
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "ONE-WAY");
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "ONE-WAY");
             } else {
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "TWO-WAY");
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "TWO-WAY");
             }
         }
     }
@@ -4753,7 +4753,7 @@ void CopStartPointInfo(void) {
     closest = -1;
     closest_distance = FLT_MAX;
     if (!gOppo_paths_shown) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else {
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
             BrVector3Sub(&car_to_point, &gSelf->t.t.translate.t, &gProgram_state.AI_vehicles.cop_start_points[i]);
@@ -4764,10 +4764,10 @@ void CopStartPointInfo(void) {
             }
         }
         if (closest < 0 || closest_distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "No cop start points close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "No cop start points close enough");
         } else {
             sprintf(str, "Nearest cop start point #%d", closest);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
         }
     }
 }
@@ -4778,19 +4778,19 @@ void DropCopStartPoint(void) {
     char str[256];
 
     if (!gOppo_paths_shown) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not while you're creating a new section");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Not while you're creating a new section");
     } else {
         if (gProgram_state.AI_vehicles.number_of_cops < COUNT_OF(gProgram_state.AI_vehicles.cop_start_points)) {
             BrVector3Copy(&gProgram_state.AI_vehicles.cop_start_points[gProgram_state.AI_vehicles.number_of_cops], &gSelf->t.t.translate.t);
             gProgram_state.AI_vehicles.number_of_cops += 1;
             ShowOppoPaths();
             sprintf(str, "New cop start point dropped (%d of %d)", gProgram_state.AI_vehicles.number_of_cops, (int)COUNT_OF(gProgram_state.AI_vehicles.cop_start_points));
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
         } else {
             sprintf(str, "Sorry, no more than %d cop start points", (int)COUNT_OF(gProgram_state.AI_vehicles.cop_start_points));
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
         }
     }
 }
@@ -4808,9 +4808,9 @@ void DeleteCopStartPoint(void) {
     closest = -1;
     closest_distance = FLT_MAX;
     if (!gOppo_paths_shown) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Show paths first (F5)");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Show paths first (F5)");
     } else if (gAlready_elasticating) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Not while you're creating a new section");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Not while you're creating a new section");
     } else {
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
             BrVector3Sub(&car_to_point, &gSelf->t.t.translate.t, &gProgram_state.AI_vehicles.cop_start_points[i]);
@@ -4821,7 +4821,7 @@ void DeleteCopStartPoint(void) {
             }
         }
         if (closest < 0 || closest_distance > 10.f) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "No cop start points close enough");
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "No cop start points close enough");
         } else {
             for (i = closest; i < gProgram_state.AI_vehicles.number_of_cops - 1; i++) {
                 BrVector3Copy(&gProgram_state.AI_vehicles.cop_start_points[i],
@@ -4830,7 +4830,7 @@ void DeleteCopStartPoint(void) {
             gProgram_state.AI_vehicles.number_of_cops -= 1;
             ShowOppoPaths();
             sprintf(str, "Deleted cop start point #%d", closest);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, str);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, str);
         }
     }
 }

@@ -260,6 +260,11 @@ int UpRace(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
+#ifdef DETHRACE_FIX_BUGS
+    if (gCurrent_race_index <= 0) {
+        return 0;
+    }
+#endif
     if (gRace_list[gCurrent_race_index - 1].best_rank <= gProgram_state.rank || gProgram_state.game_completed || gChange_race_net_mode) {
         if (gCurrent_race_index != 0) {
             RemoveTransientBitmaps(1);
@@ -336,24 +341,28 @@ void StartChangeRace(void) {
 // IDA: int __usercall ChangeRace@<EAX>(int *pRace_index@<EAX>, int pNet_mode@<EDX>, tNet_sequence_type pNet_race_sequence@<EBX>)
 // FUNCTION: CARM95 0x0044f131
 int ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_sequence) {
+    // GLOBAL: CARM95 0x0050f1b0
     static tFlicette flicker_on[4] = {
         { 43, { 60, 120 }, { 154, 370 } },
         { 43, { 221, 442 }, { 154, 370 } },
         { 221, { 30, 60 }, { 78, 187 } },
         { 221, { 30, 60 }, { 78, 187 } },
     };
+    // GLOBAL: CARM95 0x0050f200
     static tFlicette flicker_off[4] = {
         { 42, { 60, 120 }, { 154, 370 } },
         { 42, { 221, 442 }, { 154, 370 } },
         { 220, { 30, 60 }, { 78, 187 } },
         { 220, { 30, 60 }, { 78, 187 } },
     };
+    // GLOBAL: CARM95 0x0050f250
     static tFlicette push[4] = {
         { 154, { 60, 120 }, { 154, 370 } },
         { 45, { 221, 442 }, { 154, 370 } },
         { 222, { 30, 60 }, { 78, 187 } },
         { 225, { 30, 60 }, { 118, 283 } },
     };
+    // GLOBAL: CARM95 0x0050f2a0
     static tMouse_area mouse_areas[5] = {
         { { 60, 120 }, { 154, 370 }, { 125, 250 }, { 174, 418 }, 0, 0, 0, NULL },
         { { 221, 442 }, { 154, 370 }, { 286, 572 }, { 174, 418 }, 1, 0, 0, NULL },
@@ -361,6 +370,7 @@ int ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_seq
         { { 30, 60 }, { 118, 283 }, { 45, 90 }, { 145, 348 }, -1, 0, 0, DownClickRace },
         { { 66, 132 }, { 33, 79 }, { 278, 556 }, { 144, 346 }, -1, 0, 0, ClickOnRace },
     };
+    // GLOBAL: CARM95 0x0050f390
     static tInterface_spec interface_spec = {
         0, 230, 60, 231, 231, 231, 6,
         { -1, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
@@ -557,24 +567,28 @@ int ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 // IDA: int __usercall ChangeCar@<EAX>(int pNet_mode@<EAX>, int *pCar_index@<EDX>, tNet_game_details *pNet_game@<EBX>)
 // FUNCTION: CARM95 0x0044f7e6
 int ChangeCar(int pNet_mode, int* pCar_index, tNet_game_details* pNet_game) {
+    // GLOBAL: CARM95 0x0050f4c0
     static tFlicette flicker_on[4] = {
         { 43, { 60, 120 }, { 154, 370 } },
         { 43, { 221, 442 }, { 154, 370 } },
         { 221, { 30, 60 }, { 78, 187 } },
         { 221, { 30, 60 }, { 78, 187 } },
     };
+    // GLOBAL: CARM95 0x0050f510
     static tFlicette flicker_off[4] = {
         { 42, { 60, 120 }, { 154, 370 } },
         { 42, { 221, 442 }, { 154, 370 } },
         { 220, { 30, 60 }, { 78, 187 } },
         { 220, { 30, 60 }, { 78, 187 } },
     };
+    // GLOBAL: CARM95 0x0050f560
     static tFlicette push[4] = {
         { 154, { 60, 120 }, { 154, 370 } },
         { 45, { 221, 442 }, { 154, 370 } },
         { 222, { 30, 60 }, { 78, 187 } },
         { 225, { 30, 60 }, { 118, 283 } },
     };
+    // GLOBAL: CARM95 0x0050f5b0
     static tMouse_area mouse_areas[4] = {
         { { 60, 120 }, { 154, 370 }, { 125, 250 }, { 174, 418 }, 0, 0, 0, NULL },
         { { 221, 442 }, { 154, 370 }, { 286, 572 }, { 174, 418 }, 1, 0, 0, NULL },
@@ -1121,6 +1135,7 @@ void DrawPartsShop(int pCurrent_choice, int pCurrent_mode) {
 // IDA: void __usercall DoPartsShop(int pFade_away@<EAX>)
 // FUNCTION: CARM95 0x00450e06
 void DoPartsShop(int pFade_away) {
+    // GLOBAL: CARM95 0x0050f7a0
     static tFlicette flicker_on[7] = {
         { 43, { 225, 450 }, { 30, 72 } },
         { 43, { 225, 450 }, { 60, 144 } },
@@ -1130,6 +1145,7 @@ void DoPartsShop(int pFade_away) {
         { 221, { 30, 60 }, { 79, 190 } },
         { 221, { 30, 60 }, { 79, 190 } },
     };
+    // GLOBAL: CARM95 0x0050f830
     static tFlicette flicker_off[7] = {
         { 42, { 225, 450 }, { 30, 72 } },
         { 42, { 225, 450 }, { 60, 144 } },
@@ -1139,6 +1155,7 @@ void DoPartsShop(int pFade_away) {
         { 220, { 30, 60 }, { 79, 190 } },
         { 220, { 30, 60 }, { 79, 190 } },
     };
+    // GLOBAL: CARM95 0x0050f8c0
     static tFlicette push[7] = {
         { 254, { 225, 450 }, { 30, 72 } },
         { 255, { 225, 450 }, { 60, 144 } },
@@ -1148,6 +1165,7 @@ void DoPartsShop(int pFade_away) {
         { 222, { 30, 60 }, { 79, 190 } },
         { 225, { 30, 60 }, { 120, 288 } },
     };
+    // GLOBAL: CARM95 0x0050f950
     static tMouse_area mouse_areas[7] = {
         { { 225, 450 }, { 30, 72 }, { 288, 576 }, { 50, 120 }, 0, 0, 0, NULL },
         { { 225, 450 }, { 60, 144 }, { 288, 576 }, { 80, 192 }, 1, 0, 0, NULL },
@@ -1157,6 +1175,7 @@ void DoPartsShop(int pFade_away) {
         { { 30, 60 }, { 79, 190 }, { 45, 90 }, { 106, 254 }, -1, 1, 0, UpClickPart },
         { { 30, 60 }, { 120, 288 }, { 45, 90 }, { 147, 353 }, -1, 1, 0, DownClickPart },
     };
+    // GLOBAL: CARM95 0x0050faa0
     static tInterface_spec interface_spec = {
         0, 250, 190, 0, 0, 0, 6,
         { 1, 0 }, { 4, -1 }, { 4, 0 }, { 4, 3 }, { PartsArrowsOn, PartsArrowsOff },
@@ -1209,21 +1228,25 @@ int AutoPartsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // IDA: tSO_result __cdecl DoAutoPartsShop()
 // FUNCTION: CARM95 0x00450b05
 tSO_result DoAutoPartsShop(void) {
+    // GLOBAL: CARM95 0x0050fbd0
     static tFlicette flicker_on[3] = {
         { 43, { 84, 168 }, { 67, 161 } },
         { 43, { 84, 168 }, { 95, 228 } },
         { 43, { 84, 168 }, { 124, 298 } },
     };
+    // GLOBAL: CARM95 0x0050fc10
     static tFlicette flicker_off[3] = {
         { 42, { 84, 168 }, { 67, 161 } },
         { 42, { 84, 168 }, { 95, 228 } },
         { 42, { 84, 168 }, { 124, 298 } },
     };
+    // GLOBAL: CARM95 0x0050fc50
     static tFlicette push[3] = {
         { 284, { 84, 168 }, { 67, 161 } },
         { 284, { 84, 168 }, { 95, 228 } },
         { 284, { 84, 168 }, { 124, 298 } },
     };
+    // GLOBAL: CARM95 0x0050fc90
     static tMouse_area mouse_areas[3] = {
         { { 84, 168 }, { 32, 77 }, { 147, 294 }, { 87, 209 }, 0, 0, 0, NULL },
         { { 84, 168 }, { 95, 228 }, { 147, 294 }, { 115, 276 }, 1, 0, 0, NULL },
@@ -1560,11 +1583,19 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
     if (*test) {
         test2 = *test;
     }
+#ifdef DETHRACE_FIX_BUGS
+    // The demos only have a single race and menud ata for a single car.
+#define ENABLE_KEVWOZEAR !(harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo)
+#else
+#define ENABLE_KEVWOZEAR 1
+#endif
     if (test[0] == 0x27645433 && test[1] == 0x758f0015) {
-        // cheat code: "KEVWOZEAR"
-        gProgram_state.game_completed = 1;
-        DRS3StartSound(gEffects_outlet, 3202);
-        DRS3StartSound(gEffects_outlet, 3202);
+        if (ENABLE_KEVWOZEAR) {
+            // cheat code: "KEVWOZEAR"
+            gProgram_state.game_completed = 1;
+            DRS3StartSound(gEffects_outlet, 3202);
+            DRS3StartSound(gEffects_outlet, 3202);
+        }
     }
     if (test[0] == 0x33f75455 && test[1] == 0xC10AAAF2) {
         // cheat code: "IWANTTOFIDDLE"
@@ -1619,6 +1650,7 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
 // IDA: tSO_result __usercall DoSelectRace@<EAX>(int *pSecond_time_around@<EAX>)
 // FUNCTION: CARM95 0x00451c8e
 tSO_result DoSelectRace(int* pSecond_time_around) {
+    // GLOBAL: CARM95 0x0050fe50
     static tFlicette flicker_on[7] = {
         { 43, { 224, 448 }, { 28, 67 } },
         { 43, { 224, 448 }, { 56, 134 } },
@@ -1629,6 +1661,7 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
         { 221, { 30, 60 }, { 79, 190 } }
     };
 
+    // GLOBAL: CARM95 0x0050fee0
     static tFlicette flicker_off[7] = {
         { 42, { 224, 448 }, { 28, 67 } },
         { 42, { 224, 448 }, { 56, 134 } },
@@ -1639,6 +1672,7 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
         { 220, { 30, 60 }, { 79, 190 } }
     };
 
+    // GLOBAL: CARM95 0x0050ff70
     static tFlicette push[7] = {
         { 195, { 224, 448 }, { 28, 67 } },
         { -1, { 224, 448 }, { 56, 134 } },
@@ -1649,6 +1683,7 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
         { 225, { 30, 60 }, { 119, 286 } }
     };
 
+    // GLOBAL: CARM95 0x00510000
     static tMouse_area mouse_areas[7] = {
         { { 224, 448 }, { 28, 67 }, { 287, 574 }, { 48, 115 }, 0, 0, 0, NULL },
         { { 224, 448 }, { 56, 134 }, { 287, 574 }, { 76, 182 }, 1, 0, 0, NULL },
@@ -1673,6 +1708,7 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
             &DownClickOpp }
     };
 
+    // GLOBAL: CARM95 0x00510150
     static tInterface_spec interface_spec = {
         0,                            // initial_imode
         191,                          // first_opening_flic
@@ -2192,13 +2228,18 @@ int ChallengeDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // IDA: void __cdecl DoChallengeScreen()
 // FUNCTION: CARM95 0x00453952
 void DoChallengeScreen(void) {
+    // GLOBAL: CARM95 0x00510280
     static tFlicette flicker_on[2] = { { 43, { 54, 108 }, { 157, 377 } }, { 43, { 218, 436 }, { 157, 377 } } };
+    // GLOBAL: CARM95 0x005102a8
     static tFlicette flicker_off[2] = { { 42, { 54, 108 }, { 157, 377 } }, { 42, { 218, 436 }, { 157, 377 } } };
+    // GLOBAL: CARM95 0x005102d0
     static tFlicette push[2] = { { 304, { 54, 108 }, { 157, 377 } }, { 305, { 218, 436 }, { 157, 377 } } };
+    // GLOBAL: CARM95 0x005102f8
     static tMouse_area mouse_areas[2] = {
         { { 54, 108 }, { 157, 377 }, { 117, 234 }, { 178, 427 }, 0, 0, 0, NULL },
         { { 218, 436 }, { 157, 377 }, { 281, 562 }, { 178, 427 }, 1, 0, 0, NULL }
     };
+    // GLOBAL: CARM95 0x00510358
     static tInterface_spec interface_spec = {
         0,               // initial_imode
         301,             // first_opening_flic
@@ -2436,23 +2477,27 @@ void SortOpponents(void) {
 // IDA: tSO_result __cdecl DoGridPosition()
 // FUNCTION: CARM95 0x004537ee
 tSO_result DoGridPosition(void) {
+    // GLOBAL: CARM95 0x00510488
     static tFlicette flicker_on[3] = {
         { 43, { 240, 480 }, { 158, 379 } },
         { 293, { 56, 112 }, { 151, 362 } },
         { 296, { 136, 272 }, { 151, 362 } }
     };
 
+    // GLOBAL: CARM95 0x005104c8
     static tFlicette flicker_off[3] = {
         { 42, { 240, 480 }, { 158, 379 } },
         { 292, { 56, 112 }, { 151, 362 } },
         { 295, { 136, 272 }, { 151, 362 } }
     };
 
+    // GLOBAL: CARM95 0x00510508
     static tFlicette push[3] = {
         { 154, { 240, 480 }, { 158, 379 } },
         { 294, { 56, 112 }, { 151, 362 } },
         { 297, { 136, 272 }, { 151, 362 } }
     };
+    // GLOBAL: CARM95 0x00510548
     static tMouse_area mouse_areas[5] = {
         { { 240, 480 }, { 158, 379 }, { 305, 610 }, { 178, 427 }, 0, 0, 0, NULL },
         { { 56, 112 },
@@ -2489,6 +2534,7 @@ tSO_result DoGridPosition(void) {
             GridClickNumbers }
     };
 
+    // GLOBAL: CARM95 0x00510638
     static tInterface_spec interface_spec = {
         0,                       // initial_imode
         290,                     // first_opening_flic

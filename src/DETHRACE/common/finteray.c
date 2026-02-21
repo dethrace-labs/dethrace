@@ -255,7 +255,7 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
             }
             d = BrVector3Dot(eqn, ray_dir);
             if (fabs(d) >= 0.00000023841858 && (!this_material || !this_material->identifier || *this_material->identifier != '!' || !gPling_materials)
-                && (!this_material || (this_material->flags & 0x1800) != 0 || d <= 0.0)) {
+                && (!this_material || (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) != 0 || d <= 0.0)) {
                 numerator = eqn->v[1] * ray_pos->v[1]
                     + eqn->v[2] * ray_pos->v[2]
                     + eqn->v[0] * ray_pos->v[0]
@@ -548,7 +548,7 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
     for (i = 0; i < pNum_rays; ++i) {
         rt[i] = 100.0;
     }
-    if ((!this_material || (this_material->flags & 0x1800) != 0 || d <= 0.0)
+    if ((!this_material || (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) != 0 || d <= 0.0)
         && (!this_material || !this_material->identifier || *this_material->identifier != '!' || !gPling_materials)
         && fabs(d) >= 0.00000023841858) {
         for (i = 0;; ++i) {

@@ -37,30 +37,39 @@ extern br_pixelmap* gBack_screen;
 
 #ifdef DETHRACE_SDL_DYNAMIC
 #ifdef _WIN32
-static const char * const possible_locations[] = {
+static const char* const possible_locations[] = {
     "SDL3.dll",
 };
 #elif defined(__APPLE__)
 #define SHARED_OBJECT_NAME "libSDL3"
 #define SDL3_LIBNAME "libSDL3.dylib"
 #define SDL3_FRAMEWORK "SDL3.framework/Versions/A/SDL3"
-static const char * const possible_locations[] = {
-    "@loader_path/" SDL3_LIBNAME, /* MyApp.app/Contents/MacOS/libSDL3_dylib */
-    "@loader_path/../Frameworks/" SDL3_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL3_framework */
-    "@executable_path/" SDL3_LIBNAME, /* MyApp.app/Contents/MacOS/libSDL3_dylib */
+static const char* const possible_locations[] = {
+    "@loader_path/" SDL3_LIBNAME,                     /* MyApp.app/Contents/MacOS/libSDL3_dylib */
+    "@loader_path/../Frameworks/" SDL3_FRAMEWORK,     /* MyApp.app/Contents/Frameworks/SDL3_framework */
+    "@executable_path/" SDL3_LIBNAME,                 /* MyApp.app/Contents/MacOS/libSDL3_dylib */
     "@executable_path/../Frameworks/" SDL3_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL3_framework */
-    NULL,  /* /Users/username/Library/Frameworks/SDL3_framework */
-    "/Library/Frameworks" SDL3_FRAMEWORK, /* /Library/Frameworks/SDL3_framework */
-    SDL3_LIBNAME /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
+    NULL,                                             /* /Users/username/Library/Frameworks/SDL3_framework */
+    "/Library/Frameworks" SDL3_FRAMEWORK,             /* /Library/Frameworks/SDL3_framework */
+    SDL3_LIBNAME                                      /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
-static const char * const possible_locations[] = {
+#include "elfdlopennote.h"
+#ifdef ELF_NOTE_DLOPEN
+ELF_NOTE_DLOPEN(
+    "SDL3",
+    "Platform-specific operations such as creating windows and handling events",
+    ELF_NOTE_DLOPEN_PRIORITY_RECOMMENDED,
+    "libSDL3.so.0",
+    "libSDL3.so");
+#endif
+static const char* const possible_locations[] = {
     "libSDL3.so.0",
     "libSDL3.so",
 };
 #endif
 
-static void *sdl3_so;
+static void* sdl3_so;
 #endif
 
 #define SDL_NAME "SDL3"
@@ -296,7 +305,7 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
 
         screen_texture = SDL3_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
         if (screen_texture == NULL) {
-            const SDL_PixelFormat *renderer_formats = NULL;
+            const SDL_PixelFormat* renderer_formats = NULL;
             SDL_PropertiesID renderer_props = SDL3_GetRendererProperties(renderer);
             if (renderer_props) {
                 renderer_formats = SDL3_GetPointerProperty(renderer_props, SDL_PROP_RENDERER_TEXTURE_FORMATS_POINTER, NULL);
@@ -367,15 +376,6 @@ static void SDL3_Harness_GetViewport(int* x, int* y, float* width_multipler, flo
     *height_multiplier = viewport.scale_y;
 }
 
-static void SDL3_Harness_GetPrefPath(char* path, char* app_name) {
-    char* sdl_path = SDL3_GetPrefPath(NULL, app_name);
-    if (sdl_path == NULL) {
-        LOG_PANIC("Failed to get preferences path (%s)", SDL3_GetError());
-    }
-    strcpy(path, sdl_path);
-    SDL3_free(sdl_path);
-}
-
 static uint32_t SDL3_Harness_GetTicks(void) {
     return SDL3_GetTicks();
 }
@@ -414,7 +414,6 @@ static int SDL3_Harness_Platform_Init(tHarness_platform* platform) {
     platform->PaletteChanged = SDL3_Harness_PaletteChanged;
     platform->GL_GetProcAddress = SDL3_Harness_GL_GetProcAddress;
     platform->GetViewport = SDL3_Harness_GetViewport;
-    platform->GetPrefPath = SDL3_Harness_GetPrefPath;
     return 0;
 };
 

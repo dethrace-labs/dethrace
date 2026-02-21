@@ -245,7 +245,7 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
             old_vector = *target_point;
             for (bend_axis = 0; bend_axis < 3; bend_axis++) {
                 target_point->v[bend_axis] += (1.0f - the_neighbour->factor / 256.0f) * movement.v[bend_axis];
-                
+
                 if (the_neighbour->factor <= 128) {
                     v12 = the_neighbour->factor / 128.0f;
                 } else {
@@ -522,7 +522,7 @@ void TotallyRepairCar(void) {
 void CheckLastCar(void) {
 
     if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -4, GetMiscString(kMiscString_EveryOpponentWasted));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -kFont_MEDIUMHD, GetMiscString(kMiscString_EveryOpponentWasted));
         RaceCompleted(eRace_over_opponents);
     }
 }
@@ -573,16 +573,16 @@ void DamageUnit2(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
     tDamage_unit* the_damage;
     int last_level;
 
-    the_damage = &pCar->damage_units[pUnit_type];
-    if ((pCar->driver < eDriver_net_human || pUnit_type != eDamage_driver) && pDamage_amount >= 5 && !pCar->invulnerable) {
+    if (pCar->driver >= eDriver_net_human && pUnit_type == eDamage_driver) {
+        return;
+    }
+
+    if (pDamage_amount >= 5 && !pCar->invulnerable) {
+        the_damage = &pCar->damage_units[pUnit_type];
         last_level = the_damage->damage_level;
-        the_damage->damage_level = pDamage_amount + last_level;
+        the_damage->damage_level += pDamage_amount;
         if (the_damage->damage_level >= 99) {
-            if (pDamage_amount >= 10) {
-                the_damage->damage_level = 99;
-            } else {
-                the_damage->damage_level = last_level;
-            }
+            the_damage->damage_level = (pDamage_amount < 10) ? last_level : 99;
         }
         if (pCar->driver == eDriver_oppo || gNet_mode != eNet_mode_none) {
             SetKnackeredFlag(pCar);
@@ -661,10 +661,10 @@ tImpact_location CalcModifiedLocation(tCar_spec* pCar) {
     if (pCar->last_impact_location != eImpact_left && pCar->last_impact_location != eImpact_right && pCar->last_impact_location != eImpact_top && pCar->last_impact_location != eImpact_bottom) {
         return pCar->last_impact_location;
     }
-    if (pCar->last_col_prop_z < 0.25f) {
+    if (pCar->last_col_prop_z < 0.25) {
         return eImpact_front;
     }
-    if (pCar->last_col_prop_z > 0.75f) {
+    if (pCar->last_col_prop_z > 0.75) {
         return eImpact_back;
     } else {
         return pCar->last_impact_location;
@@ -689,15 +689,15 @@ void DoPratcamHit(br_vector3* pHit_vector) {
     }
     if (fabs(pHit_vector->v[2]) >= fabs(pHit_vector->v[0])) {
         if (pHit_vector->v[2] >= 0.f) {
-            PratcamEvent(14 + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_front + strength_modifier);
         } else {
-            PratcamEvent(13 + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_behind + strength_modifier);
         }
     } else {
         if (pHit_vector->v[0] >= 0.f) {
-            PratcamEvent(15 + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_left + strength_modifier);
         } else {
-            PratcamEvent(16 + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_right + strength_modifier);
         }
     }
 }
@@ -742,9 +742,9 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
         return;
     }
 
-    energy_magnitude = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor * pure_energy_magnitude / 0.7f;
-    BrVector3InvScale(&crushed_car_bounds.min, &pCar->bounds[1].min, WORLD_SCALE);
-    BrVector3InvScale(&crushed_car_bounds.max, &pCar->bounds[1].max, WORLD_SCALE);
+    energy_magnitude = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor * pure_energy_magnitude / 0.7;
+    BrVector3InvScale(&crushed_car_bounds.min, &pCar->bounds[1].min, WORLD_SCALE_D);
+    BrVector3InvScale(&crushed_car_bounds.max, &pCar->bounds[1].max, WORLD_SCALE_D);
 
     x1 = pImpact_point->v[0] - crushed_car_bounds.min.v[0];
     x2 = crushed_car_bounds.max.v[0] - pImpact_point->v[0];
@@ -1176,7 +1176,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                 victim->pre_car_col_knackered = 1;
                 credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
                 credits = 100 * (int)(credits_squared / 100.0f);
-                if (gNet_mode) {
+                if (gNet_mode != eNet_mode_none) {
                     message = NetBuildMessage(NETMSGID_WASTED, 0);
                     message->contents.data.wasted.victim = NetPlayerFromCar(victim)->ID;
                     if (NetPlayerFromCar(culprit)) {
@@ -1187,7 +1187,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                     NetGuaranteedSendMessageToEverybody(gCurrent_net_game, message, NULL);
                     NetEarnCredits(NetPlayerFromCar(culprit), credits);
                 } else {
-                    PratcamEvent(32);
+                    PratcamEvent(kPratcam_opponent_wasted);
                     DoFancyHeadup(kFancyHeadupYouWastedEm);
                     credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
                     credits = 100 * (int)(credits_squared / 100.0);
@@ -1298,70 +1298,48 @@ void DoWheelDamage(tU32 pFrame_period) {
     br_vector3 wonky_vector;
     static int kev_index[4];
 
-    if (gAction_replay_mode && ReplayIsPaused()) {
-        return;
-    }
-
-    for (i = 0; i < gNum_active_cars; i++) {
-        car = gActive_car_list[i];
-        for (j = 0; j < COUNT_OF(car->wheel_dam_offset); j++) {
-            if (car->wheel_actors[j] == NULL) {
-                continue;
-            }
-            old_offset = car->wheel_dam_offset[j];
-            damage = car->damage_units[j + 8].damage_level;
-            if (damage <= 30 || gRace_finished) {
-                car->wheel_dam_offset[j] = 0.0f;
-                continue;
-            }
-            if (PointOutOfSight(&car->pos, 32.0f)) {
-                break;
-            }
-            y_amount = (damage - 30) * gWobble_spam_y[damage & 7];
-            z_amount = (damage - 30) * gWobble_spam_z[damage & 7];
-            BrMatrix34PreRotateY(&car->wheel_actors[j]->t.t.mat, BrDegreeToAngle(y_amount < 0 ? y_amount + 360.f : y_amount));
-            BrMatrix34PreRotateZ(&car->wheel_actors[j]->t.t.mat, BrDegreeToAngle(z_amount < 0 ? z_amount + 360.f : z_amount));
-            if (j < 2 && car->wheel_actors[j + 4] != NULL) {
-                BrMatrix34PreRotateY(&car->wheel_actors[j + 4]->t.t.mat, BrDegreeToAngle(y_amount < 0 ? y_amount + 360.f : y_amount));
-                BrMatrix34PreRotateZ(&car->wheel_actors[j + 4]->t.t.mat, BrDegreeToAngle(z_amount < 0 ? z_amount + 360.f : z_amount));
-            }
-            switch (j) {
-            case 0:
-                if (car->driven_wheels_spin_ref_1 < 0) {
-                    wheel_circum = car->non_driven_wheels_circum;
-                } else {
-                    wheel_circum = car->driven_wheels_circum;
+    if (!gAction_replay_mode || !ReplayIsPaused()) {
+        for (i = 0; i < gNum_active_cars; i++) {
+            car = gActive_car_list[i];
+            for (j = 0; j < COUNT_OF(car->wheel_dam_offset); j++) {
+                if (car->wheel_actors[j] != NULL) {
+                    old_offset = car->wheel_dam_offset[j];
+                    damage = car->damage_units[j + 8].damage_level;
+                    if (damage > 30 && !gRace_finished) {
+                        if (PointOutOfSight(&car->pos, 32.0f)) {
+                            break;
+                        }
+                        y_amount = (damage - 30) * gWobble_spam_y[damage & 7];
+                        z_amount = (damage - 30) * gWobble_spam_z[damage & 7];
+                        BrMatrix34PreRotateY(&car->wheel_actors[j]->t.t.mat, BrDegreeToAngle(y_amount < 0 ? y_amount + 360.f : y_amount));
+                        BrMatrix34PreRotateZ(&car->wheel_actors[j]->t.t.mat, BrDegreeToAngle(z_amount < 0 ? z_amount + 360.f : z_amount));
+                        if (j < 2 && car->wheel_actors[j + 4] != NULL) {
+                            BrMatrix34PreRotateY(&car->wheel_actors[j + 4]->t.t.mat, BrDegreeToAngle(y_amount < 0 ? y_amount + 360.f : y_amount));
+                            BrMatrix34PreRotateZ(&car->wheel_actors[j + 4]->t.t.mat, BrDegreeToAngle(z_amount < 0 ? z_amount + 360.f : z_amount));
+                        }
+                        switch (j) {
+                        case 0:
+                            wheel_circum = (car->driven_wheels_spin_ref_1 < 0) ? car->non_driven_wheels_circum : car->driven_wheels_circum;
+                            break;
+                        case 1:
+                            wheel_circum = (car->driven_wheels_spin_ref_2 < 0) ? car->non_driven_wheels_circum : car->driven_wheels_circum;
+                            break;
+                        case 2:
+                            wheel_circum = (car->driven_wheels_spin_ref_3 < 0) ? car->non_driven_wheels_circum : car->driven_wheels_circum;
+                            break;
+                        case 3:
+                            wheel_circum = (car->driven_wheels_spin_ref_4 < 0) ? car->non_driven_wheels_circum : car->driven_wheels_circum;
+                            break;
+                        }
+                        if (gNet_mode == eNet_mode_none || car->driver == eDriver_local_human) {
+                            BrVector3Set(&temp_vector, wheel_circum * gWheel_circ_to_width, 0.f, 0.f);
+                            BrMatrix34ApplyV(&wonky_vector, &temp_vector, &car->wheel_actors[j]->t.t.mat);
+                            car->wheel_dam_offset[j] = fabs(wonky_vector.v[1]);
+                        }
+                    } else {
+                        car->wheel_dam_offset[j] = 0.0f;
+                    }
                 }
-                break;
-            case 1:
-                if (car->driven_wheels_spin_ref_2 < 0) {
-                    wheel_circum = car->non_driven_wheels_circum;
-                } else {
-                    wheel_circum = car->driven_wheels_circum;
-                }
-                break;
-            case 2:
-                if (car->driven_wheels_spin_ref_3 < 0) {
-                    wheel_circum = car->non_driven_wheels_circum;
-                } else {
-                    wheel_circum = car->driven_wheels_circum;
-                }
-                break;
-            case 3:
-                if (car->driven_wheels_spin_ref_4 < 0) {
-                    wheel_circum = car->non_driven_wheels_circum;
-                } else {
-                    wheel_circum = car->driven_wheels_circum;
-                }
-                break;
-            default:
-                TELL_ME_IF_WE_PASS_THIS_WAY();
-                break;
-            }
-            if (gNet_mode == eNet_mode_none || car->driver == eDriver_local_human) {
-                BrVector3Set(&temp_vector, wheel_circum * gWheel_circ_to_width, 0.f, 0.f);
-                BrMatrix34ApplyV(&wonky_vector, &temp_vector, &car->wheel_actors[j]->t.t.mat);
-                car->wheel_dam_offset[j] = fabs(wonky_vector.v[1]);
             }
         }
     }

@@ -23,7 +23,9 @@
 #endif
 
 // Optional: install a handler to print stack trace during a crash
-void OS_InstallSignalHandler(char* program_name);
+extern void OS_InstallSignalHandler(char* program_name);
+
+extern void OS_RemoveSignalHandler(void);
 
 char* OS_GetFirstFileInDirectory(char* path);
 
@@ -38,6 +40,8 @@ char* OS_Dirname(const char* path);
 char* OS_Basename(const char* path);
 
 char* OS_GetWorkingDirectory(char* argv0);
+
+int OS_GetPrefPath(char* dest, char* name);
 
 int OS_GetAdapterAddress(char* name, void* pSockaddr_in);
 

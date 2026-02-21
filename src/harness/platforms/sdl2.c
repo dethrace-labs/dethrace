@@ -54,6 +54,15 @@ static const char* const possible_locations[] = {
     SDL2_LIBNAME                                      /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
+#include "elfdlopennote.h"
+#ifdef ELF_NOTE_DLOPEN
+ELF_NOTE_DLOPEN(
+    "SDL2",
+    "Platform-specific operations such as creating windows and handling events",
+    ELF_NOTE_DLOPEN_PRIORITY_SUGGESTED,
+    "libSDL2-2.0.so.0",
+    "libSDL2-2.0.so");
+#endif
 static const char* const possible_locations[] = {
     "libSDL2-2.0.so.0",
     "libSDL2-2.0.so",
@@ -369,12 +378,6 @@ static void SDL2_Harness_GetViewport(int* x, int* y, float* width_multipler, flo
     *height_multiplier = viewport.scale_y;
 }
 
-static void SDL2_Harness_GetPrefPath(char* path, char* app_name) {
-    char* sdl_path = SDL2_GetPrefPath(NULL, app_name);
-    strcpy(path, sdl_path);
-    SDL2_free(sdl_path);
-}
-
 static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
     if (SDL2_LoadSymbols() != 0) {
         return 1;
@@ -396,7 +399,6 @@ static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
     platform->PaletteChanged = SDL2_Harness_PaletteChanged;
     platform->GL_GetProcAddress = SDL2_GL_GetProcAddress;
     platform->GetViewport = SDL2_Harness_GetViewport;
-    platform->GetPrefPath = SDL2_Harness_GetPrefPath;
     return 0;
 };
 

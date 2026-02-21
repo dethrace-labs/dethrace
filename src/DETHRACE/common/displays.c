@@ -1514,7 +1514,7 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
         sprintf(s, "%s%s %d %s", GetMiscString(kMiscString_Lost), pPrefix_text, -pAmount, GetMiscString(kMiscString_Credits));
         gProgram_state.credits_lost -= original_amount;
     }
-    gLast_credit_headup__displays = NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, s);
+    gLast_credit_headup__displays = NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s);
     gLast_earn_time = the_time;
 }
 
@@ -1567,7 +1567,7 @@ void AwardTime(tU32 pTime) {
     gTimer += original_amount * 1000;
     s[0] = '+';
     TimerString(1000 * pTime, &s[1], 0, 0);
-    gLast_time_credit_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 2000, -2, s);
+    gLast_time_credit_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 2000, -kFont_BLUEHEAD, s);
     gLast_time_earn_time = the_time;
 }
 

@@ -286,6 +286,20 @@ int S3ExecuteSampleFilterFuncs(tS3_channel* chan) {
     return 0;
 }
 
+// FUNCTION: CARM95 0x004C9577
+int S3GetSampleLength(tS3_sound_tag tag) {
+    tS3_descriptor* descriptor;
+    tS3_sample* sound_data;
+
+    descriptor = S3GetDescriptorByID(tag);
+    if (descriptor) {
+        sound_data = (tS3_sample*)descriptor->sound_data;
+        return 1000 * sound_data->size / sound_data->rate;
+    } else {
+        return 0;
+    }
+}
+
 int S3PlaySample(tS3_channel* chan) {
     tS3_sample* sound_data;
 
