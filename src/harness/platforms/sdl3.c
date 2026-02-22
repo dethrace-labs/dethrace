@@ -243,6 +243,7 @@ static int SDL3_Harness_ShowErrorMessage(char* text, char* caption) {
 
 static void SDL3_Harness_CreateWindow(const char* title, int width, int height, tHarness_window_type window_type) {
     int window_width, window_height;
+    SDL_WindowFlags extra_window_flags;
 
     render_width = width;
     render_height = height;
@@ -260,11 +261,17 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
         LOG_PANIC2("SDL_INIT_VIDEO error: %s", SDL3_GetError());
     }
 
+    extra_window_flags = SDL_WINDOW_RESIZABLE;
+
+    if (harness_game_config.start_full_screen) {
+        extra_window_flags |= SDL_WINDOW_FULLSCREEN;
+    }
+
     if (window_type == eWindow_type_opengl) {
 
         window = SDL3_CreateWindow(title,
             window_width, window_height,
-            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+            extra_window_flags | SDL_WINDOW_OPENGL);
 
         if (window == NULL) {
             LOG_PANIC2("Failed to create window: %s", SDL3_GetError());
@@ -290,7 +297,7 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
     } else {
         window = SDL3_CreateWindow(title,
             window_width, window_height,
-            SDL_WINDOW_RESIZABLE);
+            extra_window_flags);
         if (window == NULL) {
             LOG_PANIC2("Failed to create window: %s", SDL3_GetError());
         }
@@ -325,10 +332,6 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
     viewport.y = 0;
     viewport.scale_x = 1;
     viewport.scale_y = 1;
-
-    if (harness_game_config.start_full_screen) {
-        SDL3_SetWindowFullscreen(window, true);
-    }
 }
 
 static void SDL3_Harness_Swap(br_pixelmap* back_buffer) {
