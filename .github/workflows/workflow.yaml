@@ -90,6 +90,7 @@ jobs:
             -DDETHRACE_PLATFORM_SDL2=ON \
             -DDETHRACE_PLATFORM_SDL3=ON \
             -DDETHRACE_PLATFORM_SDL_DYNAMIC=ON \
+            -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded \
             ${{ matrix.platform.cmake-args }}
       - name: "Build (CMake)"
         run: |
