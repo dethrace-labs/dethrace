@@ -268,6 +268,9 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
     }
 
     if (window_type == eWindow_type_opengl) {
+        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
         window = SDL3_CreateWindow(title,
             window_width, window_height,
@@ -276,13 +279,10 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
         if (window == NULL) {
             LOG_PANIC2("Failed to create window: %s", SDL3_GetError());
         }
-
-        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
         gl_context = SDL3_GL_CreateContext(window);
 
         if (gl_context == NULL) {
+            // FIXME: recreate window (perhaps first create a hidden window)
             LOG_WARN2("Failed to create OpenGL core profile: %s. Trying OpenGLES...", SDL3_GetError());
             SDL3_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
             SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
