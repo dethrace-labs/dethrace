@@ -81,7 +81,7 @@ static int Harness_InitPlatform(void) {
             for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
                 if (strcasecmp(platform_bootstraps[i]->name, harness_game_config.platform_name) == 0) {
                     if ((platform_bootstraps[i]->capabilities & required_caps) != required_caps) {
-                        fprintf(stderr, "Platform \"%s\" does not support required capabilities. Try another video driver and/or add/remove --opengl\n", selected_bootstrap->name);
+                        fprintf(stderr, "Platform \"%s\" does not support required capabilities. Try another video driver and/or add/remove --opengl\n", platform_bootstraps[i]->name);
                         return 1;
                     }
                     selected_bootstrap = platform_bootstraps[i];
