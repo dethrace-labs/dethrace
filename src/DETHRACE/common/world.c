@@ -28,6 +28,7 @@
 #include "trig.h"
 #include "utility.h"
 
+#include <ctype.h>
 #include <float.h>
 #include <string.h>
 
@@ -109,80 +110,83 @@ int gNumber_of_actors;
 // GLOBAL: CARM95 0x0050c7e4
 int gNumber_of_lights;
 
-// GLOBAL: CARM95 0x005514e0
-br_actor* gActor_array[500];
-
-// GLOBAL: CARM95 0x00532af0
-float* gGroove_funk_bindings[960];
+// GLOBAL: CARM95 0x00532218
+float gTemp;
 
 // GLOBAL: CARM95 0x00532220
 br_actor* gDelete_list[500];
 
-// GLOBAL: CARM95 0x00551cb0
-br_actor* gLight_array[50];
-
-// GLOBAL: CARM95 0x00533b18
-br_model* gAdditional_models[1000];
-
-// GLOBAL: CARM95 0x00534ac0
-br_actor* gSpec_vol_actors[100];
-
-// GLOBAL: CARM95 0x00533a00
-tPath_name gAdditional_actor_path;
-
 // GLOBAL: CARM95 0x005329f0
 tPath_name gAdditional_model_path;
 
-// GLOBAL: CARM95 0x00533b00
-tU32 gPrevious_groove_times[2];
-
-// GLOBAL: CARM95 0x00551d78
-int gRace_file_version;
+// GLOBAL: CARM95 0x00532af0
+float* gGroove_funk_bindings[960];
 
 // GLOBAL: CARM95 0x005339f0
 br_vector3 gActor_centre;
 
-// GLOBAL: CARM95 0x00532218
-float gTemp;
+// GLOBAL: CARM95 0x005339fc
+br_scalar gNearest_distance;
 
-// GLOBAL: CARM95 0x00533b0c
-br_actor* gLast_actor;
+// GLOBAL: CARM95 0x00533a00
+tPath_name gAdditional_actor_path;
+
+// GLOBAL: CARM95 0x00533b00
+tU32 gPrevious_groove_times[2];
 
 // GLOBAL: CARM95 0x00533b08
 br_actor* gKnown_actor;
 
-// GLOBAL: CARM95 0x00534ab8
-br_actor* gAdditional_actors;
+// GLOBAL: CARM95 0x00533b0c
+br_actor* gLast_actor;
 
 // GLOBAL: CARM95 0x00533b10
 int gDelete_count;
 
-// GLOBAL: CARM95 0x005339fc
-br_scalar gNearest_distance;
+// GLOBAL: CARM95 0x00533b18
+br_model* gAdditional_models[1000];
+
+// GLOBAL: CARM95 0x00534ab8
+br_actor* gAdditional_actors;
+
+// GLOBAL: CARM95 0x00534abc
+br_scalar gSight_distance_squared;
+
+// GLOBAL: CARM95 0x00534ac0
+br_actor* gSpec_vol_actors[100];
 
 // GLOBAL: CARM95 0x00534c50
 br_actor* gNearest_actor;
 
+// GLOBAL: CARM95 0x005514e0
+br_actor* gActor_array[500];
+
+// GLOBAL: CARM95 0x00551cb0
+br_actor* gLight_array[50];
+
 br_actor* gStandard_lamp;
 
-// GLOBAL: CARM95 0x00534abc
-br_scalar gSight_distance_squared;
+// GLOBAL: CARM95 0x00551d78
+int gRace_file_version;
+
+#define GROOVE_FUNK_BUFFER_SIZE_INCREASE 16
+#define NO_OWNER -999
 
 // IDA: float __cdecl MapSawToTriangle(float pNumber)
 // FUNCTION: CARM95 0x0043f377
 float MapSawToTriangle(float pNumber) {
 
-    if (pNumber >= 0.5) {
-        return 3.0 - pNumber * 4.0;
+    if (pNumber < 0.5) {
+        return pNumber * 4.0f - 1.0f;
     } else {
-        return pNumber * 4.0 - 1.0;
+        return 3.0f - pNumber * 4.0f;
     }
 }
 
 // IDA: void __cdecl SetSightDistance(br_scalar pYon)
 // FUNCTION: CARM95 0x00434b10
 void SetSightDistance(br_scalar pYon) {
-    gSight_distance_squared = pYon * 1.02f * (pYon * 1.02f);
+    gSight_distance_squared = BR_SQR(pYon * 1.02);
 }
 
 // IDA: br_actor* __usercall FindActorInArray@<EAX>(char *pThe_name@<EAX>)
@@ -266,28 +270,28 @@ void DisposeStorageSpace(tBrender_storage* pStorage_space) {
 void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     int i;
 
-    for (i = 0; pStorage_space->pixelmaps_count > i; ++i) {
+    for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
         if (pStorage_space->pixelmaps[i] != NULL) {
             BrMapRemove(pStorage_space->pixelmaps[i]);
             BrPixelmapFree(pStorage_space->pixelmaps[i]);
         }
     }
     pStorage_space->pixelmaps_count = 0;
-    for (i = 0; pStorage_space->shade_tables_count > i; ++i) {
+    for (i = 0; i < pStorage_space->shade_tables_count; i++) {
         if (pStorage_space->shade_tables[i] != NULL) {
             BrTableRemove(pStorage_space->shade_tables[i]);
             BrPixelmapFree(pStorage_space->shade_tables[i]);
         }
     }
     pStorage_space->shade_tables_count = 0;
-    for (i = 0; pStorage_space->materials_count > i; ++i) {
+    for (i = 0; i < pStorage_space->materials_count; i++) {
         if (pStorage_space->materials[i] != NULL) {
             BrMaterialRemove(pStorage_space->materials[i]);
             BrMaterialFree(pStorage_space->materials[i]);
         }
     }
     pStorage_space->materials_count = 0;
-    for (i = 0; pStorage_space->models_count > i; ++i) {
+    for (i = 0; i < pStorage_space->models_count; i++) {
         if (pStorage_space->models[i] != NULL) {
             BrModelRemove(pStorage_space->models[i]);
             BrModelFree(pStorage_space->models[i]);
@@ -299,23 +303,23 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
 // IDA: tAdd_to_storage_result __usercall AddPixelmapToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_pixelmap **pThe_pm@<EDX>)
 // This seems like the signature should be `br_pixelmap* pThe_pm`
 // FUNCTION: CARM95 0x00435014
-tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm) {
+tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_pm) {
     int i;
 
-    if (pStorage_space->pixelmaps_count >= pStorage_space->max_pixelmaps) {
+    if (pStorage_space->pixelmaps_count < pStorage_space->max_pixelmaps) {
+        for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
+            if (pStorage_space->pixelmaps[i]->identifier != NULL
+                && pThe_pm->identifier != NULL
+                && strcmp(pStorage_space->pixelmaps[i]->identifier, pThe_pm->identifier) == 0) {
+                return eStorage_duplicate;
+            }
+        }
+        pStorage_space->pixelmaps[pStorage_space->pixelmaps_count] = pThe_pm;
+        pStorage_space->pixelmaps_count++;
+        return eStorage_allocated;
+    } else {
         return eStorage_not_enough_room;
     }
-
-    for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
-        if (pStorage_space->pixelmaps[i]->identifier
-            && ((br_pixelmap*)pThe_pm)->identifier
-            && strcmp(pStorage_space->pixelmaps[i]->identifier, ((br_pixelmap*)pThe_pm)->identifier) == 0) {
-            return eStorage_duplicate;
-        }
-    }
-    pStorage_space->pixelmaps[pStorage_space->pixelmaps_count] = (br_pixelmap*)pThe_pm;
-    pStorage_space->pixelmaps_count++;
-    return eStorage_allocated;
 }
 
 // IDA: tAdd_to_storage_result __usercall AddShadeTableToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_pixelmap *pThe_st@<EDX>)
@@ -323,19 +327,20 @@ tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br
 tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_st) {
     int i;
 
-    if (pStorage_space->shade_tables_count >= pStorage_space->max_shade_tables) {
+    if (pStorage_space->shade_tables_count < pStorage_space->max_shade_tables) {
+        for (i = 0; i < pStorage_space->shade_tables_count; i++) {
+            if (pStorage_space->shade_tables[i]->identifier
+                && pThe_st->identifier
+                && !strcmp(pStorage_space->shade_tables[i]->identifier, pThe_st->identifier)) {
+                return eStorage_duplicate;
+            }
+        }
+        pStorage_space->shade_tables[pStorage_space->shade_tables_count] = pThe_st;
+        pStorage_space->shade_tables_count++;
+        return eStorage_allocated;
+    } else {
         return eStorage_not_enough_room;
     }
-
-    for (i = 0; i < pStorage_space->shade_tables_count; i++) {
-        if (pStorage_space->shade_tables[i]->identifier
-            && pThe_st->identifier
-            && !strcmp(pStorage_space->shade_tables[i]->identifier, pThe_st->identifier)) {
-            return eStorage_duplicate;
-        }
-    }
-    pStorage_space->shade_tables[pStorage_space->shade_tables_count++] = pThe_st;
-    return eStorage_allocated;
 }
 
 // IDA: tAdd_to_storage_result __usercall AddMaterialToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_material *pThe_mat@<EDX>)
@@ -343,19 +348,21 @@ tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, 
 tAdd_to_storage_result AddMaterialToStorage(tBrender_storage* pStorage_space, br_material* pThe_mat) {
     int i;
 
-    if (pStorage_space->materials_count >= pStorage_space->max_materials) {
+    if (pStorage_space->materials_count < pStorage_space->max_materials) {
+        for (i = 0; i < pStorage_space->materials_count; i++) {
+            if (pStorage_space->materials[i]->identifier
+                && pThe_mat->identifier
+                && !strcmp(pStorage_space->materials[i]->identifier, pThe_mat->identifier)) {
+                return eStorage_duplicate;
+            }
+        }
+        pStorage_space->saved_colour_maps[pStorage_space->materials_count] = NULL;
+        pStorage_space->materials[pStorage_space->materials_count] = pThe_mat;
+        pStorage_space->materials_count++;
+        return eStorage_allocated;
+    } else {
         return eStorage_not_enough_room;
     }
-    for (i = 0; i < pStorage_space->materials_count; i++) {
-        if (pStorage_space->materials[i]->identifier
-            && pThe_mat->identifier
-            && !strcmp(pStorage_space->materials[i]->identifier, pThe_mat->identifier)) {
-            return eStorage_duplicate;
-        }
-    }
-    pStorage_space->saved_colour_maps[pStorage_space->materials_count] = 0;
-    pStorage_space->materials[pStorage_space->materials_count++] = pThe_mat;
-    return eStorage_allocated;
 }
 
 // IDA: tAdd_to_storage_result __usercall AddModelToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_model *pThe_mod@<EDX>)
@@ -363,20 +370,22 @@ tAdd_to_storage_result AddMaterialToStorage(tBrender_storage* pStorage_space, br
 tAdd_to_storage_result AddModelToStorage(tBrender_storage* pStorage_space, br_model* pThe_mod) {
     int i;
 
-    if (pStorage_space->materials_count >= pStorage_space->max_models) {
+    if (pStorage_space->models_count < pStorage_space->max_models) {
+
+        for (i = 0; i < pStorage_space->models_count; i++) {
+            if (pStorage_space->models[i]
+                && pStorage_space->models[i]->identifier
+                && pThe_mod->identifier
+                && !strcmp(pStorage_space->models[i]->identifier, pThe_mod->identifier)) {
+                return eStorage_duplicate;
+            }
+        }
+        pStorage_space->models[pStorage_space->models_count] = pThe_mod;
+        pStorage_space->models_count++;
+        return eStorage_allocated;
+    } else {
         return eStorage_not_enough_room;
     }
-    for (i = 0; i < pStorage_space->models_count; i++) {
-        if (pStorage_space->models[i]
-            && pStorage_space->models[i]->identifier
-            && pThe_mod->identifier
-            && !strcmp(pStorage_space->models[i]->identifier, pThe_mod->identifier)) {
-            return eStorage_duplicate;
-        }
-    }
-    pStorage_space->models[pStorage_space->models_count] = pThe_mod;
-    pStorage_space->models_count++;
-    return eStorage_allocated;
 }
 
 // IDA: int __usercall LoadNPixelmaps@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
@@ -391,7 +400,7 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char* str;
     br_pixelmap* temp_array[200];
 
-    new_ones = 0;
+    total = 0;
     for (i = 0; i < pCount; ++i) {
         PossibleService();
         GetALineAndDontArgue(pF, s);
@@ -400,33 +409,34 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         PathCat(the_path, the_path, "PIXELMAP");
         PathCat(the_path, the_path, str);
         AllowOpenToFail();
-        total = DRPixelmapLoadMany(the_path, temp_array, COUNT_OF(temp_array));
-        if (total == 0) {
+        new_ones = DRPixelmapLoadMany(the_path, temp_array, COUNT_OF(temp_array));
+        DoNotAllowOpenToFail();
+        if (new_ones == 0) {
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, str);
-            total = DRPixelmapLoadMany(the_path, temp_array, COUNT_OF(temp_array));
-            if (total == 0) {
+            new_ones = DRPixelmapLoadMany(the_path, temp_array, COUNT_OF(temp_array));
+            if (new_ones == 0) {
                 FatalError(kFatalError_LoadPixelmapFile_S, str);
             }
         }
-        for (j = 0; j < total; j++) {
+        for (j = 0; j < new_ones; j++) {
             if (temp_array[j] != NULL) {
-                switch (AddPixelmapToStorage(pStorage_space, (br_pixelmap**)temp_array[j])) {
-                case eStorage_not_enough_room:
-                    FatalError(kFatalError_InsufficientPixelmapSlots);
+                switch (AddPixelmapToStorage(pStorage_space, temp_array[j])) {
+                case eStorage_allocated:
+                    BrMapAdd(temp_array[j]);
+                    total++;
                     break;
                 case eStorage_duplicate:
                     BrPixelmapFree(temp_array[j]);
                     break;
-                case eStorage_allocated:
-                    BrMapAdd(temp_array[j]);
-                    ++new_ones;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientPixelmapSlots);
                     break;
                 }
             }
         }
     }
-    return new_ones;
+    return total;
 }
 
 // IDA: br_pixelmap* __usercall LoadSinglePixelmap@<EAX>(tBrender_storage *pStorage_space@<EAX>, char *pName@<EDX>)
@@ -439,18 +449,18 @@ br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
         return BrMapFind(pName);
     }
 
-    switch (AddPixelmapToStorage(pStorage_space, (br_pixelmap**)temp)) {
-    case eStorage_not_enough_room:
-        FatalError(kFatalError_InsufficientPixelmapSlots);
-        break;
-
-    case eStorage_duplicate:
-        BrPixelmapFree(temp);
-        return BrMapFind(pName);
-
+    switch (AddPixelmapToStorage(pStorage_space, temp)) {
     case eStorage_allocated:
         BrMapAdd(temp);
         return temp;
+        break;
+    case eStorage_duplicate:
+        BrPixelmapFree(temp);
+        return BrMapFind(pName);
+        break;
+    case eStorage_not_enough_room:
+        FatalError(kFatalError_InsufficientPixelmapSlots);
+        return NULL;
     }
 
     return NULL;
@@ -467,17 +477,17 @@ br_material* LoadSingleMaterial(tBrender_storage* pStorage_space, char* pName) {
     }
 
     switch (AddMaterialToStorage(pStorage_space, temp)) {
-    case eStorage_not_enough_room:
-        FatalError(kFatalError_InsufficientMaterialSlots);
-        break;
-
-    case eStorage_duplicate:
-        BrMaterialFree(temp);
-        return BrMaterialFind(pName);
-
     case eStorage_allocated:
         BrMaterialAdd(temp);
         return temp;
+        break;
+    case eStorage_duplicate:
+        BrMaterialFree(temp);
+        return BrMaterialFind(pName);
+        break;
+    case eStorage_not_enough_room:
+        FatalError(kFatalError_InsufficientMaterialSlots);
+        return NULL;
     }
 
     return NULL;
@@ -495,36 +505,35 @@ int LoadNShadeTables(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char* str;
     br_pixelmap* temp_array[50];
 
-    new_ones = 0;
+    total = 0;
     for (i = 0; i < pCount; i++) {
         PossibleService();
         GetALineAndDontArgue(pF, s);
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "SHADETAB");
         PathCat(the_path, the_path, str);
-        total = DRPixelmapLoadMany(the_path, temp_array, 50);
-        if (total == 0) {
+        new_ones = DRPixelmapLoadMany(the_path, temp_array, 50);
+        if (new_ones == 0) {
             FatalError(kFatalError_LoadShadeTableFile_S, str);
         }
-        for (j = 0; j < total; j++) {
+        for (j = 0; j < new_ones; j++) {
             if (temp_array[j]) {
                 switch (AddShadeTableToStorage(pStorage_space, temp_array[j])) {
-                case eStorage_not_enough_room:
-                    FatalError(kFatalError_InsufficientShadeTableSlots);
+                case eStorage_allocated:
+                    BrTableAdd(temp_array[j]);
+                    total++;
                     break;
-
                 case eStorage_duplicate:
                     BrPixelmapFree(temp_array[j]);
                     break;
-                case eStorage_allocated:
-                    BrTableAdd(temp_array[j]);
-                    new_ones++;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientShadeTableSlots);
                     break;
                 }
             }
         }
     }
-    return new_ones;
+    return total;
 }
 
 // IDA: br_pixelmap* __usercall LoadSingleShadeTable@<EAX>(tBrender_storage *pStorage_space@<EAX>, char *pName@<EDX>)
@@ -538,17 +547,17 @@ br_pixelmap* LoadSingleShadeTable(tBrender_storage* pStorage_space, char* pName)
     }
 
     switch (AddShadeTableToStorage(pStorage_space, temp)) {
-    case eStorage_not_enough_room:
-        FatalError(kFatalError_InsufficientShadeTableSlots);
-        break;
-
-    case eStorage_duplicate:
-        BrPixelmapFree(temp);
-        return BrTableFind(pName);
-
     case eStorage_allocated:
         BrTableAdd(temp);
         return temp;
+        break;
+    case eStorage_duplicate:
+        BrPixelmapFree(temp);
+        return BrTableFind(pName);
+        break;
+    case eStorage_not_enough_room:
+        FatalError(kFatalError_InsufficientShadeTableSlots);
+        return NULL;
     }
 
     return NULL;
@@ -566,37 +575,38 @@ int LoadNMaterials(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char* str;
     br_material* temp_array[200];
 
-    new_ones = 0;
+    total = 0;
     for (i = 0; i < pCount; ++i) {
         PossibleService();
         GetALineAndDontArgue(pF, s);
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "MATERIAL");
         PathCat(the_path, the_path, str);
-        total = BrMaterialLoadMany(the_path, temp_array, 200);
-        if (total == 0) {
+        new_ones = BrMaterialLoadMany(the_path, temp_array, 200);
+        if (new_ones == 0) {
             FatalError(kFatalError_LoadMaterialFile_S, str);
         }
 #ifdef DETHRACE_3DFX_PATCH
-        GlorifyMaterial(temp_array, total);
+        GlorifyMaterial(temp_array, new_ones);
 #endif
-        for (j = 0; j < total; j++) {
+        for (j = 0; j < new_ones; j++) {
             if (temp_array[j]) {
                 switch (AddMaterialToStorage(pStorage_space, temp_array[j])) {
-                case eStorage_not_enough_room:
-                    FatalError(kFatalError_InsufficientMaterialSlots);
+                case eStorage_allocated:
+                    BrMaterialAdd(temp_array[j]);
+                    total++;
                     break;
                 case eStorage_duplicate:
                     BrMaterialFree(temp_array[j]);
                     break;
-                case eStorage_allocated:
-                    BrMaterialAdd(temp_array[j]);
-                    new_ones++;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientMaterialSlots);
+                    break;
                 }
             }
         }
     }
-    return new_ones;
+    return total;
 }
 
 // IDA: int __usercall LoadNModels@<EAX>(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>, int pCount@<EBX>)
@@ -610,44 +620,44 @@ int LoadNModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     char s[256];
     char* str;
     br_model* temp_array[2000];
-    struct v11model* prepared;
-    int group;
+    // struct v11model* prepared;
+    // int group;
 
-    new_ones = 0;
+    total = 0;
     for (i = 0; i < pCount; i++) {
         PossibleService();
         GetALineAndDontArgue(pF, s);
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "MODELS");
         PathCat(the_path, the_path, str);
-        total = BrModelLoadMany(the_path, temp_array, 2000);
+        new_ones = BrModelLoadMany(the_path, temp_array, 2000);
 #ifdef DETHRACE_3DFX_PATCH
-        WhitenVertexRGB(temp_array, total);
+        WhitenVertexRGB(temp_array, new_ones);
 #endif
-        if (total == 0) {
+        if (new_ones == 0) {
             FatalError(kFatalError_LoadModelFile_S, str);
         }
-        for (j = 0; j < total; j++) {
+        for (j = 0; j < new_ones; j++) {
             if (temp_array[j]) {
                 switch (AddModelToStorage(pStorage_space, temp_array[j])) {
-                case eStorage_not_enough_room:
-                    FatalError(kFatalError_InsufficientModelSlots);
+                case eStorage_allocated:
+                    temp_array[j]->flags |= BR_MODF_UPDATEABLE;
+                    RemoveDoubleSided(temp_array[j]);
+                    BrModelAdd(temp_array[j]);
+                    total++;
                     break;
                 case eStorage_duplicate:
                     BrModelFree(temp_array[j]);
                     break;
-                case eStorage_allocated:
-                    temp_array[j]->flags |= 0x80u;
-                    RemoveDoubleSided(temp_array[j]);
-                    BrModelAdd(temp_array[j]);
-                    ++new_ones;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientModelSlots);
                     break;
                 }
             }
         }
     }
 
-    return new_ones;
+    return total;
 }
 
 // IDA: void __usercall DodgyModelUpdate(br_model *pM@<EAX>)
@@ -671,13 +681,13 @@ br_material* SuffixedMaterial(br_material* pOld, char* pSuffix) {
     new_id = BrMemAllocate(strlen(pOld->identifier) + strlen(pSuffix) + 1, kMem_new_mat_id);
     sprintf(new_id, "%s%s", pOld->identifier, pSuffix);
     new_mat = BrMaterialFind(new_id);
-    if (new_mat == NULL) {
+    if (new_mat) {
+        BrMemFree(new_id);
+    } else {
         new_mat = BrMaterialAllocate(NULL);
         MaterialCopy(new_mat, pOld);
         new_mat->identifier = new_id;
         BrMaterialAdd(new_mat);
-    } else {
-        BrMemFree(new_id);
     }
     return new_mat;
 }
@@ -702,15 +712,16 @@ br_material* RoadPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* new_mat;
 
     old_mat = pModel->faces[pFace].material;
-    if (old_mat->colour_map == NULL || !FaceIsRoad(pModel, pFace)) {
-        return NULL;
+    if (old_mat->colour_map != NULL && FaceIsRoad(pModel, pFace)) {
+
+        new_mat = SuffixedMaterial(old_mat, ".road");
+        if (new_mat->colour_map != NULL) {
+            new_mat->colour_map = NULL;
+            BrMaterialUpdate(new_mat, BR_MATU_ALL);
+        }
+        return new_mat;
     }
-    new_mat = SuffixedMaterial(old_mat, ".road");
-    if (new_mat->colour_map != NULL) {
-        new_mat->colour_map = NULL;
-        BrMaterialUpdate(new_mat, BR_MATU_ALL);
-    }
-    return new_mat;
+    return NULL;
 }
 
 // IDA: br_material* __usercall WallPerspToLinear@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -720,15 +731,15 @@ br_material* WallPerspToLinear(br_model* pModel, tU16 pFace) {
     br_material* new_mat;
 
     old_mat = pModel->faces[pFace].material;
-    if (old_mat->colour_map == NULL || !(old_mat->flags & BR_MATF_PERSPECTIVE) || FaceIsRoad(pModel, pFace)) {
-        return NULL;
+    if (old_mat->colour_map != NULL && (old_mat->flags & BR_MATF_PERSPECTIVE) && !FaceIsRoad(pModel, pFace)) {
+        new_mat = SuffixedMaterial(old_mat, ".pwall");
+        if (new_mat->flags & BR_MATF_PERSPECTIVE) {
+            new_mat->flags &= ~BR_MATF_PERSPECTIVE;
+            BrMaterialUpdate(new_mat, BR_MATU_ALL);
+        }
+        return new_mat;
     }
-    new_mat = SuffixedMaterial(old_mat, ".pwall");
-    if (new_mat->flags & BR_MATF_PERSPECTIVE) {
-        new_mat->flags &= ~BR_MATF_PERSPECTIVE;
-        BrMaterialUpdate(new_mat, BR_MATU_ALL);
-    }
-    return new_mat;
+    return NULL;
 }
 
 // IDA: br_material* __usercall WallPerspToUntex@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -738,19 +749,20 @@ br_material* WallPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* new_mat;
 
     old_mat = pModel->faces[pFace].material;
-    if (old_mat->colour_map == NULL || FaceIsRoad(pModel, pFace)) {
-        return NULL;
+    if (old_mat->colour_map != NULL && FaceIsRoad(pModel, pFace)) {
+
+        if (old_mat->flags & BR_MATF_PERSPECTIVE) {
+            new_mat = SuffixedMaterial(old_mat, ".pwall");
+        } else {
+            new_mat = SuffixedMaterial(old_mat, ".lwall");
+        }
+        if (new_mat->colour_map != NULL) {
+            new_mat->colour_map = NULL;
+            BrMaterialUpdate(new_mat, BR_MATU_ALL);
+        }
+        return new_mat;
     }
-    if (old_mat->flags & BR_MATF_PERSPECTIVE) {
-        new_mat = SuffixedMaterial(old_mat, ".pwall");
-    } else {
-        new_mat = SuffixedMaterial(old_mat, ".lwall");
-    }
-    if (new_mat->colour_map != NULL) {
-        new_mat->colour_map = NULL;
-        BrMaterialUpdate(new_mat, BR_MATU_ALL);
-    }
-    return new_mat;
+    return NULL;
 }
 
 // IDA: void __usercall ProcessModelFaceMaterials2(br_model *pModel@<EAX>, tPMFM2CB pCallback@<EDX>)
@@ -817,51 +829,49 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
     br_model* temp_array[2000];
     struct v11model* prepared;
 
-    new_ones = 0;
+    total = 0;
     for (i = 0; i < pCount; i++) {
         GetALineAndDontArgue(pF, s);
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "MODELS");
         PathCat(the_path, the_path, str);
-        total = BrModelLoadMany(the_path, temp_array, 2000);
-        if (total == 0) {
+        new_ones = BrModelLoadMany(the_path, temp_array, 2000);
+        if (new_ones == 0) {
             FatalError(kFatalError_LoadModelFile_S, str);
         }
 #ifdef DETHRACE_3DFX_PATCH
-        WhitenVertexRGB(temp_array, total);
+        WhitenVertexRGB(temp_array, new_ones);
 #endif
-        for (j = 0; j < total; j++) {
+        for (j = 0; j < new_ones; j++) {
             if (temp_array[j]) {
                 switch (AddModelToStorage(pStorage_space, temp_array[j])) {
-                case eStorage_not_enough_room:
-                    FatalError(kFatalError_InsufficientModelSlots);
-                    break;
-                case eStorage_duplicate:
-                    BrModelFree(temp_array[j]);
-                    break;
                 case eStorage_allocated:
                     temp_array[j]->flags |= BR_MODF_UPDATEABLE;
                     if (gRoad_texturing_level == eRTL_none) {
                         ProcessModelFaceMaterials(temp_array[j], RoadPerspToUntex);
                     }
-                    switch (gWall_texturing_level) {
-                    case eWTL_none:
-                        ProcessModelFaceMaterials(temp_array[j], WallPerspToUntex);
-                        break;
-                    case eWTL_linear:
+                    if (gWall_texturing_level == eWTL_linear) {
                         ProcessModelFaceMaterials(temp_array[j], WallPerspToLinear);
-                        break;
-                    default:
-                        break;
+                    }
+                    if (gWall_texturing_level == eWTL_none) {
+                        ProcessModelFaceMaterials(temp_array[j], WallPerspToUntex);
                     }
                     RemoveDoubleSided(temp_array[j]);
                     BrModelAdd(temp_array[j]);
-                    new_ones++;
+                    total++;
+                    break;
+
+                case eStorage_duplicate:
+                    BrModelFree(temp_array[j]);
+                    break;
+                case eStorage_not_enough_room:
+                    FatalError(kFatalError_InsufficientModelSlots);
+                    break;
                 }
             }
         }
     }
-    return new_ones;
+    return total;
 }
 
 // IDA: void __usercall LoadSomePixelmaps(tBrender_storage *pStorage_space@<EAX>, FILE *pF@<EDX>)
@@ -999,8 +1009,8 @@ void ShiftBoundGrooveFunks(char* pStart, char* pEnd, ptrdiff_t pDelta) {
     int i;
 
     for (i = 0; i < COUNT_OF(gGroove_funk_bindings); i++) {
-        if (pStart <= (char*)gGroove_funk_bindings[i] && (char*)gGroove_funk_bindings[i] < pEnd) {
-            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + (pDelta & ~(sizeof(void*) - 1))); // original code is (pDelta & 0xFFFFFFFC) but this caused problems;
+        if ((intptr_t)pStart <= (intptr_t)gGroove_funk_bindings[i] && (intptr_t)gGroove_funk_bindings[i] < (intptr_t)pEnd) {
+            gGroove_funk_bindings[i] = (float*)((char*)gGroove_funk_bindings[i] + (pDelta & ~(sizeof(void*) - 1)));
         }
     }
 }
@@ -1012,26 +1022,26 @@ tFunkotronic_spec* AddNewFunkotronic(void) {
     int i;
 
     for (i = 0; i < gFunkotronics_array_size; i++) {
-        if (gFunkotronics_array[i].owner == -999) {
+        if (gFunkotronics_array[i].owner == NO_OWNER) {
             memset(&gFunkotronics_array[i], 0, sizeof(tFunkotronic_spec));
             return &gFunkotronics_array[i];
         }
     }
-    gFunkotronics_array_size += 16;
+    gFunkotronics_array_size += GROOVE_FUNK_BUFFER_SIZE_INCREASE;
     new_array = BrMemCalloc(gFunkotronics_array_size, sizeof(tFunkotronic_spec), kMem_funk_spec);
     if (gFunkotronics_array != NULL) {
-        memcpy(new_array, gFunkotronics_array, (gFunkotronics_array_size - 16) * sizeof(tFunkotronic_spec));
+        memcpy(new_array, gFunkotronics_array, (gFunkotronics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE) * sizeof(tFunkotronic_spec));
         ShiftBoundGrooveFunks(
             (char*)gFunkotronics_array,
-            (char*)&gFunkotronics_array[gFunkotronics_array_size - 16],
+            (char*)(gFunkotronics_array + gFunkotronics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE),
             (char*)new_array - (char*)gFunkotronics_array);
         BrMemFree(gFunkotronics_array);
     }
     gFunkotronics_array = new_array;
-    for (i = 0; i < 16; i++) {
-        gFunkotronics_array[gFunkotronics_array_size - 16 + i].owner = -999;
+    for (i = 0; i < GROOVE_FUNK_BUFFER_SIZE_INCREASE; i++) {
+        gFunkotronics_array[gFunkotronics_array_size + i - GROOVE_FUNK_BUFFER_SIZE_INCREASE].owner = NO_OWNER;
     }
-    return &gFunkotronics_array[gFunkotronics_array_size - 16];
+    return gFunkotronics_array + gFunkotronics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE;
 }
 
 // IDA: void __usercall DisposeFunkotronics(int pOwner@<EAX>)
@@ -1040,24 +1050,22 @@ void DisposeFunkotronics(int pOwner) {
     int i;
     tFunkotronic_spec* the_funk;
 
-    if (gFunkotronics_array == NULL) {
-        return;
-    }
-    for (i = 0; i < gFunkotronics_array_size; i++) {
-        the_funk = &gFunkotronics_array[i];
-        PossibleService();
-        if (the_funk->owner == pOwner) {
-            the_funk->owner = -999;
-            if (the_funk->proximity_array != NULL) {
-                BrMemFree(the_funk->proximity_array);
-            }
-            if (the_funk->texture_animation_type == eTexture_animation_flic) {
-                BrMemFree(the_funk->texture_animation_data.flic_info.flic_data);
-                EndFlic(&the_funk->texture_animation_data.flic_info.flic_descriptor);
-                BrMemFree(the_funk->material->colour_map->pixels);
-                the_funk->material->colour_map->pixels = NULL;
-                BrPixelmapFree(the_funk->material->colour_map);
-                the_funk->material->colour_map = NULL;
+    if (gFunkotronics_array != NULL) {
+        for (i = 0, the_funk = gFunkotronics_array; i < gFunkotronics_array_size; i++, the_funk++) {
+            PossibleService();
+            if (the_funk->owner == pOwner) {
+                the_funk->owner = NO_OWNER;
+                if (the_funk->proximity_array != NULL) {
+                    BrMemFree(the_funk->proximity_array);
+                }
+                if (the_funk->texture_animation_type == eTexture_animation_flic) {
+                    BrMemFree(the_funk->texture_animation_data.flic_info.flic_data);
+                    EndFlic(&the_funk->texture_animation_data.flic_info.flic_descriptor);
+                    BrMemFree(the_funk->material->colour_map->pixels);
+                    the_funk->material->colour_map->pixels = NULL;
+                    BrPixelmapFree(the_funk->material->colour_map);
+                    the_funk->material->colour_map = NULL;
+                }
             }
         }
     }
@@ -1092,8 +1100,7 @@ br_uint_32 CalcProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spe
         if (pThe_funk->material == pMat) {
             pThe_funk->proximity_count += 8;
         } else {
-            for (i = 0; i < pActor->model->nfaces; i++) {
-                the_face = &pActor->model->faces[i];
+            for (i = 0, the_face = pActor->model->faces; i < pActor->model->nfaces; i++, the_face++) {
                 if (pThe_funk->material == the_face->material) {
                     pThe_funk->proximity_count += 3;
                 }
@@ -1152,8 +1159,7 @@ br_uint_32 AddProximities(br_actor* pActor, br_material* pMat, tFunkotronic_spec
                 pActor->model->bounds.max.v[2],
                 pThe_funk);
         } else {
-            for (i = 0; i < pActor->model->nfaces; i++) {
-                the_face = &pActor->model->faces[i];
+            for (i = 0, the_face = pActor->model->faces; i < pActor->model->nfaces; i++, the_face++) {
                 if (pThe_funk->material == the_face->material) {
                     AddProximityVertex(&pActor->model->vertices[the_face->vertices[0]].p, pThe_funk);
                     AddProximityVertex(&pActor->model->vertices[the_face->vertices[1]].p, pThe_funk);
@@ -1184,6 +1190,8 @@ void Adjust2FloatsForExceptions(float* pVictim1, float* pVictim2, br_pixelmap* p
     }
 }
 
+#define SAFE_DIV(val) (gTemp = val, gTemp != 0.0f ? 1000.0 / gTemp : 0.0f)
+
 // IDA: void __usercall AddFunkotronics(FILE *pF@<EAX>, int pOwner@<EDX>, int pRef_offset@<EBX>)
 // FUNCTION: CARM95 0x00436b8b
 void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
@@ -1203,10 +1211,6 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
     float s_max;
     void* the_pixels;
     br_pixelmap* the_pixelmap;
-    float x_0;
-    float x_1;
-    int d_0;
-    int d_1;
 
     first_time = 1;
     while (!feof(pF)) {
@@ -1219,14 +1223,14 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
         if (!first_time) {
             if (strcmp(s, "NEXT FUNK") != 0) {
                 FatalError(kFatalError_FunkotronicFile);
+            } else {
+                GetALineAndDontArgue(pF, s);
             }
-            GetALineAndDontArgue(pF, s);
         }
         first_time = 0;
-
+        str = strtok(s, "\t ,/");
         the_funk = AddNewFunkotronic();
         the_funk->owner = pOwner;
-        str = strtok(s, "\t ,/");
         the_funk->material = BrMaterialFind(str);
         if (the_funk->material == NULL) {
             FatalError(kFatalError_FindMaterialUsedByFunkotronicFile_S, str);
@@ -1239,29 +1243,33 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
         switch (the_funk->matrix_mod_type) {
         case eMatrix_mod_spin:
             if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
-                i = GetAnInt(pF);
-                AddFunkGrooveBinding(i + pRef_offset, &the_funk->matrix_mod_data.spin_info.period);
+                AddFunkGrooveBinding(GetAnInt(pF) + pRef_offset, &the_funk->matrix_mod_data.spin_info.period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_funk->matrix_mod_data.spin_info.period = (x_0 == 0.0f) ? 0.0f : 1000.0f / x_0;
+                gTemp = GetAFloat(pF);
+                the_funk->matrix_mod_data.spin_info.period = (gTemp != 0.0f ? 1000.0 / gTemp : 0.0);
             }
             break;
-        case eMatrix_mod_rock: // rock
+
+        case eMatrix_mod_rock:
             if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
-                d_0 = GetAnInt(pF);
-                AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.rock_info.period);
+                AddFunkGrooveBinding(GetAnInt(pF) + pRef_offset, &the_funk->matrix_mod_data.rock_info.period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_funk->matrix_mod_data.rock_info.period = (x_0 == 0.0f) ? 0.0f : 1000.0f / x_0;
+                the_funk->matrix_mod_data.rock_info.period = SAFE_DIV(GetAFloat(pF));
             }
 
             the_funk->matrix_mod_data.rock_info.rock_angle = GetAFloat(pF);
-            GetPairOfFloats(pF, &x_0, &x_1);
-            the_funk->matrix_mod_data.rock_info.x_centre = x_0 / 100.0f;
-            the_funk->matrix_mod_data.rock_info.y_centre = x_1 / 100.0f;
+
+            {
+                float x_0, x_1;
+                GetPairOfFloats(pF, &x_0, &x_1);
+                the_funk->matrix_mod_data.rock_info.x_centre = x_0 / 100.f;
+                the_funk->matrix_mod_data.rock_info.y_centre = x_1 / 100.f;
+            }
             break;
-        case eMatrix_mod_throb: // throb
+
+        case eMatrix_mod_throb:
             if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
+                int d_0, d_1;
                 GetPairOfInts(pF, &d_0, &d_1);
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.throb_info.x_period);
@@ -1270,18 +1278,23 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                     AddFunkGrooveBinding(d_1 + pRef_offset, &the_funk->matrix_mod_data.throb_info.y_period);
                 }
             } else {
-                GetPairOfFloats(pF, &speed1, &speed2);
-                the_funk->matrix_mod_data.throb_info.x_period = (speed1 == 0.0f) ? 0.0f : 1000.0f / speed1;
-                the_funk->matrix_mod_data.throb_info.y_period = (speed2 == 0.0f) ? 0.0f : 1000.0f / speed2;
+                float x_0, x_1;
+                GetPairOfFloats(pF, &x_0, &x_1);
+                the_funk->matrix_mod_data.throb_info.x_period = SAFE_DIV(x_0);
+                the_funk->matrix_mod_data.throb_info.y_period = SAFE_DIV(x_1);
             }
             GetPairOfFloatPercents(
                 pF,
                 &the_funk->matrix_mod_data.throb_info.x_magnitude,
                 &the_funk->matrix_mod_data.throb_info.y_magnitude);
-            GetPairOfFloats(pF, &x_0, &x_1);
-            the_funk->matrix_mod_data.throb_info.x_centre = x_0 / 100.0f;
-            the_funk->matrix_mod_data.throb_info.y_centre = x_1 / 100.0f;
-            if (the_funk->matrix_mode != eMove_controlled) {
+            {
+                float x_0, x_1;
+                GetPairOfFloats(pF, &x_0, &x_1);
+                the_funk->matrix_mod_data.throb_info.x_centre = x_0 / 100.0f;
+                the_funk->matrix_mod_data.throb_info.y_centre = x_1 / 100.0f;
+            }
+            // likely bug: the second conditional should be eMove_absolute
+            if (the_funk->matrix_mode != eMove_controlled && the_funk->matrix_mode != eMove_controlled) {
                 if (the_funk->matrix_mod_data.throb_info.x_period == 0.0f) {
                     the_funk->matrix_mod_data.throb_info.x_period = 1.0f;
                     the_funk->matrix_mod_data.throb_info.x_magnitude = 0.0f;
@@ -1292,8 +1305,10 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 }
             }
             break;
-        case eMatrix_mod_slither: // slither
+
+        case eMatrix_mod_slither:
             if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
+                int d_0, d_1;
                 GetPairOfInts(pF, &d_0, &d_1);
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.slither_info.x_period);
@@ -1302,15 +1317,16 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                     AddFunkGrooveBinding(d_1 + pRef_offset, &the_funk->matrix_mod_data.slither_info.y_period);
                 }
             } else {
-                GetPairOfFloats(pF, &speed1, &speed2);
-                the_funk->matrix_mod_data.slither_info.x_period = (speed1 == 0.0f) ? 0.0f : 1000.0f / speed1;
-                the_funk->matrix_mod_data.slither_info.y_period = (speed2 == 0.0f) ? 0.0f : 1000.0f / speed2;
+                float x_0, x_1;
+                GetPairOfFloats(pF, &x_0, &x_1);
+                the_funk->matrix_mod_data.slither_info.x_period = SAFE_DIV(x_0);
+                the_funk->matrix_mod_data.slither_info.y_period = SAFE_DIV(x_1);
             }
             GetPairOfFloatPercents(
                 pF,
                 &the_funk->matrix_mod_data.slither_info.x_magnitude,
                 &the_funk->matrix_mod_data.slither_info.y_magnitude);
-            if (the_funk->matrix_mode != eMove_controlled) {
+            if (the_funk->matrix_mode != eMove_controlled && the_funk->matrix_mode != eMove_controlled) {
                 if (the_funk->matrix_mod_data.slither_info.x_period == 0.0f) {
                     the_funk->matrix_mod_data.slither_info.x_period = 1.0f;
                     the_funk->matrix_mod_data.slither_info.x_magnitude = 0.0f;
@@ -1321,36 +1337,36 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 }
             }
             break;
-        case eMatrix_mod_roll: // roll
+
+        case eMatrix_mod_roll:
             if (the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
+                int d_0, d_1;
                 GetPairOfInts(pF, &d_0, &d_1);
                 if (d_0 >= 0) {
-                    AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->matrix_mod_data.roll_info.x_period);
+                    AddFunkGrooveBinding(pRef_offset + d_0, &the_funk->matrix_mod_data.roll_info.x_period);
                 }
                 if (d_1 >= 0) {
-                    AddFunkGrooveBinding(d_1 + pRef_offset, &the_funk->matrix_mod_data.roll_info.y_period);
+                    AddFunkGrooveBinding(pRef_offset + d_1, &the_funk->matrix_mod_data.roll_info.y_period);
                 }
             } else {
-                GetPairOfFloats(pF, &speed1, &speed2);
-                the_funk->matrix_mod_data.roll_info.x_period = speed1 == 0.0f ? 0.0f : 1000.0f / speed1;
-                the_funk->matrix_mod_data.roll_info.y_period = speed2 == 0.0f ? 0.0f : 1000.0f / speed2;
+                float x_0, x_1;
+                GetPairOfFloats(pF, &x_0, &x_1);
+                the_funk->matrix_mod_data.roll_info.x_period = SAFE_DIV(x_0);
+                the_funk->matrix_mod_data.roll_info.y_period = SAFE_DIV(x_1);
             }
 #ifdef DETHRACE_3DFX_PATCH
             Adjust2FloatsForExceptions(&the_funk->matrix_mod_data.roll_info.x_period, &the_funk->matrix_mod_data.roll_info.y_period, the_funk->material->colour_map);
-
 #endif
             break;
-        default:
-            break;
+
+            DETHRACE_DEFAULT_BREAK
         }
         the_funk->lighting_animation_type = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
         if (the_funk->lighting_animation_type != eMove_none) {
             if (the_funk->lighting_animation_type == eMove_controlled || the_funk->lighting_animation_type == eMove_absolute) {
-                d_0 = GetAnInt(pF);
-                AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->lighting_animation_period);
+                AddFunkGrooveBinding(GetAnInt(pF) + pRef_offset, &the_funk->lighting_animation_period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_funk->lighting_animation_period = (x_0 == 0.0f) ? 0.0f : 1000.0f / x_0;
+                the_funk->lighting_animation_period = SAFE_DIV(GetAFloat(pF));
             }
             GetThreeFloatPercents(pF, &a_min, &d_min, &s_min);
             GetThreeFloatPercents(pF, &a_max, &d_max, &s_max);
@@ -1371,13 +1387,32 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
         }
         the_funk->last_frame = 0.0f;
 
-        if (the_funk->texture_animation_type == eTexture_animation_flic) {
+        switch (the_funk->texture_animation_type) {
+        case eTexture_animation_frames:
+            the_funk->texture_animation_data.frames_info.mode = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
+            if (the_funk->texture_animation_data.frames_info.mode == eMove_controlled
+                || the_funk->texture_animation_data.frames_info.mode == eMove_absolute) {
+                AddFunkGrooveBinding(GetAnInt(pF) + pRef_offset, &the_funk->texture_animation_data.frames_info.period);
+            } else {
+                the_funk->texture_animation_data.frames_info.period = SAFE_DIV(GetAFloat(pF));
+            }
+            the_funk->texture_animation_data.frames_info.texture_count = (int)GetAFloat(pF);
+            the_funk->texture_animation_data.frames_info.current_frame = 0;
+            for (i = 0; i < the_funk->texture_animation_data.frames_info.texture_count; i++) {
+                GetAString(pF, s);
+                the_funk->texture_animation_data.frames_info.textures[i] = BrMapFind(s);
+                if (the_funk->texture_animation_data.frames_info.textures[i] == NULL) {
+                    FatalError(kFatalError_AnimationFramePixelmapUsedByFunkotronicFile);
+                }
+            }
+            break;
+
+        case eTexture_animation_flic:
             GetAString(pF, s);
             the_funk->texture_animation_data.flic_info.flic_data = 0;
-            if (LoadFlicData(
-                    s,
-                    &the_funk->texture_animation_data.flic_info.flic_data,
-                    &the_funk->texture_animation_data.flic_info.flic_data_length)) {
+            if (LoadFlicData(s, &the_funk->texture_animation_data.flic_info.flic_data, &the_funk->texture_animation_data.flic_info.flic_data_length) == 0) {
+                the_funk->texture_animation_type = eTexture_animation_none;
+            } else {
                 the_funk->texture_animation_data.flic_info.flic_descriptor.data_start = NULL;
                 StartFlic(
                     s,
@@ -1399,7 +1434,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                         "C:\\Msdev\\Projects\\DethRace\\World.c",
                         1729,
                         "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\World.c",
-                        193);
+                        1729);
                 }
                 the_pixelmap = DRPixelmapAllocate(
 #ifdef DETHRACE_3DFX_PATCH
@@ -1417,30 +1452,12 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                 AssertFlicPixelmap(&the_funk->texture_animation_data.flic_info.flic_descriptor, the_pixelmap);
                 the_funk->material->colour_map = the_pixelmap;
                 BrMaterialUpdate(the_funk->material, BR_MATU_ALL);
-            } else {
-                the_funk->texture_animation_type = eTexture_animation_none;
             }
-        } else if (the_funk->texture_animation_type == eTexture_animation_frames) {
-            i = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
-            the_funk->texture_animation_data.frames_info.mode = i;
-            if (the_funk->texture_animation_data.frames_info.mode == eMove_controlled
-                || the_funk->texture_animation_data.frames_info.mode == eMove_absolute) {
-                d_0 = GetAnInt(pF);
-                AddFunkGrooveBinding(d_0 + pRef_offset, &the_funk->texture_animation_data.frames_info.period);
-            } else {
-                x_0 = GetAFloat(pF);
-                the_funk->texture_animation_data.frames_info.period = (x_0 == 0.0f) ? 0.0f : 1000.0F / x_0;
-            }
+            break;
 
-            the_funk->texture_animation_data.frames_info.texture_count = (int)GetAFloat(pF);
-            for (i = 0; i < the_funk->texture_animation_data.frames_info.texture_count; i++) {
-                GetAString(pF, s);
-                the_funk->texture_animation_data.frames_info.textures[i] = BrMapFind(s);
-                if (the_funk->texture_animation_data.frames_info.textures[i] == NULL) {
-                    FatalError(kFatalError_AnimationFramePixelmapUsedByFunkotronicFile);
-                }
-            }
+            DETHRACE_DEFAULT_BREAK
         }
+
         the_funk->proximity_count = 0;
         the_funk->proximity_array = 0;
         if (the_funk->mode == eFunk_mode_distance) {
@@ -1456,9 +1473,10 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                         memmove(
                             &the_funk->proximity_array[j],
                             &the_funk->proximity_array[j + 1],
-                            sizeof(br_vector3) * (the_funk->proximity_count - j - 1));
-                        the_funk->proximity_count--;
+                            (the_funk->proximity_count - j - 1) * sizeof(br_vector3));
+
                         j--;
+                        the_funk->proximity_count--;
                     }
                 }
             }
@@ -1472,14 +1490,12 @@ void DisposeGroovidelics(int pOwner) {
     int i;
     tGroovidelic_spec* the_groove;
 
-    if (gGroovidelics_array == NULL) {
-        return;
-    }
-    for (i = 0; i < gGroovidelics_array_size; i++) {
-        the_groove = &gGroovidelics_array[i];
-        PossibleService();
-        if (the_groove->owner == pOwner) {
-            the_groove->owner = -999;
+    if (gGroovidelics_array != NULL) {
+        for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
+            PossibleService();
+            if (the_groove->owner == pOwner) {
+                the_groove->owner = NO_OWNER;
+            }
         }
     }
 }
@@ -1491,26 +1507,26 @@ tGroovidelic_spec* AddNewGroovidelic(void) {
     int i;
 
     for (i = 0; i < gGroovidelics_array_size; i++) {
-        if (gGroovidelics_array[i].owner == -999) {
+        if (gGroovidelics_array[i].owner == NO_OWNER) {
             memset(&gGroovidelics_array[i], 0, sizeof(tGroovidelic_spec));
             return &gGroovidelics_array[i];
         }
     }
-    gGroovidelics_array_size += 16;
+    gGroovidelics_array_size += GROOVE_FUNK_BUFFER_SIZE_INCREASE;
     new_array = BrMemCalloc(gGroovidelics_array_size, sizeof(tGroovidelic_spec), kMem_groove_spec);
     if (gGroovidelics_array != NULL) {
-        memcpy(new_array, gGroovidelics_array, (gGroovidelics_array_size - 16) * sizeof(tGroovidelic_spec));
+        memcpy(new_array, gGroovidelics_array, (gGroovidelics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE) * sizeof(tGroovidelic_spec));
         ShiftBoundGrooveFunks(
             (char*)gGroovidelics_array,
-            (char*)&gGroovidelics_array[gGroovidelics_array_size - 16],
+            (char*)(gGroovidelics_array + gGroovidelics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE),
             (char*)new_array - (char*)gGroovidelics_array);
         BrMemFree(gGroovidelics_array);
     }
     gGroovidelics_array = new_array;
-    for (i = 0; i < 16; i++) {
-        gGroovidelics_array[i + gGroovidelics_array_size - 16].owner = -999;
+    for (i = 0; i < GROOVE_FUNK_BUFFER_SIZE_INCREASE; i++) {
+        gGroovidelics_array[gGroovidelics_array_size + i - GROOVE_FUNK_BUFFER_SIZE_INCREASE].owner = NO_OWNER;
     }
-    return &gGroovidelics_array[gGroovidelics_array_size - 16];
+    return gGroovidelics_array + gGroovidelics_array_size - GROOVE_FUNK_BUFFER_SIZE_INCREASE;
 }
 
 // IDA: void __usercall AddGroovidelics(FILE *pF@<EAX>, int pOwner@<EDX>, br_actor *pParent_actor@<EBX>, int pRef_offset@<ECX>, int pAllowed_to_be_absent)
@@ -1522,12 +1538,6 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
     int i;
     int j;
     tGroovidelic_spec* the_groove;
-    float x_0;
-    float x_1;
-    float x_2;
-    int d_0;
-    int d_1;
-    int d_2;
 
     first_time = 1;
 
@@ -1541,8 +1551,9 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
         if (!first_time) {
             if (strcmp(s, "NEXT GROOVE") != 0) {
                 FatalError(kFatalError_GroovidelicFile);
+            } else {
+                GetALineAndDontArgue(pF, s);
             }
-            GetALineAndDontArgue(pF, s);
         }
         first_time = 0;
         str = strtok(s, "\t ,/");
@@ -1551,16 +1562,17 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
         the_groove->actor = DRActorFindRecurse(pParent_actor, str);
 
         if (the_groove->actor == NULL) {
-            if (!pAllowed_to_be_absent && !gAusterity_mode) {
+            if (pAllowed_to_be_absent || gAusterity_mode) {
+                if (gGroove_by_proxy_actor == NULL) {
+                    gGroove_by_proxy_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+                    gGroove_by_proxy_actor->model = LoadModel("PROXY.DAT");
+                    BrModelAdd(gGroove_by_proxy_actor->model);
+                    BrActorAdd(gDont_render_actor, gGroove_by_proxy_actor);
+                }
+                the_groove->actor = gGroove_by_proxy_actor;
+            } else {
                 FatalError(kFatalError_FindActorUsedByGroovidelicFile_S, str);
             }
-            if (gGroove_by_proxy_actor == NULL) {
-                gGroove_by_proxy_actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-                gGroove_by_proxy_actor->model = LoadModel("PROXY.DAT");
-                BrModelAdd(gGroove_by_proxy_actor->model);
-                BrActorAdd(gDont_render_actor, gGroove_by_proxy_actor);
-            }
-            the_groove->actor = gGroove_by_proxy_actor;
         }
         the_groove->lollipop_mode = GetALineAndInterpretCommand(pF, gLollipop_names, COUNT_OF(gLollipop_names));
         the_groove->mode = GetALineAndInterpretCommand(pF, gGroove_nature_names, COUNT_OF(gGroove_nature_names));
@@ -1572,64 +1584,52 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
             the_groove->path_mode = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
         }
 
-        if (the_groove->path_type == eGroove_path_circular) {
-            TELL_ME_IF_WE_PASS_THIS_WAY();
-            // GetThreeFloats(pF, &v90, &v89, &v88);
-            // the_groove->path_data.circular_info.centre.v[0] = v90;
-            // the_groove->path_data.circular_info.centre.v[1] = v89;
-            // the_groove->path_data.circular_info.centre.v[2] = v88;
-            // if (the_groove->path_data.circular_info.centre.v[2] == 0.0
-            //     && *(float*)&the_groove->path_data.circular_info.axis == 0.0
-            //     && *((float*)&the_groove->path_data.circular_info + 6) == 0.0) {
-            //     v25 = (_DWORD*)the_groove->actor->t.t.translate.t.v;
-            //     v26 = (_DWORD*)&the_groove->path_data.circular_info.centre.v[2];
-            //     *v26 = *v25;
-            //     v26[1] = v25[1];
-            //     v26[2] = v25[2];
-            // }
-            // if (the_groove->path_mode != 3 && the_groove->path_mode != 4) {
-            //     v29 = GetAFloat(pF);
-            //     x_0 = v29;
-            //     if (v31) {
-            //         v62 = 0.0;
-            //     } else {
-            //         v62 = 1000.0 / x_0;
-            //     }
-            //     the_groove->path_data.circular_info.period = v62;
-            // } else {
-            //     v27 = &the_groove->path_data.circular_info.period;
-            //     v28 = GetAnInt(pF);
-            //     AddFunkGrooveBinding(v28 + pRef_offset, v27);
-            // }
-            // v32 = GetAFloat(pF);
-            // the_groove->path_data.circular_info.radius = v32;
-            // v33 = GetALineAndInterpretCommand(pF, gAxis_names, 3);
-            // the_groove->path_data.circular_info.axis = v33;
+        switch (the_groove->path_type) {
 
-        } else if (the_groove->path_type == eGroove_path_straight) {
-            GetThreeFloats(pF,
-                &the_groove->path_data.straight_info.centre.v[0],
-                &the_groove->path_data.straight_info.centre.v[1],
-                &the_groove->path_data.straight_info.centre.v[2]);
+        case eGroove_path_straight:
+            ReadThreeFloats(pF,
+                the_groove->path_data.straight_info.centre.v[0],
+                the_groove->path_data.straight_info.centre.v[1],
+                the_groove->path_data.straight_info.centre.v[2]);
 
             if (Vector3IsZero(&the_groove->path_data.straight_info.centre)) {
-                BrVector3Copy(&the_groove->path_data.straight_info.centre,
-                    &the_groove->actor->t.t.translate.t);
+                the_groove->path_data.straight_info.centre = the_groove->actor->t.t.translate.t;
             }
             if (the_groove->path_mode == eMove_controlled || the_groove->path_mode == eMove_absolute) {
                 AddFunkGrooveBinding(pRef_offset + GetAnInt(pF), &the_groove->path_data.straight_info.period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_groove->path_data.straight_info.period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
+                the_groove->path_data.straight_info.period = SAFE_DIV(GetAFloat(pF));
             }
             GetThreeFloats(
                 pF,
                 &the_groove->path_data.straight_info.x_delta,
                 &the_groove->path_data.straight_info.y_delta,
                 &the_groove->path_data.straight_info.z_delta);
+            break;
+
+        case eGroove_path_circular:
+            ReadThreeFloats(pF,
+                the_groove->path_data.circular_info.centre.v[0],
+                the_groove->path_data.circular_info.centre.v[1],
+                the_groove->path_data.circular_info.centre.v[2]);
+
+            if (Vector3IsZero(&the_groove->path_data.straight_info.centre)) {
+                the_groove->path_data.straight_info.centre = the_groove->actor->t.t.translate.t;
+            }
+            if (the_groove->path_mode == eMove_controlled || the_groove->path_mode == eMove_absolute) {
+                AddFunkGrooveBinding(pRef_offset + GetAnInt(pF), &the_groove->path_data.circular_info.period);
+            } else {
+                the_groove->path_data.circular_info.period = SAFE_DIV(GetAFloat(pF));
+            }
+            the_groove->path_data.circular_info.radius = GetAFloat(pF);
+            the_groove->path_data.circular_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
+            break;
+
+            DETHRACE_DEFAULT_BREAK;
         }
+
         the_groove->object_type = GetALineAndInterpretCommand(pF, gGroove_object_names, COUNT_OF(gGroove_object_names));
-        BrVector3Copy(&the_groove->object_position, &the_groove->actor->t.t.translate.t);
+        the_groove->object_position = the_groove->actor->t.t.translate.t;
         if (the_groove->object_type != eGroove_object_none) {
             the_groove->object_mode = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
         }
@@ -1638,31 +1638,35 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
             if (the_groove->object_mode == eMove_controlled || the_groove->object_mode == eMove_absolute) {
                 AddFunkGrooveBinding(pRef_offset + GetAnInt(pF), &the_groove->object_data.spin_info.period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_groove->object_data.spin_info.period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
+                the_groove->object_data.spin_info.period = SAFE_DIV(GetAFloat(pF));
             }
-            GetThreeFloats(pF,
-                &the_groove->object_centre.v[0],
-                &the_groove->object_centre.v[1],
-                &the_groove->object_centre.v[2]);
+
+            ReadThreeFloats(pF,
+                the_groove->object_centre.v[0],
+                the_groove->object_centre.v[1],
+                the_groove->object_centre.v[2]);
+
             the_groove->object_data.spin_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
             break;
+
         case eGroove_object_rock:
             if (the_groove->object_mode == eMove_controlled || the_groove->object_mode == eMove_absolute) {
                 AddFunkGrooveBinding(pRef_offset + GetAnInt(pF), &the_groove->object_data.rock_info.period);
             } else {
-                x_0 = GetAFloat(pF);
-                the_groove->object_data.rock_info.period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
+                the_groove->object_data.rock_info.period = SAFE_DIV(GetAFloat(pF));
             }
-            GetThreeFloats(pF,
-                &the_groove->object_centre.v[0],
-                &the_groove->object_centre.v[1],
-                &the_groove->object_centre.v[2]);
+            ReadThreeFloats(pF,
+                the_groove->object_centre.v[0],
+                the_groove->object_centre.v[1],
+                the_groove->object_centre.v[2]);
+
             the_groove->object_data.rock_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
             the_groove->object_data.rock_info.max_angle = GetAFloat(pF);
             break;
+
         case eGroove_object_throb:
             if (the_groove->object_mode == eMove_controlled || the_groove->object_mode == eMove_absolute) {
+                int d_0, d_1, d_2;
                 GetThreeInts(pF, &d_0, &d_1, &d_2);
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(pRef_offset + d_0, &the_groove->object_data.throb_info.x_period);
@@ -1674,23 +1678,25 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                     AddFunkGrooveBinding(pRef_offset + d_2, &the_groove->object_data.throb_info.z_period);
                 }
             } else {
+                float x_0, x_1, x_2;
                 GetThreeFloats(pF, &x_0, &x_1, &x_2);
-                the_groove->object_data.throb_info.x_period = (x_0 == 0.0f) ? 0.0f : (1000.0f / x_0);
-                the_groove->object_data.throb_info.y_period = (x_1 == 0.0f) ? 0.0f : (1000.0f / x_1);
-                the_groove->object_data.throb_info.z_period = (x_2 == 0.0f) ? 0.0f : (1000.0f / x_2);
+                the_groove->object_data.throb_info.x_period = SAFE_DIV(x_0);
+                the_groove->object_data.throb_info.y_period = SAFE_DIV(x_1);
+                the_groove->object_data.throb_info.z_period = SAFE_DIV(x_2);
             }
-            GetThreeFloats(pF,
-                &the_groove->object_centre.v[0],
-                &the_groove->object_centre.v[1],
-                &the_groove->object_centre.v[2]);
-            GetThreeFloatPercents(
-                pF,
+            ReadThreeFloats(pF,
+                the_groove->object_centre.v[0],
+                the_groove->object_centre.v[1],
+                the_groove->object_centre.v[2]);
+            GetThreeFloatPercents(pF,
                 &the_groove->object_data.throb_info.x_magnitude,
                 &the_groove->object_data.throb_info.y_magnitude,
                 &the_groove->object_data.throb_info.z_magnitude);
             break;
+
         case eGroove_object_shear:
             if (the_groove->object_mode == eMove_controlled || the_groove->object_mode == eMove_absolute) {
+                int d_0, d_1, d_2;
                 GetThreeInts(pF, &d_0, &d_1, &d_2);
                 if (d_0 >= 0) {
                     AddFunkGrooveBinding(pRef_offset + d_0, &the_groove->object_data.shear_info.x_period);
@@ -1702,24 +1708,23 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                     AddFunkGrooveBinding(pRef_offset + d_2, &the_groove->object_data.shear_info.z_period);
                 }
             } else {
+                float x_0, x_1, x_2;
                 GetThreeFloats(pF, &x_0, &x_1, &x_2);
-                the_groove->object_data.shear_info.x_period = x_0 == 0.0f ? 0.0f : 1000.0 / x_0;
-                the_groove->object_data.shear_info.y_period = x_1 == 0.0f ? 0.0f : 1000.0 / x_1;
-                the_groove->object_data.shear_info.z_period = x_2 == 0.0f ? 0.0f : 1000.0 / x_2;
+                the_groove->object_data.shear_info.x_period = SAFE_DIV(x_0);
+                the_groove->object_data.shear_info.y_period = SAFE_DIV(x_1);
+                the_groove->object_data.shear_info.z_period = SAFE_DIV(x_2);
             }
-            GetThreeFloats(pF,
-                &the_groove->object_centre.v[0],
-                &the_groove->object_centre.v[1],
-                &the_groove->object_centre.v[2]);
-            GetThreeFloatPercents(
-                pF,
+            ReadThreeFloats(pF,
+                the_groove->object_centre.v[0],
+                the_groove->object_centre.v[1],
+                the_groove->object_centre.v[2]);
+            GetThreeFloatPercents(pF,
                 &the_groove->object_data.shear_info.x_magnitude,
                 &the_groove->object_data.shear_info.y_magnitude,
                 &the_groove->object_data.shear_info.z_magnitude);
+            break;
 
-            break;
-        default:
-            break;
+            DETHRACE_DEFAULT_BREAK;
         }
     }
 }
@@ -1730,27 +1735,16 @@ void KillGroovadelic(int pOwner) {
     int i;
     tGroovidelic_spec* the_groove;
 
-    if (gGroovidelics_array == NULL) {
-        return;
-    }
-    for (i = 0; i < gGroovidelics_array_size; i++) {
-        the_groove = &gGroovidelics_array[i];
-        if (the_groove->owner != pOwner) {
-            continue;
+    if (gGroovidelics_array != NULL) {
+        for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
+            if (the_groove->owner == pOwner
+                && the_groove->path_mode != eMove_controlled
+                && the_groove->path_mode != eMove_absolute
+                && the_groove->object_mode != eMove_controlled
+                && the_groove->object_mode != eMove_absolute) {
+                the_groove->owner = NO_OWNER;
+            }
         }
-        if (the_groove->path_mode == eMove_controlled) {
-            continue;
-        }
-        if (the_groove->path_mode == eMove_absolute) {
-            continue;
-        }
-        if (the_groove->object_mode == eMove_controlled) {
-            continue;
-        }
-        if (the_groove->object_mode == eMove_absolute) {
-            continue;
-        }
-        the_groove->owner = -999;
     }
 }
 
@@ -1760,30 +1754,18 @@ void KillFunkotronic(int pOwner) {
     int i;
     tFunkotronic_spec* the_funk;
 
-    if (gFunkotronics_array == NULL) {
-        return;
-    }
-    for (i = 0; i < gFunkotronics_array_size; i++) {
-        the_funk = &gFunkotronics_array[i];
-        if (the_funk->owner != pOwner) {
-            continue;
+    if (gFunkotronics_array != NULL) {
+        for (i = 0, the_funk = gFunkotronics_array; i < gFunkotronics_array_size; i++, the_funk++) {
+            if (the_funk->owner == pOwner
+                && the_funk->matrix_mode != eMove_controlled
+                && the_funk->matrix_mode != eMove_absolute
+                && the_funk->lighting_animation_type != eMove_controlled
+                && the_funk->lighting_animation_type != eMove_absolute
+                && (the_funk->texture_animation_data.frames_info.mode != eMove_controlled
+                    || the_funk->texture_animation_type)) {
+                the_funk->owner = NO_OWNER;
+            }
         }
-        if (the_funk->matrix_mode == eMove_controlled) {
-            continue;
-        }
-        if (the_funk->matrix_mode == eMove_absolute) {
-            continue;
-        }
-        if (the_funk->lighting_animation_type == eMove_controlled) {
-            continue;
-        }
-        if (the_funk->lighting_animation_type == eMove_absolute) {
-            continue;
-        }
-        if (the_funk->texture_animation_data.frames_info.mode == eMove_controlled && the_funk->texture_animation_type == eTexture_animation_frames) {
-            continue;
-        }
-        the_funk->owner = -999;
     }
 }
 
@@ -1816,7 +1798,7 @@ void DeleteAnyZeroBastards(void) {
 
     gDelete_count = 0;
     DRActorEnumRecurseWithTrans(gAdditional_actors, NULL, DeleteBastards, NULL);
-    for (i = 0; i < gDelete_count; i++) {
+    for (i = gDelete_count - 1; i >= 0; --i) {
         BrActorRemove(gDelete_list[i]);
     }
 }
@@ -1827,18 +1809,17 @@ br_uint_32 ApplyTransToModels(br_actor* pActor, br_matrix34* pMatrix, void* pArg
     int i;
     br_vector3 temp_point;
 
-    if (pActor->identifier == NULL || pActor->identifier[0] == '&') {
-        return 0;
-    }
-    if (pActor->model != NULL) {
-        for (i = 0; i < pActor->model->nvertices; i++) {
-            BrVector3Copy(&temp_point, &pActor->model->vertices[i].p);
-            BrMatrix34ApplyP(&pActor->model->vertices[i].p, &temp_point, pMatrix);
+    if (pActor->identifier != NULL && pActor->identifier[0] != '&') {
+        if (pActor->model != NULL) {
+            for (i = 0; i < pActor->model->nvertices; i++) {
+                temp_point = pActor->model->vertices[i].p;
+                BrMatrix34ApplyP(&pActor->model->vertices[i].p, &temp_point, pMatrix);
+            }
+            BrModelUpdate(pActor->model, BR_MATU_ALL);
         }
-        BrModelUpdate(pActor->model, BR_MATU_ALL);
+        BrMatrix34Identity(&pActor->t.t.mat);
+        pActor->t.type = BR_TRANSFORM_IDENTITY;
     }
-    BrMatrix34Identity(&pActor->t.t.mat);
-    pActor->t.type = BR_TRANSFORM_IDENTITY;
     return 0;
 }
 
@@ -1854,7 +1835,7 @@ int FindSpecVolIndex(br_actor* pActor) {
     }
 #endif
 
-    for (i = 0; i < gProgram_state.special_volume_count; i++) {
+    for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
         if (gSpec_vol_actors[i] == pActor) {
             return i;
         }
@@ -2010,14 +1991,13 @@ void ChangeSubdivToPersp(void) {
 // FUNCTION: CARM95 0x00439ddd
 br_uintptr_t ProcessFaceMaterials(br_actor* pActor, tPMFMCB pCallback) {
 
-    if (pActor->identifier == NULL || pActor->identifier[0] != '&') {
-        if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL) {
-            ProcessModelFaceMaterials(pActor->model, pCallback);
-        }
-        return BrActorEnum(pActor, (br_actor_enum_cbfn*)ProcessFaceMaterials, pCallback);
-    } else {
+    if (pActor->identifier != NULL && pActor->identifier[0] == '&') {
         return 0;
     }
+    if (pActor->type == BR_ACTOR_MODEL && pActor->model != NULL) {
+        ProcessModelFaceMaterials(pActor->model, pCallback);
+    }
+    return BrActorEnum(pActor, (br_actor_enum_cbfn*)ProcessFaceMaterials, pCallback);
 }
 
 // IDA: int __usercall DRPixelmapHasZeros@<EAX>(br_pixelmap *pm@<EAX>)
@@ -2027,20 +2007,20 @@ int DRPixelmapHasZeros(br_pixelmap* pm) {
     int y;
     char* row_ptr;
     char* pp;
-    int i;
 
     if (pm->flags & BR_PMF_NO_ACCESS) {
         return 1;
     }
 
-    row_ptr = (char*)pm->pixels + (pm->row_bytes * pm->base_y) + pm->base_x;
+    row_ptr = pm->pixels;
+    row_ptr += (pm->row_bytes * pm->base_y) + pm->base_x;
+
     for (y = 0; y < pm->height; y++) {
         pp = row_ptr;
-        for (x = 0; x < pm->width; x++) {
+        for (x = 0; x < pm->width; x++, pp++) {
             // found a zero (transparent) pixel?
             if (*pp == 0)
                 return 1;
-            pp++;
         }
         row_ptr += pm->row_bytes;
     }
@@ -2052,12 +2032,10 @@ int DRPixelmapHasZeros(br_pixelmap* pm) {
 int StorageContainsPixelmap(tBrender_storage* pStorage, br_pixelmap* pMap) {
     int i;
 
-    for (i = 0; i < pStorage->pixelmaps_count; i++) {
-        if (pMap == pStorage->pixelmaps[i]) {
-            return 1;
-        }
+    for (i = 0; i < pStorage->pixelmaps_count && pMap != pStorage->pixelmaps[i]; i++) {
+        ;
     }
-    return 0;
+    return pStorage->pixelmaps_count != i;
 }
 
 // IDA: void __usercall HideStoredOpaqueTextures(tBrender_storage *pStorage@<EAX>)
@@ -2131,26 +2109,24 @@ void RevealStoredTextures(tBrender_storage* pStorage) {
 void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_level pNew, tCar_texturing_level pOld) {
 
     switch (pNew) {
+    case eCTL_full:
+        RevealStoredTextures(pStorage);
+        break;
     case eCTL_none:
         HideStoredTextures(pStorage);
         break;
     case eCTL_transparent:
         switch (pOld) {
-        case eCTL_none:
-            RevealStoredTransparentTextures(pStorage);
-            break;
         case eCTL_full:
             HideStoredOpaqueTextures(pStorage);
             break;
-        default:
-            break;
+        case eCTL_none:
+            RevealStoredTransparentTextures(pStorage);
+
+            DETHRACE_DEFAULT_BREAK
         }
-        break;
-    case eCTL_full:
-        RevealStoredTextures(pStorage);
-        break;
-    default:
-        break;
+
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -2190,7 +2166,7 @@ int HasThisSuffix(char* pIdent, char* pSuffix) {
     if (pIdent == NULL) {
         return 0;
     }
-    if (pIdent < pSuffix) {
+    if (len_ident < len_suffix) {
         return 0;
     }
     return strcmp(pIdent + len_ident - len_suffix, pSuffix) == 0;
@@ -2220,10 +2196,9 @@ br_material* RoadUntexToPersp(br_model* pModel, tU16 pFace) {
     old_mat = pModel->faces[pFace].material;
     if (HasThisSuffix(old_mat->identifier, ".road")) {
         new_mat = UnsuffixedMaterial(old_mat->identifier, ".road");
-    } else {
-        new_mat = NULL;
+        return new_mat;
     }
-    return new_mat;
+    return NULL;
 }
 
 // IDA: br_material* __usercall WallLinearToUntex@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -2238,18 +2213,18 @@ br_material* WallLinearToUntex(br_model* pModel, tU16 pFace) {
             old_mat->colour_map = NULL;
             BrMaterialUpdate(old_mat, BR_MATU_ALL);
         }
+        return old_mat;
     } else {
         if (!FaceIsRoad(pModel, pFace) && old_mat->identifier != NULL && old_mat->colour_map != NULL) {
-            old_mat = SuffixedMaterial(old_mat, ".lwall");
-            if (old_mat->colour_map != NULL) {
-                old_mat->colour_map = NULL;
-                BrMaterialUpdate(old_mat, BR_MATU_ALL);
+            new_mat = SuffixedMaterial(old_mat, ".lwall");
+            if (new_mat->colour_map != NULL) {
+                new_mat->colour_map = NULL;
+                BrMaterialUpdate(new_mat, BR_MATU_ALL);
             }
-        } else {
-            old_mat = NULL;
+            return new_mat;
         }
     }
-    return old_mat;
+    return NULL;
 }
 
 // IDA: br_material* __usercall WallUntexToLinear@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -2261,15 +2236,16 @@ br_material* WallUntexToLinear(br_model* pModel, tU16 pFace) {
     old_mat = pModel->faces[pFace].material;
     if (HasThisSuffix(old_mat->identifier, ".lwall")) {
         new_mat = UnsuffixedMaterial(old_mat->identifier, ".lwall");
-    } else if (HasThisSuffix(old_mat->identifier, ".pwall")) {
-        old_mat->colour_map = UnsuffixedMaterial(old_mat->identifier, ".pwall")->colour_map;
+        return new_mat;
+    }
+    if (HasThisSuffix(old_mat->identifier, ".pwall")) {
+        new_mat = UnsuffixedMaterial(old_mat->identifier, ".pwall");
+        old_mat->colour_map = new_mat->colour_map;
         old_mat->flags &= ~BR_MATF_PERSPECTIVE;
         BrMaterialUpdate(old_mat, BR_MATU_ALL);
-        new_mat = NULL;
-    } else {
-        new_mat = NULL;
+        return NULL;
     }
-    return new_mat;
+    return NULL;
 }
 
 // IDA: br_material* __usercall WallUntexToPersp@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -2280,13 +2256,13 @@ br_material* WallUntexToPersp(br_model* pModel, tU16 pFace) {
 
     old_mat = pModel->faces[pFace].material;
     if (HasThisSuffix(old_mat->identifier, ".lwall")) {
-        new_mat = UnsuffixedMaterial(old_mat->identifier, ".lwall");
-    } else if (HasThisSuffix(old_mat->identifier, ".pwall")) {
-        new_mat = UnsuffixedMaterial(old_mat->identifier, ".pwall");
-    } else {
-        new_mat = NULL;
+        return UnsuffixedMaterial(old_mat->identifier, ".lwall");
     }
-    return new_mat;
+    if (HasThisSuffix(old_mat->identifier, ".pwall")) {
+        return UnsuffixedMaterial(old_mat->identifier, ".pwall");
+    }
+
+    return NULL;
 }
 
 // IDA: br_material* __usercall WallLinearToPersp@<EAX>(br_model *pModel@<EAX>, tU16 pFace@<EDX>)
@@ -2297,11 +2273,9 @@ br_material* WallLinearToPersp(br_model* pModel, tU16 pFace) {
 
     old_mat = pModel->faces[pFace].material;
     if (HasThisSuffix(old_mat->identifier, ".pwall")) {
-        new_mat = UnsuffixedMaterial(old_mat->identifier, ".pwall");
-    } else {
-        new_mat = NULL;
+        return UnsuffixedMaterial(old_mat->identifier, ".pwall");
     }
-    return new_mat;
+    return NULL;
 }
 
 // IDA: tRoad_texturing_level __cdecl GetRoadTexturingLevel()
@@ -2321,7 +2295,7 @@ void SetRoadTexturingLevel(tRoad_texturing_level pLevel) {
 void ReallySetRoadTexturingLevel(tRoad_texturing_level pLevel) {
 
     if (pLevel != gRoad_texturing_level) {
-        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, (pLevel == eRTL_none) ? RoadUntexToPersp : RoadPerspToUntex);
+        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, (pLevel != eRTL_none) ? RoadUntexToPersp : RoadPerspToUntex);
     }
 }
 
@@ -2342,6 +2316,7 @@ void SetWallTexturingLevel(tWall_texturing_level pLevel) {
 // IDA: void __usercall ReallySetWallTexturingLevel(tWall_texturing_level pLevel@<EAX>)
 // FUNCTION: CARM95 0x00439ee9
 void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
+    // GLOBAL: CARM95 0x0050C7E8
     static tPMFMCB* tweaker[3][3] = {
         {
             NULL,
@@ -2360,7 +2335,7 @@ void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
         },
     };
 
-    if (gWall_texturing_level != pLevel) {
+    if (pLevel != gWall_texturing_level) {
         ProcessFaceMaterials(gProgram_state.track_spec.the_actor, tweaker[gWall_texturing_level][pLevel]);
     }
 }
@@ -2371,27 +2346,27 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
     size_t max_suffix_len;
     br_material* mat;
     br_material* victim;
+    // GLOBAL: CARM95 0x0050C810
     static char* suffixes[3] = { ".road", ".pwall", ".lwall" };
     int s;
     char* id;
 
     mat = pModel->faces[pFace].material;
-    if (mat->identifier == NULL) {
-        return NULL;
-    }
-    max_suffix_len = 0;
-    for (s = 0; s < BR_ASIZE(suffixes); s++) {
-        if (max_suffix_len < strlen(suffixes[s])) {
-            max_suffix_len = strlen(suffixes[s]);
+    if (mat->identifier != NULL) {
+        max_suffix_len = 0;
+        for (s = 0; s < BR_ASIZE(suffixes); s++) {
+            if (max_suffix_len < strlen(suffixes[s])) {
+                max_suffix_len = strlen(suffixes[s]);
+            }
         }
-    }
-    id = BrMemAllocate(strlen(mat->identifier) + max_suffix_len + 1, kMem_new_mat_id_3);
-    for (s = 0; s < BR_ASIZE(suffixes); s++) {
-        sprintf(id, "%s%s", mat->identifier, suffixes[s]);
-        victim = BrMaterialFind(id);
-        if (victim != NULL) {
-            BrMaterialRemove(victim);
-            BrMaterialFree(victim);
+        id = BrMemAllocate(strlen(mat->identifier) + max_suffix_len + 1, kMem_new_mat_id_3);
+        for (s = 0; s < BR_ASIZE(suffixes); s++) {
+            sprintf(id, "%s%s", mat->identifier, suffixes[s]);
+            victim = BrMaterialFind(id);
+            if (victim != NULL) {
+                BrMaterialRemove(victim);
+                BrMaterialFree(victim);
+            }
         }
     }
     return NULL;
@@ -2400,26 +2375,14 @@ br_material* DisposeSuffixedMaterials(br_model* pModel, tU16 pFace) {
 // IDA: void __cdecl DisposeTexturingMaterials()
 // FUNCTION: CARM95 0x0043cd4f
 void DisposeTexturingMaterials(void) {
-
-    switch (gWall_texturing_level) {
-    case eWTL_linear:
+    if (gWall_texturing_level == eWTL_linear) {
         ProcessFaceMaterials(gProgram_state.track_spec.the_actor, WallLinearToPersp);
-        break;
-    case eWTL_none:
+    } else if (gWall_texturing_level == eWTL_none) {
         ProcessFaceMaterials(gProgram_state.track_spec.the_actor, WallUntexToPersp);
-        break;
-    default:
-        break;
     }
-
-    switch (gRoad_texturing_level) {
-    case eRTL_none:
+    if (gRoad_texturing_level == eRTL_none) {
         ProcessFaceMaterials(gProgram_state.track_spec.the_actor, RoadUntexToPersp);
-        break;
-    default:
-        break;
     }
-
     if (gWall_texturing_level != eWTL_full || gRoad_texturing_level != eRTL_full) {
         ProcessFaceMaterials(gProgram_state.track_spec.the_actor, DisposeSuffixedMaterials);
     }
@@ -2531,13 +2494,13 @@ void LoadExceptionsFile(char* pName) {
             if (DRStricmp(tok, "end") == 0) {
                 break;
             }
-            e = BrMemAllocate(sizeof(tException_list), kMem_misc);
+            e = BrMemAllocate(sizeof(tException_node), kMem_misc);
             e->name = BrMemAllocate(strlen(tok) + 1, kMem_misc_string);
             strcpy(e->name, tok);
             e->flags = 0;
             while (1) {
                 tok = strtok(NULL, delimiters);
-                if (tok == NULL /*|| (IsTable[(unsigned __int8)(*v11 + 1)] & 0xE0) == 0*/) {
+                if (tok == NULL || !isalpha(tok[0])) {
                     break;
                 }
                 if (DRStricmp(tok, "mipmap") == 0) {
@@ -2617,7 +2580,9 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     int skid_mark_cnt = 0;
 #endif
     tPath_name the_path;
+#ifdef DETHRACE_3DFX_PATCH
     tPath_name general_file_path;
+#endif
     char s[256];
     char* str;
     float temp_float;
@@ -2640,7 +2605,8 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     PathCat(the_path, gApplication_path, "RACES");
     PathCat(the_path, the_path, pFile_name);
 #ifdef DETHRACE_3DFX_PATCH
-    LoadExceptionsFileForTrack(the_path);
+    PathCat(general_file_path, gApplication_path, "RACES");
+    LoadExceptionsFileForTrack(general_file_path);
 #endif
     f = DRfopen(the_path, "rt");
     if (f == NULL) {
@@ -2648,7 +2614,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     }
     GetALineAndDontArgue(f, s);
     str = strtok(s, "\t ,/");
-    if (strcmp(str, "VERSION") == 0) {
+    if (strcmp(s, "VERSION") == 0) {
         str = strtok(NULL, "\t ,/");
         sscanf(str, "%d", &gRace_file_version);
         GetALineAndDontArgue(f, s);
@@ -2698,55 +2664,57 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             GetALineAndDontArgue(f, s);
         }
         pRace_info->checkpoints[i].quad_count = GetAnInt(f);
-        for (j = 0; j < pRace_info->checkpoints[i].quad_count; j++) {
-            for (k = 0; k < 4; ++k) {
+        for (k = 0; k < pRace_info->checkpoints[i].quad_count; k++) {
+            for (j = 0; j < 4; j++) {
                 GetThreeScalars(
                     f,
-                    &pRace_info->checkpoints[i].vertices[j][k].v[0],
-                    &pRace_info->checkpoints[i].vertices[j][k].v[1],
-                    &pRace_info->checkpoints[i].vertices[j][k].v[2]);
+                    pRace_info->checkpoints[i].vertices[k][j].v,
+                    pRace_info->checkpoints[i].vertices[k][j].v + 1,
+                    pRace_info->checkpoints[i].vertices[k][j].v + 2);
             }
-            p[0] = pRace_info->checkpoints[i].vertices[j][0];
-            p[1] = pRace_info->checkpoints[i].vertices[j][1];
-            p[2] = pRace_info->checkpoints[i].vertices[j][2];
-            pRace_info->checkpoints[i].normal[j].v[0] = (p[2].v[2] - p[0].v[2]) * (p[1].v[1] - p[0].v[1]) - (p[1].v[2] - p[0].v[2]) * (p[2].v[1] - p[0].v[1]);
-            pRace_info->checkpoints[i].normal[j].v[1] = (p[1].v[2] - p[0].v[2]) * (p[2].v[0] - p[0].v[0]) - (p[2].v[2] - p[0].v[2]) * (p[1].v[0] - p[0].v[0]);
-            pRace_info->checkpoints[i].normal[j].v[2] = (p[2].v[1] - p[0].v[1]) * (p[1].v[0] - p[0].v[0]) - (p[1].v[1] - p[0].v[1]) * (p[2].v[0] - p[0].v[0]);
+
+            BrVector3Sub(&a, &pRace_info->checkpoints[i].vertices[k][1], &pRace_info->checkpoints[i].vertices[k][0]);
+            BrVector3Sub(&b, &pRace_info->checkpoints[i].vertices[k][2], &pRace_info->checkpoints[i].vertices[k][0]);
+            BrVector3Cross(&pRace_info->checkpoints[i].normal[k], &a, &b);
         }
         if (gRace_file_version > 0) {
-            if (gRace_file_version == 1) {
-                GetPairOfInts(f, pRace_info->checkpoints[i].map_left, &pRace_info->checkpoints[i].map_left[1]);
-                GetPairOfInts(f, pRace_info->checkpoints[i].map_top, &pRace_info->checkpoints[i].map_top[1]);
-                GetPairOfInts(f, pRace_info->checkpoints[i].map_right, &pRace_info->checkpoints[i].map_right[1]);
-                GetPairOfInts(f, pRace_info->checkpoints[i].map_bottom, &pRace_info->checkpoints[i].map_bottom[1]);
-            } else {
+            if (gRace_file_version > 1) {
                 GetPairOfInts(f, pRace_info->checkpoints[i].map_left, &pRace_info->checkpoints[i].map_left[1]);
                 GetPairOfInts(f, pRace_info->checkpoints[i].map_top, &pRace_info->checkpoints[i].map_top[1]);
                 pRace_info->checkpoints[i].map_right[0] = cp_rect_w[0] + pRace_info->checkpoints[i].map_left[0];
                 pRace_info->checkpoints[i].map_right[1] = cp_rect_w[0] + pRace_info->checkpoints[i].map_left[1];
                 pRace_info->checkpoints[i].map_bottom[0] = cp_rect_h[0] + pRace_info->checkpoints[i].map_top[0];
                 pRace_info->checkpoints[i].map_bottom[1] = cp_rect_h[0] + pRace_info->checkpoints[i].map_top[1];
+            } else {
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_left, &pRace_info->checkpoints[i].map_left[1]);
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_top, &pRace_info->checkpoints[i].map_top[1]);
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_right, &pRace_info->checkpoints[i].map_right[1]);
+                GetPairOfInts(f, pRace_info->checkpoints[i].map_bottom, &pRace_info->checkpoints[i].map_bottom[1]);
             }
         }
     }
-    if (gRace_file_version <= 3) {
-        LoadSomePixelmaps(&gTrack_storage_space, f);
-    } else if (gAusterity_mode) {
-        SkipNLines(f);
-        LoadSomePixelmaps(&gTrack_storage_space, f);
+    if (gRace_file_version > 3) {
+        if (gAusterity_mode) {
+            SkipNLines(f);
+            LoadSomePixelmaps(&gTrack_storage_space, f);
+        } else {
+            LoadSomePixelmaps(&gTrack_storage_space, f);
+            SkipNLines(f);
+        }
     } else {
         LoadSomePixelmaps(&gTrack_storage_space, f);
-        SkipNLines(f);
     }
     LoadSomeShadeTables(&gTrack_storage_space, f);
-    if (gRace_file_version <= 3) {
-        LoadSomeMaterials(&gTrack_storage_space, f);
-    } else if (gAusterity_mode) {
-        SkipNLines(f);
-        LoadSomeMaterials(&gTrack_storage_space, f);
+    if (gRace_file_version > 3) {
+        if (gAusterity_mode) {
+            SkipNLines(f);
+            LoadSomeMaterials(&gTrack_storage_space, f);
+        } else {
+            LoadSomeMaterials(&gTrack_storage_space, f);
+            SkipNLines(f);
+        }
     } else {
         LoadSomeMaterials(&gTrack_storage_space, f);
-        SkipNLines(f);
     }
 #ifdef DETHRACE_3DFX_PATCH
     if (!gShade_tables_do_not_work)
@@ -2764,53 +2732,58 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             }
         }
     }
-    if (gRace_file_version <= 5) {
-        LoadSomeTrackModels(&gTrack_storage_space, f);
-    } else if (gAusterity_mode) {
-        SkipNLines(f);
-        LoadSomeTrackModels(&gTrack_storage_space, f);
+    if (gRace_file_version > 5) {
+        if (gAusterity_mode) {
+            SkipNLines(f);
+            LoadSomeTrackModels(&gTrack_storage_space, f);
+        } else {
+            LoadSomeTrackModels(&gTrack_storage_space, f);
+            SkipNLines(f);
+        }
     } else {
         LoadSomeTrackModels(&gTrack_storage_space, f);
-        SkipNLines(f);
     }
 
     PrintMemoryDump(0, "JUST LOADED IN TEXTURES/MATS/MODELS FOR TRACK");
-    if (gRace_file_version <= 5) {
-        GetALineAndDontArgue(f, s);
-        str = strtok(s, "\t ,/");
-        PathCat(the_path, gApplication_path, "ACTORS");
-        PathCat(the_path, the_path, str);
-    } else if (gAusterity_mode) {
-        GetALineAndDontArgue(f, s);
-        GetALineAndDontArgue(f, s);
-        str = strtok(s, "\t ,/");
-        PathCat(the_path, gApplication_path, "ACTORS");
-        PathCat(the_path, the_path, str);
+    if (gRace_file_version > 5) {
+        if (gAusterity_mode) {
+            GetALineAndDontArgue(f, s);
+            GetALineAndDontArgue(f, s);
+            str = strtok(s, "\t ,/");
+            PathCat(the_path, gApplication_path, "ACTORS");
+            PathCat(the_path, the_path, str);
+        } else {
+            GetALineAndDontArgue(f, s);
+            str = strtok(s, "\t ,/");
+            PathCat(the_path, gApplication_path, "ACTORS");
+            PathCat(the_path, the_path, str);
+            GetALineAndDontArgue(f, s);
+        }
     } else {
         GetALineAndDontArgue(f, s);
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "ACTORS");
         PathCat(the_path, the_path, str);
-        GetALineAndDontArgue(f, s);
     }
     pTrack_spec->the_actor = BrActorLoad(the_path);
-    if (gRace_file_version <= 6) {
-        gDefault_blend_pc = 75;
-    } else {
+    if (gRace_file_version > 6) {
         GetAString(f, s);
         if (!sscanf(s, "%d", &gDefault_blend_pc) || gDefault_blend_pc < 0 || gDefault_blend_pc > 100) {
             PDFatalError("Wanted a default blend percentage. Didn't get one. Old data file?");
         }
+    } else {
+        gDefault_blend_pc = 75;
     }
     PossibleService();
     ExtractColumns(pTrack_spec);
     for (i = 0; gTrack_storage_space.models_count > i; ++i) {
         PossibleService();
-        if (gTrack_storage_space.models[i] && gTrack_storage_space.models[i]->flags & 0x82) {
-            gTrack_storage_space.models[i]->flags &= 0xFF7Du;
+        needs_updating = 0;
+        if (gTrack_storage_space.models[i] && gTrack_storage_space.models[i]->flags & (BR_MODF_UPDATEABLE | BR_MODF_KEEP_ORIGINAL)) {
+            gTrack_storage_space.models[i]->flags &= 0xFFFFFF7Du;
+            // Minor asm differences here due to using open-sourced BRender 1.3.2
             for (group = 0; group < V11MODEL(gTrack_storage_space.models[i])->ngroups; group++) {
-                int f = V11MODEL(gTrack_storage_space.models[i])->groups[group].face_user[0];
-                material = gTrack_storage_space.models[i]->faces[f].material;
+                material = gTrack_storage_space.models[i]->faces[V11MODEL(gTrack_storage_space.models[i])->groups[group].face_user[0]].material;
                 V11MODEL(gTrack_storage_space.models[i])->groups[group].user = material;
                 if (material && !material->index_shade) {
                     material->index_shade = BrTableFind("DRRENDER.TAB");
@@ -2823,8 +2796,8 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     PrintMemoryDump(0, "JUST LOADED IN TRACK ACTOR AND PROCESSED COLUMNS");
     gTrack_actor = pTrack_spec->the_actor;
     if (!gRendering_accessories && !gNet_mode) {
-        PossibleService();
         style = BR_RSTYLE_NONE;
+        PossibleService();
         DRActorEnumRecurse(gTrack_actor, (br_actor_enum_cbfn*)SetAccessoryRenderingCB, &style);
     }
     BrActorAdd(gUniverse_actor, pTrack_spec->the_actor);
@@ -2868,10 +2841,11 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     }
     PossibleService();
 
-    gSky_image_width = BrDegreeToAngle(360.0 / GetAnInt(f));
+    gSky_image_width = BrDegreeToAngle(360.0f / GetAnInt(f));
     gSky_image_height = BrDegreeToAngle(GetAScalar(f));
     gSky_image_underground = gSky_image_height * (sky_pixels_high - GetAnInt(f)) / sky_pixels_high;
 
+    MungeForwardSky();
     MungeRearviewSky();
     PossibleService();
 
@@ -2904,9 +2878,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     gProgram_state.special_volume_count = GetAnInt(f);
     if (gProgram_state.special_volume_count) {
         gProgram_state.special_volumes = BrMemAllocate(sizeof(tSpecial_volume) * gProgram_state.special_volume_count, kMem_special_volume);
-        i = 0;
-        spec = gProgram_state.special_volumes;
-        for (i = 0; i < gProgram_state.special_volume_count; i++) {
+        for (i = 0, spec = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, spec++) {
             PossibleService();
             spec->no_mat = 0;
             GetALineAndDontArgue(f, s);
@@ -2928,7 +2900,6 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 gDefault_water_spec_vol = spec;
                 spec->no_mat = 1;
             } else {
-                TELL_ME_IF_WE_PASS_THIS_WAY();
                 spec->no_mat = 0;
                 str = strtok(s, "\t ,/");
                 sscanf(str, "%f", &spec->bounds.min.v[0]);
@@ -2938,14 +2909,12 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 sscanf(str, "%f", &spec->bounds.min.v[2]);
                 GetThreeScalars(f, &spec->bounds.max.v[0], &spec->bounds.max.v[1], &spec->bounds.max.v[2]);
                 BrMatrix34Identity(&spec->mat);
-                for (k = 0; k < 3; ++k) {
-                    // FIXME: not 100% sure this is correct
-                    spec->mat.m[3][k] = (spec->bounds.max.v[k] + spec->bounds.min.v[k]) / 2.f;
-                    spec->mat.m[k][k] = spec->bounds.max.v[k] - spec->bounds.min.v[k];
+                for (j = 0; j < 3; j++) {
+                    spec->mat.m[3][j] = (temp_bounds.max.v[j] + temp_bounds.min.v[j]) / 2.0f;
+                    MAT(&spec->mat.m, j, j) = temp_bounds.max.v[j] - spec->mat.m[3][j];
                 }
                 ParseSpecialVolume(f, spec, NULL);
             }
-            spec++;
         }
     }
     GetAString(f, s);
@@ -2965,8 +2934,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 &gProgram_state.special_screens[i].max_x,
                 &gProgram_state.special_screens[i].max_z);
             GetAString(f, s);
-            material = BrMaterialFind(s);
-            gProgram_state.special_screens[i].material = material;
+            gProgram_state.special_screens[i].material = BrMaterialFind(s);
         }
     }
     PossibleService();
@@ -2987,22 +2955,22 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     PossibleService();
     PrintMemoryDump(0, "JUST LOADING IN FUNKS AND GROOVES");
     ped_subs = NULL;
-    count = 0;
+    line_count = 0;
     if (gRace_file_version > 3) {
-        line_count = GetAnInt(f);
+        ped_subs_index = GetAnInt(f);
         if (gAusterity_mode) {
-            if (line_count >= 0) {
+            if (ped_subs_index >= 0) {
                 PathCat(the_path, gApplication_path, "PEDSUBS.TXT");
                 g = DRfopen(the_path, "rt");
                 if (g == NULL) {
                     FatalError(kFatalError_OpenRacesFile);
                 }
-                for (i = 0; i < line_count; ++i) {
+                for (i = 0; i < ped_subs_index; i++) {
                     SkipNLines(g);
                 }
-                count = GetAnInt(g);
-                ped_subs = BrMemAllocate(sizeof(tPed_subs) * count, kMem_misc);
-                for (ped_subs_index = 0; ped_subs_index < count; ped_subs_index++) {
+                line_count = GetAnInt(g);
+                ped_subs = BrMemAllocate(sizeof(tPed_subs) * line_count, kMem_misc);
+                for (i = 0; i < line_count; i++) {
                     GetPairOfInts(g, &ped_subs[i].orig, &ped_subs[i].subs);
                 }
                 fclose(g);
@@ -3010,7 +2978,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         }
     }
     PossibleService();
-    LoadInPedestrians(f, count, ped_subs);
+    LoadInPedestrians(f, line_count, ped_subs);
     if (ped_subs != NULL) {
         BrMemFree(ped_subs);
     }
@@ -3040,8 +3008,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             LoadSinglePixelmap(&gTrack_storage_space, str);
             str[sl] = 0;
             strcat(str, ".MAT");
-            material = LoadSingleMaterial(&gTrack_storage_space, str);
-            pRace_info->material_modifiers[i].skid_mark_material = material;
+            pRace_info->material_modifiers[i].skid_mark_material = LoadSingleMaterial(&gTrack_storage_space, str);
 #ifdef DETHRACE_3DFX_PATCH
             if (material != NULL) {
                 GlorifyMaterial(&material, 1);
@@ -3098,12 +3065,10 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     for (i = 0; i < COUNT_OF(gNon_car_spec_list); ++i) {
         gNon_car_spec_list[i] = '\0';
     }
-    for (i = 0; i < NONCAR_UNUSED_SLOTS; i++) {
+    for (i = 0; i < NONCAR_UNUSED_SLOTS; i++, non_car++) {
         non_car->collision_info.driver = eDriver_non_car_unused_slot;
-        non_car++;
     }
-    i = 0;
-    for (i = 0; i < num_non_cars; i++) {
+    for (i = 0; i < num_non_cars; i++, non_car++) {
         PossibleService();
         GetAString(f, s);
         PathCat(the_path, gApplication_path, "NONCARS");
@@ -3117,7 +3082,6 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         ReadShrapnelMaterials(non_car_f, &non_car->collision_info);
         gNon_car_spec_list[non_car->collision_info.index] = i + 1;
         fclose(non_car_f);
-        non_car++;
     }
     GetSmokeShadeTables(f);
     pRace_info->number_of_net_start_points = GetAnInt(f);
@@ -3129,15 +3093,15 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             &pRace_info->net_starts[i].pos.v[2]);
         pRace_info->net_starts[i].yaw = GetAScalar(f);
     }
-    if (gRace_file_version <= 2) {
-        LoadInKevStuff(NULL);
-    } else {
+    if (gRace_file_version > 2) {
         LoadInKevStuff(f);
-    }
-    if (gRace_file_version < 5) {
-        gYon_multiplier = 1.0;
     } else {
+        LoadInKevStuff(NULL);
+    }
+    if (gRace_file_version >= 5) {
         gYon_multiplier = GetAScalar(f);
+    } else {
+        gYon_multiplier = 1.0;
     }
     GetAString(f, s);
     if (strcmp(s, pFile_name) != 0) {
@@ -3204,11 +3168,14 @@ void FreeTrack(tTrack_spec* pTrack_spec) {
     if (gCurrent_race.map_image != NULL) {
         BrPixelmapFree(gCurrent_race.map_image);
     }
+    if (gProgram_state.special_volume_count != 0) {
+        BrMemFree(gProgram_state.special_volumes);
+    }
     if (gProgram_state.special_screens_count != 0) {
         BrMemFree(gProgram_state.special_screens);
     }
     PossibleService();
-    for (i = 0, non_car = gProgram_state.non_cars; i < gProgram_state.num_non_car_spaces; i++, non_car++) {
+    for (non_car = gProgram_state.non_cars, i = 0; i < gProgram_state.num_non_car_spaces; i++, non_car++) {
         PossibleService();
         if (non_car->collision_info.driver == eDriver_non_car && non_car->collision_info.car_master_actor != NULL) {
             BrActorRemove(non_car->collision_info.car_master_actor);
@@ -3315,7 +3282,7 @@ void FunkThoseTronics(void) {
     f_the_time = (float)the_time;
     for (i = 0; i < gFunkotronics_array_size; i++) {
         the_funk = &gFunkotronics_array[i];
-        if (the_funk->owner == -999) {
+        if (the_funk->owner == NO_OWNER) {
             continue;
         }
         j = 0;
@@ -3471,28 +3438,53 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
     BrActorToActorMatrix34(&subject_to_world, pSubject_actor, gNon_track_actor);
     BrVector3Sub(&ref_to_subject, (br_vector3*)ref_to_world->m[3], (br_vector3*)subject_to_world.m[3]);
     switch (pWhich_axis) {
-    case eLollipop_none:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
-        break;
     case eLollipop_x_match:
-        BrVector3SetFloat(&vector_a, 1.f, 0.f, 0.f);
+        BrVector3SetFloat(&fixed_axis, 1.f, 0.f, 0.f);
         break;
     case eLollipop_y_match:
-        BrVector3SetFloat(&vector_a, 0.f, 1.f, 0.f);
+        BrVector3SetFloat(&fixed_axis, 0.f, 1.f, 0.f);
         break;
     case eLollipop_z_match:
-        BrVector3SetFloat(&vector_a, 0.f, 0.f, 1.f);
+        BrVector3SetFloat(&fixed_axis, 0.f, 0.f, 1.f);
         break;
-    }
-    BrVector3Cross(&vector_b, &ref_to_subject, &vector_a);
-    BrVector3Normalise(&vector_b, &vector_b);
 
-    BrVector3Cross(&fixed_axis, &vector_a, &vector_b);
+        DETHRACE_DEFAULT_BREAK;
+    }
+    BrVector3Cross(&vector_a, &ref_to_subject, &fixed_axis);
+    BrVector3Normalise(&vector_a, &vector_a);
+
+    BrVector3Cross(&vector_b, &fixed_axis, &vector_a);
 
     switch (pWhich_axis) {
-    case eLollipop_none:
-        break;
     case eLollipop_x_match:
+        mat.m[0][0] = fixed_axis.v[0];
+        mat.m[1][0] = fixed_axis.v[1];
+        mat.m[2][0] = fixed_axis.v[2];
+        mat.m[0][1] = vector_a.v[0];
+        mat.m[1][1] = vector_a.v[1];
+        mat.m[2][1] = vector_a.v[2];
+        mat.m[0][2] = vector_b.v[0];
+        mat.m[1][2] = vector_b.v[1];
+        mat.m[2][2] = vector_b.v[2];
+        mat.m[3][0] = 0.f;
+        mat.m[3][1] = 0.f;
+        mat.m[3][2] = 0.f;
+        break;
+    case eLollipop_y_match:
+        mat.m[0][0] = vector_a.v[0];
+        mat.m[1][0] = vector_a.v[1];
+        mat.m[2][0] = vector_a.v[2];
+        mat.m[0][1] = fixed_axis.v[0];
+        mat.m[1][1] = fixed_axis.v[1];
+        mat.m[2][1] = fixed_axis.v[2];
+        mat.m[0][2] = vector_b.v[0];
+        mat.m[1][2] = vector_b.v[1];
+        mat.m[2][2] = vector_b.v[2];
+        mat.m[3][0] = 0.f;
+        mat.m[3][1] = 0.f;
+        mat.m[3][2] = 0.f;
+        break;
+    case eLollipop_z_match:
         mat.m[0][0] = vector_a.v[0];
         mat.m[1][0] = vector_a.v[1];
         mat.m[2][0] = vector_a.v[2];
@@ -3506,34 +3498,8 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
         mat.m[3][1] = 0.f;
         mat.m[3][2] = 0.f;
         break;
-    case eLollipop_y_match:
-        mat.m[0][0] = vector_b.v[0];
-        mat.m[1][0] = vector_b.v[1];
-        mat.m[2][0] = vector_b.v[2];
-        mat.m[0][1] = vector_a.v[0];
-        mat.m[1][1] = vector_a.v[1];
-        mat.m[2][1] = vector_a.v[2];
-        mat.m[0][2] = fixed_axis.v[0];
-        mat.m[1][2] = fixed_axis.v[1];
-        mat.m[2][2] = fixed_axis.v[2];
-        mat.m[3][0] = 0.f;
-        mat.m[3][1] = 0.f;
-        mat.m[3][2] = 0.f;
-        break;
-    case eLollipop_z_match:
-        mat.m[0][0] = vector_b.v[0];
-        mat.m[1][0] = vector_b.v[1];
-        mat.m[2][0] = vector_b.v[2];
-        mat.m[0][1] = vector_a.v[0];
-        mat.m[1][1] = vector_a.v[1];
-        mat.m[2][1] = vector_a.v[2];
-        mat.m[0][2] = fixed_axis.v[0];
-        mat.m[1][2] = fixed_axis.v[1];
-        mat.m[2][2] = fixed_axis.v[2];
-        mat.m[3][0] = 0.f;
-        mat.m[3][1] = 0.f;
-        mat.m[3][2] = 0.f;
-        break;
+
+        DETHRACE_DEFAULT_BREAK;
     }
     BrMatrix34Pre(&pSubject_actor->t.t.mat, &mat);
 }
@@ -3562,10 +3528,7 @@ int PointOutOfSight(br_vector3* pPoint, br_scalar pMax_distance) {
         distance_vector.v[0] = pPoint->v[0] - gRearview_camera_to_world.m[3][0];
         distance_vector.v[1] = pPoint->v[1] - gRearview_camera_to_world.m[3][1];
         distance_vector.v[2] = pPoint->v[2] - gRearview_camera_to_world.m[3][2];
-        if (distance_vector.v[0] * distance_vector.v[0]
-                    + distance_vector.v[1] * distance_vector.v[1]
-                    + distance_vector.v[2] * distance_vector.v[2]
-                < pMax_distance
+        if (BrVector3LengthSquared(&distance_vector) < pMax_distance
             && gRearview_camera_to_world.m[2][2] * distance_vector.v[2]
                     + gRearview_camera_to_world.m[2][1] * distance_vector.v[1]
                     + gRearview_camera_to_world.m[2][0] * distance_vector.v[0]
@@ -3576,8 +3539,14 @@ int PointOutOfSight(br_vector3* pPoint, br_scalar pMax_distance) {
     distance_vector.v[0] = pPoint->v[0] - gCamera_to_world.m[3][0];
     distance_vector.v[1] = pPoint->v[1] - gCamera_to_world.m[3][1];
     distance_vector.v[2] = pPoint->v[2] - gCamera_to_world.m[3][2];
-    return distance_vector.v[0] * distance_vector.v[0] + distance_vector.v[1] * distance_vector.v[1] + distance_vector.v[2] * distance_vector.v[2] >= pMax_distance
-        || gCamera_to_world.m[2][2] * distance_vector.v[2] + gCamera_to_world.m[2][1] * distance_vector.v[1] + gCamera_to_world.m[2][0] * distance_vector.v[0] >= 0.0f;
+    if (BrVector3LengthSquared(&distance_vector) >= pMax_distance) {
+        return 1;
+    }
+    if (gCamera_to_world.m[2][2] * distance_vector.v[2] + gCamera_to_world.m[2][1] * distance_vector.v[1] + gCamera_to_world.m[2][0] * distance_vector.v[0] >= 0.0f) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 // IDA: void __usercall PathGrooveBastard(tGroovidelic_spec *pGroove@<EAX>, tU32 pTime@<EDX>, br_matrix34 *pMat@<EBX>, int pInterrupt_it@<ECX>)
@@ -4335,9 +4304,9 @@ void GrooveThisDelic(tGroovidelic_spec* pGroove, tU32 pTime, int pInterrupt_it) 
         the_mat->m[3][1] = -pGroove->object_centre.v[1];
         the_mat->m[3][2] = -pGroove->object_centre.v[2];
         ObjectGrooveBastard(pGroove, pTime, the_mat, pInterrupt_it);
-        the_actor->t.t.mat.m[3][0] += pGroove->object_position.v[0] + pGroove->object_centre.v[0];
-        the_actor->t.t.mat.m[3][1] += pGroove->object_position.v[1] + pGroove->object_centre.v[1];
-        the_actor->t.t.mat.m[3][2] += pGroove->object_position.v[2] + pGroove->object_centre.v[2];
+        the_mat->m[3][0] += pGroove->object_position.v[0] + pGroove->object_centre.v[0];
+        the_mat->m[3][1] += pGroove->object_position.v[1] + pGroove->object_centre.v[1];
+        the_mat->m[3][2] += pGroove->object_position.v[2] + pGroove->object_centre.v[2];
         if (pGroove->lollipop_mode != eLollipop_none) {
             LollipopizeActor(pGroove->actor, &gCamera_to_world, pGroove->lollipop_mode);
         }
@@ -4361,13 +4330,12 @@ void GrooveThoseDelics(void) {
     float f_the_time;
 
     if (gGroovidelics_array != NULL) {
-        f_the_time = (double)GetTotalTime();
+        f_the_time = (float)GetTotalTime();
         gPrevious_groove_times[1] = gPrevious_groove_times[0];
         gPrevious_groove_times[0] = f_the_time;
 
-        for (i = 0; i < gGroovidelics_array_size; i++) {
-            the_groove = &gGroovidelics_array[i];
-            if (the_groove->owner != -999 && !the_groove->done_this_frame) {
+        for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
+            if (the_groove->owner != NO_OWNER && !the_groove->done_this_frame) {
                 GrooveThisDelic(the_groove, f_the_time, 0);
             }
         }
@@ -4380,8 +4348,7 @@ void StopGroovidelic(br_actor* pActor) {
     int i;
     tGroovidelic_spec* the_groove;
 
-    for (i = 0; i < gGroovidelics_array_size; i++) {
-        the_groove = &gGroovidelics_array[i];
+    for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
         if (the_groove->actor == pActor) {
             if (the_groove->path_interrupt_status == eInterrupt_none && the_groove->object_interrupt_status == eInterrupt_none) {
                 GrooveThisDelic(the_groove, gPrevious_groove_times[1], 1);
@@ -4410,10 +4377,8 @@ void ResetGrooveFlags(void) {
     int i;
     tGroovidelic_spec* the_groove;
 
-    the_groove = gGroovidelics_array;
-    for (i = 0; i < gGroovidelics_array_size; i++) {
+    for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
         the_groove->done_this_frame = 0;
-        the_groove++;
     }
 }
 
@@ -4432,11 +4397,26 @@ tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
     br_vector3 p;
 
     for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
-        if (!v->no_mat && v->bounds.min.v[0] < pP->v[0] && pP->v[0] < v->bounds.max.v[0] && v->bounds.min.v[1] < pP->v[1] && pP->v[1] < v->bounds.max.v[1] && v->bounds.min.v[2] < pP->v[2] && pP->v[2] < v->bounds.max.v[2]) {
+        if (v->no_mat) {
+            continue;
+        }
+        if (v->bounds.min.v[0] < pP->v[0]
+            && v->bounds.max.v[0] > pP->v[0]
+            && v->bounds.min.v[2] < pP->v[2]
+            && v->bounds.max.v[2] > pP->v[2]
+            && v->bounds.min.v[1] < pP->v[1]
+            && v->bounds.max.v[1] > pP->v[1]) {
             BrMatrix34ApplyP(&p, pP, &v->inv_mat);
-            if (-1.f < p.v[0] && p.v[0] < 1.f && -1.f < p.v[1] && p.v[1] < 1.f && -1.f < p.v[2] && p.v[2] < 1.f) {
-                return v;
+            if (p.v[0] < -1.f || p.v[0] > 1.f) {
+                continue;
             }
+            if (p.v[1] < -1.f || p.v[1] > 1.f) {
+                continue;
+            }
+            if (p.v[2] < -1.f || p.v[2] > 1.f) {
+                continue;
+            }
+            return v;
         }
     }
     return NULL;
@@ -4465,14 +4445,13 @@ br_uint_32 CalcHighestID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
 
-    if (pActor->identifier == NULL || pActor->identifier[0] == '@') {
-        return 0;
-    }
-    strcpy(s, &pActor->identifier[4]);
-    s[4] = '\0';
-    sscanf(s, "%d", &number);
-    if (*pHighest < number) {
-        *pHighest = number;
+    if (pActor->identifier != NULL && pActor->identifier[0] == '@') {
+        strcpy(s, &pActor->identifier[4]);
+        s[4] = '\0';
+        sscanf(s, "%d", &number);
+        if (*pHighest < number) {
+            *pHighest = number;
+        }
     }
     return 0;
 }
@@ -4499,12 +4478,11 @@ br_uint_32 SetID(br_actor* pActor, void* pArg) {
 void UniquificateActorsName(br_actor* pUniverse_actor, br_actor* pActor) {
     int highest;
 
-    if (pActor->identifier == NULL || pActor->identifier[0] == '@') {
-        return;
+    if (pActor->identifier != NULL && pActor->identifier[0] != '@') {
+        highest = 0;
+        DRActorEnumRecurse(pUniverse_actor, (br_actor_enum_cbfn*)CalcHighestNonAmID, &highest);
+        DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)SetID, (void*)(uintptr_t)(highest + 1));
     }
-    highest = 0;
-    DRActorEnumRecurse(pUniverse_actor, (br_actor_enum_cbfn*)CalcHighestNonAmID, &highest);
-    DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)SetID, (void*)(uintptr_t)(highest + 1));
 }
 
 // IDA: void __usercall AccessoryHeadup(br_actor *pActor@<EAX>, char *pPrefix@<EDX>)
@@ -4527,19 +4505,20 @@ br_uint_32 CalcHighestNonAmID(br_actor* pActor, int* pHighest) {
     char s[256];
     int number;
 
-    if (pActor->identifier == NULL || pActor->identifier[0] == '&') {
-        return 0;
+    if (pActor->identifier != NULL && pActor->identifier[0] == '&') {
+
+        if (strlen(pActor->identifier) != 12) {
+            number = 0;
+        } else {
+            strcpy(s, &pActor->identifier[4]);
+            strtok(s, ".");
+            sscanf(s, "%d", &number);
+        }
+        if (*pHighest < number) {
+            *pHighest = number;
+        }
     }
-    if (strlen(pActor->identifier) == 12) {
-        strcpy(s, &pActor->identifier[4]);
-        strtok(s, ".");
-        sscanf(s, "%d", &number);
-    } else {
-        number = 0;
-    }
-    if (*pHighest < number) {
-        *pHighest = number;
-    }
+
     return 0;
 }
 
@@ -4621,10 +4600,10 @@ void DropActor(int pIndex) {
     PathCat(the_path, gApplication_path, "ACCESSRY.TXT");
     f = DRfopen(the_path, "rt");
     for (i = 0; i <= pIndex; i++) {
-        if (!feof(f)) {
-            GetAString(f, s);
-        } else {
+        if (feof(f)) {
             s[0] = '\0';
+        } else {
+            GetAString(f, s);
         }
     }
     if (s[0] != '\0') {
@@ -4644,15 +4623,16 @@ void DropActor(int pIndex) {
             face_bastard = -1;
             for (i = 0; i < face_count; i++) {
                 distance_bastard = DistanceFromFace(gOur_pos, &the_list[i]);
-                if (distance_bastard < nearest_bastard) {
+                if (fabs(distance_bastard) < fabs(nearest_bastard)) {
                     nearest_bastard = distance_bastard;
                     face_bastard = i;
                 }
             }
 
             if (face_bastard >= 0) {
-                BrVector3Scale(&gLast_actor->t.t.translate.t, &the_list[face_bastard].normal, -nearest_bastard);
-                BrVector3Accumulate(&gLast_actor->t.t.translate.t, gOur_pos);
+                gLast_actor->t.t.mat.m[3][0] = the_list[face_bastard].normal.v[0] * (-nearest_bastard) + gOur_pos->v[0];
+                gLast_actor->t.t.mat.m[3][1] = the_list[face_bastard].normal.v[1] * (-nearest_bastard) + gOur_pos->v[1];
+                gLast_actor->t.t.mat.m[3][2] = the_list[face_bastard].normal.v[2] * (-nearest_bastard) + gOur_pos->v[2];
                 if (!PDKeyDown(KEY_SHIFT_ANY)) {
                     if (the_list[face_bastard].normal.v[1] > the_list[face_bastard].normal.v[0] && the_list[face_bastard].normal.v[2] > the_list[face_bastard].normal.v[0]) {
                         BrVector3Set(&side_vector, -1.f, 0.f, 0.f);
@@ -4662,27 +4642,29 @@ void DropActor(int pIndex) {
                         BrVector3Set(&side_vector, 0.f, 0.f, -1.f);
                     }
                     new_transform.type = BR_TRANSFORM_LOOK_UP;
-                    BrVector3Cross(&new_transform.t.look_up.look, &the_list[face_bastard].normal, &side_vector);
-                    BrVector3Copy(&new_transform.t.look_up.up, &the_list[face_bastard].normal);
-                    BrVector3Copy(&new_transform.t.look_up.t, &gLast_actor->t.t.translate.t);
+                    BrVector3Cross(&new_transform.t.look_up.look, &side_vector, &the_list[face_bastard].normal);
+                    new_transform.t.look_up.up = the_list[face_bastard].normal;
+                    new_transform.t.look_up.t = gLast_actor->t.t.translate.t;
                     BrTransformToTransform(&gLast_actor->t, &new_transform);
                 }
 
                 gKnown_actor = gLast_actor;
-                BrVector3Copy(&gActor_centre, &gLast_actor->t.t.translate.t);
+                gActor_centre = gLast_actor->t.t.translate.t;
                 DuplicateIfNotAmpersand(gLast_actor);
                 UniquificateActorsName(gUniverse_actor, gLast_actor);
                 gLast_actor->model->flags |= BR_MODF_UPDATEABLE;
-                if (gLast_actor->identifier == NULL || gLast_actor->identifier[0] == '&') {
+                if (gLast_actor->identifier != NULL && gLast_actor->identifier[0] != '&') {
+                    BrActorAdd(gAdditional_actors, gLast_actor);
+                } else {
+                    a = gAdditional_actors->children;
                     last_non_ampersand = gAdditional_actors;
-                    for (a = gAdditional_actors->children; a != NULL; a = a->next) {
-                        if (a->identifier != NULL && a->identifier[0] != '&') {
+                    while (a != NULL) {
+                        if (a->identifier && a->identifier[0] != '&') {
                             last_non_ampersand = a;
                         }
+                        a = a->next;
                     }
                     BrActorAdd(last_non_ampersand, gLast_actor);
-                } else {
-                    BrActorAdd(gAdditional_actors, gLast_actor);
                 }
                 SaveAdditionalStuff();
                 AccessoryHeadup(gLast_actor, "Shat out ");
@@ -4769,17 +4751,17 @@ br_uint_32 IdentifyAccCB(br_actor* pActor, void* pArg) {
     char s[256];
     br_vector3 v;
 
-    if (pActor == NULL || pActor->model == NULL) {
-        return 0;
-    }
-    BrVector3Add(&v, &pActor->model->bounds.max, &pActor->model->bounds.min);
-    BrVector3InvScale(&v, &v, 2.f);
-    BrVector3Accumulate(&v, &pActor->t.t.translate.t);
-    BrVector3Sub(&v, &v, gOur_pos);
-    distance = BrVector3LengthSquared(&v);
-    if (distance < gNearest_distance) {
-        gNearest_actor = pActor;
-        gNearest_distance = distance;
+    if (pActor != NULL && pActor->model != NULL) {
+        v.v[0] = (pActor->model->bounds.max.v[0] + pActor->model->bounds.min.v[0]) / 2.0f;
+        v.v[1] = (pActor->model->bounds.max.v[1] + pActor->model->bounds.min.v[1]) / 2.0f;
+        v.v[2] = (pActor->model->bounds.max.v[2] + pActor->model->bounds.min.v[2]) / 2.0f;
+        BrVector3Accumulate(&v, &pActor->t.t.translate.t);
+        BrVector3Sub(&v, &v, gOur_pos);
+        distance = BrVector3LengthSquared(&v);
+        if (distance < gNearest_distance) {
+            gNearest_distance = distance;
+            gNearest_actor = pActor;
+        }
     }
     return 0;
 }
@@ -4802,10 +4784,9 @@ br_uint_32 DelGrooveRef(br_actor* pActor, void* pArg) {
     tGroovidelic_spec* the_groove;
     int i;
 
-    for (i = 0; i < gGroovidelics_array_size; i++) {
-        the_groove = &gGroovidelics_array[i];
+    for (i = 0, the_groove = gGroovidelics_array; i < gGroovidelics_array_size; i++, the_groove++) {
         if (the_groove->actor == pActor) {
-            the_groove->owner = -999;
+            the_groove->owner = NO_OWNER;
         }
     }
     return 0;
@@ -4821,8 +4802,13 @@ br_uint_32 DelReferencedModels(br_actor* pActor, void* pArg) {
         if (pActor->model == gAdditional_models[i]) {
             BrModelRemove(pActor->model);
             BrModelFree(pActor->model);
-            memmove(&gAdditional_models[i], &gAdditional_models[i + 1], (gNumber_of_additional_models - i - 1) * sizeof(br_model*));
+#ifdef DETHRACE_FIX_BUGS
+            memmove(gAdditional_models + i, gAdditional_models + i + 1, (gNumber_of_additional_models - i - 1) * sizeof(br_model*));
+#else
+            memcpy(gAdditional_models + i, gAdditional_models + i + 1, (gNumber_of_additional_models - i - 1) * 4);
+#endif
             gNumber_of_additional_models--;
+            break;
         }
     }
     return 0;
@@ -4867,29 +4853,31 @@ void OffsetActor(br_actor* pActor, br_vector3* pOffset) {
 // FUNCTION: CARM95 0x00444803
 void CentreActor(br_actor* pActor, br_vector3* pOffset) {
 
-    if (pActor->model == NULL) {
-        BrVector3Set(pOffset, 0.f, 0.f, 0.f);
-    } else if (gKnown_actor == gLast_actor) {
-        BrVector3Scale(pOffset, &gActor_centre, -1.f);
+    if (pActor->model != NULL) {
+        if (gKnown_actor == gLast_actor) {
+            BrVector3Scale(pOffset, &gActor_centre, -1.f);
+        } else {
+            pOffset->v[0] = (pActor->model->bounds.max.v[0] + pActor->model->bounds.min.v[0]) / -2.0f;
+            pOffset->v[1] = (pActor->model->bounds.max.v[1] + pActor->model->bounds.min.v[1]) / -2.0f;
+            pOffset->v[2] = (pActor->model->bounds.max.v[2] + pActor->model->bounds.min.v[2]) / -2.0f;
+        }
     } else {
-        BrVector3Add(pOffset, &pActor->model->bounds.max, &pActor->model->bounds.min);
-        BrVector3Scale(pOffset, pOffset, -2.f);
+        BrVector3Set(pOffset, 0.f, 0.f, 0.f);
     }
+
     DRActorEnumRecurse(pActor, (br_actor_enum_cbfn*)OffsetModel, pOffset);
-    BrVector3Scale(pOffset, pOffset, -1.f);
+    BrVector3Negate(pOffset, pOffset);
 }
 
 // IDA: void __cdecl SnapAccToVertical()
 // FUNCTION: CARM95 0x00444538
 void SnapAccToVertical(void) {
-
-    if (gLast_actor == NULL) {
-        return;
+    if (gLast_actor != NULL) {
+        BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[0], 1.f, 0.f, 0.f);
+        BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[1], 0.f, 1.f, 0.f);
+        BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[2], 0.f, 0.f, 1.f);
+        SaveAdditionalStuff();
     }
-    BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[0], 1.f, 0.f, 0.f);
-    BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[1], 0.f, 1.f, 0.f);
-    BrVector3Set((br_vector3*)gLast_actor->t.t.mat.m[2], 0.f, 0.f, 1.f);
-    SaveAdditionalStuff();
 }
 
 // IDA: void __usercall RotateAccessory(br_angle pAngle@<EAX>)
@@ -4925,31 +4913,30 @@ void RotateAccessory(br_angle pAngle) {
 void ScaleAccessory(float pScaling_factor) {
     br_vector3 mr_offset;
 
-    if (gLast_actor == NULL) {
-        return;
+    if (gLast_actor != NULL) {
+        if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
+            CentreActor(gLast_actor, &mr_offset);
+        }
+        switch (gCurrent_scale_mode) {
+        case eScale_mode_all:
+            BrMatrix34PreScale(&gLast_actor->t.t.mat, pScaling_factor, pScaling_factor, pScaling_factor);
+            break;
+        case eScale_mode_x:
+            BrMatrix34PreScale(&gLast_actor->t.t.mat, pScaling_factor, 1.f, 1.f);
+            break;
+        case eScale_mode_y:
+            BrMatrix34PreScale(&gLast_actor->t.t.mat, 1.f, pScaling_factor, 1.f);
+            break;
+        case eScale_mode_z:
+            BrMatrix34PreScale(&gLast_actor->t.t.mat, 1.f, 1.f, pScaling_factor);
+            break;
+        }
+        if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
+            DRActorEnumRecurseWithTrans(gLast_actor, NULL, ApplyTransToModels, NULL);
+            OffsetActor(gLast_actor, &mr_offset);
+        }
+        SaveAdditionalStuff();
     }
-    if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
-        CentreActor(gLast_actor, &mr_offset);
-    }
-    switch (gCurrent_scale_mode) {
-    case eScale_mode_all:
-        BrMatrix34PreScale(&gLast_actor->t.t.mat, pScaling_factor, pScaling_factor, pScaling_factor);
-        break;
-    case eScale_mode_x:
-        BrMatrix34PreScale(&gLast_actor->t.t.mat, pScaling_factor, 1.f, 1.f);
-        break;
-    case eScale_mode_y:
-        BrMatrix34PreScale(&gLast_actor->t.t.mat, 1.f, pScaling_factor, 1.f);
-        break;
-    case eScale_mode_z:
-        BrMatrix34PreScale(&gLast_actor->t.t.mat, 1.f, 1.f, pScaling_factor);
-        break;
-    }
-    if (!gSpec_vol_mode && gLast_actor->identifier != NULL && gLast_actor->identifier[0] == '@') {
-        DRActorEnumRecurseWithTrans(gLast_actor, NULL, ApplyTransToModels, NULL);
-        OffsetActor(gLast_actor, &mr_offset);
-    }
-    SaveAdditionalStuff();
 }
 
 // IDA: void __cdecl MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift)
@@ -4957,75 +4944,75 @@ void ScaleAccessory(float pScaling_factor) {
 void MoveAccessory(br_scalar pX_shift, br_scalar pY_shift, br_scalar pZ_shift) {
     br_vector3 v;
 
-    if (gLast_actor == NULL) {
-        return;
+    if (gLast_actor != NULL) {
+        BrVector3Set(&v, pX_shift, pY_shift, pZ_shift);
+        BrVector3Accumulate(&gLast_actor->t.t.translate.t, &v);
+        SaveAdditionalStuff();
     }
-    BrVector3SetFloat(&v, pX_shift, pY_shift, pZ_shift);
-    BrVector3Accumulate(&gLast_actor->t.t.translate.t, &v);
-    SaveAdditionalStuff();
 }
 
 // IDA: void __cdecl RotateAccL()
 // FUNCTION: CARM95 0x004445c1
 void RotateAccL(void) {
 
-    RotateAccessory(BrDegreeToAngle(90));
+    RotateAccessory(BR_ANGLE_DEG(90));
 }
 
 // IDA: void __cdecl RotateAccL2()
 // FUNCTION: CARM95 0x0044491e
 void RotateAccL2(void) {
 
-    RotateAccessory(BrDegreeToAngle(15));
+    RotateAccessory(BR_ANGLE_DEG(15));
 }
 
 // IDA: void __cdecl RotateAccL3()
 // FUNCTION: CARM95 0x00444936
 void RotateAccL3(void) {
 
-    RotateAccessory(BrDegreeToAngle(5));
+    RotateAccessory(BR_ANGLE_DEG(5));
 }
 
 // IDA: void __cdecl RotateAccL4()
 // FUNCTION: CARM95 0x0044494e
 void RotateAccL4(void) {
 
-    RotateAccessory(BrDegreeToAngle(1));
+    RotateAccessory(BR_ANGLE_DEG(1));
 }
 
 // IDA: void __cdecl RotateAccR()
 // FUNCTION: CARM95 0x00444966
 void RotateAccR(void) {
 
-    RotateAccessory(BrDegreeToAngle(270));
+    RotateAccessory(BR_ANGLE_DEG(-90));
 }
 
 // IDA: void __cdecl RotateAccR2()
 // FUNCTION: CARM95 0x0044497e
 void RotateAccR2(void) {
 
-    RotateAccessory(BrDegreeToAngle(345));
+    RotateAccessory(BR_ANGLE_DEG(-15));
 }
 
 // IDA: void __cdecl RotateAccR3()
 // FUNCTION: CARM95 0x00444996
 void RotateAccR3(void) {
 
-    RotateAccessory(BrDegreeToAngle(355));
+    RotateAccessory(BR_ANGLE_DEG(-5));
 }
 
 // IDA: void __cdecl RotateAccR4()
 // FUNCTION: CARM95 0x004449ae
 void RotateAccR4(void) {
 
-    RotateAccessory(BrDegreeToAngle(359));
+    RotateAccessory(BR_ANGLE_DEG(-1));
 }
 
 // IDA: void __cdecl CycleAccRotate()
 // FUNCTION: CARM95 0x004449c6
 void CycleAccRotate(void) {
-
-    gCurrent_rotate_mode = (gCurrent_rotate_mode == eRotate_mode_z) ? eRotate_mode_x : (gCurrent_rotate_mode + 1);
+    if (gCurrent_rotate_mode++ == eRotate_mode_z) {
+        gCurrent_rotate_mode = eRotate_mode_x;
+    }
     switch (gCurrent_rotate_mode) {
     case eRotate_mode_x:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "Rotate mode: X");
@@ -5043,7 +5030,9 @@ void CycleAccRotate(void) {
 // FUNCTION: CARM95 0x00444a82
 void CycleAccScale(void) {
 
-    gCurrent_scale_mode = (gCurrent_scale_mode == eScale_mode_z) ? eScale_mode_all : (gCurrent_scale_mode + 1);
+    if (gCurrent_scale_mode++ == eScale_mode_z) {
+        gCurrent_scale_mode = eScale_mode_all;
+    }
     switch (gCurrent_scale_mode) {
     case eScale_mode_all:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "Scale mode: ALL");
@@ -5092,14 +5081,14 @@ void ScaleAccDown2(void) {
 // FUNCTION: CARM95 0x00444d3b
 void ScaleAccDown3(void) {
 
-    ScaleAccessory(1 / 1.05f);
+    ScaleAccessory(1 / 1.05);
 }
 
 // IDA: void __cdecl ScaleAccDown4()
 // FUNCTION: CARM95 0x00444d53
 void ScaleAccDown4(void) {
 
-    ScaleAccessory(1 / 1.002f);
+    ScaleAccessory(1 / 1.002);
 }
 
 // IDA: void __cdecl MoveXAccL()
@@ -5378,33 +5367,30 @@ void DropSpecVol(int pIndex) {
 
     PathCat(the_path, gApplication_path, "SPECVOL.TXT");
     f = DRfopen(the_path, "rt");
-    if (f == NULL) {
-        return;
-    }
-    spec_count = GetAnInt(f);
-    // pIndex = 1 means first special volume
-    if (pIndex > spec_count) {
+    if (f != NULL) {
+        spec_count = GetAnInt(f);
+        // pIndex = 1 means first special volume
+        if (pIndex <= spec_count) {
+            for (i = 0; i < pIndex; i++) {
+                ParseSpecialVolume(f, &spec, NULL);
+            }
+            spec.no_mat = 0;
+            BrMatrix34Copy(&spec.mat, &gProgram_state.current_car.car_master_actor->t.t.mat);
+            new_specs = BrMemAllocate((gProgram_state.special_volume_count + 1) * sizeof(tSpecial_volume), kMem_new_special_vol);
+            memcpy(new_specs, gProgram_state.special_volumes, gProgram_state.special_volume_count * sizeof(tSpecial_volume));
+            memcpy(&new_specs[gProgram_state.special_volume_count], &spec, sizeof(tSpecial_volume));
+            gProgram_state.special_volume_count++;
+            BrMemFree(gProgram_state.special_volumes);
+            gProgram_state.special_volumes = new_specs;
+            BuildSpecVolModel(&spec, gProgram_state.special_volume_count - 1, GetInternalMat(), GetExternalMat());
+            gLast_actor = gSpec_vol_actors[gProgram_state.special_volume_count - 1];
+            UpdateSpecVol();
+            sprintf(s, "Shat out special volume #%d (type %d)", gProgram_state.special_volume_count - 1, pIndex);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, s);
+            SaveSpecialVolumes();
+        }
         fclose(f);
-        return;
     }
-    for (i = 0; i < pIndex; i++) {
-        ParseSpecialVolume(f, &spec, NULL);
-    }
-    spec.no_mat = 0;
-    BrMatrix34Copy(&spec.mat, &gProgram_state.current_car.car_master_actor->t.t.mat);
-    new_specs = BrMemAllocate((gProgram_state.special_volume_count + 1) * sizeof(tSpecial_volume), kMem_new_special_vol);
-    memcpy(new_specs, gProgram_state.special_volumes, gProgram_state.special_volume_count * sizeof(tSpecial_volume));
-    memcpy(&new_specs[gProgram_state.special_volume_count], &spec, sizeof(tSpecial_volume));
-    gProgram_state.special_volume_count++;
-    BrMemFree(gProgram_state.special_volumes);
-    gProgram_state.special_volumes = new_specs;
-    BuildSpecVolModel(&spec, gProgram_state.special_volume_count - 1, GetInternalMat(), GetExternalMat());
-    gLast_actor = gSpec_vol_actors[gProgram_state.special_volume_count - 1];
-    UpdateSpecVol();
-    sprintf(s, "Shat out special volume #%d (type %d)", gProgram_state.special_volume_count - 1, pIndex);
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, s);
-    SaveSpecialVolumes();
-    fclose(f);
 }
 
 // IDA: void __cdecl DropSpecVol0()
@@ -5487,23 +5473,25 @@ void IdentifySpecVol(void) {
     char s[256];
 
     min_d = FLT_MAX;
-    min_index = -1;
     p = &gProgram_state.current_car.pos;
-    for (i = 0; i < gProgram_state.special_volume_count; i++) {
-        v = &gProgram_state.special_volumes[i];
+    min_index = -1;
+    for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
+        if (v->no_mat) {
+            continue;
+        }
         d = Vector3DistanceSquared((br_vector3*)v->mat.m[3], p);
         if (d < min_d) {
-            min_index = i;
             min_d = d;
+            min_index = i;
         }
     }
-    if (min_index < 0) {
-        gLast_actor = NULL;
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "No special volumes to lock onto");
-    } else {
+    if (min_index >= 0) {
         sprintf(s, "Locked onto Special Volume #%d", min_index);
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, s);
         gLast_actor = gSpec_vol_actors[min_index];
+    } else {
+        gLast_actor = NULL;
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "No special volumes to lock onto");
     }
 }
 
@@ -5540,19 +5528,18 @@ void DeleteSpecVol(void) {
     int index;
 
     index = FindSpecVolIndex(gLast_actor);
-    if (index < 0) {
-        return;
+    if (index >= 0) {
+        DelSpecVolumeGraph(index);
+        memmove(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
+        memmove(&gSpec_vol_actors[index], &gSpec_vol_actors[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(br_actor*));
+        gProgram_state.special_volume_count--;
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "There's been a special volumes MURDER!!");
+        gLast_actor = NULL;
+        if (&gProgram_state.special_volumes[index] < gDefault_water_spec_vol) {
+            gDefault_water_spec_vol--;
+        }
+        SaveSpecialVolumes();
     }
-    DelSpecVolumeGraph(index);
-    memmove(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
-    memmove(&gSpec_vol_actors[index], &gSpec_vol_actors[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(br_actor*));
-    gProgram_state.special_volume_count--;
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "There's been a special volumes MURDER!!");
-    gLast_actor = NULL;
-    if (&gProgram_state.special_volumes[index] < gDefault_water_spec_vol) {
-        gDefault_water_spec_vol--;
-    }
-    SaveSpecialVolumes();
 }
 
 // IDA: void __cdecl RotateSpecVolL()
@@ -5862,12 +5849,11 @@ void ShowSpecialVolumes(void) {
     gSpec_vol_mode = 1;
     internal_mat = GetInternalMat();
     external_mat = GetExternalMat();
-    for (i = 0; i < gProgram_state.special_volume_count; i++) {
-        v = &gProgram_state.special_volumes[i];
-        if (!v->no_mat) {
-            BuildSpecVolModel(v, i, internal_mat, external_mat);
-        } else {
+    for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
+        if (v->no_mat) {
             gSpec_vol_actors[i] = NULL;
+        } else {
+            BuildSpecVolModel(v, i, internal_mat, external_mat);
         }
     }
 }
@@ -5879,8 +5865,7 @@ void HideSpecialVolumes(void) {
     tSpecial_volume* v;
 
     gSpec_vol_mode = 0;
-    for (i = 0; i < gProgram_state.special_volume_count; i++) {
-        v = &gProgram_state.special_volumes[i];
+    for (i = 0, v = gProgram_state.special_volumes; i < gProgram_state.special_volume_count; i++, v++) {
         if (!v->no_mat) {
             DelSpecVolumeGraph(i);
         }

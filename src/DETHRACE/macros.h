@@ -25,6 +25,8 @@
 #define COUNT_OF(array) (int)(sizeof((array)) / sizeof((array)[0]))
 #define LEN(array) (sizeof((array)) / sizeof((array)[0]))
 
+#define MAT(m, row, col) (*((br_scalar*)(m) + (row) * 3 + (col)))
+
 #define DEG_TO_RAD(degrees) ((degrees) * 3.141592653589793 / 180.0)
 
 #define V11MODEL(model) (((struct v11model*)model->prepared))
@@ -77,7 +79,17 @@
         b = x[0];                          \
     } while (0)
 
-#endif
+#define ReadPairOfInts(pF, a, b)         \
+    do {                                 \
+        int d[2];                        \
+        GetPairOfInts(pF, &d[1], &d[0]); \
+        a = d[1];                        \
+        b = d[0];                        \
+    } while (0)
+
+#define mGetThreeFloats(pF) \
+    float x_0, x_1, x_2;    \
+    GetThreeFloats(pF, &x_0, &x_1, &x_2);
 
 // Many switches in the original code did not include handling all values, causing warnings in modern compilers
 #ifdef DETHRACE_FIX_BUGS
@@ -86,4 +98,7 @@
         break;
 #else
 #define DETHRACE_DEFAULT_BREAK
+#endif
+
+// MACROS_H
 #endif

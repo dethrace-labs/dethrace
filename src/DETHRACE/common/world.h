@@ -34,6 +34,7 @@ extern float* gGroove_funk_bindings[960];
 extern br_actor* gDelete_list[500];
 extern br_actor* gLight_array[50];
 extern br_model* gAdditional_models[1000];
+extern br_scalar gSight_distance_squared;
 extern br_actor* gSpec_vol_actors[100];
 extern tPath_name gAdditional_actor_path;
 extern tPath_name gAdditional_model_path;
@@ -48,7 +49,6 @@ extern int gDelete_count;
 extern br_scalar gNearest_distance;
 extern br_actor* gNearest_actor;
 extern br_actor* gStandard_lamp;
-extern br_scalar gSight_distance_squared;
 
 float MapSawToTriangle(float pNumber);
 
@@ -66,7 +66,7 @@ void DisposeStorageSpace(tBrender_storage* pStorage_space);
 
 void ClearOutStorageSpace(tBrender_storage* pStorage_space);
 
-tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm);
+tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_pm);
 
 tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_st);
 
