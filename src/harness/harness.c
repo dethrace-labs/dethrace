@@ -539,7 +539,9 @@ int Harness_ProcessIniFile(void) {
     int i;
     char path[1024];
 
-    OS_GetPrefPath(path, "dethrace");
+    if (OS_GetPrefPath(path, "dethrace")) {
+        strcpy(path, "./");
+    }
     strcat(path, "dethrace.ini");
     LOG_INFO2("Loading ini file %s", path);
 

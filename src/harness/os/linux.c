@@ -426,7 +426,7 @@ int OS_GetPrefPath(char* dest, char* app) {
         base = path;
     }
 
-    if (stat(name_buf, &statbuf) == -1) {
+    if (stat(base, &statbuf) == -1) {
         return -1;
     }
     if (!(statbuf.st_mode & S_IFDIR)) {
