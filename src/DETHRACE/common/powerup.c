@@ -1219,6 +1219,12 @@ int SetProximity(tPowerup* pPowerup, tCar_spec* pCar) {
 void ResetProximity(tPowerup* pPowerup, tCar_spec* pCar) {
 
     pCar->proxy_ray_distance = 0.f;
+#ifdef DETHRACE_FIX_BUGS
+    // Cars with built-in proximity ray should keep this ability
+    if (CAR_HAS_BUILTIN_PROX_RAY(pCar)) {
+        pCar->proxy_ray_distance = CAR_PROX_RAY_DISTANCE;
+    }
+#endif
 }
 
 // IDA: int __usercall SetPedHarvest@<EAX>(tPowerup *pPowerup@<EAX>, tCar_spec *pCar@<EDX>)
