@@ -453,6 +453,10 @@ void NetLeaveGame(tNet_game_details* pNet_game) {
     gNumber_of_net_players = 0;
     gProgram_state.prog_status = eProg_idling;
     gOnly_receive_guarantee_replies = 0;
+#ifdef DETHRACE_FIX_BUGS
+    BrMemFree(gCar_details);
+    gCar_details = NULL;
+#endif
 }
 
 // IDA: void __usercall NetSetPlayerSystemInfo(tNet_game_player_info *pPlayer@<EAX>, void *pSender_address@<EDX>)

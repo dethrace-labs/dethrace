@@ -427,7 +427,12 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
     int new_index;
     int races_count;
     int most_seldom_seen;
+#ifdef DETHRACE_FIX_BUGS
+    // Number of races to pick from can be higher then 50.
+    int* races_to_pick_from;
+#else
     int races_to_pick_from[50];
+#endif
 
     if (pNet_race_sequence == eNet_sequence_sequential) {
         pCurrent_race++;
@@ -444,6 +449,9 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
             }
         }
         races_count = 0;
+#ifdef DETHRACE_FIX_BUGS
+        races_to_pick_from = BrMemAllocate(gNumber_of_races * sizeof(int), kMem_misc);
+#endif
         for (i = 0; i < gNumber_of_races; i++) {
             if (gRace_list[i].been_there_done_that == most_seldom_seen && (i != pCurrent_race)) {
                 races_to_pick_from[races_count] = i;
@@ -451,6 +459,9 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
             }
         }
         new_index = races_to_pick_from[IRandomBetween(0, races_count - 1)];
+#ifdef DETHRACE_FIX_BUGS
+        BrMemFree(races_to_pick_from);
+#endif
         gRace_list[new_index].been_there_done_that++;
 
         return new_index;

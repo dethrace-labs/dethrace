@@ -9,8 +9,13 @@ tNet_game_player_info gNet_players[6];
 
 br_matrix34 gRoot_to_camera;
 
+#ifdef DETHRACE_FIX_BUGS
+// Number of cars can be higher then 60 (this is used in multiplayer)
+tCar_detail_info* gCar_details;
+#else
 // GLOBAL: CARM95 0x00550af0
 tCar_detail_info gCar_details[60];
+#endif
 
 // GLOBAL: CARM95 0x00550ae0
 int gThis_net_player_index;
