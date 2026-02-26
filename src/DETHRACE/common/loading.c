@@ -1891,9 +1891,17 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
     int vertex_total;
 
     if (pDriver == eDriver_local_human) {
+#if defined(DETHRACE_FIX_BUGS)
+        // Player's APC/BIGAPC wheels got stuck if the equivalent cop car was wasted in previous race
+        if (strcmp(gProgram_state.car_name, pCar_name) == 0 &&
+            strcmp(gProgram_state.car_name, "APC.TXT") != 0 &&
+            strcmp(gProgram_state.car_name, "BIGAPC.TXT") != 0)
+            return;
+#else
         if (strcmp(gProgram_state.car_name, pCar_name) == 0) {
             return;
         }
+#endif
         if (gProgram_state.car_name[0] != '\0') {
             DisposeCar(&gProgram_state.current_car, gProgram_state.current_car.index);
             ClearOutStorageSpace(&gOur_car_storage_space);
