@@ -428,6 +428,7 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
     int races_count;
     int most_seldom_seen;
 #ifdef DETHRACE_FIX_BUGS
+    // Number of races to pick from can be higher then 50.
     int* races_to_pick_from;
 #else
     int races_to_pick_from[50];
