@@ -620,12 +620,22 @@ int PDNetGetHeaderSize(void) {
 }
 
 void PDNetCopyFromNative(tCopyable_sockaddr_in* pAddress, struct sockaddr_in* sock) {
+#if BR_ENDIAN_BIG
+    pAddress->port = sock->sin_port << 16;
+    pAddress->address = (uint64_t)sock->sin_addr.s_addr << 32;
+#else
     pAddress->port = sock->sin_port;
     pAddress->address = sock->sin_addr.s_addr;
+#endif
 }
 
 void PDNetCopyToNative(struct sockaddr_in* sock, tCopyable_sockaddr_in* pAddress) {
+#if BR_ENDIAN_BIG
+    sock->sin_addr.s_addr = pAddress->address >> 32;
+    sock->sin_port = pAddress->port >> 16;
+#else
     sock->sin_addr.s_addr = pAddress->address;
     sock->sin_port = pAddress->port;
+#endif
     sock->sin_family = AF_INET;
 }

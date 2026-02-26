@@ -26,6 +26,7 @@
 #include "structur.h"
 #include "utility.h"
 #include "world.h"
+#include "network_endian.h"
 #include <stdlib.h>
 
 tU32 gMess_max_flags;
@@ -820,6 +821,9 @@ int NetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage,
     }
     pMessage->sender = gLocal_net_ID;
     pMessage->senders_time_stamp = PDGetTotalTime();
+#if BR_ENDIAN_BIG
+    NetSwapMessageAndContents(pMessage);
+#endif
     GetCheckSum(pMessage);
     return PDNetSendMessageToAddress(pDetails, pMessage, pAddress);
 }
@@ -833,6 +837,9 @@ int NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, 
     }
     pMessage->sender = gLocal_net_ID;
     pMessage->senders_time_stamp = PDGetTotalTime();
+#if BR_ENDIAN_BIG
+    NetSwapMessageAndContents(pMessage);
+#endif
     for (i = 0; i < gNumber_of_net_players; i++) {
         if (gNet_players[i].ID == pPlayer) {
             GetCheckSum(pMessage);
@@ -851,6 +858,9 @@ int NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage) {
     }
     pMessage->sender = gLocal_net_ID;
     pMessage->senders_time_stamp = PDGetTotalTime();
+#if BR_ENDIAN_BIG
+    NetSwapMessageAndContents(pMessage);
+#endif
     DoCheckSum(pMessage);
     return PDNetSendMessageToAddress(pDetails, pMessage, &pDetails->pd_net_info);
 }
@@ -867,6 +877,9 @@ int NetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessa
 
     pMessage->sender = gLocal_net_ID;
     pMessage->senders_time_stamp = PDGetTotalTime();
+#if BR_ENDIAN_BIG
+    NetSwapMessageAndContents(pMessage);
+#endif
     GetCheckSum(pMessage);
     return PDNetSendMessageToAllPlayers(pDetails, pMessage);
 }
@@ -1802,6 +1815,11 @@ void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceiv
 
     for (i = 0; i < pMessage->num_contents; i++) {
         if (contents->header.type <= NETMSGID_CARDETAILS || PlayerIsInList(pMessage->sender)) {
+#if BR_ENDIAN_BIG
+            if (pMessage->sender != gLocal_net_ID) {
+                NetSwapContents(contents);
+            }
+#endif
             switch (contents->header.type) {
             case NETMSGID_SENDMEDETAILS: // 0x00,
                 ReceivedSendMeDetails(contents, pSender_address);
@@ -1918,6 +1936,9 @@ void NetReceiveAndProcessMessages(void) {
         gIn_net_service = 1;
         while ((message = NetGetNextMessage(gCurrent_net_game, &sender_address)) != NULL) {
             receive_time = GetRaceTime();
+#if BR_ENDIAN_BIG
+            NetSwapMessage(message);
+#endif
             if (message->magic_number == 0x763a5058) {
                 CheckCheckSum(message);
                 ReceivedMessage(message, sender_address, receive_time);
@@ -2145,6 +2166,9 @@ int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message*
     gGuarantee_list[gNext_guarantee].NotifyFail = pNotifyFail;
     gGuarantee_list[gNext_guarantee].recieved = 0;
     gNext_guarantee++;
+#if BR_ENDIAN_BIG
+    NetSwapMessageAndContents(pMessage);
+#endif
     DoCheckSum(pMessage);
     return PDNetSendMessageToAddress(pDetails, pMessage, pAddress);
 }
