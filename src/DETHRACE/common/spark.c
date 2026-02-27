@@ -1875,11 +1875,12 @@ void ReplaySmokeColumn(tU32 pTime) {
     br_vector3 dummy;
 
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
-        if (TEST_BIT(gColumn_flags, i)) {
-            DoSmokeColumn(i, pTime, &dummy);
-            if (gSmoke_column[i].colour == 0) {
-                FlameAnimate(i, &gSmoke_column[i].pos, pTime);
-            }
+        if (!TEST_BIT(gColumn_flags, i)) {
+            continue;
+        }
+        DoSmokeColumn(i, pTime, &dummy);
+        if (gSmoke_column[i].colour == 0) {
+            FlameAnimate(i, &gSmoke_column[i].pos, pTime);
         }
     }
 }
