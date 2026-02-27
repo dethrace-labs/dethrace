@@ -250,7 +250,7 @@ void NetSendHeadupToEverybody(char* pMessage) {
 
     if (gNet_mode != eNet_mode_none) {
         if (gProgram_state.racing) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pMessage);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, pMessage);
         }
         the_contents = NetGetBroadcastContents(NETMSGID_HEADUP, 0);
         strcpy(the_contents->data.headup.text, pMessage);
@@ -265,7 +265,7 @@ void NetSendHeadupToPlayer(char* pMessage, tPlayer_ID pPlayer) {
     if (gNet_mode != eNet_mode_none) {
         if (gLocal_net_ID == pPlayer) {
             if (gProgram_state.racing) {
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pMessage);
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, pMessage);
             }
         } else {
             message = NetBuildMessage(NETMSGID_HEADUP, 0);
@@ -1490,7 +1490,7 @@ void ReceivedStartRace(tNet_contents* pContents) {
     int i;
     int index;
 
-    if (pContents->data.player_list.number_of_players == -1) {
+    if (pContents->data.start_race.car_count == -1) {
         if (gProgram_state.racing) {
             index = pContents->data.start_race.car_list[0].index;
             BrMatrix34Copy(&gNet_players[index].car->car_master_actor->t.t.mat, &pContents->data.start_race.car_list[0].mat);
@@ -1512,7 +1512,7 @@ void ReceivedStartRace(tNet_contents* pContents) {
             gNet_players[pContents->data.start_race.car_list[i].index].next_car_index = pContents->data.start_race.car_list[i].next_car_index;
         }
     } else {
-        for (i = 0; i < pContents->data.player_list.number_of_players; i++) {
+        for (i = 0; i < pContents->data.start_race.car_count; i++) {
             gCurrent_race.number_of_racers = i + 1;
             gCurrent_race.opponent_list[i].index = -1;
             gCurrent_race.opponent_list[i].ranking = -1;
@@ -1526,10 +1526,10 @@ void ReceivedStartRace(tNet_contents* pContents) {
             }
             gNet_players[pContents->data.start_race.car_list[i].index].next_car_index = pContents->data.start_race.car_list[i].next_car_index;
         }
-        gPending_race = pContents->data.player_list.batch_number;
-        gCurrent_race.number_of_racers = pContents->data.player_list.number_of_players;
+        gPending_race = pContents->data.start_race.next_race;
+        gCurrent_race.number_of_racers = pContents->data.start_race.car_count;
         gSynch_race_start = 1;
-        if (!pContents->data.player_list.this_index || gProgram_state.racing) {
+        if (!pContents->data.start_race.racing || gProgram_state.racing) {
             gWait_for_it = 0;
         }
     }
@@ -1552,7 +1552,7 @@ void ReceivedGuaranteeReply(tNet_contents* pContents) {
 void ReceivedHeadup(tNet_contents* pContents) {
 
     if (gProgram_state.racing) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, pContents->data.headup.text);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, pContents->data.headup.text);
     }
 }
 
@@ -1719,12 +1719,12 @@ void ReceivedWasted(tNet_contents* pContents) {
         } else {
             sprintf(s, "%s %s %s", victim->player_name, GetMiscString(kMiscString_WastedBy), culprit ? culprit->player_name : GetMiscString(kMiscString_COP));
         }
-        NewTextHeadupSlot2(eHeadupSlot_misc, 0, 3000, -4, s, 0);
+        NewTextHeadupSlot2(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, s, 0);
         last_wasty_message_time = PDGetTotalTime();
         last_culprit = culprit;
         last_victim = victim;
         if (pContents->data.wasted.culprit == gLocal_net_ID) {
-            PratcamEvent(32);
+            PratcamEvent(kPratcam_opponent_wasted);
             last_wasted_em_time = PDGetTotalTime();
             if (last_wasted_em_time - last_got_wasted_time > 1000) {
                 DoFancyHeadup(kFancyHeadupYouWastedEm);
@@ -1959,7 +1959,7 @@ void CheckForDisappearees(void) {
                 NetSendHeadupToAllPlayers(s);
                 KickPlayerOut(gNet_players[i].ID);
                 if (gProgram_state.racing) {
-                    NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, s);
+                    NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, s);
                 }
             }
         }
@@ -2130,7 +2130,7 @@ int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message*
     pMessage->senders_time_stamp = PDGetTotalTime();
     if (gNext_guarantee >= COUNT_OF(gGuarantee_list)) {
         sprintf(buffer, "Guarantee list full %d", pMessage->contents.header.type);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, buffer);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, buffer);
         pMessage->guarantee_number = 0;
         return 0;
     }

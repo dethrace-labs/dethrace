@@ -319,9 +319,9 @@ void TogglePedestrians(void) {
     if (!gProgram_state.sausage_eater_mode) {
         gPedestrians_on = !gPedestrians_on;
         if (gPedestrians_on) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_LetTheCarnageContinue));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_LetTheCarnageContinue));
         } else {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_NiceAndFluffyMode));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_NiceAndFluffyMode));
         }
     }
 }
@@ -1643,7 +1643,7 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
 void CheckLastPed(void) {
 
     if (gNet_mode == eNet_mode_none && gProgram_state.peds_killed >= gTotal_peds) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -4, GetMiscString(kMiscString_EveryPedestrianWasted));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -kFont_MEDIUMHD, GetMiscString(kMiscString_EveryPedestrianWasted));
         RaceCompleted(eRace_over_peds);
     }
 }
@@ -2042,7 +2042,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
         BrVector3Set(&up, 0.f, 1.f, 0.f);
         if (billiards_shot) {
             credits_value *= 4;
-            PratcamEvent(30);
+            PratcamEvent(kPratcam_killed_lots_of_peds);
             DoFancyHeadup(kFancyHeadupNiceShotSir);
         } else if (fabs(the_car->omega.v[X]) <= 5.0f
             && fabs(the_car->omega.v[Z]) <= 5.0f
@@ -2055,10 +2055,10 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
                 if (gCurrent_ped_multiplier >= 2) {
                     DoFancyHeadup(gCurrent_ped_multiplier + kFancyHeadup2xComboBonus - 2);
                 } else {
-                    PratcamEvent(30);
+                    PratcamEvent(kPratcam_killed_lots_of_peds);
                     if (exploded) {
                         DoFancyHeadup(kFancyHeadupSplatterBonus);
-                        PratcamEvent(30);
+                        PratcamEvent(kPratcam_killed_lots_of_peds);
                     }
                 }
             } else {
@@ -2067,10 +2067,10 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
             }
         } else {
             credits_value *= 4;
-            PratcamEvent(30);
+            PratcamEvent(kPratcam_killed_lots_of_peds);
             DoFancyHeadup(kFancyHeadupBonusForArtisticImpression);
         }
-        PratcamEvent(29);
+        PratcamEvent(kPratcam_killed_one_ped);
         EarnCredits(credits_value);
     }
     if (the_car->driver == eDriver_local_human && gProgram_state.cockpit_on) {
@@ -3297,7 +3297,7 @@ void NewPed(int pRef_num) {
         gNumber_of_pedestrians++;
         gTotal_peds++;
         sprintf(s, "New pedestrian, refnum = %d", pRef_num);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, s);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, s);
         if (pRef_num >= 100) {
             DropInitPedPoint();
             NewPed(-1);
@@ -3325,7 +3325,7 @@ void ScrubPedestrian(void) {
     gPed_instruc_count = 0;
     gNumber_of_pedestrians--;
     gTotal_peds--;
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Scrubbed pedestrian");
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Scrubbed pedestrian");
     RemoveCurrentPedPath();
 }
 
@@ -3335,9 +3335,9 @@ void TogglePedDetect(void) {
 
     gDetect_peds = !gDetect_peds;
     if (gDetect_peds) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Pedestrian are meat again");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Pedestrian are meat again");
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Pedestrians are invulnerable");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Pedestrians are invulnerable");
     }
 }
 
@@ -3511,7 +3511,7 @@ void DropPedPoint(void) {
     }
 #endif
     DropPedPoint2();
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Dropped pedestrian point");
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Dropped pedestrian point");
 }
 
 // IDA: void __cdecl DropInitPedPoint()
@@ -3525,7 +3525,7 @@ void DropInitPedPoint(void) {
 #endif
     gInit_ped_instruc = gPed_instruc_count;
     DropPedPoint2();
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Dropped initial pedestrian point");
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Dropped initial pedestrian point");
 }
 
 // IDA: void __cdecl DropPedPointAir2()
@@ -3550,7 +3550,7 @@ void DropPedPointAir(void) {
     }
 #endif
     DropPedPointAir2();
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Dropped auto-y pedestrian point");
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Dropped auto-y pedestrian point");
 }
 
 // IDA: void __cdecl DropInitPedPointAir()
@@ -3564,7 +3564,7 @@ void DropInitPedPointAir(void) {
 #endif
     gInit_ped_instruc = gPed_instruc_count;
     DropPedPointAir2();
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -1, "Dropped initial auto-y pedestrian point");
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_ORANGHED, "Dropped initial auto-y pedestrian point");
 }
 
 // IDA: br_uint_32 __cdecl KillActorsModel(br_actor *pActor, void *pArg)
@@ -3639,7 +3639,7 @@ void ShowPedPos(void) {
 
     GetPedPos(&min_ped, &min_point);
     sprintf(s, "Nearest pedestrian is #%d, point #%d", min_ped + 1, min_point + 1);
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -1, s);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_ORANGHED, s);
 }
 
 // IDA: void __cdecl ShowPedPaths()

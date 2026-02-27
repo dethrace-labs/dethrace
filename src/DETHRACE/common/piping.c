@@ -82,8 +82,11 @@ tU32 gOldest_time;
 
 int gCurrent_snapshot_registration_index;
 
-// GLOBAL: CARM95 0x00531fa0
+// GLOBAL: CARM95 0x0053203C
 tPipe_chunk* gMr_chunky;
+
+// GLOBAL: CARM95 0x00531fa0
+tPipe_chunk* gMr_chunky2;
 
 // GLOBAL: CARM95 0x00532040
 tCar_spec* gCar_ptr;
@@ -133,6 +136,7 @@ tU32 gYoungest_time;
 // GLOBAL: CARM95 0x0053208c
 tU8* gPipe_buffer_phys_end;
 
+// GLOBAL: CARM95 0x00532008
 tU8* gLocal_buffer_record_ptr;
 
 // GLOBAL: CARM95 0x00532018
@@ -155,7 +159,6 @@ tU8* gLocal_buffer;
 
 // GLOBAL: CARM95 0x00532090
 tU32 gLocal_buffer_size;
-tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)
 
 #define LOCAL_BUFFER_SIZE 15000
 
@@ -172,13 +175,13 @@ tPipe_chunk* gIncidentChunk; // FIXME: added by DethRace (really needed?)
 #define PIPE_ALIGN(V) (((V) + sizeof(void*) - 1) & ~(sizeof(void*) - 1))
 #endif
 
+#define SHOULD_SCAN_FORWARDS() gPipe_play_ptr == gPipe_record_ptr ? 0 : gPipe_play_ptr == gPipe_buffer_oldest ? 1 \
+                                                                                                              : (GetReplayRate() != 0.0f ? GetReplayRate() > 0.0f : GetReplayDirection() > 0)
+
 // IDA: void __usercall GetReducedPos(br_vector3 *v@<EAX>, tReduced_pos *p@<EDX>)
 // FUNCTION: CARM95 0x00427ed0
 void GetReducedPos(br_vector3* v, tReduced_pos* p) {
-
-    v->v[0] = p->v[0] / 800.f;
-    v->v[1] = p->v[1] / 800.f;
-    v->v[2] = p->v[2] / 800.f;
+    BrVector3InvScale(v, p, 800.0);
     BrVector3Accumulate(v, &gProgram_state.current_car.car_master_actor->t.t.translate.t);
 }
 
@@ -196,18 +199,16 @@ void SaveReducedPos(tReduced_pos* p, br_vector3* v) {
 // IDA: int __cdecl PipeSearchForwards()
 // FUNCTION: CARM95 0x00427fdf
 int PipeSearchForwards(void) {
-
     if (gPipe_play_ptr == gPipe_record_ptr) {
         return 0;
     }
     if (gPipe_play_ptr == gPipe_buffer_oldest) {
         return 1;
     }
-    if (GetReplayRate() == 0.f) {
-        return GetReplayDirection() > 0;
-    } else {
+    if (GetReplayRate() != 0.f) {
         return GetReplayRate() > 0.f;
     }
+    return GetReplayDirection() > 0 ? 1 : 0;
 }
 
 // IDA: int __cdecl IsActionReplayAvailable()
@@ -221,7 +222,7 @@ int IsActionReplayAvailable(void) {
 // FUNCTION: CARM95 0x004280a1
 int SomeReplayLeft(void) {
 
-    return ((GetReplayDirection() >= 1 && gPipe_play_ptr != gPipe_record_ptr) || (GetReplayDirection() <= -1 && gPipe_play_ptr != gPipe_buffer_oldest));
+    return ((GetReplayDirection() > 0 && gPipe_play_ptr != gPipe_record_ptr) || (GetReplayDirection() < 0 && gPipe_play_ptr != gPipe_buffer_oldest));
 }
 
 // IDA: void __cdecl DisablePipedSounds()
@@ -249,6 +250,8 @@ tU32 LengthOfSession(tPipe_session* pSession) {
 #define ROUND_UP(V, M) (((V) + (M) - 1) & (~((M) - 1)))
 
     REPLAY_DEBUG_ASSERT(pSession->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
+
+    running_total = 0;
 
     switch (pSession->chunk_type) {
     case ePipe_chunk_actor_rstyle:
@@ -292,11 +295,8 @@ tU32 LengthOfSession(tPipe_session* pSession) {
         running_total = 0;
         for (i = 0; i < pSession->number_of_chunks; i++) {
             the_chunk = (tPipe_chunk*)&(((tU8*)&pSession->chunks)[running_total]);
-            if (the_chunk->chunk_data.pedestrian_data.hit_points <= 0) {
-                running_total += SIZEOF_CHUNK(pedestrian_data);
-            } else {
-                running_total += offsetof(tPipe_pedestrian_data, spin_period) + offsetof(tPipe_chunk, chunk_data);
-            }
+            running_total = running_total + (the_chunk->chunk_data.pedestrian_data.hit_points <= 0 ? sizeof(tPipe_pedestrian_data) : offsetof(tPipe_pedestrian_data, spin_period))
+                + offsetof(tPipe_chunk, chunk_data);
         }
         break;
     case ePipe_chunk_frame_boundary:
@@ -327,11 +327,8 @@ tU32 LengthOfSession(tPipe_session* pSession) {
         running_total = 0;
         for (i = 0; i < pSession->number_of_chunks; i++) {
             the_chunk = (tPipe_chunk*)&((tU8*)&pSession->chunks)[running_total];
-            if (the_chunk->subject_index & 0x8000) {
-                running_total += SIZEOF_CHUNK(shrapnel_data);
-            } else {
-                running_total += offsetof(tPipe_shrapnel_data, age) + offsetof(tPipe_chunk, chunk_data);
-            }
+            running_total = running_total + ((the_chunk->subject_index & 0x8000) == 0 ? offsetof(tPipe_shrapnel_data, age) : sizeof(tPipe_shrapnel_data))
+                + offsetof(tPipe_chunk, chunk_data);
         }
         break;
     case ePipe_chunk_screen_shake:
@@ -359,7 +356,8 @@ tU32 LengthOfSession(tPipe_session* pSession) {
         running_total = 0;
         for (i = 0; i < pSession->number_of_chunks; i++) {
             the_chunk = (tPipe_chunk*)&((tU8*)&pSession->chunks)[running_total];
-            running_total += the_chunk->chunk_data.smudge_data.vertex_count * sizeof(tSmudged_vertex) + offsetof(tPipe_smudge_data, vertex_changes) + offsetof(tPipe_chunk, chunk_data);
+            running_total += the_chunk->chunk_data.smudge_data.vertex_count * sizeof(tSmudged_vertex) + offsetof(tPipe_smudge_data, vertex_changes)
+                + offsetof(tPipe_chunk, chunk_data);
         }
         break;
     case ePipe_chunk_splash:
@@ -394,13 +392,14 @@ void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
             }
             gReentrancy_count++;
         }
+        gLocal_buffer_size = 0;
         ((tPipe_session*)gLocal_buffer)->chunk_type = pThe_type;
         ((tPipe_session*)gLocal_buffer)->number_of_chunks = 0;
 #if defined(DETHRACE_REPLAY_DEBUG)
         ((tPipe_session*)gLocal_buffer)->pipe_magic1 = REPLAY_DEBUG_SESSION_MAGIC1;
 #endif
-        gLocal_buffer_size = offsetof(tPipe_session, chunks);
-        gMr_chunky = &((tPipe_session*)gLocal_buffer)->chunks;
+        gLocal_buffer_size = (tU8*)&((tPipe_session*)gLocal_buffer)->chunks - gLocal_buffer;
+        gMr_chunky2 = (tPipe_chunk*)(gLocal_buffer + gLocal_buffer_size);
     }
 }
 
@@ -419,14 +418,13 @@ void EndPipingSession2(int pMunge_reentrancy) {
     if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
         // Each session ends with a tU16, containing the session size
         *(tU16*)&gLocal_buffer[gLocal_buffer_size] = gLocal_buffer_size;
-        a = gLocal_buffer_size;
         gLocal_buffer_size += sizeof(tU16);
         REPLAY_DEBUG_ASSERT(LengthOfSession((tPipe_session*)gLocal_buffer) == gLocal_buffer_size);
 #if defined(DETHRACE_FIX_BUGS)
         gLocal_buffer_size = PIPE_ALIGN(gLocal_buffer_size);
         *(tU16*)&gLocal_buffer[gLocal_buffer_size - sizeof(tU16)] = gLocal_buffer_size - sizeof(tU16);
 #endif
-        if (((tPipe_session*)gLocal_buffer)->number_of_chunks != 0 && (gLocal_buffer_size < LOCAL_BUFFER_SIZE || a == LOCAL_BUFFER_SIZE - 2)) {
+        if (((tPipe_session*)gLocal_buffer)->number_of_chunks != 0 && gLocal_buffer_size <= LOCAL_BUFFER_SIZE) {
             if (gPipe_buffer_phys_end < gPipe_record_ptr + gLocal_buffer_size) {
                 // Put session at begin of pipe, as no place at end
                 gPipe_buffer_working_end = gPipe_record_ptr;
@@ -479,19 +477,21 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
     int variable_for_breaking_on;
 
     if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
-        temp_buffer_size = gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data) + pData_length;
-        if (temp_buffer_size >= LOCAL_BUFFER_SIZE) {
-            return;
-        }
-        REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
-        ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
-        gMr_chunky->subject_index = pSubject_index;
+        temp_buffer_size = pData_length + (gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data));
+        if (temp_buffer_size < LOCAL_BUFFER_SIZE) {
+            REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
+            ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
+            gMr_chunky2->subject_index = pSubject_index;
+            gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + sizeof(tPipe_chunk*));
 #if defined(DETHRACE_REPLAY_DEBUG)
-        gMr_chunky->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
+            gMr_chunky2->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
 #endif
-        memcpy(&gMr_chunky->chunk_data, pData, pData_length);
-        gMr_chunky = (tPipe_chunk*)(((tU8*)&gMr_chunky->chunk_data) + pData_length);
-        gLocal_buffer_size = temp_buffer_size;
+            memcpy(gMr_chunky2, pData, pData_length);
+            gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + pData_length);
+            gLocal_buffer_size = temp_buffer_size;
+        } else {
+            variable_for_breaking_on = 1;
+        }
     }
 }
 
@@ -507,7 +507,7 @@ void AddModelGeometryToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex
         data_size = offsetof(tPipe_model_geometry_data, vertex_changes) + pVertex_count * sizeof(tChanged_vertex);
         gModel_geometry_space->vertex_count = pVertex_count;
         gModel_geometry_space->model_index = pModel_index;
-        memcpy(gModel_geometry_space->vertex_changes, pCoordinates, pVertex_count * sizeof(tChanged_vertex));
+        memcpy(gModel_geometry_space->vertex_changes, pCoordinates, data_size);
         AddDataToSession(pCar_ID, gModel_geometry_space, data_size);
     }
 }
@@ -521,11 +521,11 @@ void AddSmudgeToPipingSession(tU16 pCar_ID, int pModel_index, int pVertex_count,
         if (pVertex_count > 600) {
             pVertex_count = 600;
         }
+        data_size = pVertex_count * sizeof(tSmudged_vertex);
         gSmudge_space->vertex_count = pVertex_count;
         gSmudge_space->model_index = pModel_index;
-        memcpy(gSmudge_space->vertex_changes, pCoordinates, pVertex_count * sizeof(tSmudged_vertex));
-        data_size = offsetof(tPipe_smudge_data, vertex_changes) + pVertex_count * sizeof(tSmudged_vertex);
-        AddDataToSession(pCar_ID, gSmudge_space, data_size);
+        memcpy(gSmudge_space->vertex_changes, pCoordinates, data_size);
+        AddDataToSession(pCar_ID, gSmudge_space, data_size + offsetof(tPipe_smudge_data, vertex_changes));
     }
 }
 
@@ -535,23 +535,18 @@ void AddPedestrianToPipingSession(int pPedestrian_index, br_matrix34* pTrans, tU
     tPipe_pedestrian_data data;
     tU32 data_size;
 
-    if (pFrame_index == 0xff) {
-        pFrame_index = 0;
-    }
-    data.action_and_frame_index = (pDone_initial ? 1 : 0) << 7 | pAction_index << 4 | pFrame_index;
+    data.action_and_frame_index = (pDone_initial == 0 ? 0 : 0x80) | ((pFrame_index != 255 ? pFrame_index : 0) + 16 * pAction_index);
     data.hit_points = pHit_points;
-    data.new_translation.v[0] = pTrans->m[3][0];
-    data.new_translation.v[1] = pTrans->m[3][1];
-    data.new_translation.v[2] = pTrans->m[3][2];
+    memcpy(&data.new_translation, &pTrans->m[3], sizeof(data.new_translation));
     data.parent = pParent_ID;
-    if (pHit_points <= 0) {
+    if (data.hit_points > 0) {
+        data_size = offsetof(tPipe_pedestrian_data, spin_period);
+    } else {
         data.spin_period = pSpin_period;
         data.parent_actor = GetPedestrianActor(pPedestrian_index)->parent;
-        BrVector3Copy(&data.offset, pOffset);
+        data.offset = *pOffset;
         data.jump_magnitude = pJump_magnitude;
         data_size = sizeof(tPipe_pedestrian_data);
-    } else {
-        data_size = offsetof(tPipe_pedestrian_data, spin_period);
     }
     AddDataToSession(pPedestrian_index, &data, data_size);
 }
@@ -635,7 +630,8 @@ void AddSmokeColumnToPipingSession(int pIndex, tCar_spec* pCar, int pVertex, int
 
     data.car_ID = pCar->car_ID;
     data.vertex = pVertex;
-    AddDataToSession(pColour << 14 | pIndex, &data, sizeof(tPipe_smoke_column_data));
+    pIndex += (pColour << 14);
+    AddDataToSession(pIndex, &data, sizeof(tPipe_smoke_column_data));
 }
 
 // IDA: void __usercall AddFlameToPipingSession(int pIndex@<EAX>, int pFrame_count@<EDX>, br_scalar pScale_x, br_scalar pScale_y, br_scalar pOffset_x, br_scalar pOffset_z)
@@ -656,11 +652,12 @@ void AddFlameToPipingSession(int pIndex, int pFrame_count, br_scalar pScale_x, b
 void AddSplashToPipingSession(tCollision_info* pCar) {
     tPipe_splash_data data;
 
-    if (pCar->driver >= eDriver_oppo) {
-        data.d = pCar->water_d;
-        BrVector3Copy(&data.normal, &pCar->water_normal);
-        AddDataToSession(pCar->car_ID, &data, sizeof(tPipe_splash_data));
+    if (pCar->driver <= eDriver_non_car) {
+        return;
     }
+    data.d = pCar->water_d;
+    BrVector3Copy(&data.normal, &pCar->water_normal);
+    AddDataToSession(pCar->car_ID, &data, sizeof(tPipe_splash_data));
 }
 
 // IDA: void __usercall AddOilSpillToPipingSession(int pIndex@<EAX>, br_matrix34 *pMat@<EDX>, br_scalar pFull_size, br_scalar pGrow_rate, tU32 pSpill_time, tU32 pStop_time, tCar_spec *pCar, br_vector3 *pOriginal_pos, br_pixelmap *pPixelmap)
@@ -693,15 +690,17 @@ void AddFrameFinishToPipingSession(tU32 pThe_time) {
 void AddCarToPipingSession(int pCar_ID, br_matrix34* pCar_mat, br_vector3* pCar_velocity, float pSpeedo_speed, float pLf_sus_position, float pRf_sus_position, float pLr_sus_position, float pRr_sus_position, float pSteering_angle, br_scalar pRevs, int pGear, int pFrame_coll_flag) {
     tPipe_car_data data;
 
-    BrMatrix34Copy(&data.transformation, pCar_mat);
-    BrVector3Copy(&data.velocity, pCar_velocity);
-    data.speedo_speed = pSpeedo_speed * 32767.f / 0.07f;
-    data.lf_sus_position = pLf_sus_position * 127.f / .15f;
-    data.rf_sus_position = pRf_sus_position * 127.f / .15f;
-    data.lr_sus_position = pLr_sus_position * 127.f / .15f;
-    data.rr_sus_position = pRr_sus_position * 127.f / .15f;
-    data.steering_angle = pSteering_angle * 32767.f / 60.f;
-    data.revs_and_gear = (pGear + 1) << 12 | (pFrame_coll_flag ? 0 : 1) << 11 | ((((int)pRevs) / 10) & 0x7ff);
+    memcpy(&data.transformation, pCar_mat, sizeof(data.transformation));
+    data.velocity = *pCar_velocity;
+    data.speedo_speed = pSpeedo_speed * 32767.0 / 0.07;
+    data.lf_sus_position = pLf_sus_position * 127.f / .15;
+    data.rf_sus_position = pRf_sus_position * 127.f / .15;
+    data.lr_sus_position = pLr_sus_position * 127.f / .15;
+    data.rr_sus_position = pRr_sus_position * 127.f / .15;
+    data.steering_angle = pSteering_angle * 32767.0 / 60.0;
+    data.revs_and_gear = ((pGear + 1) << 12)
+        + (pFrame_coll_flag == 0 ? 0 : 0x800)
+        + (((int)pRevs / 10) & 0x7ff);
     AddDataToSession(pCar_ID, &data, sizeof(tPipe_car_data));
 }
 
@@ -711,12 +710,12 @@ void AddSoundToPipingSession(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volum
     tPipe_sound_data data;
 
     data.pitch = pPitch;
-    if (pPos == NULL) {
-        BrVector3Set(&data.position, 0.f, 0.f, 0.f);
+    if (pPos != NULL) {
+        data.position = *pPos;
     } else {
-        BrVector3Copy(&data.position, pPos);
+        BrVector3Set(&data.position, 0.f, 0.f, 0.f);
     }
-    data.volume = (pR_volume << 8) | (pL_volume << 0);
+    data.volume = (pR_volume << 8) + pL_volume;
     data.outlet_index = GetIndexFromOutlet(pOutlet);
     AddDataToSession(pSound_index, &data, sizeof(tPipe_sound_data));
 }
@@ -749,7 +748,7 @@ void AddPedGibToPipingSession(int pIndex, br_matrix34* pTrans, int pSize, int pG
     data.ped_parent_index = pPed_index;
     data.size = pSize;
     data.gib_index = pGib_index;
-    BrMatrix34Copy(&data.transform, pTrans);
+    data.transform = *pTrans;
     AddDataToSession(pIndex, &data, sizeof(tPipe_ped_gib_data));
 }
 
@@ -760,7 +759,7 @@ void AddCarIncidentToPipingSession(float pSeverity, tCar_spec* pCar, br_vector3*
 
     data.severity = pSeverity;
     data.info.car_info.car_ID = pCar->car_ID;
-    BrVector3Copy(&data.info.car_info.impact_point, pImpact_point);
+    data.info.car_info.impact_point = *pImpact_point;
     AddDataToSession(1, &data, sizeof(tPipe_incident_data));
 }
 
@@ -781,7 +780,7 @@ void AddWallIncidentToPipingSession(float pSeverity, br_vector3* pImpact_point) 
     tPipe_incident_data data;
 
     data.severity = pSeverity;
-    BrVector3Copy(&data.info.wall_info.pos, pImpact_point);
+    data.info.wall_info.pos = *pImpact_point;
     AddDataToSession(2, &data, sizeof(tPipe_incident_data));
 }
 
@@ -801,7 +800,7 @@ void AddProxRayToPipingSession(int pRay_index, tCar_spec* pCar, tU16 pPed_index,
 void AddSkidAdjustmentToPipingSession(int pSkid_num, br_matrix34* pMatrix, int pMaterial_index) {
     tPipe_skid_adjustment adjustment;
 
-    BrMatrix34Copy(&adjustment.matrix, pMatrix);
+    adjustment.matrix = *pMatrix;
     adjustment.material_index = pMaterial_index;
     AddDataToSession(pSkid_num, &adjustment, sizeof(tPipe_skid_adjustment));
 }
@@ -906,7 +905,7 @@ void PipeSingleWallIncident(float pSeverity, br_vector3* pImpact_point) {
 
     if (pSeverity > gWall_severity) {
         gWall_severity = pSeverity;
-        BrVector3Copy(&gWall_impact_point, pImpact_point);
+        gWall_impact_point = *pImpact_point;
     }
 }
 
@@ -980,19 +979,21 @@ void ResetPiping(void) {
 // FUNCTION: CARM95 0x00429596
 void InitialisePiping(void) {
 
-    if (!gAusterity_mode && gNet_mode == eNet_mode_none) {
-        PDAllocateActionReplayBuffer((char**)&gPipe_buffer_start, &gPipe_buffer_size);
-        gPipe_buffer_phys_end = gPipe_buffer_start + gPipe_buffer_size;
-        gSmudge_space = BrMemAllocate(offsetof(tPipe_smudge_data, vertex_changes) + sizeof(tSmudged_vertex) * 2400, kMem_pipe_model_geometry);
-        // DAT_00532008 = 0;
-        BrVector3SetFloat(&gZero_vector, 0.f, 0.f, 0.f);
-        gModel_geometry_space = (tPipe_model_geometry_data*)gSmudge_space;
-        gLocal_buffer = BrMemAllocate(LOCAL_BUFFER_SIZE, kMem_pipe_model_geometry);
-    } else {
+    if (gAusterity_mode || gNet_mode != eNet_mode_none) {
         gPipe_buffer_start = NULL;
         gLocal_buffer = NULL;
         gModel_geometry_space = NULL;
         gSmudge_space = NULL;
+    } else {
+        PDAllocateActionReplayBuffer((char**)&gPipe_buffer_start, &gPipe_buffer_size);
+        gPipe_buffer_phys_end = gPipe_buffer_start + gPipe_buffer_size;
+        gModel_geometry_space = BrMemAllocate(offsetof(tPipe_smudge_data, vertex_changes) + sizeof(tSmudged_vertex) * 2400, kMem_pipe_model_geometry);
+        gSmudge_space = (tPipe_smudge_data*)gModel_geometry_space;
+        gLocal_buffer_record_ptr = NULL;
+        gZero_vector.v[0] = 0;
+        gZero_vector.v[1] = 0;
+        gZero_vector.v[2] = 0;
+        gLocal_buffer = BrMemAllocate(LOCAL_BUFFER_SIZE, kMem_pipe_model_geometry);
     }
     ResetPiping();
 }
@@ -1083,7 +1084,7 @@ void PipeCarPositions(void) {
     tS8 damage_deltas[12];
 
     StartPipingSession(ePipe_chunk_car);
-    for (cat = eVehicle_self; cat < eVehicle_not_really; cat++) {
+    for (cat = eVehicle_self; cat <= eVehicle_drone; cat++) {
         if (cat == eVehicle_self) {
             car_count = 1;
         } else {
@@ -1095,7 +1096,7 @@ void PipeCarPositions(void) {
             } else {
                 car = GetCarSpec(cat, i);
             }
-            AddCarToPipingSession((cat << 8) | i,
+            AddCarToPipingSession((cat << 8) + i,
                 &car->car_master_actor->t.t.mat, &car->v, car->speedo_speed,
                 car->lf_sus_position, car->rf_sus_position, car->lr_sus_position, car->rr_sus_position,
                 car->steering_angle, car->revs, car->gear, car->frame_collision_flag);
@@ -1103,7 +1104,7 @@ void PipeCarPositions(void) {
     }
     EndPipingSession();
     session_started = 0;
-    for (cat = eVehicle_self; cat < eVehicle_net_player; cat++) {
+    for (cat = eVehicle_self; cat <= eVehicle_self; cat++) {
         if (cat == eVehicle_self) {
             car_count = 1;
         } else {
@@ -1115,20 +1116,21 @@ void PipeCarPositions(void) {
             } else {
                 car = GetCarSpec(cat, i);
             }
-            if (car->active) {
-                difference_found = 0;
-                for (j = 0; j < COUNT_OF(car->damage_units); j++) {
-                    damage_deltas[j] = car->damage_units[j].damage_level - car->frame_start_damage[j];
-                    difference_found |= damage_deltas[j];
-                    car->frame_start_damage[j] = car->damage_units[j].damage_level;
+            if (!car->active) {
+                continue;
+            }
+            difference_found = 0;
+            for (j = 0; j < COUNT_OF(car->damage_units); j++) {
+                damage_deltas[j] = car->damage_units[j].damage_level - car->frame_start_damage[j];
+                difference_found |= damage_deltas[j];
+                car->frame_start_damage[j] = car->damage_units[j].damage_level;
+            }
+            if (difference_found) {
+                if (!session_started) {
+                    StartPipingSession(ePipe_chunk_damage);
+                    session_started = 1;
                 }
-                if (difference_found) {
-                    if (!session_started) {
-                        StartPipingSession(ePipe_chunk_damage);
-                        session_started = 1;
-                    }
-                    AddDamageToPipingSession((cat << 8) | i, damage_deltas);
-                }
+                AddDamageToPipingSession((cat << 8) + i, damage_deltas);
             }
         }
     }
@@ -1258,7 +1260,7 @@ void ApplyModelGeometry(tPipe_chunk** pChunk) {
     br_model* model_ptr;
     tCar_spec* car;
 
-    if (((*pChunk)->subject_index & 0xff00) == 0) {
+    if (((*pChunk)->subject_index >> 8) == 0) {
         car = &gProgram_state.current_car;
     } else {
         car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
@@ -1282,6 +1284,7 @@ void DoSmudge(tPipe_chunk** pChunk, int pDir) {
     tCar_spec* car;
     int group;
 
+    group = 0;
     if (((*pChunk)->subject_index & 0xff00) == 0) {
         car = &gProgram_state.current_car;
     } else {
@@ -1291,10 +1294,12 @@ void DoSmudge(tPipe_chunk** pChunk, int pDir) {
     for (i = 0; i < (*pChunk)->chunk_data.smudge_data.vertex_count; i++) {
         v = (*pChunk)->chunk_data.smudge_data.vertex_changes[i].vertex_index;
         inc = (*pChunk)->chunk_data.smudge_data.vertex_changes[i].light_index * pDir;
-        V11MODEL(model_ptr)->groups->vertex_colours[v] = ((V11MODEL(model_ptr)->groups->vertex_colours[v] >> 24) + inc) << 24;
+        // this is slightly different due to using BRender 1.3.2
+        V11MODEL(model_ptr)->groups->vertex_colours[v] = (BR_ALPHA(V11MODEL(model_ptr)->groups->vertex_colours[v]) + inc) << 24;
         if (model_ptr->flags & BR_MODF_UPDATEABLE) {
-            model_ptr->vertices[V11MODEL(model_ptr)->groups->vertex_user[v]].index = (V11MODEL(model_ptr)->groups->vertex_colours[v] >> 24) + inc;
+            model_ptr->vertices[V11MODEL(model_ptr)->groups->vertex_user[v]].index = BR_ALPHA(V11MODEL(model_ptr)->groups->vertex_colours[v]) + inc;
         }
+        //
     }
 }
 
@@ -1386,8 +1391,8 @@ void ApplySmoke(tPipe_chunk** pChunk) {
     AdjustSmoke((*pChunk)->subject_index,
         (*pChunk)->chunk_data.smoke_data.type,
         &pos,
-        (*pChunk)->chunk_data.smoke_data.radius / 1024.f,
-        (*pChunk)->chunk_data.smoke_data.strength / 256.f);
+        (float)(*pChunk)->chunk_data.smoke_data.radius / 1024.f,
+        (float)(*pChunk)->chunk_data.smoke_data.strength / 256.f);
     AdvanceChunkPtr(pChunk, ePipe_chunk_smoke);
 }
 
@@ -1424,7 +1429,7 @@ void ApplyFlame(tPipe_chunk** pChunk) {
 void ApplySplash(tPipe_chunk** pChunk) {
     tCar_spec* c;
 
-    if (((*pChunk)->subject_index & 0xff00) == 0) {
+    if (((*pChunk)->subject_index >> 8) == 0) {
         c = &gProgram_state.current_car;
     } else {
         c = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
@@ -1455,8 +1460,9 @@ void ApplyOilSpill(tPipe_chunk** pChunk, tU32 pStop_time) {
 void ApplyFrameBoundary(tPipe_chunk** pChunk) {
     tU32 result;
 
-    gLast_replay_frame_time = (*pChunk)->chunk_data.frame_boundary_data.time;
-    // DAT_0054b244 = PDGetTotalTime();
+    result = (*pChunk)->chunk_data.frame_boundary_data.time;
+    gLast_replay_frame_time = result;
+    gFrame_start_time = PDGetTotalTime();
     AdvanceChunkPtr(pChunk, ePipe_chunk_frame_boundary);
 }
 
@@ -1471,7 +1477,7 @@ void ApplySound(tPipe_chunk** pChunk) {
                 1,
                 -1,
                 -1,
-                65535.f * GetReplayRate(),
+                fabs(GetReplayRate()) * 65536.0,
                 0x10000);
         } else if (BrVector3LengthSquared(&(*pChunk)->chunk_data.sound_data.position) == 0) {
             DRS3StartSound2(GetOutletFromIndex((*pChunk)->chunk_data.sound_data.outlet_index),
@@ -1502,33 +1508,33 @@ void ApplyCar(tPipe_chunk** pChunk) {
     br_vector3 com_offset_c;
     br_vector3 com_offset_w;
 
-    if (((*pChunk)->subject_index & 0xff00) == 0) {
+    if (((*pChunk)->subject_index >> 8) == 0) {
         car = &gProgram_state.current_car;
     } else {
         car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0x00ff);
     }
-    BrMatrix34Copy(&car->car_master_actor->t.t.mat, &(*pChunk)->chunk_data.car_data.transformation);
-    BrVector3Copy(&car->v, &(*pChunk)->chunk_data.car_data.velocity);
+    car->car_master_actor->t.t.mat = (*pChunk)->chunk_data.car_data.transformation;
+    car->v = (*pChunk)->chunk_data.car_data.velocity;
     BrMatrix34TApplyV(&car->velocity_car_space, &car->v, &car->car_master_actor->t.t.mat);
-    BrVector3InvScale(&car->velocity_car_space, &car->velocity_car_space, WORLD_SCALE);
-    if (BrVector3LengthSquared(&car->velocity_car_space) >= .0001f) {
-        BrVector3Normalise(&car->direction, &car->v);
-    } else {
+    BrVector3InvScale(&car->velocity_car_space, &car->velocity_car_space, WORLD_SCALE * 1000);
+    if (BrVector3LengthSquared(&car->velocity_car_space) < .0001) {
         BrVector3Negate(&car->direction, (br_vector3*)car->car_master_actor->t.t.mat.m[2]);
+    } else {
+        BrVector3Normalise(&car->direction, &car->v);
     }
-    BrVector3Copy(&car->pos, &car->car_master_actor->t.t.translate.t);
+    car->pos = car->car_master_actor->t.t.translate.t;
     BrVector3InvScale(&com_offset_c, &car->cmpos, WORLD_SCALE);
     BrMatrix34ApplyV(&com_offset_w, &com_offset_c, &car->car_master_actor->t.t.mat);
     BrVector3Accumulate(&car->pos, &com_offset_w);
-    car->speedo_speed = .07f * (*pChunk)->chunk_data.car_data.speedo_speed / 32767.f;
-    car->lf_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.lf_sus_position / 127.f;
-    car->rf_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.rf_sus_position / 127.f;
-    car->lr_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.lr_sus_position / 127.f;
-    car->rr_sus_position = 0.15f * (*pChunk)->chunk_data.car_data.rr_sus_position / 127.f;
-    car->steering_angle = 60.f * (*pChunk)->chunk_data.car_data.steering_angle / 32767.f;
+    car->speedo_speed = .07 * (*pChunk)->chunk_data.car_data.speedo_speed / 32767.0;
+    car->lf_sus_position = 0.15 * (*pChunk)->chunk_data.car_data.lf_sus_position / 127.0;
+    car->rf_sus_position = 0.15 * (*pChunk)->chunk_data.car_data.rf_sus_position / 127.0;
+    car->lr_sus_position = 0.15 * (*pChunk)->chunk_data.car_data.lr_sus_position / 127.0;
+    car->rr_sus_position = 0.15 * (*pChunk)->chunk_data.car_data.rr_sus_position / 127.0;
+    car->steering_angle = 60.0 * (*pChunk)->chunk_data.car_data.steering_angle / 32767.0;
     car->revs = 10 * ((*pChunk)->chunk_data.car_data.revs_and_gear & 0x7ff);
     car->gear = ((*pChunk)->chunk_data.car_data.revs_and_gear >> 12) - 1;
-    car->frame_collision_flag = ((*pChunk)->chunk_data.car_data.revs_and_gear >> 11) & 0x1;
+    car->frame_collision_flag = ((*pChunk)->chunk_data.car_data.revs_and_gear & 0x800) >> 11;
     AdvanceChunkPtr(pChunk, ePipe_chunk_car);
 }
 
@@ -1538,7 +1544,7 @@ void ApplyDamage(tPipe_chunk** pChunk) {
     tCar_spec* car;
     int i;
 
-    if (((*pChunk)->subject_index & 0xff00) == 0) {
+    if (((*pChunk)->subject_index >> 8) == 0) {
         car = &gProgram_state.current_car;
     } else {
         car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0x00ff);
@@ -1554,21 +1560,19 @@ void ApplyDamage(tPipe_chunk** pChunk) {
 void ApplySpecial(tPipe_chunk** pChunk) {
 
     switch ((*pChunk)->subject_index) {
-    case 0:
+    case ePipe_special_fade:
         if (fabs(GetReplayRate()) <= 1.f) {
             FadePaletteDown();
         }
         break;
-    case 1:
+    case ePipe_special_giant_ped_on:
         gPed_scale_factor = 2.0f;
         break;
-    case 2:
-        gPed_scale_factor = 1.0f;
-        break;
-    case 3:
+    case ePipe_special_min_ped_on:
         gPed_scale_factor = 0.5f;
         break;
-    case 4:
+    case ePipe_special_giant_ped_off:
+    case ePipe_special_min_ped_off:
         gPed_scale_factor = 1.0f;
         break;
     }
@@ -1620,7 +1624,7 @@ int ApplyPipedSession(tU8** pPtr) {
     if (*pPtr == gPipe_record_ptr) {
         return 1;
     }
-    gEnd_of_session = *pPtr + (LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16));
+    gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
     REPLAY_DEBUG_ASSERT(((tPipe_session*)*pPtr)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
     chunk_ptr = (tPipe_chunk*)(*pPtr + offsetof(tPipe_session, chunks));
     return_value = 0;
@@ -1694,8 +1698,11 @@ int ApplyPipedSession(tU8** pPtr) {
         case ePipe_chunk_skid_adjustment:
             ApplySkidAdjustment(&chunk_ptr);
             break;
+#ifdef DETHRACE_FIX_BUGS
         default:
             break;
+
+#endif
         }
     }
 #if defined(DETHRACE_FIX_BUGS)
@@ -1715,9 +1722,10 @@ int MoveSessionPointerBackOne(tU8** pPtr) {
 
     if (*pPtr == gPipe_buffer_oldest && *pPtr != gPipe_record_ptr) {
         return 1;
-    }
-    if (*pPtr == gPipe_buffer_start) {
-        *pPtr = gPipe_buffer_working_end;
+    } else {
+        if (*pPtr == gPipe_buffer_start) {
+            *pPtr = gPipe_buffer_working_end;
+        }
     }
     *pPtr -= sizeof(tU16);
     REPLAY_DEBUG_ASSERT(*(tU16*)*pPtr != 0);
@@ -1755,27 +1763,30 @@ tPipe_chunk* FindPreviousChunk(tU8* pPtr, tPipe_chunk_type pType, tChunk_subject
     ptr = pPtr;
     chunk_counter = 0;
     masked_index = pIndex & 0x0fff;
-    while (1) {
-        if (!MoveSessionPointerBackOne(&ptr)) {
-            reached_end = chunk_counter >= gMax_rewind_chunks;
-            chunk_counter++;
-        } else {
+    do {
+        if (MoveSessionPointerBackOne(&ptr) != 0 || gMax_rewind_chunks <= chunk_counter++) {
             reached_end = 1;
+        } else {
+            reached_end = 0;
         }
+
         if (!reached_end) {
             gEnd_of_session = ptr + LengthOfSession((tPipe_session*)ptr) - sizeof(tU16);
             mr_chunky = &((tPipe_session*)ptr)->chunks;
-            for (i = 0; i < ((tPipe_session*)ptr)->number_of_chunks && ((tPipe_session*)ptr)->chunk_type == pType; i++) {
-                if ((mr_chunky->subject_index & 0xfff) == masked_index) {
-                    return mr_chunky;
+            for (i = 0; i < ((tPipe_session*)ptr)->number_of_chunks; i++) {
+                if (((tPipe_session*)ptr)->chunk_type == pType) {
+                    if ((mr_chunky->subject_index & 0xfff) == masked_index) {
+                        return mr_chunky;
+                    } else {
+                        AdvanceChunkPtr(&mr_chunky, pType);
+                    }
+                } else {
+                    break;
                 }
-                AdvanceChunkPtr(&mr_chunky, pType);
             }
         }
-        if (reached_end) {
-            return NULL;
-        }
-    }
+    } while (!reached_end);
+    return NULL;
 }
 
 // IDA: void __usercall UndoModelGeometry(tPipe_chunk **pChunk@<EAX>)
@@ -1785,7 +1796,7 @@ void UndoModelGeometry(tPipe_chunk** pChunk) {
     br_model* model_ptr;
     tCar_spec* car;
 
-    if (((*pChunk)->subject_index & 0xff00) == 0) {
+    if (((*pChunk)->subject_index >> 8) == 0) {
         car = &gProgram_state.current_car;
     } else {
         car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0x00ff);
@@ -1817,13 +1828,13 @@ void UndoPedestrian(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
 
     temp_prev_chunk = pPrev_chunk;
-    if (pPrev_chunk == NULL) {
-        ApplyPedestrian(pChunk);
-    } else {
+    if (pPrev_chunk != NULL) {
         gDisable_advance = 1;
         ApplyPedestrian(&temp_prev_chunk);
         gDisable_advance = 0;
         AdvanceChunkPtr(pChunk, ePipe_chunk_pedestrian);
+    } else {
+        ApplyPedestrian(pChunk);
     }
 }
 
@@ -1832,6 +1843,7 @@ void UndoPedestrian(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 void UndoFrameBoundary(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
 
+    temp_prev_chunk = pPrev_chunk;
     ApplyFrameBoundary(pChunk);
     AdvanceChunkPtr(pChunk, ePipe_chunk_frame_boundary);
 }
@@ -1842,13 +1854,13 @@ void UndoCar(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
 
     temp_prev_chunk = pPrev_chunk;
-    if (pPrev_chunk == NULL) {
-        ApplyCar(pChunk);
-    } else {
+    if (pPrev_chunk != NULL) {
         gDisable_advance = 1;
         ApplyCar(&temp_prev_chunk);
         gDisable_advance = 0;
         AdvanceChunkPtr(pChunk, ePipe_chunk_car);
+    } else {
+        ApplyCar(pChunk);
     }
 }
 
@@ -1865,7 +1877,7 @@ void UndoDamage(tPipe_chunk** pChunk) {
     tCar_spec* car;
     int i;
 
-    if (((*pChunk)->subject_index & 0xff00) == 0) {
+    if (((*pChunk)->subject_index >> 8) == 0) {
         car = &gProgram_state.current_car;
     } else {
         car = GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff);
@@ -1884,16 +1896,14 @@ void UndoSpecial(tPipe_chunk** pChunk) {
         ApplySpecial(pChunk);
     } else {
         switch ((*pChunk)->subject_index) {
-        case 1:
-            gPed_scale_factor = 1.0f;
-            break;
-        case 2:
+        case ePipe_special_giant_ped_off:
             gPed_scale_factor = 2.0f;
             break;
-        case 3:
+        case ePipe_special_giant_ped_on:
+        case ePipe_special_min_ped_on:
             gPed_scale_factor = 1.0f;
             break;
-        case 4:
+        case ePipe_special_min_ped_off:
             gPed_scale_factor = 0.5f;
             break;
         }
@@ -1950,10 +1960,10 @@ void UndoScreenWobble(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
-    if (pPrev_chunk == NULL) {
-        SetScreenWobble(0, 0);
-    } else {
+    if (pPrev_chunk != NULL) {
         ApplyScreenWobble(&temp_prev_chunk);
+    } else {
+        SetScreenWobble(0, 0);
     }
     gDisable_advance = 0;
     AdvanceChunkPtr(pChunk, ePipe_chunk_screen_shake);
@@ -2006,6 +2016,7 @@ void UndoSmoke(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 void UndoSmokeColumn(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
     tPipe_chunk* temp_prev_chunk;
 
+    temp_prev_chunk = pPrev_chunk;
     ApplySmokeColumn(pChunk);
 }
 
@@ -2023,10 +2034,10 @@ void UndoSplash(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
     temp_prev_chunk = pPrev_chunk;
     gDisable_advance = 1;
-    if (pPrev_chunk == NULL) {
-        ((((*pChunk)->subject_index & 0xff00) == 0) ? &gProgram_state.current_car : GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff))->water_d = 10000.f;
-    } else {
+    if (pPrev_chunk != NULL) {
         ApplySplash(&temp_prev_chunk);
+    } else {
+        ((((*pChunk)->subject_index >> 8) == 0) ? &gProgram_state.current_car : GetCarSpec((*pChunk)->subject_index >> 8, (*pChunk)->subject_index & 0xff))->water_d = 10000.f;
     }
     gDisable_advance = 0;
     AdvanceChunkPtr(pChunk, ePipe_chunk_splash);
@@ -2058,10 +2069,10 @@ void UndoProxRay(tPipe_chunk** pChunk) {
 void UndoSkidAdjustment(tPipe_chunk** pChunk, tPipe_chunk* pPrev_chunk) {
 
     gDisable_advance = 1;
-    if (pPrev_chunk == NULL) {
-        HideSkid((*pChunk)->subject_index);
-    } else {
+    if (pPrev_chunk != NULL) {
         ApplySkidAdjustment(&pPrev_chunk);
+    } else {
+        HideSkid((*pChunk)->subject_index);
     }
     gDisable_advance = 0;
     AdvanceChunkPtr(pChunk, ePipe_chunk_skid_adjustment);
@@ -2084,8 +2095,8 @@ int UndoPipedSession(tU8** pPtr) {
     gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
     chunk_ptr = &((tPipe_session*)*pPtr)->chunks;
     chunk_type = ((tPipe_session*)*pPtr)->chunk_type;
-    pushed_end_of_session = gEnd_of_session;
     for (i = 0; i < ((tPipe_session*)*pPtr)->number_of_chunks; i++) {
+        pushed_end_of_session = gEnd_of_session;
         if (!(chunk_type == ePipe_chunk_model_geometry || chunk_type == ePipe_chunk_sound || chunk_type == ePipe_chunk_damage || chunk_type == ePipe_chunk_special || chunk_type == ePipe_chunk_incident || chunk_type == ePipe_chunk_prox_ray || chunk_type == ePipe_chunk_smudge)) {
             prev_chunk = FindPreviousChunk(*pPtr, ((tPipe_session*)*pPtr)->chunk_type, chunk_ptr->subject_index);
         }
@@ -2158,8 +2169,11 @@ int UndoPipedSession(tU8** pPtr) {
         case ePipe_chunk_skid_adjustment:
             UndoSkidAdjustment(&chunk_ptr, prev_chunk);
             break;
+#ifdef DETHRACE_FIX_BUGS
         default:
+            LOG_PANIC2("enum not handling %d", chunk_type);
             break;
+#endif
         }
     }
     temp_ptr = *pPtr;
@@ -2189,24 +2203,26 @@ void ScanBuffer(tU8** pPtr, tPipe_chunk_type pType, tU32 pDefault_time, int (*pC
     tU32 the_time;
 
     the_time = pDefault_time;
-    while (1) {
-        if (PipeSearchForwards() ? MoveSessionPointerForwardOne(pPtr) : MoveSessionPointerBackOne(pPtr)) {
+
+    do {
+        if (SHOULD_SCAN_FORWARDS()) {
+
+            if (MoveSessionPointerForwardOne(pPtr)) {
+                return;
+            }
+        } else if (MoveSessionPointerBackOne(pPtr)) {
             return;
         }
         gEnd_of_session = *pPtr + LengthOfSession((tPipe_session*)*pPtr) - sizeof(tU16);
+
         if (((tPipe_session*)*pPtr)->chunk_type == ePipe_chunk_frame_boundary) {
             the_time = ((tPipe_session*)*pPtr)->chunks.chunk_data.frame_boundary_data.time;
         } else if (((tPipe_session*)*pPtr)->chunk_type == pType) {
             if (pCall_back(&((tPipe_session*)*pPtr)->chunks, ((tPipe_session*)*pPtr)->number_of_chunks, the_time)) {
-                return;
+                break;
             }
         }
-        if (pTime_check != NULL) {
-            if (!pTime_check(the_time)) {
-                return;
-            }
-        }
-    }
+    } while (pTime_check == NULL || pTime_check(the_time));
 }
 
 // IDA: int __usercall CheckSound@<EAX>(tPipe_chunk *pChunk_ptr@<EAX>, int pChunk_count@<EDX>, tU32 pTime@<EBX>)
@@ -2216,14 +2232,26 @@ int CheckSound(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     int sound_length;
     tPipe_chunk* temp_ptr;
 
-    STUB_ONCE();
-    return 1;
+    temp_ptr = pChunk_ptr;
+    for (i = 0; i < pChunk_count; i++) {
+        sound_length = S3GetSampleLength(temp_ptr->subject_index);
+        if (temp_ptr->chunk_data.sound_data.pitch > 1) {
+            sound_length = (double)sound_length / ((double)temp_ptr->chunk_data.sound_data.pitch / 65536.0);
+        }
+        if (pTime + sound_length >= gYoungest_time && pTime + sound_length < gOldest_time) {
+            ApplySound(&temp_ptr);
+        } else {
+            AdvanceChunkPtr(&temp_ptr, ePipe_chunk_sound);
+        }
+    }
+    return 0;
 }
 
 // IDA: int __usercall SoundTimeout@<EAX>(tU32 pTime@<EAX>)
 // FUNCTION: CARM95 0x0042c132
 int SoundTimeout(tU32 pTime) {
-    NOT_IMPLEMENTED();
+
+    return gYoungest_time < pTime || gYoungest_time - pTime < gLast_time;
 }
 
 // IDA: void __usercall ScanAndPlaySoundsToBe(tU8 *pPtr@<EAX>, tU32 pOldest_time@<EDX>, tU32 pYoungest_time@<EBX>)
@@ -2251,17 +2279,16 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
     tPipe_chunk* temp_ptr;
 
     temp_ptr = pChunk_ptr;
-    if (PipeSearchForwards()) {
-        if (pTime <= gEnd_time) {
+    if (SHOULD_SCAN_FORWARDS()) {
+        if (gEnd_time >= pTime) {
             return 0;
         }
-    } else {
-        if (pTime >= gEnd_time) {
-            return 0;
-        }
+    } else if (gEnd_time <= pTime) {
+        return 0;
     }
+
     for (i = 0; i < pChunk_count; i++) {
-        if ((temp_ptr->subject_index & 0xff00) == 0) {
+        if ((temp_ptr->subject_index >> 8) == 0) {
             car = &gProgram_state.current_car;
         } else {
             car = GetCarSpec(temp_ptr->subject_index >> 8, temp_ptr->subject_index & 0xff);
@@ -2271,14 +2298,12 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
             BrVector3InvScale(&com_offset_c, &car->cmpos, WORLD_SCALE);
             BrMatrix34ApplyV(&com_offset_w, &com_offset_c, &temp_ptr->chunk_data.car_data.transformation);
             BrVector3Accumulate(&gCar_pos, &com_offset_w);
+            gTrigger_time = pTime;
             BrVector3Sub(&difference, &gCar_pos, &gReference_pos);
-            if (BrVector3LengthSquared(&difference) <= gMax_distance) {
-                gTrigger_time = pTime;
-                return 0;
-            } else {
-                gTrigger_time = pTime;
+            if (BrVector3LengthSquared(&difference) > gMax_distance) {
                 return 1;
             }
+            break;
         }
         AdvanceChunkPtr(&temp_ptr, ePipe_chunk_car);
     }
@@ -2289,12 +2314,12 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 // FUNCTION: CARM95 0x0042c5b2
 int CarTimeout(tU32 pTime) {
 
-    if (PipeSearchForwards()) {
-        if (pTime > gLoop_abort_time) {
+    if (SHOULD_SCAN_FORWARDS()) {
+        if (gLoop_abort_time < pTime) {
             return 0;
         }
     } else {
-        if (pTime < gLoop_abort_time) {
+        if (gLoop_abort_time > pTime) {
             return 0;
         }
     }
@@ -2309,10 +2334,10 @@ void ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_
     temp_ptr = gPipe_play_ptr;
     gTrigger_time = 0;
     gMax_distance = pMax_distance_sqr;
-    BrVector3Copy(&gReference_pos, pSource_pos);
+    gReference_pos = *pSource_pos;
     gCar_ptr = pCar;
 
-    if (PipeSearchForwards()) {
+    if (SHOULD_SCAN_FORWARDS()) {
         gEnd_time = GetTotalTime() + pOffset_time;
         gLoop_abort_time = gEnd_time + pTime_period;
     } else {
@@ -2321,9 +2346,9 @@ void ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_
     }
 
     ScanBuffer(&temp_ptr, ePipe_chunk_car, GetTotalTime(), CheckCar, CarTimeout);
-    BrVector3Copy(pCar_pos, &gCar_pos);
+    *pCar_pos = gCar_pos;
     if (pCar_pos->v[0] > 500.f) {
-        Vector3AddFloats(pCar_pos, pCar_pos, -1000.f, -1000.f, -1000.f);
+        BrVector3Sub(pCar_pos, pCar_pos, &gDisabled_vector);
     }
     *pTime_returned = gTrigger_time;
 }
@@ -2332,8 +2357,8 @@ void ScanCarsPositions(tCar_spec* pCar, br_vector3* pSource_pos, br_scalar pMax_
 // FUNCTION: CARM95 0x0042c90d
 int CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 
-    if (PipeSearchForwards()) {
-        if (pTime <= gEnd_time) {
+    if (SHOULD_SCAN_FORWARDS()) {
+        if (gEnd_time >= pTime) {
             return 0;
         }
     } else {
@@ -2341,8 +2366,9 @@ int CheckIncident(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
             return 0;
         }
     }
-    gIncidentChunk = pChunk_ptr;
     gTrigger_time = pTime;
+    gMr_chunky = pChunk_ptr;
+
     return 1;
 }
 
@@ -2353,7 +2379,7 @@ int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pS
 
     temp_ptr = gPipe_play_ptr;
     gTrigger_time = 0;
-    if (PipeSearchForwards()) {
+    if (SHOULD_SCAN_FORWARDS()) {
         gEnd_time = GetTotalTime() + pOffset_time;
     } else {
         gEnd_time = GetTotalTime() - pOffset_time;
@@ -2361,21 +2387,30 @@ int GetNextIncident(tU32 pOffset_time, tIncident_type* pIncident_type, float* pS
     ScanBuffer(&temp_ptr, ePipe_chunk_incident, GetTotalTime(), CheckIncident, NULL);
     if (gTrigger_time != 0) {
         *pTime_away = gTrigger_time - GetTotalTime();
-        *pIncident_type = gIncidentChunk->subject_index;
-        *pSeverity = gIncidentChunk->chunk_data.incident_data.severity;
-        if (*pIncident_type == eIncident_ped) {
-            pInfo->ped_info.ped_actor = GetPedestrianActor(gIncidentChunk->chunk_data.incident_data.info.ped_info.ped_index);
-            pInfo->ped_info.murderer_actor = gIncidentChunk->chunk_data.incident_data.info.ped_info.actor;
-        } else if (*pIncident_type == eIncident_car) {
-            if ((gIncidentChunk->chunk_data.incident_data.info.car_info.car_ID & 0xff00) == 0) {
+        *pIncident_type = gMr_chunky->subject_index;
+        *pSeverity = gMr_chunky->chunk_data.incident_data.severity;
+
+        switch (*pIncident_type) {
+        case eIncident_car:
+            if ((gMr_chunky->chunk_data.incident_data.info.car_info.car_ID >> 8) == 0) {
                 pInfo->car_info.car = &gProgram_state.current_car;
             } else {
-                pInfo->car_info.car = GetCarSpec(gIncidentChunk->chunk_data.incident_data.info.car_info.car_ID >> 8,
-                    gIncidentChunk->chunk_data.incident_data.info.car_info.car_ID & 0xff);
+                pInfo->car_info.car = GetCarSpec(gMr_chunky->chunk_data.incident_data.info.car_info.car_ID >> 8,
+                    gMr_chunky->chunk_data.incident_data.info.car_info.car_ID & 0xff);
             }
-            BrVector3Copy(&pInfo->car_info.impact_point, &gIncidentChunk->chunk_data.incident_data.info.car_info.impact_point);
-        } else if (*pIncident_type == eIncident_wall) {
-            BrVector3Copy(&pInfo->wall_info.pos, &gIncidentChunk->chunk_data.incident_data.info.wall_info.pos);
+            BrVector3Copy(&pInfo->car_info.impact_point, &gMr_chunky->chunk_data.incident_data.info.car_info.impact_point);
+            break;
+        case eIncident_ped:
+            pInfo->ped_info.ped_actor = GetPedestrianActor(gMr_chunky->chunk_data.incident_data.info.ped_info.ped_index);
+            pInfo->ped_info.murderer_actor = gMr_chunky->chunk_data.incident_data.info.ped_info.actor;
+            break;
+        case eIncident_wall:
+            BrVector3Copy(&pInfo->wall_info.pos, &gMr_chunky->chunk_data.incident_data.info.wall_info.pos);
+            break;
+#ifdef DETHRACE_FIX_BUGS
+        default:
+            break;
+#endif
         }
     }
     return gTrigger_time;
@@ -2387,10 +2422,12 @@ tU32 GetARStartTime(void) {
     tU8* temp_ptr;
 
     temp_ptr = gPipe_buffer_oldest;
-    do {
+    while (1) {
         if (MoveSessionPointerForwardOne(&temp_ptr)) {
             return 0;
         }
-    } while (((tPipe_session*)temp_ptr)->chunk_type != ePipe_chunk_frame_boundary);
-    return ((tPipe_session*)temp_ptr)->chunks.chunk_data.frame_boundary_data.time;
+        if (((tPipe_session*)temp_ptr)->chunk_type == ePipe_chunk_frame_boundary) {
+            return ((tPipe_session*)temp_ptr)->chunks.chunk_data.frame_boundary_data.time;
+        }
+    }
 }

@@ -308,6 +308,7 @@ void InitializeBRenderEnvironment(void) {
     br_model* arrow_model;
 
     gBr_initialized = 1;
+    PDInstallErrorHandlers();
     InstallDRMemCalls();
     InstallDRFileCalls();
     SetBRenderScreenAndBuffers(0, 0, 0, 0);
@@ -770,7 +771,7 @@ void InitRace(void) {
     PossibleService();
     // TODO: dword_55142C = 0;
     gStart_race_sent = 0;
-    gProgram_state.frame_rate_headup = NewTextHeadupSlot(eHeadupSlot_development, 0, 0, -1, "");
+    gProgram_state.frame_rate_headup = NewTextHeadupSlot(eHeadupSlot_development, 0, 0, -kFont_ORANGHED, "");
     if (TranslationMode()) {
         if (gAusterity_mode) {
             FlushInterfaceFonts();
@@ -791,15 +792,15 @@ void InitRace(void) {
     gMap_mode = 0;
     gProgram_state.cockpit_image_index = 0;
     if (gNet_mode != eNet_mode_none) {
-        gNet_cash_headup = NewTextHeadupSlot(eHeadupSlot_cash_network, 0, 0, -6, "");
-        gNet_ped_headup = NewTextHeadupSlot(eHeadupSlot_ped_network, 0, 0, -6, "");
+        gNet_cash_headup = NewTextHeadupSlot(eHeadupSlot_cash_network, 0, 0, -kFont_NEWHITE, "");
+        gNet_ped_headup = NewTextHeadupSlot(eHeadupSlot_ped_network, 0, 0, -kFont_NEWHITE, "");
     } else {
-        gCredits_won_headup = NewTextHeadupSlot(eHeadupSlot_credits, 0, 0, -6, "");
-        gPed_kill_count_headup = NewTextHeadupSlot(eHeadupSlot_ped_kills, 0, 0, -6, "");
-        gCar_kill_count_headup = NewTextHeadupSlot(eHeadupSlot_cars_out_count, 0, 0, -6, "");
-        gTimer_headup = NewTextHeadupSlot(eHeadupSlot_timer, 0, 0, -5, "");
-        gTime_awarded_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 0, -2, "");
-        gLaps_headup = NewTextHeadupSlot(eHeadupSlot_lap_count, 0, 0, -6, "");
+        gCredits_won_headup = NewTextHeadupSlot(eHeadupSlot_credits, 0, 0, -kFont_NEWHITE, "");
+        gPed_kill_count_headup = NewTextHeadupSlot(eHeadupSlot_ped_kills, 0, 0, -kFont_NEWHITE, "");
+        gCar_kill_count_headup = NewTextHeadupSlot(eHeadupSlot_cars_out_count, 0, 0, -kFont_NEWHITE, "");
+        gTimer_headup = NewTextHeadupSlot(eHeadupSlot_timer, 0, 0, -kFont_TIMER, "");
+        gTime_awarded_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 0, -kFont_BLUEHEAD, "");
+        gLaps_headup = NewTextHeadupSlot(eHeadupSlot_lap_count, 0, 0, -kFont_NEWHITE, "");
     }
     PossibleService();
     gProgram_state.which_view = eView_forward;

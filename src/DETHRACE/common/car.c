@@ -1632,19 +1632,19 @@ void ToggleControls(void) {
     }
     switch (gControl__car) {
     case 0:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "Original Controls");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Original Controls");
         break;
     case 1:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "Accelerated steering");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Accelerated steering");
         break;
     case 2:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "0.75 Accelerated");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "0.75 Accelerated");
         break;
     case 3:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "0.5 Accelerated");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "0.5 Accelerated");
         break;
     default:
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -1, "New controls");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "New controls");
         break;
     }
 }
@@ -1957,7 +1957,7 @@ void RotateCarFirstOrder(tCollision_info* c, br_scalar dt) {
     rad_rate = BrVector3Length(&c->omega);
     rad = rad_rate * dt;
 
-    if (rad < .0001f) {
+    if (rad < .0001) {
         return;
     }
     BrVector3InvScale(&axis, &c->omega, rad_rate);
@@ -2029,11 +2029,11 @@ void SteeringSelfCentre(tCar_spec* c, br_scalar dt, br_vector3* n) {
         if (c->susp_height[1] > c->oldd[2] || c->susp_height[1] > c->oldd[3]) {
             ts = -((c->omega.v[2] * n->v[2] + c->omega.v[1] * n->v[1] + c->omega.v[0] * n->v[0]) * (dt / (c->wpos[0].v[2] - c->wpos[2].v[2])));
             ts2 = -(c->curvature * dt);
-            if (fabs(ts) < fabs(ts2) || (ts * ts2 < 0.0)) {
+            if (fabs(ts) < fabs(ts2) || (ts * ts2 < 0.0f)) {
                 ts = ts2;
             }
             c->curvature = c->curvature + ts;
-            if (c->curvature * ts > 0.0) {
+            if (c->curvature * ts > 0.0f) {
                 c->curvature = 0.0;
             }
         }
@@ -2103,7 +2103,7 @@ void AddDrag(tCar_spec* c, br_scalar dt) {
     drag_multiplier = -(dt * TIME_CONV_THING);
     if (vol != NULL) {
         if (c->underwater_ability) {
-            drag_multiplier = vol->viscosity_multiplier * drag_multiplier * .6f;
+            drag_multiplier = vol->viscosity_multiplier * drag_multiplier * .6;
         } else {
             drag_multiplier = vol->viscosity_multiplier * drag_multiplier;
         }
@@ -3419,7 +3419,7 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
         return;
     }
 
-    last_skid_vol[i] = pV * 10.0;
+    last_skid_vol[i] = pV * 10.0f;
     if ((pWheel_num & 1) != 0) {
         pos.v[0] = pC->bounds[1].max.v[0];
     } else {
@@ -3448,7 +3448,7 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
         BrVector3Scale(&wvw, &pC->road_normal, ts);
         BrVector3Add(&wv, &wv, &wvw);
         BrMatrix34ApplyV(&wvw, &wv, &pC->car_master_actor->t.t.mat);
-        CreatePuffOfSmoke(&world_pos, &wvw, pV / 25.0, 1.0, 4, pC);
+        CreatePuffOfSmoke(&world_pos, &wvw, pV / 25.0f, 1.0, 4, pC);
     }
 }
 
@@ -3645,7 +3645,7 @@ int ExpandBoundingBox(tCar_spec* c) {
     c->bounds[1].min.v[2] = min_z;
     c->bounds[1].max.v[2] = max_z;
     if (c->driver == eDriver_local_human) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_RepairObstructed));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_RepairObstructed));
     }
     return 0;
 }
@@ -4387,35 +4387,35 @@ void SetAmbientPratCam(tCar_spec* pCar) {
     abs_omega_z = fabs(pCar->omega.v[2]);
 
     if (abs_omega_x > 4.5f || abs_omega_z > 4.5f) {
-        ChangeAmbientPratcam(9);
+        ChangeAmbientPratcam(kPratcam_rolling_violent);
     } else if (abs_omega_y > 4.5f) {
-        ChangeAmbientPratcam(12);
+        ChangeAmbientPratcam(kPratcam_spinning_violent);
     } else if (abs_omega_x > 3.f || abs_omega_z > 3.f) {
-        ChangeAmbientPratcam(8);
+        ChangeAmbientPratcam(kPratcam_rolling_medium);
     } else if (abs_omega_y > 3.f) {
-        ChangeAmbientPratcam(11);
+        ChangeAmbientPratcam(kPratcam_spinning_medium);
     } else if (pCar->car_master_actor->t.t.mat.m[1][1] < 0.1f) {
-        ChangeAmbientPratcam(44);
+        ChangeAmbientPratcam(kPratcam_upside_down);
     } else if (abs_vcs_y > abs_vcs_z && abs_vcs_y > abs_vcs_x && vcs_y < -.004f) {
-        ChangeAmbientPratcam(6);
+        ChangeAmbientPratcam(kPratcam_falling);
     } else if (the_time - last_time_on_ground > 500) {
-        ChangeAmbientPratcam(5);
+        ChangeAmbientPratcam(kPratcam_flying);
     } else if (abs_vcs_x > abs_vcs_z && vcs_x > .001f) {
-        ChangeAmbientPratcam(26);
+        ChangeAmbientPratcam(kPratcam_skidding_right);
     } else if (abs_vcs_x > abs_vcs_z && vcs_x < -.001f) {
-        ChangeAmbientPratcam(25);
+        ChangeAmbientPratcam(kPratcam_skidding_left);
     } else if (abs_omega_x > 1.5f || abs_omega_z > 1.5f) {
-        ChangeAmbientPratcam(7);
+        ChangeAmbientPratcam(kPratcam_rolling_gently);
     } else if (abs_omega_y > 1.5f) {
-        ChangeAmbientPratcam(10);
+        ChangeAmbientPratcam(kPratcam_spinning_gently);
     } else if (abs_vcs_z > .01f) {
-        ChangeAmbientPratcam(3);
+        ChangeAmbientPratcam(kPratcam_over_137mph);
     } else if (abs_vcs_z > .004f) {
-        ChangeAmbientPratcam(2);
+        ChangeAmbientPratcam(kPratcam_between_67_and_167mph);
     } else if (abs_vcs_z > .0015f) {
-        ChangeAmbientPratcam(1);
+        ChangeAmbientPratcam(kPratcam_between_25_and_67mph);
     } else {
-        ChangeAmbientPratcam(0);
+        ChangeAmbientPratcam(kPratcam_stationary_or_below_25mph);
     }
 }
 
@@ -4775,7 +4775,7 @@ void AmIGettingBoredWatchingCameraSpin(void) {
                     strcat(s, GetMiscString(kMiscString_RACE_LEADER));
                 }
                 headup_timer = GetRaceTime();
-                NewTextHeadupSlot(eHeadupSlot_fancies, 0, 500, -4, s);
+                NewTextHeadupSlot(eHeadupSlot_fancies, 0, 500, -kFont_MEDIUMHD, s);
             }
         }
     }
@@ -4816,13 +4816,13 @@ void ViewOpponent(void) {
             n = 0;
         }
         gCar_to_view = gNet_players[n].car;
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -3, gNet_players[n].player_name);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_GREENHED, gNet_players[n].player_name);
     } else {
         if (n >= gNum_viewable_cars) {
             n = 0;
         }
         gCar_to_view = gViewable_car_list[n];
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -3, gViewable_car_list[n]->driver_name);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_GREENHED, gViewable_car_list[n]->driver_name);
     }
     gCamera_yaw = 0;
     InitialiseExternalCamera();
@@ -4835,9 +4835,9 @@ void ToggleCarToCarCollisions(void) {
 
     gCar_car_collisions = !gCar_car_collisions;
     if (gCar_car_collisions) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Car Car Collisions");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Car Car Collisions");
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Ghost Cars");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Ghost Cars");
     }
 }
 
@@ -4861,7 +4861,7 @@ void AdjustDownForce(void) {
         c->down_force_speed = 2000.0;
     }
     sprintf(s, "DownForceSpeed %f", c->down_force_speed);
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -4, s);
+    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, s);
 }
 
 // IDA: void __cdecl FreezeMechanics()
@@ -4870,9 +4870,9 @@ void FreezeMechanics(void) {
 
     gFreeze_mechanics = !gFreeze_mechanics;
     if (gFreeze_mechanics) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Mechanics Frozen");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Mechanics Frozen");
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Thawed Mechanics");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Thawed Mechanics");
     }
 }
 
@@ -4882,9 +4882,9 @@ void PutOpponentsInNeutral(void) {
 
     gStop_opponents_moving = !gStop_opponents_moving;
     if (gStop_opponents_moving) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Opponents in neutral");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Opponents in neutral");
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, "Back in gear");
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, "Back in gear");
     }
 }
 
@@ -4895,7 +4895,7 @@ void SetPanningFieldOfView(void) {
 
     camera_ptr = gCamera->type_data;
     if (gPanning_camera_angle == 0) {
-        gPanning_camera_angle = BrDegreeToAngle(gCamera_angle) * 0.7f;
+        gPanning_camera_angle = BrDegreeToAngle(gCamera_angle) * 0.7;
     }
     camera_ptr->field_of_view = gPanning_camera_angle;
 }
@@ -5396,7 +5396,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
 
     m1 = &gCamera->t.t.mat;
     m2 = &c->car_master_actor->t.t.mat;
-    swoop = gCountdown && c->pos.v[1] + 0.001f < gCamera_height;
+    swoop = gCountdown && c->pos.v[1] + 0.001 < gCamera_height;
     manual_swing = gOld_yaw__car != gCamera_yaw || swoop;
     manual_zoom = (double)gOld_zoom != gCamera_zoom;
     BrVector3Copy(&old_camera_pos, &gCamera->t.t.translate.t);
@@ -5406,7 +5406,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
             gCamera_yaw = 0;
             manual_swing = 1;
         }
-        if (fabs(c->speedo_speed) > 0.0006f && gCamera_mode > 0) {
+        if (fabs(c->speedo_speed) > 0.0006 && gCamera_mode > 0) {
             gCamera_mode = -1;
             gCamera_sign = BrVector3Dot((br_vector3*)m2->m[2], &c->direction) > 0.0f;
         }
@@ -6876,10 +6876,10 @@ void MungeCarsMass(tCollision_info* pCar, br_scalar pFactor) {
 // FUNCTION: CARM95 0x0048fb97
 void ModifyCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
 
-    if (pCar_1->driver > eDriver_non_car && ((tCar_spec*)pCar_1)->collision_mass_multiplier != 1.0f) {
+    if (pCar_1->driver > eDriver_non_car && ((tCar_spec*)pCar_1)->collision_mass_multiplier != 1.0) {
         MungeCarsMass(pCar_1, ((tCar_spec*)pCar_1)->collision_mass_multiplier);
     }
-    if (pCar_2->driver > eDriver_non_car && ((tCar_spec*)pCar_2)->collision_mass_multiplier != 1.0f) {
+    if (pCar_2->driver > eDriver_non_car && ((tCar_spec*)pCar_2)->collision_mass_multiplier != 1.0) {
         MungeCarsMass(pCar_2, ((tCar_spec*)pCar_2)->collision_mass_multiplier);
     }
 }
@@ -6888,11 +6888,11 @@ void ModifyCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
 // FUNCTION: CARM95 0x0048fc7b
 void ResetCarsMass(tCollision_info* pCar_1, tCollision_info* pCar_2) {
 
-    if (pCar_1->driver > eDriver_non_car && ((tCar_spec*)pCar_1)->collision_mass_multiplier != 1.0f) {
-        MungeCarsMass(pCar_1, 1.0f / ((tCar_spec*)pCar_1)->collision_mass_multiplier);
+    if (pCar_1->driver > eDriver_non_car && ((tCar_spec*)pCar_1)->collision_mass_multiplier != 1.0) {
+        MungeCarsMass(pCar_1, 1.0 / ((tCar_spec*)pCar_1)->collision_mass_multiplier);
     }
-    if (pCar_2->driver > eDriver_non_car && ((tCar_spec*)pCar_2)->collision_mass_multiplier != 1.0f) {
-        MungeCarsMass(pCar_2, 1.0f / ((tCar_spec*)pCar_2)->collision_mass_multiplier);
+    if (pCar_2->driver > eDriver_non_car && ((tCar_spec*)pCar_2)->collision_mass_multiplier != 1.0) {
+        MungeCarsMass(pCar_2, 1.0 / ((tCar_spec*)pCar_2)->collision_mass_multiplier);
     }
 }
 
@@ -7303,12 +7303,14 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
 // FUNCTION: CARM95 0x00492ff8
 int TestForNan(float* f) {
     tU32 i;
-    // i = *f;
-    // return isnan(*f);
-    // return (~i & 0x7F800000) == 0;
 
-    i = *(unsigned long*)f;
-    return ((i & 0x7F800000) == 0x7F800000) && ((i & 0x007FFFFF) != 0);
+#ifdef DETHRACE_FIX_BUGS
+    return isnan(*f);
+#else
+    memcpy(&i, f, sizeof i);
+    i = ~i & 0x7F800000;
+    return i == 0;
+#endif
 }
 
 // IDA: void __cdecl CheckCameraHither()

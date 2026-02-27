@@ -31,6 +31,8 @@
 int gDOSGfx_initialized;
 int gExtra_mem;
 int gReplay_override;
+
+// GLOBAL: CARM95 0x0051D608
 tGraf_spec gGraf_specs[2] = {
     { 8, 1, 0, 320, 200, 0, 0, "32X20X8", "MCGA,W:320,H:200,B:8", 320, 320, 200, NULL },
     { 8, 1, 0, 640, 480, 0, 0, "64X48X8", "VESA,W:640,H:480,B:8", 640, 640, 480, NULL }
@@ -597,26 +599,26 @@ void PDPixelmapVLineOnScreen(br_pixelmap* dst, br_int_16 x1, br_int_16 y1, br_in
 }
 
 // FUNCTION: CARM95 0x004a76e9
-void Win32BRenderWarningFunc(char* msg) {
+void BRenderWarningFunc(char* msg) {
     dr_dprintf("*******************************************************************************");
     dr_dprintf("BRender WARNING: '%s'", msg);
     dr_dprintf("*******************************************************************************");
 }
 
 // FUNCTION: CARM95 0x004a771f
-void Win32BRenderFailureFunc(char* msg) {
+void BRenderFailureFunc(char* msg) {
     dr_dprintf("*******************************************************************************");
     dr_dprintf("BRender FAILURE: '%s'", msg);
     dr_dprintf("*******************************************************************************");
-    Win32FatalError("BRender error detected:", msg);
+    LOG_PANIC(msg);
 }
 
 // IDA: void __cdecl PDInstallErrorHandlers()
 // FUNCTION: CARM95 0x004a7766
 void PDInstallErrorHandlers(void) {
     gBr_diaghandler.identifier = "LlantisilioBlahBlahBlahOgOgOch";
-    gBr_diaghandler.warning = Win32BRenderWarningFunc;
-    gBr_diaghandler.failure = Win32BRenderFailureFunc;
+    gBr_diaghandler.warning = BRenderWarningFunc;
+    gBr_diaghandler.failure = BRenderFailureFunc;
     BrDiagHandlerSet(&gBr_diaghandler);
 }
 
@@ -843,6 +845,11 @@ int original_main(int pArgc, char** pArgv) {
 
     for (i = 1; i < pArgc; i++) {
         if (strcasecmp(pArgv[i], "-hires") == 0) {
+#ifdef DETHRACE_FIX_BUGS
+            if (!PDCheckDriveExists("DATA/64X48X8/HEADUP.TXT")) {
+                PDFatalError("No high resolution data (\"DATA/64X48X8\") is available. Run game without -hires.");
+            }
+#endif
             gGraf_spec_index = 1;
         } else if (strcasecmp(pArgv[i], "-yon") == 0 && i < pArgc - 1) {
             i++;

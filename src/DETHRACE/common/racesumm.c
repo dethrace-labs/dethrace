@@ -125,10 +125,10 @@ void MungeRankEtc(tProgram_state* pThe_state) {
         gRank_etc_munged = 1;
         gRace_list[pThe_state->current_race_index].been_there_done_that++;
         pThe_state->rank -= gRank_increase;
-        if (pThe_state->rank <= 0) {
+        if (pThe_state->rank < 1) {
             pThe_state->rank = 1;
             for (i = 0; i < gNumber_of_races; i++) {
-                if (gRace_list[i].best_rank < 2 && !gRace_list[i].been_there_done_that) {
+                if (gRace_list[i].best_rank <= 1 && !gRace_list[i].been_there_done_that) {
                     not_done_yet = 1;
                     break;
                 }
@@ -153,13 +153,13 @@ void MungeRankEtc(tProgram_state* pThe_state) {
 // FUNCTION: CARM95 0x0041631f
 void CalcRankIncrease(void) {
 
-    if (gNet_mode == eNet_mode_none) {
+    if (gNet_mode != eNet_mode_none) {
+        gRank_increase = 1;
+    } else {
         gRank_increase = gProgram_state.credits_earned / gProgram_state.credits_per_rank;
         if (gRank_increase > 5) {
             gRank_increase = 5;
         }
-    } else {
-        gRank_increase = 1;
     }
 }
 
@@ -168,11 +168,12 @@ void CalcRankIncrease(void) {
 int RaceSummaryDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
 
     if (pTimed_out) {
-        pCurrent_choice = 0;
+        return 0;
     } else if (pEscaped) {
-        pCurrent_choice = -1;
+        return -1;
+    } else {
+        return pCurrent_choice;
     }
-    return pCurrent_choice;
 }
 
 // IDA: void __usercall DrawInBox(int pBox_left@<EAX>, int pText_left@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour, int pAmount)
@@ -269,13 +270,13 @@ void DrawSummaryItems(void) {
 // FUNCTION: CARM95 0x00415f72
 void RampUpRate(float* pRate, tU32 pTime) {
 
-    if (pTime >= 6000) {
+    if (pTime > 6000) {
         *pRate = 10.f;
-    } else if (pTime >= 4000) {
+    } else if (pTime > 4000) {
         *pRate = 5.f;
-    } else if (pTime >= 3000) {
+    } else if (pTime > 3000) {
         *pRate = 1.f;
-    } else if (pTime >= 2000) {
+    } else if (pTime > 2000) {
         *pRate = 0.5f;
     } else {
         *pRate = 0.1f;
@@ -310,8 +311,8 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
                 S3StopOutletSound(gEffects_outlet);
                 gSumm_sound = 0;
                 gTemp_earned = 0;
-                gCredits_per_ms = 0.1f;
                 last_change_time = the_time;
+                gCredits_per_ms = 0.1f;
             }
         } else if (gTemp_lost != 0) {
             ResetInterfaceTimeout();
@@ -337,7 +338,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
                 rank_delta = (the_time - last_time) * gRank_per_ms;
                 old_temp_increase = gTemp_rank_increase;
                 gTemp_rank_increase -= rank_delta;
-                if ((int)(old_temp_increase + 0.5f) != (int)(gTemp_rank_increase + 0.5f)) {
+                if ((int)(old_temp_increase + 0.5) != (int)(gTemp_rank_increase + 0.5)) {
                     if (gTemp_rank > 1) {
                         gTemp_rank -= 1;
                     }
@@ -355,6 +356,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
             gSumm_sound = 0;
         }
     } else {
+        last_time = the_time;
         last_change_time = the_time;
     }
     DrawSummaryItems();
@@ -375,9 +377,9 @@ void SetUpTemps(void) {
 
     gTemp_earned = gProgram_state.credits_earned;
     gTemp_lost = gProgram_state.credits_lost;
+    gTemp_credits = gProgram_state.credits;
     gTemp_rank_increase = gRank_increase;
     gTemp_rank = gProgram_state.rank;
-    gTemp_credits = gProgram_state.credits;
 }
 
 // IDA: int __usercall Summ1GoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -397,54 +399,61 @@ int SummCheckGameOver(int* pCurrent_choice, int* pCurrent_mode) {
     int i;
     tS3_sound_tag sound_tag;
 
-    if (gTemp_credits > 0) {
+    if (gTemp_credits <= 0) {
+        S3StopOutletSound(gEffects_outlet);
+        RemoveTransientBitmaps(1);
+        for (i = 0; i < 7; i++) {
+            DrawInBox(
+                gCurrent_graf_data->summ1_credits_box_left,
+                gCurrent_graf_data->summ1_credits_left,
+                gCurrent_graf_data->summ1_total_top,
+                gCurrent_graf_data->summ1_credits_right,
+                gCurrent_graf_data->summ1_total_bottom,
+                2, -1);
+            ProcessFlicQueue(gFrame_period);
+            PDScreenBufferSwap(0);
+            SoundService();
+            WaitFor(300);
+            DrawInBox(
+                gCurrent_graf_data->summ1_credits_box_left,
+                gCurrent_graf_data->summ1_credits_left,
+                gCurrent_graf_data->summ1_total_top,
+                gCurrent_graf_data->summ1_credits_right,
+                gCurrent_graf_data->summ1_total_bottom,
+                2, 0);
+            ProcessFlicQueue(gFrame_period);
+            PDScreenBufferSwap(0);
+            SoundService();
+            WaitFor(300);
+        }
+        S3StopAllOutletSounds();
+        return 1;
+    } else {
         return 0;
     }
-    S3StopOutletSound(gEffects_outlet);
-    RemoveTransientBitmaps(1);
-    for (i = 0; i < 7; i++) {
-        DrawInBox(
-            gCurrent_graf_data->summ1_credits_box_left,
-            gCurrent_graf_data->summ1_credits_left,
-            gCurrent_graf_data->summ1_total_top,
-            gCurrent_graf_data->summ1_credits_right,
-            gCurrent_graf_data->summ1_total_bottom,
-            2, -1);
-        ProcessFlicQueue(gFrame_period);
-        PDScreenBufferSwap(0);
-        SoundService();
-        WaitFor(300);
-        DrawInBox(
-            gCurrent_graf_data->summ1_credits_box_left,
-            gCurrent_graf_data->summ1_credits_left,
-            gCurrent_graf_data->summ1_total_top,
-            gCurrent_graf_data->summ1_credits_right,
-            gCurrent_graf_data->summ1_total_bottom,
-            2, 0);
-        ProcessFlicQueue(gFrame_period);
-        PDScreenBufferSwap(0);
-        SoundService();
-        WaitFor(300);
-    }
-    S3StopAllOutletSounds();
-    return 1;
 }
 
 // IDA: tSO_result __cdecl DoEndRaceSummary1()
 // FUNCTION: CARM95 0x004161dd
 tSO_result DoEndRaceSummary1(void) {
+    // GLOBAL: CARM95 0x00509bc0
     static tFlicette flicker_on[1] = {
         { 43, { 218, 436 }, { 147, 353 } },
     };
+    // GLOBAL: CARM95 0x00509bd8
     static tFlicette flicker_off[1] = {
         { 42, { 218, 436 }, { 147, 353 } },
     };
+    // GLOBAL: CARM95 0x00509bf0
     static tFlicette push[1] = {
         { 154, { 218, 436 }, { 147, 353 } },
     };
+    // GLOBAL: CARM95 0x00509c08
     static tMouse_area mouse_areas[1] = {
         { { 218, 436 }, { 147, 353 }, { 281, 562 }, { 167, 401 }, 0, 0, 0, NULL },
     };
+
+    // GLOBAL: CARM95 0x00509C38
     static tInterface_spec interface_spec = {
         0,
         310,
@@ -516,20 +525,18 @@ tSO_result DoEndRaceSummary1(void) {
     if (result < 0) {
         DRS3StartSound(gEffects_outlet, 3007);
         RunFlic(311);
-        result = eSO_main_menu_invoked;
+        return eSO_main_menu_invoked;
     } else if (gTemp_credits <= 0) {
         FadePaletteDown();
-        result = eSO_game_over;
+        return eSO_game_over;
     } else if (gProgram_state.game_completed && !completed_already) {
         FadePaletteDown();
-        result = eSO_game_completed;
+        return eSO_game_completed;
     } else {
         DRS3StartSound(gEffects_outlet, 3007);
         FadePaletteDown();
-        result = eSO_continue;
+        return eSO_continue;
     }
-
-    return result;
 }
 
 // IDA: void __usercall PrepareBoundingRadius(br_model *model@<EAX>)
@@ -542,15 +549,13 @@ void PrepareBoundingRadius__racesumm(br_model* model) {
     br_vertex* vp;
 
     max = 0.f;
-    for (v = 0; v < model->nvertices; v++) {
-        vp = &model->vertices[v];
+    for (v = 0, vp = model->vertices; v < model->nvertices; v++, vp++) {
         d = BrVector3LengthSquared(&vp->p);
         if (d > max) {
             max = d;
         }
     }
-    d = sqrt(max);
-    model->radius = d;
+    model->radius = sqrt(max);
 }
 
 // IDA: void __cdecl BuildWrecks()
@@ -571,10 +576,10 @@ void BuildWrecks(void) {
     BrActorAdd(gWreck_root, gWreck_camera);
     memcpy(gWreck_camera->type_data, gCamera_list[1]->type_data, sizeof(br_camera));
     ((br_camera*)gWreck_camera->type_data)->aspect = 2.f;
-    ((br_camera*)gWreck_camera->type_data)->field_of_view = BR_ANGLE_DEG(55);
+    ((br_camera*)gWreck_camera->type_data)->field_of_view = BrDegreeToAngle(55);
     BrMatrix34Identity(&gWreck_camera->t.t.mat);
     BrVector3SetFloat(&gWreck_camera->t.t.translate.t, 0.f, 0.f, 2.2f);
-    for (cat = eVehicle_self; cat < eVehicle_rozzer; cat++) {
+    for (cat = eVehicle_self; cat <= eVehicle_opponent; cat++) {
         if (cat == eVehicle_self) {
             car_count = 1;
         } else {
@@ -594,10 +599,10 @@ void BuildWrecks(void) {
             gWreck_array[gWreck_count].actor = this_car;
             PrepareBoundingRadius__racesumm(this_car->model);
             gWreck_array[gWreck_count].scaling_factor = .47f / this_car->model->radius;
-            gWreck_array[gWreck_count].pos_x = (position % 3) - 1.0f;
-            gWreck_array[gWreck_count].pos_y = (position / 3) - 0.5f;
-            this_car->t.t.translate.t.v[0] = 1.5f * gWreck_array[gWreck_count].pos_x;
-            this_car->t.t.translate.t.v[1] = -1.2f * gWreck_array[gWreck_count].pos_y;
+            gWreck_array[gWreck_count].pos_x = (position % 3) - 1.0;
+            gWreck_array[gWreck_count].pos_y = (position / 3) - 0.5;
+            this_car->t.t.translate.t.v[0] = 1.5 * gWreck_array[gWreck_count].pos_x;
+            this_car->t.t.translate.t.v[1] = -(1.2 * gWreck_array[gWreck_count].pos_y);
             this_car->t.t.translate.t.v[2] = 0.f;
             gWreck_array[gWreck_count].car_type = cat;
             gWreck_array[gWreck_count].car_index = i;
@@ -653,7 +658,7 @@ void DisposeWrecks(void) {
     br_actor* this_car;
     tCar_spec* the_car;
 
-    for (cat = eVehicle_self; cat < eVehicle_rozzer; cat++) {
+    for (cat = eVehicle_self; cat <= eVehicle_opponent; cat++) {
         if (cat == eVehicle_self) {
             car_count = 1;
         } else {
@@ -678,13 +683,17 @@ void DisposeWrecks(void) {
     BrActorFree(gWreck_root);
     BrActorFree(gWreck_camera);
     gWreck_render_area->pixels = NULL;
-    BrPixelmapFree(gWreck_render_area);
 
 #ifdef DETHRACE_3DFX_PATCH
     if (gScreen->type == BR_PMT_INDEX_8) {
+        BrPixelmapFree(gWreck_render_area);
         gWreck_z_buffer->pixels = NULL;
         BrPixelmapFree(gWreck_z_buffer);
     }
+#else
+    gWreck_z_buffer->pixels = NULL;
+    BrPixelmapFree(gWreck_render_area);
+    BrPixelmapFree(gWreck_z_buffer);
 #endif
 }
 
@@ -704,9 +713,9 @@ void SpinWrecks(tU32 pFrame_period) {
 
     for (i = 0; i < gWreck_count; i++) {
         if (gWreck_array[i].customised == 0) {
-            BrMatrix34RotateY(&gWreck_array[i].rotation, BR_ANGLE_DEG(.05f * pFrame_period));
+            BrMatrix34RotateY(&gWreck_array[i].rotation, BrDegreeToAngle(0.05 * pFrame_period));
         }
-        BrVector3Copy(&translation, &gWreck_array[i].actor->t.t.translate.t);
+        translation = gWreck_array[i].actor->t.t.translate.t;
         BrVector3Set(&gWreck_array[i].actor->t.t.translate.t, 0.f, 0.f, 0.f);
         BrMatrix34Post(&gWreck_array[i].actor->t.t.mat, &gWreck_array[i].rotation);
         if (!MatrixIsIdentity(&gWreck_array[i].actor->t.t.mat)) {
@@ -715,7 +724,7 @@ void SpinWrecks(tU32 pFrame_period) {
             BrMatrix34PostScale(&gWreck_array[i].actor->t.t.mat,
                 gWreck_array[i].scaling_factor, gWreck_array[i].scaling_factor, gWreck_array[i].scaling_factor);
         }
-        BrVector3Copy(&gWreck_array[i].actor->t.t.translate.t, &translation);
+        gWreck_array[i].actor->t.t.translate.t = translation;
     }
 }
 
@@ -780,44 +789,35 @@ int CastSelectionRay(int* pCurrent_choice, int* pCurrent_mode) {
     int result;
     br_scalar inv_wreck_pick_scale_factor;
 
-    if (!gMouse_in_use) {
-        return 0;
-    }
-    if (*pCurrent_choice != 0) {
-        return 0;
-    }
-    if (*pCurrent_mode != 0) {
-        return 0;
-    }
-    if (gWreck_zoomed_in >= 0) {
-        return 0;
-    }
-    if (gWreck_zoom_out >= 0) {
-        return 0;
-    }
-    if (gWreck_zoom_in >= 0) {
-        return 0;
-    }
+    if (gMouse_in_use
+        && *pCurrent_choice == 0
+        && *pCurrent_mode == 0
+        && gWreck_zoomed_in < 0
+        && gWreck_zoom_out < 0
+        && gWreck_zoom_in < 0) {
 
-    inv_wreck_pick_scale_factor = 0.5f;
-    GetMousePosition(&mouse_x, &mouse_y);
-    if (gReal_graf_data_index != 0) {
-        mouse_x = 2 * mouse_x;
-        mouse_y = 2 * mouse_y + HIRES_Y_OFFSET;
+        inv_wreck_pick_scale_factor = 0.5f;
+        GetMousePosition(&mouse_x, &mouse_y);
+        if (gReal_graf_data_index != 0) {
+            mouse_x = 2 * mouse_x;
+            mouse_y = 2 * mouse_y + HIRES_Y_OFFSET;
+        }
+        for (i = 0; i < gWreck_count; i++) {
+            BrMatrix34PreScale(&gWreck_array[i].actor->t.t.mat, 2.f, 2.f, 2.f);
+        }
+        result = DRScenePick2DXY(gWreck_root, gWreck_camera, gRender_screen,
+            mouse_x - gBack_screen->width / 2,
+            mouse_y - gBack_screen->height / 2,
+            WreckPick,
+            NULL);
+        for (i = 0; i < gWreck_count; i++) {
+            BrMatrix34PreScale(&gWreck_array[i].actor->t.t.mat,
+                inv_wreck_pick_scale_factor, inv_wreck_pick_scale_factor, inv_wreck_pick_scale_factor);
+        }
+        return result;
+    } else {
+        return 0;
     }
-    for (i = 0; i < gWreck_count; i++) {
-        BrMatrix34PreScale(&gWreck_array[i].actor->t.t.mat, 2.f, 2.f, 2.f);
-    }
-    result = DRScenePick2DXY(gWreck_root, gWreck_camera, gRender_screen,
-        mouse_x - gBack_screen->width / 2,
-        mouse_y - gBack_screen->height / 2,
-        WreckPick,
-        NULL);
-    for (i = 0; i < gWreck_count; i++) {
-        BrMatrix34PreScale(&gWreck_array[i].actor->t.t.mat,
-            inv_wreck_pick_scale_factor, inv_wreck_pick_scale_factor, inv_wreck_pick_scale_factor);
-    }
-    return result;
 }
 
 // IDA: int __usercall DamageScrnExit@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -868,30 +868,32 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
         if (gWreck_start_zoom == 0) {
             gWreck_start_zoom = the_time;
         }
-        finished = the_time - gWreck_start_zoom > 1000;
-        if (finished) {
+
+        if (the_time - gWreck_start_zoom > 1000) {
             the_time = gWreck_start_zoom + 1000;
-        }
-        if (gWreck_zoom_out < 0) {
-            camera_movement.v[0] = (1.f - (the_time - gWreck_start_zoom) / 1000.f) * gWreck_array[gWreck_zoom_in].actor->t.t.translate.t.v[0];
-            camera_movement.v[1] = (1.f - (the_time - gWreck_start_zoom) / 1000.f) * gWreck_array[gWreck_zoom_in].actor->t.t.translate.t.v[1];
-            camera_movement.v[2] = (1.f - (the_time - gWreck_start_zoom) / 1000.f) * -1.45f;
-            if (finished) {
-                gWreck_zoom_in = -1;
-                gWreck_zoomed_in = -1;
-            }
+            finished = 1;
         } else {
-            camera_movement.v[0] = (the_time - gWreck_start_zoom) / 1000.f * gWreck_array[gWreck_zoom_out].actor->t.t.translate.t.v[0];
-            camera_movement.v[1] = (the_time - gWreck_start_zoom) / 1000.f * gWreck_array[gWreck_zoom_out].actor->t.t.translate.t.v[1];
-            camera_movement.v[2] = (the_time - gWreck_start_zoom) / 1000.f * -1.45f;
+            finished = 0;
+        }
+        if (gWreck_zoom_out >= 0) {
+            camera_movement = gWreck_array[gWreck_zoom_out].actor->t.t.translate.t;
+            camera_movement.v[2] = -1.45f;
+            BrVector3Scale(&camera_movement, &camera_movement, (the_time - gWreck_start_zoom) / 1000.f);
             if (finished) {
                 gWreck_zoomed_in = gWreck_zoom_out;
                 gWreck_zoom_out = -1;
             }
+        } else {
+            camera_movement = gWreck_array[gWreck_zoom_in].actor->t.t.translate.t;
+            camera_movement.v[2] = -1.45f;
+            BrVector3Scale(&camera_movement, &camera_movement, 1.f - (the_time - gWreck_start_zoom) / 1000.f);
+            if (finished) {
+                gWreck_zoom_in = -1;
+                gWreck_zoomed_in = -1;
+            }
         }
-        gWreck_camera->t.t.translate.t.v[0] = camera_movement.v[0];
-        gWreck_camera->t.t.translate.t.v[1] = camera_movement.v[1];
-        gWreck_camera->t.t.translate.t.v[2] = camera_movement.v[2] + 2.2f;
+        camera_movement.v[2] += 2.2f;
+        gWreck_camera->t.t.translate.t = camera_movement;
     }
     EnsureRenderPalette();
     EnsurePaletteUp();
@@ -900,22 +902,22 @@ void DamageScrnDraw(int pCurrent_choice, int pCurrent_mode) {
 #endif
         BrPixelmapFill(gWreck_z_buffer, 0xffffffff);
         BrPixelmapFill(gWreck_render_area, BR_COLOUR_RGBA(0xb0, 0xb0, 0xb0, 0xb0));
-
-        rows = gWreck_render_area->height / 15.f;
-        columns = gWreck_render_area->width / 15.f;
+        spacing = 15.f;
+        rows = gWreck_render_area->height / spacing;
+        columns = gWreck_render_area->width / spacing;
         for (v = 0; v <= rows; v++) {
             BrPixelmapLine(gWreck_render_area,
                 -gWreck_render_area->origin_x,
-                gWreck_render_area->height / 2.f - 15.f * (rows / 2.f - v) - gWreck_render_area->origin_y,
+                gWreck_render_area->height / 2.0 - spacing * (rows / 2.0 - v) - gWreck_render_area->origin_y,
                 gWreck_render_area->width - gWreck_render_area->origin_x,
-                gWreck_render_area->height / 2.f - 15.f * (rows / 2.f - v) - gWreck_render_area->origin_y,
+                gWreck_render_area->height / 2.0 - spacing * (rows / 2.0 - v) - gWreck_render_area->origin_y,
                 8);
         }
         for (h = 0; h <= columns; h++) {
             BrPixelmapLine(gWreck_render_area,
-                gWreck_render_area->width / 2.f - 15.f * (columns / 2.f - h) - gWreck_render_area->origin_x,
+                gWreck_render_area->width / 2.0 - spacing * (columns / 2.0 - h) - gWreck_render_area->origin_x,
                 -gWreck_render_area->origin_y,
-                gWreck_render_area->width / 2.f - 15.f * (columns / 2.f - h) - gWreck_render_area->origin_x,
+                gWreck_render_area->width / 2.0 - spacing * (columns / 2.0 - h) - gWreck_render_area->origin_x,
                 gWreck_render_area->height - gWreck_render_area->origin_y,
                 8);
         }
@@ -1016,15 +1018,15 @@ int DamageScrnLeft(int* pCurrent_choice, int* pCurrent_mode) {
     if (*pCurrent_mode == 0 && gWreck_zoomed_in < 0) {
         if (gWreck_selected < 0) {
             gWreck_selected = gWreck_count - 1;
-        } else if (gWreck_selected != 0 && gWreck_array[gWreck_selected - 1].pos_y == gWreck_array[gWreck_selected].pos_y) {
-            gWreck_selected--;
-        } else {
+        } else if (gWreck_selected == 0 || gWreck_array[gWreck_selected - 1].pos_y != gWreck_array[gWreck_selected].pos_y) {
             for (i = gWreck_count - 1; i >= 0; i--) {
                 if (gWreck_array[i].pos_y == gWreck_array[gWreck_selected].pos_y) {
                     gWreck_selected = i;
                     break;
                 }
             }
+        } else {
+            gWreck_selected--;
         }
     } else if (gWreck_zoomed_in >= 0) {
         *pCurrent_choice = *pCurrent_choice + 1;
@@ -1045,15 +1047,15 @@ int DamageScrnRight(int* pCurrent_choice, int* pCurrent_mode) {
     if (*pCurrent_mode == 0 && gWreck_zoomed_in < 0) {
         if (gWreck_selected < 0) {
             gWreck_selected = 0;
-        } else if (gWreck_selected - 1 != gWreck_count && gWreck_array[gWreck_selected + 1].pos_y == gWreck_array[gWreck_selected].pos_y) {
-            gWreck_selected++;
-        } else {
+        } else if (gWreck_count - 1 == gWreck_selected || gWreck_array[gWreck_selected + 1].pos_y != gWreck_array[gWreck_selected].pos_y) {
             for (i = 0; i < gWreck_count; i++) {
                 if (gWreck_array[i].pos_y == gWreck_array[gWreck_selected].pos_y) {
                     gWreck_selected = i;
                     break;
                 }
             }
+        } else {
+            gWreck_selected++;
         }
     } else if (gWreck_zoomed_in >= 0) {
         *pCurrent_choice = *pCurrent_choice + 1;
@@ -1092,18 +1094,19 @@ int DamageScrnUp(int* pCurrent_choice, int* pCurrent_mode) {
             *pCurrent_mode = 1;
             *pCurrent_choice = 2;
         } else {
-            new_difference = 1000;
+            difference = 1000;
             new_selection = gWreck_selected;
             for (i = 0; i < gWreck_count; i++) {
                 if (gWreck_array[gWreck_selected].pos_y - 1.f == gWreck_array[i].pos_y) {
                     if (gWreck_array[i].pos_x == gWreck_array[gWreck_selected].pos_x) {
                         new_selection = i;
                         break;
-                    }
-                    difference = abs((int)(gWreck_array[i].pos_x - gWreck_array[gWreck_selected].pos_x));
-                    if (difference < new_difference) {
-                        new_selection = i;
-                        new_difference = difference;
+                    } else {
+                        new_difference = abs((int)(gWreck_array[i].pos_x - gWreck_array[gWreck_selected].pos_x));
+                        if (new_difference < difference) {
+                            difference = new_difference;
+                            new_selection = i;
+                        }
                     }
                 }
             }
@@ -1144,18 +1147,19 @@ int DamageScrnDown(int* pCurrent_choice, int* pCurrent_mode) {
             *pCurrent_mode = 1;
             *pCurrent_choice = 2;
         } else {
-            new_difference = 1000;
+            difference = 1000;
             new_selection = gWreck_selected;
             for (i = 0; i < gWreck_count; i++) {
                 if (gWreck_array[gWreck_selected].pos_y + 1.f == gWreck_array[i].pos_y) {
                     if (gWreck_array[i].pos_x == gWreck_array[gWreck_selected].pos_x) {
                         new_selection = i;
                         break;
-                    }
-                    difference = abs((int)(gWreck_array[i].pos_x - gWreck_array[gWreck_selected].pos_x));
-                    if (difference < new_difference) {
-                        new_selection = i;
-                        new_difference = difference;
+                    } else {
+                        new_difference = abs((int)(gWreck_array[i].pos_x - gWreck_array[gWreck_selected].pos_x));
+                        if (new_difference < difference) {
+                            difference = new_difference;
+                            new_selection = i;
+                        }
                     }
                 }
             }
@@ -1172,15 +1176,18 @@ int DamageScrnGoHead(int* pCurrent_choice, int* pCurrent_mode) {
     gDone_initial = 1;
     if (*pCurrent_choice == 2) {
         return 1;
-    } else if (gWreck_zoomed_in < 0) {
+    } else if (gWreck_zoomed_in >= 0) {
+        if (*pCurrent_choice == 1) {
+            ZoomInTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
+            return 0;
+        }
+    } else {
         if (*pCurrent_choice == 0 && gWreck_selected >= 0) {
             ZoomOutTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
             gUser_interacted = 1;
+            return 0;
         }
-    } else if (*pCurrent_choice == 1) {
-        ZoomInTo(gWreck_selected, pCurrent_choice, pCurrent_mode);
     }
-    gDone_initial = 1;
     return 0;
 }
 
@@ -1197,15 +1204,8 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
     old_mouse_y = 0; // Fixes warning caused by -Wsometimes-uninitialized
 #endif
     GetMousePosition(&old_mouse_x, &old_mouse_y);
-    if (gWreck_zoomed_in < 0) {
-        if (CastSelectionRay(pCurrent_choice, pCurrent_mode)) {
-            gUser_interacted = 1;
-            return 1;
-        } else {
-            return 0;
-        }
-    } else {
-        while (1) {
+    if (gWreck_zoomed_in >= 0) {
+        do {
             GetMousePosition(&mouse_x, &mouse_y);
             BrMatrix34RollingBall(&gWreck_array[gWreck_zoomed_in].rotation, mouse_x - old_mouse_x, old_mouse_y - mouse_y, 50);
             old_mouse_x = mouse_x;
@@ -1217,11 +1217,15 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
             DoMouseCursor();
             PDScreenBufferSwap(0);
             ServiceGame();
-            if (!EitherMouseButtonDown()) {
-                break;
-            }
-        }
+        } while (EitherMouseButtonDown());
         return 0;
+    } else {
+        if (CastSelectionRay(pCurrent_choice, pCurrent_mode)) {
+            gUser_interacted = 1;
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
 
@@ -1230,34 +1234,42 @@ int ClickDamage(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
 int DamageScrnDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
 
     if (pTimed_out) {
-        pCurrent_choice = 2;
+        return 2;
+    } else {
+        return pCurrent_choice;
     }
-    return pCurrent_choice;
 }
 
 // IDA: tSO_result __cdecl DoEndRaceSummary2()
 // FUNCTION: CARM95 0x0041797b
 tSO_result DoEndRaceSummary2(void) {
+    // GLOBAL: CARM95 0x00509d68
     static tFlicette flicker_on[3] = {
         { -1, { 0, 0 }, { 0, 0 } },
         { 321, { 9, 18 }, { 174, 418 } },
         { 321, { 247, 494 }, { 174, 418 } },
     };
+    // GLOBAL: CARM95 0x00509da8
     static tFlicette flicker_off[3] = {
         { -1, { 0, 0 }, { 0, 0 } },
         { 322, { 9, 18 }, { 174, 418 } },
         { 322, { 247, 494 }, { 174, 418 } },
     };
+    // GLOBAL: CARM95 0x00509de8
     static tFlicette push[3] = {
         { -1, { 0, 0 }, { 0, 0 } },
         { 324, { 9, 18 }, { 174, 418 } },
         { 323, { 247, 494 }, { 174, 418 } },
     };
+
+    // GLOBAL: CARM95 0x00509E28
     static tMouse_area mouse_areas[3] = {
         { { 11, 22 }, { 20, 48 }, { 309, 618 }, { 169, 406 }, 0, 0, 0, ClickDamage },
         { { 9, 18 }, { 174, 418 }, { 72, 144 }, { 194, 466 }, 1, 1, 0, NULL },
         { { 247, 494 }, { 174, 418 }, { 310, 620 }, { 194, 466 }, 2, 1, 0, NULL },
     };
+
+    // GLOBAL: CARM95 0x00509EB8
     static tInterface_spec interface_spec = {
         1, 320, 0, -1, -1, -1, -1,
         { -1, -1 }, { 0, 0 }, { 0, 0 }, { 0, 2 }, { DamageScrnLeft, DamageScrnLeft },
@@ -1280,7 +1292,7 @@ tSO_result DoEndRaceSummary2(void) {
     }
     NetPlayerStatusChanged(ePlayer_status_wrecks_gallery);
     gBack_button_ptr = &mouse_areas[1];
-    memcpy(&gOld_back_button, &mouse_areas[1], sizeof(tMouse_area));
+    memcpy(&gOld_back_button, gBack_button_ptr, sizeof(tMouse_area));
     gOld_back_button.new_choice = 1;
     gOld_back_button.new_mode = 1;
     memcpy(gBack_button_ptr, &gOld_back_button, sizeof(tMouse_area));
@@ -1300,8 +1312,9 @@ tSO_result DoEndRaceSummary2(void) {
     DisposeWrecks();
     if (result < 0) {
         return eSO_main_menu_invoked;
+    } else {
+        return eSO_continue;
     }
-    return eSO_continue;
 }
 
 // IDA: void __usercall DrawAnItem(int pX@<EAX>, int pY_index@<EDX>, int pFont_index@<EBX>, char *pText@<ECX>)
@@ -1335,6 +1348,9 @@ void DrawColumnHeading__racesumm(int pStr_index, int pX) {
 int SortScores(const void* pFirst_one, const void* pSecond_one) {
 
     return gNet_players[*(int*)pSecond_one].games_score - gNet_players[*(int*)pFirst_one].games_score;
+    if (0) {
+        return gNet_players[*(int*)pSecond_one].won - gNet_players[*(int*)pFirst_one].won;
+    }
 }
 
 // IDA: void __cdecl SortGameScores()
@@ -1353,6 +1369,12 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
     DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_3);
     DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_4);
     DrawColumnHeading__racesumm(kMiscString_SCORE, gCurrent_graf_data->net_sum_x_5);
+    if (0) {
+        // looks like leftover code from a previous version..
+        DrawColumnHeading__racesumm(kMiscString_PLAYED, gCurrent_graf_data->net_sum_x_4);
+        DrawColumnHeading__racesumm(kMiscString_WON, gCurrent_graf_data->net_sum_x_5);
+    }
+
     BrPixelmapLine(gBack_screen,
         gCurrent_graf_data->net_sum_x_1,
         gCurrent_graf_data->net_sum_headings_y + 1 + gFont_7->glyph_y - gCurrent_graf_data->net_sum_y_pitch,
@@ -1373,10 +1395,20 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
         DRPixelmapRectangleMaskedCopy(gBack_screen,
             gCurrent_graf_data->net_sum_x_1,
             gCurrent_graf_data->net_sum_headings_y + 1 + i * gCurrent_graf_data->net_sum_y_pitch,
-            gIcons_pix_low_res, /* DOS version uses low res, Windows version uses normal res */
+#ifdef DETHRACE_FIX_BUGS
+            // menu renders in low res, should always use low-res icon
+            gIcons_pix_low_res,
+#else
+            gIcons_pix,
+#endif
             0,
             gCurrent_graf_data->net_head_icon_height * player->car_index,
-            gIcons_pix_low_res->width, /* DOS version uses low res, Windows version uses normal res */
+#ifdef DETHRACE_FIX_BUGS
+            // menu renders in low res, should always use low-res icon
+            gIcons_pix_low_res->width,
+#else
+            gIcons_pix->width,
+#endif
             gCurrent_graf_data->net_head_icon_height);
         TurnOnPaletteConversion();
         DrawAnItem__racesumm(gCurrent_graf_data->net_sum_x_2, i, 83, s);
@@ -1392,10 +1424,16 @@ void NetSumDraw(int pCurrent_choice, int pCurrent_mode) {
 // IDA: void __cdecl DoNetRaceSummary()
 // FUNCTION: CARM95 0x00418452
 void DoNetRaceSummary(void) {
+    // GLOBAL: CARM95 0x00509fe8
     static tFlicette flicker_on[1] = { { 321, { 219, 112 }, { 172, 362 } } };
+    // GLOBAL: CARM95 0x0050a000
     static tFlicette flicker_off[1] = { { 322, { 219, 112 }, { 172, 362 } } };
+    // GLOBAL: CARM95 0x0050a018
     static tFlicette push[1] = { { 323, { 219, 112 }, { 172, 362 } } };
+    // GLOBAL: CARM95 0x0050a030
     static tMouse_area mouse_areas[1] = { { { 219, 112 }, { 172, 362 }, { 282, 182 }, { 192, 379 }, 0, 0, 0, NULL } };
+
+    // GLOBAL: CARM95 0x0050A060
     static tInterface_spec interface_spec = {
         0,              // initial_imode
         63,             // first_opening_flic
@@ -1457,17 +1495,18 @@ void DoNetRaceSummary(void) {
     while (!gReceived_game_scores && PDGetTotalTime() - start_time < 20000) {
         NetService(0);
     }
-    if (gReceived_game_scores) {
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            gPlayer_lookup[i] = i;
-        }
-        SortGameScores();
-        TurnOnPaletteConversion();
-        DoInterfaceScreen(&interface_spec, 0, 0);
-        NetPlayerStatusChanged(ePlayer_status_loading);
-        TurnOffPaletteConversion();
-        FadePaletteDown();
+    if (!gReceived_game_scores) {
+        return;
     }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        gPlayer_lookup[i] = i;
+    }
+    SortGameScores();
+    TurnOnPaletteConversion();
+    result = DoInterfaceScreen(&interface_spec, 0, 0);
+    NetPlayerStatusChanged(ePlayer_status_loading);
+    TurnOffPaletteConversion();
+    FadePaletteDown();
 }
 
 // IDA: tSO_result __usercall DoEndRaceSummary@<EAX>(int *pFirst_summary_done@<EAX>, tRace_result pRace_result@<EDX>)
@@ -1475,40 +1514,44 @@ void DoNetRaceSummary(void) {
 tSO_result DoEndRaceSummary(int* pFirst_summary_done, tRace_result pRace_result) {
     tSO_result result;
 
+#ifdef DETHRACE_FIX_BUGS
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         gRank_etc_munged = 1;
         DoEndRaceSummary2();
         return eSO_continue;
     }
+#endif
+
     gRank_etc_munged = 0;
-    if (!*pFirst_summary_done && pRace_result != eRace_timed_out) {
+    if (*pFirst_summary_done || pRace_result == eRace_timed_out) {
+        result = eSO_continue;
+    } else {
         if (gNet_mode != eNet_mode_none) {
             CalcRankIncrease();
             MungeRankEtc(&gProgram_state);
             DoNetRaceSummary();
             return eSO_continue;
+        } else {
+            result = DoEndRaceSummary1();
         }
-        result = DoEndRaceSummary1();
-    } else {
-        result = eSO_continue;
     }
     *pFirst_summary_done = 1;
     if (result == eSO_game_over) {
         DoGameOverAnimation();
         gProgram_state.prog_status = eProg_opening;
-        result = eSO_continue;
+        return eSO_continue;
     } else if (result == eSO_main_menu_invoked) {
         *pFirst_summary_done = 0;
-        result = eSO_main_menu_invoked;
+        return eSO_main_menu_invoked;
     } else {
         if (result == eSO_game_completed) {
             DoGameCompletedAnimation();
         }
-        result = DoEndRaceSummary2();
-        if (result != eSO_main_menu_invoked) {
+        if (DoEndRaceSummary2() == eSO_main_menu_invoked) {
+            return eSO_main_menu_invoked;
+        } else {
             TotallyRepairCar();
-            result = eSO_continue;
+            return eSO_continue;
         }
     }
-    return result;
 }

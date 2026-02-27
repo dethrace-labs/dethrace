@@ -4,8 +4,8 @@
 #include "harness/config.h"
 #include "harness/hooks.h"
 #include "harness/trace.h"
+#include "sdl2_scancode_map.h"
 #include "sdl2_syms.h"
-#include "sdl_scancode_map.h"
 
 SDL_COMPILE_TIME_ASSERT(sdl2_platform_requires_SDL2, SDL_MAJOR_VERSION == 2);
 
@@ -21,7 +21,7 @@ static int render_width, render_height;
 
 static Uint32 last_frame_time;
 
-void (*gKeyHandler_func)(void);
+static void (*gKeyHandler_func)(void);
 
 // 32 bytes, 1 bit per key. Matches dos executable behavior
 static br_uint_32 key_state[8];
@@ -54,17 +54,25 @@ static const char* const possible_locations[] = {
     SDL2_LIBNAME                                      /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
+#include "elfdlopennote.h"
+#ifdef ELF_NOTE_DLOPEN
+ELF_NOTE_DLOPEN(
+    "SDL2",
+    "Platform-specific operations such as creating windows and handling events",
+    ELF_NOTE_DLOPEN_PRIORITY_SUGGESTED,
+    "libSDL2-2.0.so.0",
+    "libSDL2-2.0.so");
+#endif
 static const char* const possible_locations[] = {
     "libSDL2-2.0.so.0",
     "libSDL2-2.0.so",
 };
 #endif
-#endif
 
-#ifdef DETHRACE_SDL_DYNAMIC
 static void* sdl2_so;
 #endif
 
+#define SDL_NAME "SDL2"
 #define OBJECT_NAME sdl2_so
 #define SYMBOL_PREFIX SDL2_
 #define FOREACH_SDLX_SYM FOREACH_SDL2_SYM
@@ -236,6 +244,7 @@ static int SDL2_Harness_ShowErrorMessage(char* title, char* message) {
 
 static void SDL2_Harness_CreateWindow(const char* title, int width, int height, tHarness_window_type window_type) {
     int window_width, window_height;
+    Uint32 extra_window_flags;
 
     render_width = width;
     render_height = height;
@@ -253,13 +262,18 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
         LOG_PANIC2("SDL_INIT_VIDEO error: %s", SDL2_GetError());
     }
 
+    extra_window_flags = SDL_WINDOW_RESIZABLE;
+    if (harness_game_config.start_full_screen) {
+        extra_window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
+
     if (window_type == eWindow_type_opengl) {
 
         window = SDL2_CreateWindow(title,
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
             window_width, window_height,
-            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+            extra_window_flags | SDL_WINDOW_OPENGL);
 
         if (window == NULL) {
             LOG_PANIC2("Failed to create window: %s", SDL2_GetError());
@@ -287,7 +301,7 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
             window_width, window_height,
-            SDL_WINDOW_RESIZABLE);
+            extra_window_flags);
         if (window == NULL) {
             LOG_PANIC2("Failed to create window: %s", SDL2_GetError());
         }
@@ -316,10 +330,6 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
     viewport.y = 0;
     viewport.scale_x = 1;
     viewport.scale_y = 1;
-
-    if (harness_game_config.start_full_screen) {
-        SDL2_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    }
 }
 
 static void SDL2_Harness_Swap(br_pixelmap* back_buffer) {
@@ -370,12 +380,6 @@ static void SDL2_Harness_GetViewport(int* x, int* y, float* width_multipler, flo
     *height_multiplier = viewport.scale_y;
 }
 
-static void SDL2_Harness_GetPrefPath(char* path, char* app_name) {
-    char* sdl_path = SDL2_GetPrefPath(NULL, app_name);
-    strcpy(path, sdl_path);
-    SDL2_free(sdl_path);
-}
-
 static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
     if (SDL2_LoadSymbols() != 0) {
         return 1;
@@ -397,7 +401,6 @@ static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
     platform->PaletteChanged = SDL2_Harness_PaletteChanged;
     platform->GL_GetProcAddress = SDL2_GL_GetProcAddress;
     platform->GetViewport = SDL2_Harness_GetViewport;
-    platform->GetPrefPath = SDL2_Harness_GetPrefPath;
     return 0;
 };
 

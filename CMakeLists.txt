@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
 if(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo" FORCE)
@@ -16,7 +16,6 @@ endif()
 include(GNUInstallDirs)
 include(CheckCCompilerFlag)
 include(CMakeDependentOption)
-include(TestBigEndian)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
     file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" DETHRACE_VERSION)
@@ -45,6 +44,7 @@ option(DETHRACE_SOUND_ENABLED "Include audio support" ON)
 option(DETHRACE_NET_ENABLED "Include net support" ON)
 option(DETHRACE_PLATFORM_SDL1 "Support SDL 1.2 platform driver" OFF)
 option(DETHRACE_PLATFORM_SDL2 "Support SDL 2 platform driver" ON)
+option(DETHRACE_PLATFORM_SDL3 "Support SDL 3 platform driver" OFF)
 
 option(MSVC_42_FOR_RECCMP "Build with MSVC 4.2 to match assembly" OFF)
 
@@ -55,7 +55,11 @@ if(MSVC_42_FOR_RECCMP)
     set(DETHRACE_NET_ENABLED OFF)
     set(DETHRACE_PLATFORM_SDL1 OFF)
     set(DETHRACE_PLATFORM_SDL2 OFF)
+    set(DETHRACE_PLATFORM_SDL3 OFF)
     set(BRENDER_BUILD_DRIVERS OFF)
+
+    # Allow us to explicitly set "/MLd"
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "" CACHE STRING "" FORCE)
 
     set(CMAKE_C_FLAGS_DEBUG "/Od /Oi /Zi /MLd")
 
@@ -85,7 +89,16 @@ function(add_compile_flags_if_supported TARGET)
     endforeach()
 endfunction()
 
-test_big_endian(IS_BIGENDIAN)
+if(CMAKE_C_BYTE_ORDER STREQUAL "BIG_ENDIAN")
+    set(WORDS_BIGENDIAN TRUE)
+    add_definitions(-DBR_ENDIAN_BIG=1 -DBR_ENDIAN_LITTLE=0)
+elseif(CMAKE_C_BYTE_ORDER STREQUAL "LITTLE_ENDIAN")
+    set(WORDS_BIGENDIAN FALSE)
+    add_definitions(-DBR_ENDIAN_BIG=0 -DBR_ENDIAN_LITTLE=1)
+else()
+    set(WORDS_BIGENDIAN FALSE)
+    message(WARNING "Endianness could not be determined.")
+endif()
 
 set(count_sdl_platforms 0)
 
@@ -105,6 +118,12 @@ if(DETHRACE_PLATFORM_SDL2)
     endif()
 
     list(APPEND DETHRACE_PLATFORMS SDL2)
+    math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
+endif()
+
+if(DETHRACE_PLATFORM_SDL3)
+    find_package(SDL3 CONFIG REQUIRED)
+    list(APPEND DETHRACE_PLATFORMS SDL3)
     math(EXPR count_sdl_platforms "${count_sdl_platforms} + 1")
 endif()
 

@@ -125,10 +125,11 @@ void QueueOilSpill(tCar_spec* pCar) {
         if (gOily_spills[i].car == NULL) {
             oily_index = i;
             break;
-        }
-        if (gOily_spills[i].spill_time < oldest_time) {
-            oldest_time = gOily_spills[i].spill_time;
-            oldest_one = i;
+        } else {
+            if (gOily_spills[i].spill_time < oldest_time) {
+                oldest_time = gOily_spills[i].spill_time;
+                oldest_one = i;
+            }
         }
     }
 
@@ -164,7 +165,7 @@ int OKToSpillOil(tOil_spill_info* pOil) {
     tFace_ref* face_ref;
 
     car = pOil->car;
-    if (car->driver >= eDriver_net_human && car->damage_units[eDamage_engine].damage_level <= 98 && car->damage_units[eDamage_transmission].damage_level <= 98) {
+    if (car->driver >= eDriver_net_human && car->damage_units[eDamage_engine].damage_level < 99 && car->damage_units[eDamage_transmission].damage_level < 99) {
         return 0;
     }
     angle_to_rotate_by = IRandomBetween(0, 0xffff);
@@ -180,38 +181,38 @@ int OKToSpillOil(tOil_spill_info* pOil) {
     BrVector3Set(&v, .0f, .2f, .0f);
     BrMatrix34ApplyP(&ray_pos, &v, &car->car_master_actor->t.t.mat);
     BrVector3Set(&ray_dir, 0.f, kev_bounds.original_bounds.min.v[1] - kev_bounds.original_bounds.max.v[1], 0.f);
-    if (face_count == 0) {
-        return 0;
-    }
-    found_one = 0;
-    for (i = 0; i < face_count; i++) {
-        face_ref = &the_list[i];
-        if (!found_one) {
-            CheckSingleFace(face_ref, &ray_pos, &ray_dir, &normal, &distance);
-            if (distance < 100.f) {
-                found_one = 1;
-                BrVector3Copy((br_vector3*)pOil->actor->t.t.mat.m[1], &normal);
-                BrVector3Set(&v, 0.f, 0.f, 1.f);
-                BrVector3Cross((br_vector3*)pOil->actor->t.t.mat.m[0], &normal, &v);
-                BrVector3Set(&v, 1.f, 0.f, 0.f);
-                BrVector3Cross((br_vector3*)pOil->actor->t.t.mat.m[2], &normal, &v);
-                BrVector3Scale(&v, &ray_dir, distance);
-                BrVector3Add(&pOil->pos, &ray_pos, &v);
-                BrMatrix34PreRotateY(&pOil->actor->t.t.mat, angle_to_rotate_by);
+    if (face_count != 0) {
+        found_one = 0;
+        for (i = 0, face_ref = the_list; i < face_count; i++, face_ref++) {
+            if (!found_one) {
+                CheckSingleFace(face_ref, &ray_pos, &ray_dir, &normal, &distance);
+                if (distance < 100.f) {
+                    found_one = 1;
+                    BrVector3Copy((br_vector3*)pOil->actor->t.t.mat.m[1], &normal);
+                    BrVector3Set(&v, 0.f, 0.f, 1.f);
+                    BrVector3Cross((br_vector3*)pOil->actor->t.t.mat.m[0], &normal, &v);
+                    BrVector3Set(&v, 1.f, 0.f, 0.f);
+                    BrVector3Cross((br_vector3*)pOil->actor->t.t.mat.m[2], &v, &normal);
+                    BrVector3Scale(&v, &ray_dir, distance);
+                    BrVector3Add(&pOil->pos, &ray_pos, &v);
+                    BrMatrix34PreRotateY(&pOil->actor->t.t.mat, angle_to_rotate_by);
+                }
             }
         }
-    }
-    if (!found_one || normal.v[1] < .97f) {
+        if (!found_one || normal.v[1] < .97f) {
+            return 0;
+        } else {
+            for (i = 0, face_ref = the_list; i < face_count; i++, face_ref++) {
+                mr_dotty = BrVector3Dot(&face_ref->normal, &normal);
+                if (mr_dotty < .98f && (mr_dotty > .8f || !NormalSideOfPlane(&pOil->actor->t.t.translate.t, &face_ref->normal, face_ref->d))) {
+                    return 0;
+                }
+            }
+            return 1;
+        }
+    } else {
         return 0;
     }
-    for (i = 0; i < face_count; i++) {
-        face_ref = &the_list[i];
-        mr_dotty = BrVector3Dot(&face_ref->normal, &normal);
-        if (mr_dotty < .98f && (mr_dotty > .8f || !NormalSideOfPlane(&pOil->actor->t.t.translate.t, &face_ref->normal, face_ref->d))) {
-            return 0;
-        }
-    }
-    return 1;
 }
 
 // IDA: void __usercall Vector3Interpolate(br_vector3 *pDst@<EAX>, br_vector3 *pFrom@<EDX>, br_vector3 *pTo@<EBX>, br_scalar pP)
@@ -235,18 +236,20 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
     to_camera.v[1] = gCamera_to_world.m[3][1] - pOld_pos->v[1];
     to_camera.v[2] = gCamera_to_world.m[3][2] - pOld_pos->v[2];
     dist = BrVector3Length(&to_camera);
-    if (dist > BR_SCALAR_EPSILON) {
-        factor = BrVector3Dot(pGround_normal, &to_camera) / dist;
-        if (fabs(factor) <= 0.01f) {
-            s = 0.01f;
-        } else {
-            s = 0.01f / factor;
-            if (s > 0.1f) {
-                s = 0.1f;
-            }
-        }
-        Vector3Interpolate(pNew_pos, pOld_pos, (br_vector3*)gCamera_to_world.m[3], s);
+    if (dist <= BR_SCALAR_EPSILON) {
+        return;
     }
+    s = BrVector3Dot(pGround_normal, &to_camera);
+    s /= dist;
+    if (BR_ABS(s) > 0.01f) {
+        factor = 0.01f / s;
+        if (factor > 0.1f) {
+            factor = 0.1f;
+        }
+    } else {
+        factor = 0.01f;
+    }
+    Vector3Interpolate(pNew_pos, pOld_pos, (br_vector3*)gCamera_to_world.m[3], factor);
 }
 
 // IDA: void __usercall MungeOilsHeightAboveGround(tOil_spill_info *pOil@<EAX>)
@@ -294,24 +297,20 @@ void ProcessOilSpills(tU32 pFrame_period) {
 
     time = GetTotalTime();
     for (i = 0; i < COUNT_OF(gOily_spills); i++) {
-        if (gOily_spills[i].car == NULL) {
-            gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
-        } else {
+        if (gOily_spills[i].car != NULL) {
             the_model = gOily_spills[i].actor->model;
-            if (gOily_spills[i].actor->render_style == BR_RSTYLE_NONE && gOily_spills[i].spill_time <= time && fabs(gOily_spills[i].car->v.v[0]) < .01f && fabs(gOily_spills[i].car->v.v[1]) < .01f && fabs(gOily_spills[i].car->v.v[2]) < .01f) {
+            if (gOily_spills[i].actor->render_style == BR_RSTYLE_NONE && gOily_spills[i].spill_time <= time && BR_ABS(gOily_spills[i].car->v.v[0]) < .01f && BR_ABS(gOily_spills[i].car->v.v[1]) < .01f && BR_ABS(gOily_spills[i].car->v.v[2]) < .01f) {
                 if (gAction_replay_mode) {
                     SetInitialOilStuff(&gOily_spills[i], the_model);
                 } else {
-                    if (!OKToSpillOil(&gOily_spills[i])) {
-                        gOily_spills[i].car = NULL;
-                    } else {
+                    if (OKToSpillOil(&gOily_spills[i])) {
                         gOily_spills[i].spill_time = time;
                         gOily_spills[i].actor->material->colour_map = gOil_pixies[gNext_oil_pixie];
                         gNext_oil_pixie++;
                         if (gNext_oil_pixie >= COUNT_OF(gOil_pixies)) {
                             gNext_oil_pixie = 0;
                         }
-                        BrVector3Copy(&gOily_spills[i].original_pos, &gOily_spills[i].car->pos);
+                        memcpy(&gOily_spills[i].original_pos, &gOily_spills[i].car->pos, sizeof(gOily_spills[i].original_pos));
                         PipeSingleOilSpill(i,
                             &gOily_spills[i].actor->t.t.mat,
                             gOily_spills[i].full_size,
@@ -331,47 +330,52 @@ void ProcessOilSpills(tU32 pFrame_period) {
                             message->contents.data.oil_spill.current_size = gOily_spills[i].current_size;
                             NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, message, NULL);
                         }
+                    } else {
+                        gOily_spills[i].car = NULL;
                     }
                 }
             } else {
                 if (gOily_spills[i].actor->render_style == BR_RSTYLE_FACES && (gOily_spills[i].stop_time == 0 || time < gOily_spills[i].stop_time)) {
                     BrVector3Sub(&v, &gOily_spills[i].original_pos, &gOily_spills[i].car->pos);
-                    grow_amount = BrVector3LengthSquared(&v);
-                    if (gOily_spills[i].stop_time != 0 || grow_amount <= 0.2f) {
-                        this_size = 0.1f + (time - gOily_spills[i].spill_time) * gOily_spills[i].grow_rate;
-                        if (this_size >= 0.1f) {
-                            gOily_spills[i].actor->render_style = BR_RSTYLE_FACES;
-                            if (this_size <= gOily_spills[i].full_size) {
-                                the_model->vertices[0].p.v[0] = -this_size;
-                                the_model->vertices[0].p.v[2] = -this_size;
-                                the_model->vertices[1].p.v[0] = this_size;
-                                the_model->vertices[1].p.v[2] = -this_size;
-                                the_model->vertices[2].p.v[0] = this_size;
-                                the_model->vertices[2].p.v[2] = this_size;
-                                the_model->vertices[3].p.v[0] = -this_size;
-                                the_model->vertices[3].p.v[2] = this_size;
-                                gOily_spills[i].current_size = this_size;
-                            } else {
-                                the_model->vertices[0].p.v[0] = -gOily_spills[i].full_size;
-                                the_model->vertices[0].p.v[2] = -gOily_spills[i].full_size;
-                                the_model->vertices[1].p.v[0] = gOily_spills[i].full_size;
-                                the_model->vertices[1].p.v[2] = -gOily_spills[i].full_size;
-                                the_model->vertices[2].p.v[0] = gOily_spills[i].full_size;
-                                the_model->vertices[2].p.v[2] = gOily_spills[i].full_size;
-                                the_model->vertices[3].p.v[0] = -gOily_spills[i].full_size;
-                                the_model->vertices[3].p.v[2] = gOily_spills[i].full_size;
-                                gOily_spills[i].current_size = gOily_spills[i].full_size;
-                            }
-                            BrModelUpdate(the_model, BR_MODU_ALL);
-                        } else {
-                            gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
+
+                    if (gOily_spills[i].stop_time == 0) {
+                        if (BrVector3LengthSquared(&v) > 0.2f) {
+                            gOily_spills[i].stop_time = time;
+                            continue;
                         }
+                    }
+                    this_size = (int)(time - gOily_spills[i].spill_time) * gOily_spills[i].grow_rate + 0.1f;
+                    if (this_size < 0.1f) {
+                        gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
                     } else {
-                        gOily_spills[i].stop_time = time;
-                        continue;
+                        gOily_spills[i].actor->render_style = BR_RSTYLE_FACES;
+                        if (this_size > gOily_spills[i].full_size) {
+                            the_model->vertices[0].p.v[0] = -gOily_spills[i].full_size;
+                            the_model->vertices[0].p.v[2] = -gOily_spills[i].full_size;
+                            the_model->vertices[1].p.v[0] = gOily_spills[i].full_size;
+                            the_model->vertices[1].p.v[2] = -gOily_spills[i].full_size;
+                            the_model->vertices[2].p.v[0] = gOily_spills[i].full_size;
+                            the_model->vertices[2].p.v[2] = gOily_spills[i].full_size;
+                            the_model->vertices[3].p.v[0] = -gOily_spills[i].full_size;
+                            the_model->vertices[3].p.v[2] = gOily_spills[i].full_size;
+                            gOily_spills[i].current_size = gOily_spills[i].full_size;
+                        } else {
+                            the_model->vertices[0].p.v[0] = -this_size;
+                            the_model->vertices[0].p.v[2] = -this_size;
+                            the_model->vertices[1].p.v[0] = this_size;
+                            the_model->vertices[1].p.v[2] = -this_size;
+                            the_model->vertices[2].p.v[0] = this_size;
+                            the_model->vertices[2].p.v[2] = this_size;
+                            the_model->vertices[3].p.v[0] = -this_size;
+                            the_model->vertices[3].p.v[2] = this_size;
+                            gOily_spills[i].current_size = this_size;
+                        }
+                        BrModelUpdate(the_model, BR_MODU_ALL);
                     }
                 }
             }
+        } else {
+            gOily_spills[i].actor->render_style = BR_RSTYLE_NONE;
         }
         if (gOily_spills[i].actor->render_style == BR_RSTYLE_FACES) {
             MungeOilsHeightAboveGround(&gOily_spills[i]);
@@ -500,8 +504,7 @@ void ReceivedOilSpill(tNet_contents* pContents) {
         if (gOily_spills[i].car == NULL) {
             oily_index = i;
             break;
-        }
-        if (gOily_spills[i].spill_time < oldest_time) {
+        } else if (gOily_spills[i].spill_time < oldest_time) {
             oldest_time = gOily_spills[i].spill_time;
             oldest_one = i;
         }

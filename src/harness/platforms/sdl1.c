@@ -44,17 +44,25 @@ static const char* const possible_locations[] = {
     SDL1_LIBNAME                      /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
+#include "elfdlopennote.h"
+#ifdef ELF_NOTE_DLOPEN
+ELF_NOTE_DLOPEN(
+    "SDL1",
+    "Platform-specific operations such as creating windows and handling events",
+    ELF_NOTE_DLOPEN_PRIORITY_SUGGESTED,
+    "libSDL-1.2.so.0",
+    "libSDL-1.2.so");
+#endif
 static const char* const possible_locations[] = {
     "libSDL-1.2.so.0",
     "libSDL-1.2.so",
 };
 #endif
-#endif
 
-#ifdef DETHRACE_SDL_DYNAMIC
 static void* sdl1_so;
 #endif
 
+#define SDL_NAME "SDL1"
 #define OBJECT_NAME sdl1_so
 #define SYMBOL_PREFIX SDL1_
 #define FOREACH_SDLX_SYM FOREACH_SDL1_SYM
@@ -256,10 +264,6 @@ static void SDL1_Harness_Swap(br_pixelmap* back_buffer) {
         SDL1_GL_SwapBuffers();
     } else {
         SDL1_Renderer_Present(back_buffer);
-
-        if (harness_game_config.fps != 0) {
-            limit_fps();
-        }
     }
 }
 
@@ -288,12 +292,6 @@ static void SDL1_Harness_GetViewport(int* x, int* y, float* width_multipler, flo
     *height_multiplier = viewport.scale_y;
 }
 
-static void SDL1_Harness_GetPrefPath(char* path, char* app_name) {
-    // SDL_GetPrefPath not in SDL1. We could implement it if we really needed to.
-    // for now, just return the current path
-    strcpy(path, ".");
-}
-
 static int SDL1_Harness_Platform_Init(tHarness_platform* platform) {
     if (SDL1_LoadSymbols() != 0) {
         return 1;
@@ -315,7 +313,6 @@ static int SDL1_Harness_Platform_Init(tHarness_platform* platform) {
     platform->PaletteChanged = SDL1_Harness_PaletteChanged;
     platform->GL_GetProcAddress = SDL1_GL_GetProcAddress;
     platform->GetViewport = SDL1_Harness_GetViewport;
-    platform->GetPrefPath = SDL1_Harness_GetPrefPath;
     return 0;
 }
 

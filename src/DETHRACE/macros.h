@@ -1,14 +1,18 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+/*
+ * All macros contained in this file were created as part of the reverse engineering effort
+ * and may or may not exist (or use the same names) in the retail code.
+ *
+ */
+
 #define DR_JOIN2(A, B) A##B
 #define DR_JOIN(A, B) DR_JOIN2(A, B)
 #define DR_STATIC_ASSERT(V) typedef int DR_JOIN(dr_static_assert_, __COUNTER__)[(V) ? 1 : -1]
 
 #define VEHICLE_TYPE_FROM_ID(id) ((tVehicle_type)(id >> 8))
 #define VEHICLE_INDEX_FROM_ID(id) ((id) & 0x00ff)
-
-// #define VEC3_TRANSLATE(mat) (*(br_vector3*)(&mat->m[3][0]))
 
 #define SLOBYTE(x) (*((signed char*)&(x)))
 
@@ -20,6 +24,8 @@
 
 #define COUNT_OF(array) (int)(sizeof((array)) / sizeof((array)[0]))
 #define LEN(array) (sizeof((array)) / sizeof((array)[0]))
+
+#define MAT(m, row, col) (*((br_scalar*)(m) + (row) * 3 + (col)))
 
 #define DEG_TO_RAD(degrees) ((degrees) * 3.141592653589793 / 180.0)
 
@@ -55,23 +61,14 @@
         (V2) = (T);                         \
     } while (0)
 
-#define ReadVector3(pF, a, b, c)                 \
-    do {                                         \
-        float x[3];                              \
-        GetThreeFloats(pF, &x[2], &x[1], &x[0]); \
-        a = x[2];                                \
-        b = x[1];                                \
-        c = x[0];                                \
-                                                 \
-    } while (0)
-
-#define ReadVector32(pF, a, b, c)                \
-    do {                                         \
-        float x[3];                              \
-        GetThreeFloats(pF, &x[2], &x[1], &x[0]); \
-        b = x[2];                                \
-        c = x[1];                                \
-        a = x[0];                                \
+#define ReadThreeFloats(pF, a, b, c)          \
+    do {                                      \
+        float x_0, x_1, x_2;                  \
+        GetThreeFloats(pF, &x_0, &x_1, &x_2); \
+        a = x_0;                              \
+        b = x_1;                              \
+        c = x_2;                              \
+                                              \
     } while (0)
 
 #define ReadPairOfFloats(pF, a, b)         \
@@ -82,11 +79,26 @@
         b = x[0];                          \
     } while (0)
 
-#define DRVector3Scale(v1, v2, s)           \
-    do {                                    \
-        (v1)->v[0] = BR_MUL((v2)->v[0], s); \
-        (v1)->v[1] = BR_MUL((v2)->v[1], s); \
-        (v1)->v[2] = BR_MUL((v2)->v[2], s); \
+#define ReadPairOfInts(pF, a, b)         \
+    do {                                 \
+        int d[2];                        \
+        GetPairOfInts(pF, &d[1], &d[0]); \
+        a = d[1];                        \
+        b = d[0];                        \
     } while (0)
 
+#define mGetThreeFloats(pF) \
+    float x_0, x_1, x_2;    \
+    GetThreeFloats(pF, &x_0, &x_1, &x_2);
+
+// Many switches in the original code did not include handling all values, causing warnings in modern compilers
+#ifdef DETHRACE_FIX_BUGS
+#define DETHRACE_DEFAULT_BREAK \
+    default:                   \
+        break;
+#else
+#define DETHRACE_DEFAULT_BREAK
+#endif
+
+// MACROS_H
 #endif

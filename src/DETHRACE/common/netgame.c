@@ -8,6 +8,7 @@
 #include "errors.h"
 #include "globvars.h"
 #include "globvrbm.h"
+#include "globvrkm.h"
 #include "globvrpb.h"
 #include "grafdata.h"
 #include "graphics.h"
@@ -40,10 +41,10 @@ int gPed_target;
 // GLOBAL: CARM95 0x00532210
 int gNot_shown_race_type_headup;
 
-// GLOBAL: CARM95 0x00532208
+// GLOBAL: CARM95 0x00532204
 tU32 gLast_it_change;
 
-// GLOBAL: CARM95 0x00532204
+// GLOBAL: CARM95 0x00532208
 tU32 gTime_for_punishment;
 
 // GLOBAL: CARM95 0x00532200
@@ -55,7 +56,7 @@ int gInitialised_grid;
 // GLOBAL: CARM95 0x00551d80
 int gIt_or_fox;
 
-#define PACK_POWERUPS(car) (car->power_up_levels[0] & 0xff) + ((car->power_up_levels[2] & 0xff) << 6) + ((car->power_up_levels[1] & 0xff) << 3);
+#define PACK_POWERUPS(car) car->power_up_levels[0] + (car->power_up_levels[1] << 3) + (car->power_up_levels[2] << 6);
 
 // IDA: void __usercall SendCarData(tU32 pNext_frame_time@<EAX>)
 // FUNCTION: CARM95 0x0042f2d0
@@ -71,7 +72,10 @@ void SendCarData(tU32 pNext_frame_time) {
     int damaged_wheels;
 
     time = GetRaceTime();
-    if (gNet_mode == eNet_mode_none || (time > last_time && last_time + 80 > time)) {
+    if (gNet_mode == eNet_mode_none) {
+        return;
+    }
+    if (time > last_time && last_time + 80 > time) {
         return;
     }
     last_time = time;
@@ -93,8 +97,8 @@ void SendCarData(tU32 pNext_frame_time) {
             BrVector3Copy(&contents->data.mech.v, &car->v);
             contents->data.mech.curvature = (car->curvature / car->maxcurve * 32767.0f);
             contents->data.mech.keys = car->keys;
-            contents->data.mech.keys.joystick_acc = (tU8)(car->joystick.acc >> 9);
-            contents->data.mech.keys.joystick_dec = (tU8)(car->joystick.dec >> 9);
+            contents->data.mech.keys.joystick_acc = (car->joystick.acc >> 9) & 0xff;
+            contents->data.mech.keys.joystick_dec = (car->joystick.dec >> 9) & 0xff;
             contents->data.mech.revs = car->revs;
             for (j = 0; j < COUNT_OF(contents->data.mech.d); j++) {
                 contents->data.mech.d[j] = (int)(car->oldd[j] / car->susp_height[j >> 1] * 255.0f);
@@ -154,7 +158,7 @@ void SendCarData(tU32 pNext_frame_time) {
         }
         damaged_wheels = car->damage_units[eDamage_lf_wheel].damage_level > 30 || car->damage_units[eDamage_rf_wheel].damage_level > 30 || car->damage_units[eDamage_lr_wheel].damage_level > 30 || car->damage_units[eDamage_rr_wheel].damage_level > 30;
         contents = NetGetToHostContents(NETMSGID_MECHANICS, damaged_wheels);
-        GetReducedMatrix(&contents->data.mech.mat, &gProgram_state.current_car.car_master_actor->t.t.mat);
+        GetReducedMatrix(&contents->data.mech.mat, &car->car_master_actor->t.t.mat);
         contents->data.mech.ID = gNet_players[gThis_net_player_index].ID;
         contents->data.mech.time = pNext_frame_time;
         BrVector3Copy(&contents->data.mech.omega, &car->omega);
@@ -162,8 +166,8 @@ void SendCarData(tU32 pNext_frame_time) {
 
         contents->data.mech.curvature = (car->curvature / car->maxcurve * 32767.0f);
         contents->data.mech.keys = car->keys;
-        contents->data.mech.keys.joystick_acc = (tU8)(car->joystick.acc >> 9);
-        contents->data.mech.keys.joystick_dec = (tU8)(car->joystick.dec >> 9);
+        contents->data.mech.keys.joystick_acc = (car->joystick.acc >> 9) & 0xff;
+        contents->data.mech.keys.joystick_dec = (car->joystick.dec >> 9) & 0xff;
         contents->data.mech.revs = car->revs;
         contents->data.mech.cc_coll_time = car->last_car_car_collision;
         for (j = 0; j < COUNT_OF(contents->data.mech.d); j++) {
@@ -181,10 +185,10 @@ void SendCarData(tU32 pNext_frame_time) {
                 contents->data.mech.wheel_dam_offset[j] = car->wheel_dam_offset[j];
             }
         }
-        if (car->time_to_recover > 0 && car->time_to_recover - 500 < pNext_frame_time) {
+        if (car->time_to_recover != 0 && car->time_to_recover - 500 < pNext_frame_time) {
             contents = NetGetToHostContents(NETMSGID_RECOVER, 0);
             contents->data.recover.ID = gNet_players[gThis_net_player_index].ID;
-            contents->data.recover.time_to_recover = gProgram_state.current_car.time_to_recover;
+            contents->data.recover.time_to_recover = car->time_to_recover;
         }
     }
 }
@@ -194,11 +198,12 @@ void SendCarData(tU32 pNext_frame_time) {
 void ReceivedRecover(tNet_contents* pContents) {
     int i;
 
-    if (gNet_players[gThis_net_player_index].ID != pContents->data.player_list.number_of_players) {
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            if (gNet_players[i].ID == pContents->data.player_list.number_of_players) {
-                gNet_players[i].car->time_to_recover = pContents->data.mech.time;
-            }
+    if (gNet_players[gThis_net_player_index].ID == pContents->data.recover.ID) {
+        return;
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gNet_players[i].ID == pContents->data.recover.ID) {
+            gNet_players[i].car->time_to_recover = pContents->data.recover.time_to_recover;
         }
     }
 }
@@ -230,17 +235,14 @@ void ReceivedMechanics(tNet_contents* pContents) {
             break;
         }
     }
-    if (car == NULL || car->message.time >= pContents->data.mech.time) {
+    if (car == NULL || car->message.time > pContents->data.mech.time) {
         return;
     }
     if (car->disabled) {
         EnableCar(car);
         GetExpandedMatrix(&car->car_master_actor->t.t.mat, &pContents->data.mech.mat);
         BrMatrix34Copy(&car->oldmat, &car->car_master_actor->t.t.mat);
-        BrVector3InvScale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
-        // car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] * 0.14492753;
-        // car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * 0.14492753;
-        // car->car_master_actor->t.t.mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * 0.14492753;
+        BrVector3Scale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, 1 / WORLD_SCALE);
         car->box_face_ref = gFace_num__car - 2;
         car->message.time = pContents->data.mech.time;
         car->message.type = NETMSGID_NONE;
@@ -257,54 +259,53 @@ void ReceivedMechanics(tNet_contents* pContents) {
         return;
     }
     if (gNet_mode == eNet_mode_host) {
-        if (gThis_net_player_index == i) {
-            return;
-        }
-        if (car->last_car_car_collision <= pContents->data.mech.cc_coll_time) {
-            CopyMechanics(car, pContents);
-        }
-        car->power_up_levels[0] = pContents->data.mech.powerups & 7;
-        car->power_up_levels[1] = (pContents->data.mech.powerups >> 3) & 7;
-        car->power_up_levels[2] = (pContents->data.mech.powerups >> 6) & 7;
-        car->keys = car->message.keys;
-        if (car->message.keys.joystick_acc < 0) {
-            car->joystick.acc = -1;
-        } else {
-            car->joystick.acc = car->message.keys.joystick_acc << 9;
-        }
-        if (car->message.keys.joystick_dec < 0) {
-            car->joystick.dec = -1;
-        } else {
-            car->joystick.dec = car->message.keys.joystick_dec << 9;
-        }
-    } else if (gNet_mode == eNet_mode_client) {
-        if (gThis_net_player_index == i) {
-            if (car->last_car_car_collision < pContents->data.mech.cc_coll_time) {
+        if (gThis_net_player_index != i) {
+            if (car->last_car_car_collision <= pContents->data.mech.cc_coll_time) {
                 CopyMechanics(car, pContents);
             }
-        } else {
+            car->power_up_levels[0] = pContents->data.mech.powerups & 7;
+            car->power_up_levels[1] = (pContents->data.mech.powerups >> 3) & 7;
+            car->power_up_levels[2] = (pContents->data.mech.powerups >> 6) & 7;
+            car->keys = car->message.keys;
+            if (car->message.keys.joystick_acc >= 0) {
+                car->joystick.acc = car->message.keys.joystick_acc << 9;
+            } else {
+                car->joystick.acc = -1;
+            }
+            if (car->message.keys.joystick_dec >= 0) {
+                car->joystick.dec = car->message.keys.joystick_dec << 9;
+            } else {
+                car->joystick.dec = -1;
+            }
+        }
+    } else if (gNet_mode == eNet_mode_client) {
+        if (gThis_net_player_index != i) {
             CopyMechanics(car, pContents);
             car->power_up_levels[0] = pContents->data.mech.powerups & 7;
             car->power_up_levels[1] = (pContents->data.mech.powerups >> 3) & 7;
             car->power_up_levels[2] = (pContents->data.mech.powerups >> 6) & 7;
             car->keys = car->message.keys;
-            if (car->message.keys.joystick_acc < 0) {
-                car->joystick.acc = -1;
-            } else {
+            if (car->message.keys.joystick_acc >= 0) {
                 car->joystick.acc = car->message.keys.joystick_acc << 9;
-            }
-            if (car->message.keys.joystick_dec < 0) {
-                car->joystick.dec = -1;
             } else {
+                car->joystick.acc = -1;
+            }
+            if (car->message.keys.joystick_dec >= 0) {
                 car->joystick.dec = car->message.keys.joystick_dec << 9;
+            } else {
+                car->joystick.dec = -1;
             }
             if (!car->active) {
                 GetExpandedMatrix(&car->car_master_actor->t.t.mat, &pContents->data.mech.mat);
                 BrMatrix34Copy(&car->oldmat, &car->car_master_actor->t.t.mat);
                 BrMatrix34ApplyP(&car->pos, &car->cmpos, &car->car_master_actor->t.t.mat);
-                BrVector3InvScale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
-                BrVector3InvScale(&car->pos, &car->pos, WORLD_SCALE);
+                BrVector3Scale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, 1 / WORLD_SCALE);
+                BrVector3Scale(&car->pos, &car->pos, 1 / WORLD_SCALE);
                 car->box_face_ref = gFace_num__car - 2;
+            }
+        } else {
+            if (car->last_car_car_collision < pContents->data.mech.cc_coll_time) {
+                CopyMechanics(car, pContents);
             }
         }
     }
@@ -319,14 +320,18 @@ void ReceivedCopInfo(tNet_contents* pContents) {
     if (gNet_mode != eNet_mode_client) {
         return;
     }
-    if (pContents->data.cop_info.ID & 0xffffff00) {
-        c = GetCarSpec(pContents->data.cop_info.ID >> 8, pContents->data.cop_info.ID & 0xff);
-    } else {
+    if (pContents->data.cop_info.ID >> 8 == 0) {
         c = &gProgram_state.current_car;
+    } else {
+        c = GetCarSpec(pContents->data.cop_info.ID >> 8, pContents->data.cop_info.ID & 0xff);
     }
-    if (c == NULL || c->message.time > pContents->data.cop_info.time) {
+    if (c == NULL) {
         return;
     }
+    if (pContents->data.cop_info.time > c->message.time) {
+        return;
+    }
+
     c->message.time = pContents->data.cop_info.time;
     if (c->active) {
         c->message.type = NETMSGID_MECHANICS;
@@ -342,7 +347,7 @@ void ReceivedCopInfo(tNet_contents* pContents) {
         }
     } else {
         GetExpandedMatrix(&c->car_master_actor->t.t.mat, &pContents->data.cop_info.mat);
-        BrVector3InvScale(&c->car_master_actor->t.t.translate.t, &c->car_master_actor->t.t.translate.t, WORLD_SCALE);
+        BrVector3Scale(&c->car_master_actor->t.t.translate.t, &c->car_master_actor->t.t.translate.t, 1 / WORLD_SCALE);
         for (i = 0; i < COUNT_OF(c->damage_units); i++) {
             c->damage_units[i].damage_level = pContents->data.cop_info.damage[i];
         }
@@ -359,15 +364,17 @@ void SendAllNonCarPositions(void) {
 
     list = gProgram_state.track_spec.non_car_list;
     for (i = 0; i < gProgram_state.track_spec.ampersand_digits; ++i) {
-        if (list[i]->type_data != NULL) {
-            non_car = (tNon_car_spec*)list[i]->type_data;
-            if (non_car->collision_info.driver == eDriver_non_car_unused_slot || non_car->collision_info.car_ID != i) {
-                contents = NetGetBroadcastContents(NETMSGID_NONCARPOSITION, 0);
-                BrMatrix34Copy(&contents->data.non_car_position.mat, &list[i]->t.t.mat);
-                contents->data.non_car_position.ID = i;
-                contents->data.non_car_position.flags = list[i]->identifier[3] == '!';
-            }
+        if (list[i]->type_data == NULL) {
+            continue;
         }
+        non_car = (tNon_car_spec*)list[i]->type_data;
+        if (non_car->collision_info.driver != eDriver_non_car_unused_slot && non_car->collision_info.car_ID == i) {
+            continue;
+        }
+        contents = NetGetBroadcastContents(NETMSGID_NONCARPOSITION, 0);
+        BrMatrix34Copy(&contents->data.non_car_position.mat, &list[i]->t.t.mat);
+        contents->data.non_car_position.ID = i;
+        contents->data.non_car_position.flags = list[i]->identifier[3] == '!';
     }
     NetSendMessageStacks();
 }
@@ -378,11 +385,12 @@ void ReceivedNonCarPosition(tNet_contents* pContents) {
     br_actor* actor;
 
     actor = gProgram_state.track_spec.non_car_list[pContents->data.non_car_position.ID];
-    if (actor != NULL && gNet_mode != eNet_mode_none) {
-        BrMatrix34Copy(&actor->t.t.mat, &pContents->data.non_car_position.mat);
-        if (pContents->data.non_car_position.flags) {
-            actor->identifier[3] = '!';
-        }
+    if (actor == NULL || gNet_mode == eNet_mode_host) {
+        return;
+    }
+    BrMatrix34Copy(&actor->t.t.mat, &pContents->data.non_car_position.mat);
+    if (pContents->data.non_car_position.flags) {
+        actor->identifier[3] = '!';
     }
 }
 
@@ -398,10 +406,10 @@ void ReceivedNonCar(tNet_contents* pContents) {
     tCollision_info* c;
 
     track_spec = &gProgram_state.track_spec;
-    if (pContents->data.non_car.ID >= track_spec->ampersand_digits) {
+    if (pContents->data.non_car.ID >= gProgram_state.track_spec.ampersand_digits) {
         return;
     }
-    actor = track_spec->non_car_list[pContents->data.non_car.ID];
+    actor = gProgram_state.track_spec.non_car_list[pContents->data.non_car.ID];
     if (actor == NULL) {
         return;
     }
@@ -421,7 +429,17 @@ void ReceivedNonCar(tNet_contents* pContents) {
             ncar = (tNon_car_spec*)actor->type_data;
         }
     }
-    if (ncar != NULL) {
+    if (ncar == NULL) {
+        GetExpandedMatrix(&actor->t.t.mat, &pContents->data.non_car.mat);
+        BrVector3Scale(&actor->t.t.translate.t, &actor->t.t.translate.t, 1 / WORLD_SCALE);
+        XZToColumnXZ(&cx, &cz, actor->t.t.translate.t.v[0], actor->t.t.translate.t.v[2], track_spec);
+        if (track_spec->columns[cz][cx] != actor->parent) {
+            if (track_spec->columns[cz][cx] != NULL) {
+                BrActorRemove(actor);
+                BrActorAdd(track_spec->columns[cz][cx], actor);
+            }
+        }
+    } else {
         c = &ncar->collision_info;
         if ((pContents->data.non_car.flags & 2) != 0) {
             GetExpandedMatrix(&c->car_master_actor->t.t.mat, &pContents->data.non_car.mat);
@@ -435,16 +453,6 @@ void ReceivedNonCar(tNet_contents* pContents) {
             c->message.time = pContents->data.non_car.time;
             c->message.type = NETMSGID_NONCAR_INFO;
             c->doing_nothing_flag = 0;
-        }
-    } else {
-        GetExpandedMatrix(&actor->t.t.mat, &pContents->data.mech.mat);
-        BrVector3InvScale(&actor->t.t.translate.t, &actor->t.t.translate.t, WORLD_SCALE);
-        XZToColumnXZ(&cx, &cz, actor->t.t.translate.t.v[0], actor->t.t.translate.t.v[2], track_spec);
-        if (track_spec->columns[cz][cx] != actor->parent) {
-            if (track_spec->columns[cz][cx] != NULL) {
-                BrActorRemove(actor);
-                BrActorAdd(track_spec->columns[cz][cx], actor);
-            }
         }
     }
 }
@@ -465,14 +473,7 @@ void SignalToStartRace2(int pIndex) {
     gStart_race_sent = 1;
     the_message = NetBuildMessage(NETMSGID_STARTRACE, 0);
     the_message->contents.data.start_race.racing = gProgram_state.racing;
-    if (pIndex >= 0) {
-        gNet_players[pIndex].last_waste_message = 0;
-        gNet_players[pIndex].wasteage_attributed = 0;
-        the_message->contents.data.start_race.car_count = -1;
-        the_message->contents.data.start_race.car_list[0].index = pIndex;
-        BrMatrix34Copy(&the_message->contents.data.start_race.car_list[0].mat,
-            &gCurrent_race.opponent_list[gNet_players[pIndex].opponent_list_index].car_spec->car_master_actor->t.t.mat);
-    } else {
+    if (pIndex < 0) {
         the_message->contents.data.start_race.car_count = gCurrent_race.number_of_racers;
         for (i = 0; i < gCurrent_race.number_of_racers; i++) {
             BrMatrix34Copy(&the_message->contents.data.start_race.car_list[i].mat,
@@ -496,6 +497,14 @@ void SignalToStartRace2(int pIndex) {
                 gCurrent_net_game->options.race_sequence_type);
         }
         the_message->contents.data.start_race.next_race = gPending_race;
+
+    } else {
+        gNet_players[pIndex].last_waste_message = 0;
+        gNet_players[pIndex].wasteage_attributed = 0;
+        the_message->contents.data.start_race.car_count = -1;
+        the_message->contents.data.start_race.car_list[0].index = pIndex;
+        BrMatrix34Copy(&the_message->contents.data.start_race.car_list[0].mat,
+            &gCurrent_race.opponent_list[gNet_players[pIndex].opponent_list_index].car_spec->car_master_actor->t.t.mat);
     }
     NetGuaranteedSendMessageToAllPlayers(gCurrent_net_game, the_message, NULL);
     if (gProgram_state.racing) {
@@ -535,6 +544,7 @@ void SetUpNetCarPositions(void) {
         gCurrent_race.opponent_list[i].net_player_index = i;
         gNet_players[i].opponent_list_index = i;
     }
+    racer_count = gNumber_of_net_players;
     if (!gInitialised_grid && gCurrent_net_game->options.grid_start) {
         qsort(gCurrent_race.opponent_list, gNumber_of_net_players, sizeof(tOpp_spec), SortGridFunction);
     }
@@ -542,37 +552,36 @@ void SetUpNetCarPositions(void) {
     for (i = 0; i < gNumber_of_net_players; i++) {
         gNet_players[gCurrent_race.opponent_list[i].net_player_index].opponent_list_index = i;
     }
-    for (i = 0; i < gNumber_of_net_players; i++) {
+    for (i = 0; i < racer_count; i++) {
         if ((gCurrent_race.opponent_list[i].car_spec->driver == eDriver_oppo && !gInitialised_grid)
             || (gCurrent_race.opponent_list[i].car_spec->driver >= eDriver_net_human && !gNet_players[gCurrent_race.opponent_list[i].net_player_index].grid_position_set)) {
             grid_index = -1;
-            racer_count = 0;
-            while (racer_count < 6 && grid_index < 0) {
-                grid_index = racer_count;
-                for (k = 0; k < gNumber_of_net_players; k++) {
+
+            for (j = 0; j < OPPONENT_COUNT + 1 && grid_index < 0; j++) {
+                grid_index = j;
+                for (k = 0; k < racer_count; k++) {
                     if (k != i
                         && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_position_set
-                        && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_index == racer_count) {
+                        && gNet_players[gCurrent_race.opponent_list[k].net_player_index].grid_index == j) {
                         grid_index = -1;
                         break;
                     }
                 }
-                racer_count++;
             }
             if (grid_index < 0) {
                 FatalError(kFatalError_NetworkCodeSelfCheck);
             }
             SetInitialPosition(&gCurrent_race, i, grid_index);
             gNet_players[gCurrent_race.opponent_list[i].net_player_index].grid_index = grid_index;
-            if (gInitialised_grid) {
-                InitialiseCar2(gCurrent_race.opponent_list[i].car_spec, 0);
-            } else {
+            if (!gInitialised_grid) {
                 gCurrent_race.number_of_racers = i + 1;
+            } else {
+                InitialiseCar2(gCurrent_race.opponent_list[i].car_spec, 0);
             }
             gNet_players[gCurrent_race.opponent_list[i].net_player_index].grid_position_set = 1;
         }
     }
-    gCurrent_race.number_of_racers = gNumber_of_net_players;
+    gCurrent_race.number_of_racers = racer_count;
     gInitialised_grid = 1;
     ReenableNetService();
 }
@@ -628,9 +637,7 @@ void DisableCar(tCar_spec* pCar) {
             ForceRebuildActiveCarList();
         }
         if (pCar->car_master_actor->t.t.mat.m[3][0] < 500.0f) {
-            pCar->car_master_actor->t.t.mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0] + 1000.0f;
-            pCar->car_master_actor->t.t.mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1] + 1000.0f;
-            pCar->car_master_actor->t.t.mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2] + 1000.0f;
+            BrVector3Add(&pCar->car_master_actor->t.t.translate.t, &pCar->car_master_actor->t.t.translate.t, &gDisabled_vector);
             pCar->old_frame_mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0];
             pCar->old_frame_mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1];
             pCar->old_frame_mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2];
@@ -648,9 +655,7 @@ void EnableCar(tCar_spec* pCar) {
             ForceRebuildActiveCarList();
         }
         if (pCar->car_master_actor->t.t.mat.m[3][0] > 500.0f) {
-            pCar->car_master_actor->t.t.mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0] - 1000.0f;
-            pCar->car_master_actor->t.t.mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1] - 1000.0f;
-            pCar->car_master_actor->t.t.mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2] - 1000.0f;
+            BrVector3Sub(&pCar->car_master_actor->t.t.translate.t, &pCar->car_master_actor->t.t.translate.t, &gDisabled_vector);
             pCar->old_frame_mat.m[3][0] = pCar->car_master_actor->t.t.mat.m[3][0];
             pCar->old_frame_mat.m[3][1] = pCar->car_master_actor->t.t.mat.m[3][1];
             pCar->old_frame_mat.m[3][2] = pCar->car_master_actor->t.t.mat.m[3][2];
@@ -670,33 +675,35 @@ void DoNetworkHeadups(int pCredits) {
 
     if (gNot_shown_race_type_headup) {
         gNot_shown_race_type_headup = 0;
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_NetworkGameTypeNames_START + gCurrent_net_game->type));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_NetworkGameTypeNames_START + gCurrent_net_game->type));
     }
     if (gTime_for_punishment && gTime_for_punishment <= PDGetTotalTime()) {
         gTime_for_punishment = 0;
         switch (gCurrent_net_game->type) {
         case eNet_game_type_carnage:
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_THAT_HALVED_YOUR_KILL_COUNT));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_THAT_HALVED_YOUR_KILL_COUNT));
             break;
         case eNet_game_type_checkpoint:
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_THAT_LOST_YOU_A_CHECKPOINT));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_THAT_LOST_YOU_A_CHECKPOINT));
             break;
         case eNet_game_type_sudden_death:
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_BACK_TO_THE_START));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_BACK_TO_THE_START));
             break;
         case eNet_game_type_foxy:
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -4, GetMiscString(kMiscString_THAT_HALVED_YOUR_TIME));
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_THAT_HALVED_YOUR_TIME));
             break;
-        default:
-            break;
+
+            DETHRACE_DEFAULT_BREAK
         }
     }
-    if (gNet_mode == eNet_mode_none || gNet_recovery_cost[gCurrent_net_game->type] <= gProgram_state.credits_earned - gProgram_state.credits_lost || Flash(200, &last_flash, &flash_state)) {
+
+    if (!gNet_mode || ((gNet_mode ? gNet_recovery_cost[gCurrent_net_game->type] : gRecovery_cost[gProgram_state.skill_level]) <= (gProgram_state.credits_earned - gProgram_state.credits_lost) || Flash(200, &last_flash, &flash_state))) {
         sprintf(s, "\xf8%d\xfa %s", pCredits, GetMiscString(kMiscString_CREDITS));
         ChangeHeadupText(gNet_cash_headup, s);
     } else {
         ChangeHeadupText(gNet_cash_headup, "");
     }
+
     switch (gCurrent_net_game->type) {
     case eNet_game_type_carnage:
         sprintf(s, "%s \xf8%d\xfa", GetMiscString(kMiscString_TARGET_180), gPed_target);
@@ -714,7 +721,7 @@ void DoNetworkHeadups(int pCredits) {
         break;
     default:
         s[0] = '\0';
-        break;
+        // break;
     }
     ChangeHeadupText(gNet_ped_headup, s);
 }
@@ -734,11 +741,11 @@ int SortNetHeadAscending(void* pFirst_one, void* pSecond_one) {
         }
     } else if (HEADUP2->out_of_game) {
         return -INT_MAX;
-    } else if (HEADUP2->score == HEADUP1->score) {
+    } else if (HEADUP2->score != HEADUP1->score) {
+        return HEADUP1->score - HEADUP2->score;
+    } else {
         return gNet_players[HEADUP1->player_index].last_score_index
             - gNet_players[HEADUP2->player_index].last_score_index;
-    } else {
-        return HEADUP1->score - HEADUP2->score;
     }
 }
 
@@ -754,11 +761,11 @@ int SortNetHeadDescending(void* pFirst_one, void* pSecond_one) {
         }
     } else if (HEADUP2->out_of_game) {
         return -INT_MAX;
-    } else if (HEADUP2->score == HEADUP1->score) {
+    } else if (HEADUP2->score != HEADUP1->score) {
+        return HEADUP2->score - HEADUP1->score;
+    } else {
         return gNet_players[HEADUP1->player_index].last_score_index
             - gNet_players[HEADUP2->player_index].last_score_index;
-    } else {
-        return HEADUP2->score - HEADUP1->score;
     }
 }
 
@@ -795,7 +802,15 @@ void DoNetScores2(int pOnly_sort_scores) {
 
     ascending_order = gCurrent_net_game->type == eNet_game_type_checkpoint || gCurrent_net_game->type == eNet_game_type_tag;
     for (i = 0; i < gNumber_of_net_players; i++) {
-        if (gNet_players[i].player_status < ePlayer_status_racing) {
+        if (gNet_players[i].player_status >= ePlayer_status_racing) {
+            headup_pairs[i].player_index = i;
+            headup_pairs[i].score = gNet_players[i].score;
+            if (abs(gNet_players[i].score) == 1000000 || (gNet_players[i].score < 0 && gCurrent_net_game->type != eNet_game_type_car_crusher)) {
+                headup_pairs[i].out_of_game = gNet_players[i].last_score_index + 1;
+            } else {
+                headup_pairs[i].out_of_game = 0;
+            }
+        } else {
             headup_pairs[i].player_index = -1;
             if (ascending_order) {
                 headup_pairs[i].score = 1000001;
@@ -803,14 +818,6 @@ void DoNetScores2(int pOnly_sort_scores) {
                 headup_pairs[i].score = -1000001;
             }
             headup_pairs[i].out_of_game = 1000;
-        } else {
-            headup_pairs[i].player_index = i;
-            headup_pairs[i].score = gNet_players[i].score;
-            if (abs(gNet_players[i].score) != 1000000 && (gNet_players[i].score >= 0 || gCurrent_net_game->type == eNet_game_type_car_crusher)) {
-                headup_pairs[i].out_of_game = 0;
-            } else {
-                headup_pairs[i].out_of_game = gNet_players[i].last_score_index + 1;
-            }
         }
     }
     for (i = gNumber_of_net_players; i < COUNT_OF(headup_pairs); i++) {
@@ -843,10 +850,10 @@ void DoNetScores2(int pOnly_sort_scores) {
                 || (gCurrent_net_game->type != eNet_game_type_tag && gCurrent_net_game->type != eNet_game_type_foxy)
                 || index != gIt_or_fox) {
                 if (gNet_players[index].name_not_clipped) {
-                    ClipName(gNet_players[index].player_name, &gFonts[6], gCurrent_graf_data->net_head_box_width - gCurrent_graf_data->net_head_name_x_marg - 2);
+                    ClipName(gNet_players[index].player_name, &gFonts[kFont_NEWHITE], gCurrent_graf_data->net_head_box_width - gCurrent_graf_data->net_head_name_x_marg - 2);
                     gNet_players[index].name_not_clipped = 0;
                 }
-                TransDRPixelmapText(gBack_screen, x + gCurrent_graf_data->net_head_name_x_marg, gCurrent_graf_data->net_head_name_y, &gFonts[6], gNet_players[index].player_name, right_edge);
+                TransDRPixelmapText(gBack_screen, x + gCurrent_graf_data->net_head_name_x_marg, gCurrent_graf_data->net_head_name_y, &gFonts[kFont_NEWHITE], gNet_players[index].player_name, right_edge);
             }
             if (abs(gNet_players[index].score) == 1000000) {
                 if (flash_state) {
@@ -866,36 +873,36 @@ void DoNetScores2(int pOnly_sort_scores) {
                 case eNet_game_type_checkpoint:
                     sprintf(s, "%d left", gNet_players[index].score >> 16);
                     break;
-                case eNet_game_type_sudden_death:
+                case eNet_game_type_tag:
+                case eNet_game_type_foxy:
                     if (gNet_players[index].score < 0) {
+                        sprintf(s, "%s", GetMiscString(kMiscString_OUT));
+                    } else {
+                        if (index != gIt_or_fox || flash_state) {
+                            TimerString(gNet_players[index].score, s, 0, 1);
+                        } else {
+                            s[0] = '\0';
+                        }
+                    }
+                    break;
+                case eNet_game_type_sudden_death:
+                    if (gNet_players[index].score >= 0) {
+                        sprintf(s, "%s -%d-", GetMiscString(kMiscString_IN), gNet_players[index].score);
+                    } else {
                         if (flash_state) {
                             sprintf(s, "%s", GetMiscString(kMiscString_OUT));
                         } else {
                             s[0] = '\0';
                         }
-                    } else {
-                        score = gNet_players[index].score;
-                        sprintf(s, "%s -%d-", GetMiscString(kMiscString_IN), score);
                     }
-                    break;
-                case eNet_game_type_tag:
-                case eNet_game_type_foxy:
-                    if (gNet_players[index].score >= 0) {
-                        if (index == gIt_or_fox && !flash_state) {
-                            s[0] = '\0';
-                        } else {
-                            TimerString(gNet_players[index].score, s, 0, 1);
-                        }
-                    } else {
-                        sprintf(s, "%s", GetMiscString(kMiscString_OUT));
-                    }
-                    break;
+                    // break;
+
                 default:
                     break;
                 }
             }
-            len = DRTextWidth(&gFonts[6], s);
-            TransDRPixelmapText(gBack_screen, x + gCurrent_graf_data->net_head_score_x - len, gCurrent_graf_data->net_head_score_y, &gFonts[6], s, right_edge);
+            len = DRTextWidth(&gFonts[kFont_NEWHITE], s);
+            TransDRPixelmapText(gBack_screen, x + gCurrent_graf_data->net_head_score_x - len, gCurrent_graf_data->net_head_score_y, &gFonts[kFont_NEWHITE], s, right_edge);
             DRPixelmapRectangleMaskedCopy(gBack_screen, x + gCurrent_graf_data->net_head_num_x, gCurrent_graf_data->net_head_num_y, gDigits_pix, 0, i * gCurrent_graf_data->net_head_num_height, gDigits_pix->width, gCurrent_graf_data->net_head_num_height);
             DRPixelmapRectangleMaskedCopy(gBack_screen, x + gCurrent_graf_data->net_head_icon_x, gCurrent_graf_data->net_head_icon_y, gIcons_pix, 0, gCurrent_graf_data->net_head_icon_height * gNet_players[index].car_index, gIcons_pix->width, gCurrent_graf_data->net_head_icon_height);
             if (gNet_players[index].ID == gLocal_net_ID) {
@@ -931,6 +938,7 @@ void InitNetHeadups(void) {
     if (gDigits_pix != NULL) {
         BrMapAdd(gDigits_pix);
     }
+#ifdef DETHRACE_FIX_BUGS
     /* The Windows version does not use gIcons_pix_low_res. */
     if (gGraf_data_index != 0) {
         SwitchToLoresMode();
@@ -939,16 +947,19 @@ void InitNetHeadups(void) {
     } else {
         gIcons_pix_low_res = gIcons_pix;
     }
+#endif
 }
 
 // IDA: void __cdecl DisposeNetHeadups()
 // FUNCTION: CARM95 0x0043221f
 void DisposeNetHeadups(void) {
 
+#ifdef DETHRACE_FIX_BUGS
     /* Windows version does not use gIcons_pix_low_res. */
     if (gIcons_pix_low_res != NULL && gIcons_pix_low_res != gIcons_pix) {
         BrPixelmapFree(gIcons_pix_low_res);
     }
+#endif
 
     if (gIcons_pix != NULL) {
         BrMapRemove(gIcons_pix);
@@ -1064,14 +1075,21 @@ int FarEnoughAway(tNet_game_player_info* pPlayer_1, tNet_game_player_info* pPlay
 // FUNCTION: CARM95 0x004327a5
 void CarInContactWithItOrFox(tNet_game_player_info* pPlayer) {
 
-    if (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) {
-        if (PDGetTotalTime() - gLast_it_change > 500) {
-            gLast_it_change = PDGetTotalTime();
-            if (gIt_or_fox >= 0) {
-                gLast_lepper = &gNet_players[gIt_or_fox];
+    switch (gCurrent_net_game->type) {
+    case eNet_game_type_tag:
+    case eNet_game_type_foxy:
+        if ((int)(PDGetTotalTime() - gLast_it_change) > 500) {
+            if (pPlayer != gLast_lepper) {
+                gLast_it_change = PDGetTotalTime();
+                if (gIt_or_fox >= 0) {
+                    gLast_lepper = &gNet_players[gIt_or_fox];
+                }
+                PlayerIsIt(pPlayer);
             }
-            PlayerIsIt(pPlayer);
         }
+        break;
+
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -1131,7 +1149,8 @@ void CalcPlayerScores(void) {
 
     time = GetTotalTime();
 
-    if (gCurrent_net_game->type == eNet_game_type_carnage) {
+    switch (gCurrent_net_game->type) {
+    case eNet_game_type_carnage:
         highest = 0;
         next_highest = 0;
         for (i = 0; i < gNumber_of_net_players; ++i) {
@@ -1146,16 +1165,23 @@ void CalcPlayerScores(void) {
         if (gCurrent_net_game->options.race_end_target < gPed_target) {
             gPed_target = gCurrent_net_game->options.race_end_target;
         }
-    } else if (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) {
+        break;
+    case eNet_game_type_tag:
+    case eNet_game_type_foxy:
         if (gIt_or_fox < 0) {
             SelectRandomItOrFox(-1);
         }
         if (gLast_lepper != NULL && gIt_or_fox >= 0 && FarEnoughAway(gLast_lepper, &gNet_players[gIt_or_fox])) {
             gLast_lepper = NULL;
         }
+        break;
+
+        DETHRACE_DEFAULT_BREAK
     }
+
     lowest_score = 9999;
     lowest_score_player = NULL;
+    cars_left = 0;
     for (i = 0; i < gNumber_of_net_players; i++) {
         car = gNet_players[i].car;
         if (gNet_players[i].reposition_time != 0 && gNet_players[i].reposition_time <= time && (!gRace_finished || gRace_over_reason == -1)) {
@@ -1188,20 +1214,13 @@ void CalcPlayerScores(void) {
                         car_left = j;
                     }
                 }
-                gNet_players[i].games_score += gGame_scores[5 - cars_left];
+                gNet_players[i].games_score += gGame_scores[6 - cars_left - 1];
+
                 if (cars_left == 1) {
                     DeclareWinner(car_left);
                 } else if (cars_left <= 0) {
                     EverybodysLost();
                 }
-                break;
-            case eNet_game_type_car_crusher:
-            case eNet_game_type_sudden_death:
-                gNet_players[i].reposition_time = GetTotalTime() + 5000;
-                break;
-            case eNet_game_type_carnage:
-                gNet_players[i].reposition_time = GetTotalTime() + 5000;
-                gNet_players[i].score /= 2;
                 break;
             case eNet_game_type_checkpoint:
                 if (gNet_players[i].score >> 16 != gCurrent_race.check_point_count) {
@@ -1216,6 +1235,14 @@ void CalcPlayerScores(void) {
                 }
                 gNet_players[i].reposition_time = GetTotalTime() + 5000;
                 break;
+            case eNet_game_type_carnage:
+                gNet_players[i].reposition_time = GetTotalTime() + 5000;
+                gNet_players[i].score /= 2;
+                break;
+            case eNet_game_type_car_crusher:
+            case eNet_game_type_sudden_death:
+                gNet_players[i].reposition_time = GetTotalTime() + 5000;
+                break;
             case eNet_game_type_tag:
                 gNet_players[i].reposition_time = GetTotalTime() + 5000;
                 PlayerIsIt(&gNet_players[i]);
@@ -1223,12 +1250,12 @@ void CalcPlayerScores(void) {
             case eNet_game_type_foxy:
                 gNet_players[i].reposition_time = GetTotalTime() + 5000;
                 gNet_players[i].score /= 2;
-                if (gNumber_of_net_players > 1 && i == gIt_or_fox) {
+                if (gNumber_of_net_players > 1 && gIt_or_fox == i) {
                     SelectRandomItOrFox(i);
                 }
                 break;
-            default:
-                break;
+
+                DETHRACE_DEFAULT_BREAK
             }
         }
         switch (gCurrent_net_game->type) {
@@ -1250,14 +1277,14 @@ void CalcPlayerScores(void) {
                             + car->damage_units[eDamage_rf_wheel].damage_level)
                     / 4;
 
-                if (e_dam >= t_dam && e_dam >= d_dam && e_dam >= w_dam) {
+                if (e_dam > t_dam && e_dam > d_dam && e_dam > w_dam) {
                     gNet_players[i].score = 100 - e_dam;
-                } else if (t_dam >= d_dam && t_dam >= w_dam) {
+                } else if (t_dam > d_dam && t_dam > w_dam) {
                     gNet_players[i].score = 100 - t_dam;
-                } else if (w_dam >= d_dam) {
-                    gNet_players[i].score = 100 - w_dam;
-                } else {
+                } else if (w_dam < d_dam) {
                     gNet_players[i].score = 100 - d_dam;
+                } else {
+                    gNet_players[i].score = 100 - w_dam;
                 }
             }
             break;
@@ -1283,13 +1310,13 @@ void CalcPlayerScores(void) {
             break;
         case eNet_game_type_sudden_death:
             if (gNet_players[i].score >= 0) {
-                if (gNet_players[i].score >= lowest_score) {
+                if (gNet_players[i].score < lowest_score) {
+                    lowest_score = gNet_players[i].score;
+                    lowest_score_player = &gNet_players[i];
+                } else {
                     if (gNet_players[i].score == lowest_score) {
                         lowest_score_player = 0;
                     }
-                } else {
-                    lowest_score = gNet_players[i].score;
-                    lowest_score_player = &gNet_players[i];
                 }
             }
             break;
@@ -1309,8 +1336,8 @@ void CalcPlayerScores(void) {
                 }
             }
             break;
-        default:
-            continue;
+
+            DETHRACE_DEFAULT_BREAK
         }
     }
     if ((gCurrent_net_game->type == eNet_game_type_sudden_death || gCurrent_net_game->type == eNet_game_type_tag)
@@ -1331,19 +1358,19 @@ void CalcPlayerScores(void) {
         if (cars_left) {
             lowest_score_player->car->knackered = 1;
             lowest_score_player->wasted = 1;
-            lowest_score_player->games_score += gGame_scores[5 - cars_left];
+            lowest_score_player->games_score += gGame_scores[6 - cars_left - 1];
             lowest_score_player->score = -1;
             if (player_left == -1) {
                 EverybodysLost();
-            } else if (player_left < 0) {
+            } else if (player_left >= 0) {
+                DeclareWinner(player_left);
+            } else {
                 if (gCurrent_net_game->type == eNet_game_type_tag) {
                     SelectRandomItOrFox(i);
                 }
                 SendGameplay(lowest_score_player->ID, eNet_gameplay_suddenly_death, 0, 0, 0, 0);
                 sprintf(s, "%s %s", lowest_score_player->player_name, GetMiscString(kMiscString_IS_OUT));
                 NetSendHeadupToEverybody(s);
-            } else {
-                DeclareWinner(player_left);
             }
         }
     }
@@ -1356,10 +1383,16 @@ void SendPlayerScores(void) {
     int i;
 
     the_contents = NetGetBroadcastContents(NETMSGID_SCORES, 0);
-    if (gCurrent_net_game->type == eNet_game_type_carnage) {
+    switch (gCurrent_net_game->type) {
+    case eNet_game_type_carnage:
         the_contents->data.scores.general_score = gPed_target;
-    } else if (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) {
+        break;
+    case eNet_game_type_tag:
+    case eNet_game_type_foxy:
         the_contents->data.scores.general_score = gNet_players[gIt_or_fox].ID;
+        break;
+
+        DETHRACE_DEFAULT_BREAK
     }
     for (i = 0; i < gNumber_of_net_players; i++) {
         the_contents->data.scores.scores[i] = gNet_players[i].score;
@@ -1379,7 +1412,6 @@ void DoNetGameManagement(void) {
 // IDA: void __usercall InitialisePlayerScore(tNet_game_player_info *pPlayer@<EAX>)
 // FUNCTION: CARM95 0x0043385c
 void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
-
     PossibleService();
     switch (gCurrent_net_game->type) {
     case eNet_game_type_fight_to_death:
@@ -1392,17 +1424,17 @@ void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
     case eNet_game_type_checkpoint:
         pPlayer->score = 0xffff;
         break;
-    case eNet_game_type_sudden_death:
-        pPlayer->score = 0;
-        break;
     case eNet_game_type_tag:
         pPlayer->score = 0;
         break;
     case eNet_game_type_foxy:
         pPlayer->score = 0;
         break;
-    default:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
+    case eNet_game_type_sudden_death:
+        pPlayer->score = 0;
+        break;
+
+        DETHRACE_DEFAULT_BREAK
     }
     pPlayer->credits = gInitial_net_credits[gCurrent_net_game->options.starting_money_index];
     pPlayer->wasted = 0;
@@ -1417,13 +1449,13 @@ void InitPlayers(void) {
     for (i = 0; i < gNumber_of_net_players; i++) {
         InitialisePlayerScore(&gNet_players[i]);
     }
+    gIt_or_fox = -1;
     if (gNet_mode == eNet_mode_host) {
         gLast_it_change = 0;
         gLast_lepper = NULL;
     }
-    gTime_for_punishment = 0;
     gNot_shown_race_type_headup = 1;
-    gIt_or_fox = -1;
+    gTime_for_punishment = 0;
 }
 
 // IDA: void __usercall BuyPSPowerup(int pIndex@<EAX>)
@@ -1432,20 +1464,22 @@ void BuyPSPowerup(int pIndex) {
     char s[256];
     char s2[256];
 
-    if (gNet_mode == eNet_mode_none) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_ONLY_AVAILABLE_IN_NET_GAMES));
-    } else if (gProgram_state.current_car.power_up_levels[pIndex] < 4) {
-        if (gNet_mode == eNet_mode_none || gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]] <= (gProgram_state.credits_earned - gProgram_state.credits_lost)) {
-            SpendCredits(gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
-            ImprovePSPowerup(&gProgram_state.current_car, pIndex);
+    if (gNet_mode != eNet_mode_none) {
+        if (gProgram_state.current_car.power_up_levels[pIndex] < 4) {
+            if (gNet_mode != eNet_mode_none && gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]] > (gProgram_state.credits_earned - gProgram_state.credits_lost)) {
+                strcpy(s, GetMiscString(kMiscString_CANNOT_AFFORD_IT));
+                sprintf(s2, "%d", gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
+                SubsStringJob(s, s2);
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, s);
+            } else {
+                SpendCredits(gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
+                ImprovePSPowerup(&gProgram_state.current_car, pIndex);
+            }
         } else {
-            strcpy(s, GetMiscString(kMiscString_CANNOT_AFFORD_IT));
-            sprintf(s2, "%d", gPowerup_cost[gProgram_state.current_car.power_up_levels[pIndex]]);
-            SubsStringJob(s, s2);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3008, -4, s);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
         }
     } else {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -4, GetMiscString(kMiscString_YOU_ARE_ALREADY_AT_MAX));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ONLY_AVAILABLE_IN_NET_GAMES));
     }
 }
 
@@ -1461,9 +1495,9 @@ void BuyArmour(void) {
 void BuyPower(void) {
 
     if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_THE_FOX_CANNOT_DO_THAT));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_THE_FOX_CANNOT_DO_THAT));
     } else if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -4, GetMiscString(kMiscString_ONLY_IT_CAN_DO_THAT));
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ONLY_IT_CAN_DO_THAT));
     } else {
         BuyPSPowerup(1);
     }
@@ -1481,18 +1515,27 @@ void BuyOffense(void) {
 void UseGeneralScore(int pScore) {
     int i;
 
-    if (gCurrent_net_game->type == eNet_game_type_carnage) {
+    switch (gCurrent_net_game->type) {
+
+    case eNet_game_type_carnage:
         gPed_target = pScore;
-    } else if ((gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) && gNet_players[gIt_or_fox].ID != pScore) {
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            StopCarBeingIt(gNet_players[i].car);
-        }
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            if (gNet_players[i].ID == pScore) {
-                MakeCarIt(gNet_players[i].car);
-                gIt_or_fox = i;
+        break;
+    case eNet_game_type_tag:
+    case eNet_game_type_foxy:
+        if (gNet_players[gIt_or_fox].ID != pScore) {
+            for (i = 0; i < gNumber_of_net_players; i++) {
+                StopCarBeingIt(gNet_players[i].car);
+            }
+            for (i = 0; i < gNumber_of_net_players; i++) {
+                if (gNet_players[i].ID == pScore) {
+                    MakeCarIt(gNet_players[i].car);
+                    gIt_or_fox = i;
+                }
             }
         }
+        break;
+
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -1529,8 +1572,7 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
     // GLOBAL: CARM95 0x50c61c
     static int pause_semaphore;
 
-    switch (pContents->data.gameplay.mess) {
-    case eNet_gameplay_host_paused:
+    if (pContents->data.gameplay.mess == eNet_gameplay_host_paused) {
         if (!pause_semaphore) {
             gPixel_buffer_size = gBack_screen->row_bytes * gBack_screen->height;
             gPixels_copy = BrMemAllocate(gPixel_buffer_size, kMem_quit_vfy_pixels);
@@ -1555,28 +1597,29 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
             FadePaletteDown();
             memcpy(gBack_screen->pixels, gPixels_copy, gPixel_buffer_size);
             memcpy(gCurrent_palette_pixels, gPalette_copy, 1024);
+#ifdef DETHRACE_3DFX_PATCH
             g16bit_palette_valid = 0;
+#endif
             BrMemFree(gPixels_copy);
             BrMemFree(gPalette_copy);
             PDScreenBufferSwap(0);
             FadePaletteUp();
             pause_semaphore = 0;
         }
-        break;
-    case eNet_gameplay_earn_credits:
+    } else if (pContents->data.gameplay.mess == eNet_gameplay_earn_credits) {
         EarnCredits(pContents->data.gameplay.param_1);
-        break;
-    case eNet_gameplay_host_unpaused:
+    } else if (pContents->data.gameplay.mess == eNet_gameplay_host_unpaused) {
         gWaiting_for_unpause = 0;
-        break;
-    case eNet_gameplay_suicide:
+    } else if (pContents->data.gameplay.mess == eNet_gameplay_suicide) {
         KnackerThisCar(NetCarFromPlayerID(pMessage->sender));
-        break;
-    case eNet_gameplay_go_for_it:
+    } else if (pContents->data.gameplay.mess == eNet_gameplay_go_for_it) {
         gWait_for_it = 0;
-        break;
-    default:
-        if (gCurrent_net_game->type == eNet_game_type_checkpoint || gCurrent_net_game->type == eNet_game_type_sudden_death || gCurrent_net_game->type == eNet_game_type_tag) {
+    } else {
+        switch (gCurrent_net_game->type) {
+        case eNet_game_type_checkpoint:
+        case eNet_game_type_sudden_death:
+        case eNet_game_type_tag:
+
             switch (pContents->data.gameplay.mess) {
             case eNet_gameplay_checkpoint:
                 Checkpoint(pContents->data.gameplay.param_1, 1);
@@ -1586,14 +1629,16 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
                 break;
             case eNet_gameplay_suddenly_death:
                 DoFancyHeadup(kFancyHeadupNetworkRaceOverNetworkLoss);
-                ChangeAmbientPratcam(36);
+                ChangeAmbientPratcam(kPratcam_network_timeout);
                 gRace_finished = 1;
                 break;
-            default:
-                break;
+
+                DETHRACE_DEFAULT_BREAK;
             }
+            break;
+
+            DETHRACE_DEFAULT_BREAK;
         }
-        break;
     }
 }
 
@@ -1644,6 +1689,10 @@ void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, in
 // IDA: void __cdecl InitNetGameplayStuff()
 // FUNCTION: CARM95 0x004342a4
 void InitNetGameplayStuff(void) {
+
+    switch (gCurrent_net_game->type) {
+        DETHRACE_DEFAULT_BREAK;
+    }
 }
 
 // IDA: void __cdecl DefaultNetName()
@@ -1669,22 +1718,25 @@ void RecievedCrushPoint(tNet_contents* pContents) {
     tCar_spec* car;
 
     car = NetCarFromPlayerID(pContents->data.crush.id);
-    if (car == NULL || gNet_mode == eNet_mode_host || car->active || gArrow_mode) {
-        return;
-    }
-    if (car->car_model_actors[car->principal_car_actor].crush_data.number_of_crush_points == 0) {
-        return;
-    }
 
-    CrushModelPoint(
-        car,
-        car->principal_car_actor,
-        car->car_model_actors[car->principal_car_actor].actor->model,
-        pContents->data.crush.vertex,
-        &pContents->data.crush.energy_vector,
-        BrVector3Length(&pContents->data.crush.energy_vector) + 0.06f,
-        &car->car_model_actors[car->principal_car_actor].crush_data);
-    SetModelForUpdate(car->car_model_actors[car->principal_car_actor].actor->model, car, 0);
+    if (!car
+        || gNet_mode == eNet_mode_host
+        || car->active
+        || gArrow_mode
+        || car->car_model_actors[car->principal_car_actor].crush_data.number_of_crush_points == 0) {
+
+        // do nothing
+    } else {
+        CrushModelPoint(
+            car,
+            car->principal_car_actor,
+            car->car_model_actors[car->principal_car_actor].actor->model,
+            pContents->data.crush.vertex,
+            &pContents->data.crush.energy_vector,
+            BrVector3Length(&pContents->data.crush.energy_vector) + 0.06,
+            &car->car_model_actors[car->principal_car_actor].crush_data);
+        SetModelForUpdate(car->car_model_actors[car->principal_car_actor].actor->model, car, 0);
+    }
 }
 
 // IDA: void __usercall GetReducedMatrix(tReduced_matrix *m1@<EAX>, br_matrix34 *m2@<EDX>)

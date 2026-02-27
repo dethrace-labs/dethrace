@@ -544,8 +544,8 @@ int MungeRaceFinished(void) {
             return 1;
         }
         gRace_finished = 15 * gTimer + 4500;
-        gRace_bonus_headup = NewTextHeadupSlot(eHeadupSlot_race_bonus, 0, 0, -4, "");
-        gTime_bonus_headup = NewTextHeadupSlot(eHeadupSlot_time_bonus, 0, 0, -4, "");
+        gRace_bonus_headup = NewTextHeadupSlot(eHeadupSlot_race_bonus, 0, 0, -kFont_MEDIUMHD, "");
+        gTime_bonus_headup = NewTextHeadupSlot(eHeadupSlot_time_bonus, 0, 0, -kFont_MEDIUMHD, "");
         gTime_bonus = 0;
         gTime_bonus_start = GetTotalTime();
         gTime_bonus_state = eTime_bonus_initial_pause;

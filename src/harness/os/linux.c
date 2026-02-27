@@ -1,5 +1,12 @@
 // Based on https://gist.github.com/jvranish/4441299
 
+#ifdef __TINYC__
+/* tcc does potentially not have __int128_t, used in /usr/include/bits/link.h:99 */
+#define SUPPORT_TRACEBACK 0
+#else
+#define SUPPORT_TRACEBACK 1
+#endif
+
 #define _GNU_SOURCE
 #include "harness/config.h"
 #include "harness/os.h"
@@ -9,12 +16,10 @@
 #include <dirent.h>
 #include <err.h>
 #include <errno.h>
-#include <execinfo.h>
 #include <fcntl.h>
 #include <ifaddrs.h>
 #include <libgen.h>
 #include <limits.h>
-#include <link.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -28,10 +33,13 @@
 #include <time.h>
 #include <unistd.h>
 
+#if SUPPORT_TRACEBACK
+#include <execinfo.h>
+#include <link.h>
+#endif
+
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof(A[0]))
 #define MAX_STACK_FRAMES 64
-#define TRACER_PID_STRING "TracerPid:"
-
 static int stack_nbr = 0;
 static char _program_name[1024];
 
@@ -39,11 +47,14 @@ static void* stack_traces[MAX_STACK_FRAMES];
 static char name_buf[4096];
 static DIR* directory_iterator;
 
+static void* signal_alternative_stack;
+
 struct dl_iterate_callback_data {
     int initialized;
     intptr_t start;
 } dethrace_dl_data;
 
+#if SUPPORT_TRACEBACK
 static int dl_iterate_callback(struct dl_phdr_info* info, size_t size, void* data) {
     struct dl_iterate_callback_data* callback_data = data;
 
@@ -92,6 +103,7 @@ static void print_stack_trace(void) {
         free(messages);
     }
 }
+#endif
 
 static void signal_handler(int sig, siginfo_t* siginfo, void* context) {
     (void)context;
@@ -176,7 +188,9 @@ static void signal_handler(int sig, siginfo_t* siginfo, void* context) {
         break;
     }
     fputs("******************\n", stderr);
+#if SUPPORT_TRACEBACK
     print_stack_trace();
+#endif
     exit(1);
 }
 
@@ -199,7 +213,8 @@ void OS_InstallSignalHandler(char* program_name) {
     /* setup alternate stack */
     {
         stack_t ss = {};
-        ss.ss_sp = malloc(2 * MINSIGSTKSZ);
+        signal_alternative_stack = malloc(2 * MINSIGSTKSZ + 4096);
+        ss.ss_sp = (void *)((uintptr_t)signal_alternative_stack & ~0xf);
         if (ss.ss_sp == NULL) {
             err(1, "malloc");
         }
@@ -237,6 +252,47 @@ void OS_InstallSignalHandler(char* program_name) {
         if (sigaction(SIGABRT, &sig_action, NULL) != 0) {
             err(1, "sigaction");
         }
+    }
+}
+
+void OS_RemoveSignalHandler(void) {
+
+    /* Unregister our signal handlers */
+    {
+        struct sigaction sig_action = {};
+        sig_action.sa_handler = SIG_DFL;
+        sigemptyset(&sig_action.sa_mask);
+
+        if (sigaction(SIGSEGV, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGFPE, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGINT, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGILL, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGTERM, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+        if (sigaction(SIGABRT, &sig_action, NULL) != 0) {
+            err(1, "sigaction");
+        }
+    }
+
+    /* remove alternate stack */
+    {
+        stack_t ss = {};
+        ss.ss_flags = SS_DISABLE;
+
+        if (sigaltstack(&ss, NULL) != 0) {
+            err(1, "sigaltstack");
+        }
+        free(signal_alternative_stack);
+        signal_alternative_stack = NULL;
     }
 }
 
@@ -350,6 +406,40 @@ char* OS_Basename(const char* path) {
 
 char* OS_GetWorkingDirectory(char* argv0) {
     return OS_Dirname(argv0);
+}
+
+int OS_GetPrefPath(char* dest, char* app) {
+    const char* base = NULL;
+    char path[1024];
+    struct stat statbuf;
+
+    base = getenv("XDG_DATA_HOME");
+    if (!base) {
+        const char* home = getenv("HOME");
+        if (home == NULL) {
+            return -1;
+        }
+        if (snprintf(path, sizeof(path), "%s/.local/share", home) >= (int)sizeof(path)) {
+            return -1;
+        }
+        mkdir(path, 0755);
+        base = path;
+    }
+
+    if (stat(base, &statbuf) == -1) {
+        return -1;
+    }
+    if (!(statbuf.st_mode & S_IFDIR)) {
+        return -1;
+    }
+
+    if (snprintf(name_buf, sizeof(name_buf), "%s/%s/", base, app)  >= (int)sizeof(name_buf)) {
+        return -1;
+    }
+    mkdir(name_buf, 0755);
+
+    strcpy(dest, name_buf);
+    return 0;
 }
 
 int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {
