@@ -1533,33 +1533,37 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
 // FUNCTION: CARM95 0x0046a225
 void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_scalar pDecay_factor, int pType, tCar_spec* pC) {
     br_vector3 tv;
-    int pipe_me;
+    int pipe_me = 1;
 
     if (!gSmoke_on) {
         return;
     }
     // if we are too far away from the current car...
     BrVector3Sub(&tv, pos, &gProgram_state.current_car.pos);
-    if (BrVector3LengthSquared(&tv) > 625.0) {
-        // check the distance from the car we are viewing and if it is too far away also, just return
-        BrVector3Sub(&tv, pos, &gCar_to_view->pos);
-        if (&gProgram_state.current_car != gCar_to_view && BrVector3LengthSquared(&tv) > 625.0) {
+    if (BrVector3LengthSquared(&tv) > 625.0f) {
+        if (&gProgram_state.current_car == gCar_to_view) {
             return;
         }
+        // check the distance from the car we are viewing and if it is too far away also, just return
+        BrVector3Sub(&tv, pos, &gCar_to_view->pos);
+        if (BrVector3LengthSquared(&tv) > 625.0f) {
+            return;
+        }
+        pipe_me = 0;
     }
 
     BrVector3InvScale(&gSmoke[gSmoke_num].v, v, WORLD_SCALE);
-    gSmoke[gSmoke_num].v.v[1] += (1.0f / WORLD_SCALE);
+    gSmoke[gSmoke_num].v.v[1] += (1.0 / WORLD_SCALE_D);
     BrVector3Copy(&gSmoke[gSmoke_num].pos, pos);
     gSmoke[gSmoke_num].radius = 0.05f;
     if ((pType & 0xF) == 7) {
         gSmoke[gSmoke_num].radius *= 2.0f;
     } else {
-        gSmoke[gSmoke_num].pos.v[1] += 0.04;
+        gSmoke[gSmoke_num].pos.v[1] += 0.04f;
     }
-    gSmoke[gSmoke_num].pos.v[1] += 0.04;
-    if (strength > 1.0) {
-        strength = 1.0;
+    gSmoke[gSmoke_num].pos.v[1] += 0.04f;
+    if (strength > 1.0f) {
+        strength = 1.0f;
     }
     gSmoke[gSmoke_num].strength = strength;
     SET_BIT(gSmoke_flags, gSmoke_num);
