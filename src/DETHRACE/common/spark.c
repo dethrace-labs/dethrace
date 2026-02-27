@@ -499,42 +499,42 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
         BrVector3Scale(&tv, &gSparks[i].normal, ts);
         BrVector3Sub(&gSparks[i].v, &gSparks[i].v, &tv);
         if (gSparks[i].time_sync) {
-            BrVector3Scale(&o, &gSparks[i].v, gSparks[i].time_sync / 1000.0);
-            gSparks[i].count = gSparks[i].time_sync + gSparks[i].count - pTime;
+            BrVector3Scale(&pos, &gSparks[i].v, gSparks[i].time_sync / 1000.0f);
+            gSparks[i].count = gSparks[i].time_sync + gSparks[i].count + -pTime;
             gSparks[i].time_sync = 0;
         } else {
-            BrVector3Scale(&o, &gSparks[i].v, pTime / 1000.0);
+            BrVector3Scale(&pos, &gSparks[i].v, pTime / 1000.0f);
             gSparks[i].count -= pTime;
         }
-        BrVector3Accumulate(&gSparks[i].pos, &o);
+        BrVector3Accumulate(&gSparks[i].pos, &pos);
         time = 1000 - gSparks[i].count;
         if (time > 150) {
             time = 150;
         }
-        ts = -time / 1000.0;
+        ts = -time / 1000.0f;
         if (gSparks[i].colour) {
-            ts = ts / 2.0;
+            ts = ts / 2.0f;
         }
         BrVector3Scale(&gSparks[i].length, &gSparks[i].v, ts);
-        ts = pTime * 10.0 / 6900.0;
+        ts = pTime * 10.0f / 6900.0;
         if (gSparks[i].car) {
             BrMatrix34ApplyV(&tv, &gSparks[i].length, &gSparks[i].car->car_master_actor->t.t.mat);
             BrVector3Copy(&gSparks[i].length, &tv);
-            BrMatrix34ApplyP(&pos, &gSparks[i].pos, &gSparks[i].car->car_master_actor->t.t.mat);
-            o = tv;
+            BrMatrix34ApplyP(&new_pos, &gSparks[i].pos, &gSparks[i].car->car_master_actor->t.t.mat);
+            BrVector3Copy(&pos, &tv);
             gSparks[i].v.v[0] = gSparks[i].v.v[0] - gSparks[i].car->car_master_actor->t.t.mat.m[0][1] * ts;
             gSparks[i].v.v[1] = gSparks[i].v.v[1] - gSparks[i].car->car_master_actor->t.t.mat.m[1][1] * ts;
             gSparks[i].v.v[2] = gSparks[i].v.v[2] - gSparks[i].car->car_master_actor->t.t.mat.m[2][1] * ts;
         } else {
-            BrVector3Copy(&pos, &gSparks[i].pos);
+            BrVector3Copy(&new_pos, &gSparks[i].pos);
             gSparks[i].v.v[1] = gSparks[i].v.v[1] - ts;
         }
-        AddSparkToPipingSession(i + (gSparks[i].colour << 8), &pos, &gSparks[i].length);
-        BrVector3Add(&o, &gSparks[i].length, &pos);
-        BrVector3Sub(&tv, &pos, (br_vector3*)gCamera_to_world.m[3]);
-        BrMatrix34TApplyV(&new_pos, &tv, &gCamera_to_world);
-        BrVector3Sub(&tv, &o, (br_vector3*)gCamera_to_world.m[3]);
+        AddSparkToPipingSession(i + (gSparks[i].colour << 8), &new_pos, &gSparks[i].length);
+        BrVector3Add(&pos, &gSparks[i].length, &new_pos);
+        BrVector3Sub(&tv, &new_pos, (br_vector3*)gCamera_to_world.m[3]);
         BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
+        BrVector3Sub(&tv, &pos, (br_vector3*)gCamera_to_world.m[3]);
+        BrMatrix34TApplyV(&o, &tv, &gCamera_to_world);
         BrVector3SetFloat(&tv, FRandomBetween(-0.1f, 0.1f), FRandomBetween(-0.1f, 0.1f), FRandomBetween(-0.1f, 0.1f));
         BrVector3Accumulate(&gSparks[i].v, &tv);
         ts = 1.0f - BrVector3Length(&gSparks[i].v) / 1.4f * pTime / 1000.0f;
@@ -547,11 +547,7 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
             SetLineModelCols(gSparks[i].colour);
         }
 #endif
-        if (gSparks[i].colour) {
-            DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gFog_shade_table);
-        } else {
-            DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gAcid_shade_table);
-        }
+        DrawLine3D(&o, &p, pRender_screen, pDepth_buffer, gSparks[i].colour ? gFog_shade_table : gAcid_shade_table);
     }
     EndPipingSession();
 #ifdef DETHRACE_3DFX_PATCH
