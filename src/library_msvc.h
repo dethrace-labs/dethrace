@@ -18,6 +18,9 @@
 // LIBRARY: CARM95 0x004ead80
 // qsort
 
+// LIBRARY: CARM95 0x004eb3c0
+// srand
+
 // LIBRARY: CARM95 0x004eb3e0
 // rand
 
