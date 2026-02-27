@@ -138,6 +138,11 @@ tShrapnel gShrapnel[15];
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
+#define TEST_BIT(var, pos)   (var & (1 << pos))
+#define SET_BIT(var, pos)    (var |= (1 << pos))
+#define FLIP_BIT(var, pos)   (var ^= (1 << pos))
+#define CLEAR_BIT(var, pos)  (var &= ~(1 << pos))
+
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
 void DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr) {
@@ -423,7 +428,7 @@ void ReplaySparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
     br_vector3 new_pos;
 
     for (i = 0; i < COUNT_OF(gSparks); i++) {
-        if (gSpark_flags & (1 << i)) {
+        if (TEST_BIT(gSpark_flags, i)) {
             if (gSparks[i].car == NULL) {
                 BrVector3Copy(&pos, &gSparks[i].pos);
             } else {
@@ -483,12 +488,12 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
     }
     StartPipingSession(ePipe_chunk_spark);
     for (i = 0; i < COUNT_OF(gSparks); i++) {
-        if (((1u << i) & gSpark_flags) == 0) {
+        if (!TEST_BIT(gSpark_flags, i)) {
             continue;
         }
         if (gSparks[i].count <= 0) {
             gSparks[i].count = 0;
-            gSpark_flags &= ~(1u << i);
+            CLEAR_BIT(gSpark_flags, i);
         }
         ts = BrVector3Dot(&gSparks[i].normal, &gSparks[i].v);
         BrVector3Scale(&tv, &gSparks[i].normal, ts);
@@ -566,7 +571,7 @@ void CreateSingleSpark(tCar_spec* pCar, br_vector3* pPos, br_vector3* pVel) {
     BrVector3Copy(&gSparks[gNext_spark].v, pVel);
     gSparks[gNext_spark].count = 500;
     gSparks[gNext_spark].car = pCar;
-    gSpark_flags |= 1u << gNext_spark;
+    SET_BIT(gSpark_flags, gNext_spark);
     gSparks[gNext_spark].time_sync = 1;
     gSparks[gNext_spark].colour = 1;
     gNext_spark++;
@@ -613,7 +618,7 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
         gSparks[gNext_spark].v.v[2] *= FRandomBetween(.5f, .9f);
         gSparks[gNext_spark].count = 1000;
         gSparks[gNext_spark].car = NULL;
-        gSpark_flags |= 1u << gNext_spark;
+        SET_BIT(gSpark_flags, gNext_spark);
         gSparks[gNext_spark].time_sync = gMechanics_time_sync;
         gSparks[gNext_spark].colour = 0;
         gNext_spark++;
@@ -642,7 +647,7 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
             BrVector3Sub(&gSparks[gNext_spark].v, &tv, &tv2);
             gSparks[gNext_spark].count = 1000;
             gSparks[gNext_spark].car = pCar;
-            gSpark_flags |= 1u << gNext_spark;
+            SET_BIT(gSpark_flags, gNext_spark);
             gSparks[gNext_spark].time_sync = gMechanics_time_sync;
             gSparks[gNext_spark].colour = 0;
             gNext_spark++;
@@ -695,7 +700,7 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
         BrVector3Accumulate(&gSparks[gNext_spark].v, v);
         gSparks[gNext_spark].count = 1000;
         gSparks[gNext_spark].car = c;
-        gSpark_flags |= 1u << gNext_spark;
+        SET_BIT(gSpark_flags, gNext_spark);
         gSparks[gNext_spark].time_sync = gMechanics_time_sync;
         gSparks[gNext_spark].colour = 0;
         gNext_spark++;
@@ -713,7 +718,7 @@ void AdjustSpark(int pSpark_num, br_vector3* pos, br_vector3* length) {
     int i;
 
     i = pSpark_num & 0xff;
-    gSpark_flags |= 1u << pSpark_num;
+    SET_BIT(gSpark_flags, pSpark_num);
     if (gSparks[i].car != NULL) {
         mat = &gSparks[i].car->car_master_actor->t.t.mat;
         tv.v[0] = pos->v[0] - mat->m[3][0];
@@ -737,10 +742,10 @@ void AdjustShrapnel(int pShrapnel_num, br_vector3* pos, tU16 pAge, br_material* 
     int i;
 
     i = pShrapnel_num & 0x7fff;
-    if (!(gShrapnel_flags & (1u << i))) {
+    if (!TEST_BIT(gShrapnel_flags, i)) {
         BrActorAdd(gNon_track_actor, gShrapnel[i].actor);
     }
-    gShrapnel_flags = gShrapnel_flags | (1u << i);
+    SET_BIT(gShrapnel_flags, i);
     gShrapnel[i].actor->t.t.translate.t.v[0] = pos->v[0];
     gShrapnel[i].actor->t.t.translate.t.v[1] = pos->v[1];
     gShrapnel[i].actor->t.t.translate.t.v[2] = pos->v[2];
@@ -766,7 +771,7 @@ void ResetShrapnel(void) {
         return;
     }
     for (i = 0; i < COUNT_OF(gShrapnel); i++) {
-        if (gShrapnel_flags & (1u << i)) {
+        if (TEST_BIT(gShrapnel_flags, i)) {
             BrActorRemove(gShrapnel[i].actor);
         }
     }
@@ -802,10 +807,10 @@ void CreateShrapnelShower(br_vector3* pos, br_vector3* v, br_vector3* pNormal, b
     num = (int)(pForce / 10.f) * 3;
     rnd = ((pForce + 20.f) * 3.f) / 200.f;
     for (i = 0; i < num; i++) {
-        if ((gShrapnel_flags & (1u << gNext_shrapnel)) == 0) {
+        if (!TEST_BIT(gShrapnel_flags, gNext_shrapnel)) {
             BrActorAdd(gNon_track_actor, gShrapnel[gNext_shrapnel].actor);
         }
-        gShrapnel_flags |= 1 << gNext_shrapnel;
+        SET_BIT(gShrapnel_flags, gNext_shrapnel);
         BrVector3Copy(&gShrapnel[gNext_shrapnel].actor->t.t.translate.t, pos);
         BrVector3SetFloat(&tv, FRandomBetween(-rnd, rnd), FRandomBetween(-vel.v[1] + 0.3, rnd), FRandomBetween(-rnd, rnd));
         ts2 = BrVector3Dot(pNormal, &tv);
@@ -865,7 +870,7 @@ void LoadInShrapnel(void) {
 void KillShrapnel(int i) {
 
     BrActorRemove(gShrapnel[i].actor);
-    gShrapnel_flags &= ~(1u << i);
+    CLEAR_BIT(gShrapnel_flags, i);
 }
 
 // IDA: void __cdecl DisposeShrapnel()
@@ -874,7 +879,7 @@ void DisposeShrapnel(void) {
     int i;
 
     for (i = 0; i < COUNT_OF(gShrapnel); i++) {
-        if (gShrapnel_flags & (1u << i)) {
+        if (TEST_BIT(gShrapnel_flags, i)) {
             BrActorRemove(gShrapnel[i].actor);
         }
         BrActorFree(gShrapnel[i].actor);
@@ -894,7 +899,7 @@ void ReplayShrapnel(tU32 pTime) {
 
     for (i = 0; i < COUNT_OF(gShrapnel); i++) {
         mat = &gShrapnel[i].actor->t.t.mat;
-        if (gShrapnel_flags & (1 << i)) {
+        if (TEST_BIT(gShrapnel_flags, i)) {
             gShrapnel[i].age += GetReplayRate() * pTime;
             DrMatrix34Rotate(mat, gShrapnel[i].age * BrDegreeToAngle(1), &gShrapnel[i].axis);
             BrMatrix34PreShearX(mat, gShrapnel[i].shear1, gShrapnel[i].shear2);
@@ -921,7 +926,7 @@ void MungeShrapnel(tU32 pTime) {
     StartPipingSession(ePipe_chunk_shrapnel);
     for (i = 0; i < COUNT_OF(gShrapnel); i++) {
         mat = &gShrapnel[i].actor->t.t.mat;
-        if (((1u << i) & gShrapnel_flags) == 0) {
+        if (!TEST_BIT(gShrapnel_flags, i)) {
             continue;
         }
         if (gShrapnel[i].age == -1) {
@@ -1314,7 +1319,7 @@ void ReplaySmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     int i;
 
     for (i = 0; i < COUNT_OF(gSmoke_column); i++) {
-        if (gSmoke_flags & (1 << i)) {
+        if (TEST_BIT(gSmoke_flags, i)) {
             aspect = 1.0 + (gSmoke[i].radius - .05f) / .25f * .5;
             if (gSmoke[i].type & 0x10) {
                 SmokeCircle3D(&gSmoke[i].pos, gSmoke[i].radius / aspect, gSmoke[i].strength, 1.f,
@@ -1447,7 +1452,7 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     }
     StartPipingSession(ePipe_chunk_smoke);
     for (i = 0; i < COUNT_OF(gSmoke); i++) {
-        if ((gSmoke_flags & (1u << i)) != 0) {
+        if (TEST_BIT(gSmoke_flags, i)) {
             if (gSmoke[i].strength > 0.0) {
                 if (gSmoke[i].time_sync) {
                     BrVector3Scale(&tv, &gSmoke[i].v, gSmoke[i].time_sync / 1000.0f);
@@ -1457,27 +1462,28 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
                 }
                 BrVector3Accumulate(&gSmoke[i].pos, &tv);
             } else {
-                gSmoke_flags &= ~(1u << i);
+                CLEAR_BIT(gSmoke_flags, i);
             }
         }
     }
     for (i = 0; i < COUNT_OF(gSmoke); i++) {
-        if ((gSmoke_flags & (1u << i)) != 0) {
+        if (TEST_BIT(gSmoke_flags, i)) {
             if ((gSmoke[i].type & 0xf) == 7) {
-                not_lonely |= 1u << i;
-            } else if ((not_lonely & (1u << i)) == 0) {
+                SET_BIT(not_lonely, i);
+            } else if (!TEST_BIT(not_lonely, i)) {
                 for (j = i + 1; j < COUNT_OF(gSmoke); j++) {
-                    if ((gSmoke_flags & (1u << j)) != 0) {
+                    if (TEST_BIT(gSmoke_flags, j)) {
                         BrVector3Sub(&tv, &gSmoke[i].pos, &gSmoke[i].pos);
                         ts = BrVector3LengthSquared(&tv);
                         if ((gSmoke[i].radius + gSmoke[j].radius) * (gSmoke[i].radius + gSmoke[j].radius) > ts) {
-                            not_lonely |= (1u << j) | (1u << i);
+                            SET_BIT(not_lonely, i);
+                            SET_BIT(not_lonely, j);
                             break;
                         }
                     }
                 }
             }
-            if (((1u << i) & not_lonely) == 0) {
+            if (!TEST_BIT(not_lonely, i)) {
                 gSmoke[i].strength = gSmoke[i].strength / 2.0;
             }
             aspect = (gSmoke[i].radius - 0.05f) / 0.25f * 0.5 + 1.0;
@@ -1508,7 +1514,7 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
                     }
                 }
             } else {
-                gSmoke_flags &= ~(1u << i);
+                CLEAR_BIT(gSmoke_flags, i);
             }
         }
     }
@@ -1556,7 +1562,7 @@ void CreatePuffOfSmoke(br_vector3* pos, br_vector3* v, br_scalar strength, br_sc
         strength = 1.0;
     }
     gSmoke[gSmoke_num].strength = strength;
-    gSmoke_flags |= 1u << gSmoke_num;
+    SET_BIT(gSmoke_flags, gSmoke_num);
     gSmoke[gSmoke_num].time_sync = gMechanics_time_sync;
     gSmoke[gSmoke_num].type = pType;
     gSmoke[gSmoke_num].decay_factor = pDecay_factor;
@@ -1582,7 +1588,7 @@ void AdjustSmoke(int pIndex, tU8 pType, br_vector3* pPos, br_scalar pRadius, br_
     gSmoke[pIndex].radius = pRadius;
     gSmoke[pIndex].strength = pStrength;
     BrVector3Copy(&gSmoke[pIndex].pos, pPos);
-    gSmoke_flags |= 1 << pIndex;
+    SET_BIT(gSmoke_flags, pIndex);
 }
 
 // IDA: void __cdecl ActorError()
@@ -1596,7 +1602,7 @@ void AdjustSmokeColumn(int pIndex, tCar_spec* pCar, int pVertex, int pColour) {
     int i;
     br_actor* actor;
 
-    gColumn_flags ^= 1 << pIndex;
+    FLIP_BIT(gColumn_flags, pIndex);
     gSmoke_column[pIndex].car = pCar;
     gSmoke_column[pIndex].vertex_index = pVertex;
     gSmoke_column[pIndex].colour = pColour;
@@ -1604,7 +1610,7 @@ void AdjustSmokeColumn(int pIndex, tCar_spec* pCar, int pVertex, int pColour) {
         gSmoke_column[pIndex].frame_count[i] = 100;
     }
     if (pColour == 0) {
-        if ((gColumn_flags & (1 << pIndex)) != 0) {
+        if (TEST_BIT(gColumn_flags, pIndex)) {
             if (gSmoke_column[pIndex].flame_actor->depth != 0) {
                 ActorError();
             }
@@ -1636,7 +1642,7 @@ void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLi
     if (!gSmoke_on) {
         return;
     }
-    if (((1u << gNext_column) & gColumn_flags) != 0) {
+    if (TEST_BIT(gColumn_flags, gNext_column)) {
         if (gSmoke_column[gNext_column].car != NULL) {
             gSmoke_column[gNext_column].car->num_smoke_columns--;
         }
@@ -1656,10 +1662,10 @@ void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLi
             EndPipingSession();
         }
     }
-    if (pColour == 0 && (((1u << gNext_column) & gColumn_flags) == 0 || gSmoke_column[gNext_column].colour != 0)) {
+    if (pColour == 0 && (!TEST_BIT(gColumn_flags, gNext_column) || gSmoke_column[gNext_column].colour != 0)) {
         BrActorAdd(gNon_track_actor, gSmoke_column[gNext_column].flame_actor);
     }
-    if (pColour != 0 && ((1u << gNext_column) & gColumn_flags) != 0 && gSmoke_column[gNext_column].colour == 0) {
+    if (pColour != 0 && (TEST_BIT(gColumn_flags, gNext_column) && gSmoke_column[gNext_column].colour == 0)) {
         BrActorRemove(gSmoke_column[gNext_column].flame_actor);
     }
     StartPipingSession(ePipe_chunk_smoke_column);
@@ -1672,7 +1678,7 @@ void CreateSmokeColumn(tCar_spec* pCar, int pColour, int pVertex_index, tU32 pLi
     gSmoke_column[gNext_column].smudge_timer = 1000;
     gSmoke_column[gNext_column].vertex_index = pVertex_index;
     gSmoke_column[gNext_column].upright = 1;
-    gColumn_flags |= 1 << gNext_column;
+    SET_BIT(gColumn_flags, gNext_column);
     pCar->num_smoke_columns++;
     for (i = 0; i < COUNT_OF(gSmoke_column[gNext_column].frame_count); i++) {
         gSmoke_column[gNext_column].frame_count[i] = 100;
@@ -1869,7 +1875,7 @@ void ReplaySmokeColumn(tU32 pTime) {
     br_vector3 dummy;
 
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
-        if ((gColumn_flags & (1 << i)) != 0) {
+        if (TEST_BIT(gColumn_flags, i)) {
             DoSmokeColumn(i, pTime, &dummy);
             if (gSmoke_column[i].colour == 0) {
                 FlameAnimate(i, &gSmoke_column[i].pos, pTime);
@@ -1905,7 +1911,7 @@ void MungeSmokeColumn(tU32 pTime) {
 
     gMechanics_time_sync = 1;
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
-        if (((1u << i) & gColumn_flags) == 0) {
+        if (!TEST_BIT(gColumn_flags, i)) {
             continue;
         }
 
@@ -1915,7 +1921,7 @@ void MungeSmokeColumn(tU32 pTime) {
                 AddSmokeColumnToPipingSession(i, gSmoke_column[i].car, gSmoke_column[i].vertex_index, gSmoke_column[i].colour);
                 EndPipingSession();
             }
-            gColumn_flags &= ~(1 << i);
+            CLEAR_BIT(gColumn_flags, i);
             if (gSmoke_column[i].colour == 0) {
                 BrActorRemove(gSmoke_column[i].flame_actor);
             }
@@ -1989,7 +1995,7 @@ void DisposeFlame(void) {
     }
 
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
-        if ((gColumn_flags & (1u << i)) && (gSmoke_column[i].colour == 0)) {
+        if (TEST_BIT(gColumn_flags, i) && gSmoke_column[i].colour == 0) {
             BrActorRemove(gSmoke_column[i].flame_actor);
         }
         actor = gSmoke_column[i].flame_actor->children;
@@ -2152,7 +2158,7 @@ void DisposeSplash(void) {
         BrMaterialFree(gSplash_material[i]);
     }
     for (i = 0; i < COUNT_OF(gSplash); i++) {
-        if (gSplash_flags & (1u << i)) {
+        if (TEST_BIT(gSplash_flags, i)) {
             BrActorRemove(gSplash[i].actor);
         }
         BrActorFree(gSplash[i].actor);
@@ -2173,7 +2179,7 @@ void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
         seed = rand();
         srand(GetTotalTime());
         for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
-            if (((1u << i) & gColumn_flags) != 0 && gSmoke_column[i].colour <= 1) {
+            if (TEST_BIT(gColumn_flags, i) && gSmoke_column[i].colour <= 1) {
                 strength = 0.5f;
                 if (gSmoke_column[i].lifetime < 4000) {
                     strength = gSmoke_column[i].lifetime * 0.5f / 4000.f;
@@ -2380,7 +2386,7 @@ void ResetSmokeColumns(void) {
     int i;
 
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
-        if (gColumn_flags & (1 << i)) {
+        if (TEST_BIT(gColumn_flags, i)) {
             BrActorRemove(gSmoke_column[i].flame_actor);
         }
     }
@@ -2452,7 +2458,7 @@ void ConditionalSmokeColumn(tCar_spec* pCar, int pDamage_index, int pColour) {
     if (pCar->num_smoke_columns != 0) {
         for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
             if (gSmoke_column[i].car == pCar) {
-                if (((1u << i) & gColumn_flags) != 0 && gSmoke_column[i].colour <= pColour && gSmoke_column[i].lifetime) {
+                if (TEST_BIT(gColumn_flags, i) && gSmoke_column[i].colour <= pColour && gSmoke_column[i].lifetime) {
                     return;
                 }
                 gSmoke_column[i].lifetime = 2000;
@@ -2491,10 +2497,10 @@ void SingleSplash(tCar_spec* pCar, br_vector3* sp, br_vector3* normal, tU32 pTim
     }
 
     gSplash[gNext_splash].size = SRandomBetween(size / 2.0, size);
-    if (((1u << gNext_splash) & gSplash_flags) == 0) {
+    if (!TEST_BIT(gSplash_flags, gNext_splash)) {
         BrActorAdd(gDont_render_actor, gSplash[gNext_splash].actor);
     }
-    gSplash_flags |= 1u << gNext_splash;
+    SET_BIT(gSplash_flags, gNext_splash);
     gSplash[gNext_splash].just_done = 1;
     if ((double)pTime * 0.003 > SRandomBetween(0.0, 1.0) && !gAction_replay_mode) {
         BrVector3InvScale(&vel, &vel, WORLD_SCALE);
@@ -2752,11 +2758,11 @@ void MungeSplash(tU32 pTime) {
     dt = pTime * 0.001f;
 
     for (i = 0; i < COUNT_OF(gSplash); i++) {
-        if (((1u << i) & gSplash_flags) == 0) {
+        if (!TEST_BIT(gSplash_flags, i)) {
             continue;
         }
         if (!gSplash[i].just_done && (!gAction_replay_mode || GetReplayRate() != 0.0f)) {
-            gSplash_flags &= ~(1u << i);
+            CLEAR_BIT(gSplash_flags, i);
             BrActorRemove(gSplash[i].actor);
             continue;
         }
@@ -2781,7 +2787,7 @@ void RenderSplashes(void) {
     int i;
 
     for (i = 0; i < COUNT_OF(gSplash); i++) {
-        if (gSplash_flags & (1u << i)) {
+        if (TEST_BIT(gSplash_flags, i)) {
             BrActorRelink(gNon_track_actor, gSplash[i].actor);
             BrZbSceneRenderAdd(gSplash[i].actor);
             BrActorRelink(gDont_render_actor, gSplash[i].actor);
@@ -2859,12 +2865,12 @@ void DisposeKevStuffCar(tCar_spec* pCar) {
         }
     }
     for (i = 0; i < COUNT_OF(gSparks); i++) {
-        if (!(gSpark_flags & (1 << i))) {
+        if (!TEST_BIT(gSpark_flags, i)) {
             continue;
         }
         if (gSparks[i].car == pCar) {
             gSparks[i].count = 0;
-            gSpark_flags &= ~(1 << i);
+            CLEAR_BIT(gSpark_flags, i);
         }
     }
     if (gCar_to_view == pCar) {
