@@ -4,6 +4,8 @@
 #include "dr_types.h"
 
 #define CAR_MAX_SIMPLIFICATION_LEVEL 4
+#define CAR_HAS_BUILTIN_PROX_RAY(CAR) (strcmp((CAR)->name, "STELLA.TXT") == 0)
+#define CAR_PROX_RAY_DISTANCE 6.0f
 
 extern int gDoing_physics;
 extern br_scalar gDt;
