@@ -1,6 +1,9 @@
 #ifndef _SOUND_H_
 #define _SOUND_H_
 
+#if defined(DETHRACE_FIX_BUGS)
+#include "../S3/s3_defs.h"
+#endif
 #include "dr_types.h"
 
 extern int gSound_detail_level;
