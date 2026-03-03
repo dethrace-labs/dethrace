@@ -217,13 +217,15 @@ void ReenableNetService(void) {
 // IDA: int __cdecl PermitNetServiceReentrancy()
 // FUNCTION: CARM95 0x00446622
 int PermitNetServiceReentrancy(void) {
-    int prev;
+    // Present in symbol dump, but not present in win95 code
+    // int prev;
 
-    prev = !!gIn_net_service;
-    if (prev) {
+    if (gIn_net_service) {
         gIn_net_service = 0;
+        return 1;
+    } else {
+        return 0;
     }
-    return prev;
 }
 
 // IDA: void __cdecl HaltNetServiceReentrancy()
