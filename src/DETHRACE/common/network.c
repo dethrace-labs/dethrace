@@ -102,7 +102,7 @@ int gNext_guarantee;
 // GLOBAL: CARM95 0x00534c84
 tU32 gAsk_time;
 
-// GLOBAL: CARM95 0x00551420
+// GLOBAL: CARM95 0x00534c6c
 int gNet_initialised;
 
 // GLOBAL: CARM95 0x00534c60
@@ -152,17 +152,18 @@ int NetInitialise(void) {
     gIn_net_service = 0;
     gMessage_header_size = PDNetGetHeaderSize();
     gOnly_receive_guarantee_replies = 0;
-    gMin_messages = BrMemAllocate(MIN_MESSAGES_CAPACITY * (gMessage_header_size + sizeof(tMin_message)), kMem_net_min_messages);
+    // gMin_messages = BrMemAllocate(MIN_MESSAGES_CAPACITY * (gMessage_header_size + sizeof(tMin_message)), kMem_net_min_messages);
+    gMin_messages = BrMemAllocate(20 * (gMessage_header_size + sizeof(tMin_message)), kMem_net_min_messages);
     gMid_messages = BrMemAllocate(MID_MESSAGES_CAPACITY * (gMessage_header_size + sizeof(tMid_message)), kMem_net_mid_messages);
     gMax_messages = BrMemAllocate(MAX_MESSAGES_CAPACITY * (gMessage_header_size + sizeof(tMax_message)), kMem_net_max_messages);
     for (i = 0; i < MIN_MESSAGES_CAPACITY; i++) {
-        ((tNet_message*)&gMin_messages[i])->contents.header.type = NETMSGID_NONE;
+        *(gMin_messages[i].buffer + gMessage_header_size + offsetof(tNet_message, contents.header.type)) = NETMSGID_NONE;
     }
     for (i = 0; i < MID_MESSAGES_CAPACITY; i++) {
-        ((tNet_message*)&gMid_messages[i])->contents.header.type = NETMSGID_NONE;
+        *(gMid_messages[i].buffer + gMessage_header_size + offsetof(tNet_message, contents.header.type)) = NETMSGID_NONE;
     }
     for (i = 0; i < MAX_MESSAGES_CAPACITY; i++) {
-        ((tNet_message*)&gMax_messages[i])->contents.header.type = NETMSGID_NONE;
+        *(gMax_messages[i].buffer + gMessage_header_size + offsetof(tNet_message, contents.header.type)) = NETMSGID_NONE;
     }
     gNet_initialised = PDNetInitialise() == 0;
     if (gNet_initialised) {

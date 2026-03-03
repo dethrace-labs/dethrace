@@ -68,6 +68,7 @@ int BroadcastMessage(void) {
 }
 
 // IDA: int __cdecl PDNetInitialise()
+// FUNCTION: CARM95 0x004543F8
 int PDNetInitialise(void) {
     tU32 timenow;
     char profile_string[32];
@@ -196,6 +197,7 @@ int PDNetInitClient(tNet_game_details* pDetails) {
 }
 
 // IDA: int __cdecl PDNetGetHeaderSize()
+// FUNCTION: CARM95 0x00455857
 int PDNetGetHeaderSize(void) {
     return 0;
 }

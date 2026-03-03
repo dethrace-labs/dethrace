@@ -74,6 +74,7 @@ target_sources(dethrace_obj PRIVATE
     common/powerup.c
     common/netgame.c
     common/world.c
+    common/network.c
 
     common/brucetrk.c
     common/brucetrk.h
@@ -130,8 +131,7 @@ target_sources(dethrace_obj PRIVATE
     common/mainmenu.c
     common/mainmenu.h
 
-    common/network.c
-    common/network.h
+
     common/newgame.c
     common/newgame.h
     common/oppocar.c
