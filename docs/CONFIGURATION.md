@@ -3,9 +3,9 @@
 Dethrace looks for a `dethrace.ini` file in the [system preferences directory](https://wiki.libsdl.org/SDL2/SDL_GetPrefPath):
 | Platform | Example Path                                                                 |
 |----------|----------------------------------------------------------------------|
-| Windows  | `C:\Users\bob\AppData\Roaming\dethrace\dethrace.ini`                |
-| macOS    | `/Users/bob/Library/Application Support/dethrace/dethrace.ini`      |
-| Linux    | `/home/bob/.local/share/dethrace/dethrace.ini`                      |
+| Windows  | `C:\Users\<NAME>\AppData\Roaming\dethrace\dethrace.ini`                |
+| macOS    | `/Users/<NAME>/Library/Application Support/dethrace/dethrace.ini`      |
+| Linux    | `/home/<NAME>/.local/share/dethrace/dethrace.ini`                      |
 
 
 If this file is not present, dethrace will run with default configuration and attempt to discover the correct Carmageddon directory to use (see below).
