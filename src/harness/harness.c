@@ -24,6 +24,11 @@ extern const tPlatform_bootstrap SDL1_bootstrap;
 extern const tPlatform_bootstrap SDL2_bootstrap;
 extern const tPlatform_bootstrap SDL3_bootstrap;
 
+#ifdef _WIN32
+__declspec(dllexport) unsigned long NvOptimusEnablement                  = 1;
+__declspec(dllexport) unsigned long AmdPowerXpressRequestHighPerformance = 1;
+#endif
+
 static const tPlatform_bootstrap* platform_bootstraps[] = {
 #if defined(DETHRACE_PLATFORM_SDL3)
     &SDL3_bootstrap,
@@ -444,6 +449,16 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
                 safe_strcpy(harness_game_config.platform_name, argv[i + 1]);
                 consumed = 2;
             }
+#ifdef _WIN32
+        } else if (strcasecmp(argv[i], "--gpu-accelerator") == 0) {
+            NvOptimusEnablement = 1;
+            AmdPowerXpressRequestHighPerformance = 1;
+            consumed = 1;
+        } else if (strcasecmp(argv[i], "--no-gpu-accelerator") == 0) {
+            NvOptimusEnablement = 0;
+            AmdPowerXpressRequestHighPerformance = 0;
+            consumed = 1;
+#endif
         }
 
         if (consumed > 0) {
