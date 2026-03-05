@@ -68,6 +68,7 @@ int BroadcastMessage(void) {
 }
 
 // IDA: int __cdecl PDNetInitialise()
+// FUNCTION: CARM95 0x004543F8
 int PDNetInitialise(void) {
     tU32 timenow;
     char profile_string[32];
@@ -88,10 +89,12 @@ int PDNetShutdown(void) {
 }
 
 // IDA: void __cdecl PDNetStartProducingJoinList()
+// FUNCTION: CARM95 0x00454A33
 void PDNetStartProducingJoinList(void) {
 }
 
 // IDA: void __cdecl PDNetEndJoinList()
+// FUNCTION: CARM95 0x00454A86
 void PDNetEndJoinList(void) {
 }
 
@@ -122,10 +125,12 @@ int PDNetJoinGame(tNet_game_details* pDetails, char* pPlayer_name) {
 }
 
 // IDA: void __usercall PDNetLeaveGame(tNet_game_details *pDetails@<EAX>)
+// FUNCTION: CARM95 0x004551C3
 void PDNetLeaveGame(tNet_game_details* pDetails) {
 }
 
 // IDA: void __usercall PDNetHostFinishGame(tNet_game_details *pDetails@<EAX>)
+// FUNCTION: CARM95 0x004551DB
 void PDNetHostFinishGame(tNet_game_details* pDetails) {
 }
 
@@ -196,6 +201,7 @@ int PDNetInitClient(tNet_game_details* pDetails) {
 }
 
 // IDA: int __cdecl PDNetGetHeaderSize()
+// FUNCTION: CARM95 0x00455857
 int PDNetGetHeaderSize(void) {
     return 0;
 }

@@ -2751,21 +2751,39 @@ typedef struct tHeadup_pair {
     int out_of_game;
 } tHeadup_pair;
 
+#ifdef DETHRACE_FIX_BUGS
+
+// these structs hold data plus a void*. For 64 bits, we cannot assume a pointer is 4 bytes
 typedef struct tMax_message {
-    // char buffer[516];  // 512 + sizeof(void*)
-    char buffer[520];
+    char buffer[512];
+    void *ptr;
 } tMax_message;
 
 typedef struct tMid_message {
-    // char buffer[132];  // 128 + sizeof(void*)
-    char buffer[136];
+    char buffer[132];
+    void *ptr;
 } tMid_message;
 
 typedef struct tMin_message {
-    // char buffer[36];   // 32 + sizeof(void*)
-    char buffer[40];
+    char buffer[32];
+    void *ptr;
 } tMin_message;
 
+#else
+
+typedef struct tMax_message {
+    char buffer[516];
+} tMax_message;
+
+typedef struct tMid_message {
+    char buffer[132];
+} tMid_message;
+
+typedef struct tMin_message {
+    char buffer[36];
+} tMin_message;
+
+#endif
 typedef struct tGuaranteed_message {        // size: 0x2c
     tNet_message* message;                  // @0x0
     tU32 send_time;                         // @0x4
