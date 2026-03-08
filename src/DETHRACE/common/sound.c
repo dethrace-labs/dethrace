@@ -762,6 +762,7 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
 
                     gCDA_tag = DRS3StartSoundNoPiping(gMusic_outlet, pCDA_id);
 #if defined(DETHRACE_FIX_BUGS)
+                    // Fix issue where attempting to play the last cd track (9607) causes the CD audio playback to stop and not play any other tracks until sound is disabled then re-enabled.
                     if (gCDA_tag == 0 && gS3_last_error == eS3_error_bad_id && random_track && retries_remaining > 0) {
                         retries_remaining--;
                         // Retry with a random tune if the CD track is missing, instead of disabling music completely
