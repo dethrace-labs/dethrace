@@ -176,11 +176,11 @@ target_sources(dethrace_obj PRIVATE
     # pc-dos/dossys.c
 )
 
-if(DETHRACE_NET_ENABLED)
+if(MSVC_42_FOR_RECCMP)
+    target_sources(dethrace_obj PRIVATE pc-win95/win95net.c)
+else()
     # dethrace-added cross platform sys and network implementation
     target_sources(dethrace_obj PRIVATE pc-all/allnet.c)
-else()
-    target_sources(dethrace_obj PRIVATE pc-none/nonet.c)
 endif()
 
 # Create our main game binary.
@@ -192,6 +192,7 @@ if(MSVC_42_FOR_RECCMP)
     add_compile_definitions(_DEBUG)
     set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
     target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
+    target_link_libraries(dethrace PRIVATE ws2_32)
 
     set_source_files_properties(common/network.c PROPERTIES COMPILE_FLAGS "/FAs")
 

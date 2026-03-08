@@ -5,15 +5,18 @@
 
 int gS3_cda_enabled;
 
+// FUNCTION: CARM95 0x004956C0
 void S3EnableCDA(void) {
     gS3_cda_enabled = 1;
 }
 
+// FUNCTION: CARM95 0x004956D5
 void S3DisableCDA(void) {
     S3StopCDAOutlets();
     gS3_cda_enabled = 0;
 }
 
+// FUNCTION: CARM95 0x004957BE
 int S3StopCDAOutlets(void) {
     tS3_channel* chan;
     tS3_outlet* o;
@@ -31,10 +34,12 @@ int S3StopCDAOutlets(void) {
     return 1;
 }
 
+// FUNCTION: CARM95 0x00495725
 int S3CDAEnabled(void) {
     return gS3_cda_enabled;
 }
 
+// FUNCTION: CARM95 0x00495753
 int S3PlayCDA(tS3_channel* chan) {
     int track;
     if (gS3_cda_enabled) {
@@ -46,11 +51,13 @@ int S3PlayCDA(tS3_channel* chan) {
     return eS3_error_none;
 }
 
+// FUNCTION: CARM95 0x0049578C
 int S3StopCDA(tS3_channel* chan) {
     AudioBackend_StopCDA();
     return eS3_error_none;
 }
 
+// FUNCTION: CARM95 0x0049592E
 int S3SetCDAVolume(tS3_channel* chan, int pVolume) {
     if (gS3_cda_enabled) {
         AudioBackend_SetCDAVolume(pVolume);
@@ -58,10 +65,12 @@ int S3SetCDAVolume(tS3_channel* chan, int pVolume) {
     return 0;
 }
 
+// FUNCTION: CARM95 0x0049E278
 int S3IsCDAPlaying2(void) {
     return AudioBackend_CDAIsPlaying();
 }
 
+// FUNCTION: CARM95 0x00495919
 int S3IsCDAPlaying(void) {
     return S3IsCDAPlaying2();
 }
