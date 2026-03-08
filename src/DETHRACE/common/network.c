@@ -528,10 +528,11 @@ void DisposeCarN(int pIndex) {
         if (gCurrent_race.opponent_list[i].car_spec == gNet_players[pIndex].car) {
             gCurrent_race.number_of_racers--;
             for (j = i; j < gCurrent_race.number_of_racers; j++) {
-                gCurrent_race.opponent_list[j].index = gCurrent_race.opponent_list[j + 1].index;
-                gCurrent_race.opponent_list[j].ranking = gCurrent_race.opponent_list[j + 1].ranking;
-                gCurrent_race.opponent_list[j].net_player_index = gCurrent_race.opponent_list[j + 1].net_player_index;
-                gCurrent_race.opponent_list[j].car_spec = gCurrent_race.opponent_list[j + 1].car_spec;
+                // gCurrent_race.opponent_list[j].index = gCurrent_race.opponent_list[j + 1].index;
+                // gCurrent_race.opponent_list[j].ranking = gCurrent_race.opponent_list[j + 1].ranking;
+                // gCurrent_race.opponent_list[j].net_player_index = gCurrent_race.opponent_list[j + 1].net_player_index;
+                // gCurrent_race.opponent_list[j].car_spec = gCurrent_race.opponent_list[j + 1].car_spec;
+                memcpy(&gCurrent_race.opponent_list[j], &gCurrent_race.opponent_list[j + 1], sizeof(gCurrent_race.opponent_list[j]));
             }
         }
     }
