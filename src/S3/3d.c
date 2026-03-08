@@ -24,6 +24,7 @@ float dword_531D9C;
 float flt_531D7C;
 float flt_531D98;
 
+// FUNCTION: CARM95 0x00418690
 void S3Set3DSoundEnvironment(float pInverse_world_scale, float a2, float a3) {
     float tmp;
 
@@ -51,6 +52,7 @@ void S3Set3DSoundEnvironment(float pInverse_world_scale, float a2, float a3) {
     gS3_listener_left_now.z = 0.0;
 }
 
+// FUNCTION: CARM95 0x0041A2E3
 void S3CopyVector3(void* a1, void* a2, int pBrender_vector) {
     if (pBrender_vector) {
         S3CopyBrVector3((tS3_vector3*)a1, (br_vector3*)a2);
@@ -59,32 +61,38 @@ void S3CopyVector3(void* a1, void* a2, int pBrender_vector) {
     }
 }
 
+// FUNCTION: CARM95 0x0041881F
 void S3CopyBrVector3(tS3_vector3* a1, br_vector3* a2) {
     a1->x = a2->v[0];
     a1->y = a2->v[1];
     a1->z = a2->v[2];
 }
 
+// FUNCTION: CARM95 0x0041A31D
 void S3CopyS3Vector3(tS3_vector3* a1, tS3_vector3* a2) {
     *a1 = *a2;
 }
 
+// FUNCTION: CARM95 0x004188FB
 void S3BindListenerPositionBRender(br_vector3* pos) {
     gS3_listener_pos_ptr = pos;
     gS3_listener_pos_is_brender = 1;
     S3CopyBrVector3(&gS3_listener_position_old, pos);
 }
 
+// FUNCTION: CARM95 0x00418946
 void S3BindListenerVelocityBRender(br_vector3* vel) {
     gS3_listener_vel_ptr = vel;
     gS3_listener_vel_is_brender = 1;
 }
 
+// FUNCTION: CARM95 0x00418980
 void S3BindListenerLeftBRender(br_vector3* left) {
     gS3_listener_left_ptr = left;
     gS3_listener_left_is_brender = 1;
 }
 
+// FUNCTION: CARM95 0x0041A1A6
 void S3UpdateListenerVectors(void) {
     if (gS3_listener_pos_ptr) {
         S3CopyVector3(&gS3_listener_position_now, gS3_listener_pos_ptr, gS3_listener_pos_is_brender);
@@ -106,6 +114,7 @@ void S3UpdateListenerVectors(void) {
     }
 }
 
+// FUNCTION: CARM95 0x0041AC36
 void S3ServiceAmbientSoundSources(void) {
     tS3_sound_source* s; // [esp+Ch] [ebp-4h]
 
@@ -143,6 +152,7 @@ void S3ServiceAmbientSoundSources(void) {
     }
 }
 
+// FUNCTION: CARM95 0x0041A124
 int S3UpdateSpatialSound(tS3_channel* chan) {
     int close_enough_to_play; // [esp+10h] [ebp-4h]
 
@@ -158,6 +168,7 @@ int S3UpdateSpatialSound(tS3_channel* chan) {
     return close_enough_to_play;
 }
 
+// FUNCTION: CARM95 0x0041A34A
 int S3BindAmbientSoundToOutlet(tS3_outlet* pOutlet, int pSound, tS3_sound_source* source, float pMax_distance, int pPeriod, int pRepeats, int pVolume, int pPitch, int pSpeed) {
     tS3_descriptor* desc; // [esp+Ch] [ebp-4h]
 
@@ -205,6 +216,7 @@ int S3BindAmbientSoundToOutlet(tS3_outlet* pOutlet, int pSound, tS3_sound_source
     return eS3_error_none;
 }
 
+// FUNCTION: CARM95 0x0041A4B3
 void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source* src, float pMax_distance_squared, int pPeriod, tS3_repeats pAmbient_repeats, tS3_volume pVolume, int pPitch, tS3_speed pSpeed) {
     tS3_channel* chan;    // [esp+28h] [ebp-Ch]
     tS3_descriptor* desc; // [esp+2Ch] [ebp-8h]
@@ -288,6 +300,7 @@ void S3UpdateSoundSource(tS3_outlet* outlet, tS3_sound_tag tag, tS3_sound_source
     }
 }
 
+// FUNCTION: CARM95 0x0041A7BC
 void S3StopSoundSource(tS3_sound_source* src) {
     if (!gS3_enabled) {
         return;
@@ -303,6 +316,7 @@ void S3StopSoundSource(tS3_sound_source* src) {
     }
 }
 
+// FUNCTION: CARM95 0x0041A84C
 tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
     tS3_channel* chan;    // [esp+30h] [ebp-10h]
     tS3_outlet* outlet;   // [esp+34h] [ebp-Ch]
@@ -399,6 +413,7 @@ tS3_sound_tag S3ServiceSoundSource(tS3_sound_source* src) {
     }
 }
 
+// FUNCTION: CARM95 0x0041899D
 tS3_sound_tag S3StartSound3D(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_vector3* pInitial_position, tS3_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_channel* chan;    // [esp+30h] [ebp-Ch]
     tS3_descriptor* desc; // [esp+38h] [ebp-4h]
@@ -482,6 +497,7 @@ tS3_sound_tag S3StartSound3D(tS3_outlet* pOutlet, tS3_sound_id pSound, tS3_vecto
     }
 }
 
+// FUNCTION: CARM95 0x00419CF5
 int S3Calculate3D(tS3_channel* chan, int pIs_ambient) {
     float attenuation;                  // [esp+2Ch] [ebp-1Ch]
     float doppler_shift;                // [esp+30h] [ebp-18h]
