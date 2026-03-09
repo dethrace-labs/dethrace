@@ -819,7 +819,7 @@ int NetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage,
     if (gNet_mode != eNet_mode_none || gJoin_list_mode) {
         pMessage->sender = gLocal_net_ID;
         pMessage->senders_time_stamp = PDGetTotalTime();
-        GetCheckSum(pMessage);
+        DoCheckSum(pMessage);
         return PDNetSendMessageToAddress(pDetails, pMessage, pAddress);
     } else {
         return -3;
@@ -837,7 +837,7 @@ int NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, 
     pMessage->senders_time_stamp = PDGetTotalTime();
     for (i = 0; i < gNumber_of_net_players; i++) {
         if (gNet_players[i].ID == pPlayer) {
-            GetCheckSum(pMessage);
+            DoCheckSum(pMessage);
             return PDNetSendMessageToAddress(pDetails, pMessage, &gNet_players[i]);
         }
     }
@@ -847,14 +847,14 @@ int NetSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, 
 // IDA: int __usercall NetSendMessageToHost@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>)
 // FUNCTION: CARM95 0x00447a10
 int NetSendMessageToHost(tNet_game_details* pDetails, tNet_message* pMessage) {
-
-    if (gNet_mode == eNet_mode_none) {
+    if (gNet_mode != eNet_mode_none) {
+        pMessage->sender = gLocal_net_ID;
+        pMessage->senders_time_stamp = PDGetTotalTime();
+        DoCheckSum(pMessage);
+        return PDNetSendMessageToAddress(pDetails, pMessage, &pDetails->pd_net_info);
+    } else {
         return -3;
     }
-    pMessage->sender = gLocal_net_ID;
-    pMessage->senders_time_stamp = PDGetTotalTime();
-    DoCheckSum(pMessage);
-    return PDNetSendMessageToAddress(pDetails, pMessage, &pDetails->pd_net_info);
 }
 
 // IDA: int __usercall NetReplyToMessage@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pIncoming_message@<EDX>, tNet_message *pReply_message@<EBX>)
@@ -869,7 +869,7 @@ int NetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessa
 
     pMessage->sender = gLocal_net_ID;
     pMessage->senders_time_stamp = PDGetTotalTime();
-    GetCheckSum(pMessage);
+    DoCheckSum(pMessage);
     return PDNetSendMessageToAllPlayers(pDetails, pMessage);
 }
 
@@ -2176,7 +2176,7 @@ void ResendGuaranteedMessages(void) {
         if (!gGuarantee_list[i].recieved) {
             if (time > gGuarantee_list[i].next_resend_time) {
                 gGuarantee_list[i].message->guarantee_number = gGuarantee_list[i].guarantee_number;
-                GetCheckSum(gGuarantee_list[i].message);
+                DoCheckSum(gGuarantee_list[i].message);
                 PDNetSendMessageToAddress(gCurrent_net_game, gGuarantee_list[i].message, &gGuarantee_list[i].pd_address);
                 gGuarantee_list[i].resend_period = (tU32)(gGuarantee_list[i].resend_period * 1.2f);
                 gGuarantee_list[i].next_resend_time += gGuarantee_list[i].resend_period;
@@ -2252,6 +2252,7 @@ tNet_game_player_info* NetPlayerFromCar(tCar_spec* pCar) {
 }
 
 // IDA: tU32 __usercall DoCheckSum@<EAX>(tNet_message *pMessage@<EAX>)
+// FUNCTION: CARM95 0x0044ae74
 tU32 DoCheckSum(tNet_message* pMessage) {
     int i;
     int j;
@@ -2259,12 +2260,12 @@ tU32 DoCheckSum(tNet_message* pMessage) {
     tU32* p;
     tU8* q;
 
-    // empty function
+#ifdef DETHRACE_FIX_BUGS
     return 0;
+#endif
 }
 
-// IDA: void __usercall GetCheckSum(tNet_message *pMessage@<EAX>)
-// FUNCTION: CARM95 0x0044ae74
+// IDA: void __usercall DoCheckSum(tNet_message *pMessage@<EAX>)
 void GetCheckSum(tNet_message* pMessage) {
 }
 
