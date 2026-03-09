@@ -528,10 +528,6 @@ void DisposeCarN(int pIndex) {
         if (gCurrent_race.opponent_list[i].car_spec == gNet_players[pIndex].car) {
             gCurrent_race.number_of_racers--;
             for (j = i; j < gCurrent_race.number_of_racers; j++) {
-                // gCurrent_race.opponent_list[j].index = gCurrent_race.opponent_list[j + 1].index;
-                // gCurrent_race.opponent_list[j].ranking = gCurrent_race.opponent_list[j + 1].ranking;
-                // gCurrent_race.opponent_list[j].net_player_index = gCurrent_race.opponent_list[j + 1].net_player_index;
-                // gCurrent_race.opponent_list[j].car_spec = gCurrent_race.opponent_list[j + 1].car_spec;
                 memcpy(&gCurrent_race.opponent_list[j], &gCurrent_race.opponent_list[j + 1], sizeof(gCurrent_race.opponent_list[j]));
             }
         }
@@ -640,7 +636,11 @@ void NetPlayersChanged(int pNew_count, tNet_game_player_info* pNew_players) {
         if (!player_still_there) {
             for (j = 0; j < gNumber_of_net_players; j++) {
                 if (gCurrent_race.opponent_list[j].net_player_index == i) {
-                    memmove(&gCurrent_race.opponent_list[j], &gCurrent_race.opponent_list[j + 1], (gNumber_of_net_players - j - 1) * sizeof(tOpp_spec));
+#ifdef DETHRACE_FIX_BUGS
+                    memmove(gCurrent_race.opponent_list + j, gCurrent_race.opponent_list + j + 1, (gNumber_of_net_players - j - 1) * sizeof(tOpp_spec));
+#else
+                    memcpy(gCurrent_race.opponent_list + j, gCurrent_race.opponent_list + j + 1, (gNumber_of_net_players - j - 1) * sizeof(tOpp_spec));
+#endif
                     for (k = 0; k < pNew_count; k++) {
                         if (j < pNew_players[k].opponent_list_index) {
                             pNew_players[k].opponent_list_index--;
@@ -659,7 +659,7 @@ void NetPlayersChanged(int pNew_count, tNet_game_player_info* pNew_players) {
         }
     }
     gNumber_of_net_players = pNew_count;
-    memcpy(gNet_players, pNew_players, pNew_count * sizeof(tNet_game_player_info));
+    memcpy(gNet_players, pNew_players, gNumber_of_net_players * sizeof(tNet_game_player_info));
     for (i = 0; i < gNumber_of_net_players; i++) {
         gNet_players[i].last_heard_from_him = PDGetTotalTime();
     }
