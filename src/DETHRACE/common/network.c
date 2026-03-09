@@ -396,7 +396,8 @@ void NetDisposeGameDetails(tNet_game_details* pDetails) {
 tNet_game_details* NetAllocatePIDGameDetails(void) {
     tNet_game_details* game;
 
-    return BrMemAllocate(sizeof(tNet_game_details), kMem_net_pid_details);
+    game = BrMemAllocate(sizeof(tNet_game_details), kMem_net_pid_details);
+    return game;
 }
 
 // IDA: void __usercall NetLeaveGameLowLevel(tNet_game_details *pDetails@<EAX>)
