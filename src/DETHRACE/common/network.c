@@ -746,50 +746,52 @@ int NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index)
     tU32 start_time;
 
     result = NetJoinGameLowLevel(pDetails, pPlayer_name);
-    if (result != 0) {
-        return result;
-    }
-    DisableNetService();
-    gReceiving_new_players = 0;
-    gNet_mode = eNet_mode_client;
-    gCurrent_net_game = pDetails;
-    gLocal_net_ID = NetExtractPlayerID(pDetails);
-    gNumber_of_net_players = 0;
-    gLast_player_list_received = 0;
-    gJoin_request_denied = 0;
-    gCar_was_taken = 0;
-    gHost_died = 0;
-    the_message = NetBuildMessage(NETMSGID_JOIN, 0);
-    FillInThisPlayer(pDetails, &the_message->contents.data.join.player_info, pCar_index, 0);
-    ReenableNetService();
-    NetGuaranteedSendMessageToAddress(pDetails, the_message, pDetails, NULL);
-    start_time = PDGetTotalTime();
-    while (1) {
-        NetService(0);
-        if (gNumber_of_net_players != 0) {
-            break;
-        }
-        if (PDGetTotalTime() - start_time >= 30000 || gJoin_request_denied || gHost_died) {
-            break;
-        }
-    }
-    DisableNetService();
-    InitialisePlayerStati();
-    if (gNumber_of_net_players == 0) {
+    if (result == 0) {
+
+        DisableNetService();
+        gReceiving_new_players = 0;
+        gNet_mode = eNet_mode_client;
+        gCurrent_net_game = pDetails;
+        gLocal_net_ID = NetExtractPlayerID(pDetails);
+        gNumber_of_net_players = 0;
+        gLast_player_list_received = 0;
+        gJoin_request_denied = 0;
+        gCar_was_taken = 0;
+        gHost_died = 0;
+        the_message = NetBuildMessage(NETMSGID_JOIN, 0);
+        FillInThisPlayer(pDetails, &the_message->contents.data.join.player_info, pCar_index, 0);
         ReenableNetService();
-        if (gJoin_request_denied && gCar_was_taken) {
-            result = -4;
-        } else {
-            gNet_mode = eNet_mode_none;
-#if !defined(DETHRACE_FIX_BUGS)
-            // Avoid double free
-            NetDisposeGameDetails(gCurrent_net_game);
-#endif
-            gCurrent_net_game = NULL;
-            if (gJoin_request_denied) {
-                result = -2;
+        NetGuaranteedSendMessageToAddress(pDetails, the_message, pDetails, NULL);
+        start_time = PDGetTotalTime();
+        // while (1) {
+        //     NetService(0);
+        //     if (gNumber_of_net_players == 0) {
+        //         if (PDGetTotalTime() - start_time >= 30000 || gJoin_request_denied || gHost_died) {
+        //             break;
+        //         }
+        //     }
+        // }
+        do {
+            NetService(0);
+        } while (!gNumber_of_net_players && PDGetTotalTime() - start_time < 30000 && !gJoin_request_denied && !gHost_died);
+        DisableNetService();
+        InitialisePlayerStati();
+        if (gNumber_of_net_players == 0) {
+            ReenableNetService();
+            if (gJoin_request_denied && gCar_was_taken) {
+                result = -4;
             } else {
-                result = -1;
+                gNet_mode = eNet_mode_none;
+#if !defined(DETHRACE_FIX_BUGS)
+                // Avoid double free
+                NetDisposeGameDetails(gCurrent_net_game);
+#endif
+                gCurrent_net_game = NULL;
+                if (gJoin_request_denied) {
+                    result = -2;
+                } else {
+                    result = -1;
+                }
             }
         }
     }
