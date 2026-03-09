@@ -876,89 +876,130 @@ int NetSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_message* pMessa
 // IDA: tU32 __usercall NetGetContentsSize@<EAX>(tNet_message_type pType@<EAX>, tS32 pSize_decider@<EDX>)
 // FUNCTION: CARM95 0x00447adb
 tU32 NetGetContentsSize(tNet_message_type pType, tS32 pSize_decider) {
+
     tU32 the_size;
 
     switch (pType) {
     case NETMSGID_SENDMEDETAILS:
-        return sizeof(tNet_message_send_me_details);
+        the_size = sizeof(tNet_message_send_me_details);
+        break;
     case NETMSGID_DETAILS:
-        return sizeof(tNet_message_my_details);
+        the_size = sizeof(tNet_message_my_details);
+        break;
     case NETMSGID_JOIN:
-        return sizeof(tNet_message_join);
-    case NETMSGID_NEWPLAYERLIST:
-        return sizeof(tNet_message_new_player_list);
-    case NETMSGID_GUARANTEEREPLY:
-        return sizeof(tNet_message_guarantee_reply);
-    case NETMSGID_CARDETAILSREQ:
-        return sizeof(tNet_message_car_details_req);
-    case NETMSGID_CARDETAILS:
-        return sizeof(tNet_message_car_details);
+        the_size = sizeof(tNet_message_join);
+        break;
     case NETMSGID_LEAVE:
-        return sizeof(tNet_message_leave);
+        the_size = sizeof(tNet_message_leave);
+        break;
     case NETMSGID_HOSTICIDE:
-        return sizeof(tNet_message_host_pissing_off);
+        the_size = sizeof(tNet_message_host_pissing_off);
+        break;
+    case NETMSGID_NEWPLAYERLIST:
+        the_size = sizeof(tNet_message_new_player_list);
+        break;
     case NETMSGID_RACEOVER:
-        return sizeof(tNet_message_race_over);
+        the_size = sizeof(tNet_message_race_over);
+        break;
     case NETMSGID_STATUSREPORT:
-        return sizeof(tNet_message_status_report);
+        the_size = sizeof(tNet_message_status_report);
+        break;
     case NETMSGID_STARTRACE:
-        return sizeof(tNet_message_start_race);
+        the_size = sizeof(tNet_message_start_race);
+        break;
+    case NETMSGID_GUARANTEEREPLY:
+        the_size = sizeof(tNet_message_guarantee_reply);
+        break;
     case NETMSGID_HEADUP:
-        return sizeof(tNet_message_headup);
+        the_size = sizeof(tNet_message_headup);
+        break;
     case NETMSGID_HOSTQUERY:
-        return sizeof(tNet_message_host_query);
+        the_size = sizeof(tNet_message_host_query);
+        break;
     case NETMSGID_HOSTREPLY:
-        return sizeof(tNet_message_host_reply);
+        the_size = sizeof(tNet_message_host_reply);
+        break;
     case NETMSGID_MECHANICS:
-        if (pSize_decider == 0) {
-            return offsetof(tNet_message_mechanics_info, wheel_dam_offset);
+        if (pSize_decider != 0) {
+            the_size = sizeof(tNet_message_mechanics_info);
         } else {
-            return sizeof(tNet_message_mechanics_info);
+            the_size = offsetof(tNet_message_mechanics_info, wheel_dam_offset);
         }
+        break;
     case NETMSGID_NONCAR_INFO:
-        return sizeof(tNet_message_non_car_info);
+        the_size = sizeof(tNet_message_non_car_info);
+        break;
     case NETMSGID_TIMESYNC:
-        return sizeof(tNet_message_time_sync);
+        the_size = sizeof(tNet_message_time_sync);
+        break;
     case NETMSGID_CONFIRM:
-        return sizeof(tNet_message_players_confirm);
+        the_size = sizeof(tNet_message_players_confirm);
+        break;
     case NETMSGID_DISABLECAR:
-        return sizeof(tNet_message_disable_car);
+        the_size = sizeof(tNet_message_disable_car);
+        break;
     case NETMSGID_ENABLECAR:
-        return sizeof(tNet_message_enable_car);
+        the_size = sizeof(tNet_message_enable_car);
+        break;
     case NETMSGID_POWERUP:
-        return sizeof(tNet_message_powerup);
+        the_size = sizeof(tNet_message_powerup);
+        break;
     case NETMSGID_RECOVER:
-        return sizeof(tNet_message_recover);
+        the_size = sizeof(tNet_message_recover);
+        break;
     case NETMSGID_SCORES:
-        return sizeof(tNet_message_scores);
+        the_size = sizeof(tNet_message_scores);
+        break;
     case NETMSGID_WASTED:
-        return sizeof(tNet_message_wasted);
+        the_size = sizeof(tNet_message_wasted);
+        break;
     case NETMSGID_PEDESTRIAN:
         switch (pSize_decider) {
         case 0:
-            return offsetof(tNet_message_pedestrian, to_pos);
+            the_size = offsetof(tNet_message_pedestrian, to_pos);
+            break;
         case 1:
-            return offsetof(tNet_message_pedestrian, offset);
+            the_size = offsetof(tNet_message_pedestrian, offset);
+            break;
         case 2:
-            return sizeof(tNet_message_pedestrian);
-        default:
-            TELL_ME_IF_WE_PASS_THIS_WAY();
+            the_size = sizeof(tNet_message_pedestrian);
+            break;
         }
+        break;
     case NETMSGID_GAMEPLAY:
-        return sizeof(tNet_message_gameplay);
+        the_size = sizeof(tNet_message_gameplay);
+        break;
     case NETMSGID_NONCARPOSITION:
-        return sizeof(tNet_message_non_car_position);
+        the_size = sizeof(tNet_message_non_car_position);
+        break;
     case NETMSGID_COPINFO:
-        return sizeof(tNet_message_cop_info);
+        the_size = sizeof(tNet_message_cop_info);
+        break;
+    case NETMSGID_CARDETAILSREQ:
+        the_size = sizeof(tNet_message_car_details_req);
+        break;
+    case NETMSGID_CARDETAILS:
+        the_size = sizeof(tNet_message_car_details);
+        break;
     case NETMSGID_GAMESCORES:
-        return sizeof(tNet_message_game_scores);
+        the_size = sizeof(tNet_message_game_scores);
+        break;
     case NETMSGID_OILSPILL:
-        return sizeof(tNet_message_oil_spill);
+        the_size = sizeof(tNet_message_oil_spill);
+        break;
     case NETMSGID_CRUSHPOINT:
-        return sizeof(tNet_message_crush_point);
+        the_size = sizeof(tNet_message_crush_point);
+        break;
     default:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
-        return 4;
+        the_size = 4;
+        break;
+    }
+    return the_size;
+
+    if (the_size > 255) {
+        char s[256];
+        sprintf(s, " type %d", pType);
+        FatalError(kFatalError_NetContentsTooBig_S, s);
     }
 }
 
