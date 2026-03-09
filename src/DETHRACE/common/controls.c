@@ -1057,7 +1057,7 @@ void TiltBonnetDownX(void) {
 // FUNCTION: CARM95 0x004a16b5
 void TiltBonnetUpX(void) {
 
-    BrMatrix34PreRotateX(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.5f));
+    BrMatrix34PreRotateX(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.59f));
 }
 
 // IDA: void __cdecl TiltBonnetDownY()
@@ -1071,7 +1071,7 @@ void TiltBonnetDownY(void) {
 // FUNCTION: CARM95 0x004a170a
 void TiltBonnetUpY(void) {
 
-    BrMatrix34PreRotateY(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.5f));
+    BrMatrix34PreRotateY(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.59f));
 }
 
 // IDA: void __cdecl TiltBonnetDownZ()
@@ -1085,7 +1085,7 @@ void TiltBonnetDownZ(void) {
 // FUNCTION: CARM95 0x004a175f
 void TiltBonnetUpZ(void) {
 
-    BrMatrix34PreRotateZ(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.5f));
+    BrMatrix34PreRotateZ(&gProgram_state.current_car.car_model_actors[gProgram_state.current_car.car_actor_count - 1].actor->t.t.mat, -BR_ANGLE_DEG(.59f));
 }
 
 // IDA: void __cdecl ToggleCockpit()
