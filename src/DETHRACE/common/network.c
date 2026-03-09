@@ -687,33 +687,35 @@ tNet_game_details* NetHostGame(tNet_game_type pGame_type, tNet_game_options* pOp
         sprintf(pHost_name, "%s", "HOST");
     }
     DisableNetService();
-    if (PDNetHostGame(game, pHost_name, &host_address) == 0) {
+    if (PDNetHostGame(game, pHost_name, &host_address)) {
+
+        gCurrent_net_game = game;
+        gNeed_to_send_start_race = 0;
+        strcpy(game->host_name, pHost_name);
+        game->host_ID = NetExtractPlayerID(game);
+        game->num_players = 1;
+        memcpy(&game->options, pOptions, sizeof(tNet_game_options));
+        game->status.stage = eNet_game_starting;
+        game->type = pGame_type;
+        game->start_race = pStart_rank;
+        game->no_races_yet = 1;
+        gReceiving_new_players = 0;
+        gHost_died = 0;
+        gNumber_of_net_players = 0;
+        gThis_net_player_index = 0;
+        gLocal_net_ID = game->host_ID;
+        FillInThisPlayer(game, &me, pCar_index, 1);
+        gNet_players[0].race_stuff_initialised = 1;
+        NetSetPlayerSystemInfo(&me, host_address);
+        NetPlayersChanged(1, &me);
+        InitialisePlayerStati();
+        gNet_mode = eNet_mode_host;
+        gDont_allow_joiners = 0;
+        return game;
+    } else {
         NetDisposeGameDetails(game);
         return NULL;
     }
-    gCurrent_net_game = game;
-    gNeed_to_send_start_race = 0;
-    strcpy(game->host_name, pHost_name);
-    game->host_ID = NetExtractPlayerID(game);
-    game->num_players = 1;
-    memcpy(&game->options, pOptions, sizeof(tNet_game_options));
-    game->status.stage = eNet_game_starting;
-    game->type = pGame_type;
-    game->start_race = pStart_rank;
-    game->no_races_yet = 1;
-    gReceiving_new_players = 0;
-    gHost_died = 0;
-    gNumber_of_net_players = 0;
-    gThis_net_player_index = 0;
-    gLocal_net_ID = game->host_ID;
-    FillInThisPlayer(game, &me, pCar_index, 1);
-    gNet_players[0].race_stuff_initialised = 1;
-    NetSetPlayerSystemInfo(&me, host_address);
-    NetPlayersChanged(1, &me);
-    InitialisePlayerStati();
-    gNet_mode = eNet_mode_host;
-    gDont_allow_joiners = 0;
-    return game;
 }
 
 // IDA: int __usercall NetInitClient@<EAX>(tNet_game_details *pDetails@<EAX>)
