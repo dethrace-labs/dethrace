@@ -763,14 +763,6 @@ int NetJoinGame(tNet_game_details* pDetails, char* pPlayer_name, int pCar_index)
         ReenableNetService();
         NetGuaranteedSendMessageToAddress(pDetails, the_message, pDetails, NULL);
         start_time = PDGetTotalTime();
-        // while (1) {
-        //     NetService(0);
-        //     if (gNumber_of_net_players == 0) {
-        //         if (PDGetTotalTime() - start_time >= 30000 || gJoin_request_denied || gHost_died) {
-        //             break;
-        //         }
-        //     }
-        // }
         do {
             NetService(0);
         } while (!gNumber_of_net_players && PDGetTotalTime() - start_time < 30000 && !gJoin_request_denied && !gHost_died);
@@ -824,13 +816,14 @@ tPlayer_ID NetExtractPlayerID(tNet_game_details* pDetails) {
 // FUNCTION: CARM95 0x004478fd
 int NetSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress) {
 
-    if (gNet_mode == eNet_mode_none && !gJoin_list_mode) {
+    if (gNet_mode != eNet_mode_none || gJoin_list_mode) {
+        pMessage->sender = gLocal_net_ID;
+        pMessage->senders_time_stamp = PDGetTotalTime();
+        GetCheckSum(pMessage);
+        return PDNetSendMessageToAddress(pDetails, pMessage, pAddress);
+    } else {
         return -3;
     }
-    pMessage->sender = gLocal_net_ID;
-    pMessage->senders_time_stamp = PDGetTotalTime();
-    GetCheckSum(pMessage);
-    return PDNetSendMessageToAddress(pDetails, pMessage, pAddress);
 }
 
 // IDA: int __usercall NetSendMessageToPlayer@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, tPlayer_ID pPlayer@<EBX>)
@@ -2259,7 +2252,6 @@ tNet_game_player_info* NetPlayerFromCar(tCar_spec* pCar) {
 }
 
 // IDA: tU32 __usercall DoCheckSum@<EAX>(tNet_message *pMessage@<EAX>)
-// FUNCTION: CARM95 0x0044ae74
 tU32 DoCheckSum(tNet_message* pMessage) {
     int i;
     int j;
@@ -2272,6 +2264,7 @@ tU32 DoCheckSum(tNet_message* pMessage) {
 }
 
 // IDA: void __usercall GetCheckSum(tNet_message *pMessage@<EAX>)
+// FUNCTION: CARM95 0x0044ae74
 void GetCheckSum(tNet_message* pMessage) {
 }
 
