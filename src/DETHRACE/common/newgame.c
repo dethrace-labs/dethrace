@@ -1888,6 +1888,9 @@ int DoMultiPlayerStart(void) {
         }
     case eJoin_or_host_host:
 #if defined(DETHRACE_FIX_BUGS)
+        gCar_details = BrMemCalloc(gNumber_of_racers, sizeof(tCar_detail_info), kMem_net_car_spec);
+#endif
+#if defined(DETHRACE_FIX_BUGS)
         /* Don't allow hosting a game when the game is launched with --no-bind */
         if (harness_game_config.no_bind) {
             DoErrorInterface(76);
