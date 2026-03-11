@@ -1023,6 +1023,7 @@ tNet_message* NetBuildMessage(tNet_message_type pType, tS32 pSize_decider) {
     tNet_message* the_message;
     tU32 the_size;
 
+    the_message = NULL;
     the_size = NetGetMessageSize(pType, pSize_decider);
     the_message = NetAllocateMessage(the_size);
     if (the_message != NULL) {
