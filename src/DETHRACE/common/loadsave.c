@@ -650,7 +650,15 @@ void MakeSavedGame(tSave_game** pSave_record) {
     for (i = 0; i < gNumber_of_races; i++) {
         (*pSave_record)->race_info[i].been_there_done_that = gRace_list[i].been_there_done_that;
     }
-    for (i = 0; i < gNumber_of_racers; i++) {
+#ifdef DETHRACE_FIX_BUGS
+// Tracking more than 48 vehicles corrupts save files.
+// This only matters in modded games that add more stealable vehicles
+#define VALID_SAVE_GAME_INDEX(SAVE_GAME, INDEX) ((INDEX) < gNumber_of_racers && (INDEX) < COUNT_OF((SAVE_GAME)->opponent_info))
+#else
+#define VALID_SAVE_GAME_INDEX(SAVE_GAME, INDEX) ((INDEX) < gNumber_of_racers)
+#endif
+    for (i = 0; VALID_SAVE_GAME_INDEX(*pSave_record, i); i++) {
+#undef VALID_SAVE_GAME_INDEX
         (*pSave_record)->opponent_info[i].dead = gOpponents[i].dead;
     }
     (*pSave_record)->credits = gProgram_state.credits;
