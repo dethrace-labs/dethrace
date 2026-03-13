@@ -138,6 +138,7 @@ int gReceived_game_scores;
 #define MIN_MESSAGES_CAPACITY 20
 #define MID_MESSAGES_CAPACITY 10
 #define MAX_MESSAGES_CAPACITY 20
+#define NETMSG_BLOCK_NEXT(p) (*(void**)(p))
 
 #define MAX_MESAGE_STACK_SIZE 512
 
@@ -1113,9 +1114,12 @@ tNet_message* NetAllocateMessage(int pSize) {
     int i;
 
     pointer = NULL;
+    last_message = NULL;
     if (pSize <= sizeof(tMin_message) - sizeof(void*)) {
         for (i = 0; i < MIN_MESSAGES_CAPACITY; i++) {
-            if (((tNet_message*)&gMin_messages[rr_min])->contents.header.type == NETMSGID_NONE) {
+            test = gMin_messages[rr_min].buffer;
+            test += gMessage_header_size;
+            if (((tNet_message*)test)->contents.header.type == NETMSGID_NONE) {
                 pointer = &gMin_messages[rr_min];
                 break;
             }
@@ -1125,9 +1129,11 @@ tNet_message* NetAllocateMessage(int pSize) {
             }
         }
     }
-    if (pointer == NULL && pSize <= sizeof(tMid_message) - sizeof(void*)) {
+    if (pointer == NULL && pSize <= (int)(sizeof(tMid_message) - sizeof(void*))) {
         for (i = 0; i < MID_MESSAGES_CAPACITY; i++) {
-            if (((tNet_message*)&gMid_messages[rr_mid])->contents.header.type == NETMSGID_NONE) {
+            test = gMid_messages[rr_mid].buffer;
+            test += gMessage_header_size;
+            if (((tNet_message*)test)->contents.header.type == NETMSGID_NONE) {
                 pointer = &gMid_messages[rr_mid];
                 break;
             }
@@ -1137,9 +1143,11 @@ tNet_message* NetAllocateMessage(int pSize) {
             }
         }
     }
-    if (pointer == NULL && pSize <= sizeof(tMax_message) - sizeof(void*)) {
+    if (pointer == NULL && pSize <= (int)(sizeof(tMax_message) - sizeof(void*))) {
         for (i = 0; i < MAX_MESSAGES_CAPACITY; i++) {
-            if (((tNet_message*)&gMax_messages[rr_max])->contents.header.type == NETMSGID_NONE) {
+            test = gMax_messages[rr_max].buffer;
+            test += gMessage_header_size;
+            if (((tNet_message*)test)->contents.header.type == NETMSGID_NONE) {
                 pointer = &gMax_messages[rr_max];
                 break;
             }
@@ -1152,27 +1160,32 @@ tNet_message* NetAllocateMessage(int pSize) {
     if (pointer == NULL) {
         pointer = BrMemAllocate(gMessage_header_size + pSize + sizeof(void*), kMem_dynamic_message);
         if (pointer != NULL) {
-            *(void**)pointer = NULL;
+            NETMSG_BLOCK_NEXT(pointer) = NULL;
             if (gMessage_to_free != NULL) {
-                for (last_message = gMessage_to_free; *(void**)last_message != NULL; last_message = *(void**)last_message) {
+                tNet_message* m;
+
+                i = 0, last_message = gMessage_to_free;
+                while (NETMSG_BLOCK_NEXT(last_message) != NULL) {
+                    if (i++ > 10) {
+                        m = (tNet_message*)((void**)last_message + 1);
+                    }
+                    last_message = NETMSG_BLOCK_NEXT(last_message);
                 }
-                *(void**)last_message = pointer;
+                NETMSG_BLOCK_NEXT(last_message) = pointer;
             } else {
                 gMessage_to_free = pointer;
             }
             pointer = (char*)pointer + sizeof(void*);
         }
     }
-    if (pointer == NULL) {
-        LOG_PANIC("null pointer!");
-        message = NULL;
-    } else {
+    if (pointer != NULL) {
         message = (tNet_message*)((tU8*)pointer + gMessage_header_size);
         message->guarantee_number = 0;
         message->version = 1;
         message->magic_number = 0x763a5058;
+        return message;
     }
-    return message;
+    return NULL;
 }
 
 // IDA: void __cdecl NetFreeExcessMemory()
@@ -1181,7 +1194,7 @@ void NetFreeExcessMemory(void) {
     void* temp;
 
     while (gMessage_to_free != NULL && ((tNet_message*)((char*)gMessage_to_free + sizeof(void*)))->contents.header.type == NETMSGID_NONE) {
-        temp = *(void**)gMessage_to_free;
+        temp = NETMSG_BLOCK_NEXT(gMessage_to_free);
         BrMemFree(gMessage_to_free);
         gMessage_to_free = temp;
     }
