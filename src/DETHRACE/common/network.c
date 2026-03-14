@@ -1852,15 +1852,15 @@ void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceiv
     if (pMessage->guarantee_number != 0) {
         SendGuaranteeReply(pMessage, pSender_address);
     }
-    if (!gProgram_state.racing && gRace_only_flags[pMessage->contents.header.type]) {
+    if (!gProgram_state.racing && gRace_only_flags[contents->header.type]) {
         return;
     }
-    if (gOnly_receive_guarantee_replies && pMessage->contents.header.type != NETMSGID_GUARANTEEREPLY) {
+    if (gOnly_receive_guarantee_replies && contents->header.type != NETMSGID_GUARANTEEREPLY) {
         return;
     }
 
     for (i = 0; i < pMessage->num_contents; i++) {
-        if (contents->header.type <= NETMSGID_CARDETAILS || PlayerIsInList(pMessage->sender)) {
+        if (contents->header.type < NETMSGID_LEAVE || PlayerIsInList(pMessage->sender)) {
             switch (contents->header.type) {
             case NETMSGID_SENDMEDETAILS: // 0x00,
                 ReceivedSendMeDetails(contents, pSender_address);
@@ -1871,23 +1871,14 @@ void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceiv
             case NETMSGID_JOIN: // 0x02,
                 ReceivedJoin(contents, pSender_address);
                 break;
-            case NETMSGID_NEWPLAYERLIST: // 0x03,
-                ReceivedNewPlayerList(contents, pMessage);
-                break;
-            case NETMSGID_GUARANTEEREPLY: // 0x04,
-                ReceivedGuaranteeReply(contents);
-                break;
-            case NETMSGID_CARDETAILSREQ: // 0x05,
-                ReceivedCarDetailsReq(contents, pSender_address);
-                break;
-            case NETMSGID_CARDETAILS: // 0x06,
-                ReceivedCarDetails(contents);
-                break;
             case NETMSGID_LEAVE: // 0x07,
                 ReceivedLeave(contents, pMessage);
                 break;
             case NETMSGID_HOSTICIDE: // 0x08,
                 ReceivedHosticide(contents);
+                break;
+            case NETMSGID_NEWPLAYERLIST: // 0x03,
+                ReceivedNewPlayerList(contents, pMessage);
                 break;
             case NETMSGID_RACEOVER: // 0x09,
                 ReceivedRaceOver(contents);
@@ -1897,6 +1888,9 @@ void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceiv
                 break;
             case NETMSGID_STARTRACE: // 0x0b,
                 ReceivedStartRace(contents);
+                break;
+            case NETMSGID_GUARANTEEREPLY: // 0x04,
+                ReceivedGuaranteeReply(contents);
                 break;
             case NETMSGID_HEADUP: // 0x0c,
                 ReceivedHeadup(contents);
@@ -1948,6 +1942,12 @@ void ReceivedMessage(tNet_message* pMessage, void* pSender_address, tU32 pReceiv
                 break;
             case NETMSGID_COPINFO: // 0x1c,
                 ReceivedCopInfo(contents);
+                break;
+            case NETMSGID_CARDETAILSREQ: // 0x05,
+                ReceivedCarDetailsReq(contents, pSender_address);
+                break;
+            case NETMSGID_CARDETAILS: // 0x06,
+                ReceivedCarDetails(contents);
                 break;
             case NETMSGID_GAMESCORES: // 0x1d,
                 ReceivedGameScores(contents);
