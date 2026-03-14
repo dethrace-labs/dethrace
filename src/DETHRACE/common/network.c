@@ -1223,12 +1223,11 @@ tNet_message* NetGetNextMessage(tNet_game_details* pDetails, void** pSender_addr
 void ReceivedSendMeDetails(tNet_contents* pContents, void* pSender_address) {
     tNet_message* message;
 
-    if (gDont_allow_joiners) {
-        return;
+    if (!gDont_allow_joiners) {
+        message = NetBuildMessage(NETMSGID_DETAILS, 0);
+        memcpy(&message->contents.data.details.details.host_name, gCurrent_net_game->host_name, sizeof(*gCurrent_net_game) - offsetof(tNet_game_details, host_name));
+        NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
     }
-    message = NetBuildMessage(NETMSGID_DETAILS, 0);
-    memcpy(&message->contents.data.details.details.host_name, gCurrent_net_game->host_name, sizeof(*gCurrent_net_game) - offsetof(tNet_game_details, host_name));
-    NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
 }
 
 // IDA: void __usercall ReceivedDetails(tNet_contents *pContents@<EAX>)
