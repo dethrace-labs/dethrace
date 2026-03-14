@@ -1278,49 +1278,61 @@ void ReceivedJoin(tNet_contents* pContents, void* pSender_address) {
 
     new_player_count = gNumber_of_net_players;
     new_players = BrMemAllocate((new_player_count + 1) * sizeof(tNet_game_player_info), kMem_player_list_join);
-    memcpy(new_players, gNet_players, gNumber_of_net_players * sizeof(tNet_game_player_info));
+    memcpy(new_players, gNet_players, new_player_count * sizeof(tNet_game_player_info));
 
-    if ((!gCurrent_net_game->options.open_game && gProgram_state.racing) || gCurrent_net_game->num_players > 5 || gDont_allow_joiners) {
+    if ((!gCurrent_net_game->options.open_game && gProgram_state.racing) || gCurrent_net_game->num_players >= 6 || gDont_allow_joiners) {
         message = NetBuildMessage(NETMSGID_NEWPLAYERLIST, 0);
         // Send player count = 0 when race has already begun or is full
         message->contents.data.player_list.number_of_players = 0;
         NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
     } else {
-        for (i = 0; i < new_player_count; i++) {
-            if (new_players[i].ID == pContents->data.join.player_info.ID) {
-                return;
-            }
-        }
-        slot_index = new_player_count;
-        new_player_count++;
-        if (pContents->data.join.player_info.car_index < 0) {
-            pContents->data.join.player_info.car_index = PickARandomCar();
-        } else {
-            for (i = 0; i < gNumber_of_net_players; i++) {
-                if (gNet_players[i].car_index == pContents->data.join.player_info.car_index) {
-                    message = NetBuildMessage(NETMSGID_NEWPLAYERLIST, 0);
-                    // Send player count = -1 when selected car is unavailable
-                    message->contents.data.player_list.number_of_players = -1;
-                    NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
-                    return;
+        do {
+            slot_index = -1;
+            for (i = 0; i < new_player_count; i++) {
+                if (new_players[i].ID == pContents->data.join.player_info.ID) {
+                    break;
                 }
             }
-        }
-        if (pContents->data.join.player_info.car_index >= 0) {
-            gCar_details[pContents->data.join.player_info.car_index].ownership = eCar_owner_someone;
-        }
-        memcpy(&new_players[slot_index], &pContents->data.join.player_info, sizeof(tNet_game_player_info));
-        new_players[slot_index].player_status = ePlayer_status_loading;
-        new_players[slot_index].last_heard_from_him = PDGetTotalTime();
-        new_players[slot_index].grid_position_set = 0;
-        if (new_players[slot_index].player_name[0] == '\0') {
-            sprintf(new_players[slot_index].player_name, "%s %d", "PLAYER", slot_index);
-        }
-        NetSetPlayerSystemInfo(&new_players[slot_index], pSender_address);
-        NetPlayersChanged(new_player_count, new_players);
-        BrMemFree(new_players);
-        SendOutPlayerList();
+            if (i < new_player_count) {
+                break;
+            }
+            if (slot_index < 0) {
+                slot_index = new_player_count;
+                new_player_count++;
+            }
+            if (pContents->data.join.player_info.car_index < 0) {
+                pContents->data.join.player_info.car_index = PickARandomCar();
+            } else {
+                for (i = 0; i < gNumber_of_net_players; i++) {
+                    if (gNet_players[i].car_index == pContents->data.join.player_info.car_index) {
+                        message = NetBuildMessage(NETMSGID_NEWPLAYERLIST, 0);
+                        // Send player count = -1 when selected car is unavailable
+                        message->contents.data.player_list.number_of_players = -1;
+                        NetSendMessageToAddress(gCurrent_net_game, message, pSender_address);
+                        break;
+                    }
+                }
+                if (i < gNumber_of_net_players) {
+                    break;
+                }
+            }
+            NetDisposePlayer(&new_players[slot_index]);
+            if (pContents->data.join.player_info.car_index >= 0) {
+                gCar_details[pContents->data.join.player_info.car_index].ownership = eCar_owner_someone;
+            }
+            memcpy(&new_players[slot_index], &pContents->data.join.player_info, sizeof(tNet_game_player_info));
+            new_players[slot_index].player_status = ePlayer_status_loading;
+            new_players[slot_index].last_heard_from_him = PDGetTotalTime();
+            new_players[slot_index].grid_position_set = 0;
+            if (new_players[slot_index].player_name[0] == '\0') {
+                sprintf(new_players[slot_index].player_name, "%s %d", "PLAYER", slot_index);
+            }
+            NetSetPlayerSystemInfo(&new_players[slot_index], pSender_address);
+            NetPlayersChanged(new_player_count, new_players);
+        } while (0);
     }
+    BrMemFree(new_players);
+    SendOutPlayerList();
 }
 // IDA: void __usercall KickPlayerOut(tPlayer_ID pID@<EAX>)
 // FUNCTION: CARM95 0x004496f8
@@ -1463,16 +1475,23 @@ void ReceivedNewPlayerList(tNet_contents* pContents, tNet_message* pM) {
         }
         return;
     }
-    if (pContents->data.player_list.batch_number >= gReceiving_batch_number) {
-        if (!gReceiving_new_players) {
-            gLast_player_list_received = pM->senders_time_stamp;
-            for (i = 0; i < COUNT_OF(gNew_net_players); i++) {
-                gNew_net_players[i].car_index = -1;
-            }
-            gReceiving_new_players = 1;
-            gReceiving_batch_number = pContents->data.player_list.batch_number;
+    if (pContents->data.player_list.batch_number < gReceiving_batch_number) {
+        return;
+    }
+
+    if (!gReceiving_new_players) {
+        gLast_player_list_received = pM->senders_time_stamp;
+        for (i = 0; i < COUNT_OF(gNew_net_players); i++) {
+            gNew_net_players[i].car_index = -1;
         }
-        if (pContents->data.player_list.batch_number <= gReceiving_batch_number) {
+        gReceiving_new_players = 1;
+        gReceiving_batch_number = pContents->data.player_list.batch_number;
+    }
+
+    if (pContents->data.player_list.batch_number > gReceiving_batch_number) {
+        gReceiving_new_players = 0;
+        ReceivedNewPlayerList(pContents, pM);
+    } else {
             memcpy(&gNew_net_players[pContents->data.player_list.this_index], &pContents->data.player_list.player, sizeof(tNet_game_player_info));
             for (i = 0; i < pContents->data.player_list.number_of_players; i++) {
                 if (gNew_net_players[i].car_index < 0) {
@@ -1498,11 +1517,7 @@ void ReceivedNewPlayerList(tNet_contents* pContents, tNet_message* pM) {
                     gCurrent_race.opponent_list[gNet_players[i].opponent_list_index].net_player_index = i;
                 }
             }
-        } else {
-            gReceiving_new_players = 0;
-            ReceivedNewPlayerList(pContents, pM);
         }
-    }
 }
 
 // IDA: void __usercall ReceivedRaceOver(tNet_contents *pContents@<EAX>)
