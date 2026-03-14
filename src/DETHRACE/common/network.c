@@ -1234,11 +1234,10 @@ void ReceivedSendMeDetails(tNet_contents* pContents, void* pSender_address) {
 // FUNCTION: CARM95 0x004492f6
 void ReceivedDetails(tNet_contents* pContents) {
 
-    if (gCurrent_join_poll_game == NULL) {
-        return;
+    if (gCurrent_join_poll_game != NULL) {
+        gBastard_has_answered = 1;
+        memcpy(gCurrent_join_poll_game->host_name, &pContents->data.details.details.host_name, sizeof(*gCurrent_join_poll_game) - offsetof(tNet_game_details, host_name));
     }
-    gBastard_has_answered = 1;
-    memcpy(gCurrent_join_poll_game->host_name, &pContents->data.details.details.host_name, sizeof(*gCurrent_join_poll_game) - offsetof(tNet_game_details, host_name));
 }
 
 // IDA: void __cdecl SendOutPlayerList()
