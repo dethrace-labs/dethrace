@@ -1193,7 +1193,7 @@ tNet_message* NetAllocateMessage(int pSize) {
 void NetFreeExcessMemory(void) {
     void* temp;
 
-    while (gMessage_to_free != NULL && ((tNet_message*)((char*)gMessage_to_free + sizeof(void*)))->contents.header.type == NETMSGID_NONE) {
+    while (gMessage_to_free != NULL && ((tNet_message*)((char*)gMessage_to_free + sizeof(void*) + gMessage_header_size))->contents.header.type == NETMSGID_NONE) {
         temp = NETMSG_BLOCK_NEXT(gMessage_to_free);
         BrMemFree(gMessage_to_free);
         gMessage_to_free = temp;
