@@ -1525,8 +1525,10 @@ void ReceivedNewPlayerList(tNet_contents* pContents, tNet_message* pM) {
 void ReceivedRaceOver(tNet_contents* pContents) {
 
     gRace_finished = 0;
-    if (gProgram_state.racing && (gNet_mode == eNet_mode_client || pContents->data.race_over.reason == eRace_over_network_victory || pContents->data.race_over.reason == eRace_over_network_loss)) {
-        RaceCompleted(pContents->data.race_over.reason);
+    if (gProgram_state.racing) {
+        if (gNet_mode == eNet_mode_client || pContents->data.race_over.reason >= eRace_over_network_victory) {
+            RaceCompleted(pContents->data.race_over.reason);
+        }
     }
 }
 
