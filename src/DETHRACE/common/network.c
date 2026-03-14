@@ -1638,13 +1638,14 @@ void ReceivedHostReply(tNet_contents* pContents) {
         NetLeaveGame(gCurrent_net_game);
         NetFullScreenMessage(kMiscString_RACE_CHANGED_DURING_LOADING, 0);
         gProgram_state.prog_status = eProg_idling;
+        return;
     }
     if (pContents->data.heres_where_we_at.race_has_started) {
-        if (gCurrent_net_game->options.open_game) {
-            gPending_race = pContents->data.heres_where_we_at.pending_race;
-        } else {
+        if (!gCurrent_net_game->options.open_game) {
             NetFullScreenMessage(kMiscString_SORRY_YOU_RE_TOO_LATE, 0);
             gProgram_state.prog_status = eProg_idling;
+        } else {
+            gPending_race = pContents->data.heres_where_we_at.pending_race;
         }
     }
 }
