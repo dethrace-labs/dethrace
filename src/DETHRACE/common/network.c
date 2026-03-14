@@ -1740,18 +1740,19 @@ void ReceivedWasted(tNet_contents* pContents) {
     if (victim == NULL) {
         return;
     }
-    victim->car->knackered = 1;
+    car = victim->car;
+    car->knackered = 1;
     if (pContents->data.wasted.victim == gLocal_net_ID) {
-        if (gCurrent_net_game->type == eNet_game_type_fight_to_death) {
+        if (gCurrent_net_game->type != eNet_game_type_fight_to_death) {
+            last_got_wasted_time = PDGetTotalTime();
+            if (last_got_wasted_time - last_wasted_em_time <= 1000) {
+                DoFancyHeadup(kFancyHeadupYouAreBothWasted);
+            } else {
+                DoFancyHeadup(kFancyHeadupYouAreWasted);
+            }
+        } else {
             DoFancyHeadup(kFancyHeadupYouLost);
             gRace_finished = 1;
-        } else {
-            last_got_wasted_time = PDGetTotalTime();
-            if (last_got_wasted_time - last_wasted_em_time > 1000) {
-                DoFancyHeadup(kFancyHeadupYouAreWasted);
-            } else {
-                DoFancyHeadup(kFancyHeadupYouAreBothWasted);
-            }
         }
     }
     if (pContents->data.wasted.culprit == -1) {
@@ -1784,10 +1785,10 @@ void ReceivedWasted(tNet_contents* pContents) {
         if (pContents->data.wasted.culprit == gLocal_net_ID) {
             PratcamEvent(kPratcam_opponent_wasted);
             last_wasted_em_time = PDGetTotalTime();
-            if (last_wasted_em_time - last_got_wasted_time > 1000) {
-                DoFancyHeadup(kFancyHeadupYouWastedEm);
-            } else {
+            if (last_wasted_em_time - last_got_wasted_time <= 1000) {
                 DoFancyHeadup(kFancyHeadupYouAreBothWasted);
+            } else {
+                DoFancyHeadup(kFancyHeadupYouWastedEm);
             }
         }
     }
