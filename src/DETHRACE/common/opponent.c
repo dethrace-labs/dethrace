@@ -2755,7 +2755,7 @@ void DisposeOpponents(void) {
     int i;
     if (gProgram_state.AI_vehicles.number_of_cops != 0) {
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
-            DisposeCar(gProgram_state.AI_vehicles.cops[i].car_spec, (i == gBIG_APC_index) ? 4 : 3);
+            DisposeCar(gProgram_state.AI_vehicles.cops[i].car_spec, (i - gBIG_APC_index != 0) ? 3 : 4);
             BrMemFree(gProgram_state.AI_vehicles.cops[i].car_spec);
         }
     }
