@@ -11,6 +11,7 @@ We want to generate assembly that matches the original retail binary. Each funct
 - If the stack size is different (the sub esp, [size]), then abort trying to match
 - Don't add unecessary casts
 - Don't add goto statements or goto labels
+- Don't look back at previous commits. This code has never matched, so no point in doing this.
 
 ## Stack variable slots
 
@@ -61,4 +62,4 @@ We are generally unable to resolve a diff like this, so resolve the other diffs 
 
 ## Git
 
-If you made changes to a function, create a branch from `network-matching` called `match-<function name>`. When you are finished (100% or abort), commit the changes and push to origin. If you are able to get to a 100% match, make a pr with `gh`. You must run switch gh auth to `dethrace-labs`, then switch back after making the pr. Include the output from reccmp in the PR description in a code block
+If you made changes to a function, create a branch from `network-matching` called `match-<function name>`. When you are finished (100% or abort), commit the changes (commit comment should be "<function name> <percentage>") and push to origin. If you are able to get to a 100% match, make a pr with `gh`. You must run switch gh auth to `dethrace-labs`, then switch back after making the pr. Include the output from reccmp in the PR description in a code block
