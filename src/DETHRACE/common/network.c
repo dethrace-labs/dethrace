@@ -2133,12 +2133,11 @@ int NetGuaranteedSendMessageToAllPlayers(tNet_game_details* pDetails, tNet_messa
     err = 0;
     if (gNumber_of_net_players == 1) {
         NetDisposeMessage(pDetails, pMessage);
-        err = 0;
-    } else {
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            if (gThis_net_player_index != i) {
-                err |= NetGuaranteedSendMessageToAddress(pDetails, pMessage, &gNet_players[i], pNotifyFail);
-            }
+        return err;
+    }
+    for (i = 0; i < gNumber_of_net_players; i++) {
+        if (gThis_net_player_index != i) {
+            err |= NetGuaranteedSendMessageToAddress(pDetails, pMessage, &gNet_players[i], pNotifyFail);
         }
     }
     return err;
