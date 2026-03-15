@@ -320,14 +320,14 @@ void DoNextJoinPoll(void) {
         gCurrent_join_poll_game = NetAllocatePIDGameDetails();
         if (gCurrent_join_poll_game != NULL) {
             if (PDNetGetNextJoinGame(gCurrent_join_poll_game, gJoin_poll_index)) {
-                if (NetJoinGameLowLevel(gCurrent_join_poll_game, "!TEMP!")) {
-                    DisposeCurrentJoinPollGame();
-                } else {
+                if (!NetJoinGameLowLevel(gCurrent_join_poll_game, "!TEMP!")) {
                     gTime_for_next_one = 0;
                     the_message = NetBuildMessage(NETMSGID_SENDMEDETAILS, 0);
                     NetSendMessageToAddress(gCurrent_join_poll_game, the_message, gCurrent_join_poll_game);
                     gBastard_has_answered = 0;
                     gAsk_time = PDGetTotalTime();
+                } else {
+                    DisposeCurrentJoinPollGame();
                 }
                 gJoin_poll_index++;
             } else {
