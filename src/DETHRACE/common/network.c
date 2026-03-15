@@ -1537,15 +1537,13 @@ void ReceivedStatusReport(tNet_contents* pContents, tNet_message* pMessage) {
         if (gNet_players[i].ID == pMessage->sender) {
             gNet_players[i].player_status = pContents->data.report.status;
             gNet_players[i].last_heard_from_him = PDGetTotalTime();
-            if (gNet_players[i].player_status < ePlayer_status_racing || gNet_players[i].player_status == ePlayer_status_recovering) {
-                if (gNet_players[i].player_status < ePlayer_status_racing) {
-                    DisableCar(gNet_players[i].car);
-                }
-            } else {
+            if (gNet_players[i].player_status >= ePlayer_status_racing && gNet_players[i].player_status != ePlayer_status_recovering) {
                 if (gNet_players[i].car->disabled) {
                     SendCurrentPowerups();
                 }
                 EnableCar(gNet_players[i].car);
+            } else if (gNet_players[i].player_status < ePlayer_status_racing) {
+                DisableCar(gNet_players[i].car);
             }
             return;
         }
