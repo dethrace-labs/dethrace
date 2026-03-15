@@ -1575,30 +1575,32 @@ void ReceivedStartRace(tNet_contents* pContents) {
             gNet_players[index].last_waste_message = 0;
             gNet_players[index].wasteage_attributed = 0;
         }
-    } else if (gSynch_race_start) {
-        for (i = 0; i < pContents->data.start_race.car_count; i++) {
-            gNet_players[pContents->data.start_race.car_list[i].index].next_car_index = pContents->data.start_race.car_list[i].next_car_index;
-        }
     } else {
-        for (i = 0; i < pContents->data.start_race.car_count; i++) {
-            gCurrent_race.number_of_racers = i + 1;
-            gCurrent_race.opponent_list[i].index = -1;
-            gCurrent_race.opponent_list[i].ranking = -1;
-            gCurrent_race.opponent_list[i].car_spec = gNet_players[pContents->data.start_race.car_list[i].index].car;
-            gCurrent_race.opponent_list[i].net_player_index = pContents->data.start_race.car_list[i].index;
-            gNet_players[gCurrent_race.opponent_list[i].net_player_index].last_waste_message = 0;
-            gNet_players[gCurrent_race.opponent_list[i].net_player_index].wasteage_attributed = 0;
-            if (!gProgram_state.racing || gCurrent_race.opponent_list[i].car_spec->driver != eDriver_local_human) {
-                BrMatrix34Copy(&gCurrent_race.opponent_list[i].car_spec->car_master_actor->t.t.mat, &pContents->data.start_race.car_list[i].mat);
-                InitialiseCar(gCurrent_race.opponent_list[i].car_spec);
+        if (!gSynch_race_start) {
+            for (i = 0; i < pContents->data.start_race.car_count; i++) {
+                gCurrent_race.number_of_racers = i + 1;
+                gCurrent_race.opponent_list[i].index = -1;
+                gCurrent_race.opponent_list[i].ranking = -1;
+                gCurrent_race.opponent_list[i].car_spec = gNet_players[pContents->data.start_race.car_list[i].index].car;
+                gCurrent_race.opponent_list[i].net_player_index = pContents->data.start_race.car_list[i].index;
+                gNet_players[gCurrent_race.opponent_list[i].net_player_index].last_waste_message = 0;
+                gNet_players[gCurrent_race.opponent_list[i].net_player_index].wasteage_attributed = 0;
+                if (!gProgram_state.racing || gCurrent_race.opponent_list[i].car_spec->driver != eDriver_local_human) {
+                    BrMatrix34Copy(&gCurrent_race.opponent_list[i].car_spec->car_master_actor->t.t.mat, &pContents->data.start_race.car_list[i].mat);
+                    InitialiseCar(gCurrent_race.opponent_list[i].car_spec);
+                }
+                gNet_players[pContents->data.start_race.car_list[i].index].next_car_index = pContents->data.start_race.car_list[i].next_car_index;
             }
-            gNet_players[pContents->data.start_race.car_list[i].index].next_car_index = pContents->data.start_race.car_list[i].next_car_index;
-        }
-        gPending_race = pContents->data.start_race.next_race;
-        gCurrent_race.number_of_racers = pContents->data.start_race.car_count;
-        gSynch_race_start = 1;
-        if (!pContents->data.start_race.racing || gProgram_state.racing) {
-            gWait_for_it = 0;
+            gPending_race = pContents->data.start_race.next_race;
+            gCurrent_race.number_of_racers = pContents->data.start_race.car_count;
+            gSynch_race_start = 1;
+            if (!pContents->data.start_race.racing || gProgram_state.racing) {
+                gWait_for_it = 0;
+            }
+        } else {
+            for (i = 0; i < pContents->data.start_race.car_count; i++) {
+                gNet_players[pContents->data.start_race.car_list[i].index].next_car_index = pContents->data.start_race.car_list[i].next_car_index;
+            }
         }
     }
 }
