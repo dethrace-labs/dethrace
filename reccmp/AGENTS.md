@@ -62,4 +62,4 @@ We are generally unable to resolve a diff like this, so resolve the other diffs 
 
 ## Git
 
-If you made changes to a function, create a branch from `network-matching` called `match-<function name>`. When you are finished (100% or abort), commit the changes (commit comment should be "<function name> <percentage>") and push to origin. If you are able to get to a 100% match, make a pr with `gh`. You must run switch gh auth to `dethrace-labs`, then switch back after making the pr. Include the output from reccmp in the PR description in a code block
+If you made changes to a function, fetch latest `main` and make branch from it called `match-<function name>`. When you are finished (100% or abort), commit the changes (commit comment should be "<function name> <percentage>") and push to origin. If you are able to get to a 100% match, make a pr with `gh`. You must run switch gh auth to `dethrace-labs`, then switch back after making the pr. Include the output from reccmp in the PR description in a code block
