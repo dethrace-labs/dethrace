@@ -328,7 +328,7 @@ void ReceivedCopInfo(tNet_contents* pContents) {
     if (c == NULL) {
         return;
     }
-    if (pContents->data.cop_info.time > c->message.time) {
+    if (c->message.time > pContents->data.cop_info.time) {
         return;
     }
 
