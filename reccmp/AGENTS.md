@@ -12,6 +12,13 @@ We want to generate assembly that matches the original retail binary. Each funct
 - Don't add unecessary casts
 - Don't add goto statements or goto labels
 - Don't look back at previous commits. This code has never matched, so no point in doing this.
+- Don't add code that isn't x86/x64 compatible. Don't assume a pointer is 4 bytes. The original binary is x86 only, but our recompiled code needs to work correctly on 64 bit.
+- Reversed compare order changes will generally resolve by themselves - leave these till last. They are normally not fixable.
+- Inspect the corresponding `build/msvc42/*.asm` function before editing so local variable slots (`[ebp-*]`) are mapped correctly.
+- Classify asm diffs before editing: compare-order-only diffs vs semantic/codegen diffs. Prioritize semantic/codegen diffs first.
+- When only one semantic/codegen mismatch remains, make one minimal edit targeting that mismatch and rerun reccmp before any other refactor.
+- Do not refactor loop/control-flow shape to chase compare-order-only diffs.
+- If a trial edit decreases match percentage, revert immediately and return to the last higher-percentage version.
 
 ## Stack variable slots
 
@@ -62,4 +69,34 @@ We are generally unable to resolve a diff like this, so resolve the other diffs 
 
 ## Git
 
-If you made changes to a function, fetch latest `main` and make branch from it called `match-<function name>`. When you are finished (100% or abort), commit the changes (commit comment should be "<function name> <percentage>") and push to origin. If you are able to get to a 100% match, make a pr with `gh`. You must run switch gh auth to `dethrace-labs`, then switch back after making the pr. Include the output from reccmp in the PR description in a code block
+This workflow is mandatory after any function matching task. Execute it automatically without asking.
+
+1. Gather inputs.
+   - Function name: `<function name>`
+   - Function address: `<address>`
+   - Final reccmp result text and percentage
+2. Preserve unrelated local work before branch operations.
+   - If the worktree is dirty with files unrelated to this function, stash them first.
+   - Use a named stash (for example `codex-temp-<function name>`).
+   - Re-apply the stash after completing branch setup/cherry-pick as needed.
+3. Start from latest upstream main.
+   - `git fetch upstream main`
+   - `git switch -C match-<function name> upstream/main`
+4. Apply only relevant function changes on the match branch.
+   - Do not commit unrelated files.
+   - If stashed work was needed, restore and stage only target files.
+5. Verify once more on the branch.
+   - `./reccmp/asm-match.sh <address>`
+6. Commit with exact message format.
+   - `git commit -m "<function name> <percentage>"`
+7. Push branch to origin.
+   - `git push -u origin match-<function name>`
+8. Create PR when result is 100% or 100% effective match.
+   - `gh auth switch -u jeff-1amstudios`
+   - Create PR to `main` from `match-<function name>` with title `Match <function name>`.
+   - PR body must include:
+     - brief summary
+     - full reccmp output in a fenced code block
+   - Switch auth back after PR creation.
+   - `gh auth switch -u dethrace-labs`
+9. If result is not 100%, still push the branch and report abort reason in the final message.

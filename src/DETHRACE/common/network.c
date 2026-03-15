@@ -1339,7 +1339,7 @@ void KickPlayerOut(tPlayer_ID pID) {
     tNet_game_player_info* new_players;
 
     new_player_count = gNumber_of_net_players;
-    new_players = (tNet_game_player_info*)BrMemAllocate(sizeof(tNet_game_player_info) * gNumber_of_net_players, kMem_player_list_leave);
+    new_players = (tNet_game_player_info*)BrMemAllocate(sizeof(tNet_game_player_info) * new_player_count, kMem_player_list_leave);
     memcpy(new_players, gNet_players, sizeof(tNet_game_player_info) * new_player_count);
     for (i = 0; i < new_player_count; i++) {
         if (new_players[i].ID == pID) {
