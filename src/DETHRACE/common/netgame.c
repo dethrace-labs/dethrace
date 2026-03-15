@@ -596,7 +596,7 @@ void ReinitialiseCar(tCar_spec* pCar) {
     InitialiseCar(pCar);
     TotallyRepairACar(pCar);
     if (pCar->driver == eDriver_local_human) {
-        gLast_it_change = PDGetTotalTime() + 2000;
+        gTime_for_punishment = PDGetTotalTime() + 2000;
     }
 }
 
