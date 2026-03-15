@@ -3,9 +3,9 @@
 Dethrace looks for a `dethrace.ini` file in the [system preferences directory](https://wiki.libsdl.org/SDL2/SDL_GetPrefPath):
 | Platform | Example Path                                                                 |
 |----------|----------------------------------------------------------------------|
-| Windows  | `C:\Users\bob\AppData\Roaming\dethrace\dethrace.ini`                |
-| macOS    | `/Users/bob/Library/Application Support/dethrace/dethrace.ini`      |
-| Linux    | `/home/bob/.local/share/dethrace/dethrace.ini`                      |
+| Windows  | `C:\Users\<NAME>\AppData\Roaming\dethrace\dethrace.ini`                |
+| macOS    | `/Users/<NAME>/Library/Application Support/dethrace/dethrace.ini`      |
+| Linux    | `/home/<NAME>/.local/share/dethrace/dethrace.ini`                      |
 
 
 If this file is not present, dethrace will run with default configuration and attempt to discover the correct Carmageddon directory to use (see below).
@@ -65,6 +65,6 @@ AdapterName = ""
 ## Order of precedence for game directory detection:
 1. Directory pointed to by DefaultGame
 2. First game in the list if at least 1 game dir is specified
-3. `DETHRACE_ROOT_DIR` environment variable
+3. `--dir` command line argument
 4. Current working directory (if `DATA/GENERAL.TXT` exists)
 5. `SDL_GetPrefPath` directory
