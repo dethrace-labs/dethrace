@@ -26,6 +26,16 @@ The `asm-match.sh` script should be invoked with a single argument `asm-match.sh
 
 Continue making changes and running the command until it shows a 100% match or you run out of ideas.
 
+## Reccmp Matching Heuristics (important)
+
+- Prefer original control-flow shape over logical cleanup/safety refactors.
+- If asm diff shows extra post-loop compare/jump blocks (for example `+mov`/`+cmp` after a `for` loop), avoid `break`-then-check-index patterns; try early `return` in-loop.
+- Avoid `do { ... } while (0)` wrappers in target functions unless proven necessary; they often add synthetic jump blocks.
+- Do not "fix" leaks or unreachable branches in matching work. Binary-faithful behavior wins over code quality.
+- Keep odd or redundant locals and branches if they help codegen, even when logically unnecessary.
+- Treat reccmp `+` and `-` lines as assembly-shape guidance, not direct C line add/remove instructions.
+- For matching tasks, make one control-flow change at a time and rerun reccmp after each change.
+
 ## Aborting
 
 In some cases, a match is not possible due to compiler entropy. This is more common with floating point instructions. For example:
