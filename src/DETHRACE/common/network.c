@@ -2024,7 +2024,8 @@ void CheckForDisappearees(void) {
         for (i = 0; i < gNumber_of_net_players; i++) {
             if (!gNet_players[i].host && gNet_players[i].last_heard_from_him != 0 && the_time - gNet_players[i].last_heard_from_him >= 20000) {
                 strcpy(s, gNet_players[i].player_name);
-                strcat(s, (s2 = GetMiscString(kMiscString_IS_NO_LONGER_RESPONDING), " "));
+                s2 = GetMiscString(kMiscString_IS_NO_LONGER_RESPONDING);
+                strcat(s, " ");
                 strcat(s, s2);
                 NetSendHeadupToAllPlayers(s);
                 KickPlayerOut(gNet_players[i].ID);
