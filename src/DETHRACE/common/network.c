@@ -1983,21 +1983,24 @@ void NetReceiveAndProcessMessages(void) {
     tU32 receive_time;
     int old_net_service;
 
-    old_net_service = gIn_net_service;
     if (gNet_mode != eNet_mode_none || gJoin_list_mode) {
+        old_net_service = gIn_net_service;
         gIn_net_service = 1;
-        while ((message = NetGetNextMessage(gCurrent_net_game, &sender_address)) != NULL) {
-            receive_time = GetRaceTime();
-            if (message->magic_number == 0x763a5058) {
-                CheckCheckSum(message);
-                ReceivedMessage(message, sender_address, receive_time);
-            } else {
-                message->guarantee_number = 0;
+        do {
+            message = NetGetNextMessage(gCurrent_net_game, &sender_address);
+            if (message != NULL) {
+                receive_time = GetRaceTime();
+                if (message->magic_number == 0x763a5058) {
+                    CheckCheckSum(message);
+                    ReceivedMessage(message, sender_address, receive_time);
+                } else {
+                    message->guarantee_number = 0;
+                }
+                NetDisposeMessage(gCurrent_net_game, message);
             }
-            NetDisposeMessage(gCurrent_net_game, message);
-        }
+        } while (message != NULL);
+        gIn_net_service = old_net_service;
     }
-    gIn_net_service = old_net_service;
 }
 
 // IDA: void __cdecl BroadcastStatus()
