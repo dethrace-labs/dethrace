@@ -1,8 +1,6 @@
 # Matching assembly
 
-We want to generate assembly that matches the original retail binary.
-
-Each function has an annotation describing the memory location of this function in the original binary.
+We want to generate assembly that matches the original retail binary. Each function has an annotation describing the memory location of this function in the original binary.
 
 ## Rules
 
@@ -13,11 +11,10 @@ Each function has an annotation describing the memory location of this function 
 - If the stack size is different (the sub esp, [size]), then abort trying to match
 - Don't add unecessary casts
 - Don't add goto statements or goto labels
-- Don't use any other tools except `dr-reccmp`
 
 ## Stack variable slots
 
-Each .c file that we work on has a corresponding .asm file in build\*msvc42 which you can read to discover the local variable slots so that you can discover that [ebp-4] is "i" for example. You _are_ allowed to swap variable _usage_ (not declarations) to match the original variable slots.
+Each .c file that we work on has a corresponding .asm file in `build/msvc42` which you can read to discover the local variable slots so that you can discover that [ebp-4] is "i" for example. You _are_ allowed to swap variable _usage_ (not declarations) to match the original variable slots.
 
 ## To see what assembly is different
 
@@ -31,18 +28,27 @@ Continue making changes and running the command until it shows a 100% match or y
 
 ## Aborting
 
-Abort if the only difference is a swapped ordering of a compare and small associated jmp difference. For example:
+In some cases, a match is not possible due to compiler entropy. This is more common with floating point instructions. For example:
 
 ```
-0x448cdb	-mov eax, dword ptr [ebp - 4]
-0x448cde	-cmp dword ptr [gNumber_of_net_players (DATA)], eax
-0x448ce4	-jle 0x69
-+mov eax, dword ptr [gNumber_of_net_players (DATA)]
-+cmp dword ptr [ebp - 4], eax
-+jge 0x69
-...
-0x448d4e	-jmp -0x7b
-+jmp -0x7a (network.c:1754)
+0x404f73	fsub dword ptr [eax + ecx + 8]
+0x404f77	fstp dword ptr [ebp - 0x1118]
++fld dword ptr [ebp - 0x111c] (opponent.c:2383)
++fmul dword ptr [ebp - 0x111c]
+0x404f7d	fld dword ptr [ebp - 0x1118]
+0x404f83	fmul dword ptr [ebp - 0x1118]
++faddp st(1)
+0x404f89	fld dword ptr [ebp - 0x1120]
+0x404f8f	fmul dword ptr [ebp - 0x1120]
+0x404f95	-faddp st(1)
+0x404f97	-fld dword ptr [ebp - 0x111c]
+0x404f9d	-fmul dword ptr [ebp - 0x111c]
+0x404fa3	faddp st(1)
+0x404fa5	call __CIsqrt (FUNCTION)
 ```
 
-This is caused by compiler entropy and not something you will be able to resolve.
+We are generally unable to resolve a diff like this, so resolve the other diffs in the function, then abort.
+
+## Git
+
+If you made changes to a function, create a branch from `network-matching` called `match-<function name>`. When you are finished (100% or abort), commit the changes and push to origin. If you are able to get to a 100% match, make a pr with `gh`. You must run switch gh auth to `dethrace-labs`, then switch back after making the pr. Include the output from reccmp in the PR description in a code block
