@@ -1377,29 +1377,28 @@ void ReceivedLeave(tNet_contents* pContents, tNet_message* pMessage) {
 void NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
     tU32 start_time;
     char* s;
-    // Jeff: added underscore suffix to avoid collisions with samed-named globals
-    int gPixel_buffer_size_;
-    char* gPixels_copy_;
-    char* gPalette_copy_;
+    int gPixel_buffer_size;
     int restore_screen;
+    char* gPixels_copy;
+    char* gPalette_copy;
 
-    if (pLeave_it_up_there || (gProgram_state.racing && !gInterface_within_race_mode)) {
-        restore_screen = 0;
-    } else {
-        gPixel_buffer_size_ = gBack_screen->height * gBack_screen->row_bytes;
-        gPixels_copy_ = BrMemAllocate(gPixel_buffer_size_, 0xB0u);
-        gPalette_copy_ = BrMemAllocate(0x400u, 0xB1u);
-        memcpy(gPixels_copy_, gBack_screen->pixels, gPixel_buffer_size_);
-        memcpy(gPalette_copy_, gCurrent_palette_pixels, 0x400u);
+    if (!(pLeave_it_up_there || (gProgram_state.racing && !gInterface_within_race_mode))) {
+        gPixel_buffer_size = gBack_screen->height * gBack_screen->row_bytes;
+        gPixels_copy = BrMemAllocate(gPixel_buffer_size, 0xB0u);
+        gPalette_copy = BrMemAllocate(0x400u, 0xB1u);
+        memcpy(gPixels_copy, gBack_screen->pixels, gPixel_buffer_size);
+        memcpy(gPalette_copy, gCurrent_palette_pixels, 0x400u);
         restore_screen = 1;
+    } else {
+        restore_screen = 0;
     }
     FadePaletteDown();
     LoadFont(FONT_MEDIUMHD);
     ClearEntireScreen();
-    if (pStr_index <= 0) {
-        s = "FIXED THAT YOU TWISTED BASTARDS";
-    } else {
+    if (pStr_index > 0) {
         s = GetMiscString(pStr_index);
+    } else {
+        s = "FIXED THAT YOU TWISTED BASTARDS";
     }
     OoerrIveGotTextInMeBoxMissus(
         FONT_MEDIUMHD,
@@ -1413,20 +1412,21 @@ void NetFullScreenMessage(int pStr_index, int pLeave_it_up_there) {
     PDScreenBufferSwap(0);
     EnsureRenderPalette();
     EnsurePaletteUp();
-    if (!pLeave_it_up_there) {
+    if (pLeave_it_up_there) {
+    } else {
         start_time = PDGetTotalTime();
         while (PDGetTotalTime() - start_time < 3000) {
             ;
         }
         FadePaletteDown();
         if (restore_screen) {
-            memcpy(gBack_screen->pixels, gPixels_copy_, gPixel_buffer_size_);
-            memcpy(gCurrent_palette_pixels, gPalette_copy_, 0x400u);
+            memcpy(gBack_screen->pixels, gPixels_copy, gPixel_buffer_size);
+            memcpy(gCurrent_palette_pixels, gPalette_copy, 0x400u);
 #ifdef DETHRACE_3DFX_PATCH
             g16bit_palette_valid = 0;
 #endif
-            BrMemFree(gPixels_copy_);
-            BrMemFree(gPalette_copy_);
+            BrMemFree(gPixels_copy);
+            BrMemFree(gPalette_copy);
             PDScreenBufferSwap(0);
             FadePaletteUp();
         } else {
