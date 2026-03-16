@@ -86,6 +86,7 @@ int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
 // FUNCTION: CARM95 0x0044af61
 int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
 
+#ifdef DETHRACE_FIX_BUGS
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         if (pCurrent_mode == 0) {
             if (pCurrent_choice == 4) {
@@ -96,28 +97,32 @@ int MainMenuDone2(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
         }
         return pCurrent_choice;
     }
+#endif
 
     if (pTimed_out) {
         return -1;
+    } else {
+        switch (pCurrent_choice) {
+        case 0:
+            PreloadBunchOfFlics(4);
+            break;
+        case 1:
+            PreloadBunchOfFlics(5);
+            break;
+        case 2:
+            PreloadBunchOfFlics(1);
+            break;
+        case 3:
+            PreloadBunchOfFlics(3);
+            break;
+        case 4:
+            PreloadBunchOfFlics(7);
+            break;
+        default:
+            break;
+        }
+        return pCurrent_choice;
     }
-    switch (pCurrent_choice) {
-    case 0:
-        PreloadBunchOfFlics(4);
-        break;
-    case 1:
-        PreloadBunchOfFlics(5);
-        break;
-    case 2:
-        PreloadBunchOfFlics(1);
-        break;
-    case 3:
-        PreloadBunchOfFlics(3);
-        break;
-    case 4:
-        PreloadBunchOfFlics(7);
-        break;
-    }
-    return pCurrent_choice;
 }
 
 // IDA: void __cdecl StartMainMenu()
