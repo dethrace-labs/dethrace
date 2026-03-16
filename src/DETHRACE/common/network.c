@@ -2302,8 +2302,9 @@ tCar_spec* NetCarFromPlayerID(tPlayer_ID pPlayer) {
     player = NetPlayerFromID(pPlayer);
     if (player) {
         return player->car;
+    } else {
+        return NULL;
     }
-    return NULL;
 }
 
 // IDA: tNet_game_player_info* __usercall NetPlayerFromCar@<EAX>(tCar_spec *pCar@<EAX>)
