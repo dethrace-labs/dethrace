@@ -414,6 +414,8 @@ tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
         return eMM_continue;
     }
     switch (result) {
+    case 0:
+        return eMM_continue;
     case 1:
         return eMM_end_game;
     case 2:
@@ -433,8 +435,9 @@ tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
     case 9:
         return eMM_abort_race;
     default:
-        return eMM_continue;
+        break;
     }
+    return eMM_continue;
 }
 
 // IDA: void __cdecl QuitVerifyStart()
