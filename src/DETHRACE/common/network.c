@@ -2168,24 +2168,22 @@ int NetGuaranteedSendMessageToHost(tNet_game_details* pDetails, tNet_message* pM
 int NetGuaranteedSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer, int (*pNotifyFail)(tU32, tNet_message*)) {
     int i;
 
-    for (i = 0; i <= gNumber_of_net_players; i++) {
+    for (i = 0; gNumber_of_net_players > i; i++) {
         if (pPlayer == gNet_players[i].ID) {
-            break;
+            if (gLocal_net_ID == pPlayer) {
+                pMessage->sender = gLocal_net_ID;
+                pMessage->senders_time_stamp = PDGetTotalTime();
+                pMessage->num_contents = 1;
+                pMessage->guarantee_number = 0;
+                ReceivedMessage(pMessage, &gNet_players[i], GetRaceTime());
+                NetDisposeMessage(pDetails, pMessage);
+                return 0;
+            } else {
+                return NetGuaranteedSendMessageToAddress(pDetails, pMessage, &gNet_players[i].pd_net_info, pNotifyFail);
+            }
         }
     }
-    if (i == gNumber_of_net_players) {
-        return -1;
-    }
-    if (gLocal_net_ID != pPlayer) {
-        return NetGuaranteedSendMessageToAddress(pDetails, pMessage, &gNet_players[i].pd_net_info, pNotifyFail);
-    }
-    pMessage->sender = gLocal_net_ID;
-    pMessage->senders_time_stamp = PDGetTotalTime();
-    pMessage->num_contents = 1;
-    pMessage->guarantee_number = 0;
-    ReceivedMessage(pMessage, &gNet_players[i], GetRaceTime());
-    NetDisposeMessage(pDetails, pMessage);
-    return 0;
+    return -1;
 }
 
 // IDA: int __usercall NetGuaranteedSendMessageToAddress@<EAX>(tNet_game_details *pDetails@<EAX>, tNet_message *pMessage@<EDX>, void *pAddress@<EBX>, int (*pNotifyFail)(tU32, tNet_message*)@<ECX>)
