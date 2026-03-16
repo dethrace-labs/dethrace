@@ -2272,10 +2272,7 @@ void NetWaitForGuaranteeReplies(void) {
     tU32 start_time;
 
     start_time = PDGetTotalTime();
-    while (gNext_guarantee != 0) {
-        if (PDGetTotalTime() - start_time >= 5000) {
-            break;
-        }
+    while (gNext_guarantee != 0 && PDGetTotalTime() - start_time < 5000) {
         NetService(0);
     }
 }
