@@ -460,7 +460,9 @@ int QuitVerifyDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
         if (pCurrent_choice) {
             memcpy(gBack_screen->pixels, gPixels_copy__mainmenu, gPixel_buffer_size__mainmenu);
             memcpy(gCurrent_palette_pixels, gPalette_copy__mainmenu, 0x400u);
+#ifdef DETHRACE_3DFX_PATCH
             g16bit_palette_valid = 0;
+#endif
         } else {
             ClearEntireScreen();
         }
