@@ -43,6 +43,7 @@ char* gPixels_copy__mainmenu; // suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x0044ae90
 int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
 
+#ifdef DETHRACE_FIX_BUGS
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         if (pCurrent_mode == 0) {
             if (pCurrent_choice == 7) {
@@ -53,33 +54,35 @@ int MainMenuDone1(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
         }
         return pCurrent_choice;
     }
+#endif
 
     if (pTimed_out) {
         return -1;
-    }
-    switch (pCurrent_choice) {
-    case 1:
-        PreloadBunchOfFlics(4);
-        break;
-    case 2:
-        PreloadBunchOfFlics(5);
-        break;
-    case 3:
-        PreloadBunchOfFlics(1);
-        break;
-    case 4:
-        PreloadBunchOfFlics(3);
-        break;
-    case 5:
-        PreloadBunchOfFlics(2);
-        break;
-    case 7:
-        PreloadBunchOfFlics(7);
-        break;
-    default:
+    } else {
+        switch (pCurrent_choice) {
+        case 1:
+            PreloadBunchOfFlics(4);
+            break;
+        case 2:
+            PreloadBunchOfFlics(5);
+            break;
+        case 3:
+            PreloadBunchOfFlics(1);
+            break;
+        case 4:
+            PreloadBunchOfFlics(3);
+            break;
+        case 5:
+            PreloadBunchOfFlics(2);
+            break;
+        case 7:
+            PreloadBunchOfFlics(7);
+            break;
+        default:
+            break;
+        }
         return pCurrent_choice;
     }
-    return pCurrent_choice;
 }
 
 // IDA: int __usercall MainMenuDone2@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
