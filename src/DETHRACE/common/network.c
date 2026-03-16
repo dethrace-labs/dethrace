@@ -2194,30 +2194,32 @@ int NetGuaranteedSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* 
 int NetGuaranteedSendMessageToAddress(tNet_game_details* pDetails, tNet_message* pMessage, void* pAddress, int (*pNotifyFail)(tU32, tNet_message*)) {
     char buffer[256]; // Added by Dethrace
 
-    if (gNet_mode == eNet_mode_none && !gJoin_list_mode) {
+    if (gNet_mode != eNet_mode_none || gJoin_list_mode) {
+        pMessage->sender = gLocal_net_ID;
+        pMessage->senders_time_stamp = PDGetTotalTime();
+        if (gNext_guarantee < COUNT_OF(gGuarantee_list)) {
+            pMessage->guarantee_number = gGuarantee_number;
+            gGuarantee_list[gNext_guarantee].guarantee_number = gGuarantee_number;
+            gGuarantee_number++;
+            gGuarantee_list[gNext_guarantee].message = pMessage;
+            gGuarantee_list[gNext_guarantee].send_time = PDGetTotalTime();
+            gGuarantee_list[gNext_guarantee].next_resend_time = gGuarantee_list[gNext_guarantee].send_time + 100;
+            gGuarantee_list[gNext_guarantee].resend_period = 100;
+            memcpy(&gGuarantee_list[gNext_guarantee].pd_address, pAddress, sizeof(tPD_net_player_info));
+            gGuarantee_list[gNext_guarantee].NotifyFail = pNotifyFail;
+            gGuarantee_list[gNext_guarantee].recieved = 0;
+            gNext_guarantee++;
+        } else {
+            sprintf(buffer, "Guarantee list full %d", pMessage->contents.header.type);
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, buffer);
+            pMessage->guarantee_number = 0;
+            return 0;
+        }
+        DoCheckSum(pMessage);
+        return PDNetSendMessageToAddress(pDetails, pMessage, pAddress);
+    } else {
         return -3;
     }
-    pMessage->sender = gLocal_net_ID;
-    pMessage->senders_time_stamp = PDGetTotalTime();
-    if (gNext_guarantee >= COUNT_OF(gGuarantee_list)) {
-        sprintf(buffer, "Guarantee list full %d", pMessage->contents.header.type);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, buffer);
-        pMessage->guarantee_number = 0;
-        return 0;
-    }
-    pMessage->guarantee_number = gGuarantee_number;
-    gGuarantee_list[gNext_guarantee].guarantee_number = gGuarantee_number;
-    gGuarantee_number++;
-    gGuarantee_list[gNext_guarantee].message = pMessage;
-    gGuarantee_list[gNext_guarantee].send_time = PDGetTotalTime();
-    gGuarantee_list[gNext_guarantee].next_resend_time = gGuarantee_list[gNext_guarantee].send_time + 100;
-    gGuarantee_list[gNext_guarantee].resend_period = 100;
-    memcpy(&gGuarantee_list[gNext_guarantee].pd_address, pAddress, sizeof(tPD_net_player_info));
-    gGuarantee_list[gNext_guarantee].NotifyFail = pNotifyFail;
-    gGuarantee_list[gNext_guarantee].recieved = 0;
-    gNext_guarantee++;
-    DoCheckSum(pMessage);
-    return PDNetSendMessageToAddress(pDetails, pMessage, pAddress);
 }
 
 // IDA: void __cdecl ResendGuaranteedMessages()
