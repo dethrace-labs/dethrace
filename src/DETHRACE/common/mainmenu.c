@@ -665,10 +665,18 @@ void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
     NetPlayerStatusChanged(ePlayer_status_main_menu);
     PreloadBunchOfFlics(0);
     switch (DoMainMenu(pTime_out, pSave_allowed, pContinue_allowed)) {
+    case eMM_quit:
+        gProgram_state.prog_status = eProg_quit;
+        break;
     case eMM_end_game:
         gProgram_state.prog_status = eProg_idling;
         break;
+    case eMM_timeout:
+        gProgram_state.prog_status = eProg_demo;
+        break;
     case eMM_1_start:
+        gProgram_state.prog_status = eProg_game_starting;
+        break;
     case eMM_n_start:
         gProgram_state.prog_status = eProg_game_starting;
         break;
@@ -676,14 +684,6 @@ void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
         if (gGame_to_load < 0) {
             gProgram_state.prog_status = eProg_game_starting;
         }
-        break;
-    case eMM_quit:
-        gProgram_state.prog_status = eProg_quit;
-        break;
-    case eMM_timeout:
-        gProgram_state.prog_status = eProg_demo;
-        break;
-    default:
         break;
     }
     UnlockBunchOfFlics(0);
