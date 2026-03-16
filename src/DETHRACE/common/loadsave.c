@@ -107,11 +107,8 @@ tU32 CalcLSChecksum(tSave_game* pSaved_game) {
     CorrectChecksumByteOrdering(pSaved_game);
 #endif
     checksum = 0;
-    ptr = (tU8*)pSaved_game;
-    i = 0;
-    for (; i < (sizeof(tSave_game) - sizeof(tU32)); i++) {
-        checksum2 = (*ptr ^ 0xbd) + checksum;
-        ptr++;
+    for (ptr = (tU8*)pSaved_game, i = 0; i < (sizeof(tSave_game) - sizeof(tU32)); i++) {
+        checksum2 = (*ptr++ ^ 0xbd) + checksum;
         checksum ^= checksum2 << 25;
         checksum ^= checksum2 >> 7;
     }

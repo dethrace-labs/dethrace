@@ -14,7 +14,7 @@ We want to generate assembly that matches the original retail binary. Each funct
 - Don't look back at previous commits. This code has never matched, so no point in doing this.
 - Don't add code that isn't x86/x64 compatible. Don't assume a pointer is 4 bytes. The original binary is x86 only, but our recompiled code needs to work correctly on 64 bit.
 - Reversed compare order changes will generally resolve by themselves - leave these till last. They are normally not fixable.
-- Inspect the corresponding `build_msvc42/*.asm` function before editing so local variable slots (`[ebp-*]`) are mapped correctly.
+- Inspect the corresponding `build_msvc42/common/*.asm` function before editing so local variable slots (`[ebp-*]`) are mapped correctly.
 - Classify asm diffs before editing: compare-order-only diffs vs semantic/codegen diffs. Prioritize semantic/codegen diffs first.
 - In asm diffs, prioritize instruction presence/absence (`+`/`-` lines) before jump-target/offset changes. Jump addresses often self-correct after shape mismatches are fixed.
 - When only one semantic/codegen mismatch remains, make one minimal edit targeting that mismatch and rerun reccmp before any other refactor.
@@ -24,7 +24,7 @@ We want to generate assembly that matches the original retail binary. Each funct
 
 ## Stack variable slots
 
-Each .c file that we work on has a corresponding .asm file in `build_msvc42` which you can read to discover the local variable slots so that you can discover that [ebp-4] is "i" for example. You _are_ allowed to swap variable _usage_ (not declarations) to match the original variable slots.
+Each .c file that we work on has a corresponding .asm file in `build_msvc42/common` which you can read to discover the local variable slots so that you can discover that [ebp-4] is "i" for example. You _are_ allowed to swap variable _usage_ (not declarations) to match the original variable slots.
 
 ## To see what assembly is different
 
@@ -48,6 +48,8 @@ Continue making changes and running the command until it shows a 100% match or y
 - For enum-based `switch` matching, `default:` can change jump-table targets even when behavior is equivalent.
 - A `default: break;` often creates a separate shared break block; retail may instead route missing/unhandled entries directly to function epilogue.
 - If diffs show extra or missing epilogue-adjacent blocks (`mov eax`, `pop`, `leave`, `ret`), prioritize matching return-site structure and `if/else` nesting before tuning jump targets.
+- For loops often init and increment an index and a pointer like for (i = 0, ptr=x; .. ; i++, ptr++)
+
 
 ## Aborting
 
@@ -73,3 +75,4 @@ In some cases, a match is not possible due to compiler entropy. This is more com
 We are generally unable to resolve a diff like this, so resolve the other diffs in the function, then abort.
 
 If you see any references to `harness` in the asm diff, abort immediately.
+
