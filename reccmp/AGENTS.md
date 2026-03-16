@@ -99,6 +99,7 @@ This workflow is mandatory after any function matching task. Execute it automati
    - PR body must include:
      - brief summary
      - full reccmp output in a fenced code block
+   - The last line of body should be "_AI generated_"
    - Switch auth back after PR creation.
    - `gh auth switch -u dethrace-labs`
 9. If result is not 100%, still push the branch and report abort reason in the final message.
