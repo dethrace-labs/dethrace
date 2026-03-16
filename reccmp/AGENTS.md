@@ -14,7 +14,7 @@ We want to generate assembly that matches the original retail binary. Each funct
 - Don't look back at previous commits. This code has never matched, so no point in doing this.
 - Don't add code that isn't x86/x64 compatible. Don't assume a pointer is 4 bytes. The original binary is x86 only, but our recompiled code needs to work correctly on 64 bit.
 - Reversed compare order changes will generally resolve by themselves - leave these till last. They are normally not fixable.
-- Inspect the corresponding `build/msvc42/*.asm` function before editing so local variable slots (`[ebp-*]`) are mapped correctly.
+- Inspect the corresponding `build_msvc42/*.asm` function before editing so local variable slots (`[ebp-*]`) are mapped correctly.
 - Classify asm diffs before editing: compare-order-only diffs vs semantic/codegen diffs. Prioritize semantic/codegen diffs first.
 - When only one semantic/codegen mismatch remains, make one minimal edit targeting that mismatch and rerun reccmp before any other refactor.
 - Do not refactor loop/control-flow shape to chase compare-order-only diffs.
@@ -22,11 +22,11 @@ We want to generate assembly that matches the original retail binary. Each funct
 
 ## Stack variable slots
 
-Each .c file that we work on has a corresponding .asm file in `build/msvc42` which you can read to discover the local variable slots so that you can discover that [ebp-4] is "i" for example. You _are_ allowed to swap variable _usage_ (not declarations) to match the original variable slots.
+Each .c file that we work on has a corresponding .asm file in `build_msvc42` which you can read to discover the local variable slots so that you can discover that [ebp-4] is "i" for example. You _are_ allowed to swap variable _usage_ (not declarations) to match the original variable slots.
 
 ## To see what assembly is different
 
-The `asm-match.sh` script should be invoked with a single argument `asm-match.sh [function memory location]`. It will compile our code and then compare this function to the original. The output will show assembly-level diff.
+The `reccmp/asm-match.sh` script should be invoked with a single argument `asm-match.sh [function memory location]`. It will compile our code and then compare this function to the original. The output will show assembly-level diff.
 
 - "+" lines show where we have code that the original doesnt have, so we should try and remove it
 - "-" lines show code that is in the retail binary but not in our recompiled binary, so we should try and add it
