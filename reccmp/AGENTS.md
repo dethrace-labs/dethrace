@@ -71,3 +71,5 @@ In some cases, a match is not possible due to compiler entropy. This is more com
 ```
 
 We are generally unable to resolve a diff like this, so resolve the other diffs in the function, then abort.
+
+If you see any references to `harness` in the asm diff, abort immediately.
