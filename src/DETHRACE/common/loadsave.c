@@ -223,14 +223,32 @@ void StartRollingSaveNamesIn(void) {
     int save_slot_height;
 
     for (i = 0; i < COUNT_OF(gSaved_games); i++) {
-        save_slot_height = gCurrent_graf_data->save_slot_y_offset + i * gCurrent_graf_data->rolling_letter_y_pitch;
-        SetSlotXY(i, gCurrent_graf_data->save_slot_x_offset, save_slot_height);
+        SetSlotXY(
+            i,
+            gCurrent_graf_data->save_slot_x_offset,
+            gCurrent_graf_data->save_slot_y_offset + i * gCurrent_graf_data->rolling_letter_y_pitch);
         if (gSaved_games[i] != NULL) {
-            AddRollingString(gSaved_games[i]->slot_name, gCurrent_graf_data->save_slot_x_offset, save_slot_height, eRT_alpha);
-            AddRollingNumber(gSaved_games[i]->rank, 2, gCurrent_graf_data->save_slot_rank_x_offset, save_slot_height);
-            AddRollingNumber(gSaved_games[i]->credits, 6, gCurrent_graf_data->save_slot_credits_x_offset, save_slot_height);
+            AddRollingString(
+                gSaved_games[i]->slot_name,
+                gCurrent_graf_data->save_slot_x_offset,
+                gCurrent_graf_data->save_slot_y_offset + i * gCurrent_graf_data->rolling_letter_y_pitch,
+                eRT_alpha);
+            AddRollingNumber(
+                gSaved_games[i]->rank,
+                2,
+                gCurrent_graf_data->save_slot_rank_x_offset,
+                gCurrent_graf_data->save_slot_y_offset + i * gCurrent_graf_data->rolling_letter_y_pitch);
+            AddRollingNumber(
+                gSaved_games[i]->credits,
+                6,
+                gCurrent_graf_data->save_slot_credits_x_offset,
+                gCurrent_graf_data->save_slot_y_offset + i * gCurrent_graf_data->rolling_letter_y_pitch);
         } else {
-            AddRollingString(GetMiscString(kMiscString_Empty), gCurrent_graf_data->save_slot_x_offset, save_slot_height, eRT_alpha);
+            AddRollingString(
+                GetMiscString(kMiscString_Empty),
+                gCurrent_graf_data->save_slot_x_offset,
+                gCurrent_graf_data->save_slot_y_offset + i * gCurrent_graf_data->rolling_letter_y_pitch,
+                eRT_alpha);
         }
     }
 }

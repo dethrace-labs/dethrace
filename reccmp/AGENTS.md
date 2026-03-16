@@ -50,6 +50,7 @@ Continue making changes and running the command until it shows a 100% match or y
 - If diffs show extra or missing epilogue-adjacent blocks (`mov eax`, `pop`, `leave`, `ret`), prioritize matching return-site structure and `if/else` nesting before tuning jump targets.
 - For loops often init and increment an index and a pointer like for (i = 0, ptr=x; .. ; i++, ptr++)
 
+
 ## Aborting
 
 In some cases, a match is not possible due to compiler entropy. This is more common with floating point instructions. For example:
@@ -72,3 +73,6 @@ In some cases, a match is not possible due to compiler entropy. This is more com
 ```
 
 We are generally unable to resolve a diff like this, so resolve the other diffs in the function, then abort.
+
+If you see any references to `harness` in the asm diff, abort immediately.
+
