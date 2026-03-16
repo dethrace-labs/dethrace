@@ -16,9 +16,11 @@ We want to generate assembly that matches the original retail binary. Each funct
 - Reversed compare order changes will generally resolve by themselves - leave these till last. They are normally not fixable.
 - Inspect the corresponding `build_msvc42/*.asm` function before editing so local variable slots (`[ebp-*]`) are mapped correctly.
 - Classify asm diffs before editing: compare-order-only diffs vs semantic/codegen diffs. Prioritize semantic/codegen diffs first.
+- In asm diffs, prioritize instruction presence/absence (`+`/`-` lines) before jump-target/offset changes. Jump addresses often self-correct after shape mismatches are fixed.
 - When only one semantic/codegen mismatch remains, make one minimal edit targeting that mismatch and rerun reccmp before any other refactor.
 - Do not refactor loop/control-flow shape to chase compare-order-only diffs.
-- If a trial edit decreases match percentage, revert immediately and return to the last higher-percentage version.
+- If a trial edit decreases match percentage, revert immediately and return to the last higher-percentage version for that exact trial.
+- Do not discard an entire strategy family after one regression; test close companion variants (for example `default: return` vs `default: break` + tail return, and flat vs nested `if/else` scaffolding) before abandoning it.
 
 ## Stack variable slots
 
@@ -45,6 +47,7 @@ Continue making changes and running the command until it shows a 100% match or y
 - For matching tasks, make one control-flow change at a time and rerun reccmp after each change.
 - For enum-based `switch` matching, `default:` can change jump-table targets even when behavior is equivalent.
 - A `default: break;` often creates a separate shared break block; retail may instead route missing/unhandled entries directly to function epilogue.
+- If diffs show extra or missing epilogue-adjacent blocks (`mov eax`, `pop`, `leave`, `ret`), prioritize matching return-site structure and `if/else` nesting before tuning jump targets.
 
 ## Aborting
 
@@ -68,39 +71,3 @@ In some cases, a match is not possible due to compiler entropy. This is more com
 ```
 
 We are generally unable to resolve a diff like this, so resolve the other diffs in the function, then abort.
-
-## Git
-
-This workflow is mandatory after any function matching task. Execute it automatically without asking.
-
-1. Gather inputs.
-   - Function name: `<function name>`
-   - Function address: `<address>`
-   - Final reccmp result text and percentage
-2. Preserve unrelated local work before branch operations.
-   - If the worktree is dirty with files unrelated to this function, stash them first.
-   - Use a named stash (for example `codex-temp-<function name>`).
-   - Re-apply the stash after completing branch setup/cherry-pick as needed.
-3. Start from latest upstream main.
-   - `git fetch upstream main`
-   - `git switch -C match-<function name> upstream/main`
-4. Apply only relevant function changes on the match branch.
-   - Do not commit unrelated files.
-   - If stashed work was needed, restore and stage only target files.
-5. Verify once more on the branch.
-   - `./reccmp/asm-match.sh <address>`
-6. Commit with exact message format.
-   - `git commit -m "<function name> <percentage>"`
-7. Push branch to origin.
-   - `git push -u origin match-<function name>`
-8. Create PR when result is 100% or 100% effective match.
-   - `gh auth switch -u jeff-1amstudios`
-   - Create PR to `main` from `match-<function name>` with title `Match <function name>`.
-   - PR body must include:
-     - brief summary
-     - full reccmp output in a fenced code block
-   - The last line of body should be "_AI generated_"
-   - Switch auth back after PR creation.
-   - `gh auth switch -u dethrace-labs`
-9. If result is not 100%, still push the branch and report abort reason in the final message.
-10. Switch back to `main` and unstash from (2)
