@@ -43,6 +43,8 @@ Continue making changes and running the command until it shows a 100% match or y
 - Keep odd or redundant locals and branches if they help codegen, even when logically unnecessary.
 - Treat reccmp `+` and `-` lines as assembly-shape guidance, not direct C line add/remove instructions.
 - For matching tasks, make one control-flow change at a time and rerun reccmp after each change.
+- For enum-based `switch` matching, `default:` can change jump-table targets even when behavior is equivalent.
+- A `default: break;` often creates a separate shared break block; retail may instead route missing/unhandled entries directly to function epilogue.
 
 ## Aborting
 
@@ -100,3 +102,4 @@ This workflow is mandatory after any function matching task. Execute it automati
    - Switch auth back after PR creation.
    - `gh auth switch -u dethrace-labs`
 9. If result is not 100%, still push the branch and report abort reason in the final message.
+10. Switch back to `main` and unstash from (2)

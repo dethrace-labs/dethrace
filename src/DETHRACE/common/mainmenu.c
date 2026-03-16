@@ -600,6 +600,11 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
     }
     the_result = GetMainMenuOption(pTime_out, pContinue_allowed);
     switch (the_result) {
+    case eMM_quit:
+        if (!DoVerifyQuit(0)) {
+            the_result = eMM_none;
+        }
+        break;
     case eMM_end_game:
         if (gNet_mode) {
             gProgram_state.prog_status = eProg_idling;
@@ -636,19 +641,12 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
         DoOptions();
         FreeSoundOptionsData();
         break;
-    case eMM_quit:
-        if (!DoVerifyQuit(0)) {
-            the_result = eMM_none;
-        }
+    case eMM_abort_race:
+        gAbandon_game = 1;
         break;
     case eMM_recover:
         SetRecovery();
         break;
-    case eMM_abort_race:
-        gAbandon_game = 1;
-        break;
-    default:
-        return the_result;
     }
     return the_result;
 }
