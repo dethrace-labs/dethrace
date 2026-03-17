@@ -284,7 +284,7 @@ int DownRace(int* pCurrent_choice, int* pCurrent_mode) {
         gStart_interface_spec->pushed_flics[3].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
-    if (gCurrent_race_index < gNumber_of_races - 1 && (gProgram_state.rank <= gRace_list[gCurrent_race_index + 1].rank_required || gProgram_state.game_completed || gChange_race_net_mode)) {
+    if ((gProgram_state.rank <= gRace_list[gCurrent_race_index + 1].rank_required || gProgram_state.game_completed || gChange_race_net_mode) && gCurrent_race_index < gNumber_of_races - 1) {
         RemoveTransientBitmaps(1);
         MoveRaceList(gCurrent_race_index, gCurrent_race_index + 1, 150);
         gCurrent_race_index++;
