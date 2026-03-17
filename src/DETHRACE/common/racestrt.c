@@ -932,14 +932,14 @@ void DoExchangePart(void) {
     int cost;
 
     CalcPartPrice(gPart_category, gPart_index, &price, &cost);
-    if (cost == 0 || gProgram_state.credits < cost) {
-        DRS3StartSound(gEffects_outlet, 3100);
-    } else {
+    if (cost != 0 && gProgram_state.credits >= cost) {
         gJust_bought_part = 1;
         DRS3StartSound(gEffects_outlet, 3101);
         BuyPart(gPart_category, gPart_index);
         ErasePartsText(1);
         DrawPartsText();
+    } else {
+        DRS3StartSound(gEffects_outlet, 3100);
     }
 }
 
