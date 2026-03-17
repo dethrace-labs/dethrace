@@ -1304,14 +1304,16 @@ void SetOpponentFlic(void) {
 void DrawSceneyMappyInfoVieweyThing(void) {
 
     RemoveTransientBitmaps(1);
-    if (gProgram_state.view_type) {
-        if (gProgram_state.view_type == eVT_Info) {
-            ChangePanelFlic(0, gCurrent_race.info_image_data, gCurrent_race.info_image_data_length);
-        } else if (gProgram_state.view_type == eVT_Opponents) {
-            SetOpponentFlic();
-        }
-    } else {
+    switch (gProgram_state.view_type) {
+    case eVT_Scene:
         ChangePanelFlic(0, gCurrent_race.scene_image_data, gCurrent_race.scene_image_data_length);
+        break;
+    case eVT_Info:
+        ChangePanelFlic(0, gCurrent_race.info_image_data, gCurrent_race.info_image_data_length);
+        break;
+    case eVT_Opponents:
+        SetOpponentFlic();
+        break;
     }
     TellyInImage(GetPanelPixelmap(0), gCurrent_graf_data->start_race_panel_left, gCurrent_graf_data->start_race_panel_top);
 }
