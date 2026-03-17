@@ -919,10 +919,14 @@ int GetPartsMax(void) {
 void CalcPartsIndex(void) {
     int current_index;
 
-    gPart_index = gProgram_state.current_car.power_up_levels[gPart_category];
-    if (gPart_index + 1 < gProgram_state.current_car.power_ups[gPart_category].number_of_parts && (gProgram_state.rank <= gProgram_state.current_car.power_ups[gPart_category].info[gPart_index + 1].rank_required || gProgram_state.game_completed)) {
-        gPart_index += 1;
+    current_index = gProgram_state.current_car.power_up_levels[gPart_category];
+    if (current_index < gProgram_state.current_car.power_ups[gPart_category].number_of_parts - 1) {
+        if (gProgram_state.rank <= gProgram_state.current_car.power_ups[gPart_category].info[current_index + 1].rank_required || gProgram_state.game_completed) {
+            gPart_index = current_index + 1;
+            return;
+        }
     }
+    gPart_index = current_index;
 }
 
 // IDA: void __cdecl DoExchangePart()
