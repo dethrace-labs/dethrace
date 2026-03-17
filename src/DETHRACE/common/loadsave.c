@@ -514,6 +514,13 @@ int DoLoadGame(void) {
     };
     int result;
 
+#ifdef DETHRACE_FIX_BUGS
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
+        DoFeatureUnavailableInDemo();
+        return 0;
+    }
+#endif
+
     if (gNet_mode != eNet_mode_none) {
         SuspendPendingFlic();
         DoErrorInterface(kMiscString_CannotSaveGameInNetworkPlay);
@@ -1006,10 +1013,12 @@ int SaveGameInterface(int pDefault_choice) {
 // FUNCTION: CARM95 0x0044cdfd
 void DoSaveGame(int pSave_allowed) {
 
+#ifdef DETHRACE_FIX_BUGS
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         DoFeatureUnavailableInDemo();
         return;
     }
+#endif
 
     if (gNet_mode == eNet_mode_none) {
         DRS3StopOutletSound(gEffects_outlet);
