@@ -147,7 +147,7 @@ void DrawRaceList(int pOffset) {
         gCurrent_graf_data->choose_race_y_bottom - gCurrent_graf_data->choose_race_y_top,
         0);
     pitch = gCurrent_graf_data->choose_race_y_pitch;
-    for (i = 0; i < gNumber_of_races; i++) {
+    for (i = 0; gNumber_of_races > i; i++) {
         y = pitch * i + gCurrent_graf_data->choose_race_curr_y - pOffset;
         if (gCurrent_graf_data->choose_race_y_top <= (y - (TranslationMode() ? 2 : 0)) && (y + gBig_font->glyph_y) < gCurrent_graf_data->choose_race_line_y) {
             if ((gProgram_state.rank > gRace_list[i].rank_required || gProgram_state.rank < gRace_list[i].best_rank) && !gProgram_state.game_completed && !gChange_race_net_mode) {
@@ -1479,6 +1479,7 @@ int SuggestRace(void) {
 
     suggested_so_far = 32767;
     suggested_race = 0;
+    number_of_visits = 1000;
     if (gProgram_state.game_completed) {
         return IRandomBetween(0, gNumber_of_races - 1);
     }
@@ -1491,33 +1492,28 @@ int SuggestRace(void) {
             suggested_race = i;
         }
     }
-    number_of_visits = gRace_list[suggested_race].been_there_done_that;
+    least_done = gRace_list[suggested_race].been_there_done_that;
     new_suggestion = suggested_race;
 
-    if (number_of_visits) {
+    if (least_done) {
         // Jeff: if we have already completed the suggested race, look backwards for a race that we haven't completed as many times
         for (i = suggested_race - 1; i >= 0 && i >= suggested_race - 5; i--) {
-            if (gRace_list[i].rank_required < gProgram_state.rank || gRace_list[i].best_rank > gProgram_state.rank) {
-                continue;
-            }
-            least_done = gRace_list[i].been_there_done_that < number_of_visits;
-            if (!gRace_list[i].been_there_done_that
-                || (least_done && suggested_race - 3 <= i)) {
-                new_suggestion = i;
-                number_of_visits = gRace_list[i].been_there_done_that;
+            if (gRace_list[i].rank_required >= gProgram_state.rank && gRace_list[i].best_rank <= gProgram_state.rank) {
+                if (!gRace_list[i].been_there_done_that
+                    || (gRace_list[i].been_there_done_that < least_done && suggested_race - 3 <= i)) {
+                    new_suggestion = i;
+                    least_done = gRace_list[i].been_there_done_that;
+                }
             }
         }
         // Jeff: look forwards for a race that we haven't completed as many times as the previous suggestion
-        for (i = suggested_race + 1; i < gNumber_of_races; i++) {
-            least_done = gRace_list[i].been_there_done_that < number_of_visits;
-            if (!least_done) {
-                continue;
-            }
-
-            if ((gRace_list[i].rank_required >= gProgram_state.rank && gRace_list[i].best_rank <= gProgram_state.rank)
-                || gProgram_state.game_completed) {
-                new_suggestion = i;
-                number_of_visits = gRace_list[i].been_there_done_that;
+        for (i = suggested_race + 1; gNumber_of_races > i; i++) {
+            if (gRace_list[i].been_there_done_that < least_done) {
+                if ((gRace_list[i].rank_required >= gProgram_state.rank && gRace_list[i].best_rank <= gProgram_state.rank)
+                    || gProgram_state.game_completed) {
+                    new_suggestion = i;
+                    least_done = gRace_list[i].been_there_done_that;
+                }
             }
         }
     }
