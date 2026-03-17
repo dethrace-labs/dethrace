@@ -1331,8 +1331,9 @@ int SelectRaceDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
     DismissSceneyMappyInfoVieweyThing();
     if (pEscaped) {
         return -1;
+    } else {
+        return pCurrent_choice;
     }
-    return pCurrent_choice;
 }
 
 // IDA: int __usercall StartRaceGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
