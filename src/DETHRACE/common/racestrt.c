@@ -1220,9 +1220,10 @@ void DoPartsShop(int pFade_away) {
 int AutoPartsDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
 
     if (pEscaped) {
-        pCurrent_choice = -1;
+        return -1;
+    } else {
+        return pCurrent_choice;
     }
-    return pCurrent_choice;
 }
 
 // IDA: tSO_result __cdecl DoAutoPartsShop()
