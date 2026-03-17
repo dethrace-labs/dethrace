@@ -1122,7 +1122,7 @@ int DonePartsShop(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEs
     } else {
         RunFlic(251);
     }
-    return pGo_ahead;
+    return pCurrent_choice;
 }
 
 // IDA: void __usercall DrawPartsShop(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>)
