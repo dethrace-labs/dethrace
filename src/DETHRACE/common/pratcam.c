@@ -97,8 +97,9 @@ void TogglePratcam(void) {
         the_time = GetTotalTime();
         gProgram_state.prat_cam_on = !gProgram_state.prat_cam_on;
         time_diff = the_time - gProgram_state.pratcam_move_start;
-        gProgram_state.pratcam_move_start = the_time;
-        if (time_diff <= 400) {
+        if (time_diff > 400) {
+            gProgram_state.pratcam_move_start = the_time;
+        } else {
             gProgram_state.pratcam_move_start = the_time - 400 + time_diff;
         }
     }
