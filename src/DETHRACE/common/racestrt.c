@@ -765,7 +765,8 @@ void CalcPartPrice(int pCategory, int pIndex, int* pPrice, int* pCost) {
     if (gProgram_state.current_car.power_up_levels[pCategory] == pIndex) {
         *pCost = 0;
     } else {
-        *pCost = *pPrice - 10 * (gRefund_rate * gProgram_state.current_car.power_ups[pCategory].info[gProgram_state.current_car.power_up_levels[pCategory]].prices[gProgram_state.skill_level] / 1000);
+        current_value = gProgram_state.current_car.power_ups[pCategory].info[gProgram_state.current_car.power_up_levels[pCategory]].prices[gProgram_state.skill_level];
+        *pCost = *pPrice - (current_value * gRefund_rate / 1000) * 10;
     }
 }
 
