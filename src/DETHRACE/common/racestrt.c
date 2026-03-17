@@ -892,8 +892,8 @@ void DrawPartsText(void) {
 void SetPartsImage(void) {
 
     ChangePanelFlic(0,
-        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_ptr,
-        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_length);
+        ((tPart_info*)((char*)gProgram_state.current_car.power_ups[gPart_category].info + gPart_index * sizeof(tPart_info)))->data_ptr,
+        ((tPart_info*)((char*)gProgram_state.current_car.power_ups[gPart_category].info + gPart_index * sizeof(tPart_info)))->data_length);
     TellyInImage(GetPanelPixelmap(0), gCurrent_graf_data->parts_image_x, gCurrent_graf_data->parts_image_y);
     DrawPartsText();
 }
