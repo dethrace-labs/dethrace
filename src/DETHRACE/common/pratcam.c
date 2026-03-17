@@ -285,23 +285,18 @@ void ChangeAmbientPratcamNow(int pIndex, int pStart_chunk) {
 // FUNCTION: CARM95 0x0044d1f0
 void ChangeAmbientPratcam(int pIndex) {
 
-    if (gRace_finished) {
-        return;
-    }
-    if (gInterface_within_race_mode) {
-        return;
-    }
-    if (pIndex == gCurrent_ambient_prat_sequence) {
-        return;
-    }
-    if (!gProgram_state.prat_cam_on) {
-        return;
-    }
-
-    if (gCurrent_pratcam_index == -1) {
-        ChangeAmbientPratcamNow(pIndex, 0);
+    if (gRace_finished || gInterface_within_race_mode) {
+        ;
     } else {
-        gPending_ambient_prat = pIndex;
+        if (pIndex != gCurrent_ambient_prat_sequence
+            && !gRace_finished
+            && gProgram_state.prat_cam_on) {
+            if (gCurrent_pratcam_index != -1) {
+                gPending_ambient_prat = pIndex;
+            } else {
+                ChangeAmbientPratcamNow(pIndex, 0);
+            }
+        }
     }
 }
 
