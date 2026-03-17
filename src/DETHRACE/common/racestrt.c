@@ -748,12 +748,12 @@ int PartsShopRecommended(void) {
     counter = 0;
     for (i = 0; i < eParts_count; i++) {
         current_index = gProgram_state.current_car.power_up_levels[i];
-        if (current_index + 1 < gProgram_state.current_car.power_ups[i].number_of_parts && (gProgram_state.rank <= gProgram_state.current_car.power_ups[i].info[current_index + 1].rank_required || gProgram_state.game_completed)) {
+        if (current_index < gProgram_state.current_car.power_ups[i].number_of_parts - 1 && (gProgram_state.rank <= gProgram_state.current_car.power_ups[i].info[current_index + 1].rank_required || gProgram_state.game_completed)) {
             running_cost += gProgram_state.current_car.power_ups[i].info[current_index + 1].prices[gProgram_state.skill_level];
             counter++;
         }
     }
-    return running_cost != 0 && ((float)running_cost / counter * 1.5f <= gProgram_state.credits);
+    return running_cost != 0 && (running_cost / counter * 1.5 <= gProgram_state.credits);
 }
 
 // IDA: void __usercall CalcPartPrice(int pCategory@<EAX>, int pIndex@<EDX>, int *pPrice@<EBX>, int *pCost@<ECX>)
