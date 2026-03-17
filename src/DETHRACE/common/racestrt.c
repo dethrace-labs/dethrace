@@ -556,11 +556,14 @@ int DownClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY
 // FUNCTION: CARM95 0x0044f788
 int ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 
-    if (gChange_race_net_mode == 0 || gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership != eCar_owner_someone) {
+    if (gChange_race_net_mode == 0) {
         return 1;
-    } else {
+    }
+    if (gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership == eCar_owner_someone) {
         DRS3StartSound(gEffects_outlet, 3100);
         return 0;
+    } else {
+        return 1;
     }
 }
 
