@@ -49,7 +49,8 @@ void DRStdioClose(void* f) {
 // FUNCTION: CARM95 0x0044cfa1
 br_size_t DRStdioRead(void* buf, br_size_t size, unsigned int n, void* f) {
     br_size_t result;
-    return gOld_file_system->read(buf, size, n, f);
+    result = gOld_file_system->read(buf, size, n, f);
+    return result;
 }
 
 // IDA: br_size_t __cdecl DRStdioWrite(void *buf, br_size_t size, unsigned int n, void *f)
