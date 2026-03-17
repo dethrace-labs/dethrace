@@ -1020,7 +1020,10 @@ void DoSaveGame(int pSave_allowed) {
     }
 #endif
 
-    if (gNet_mode == eNet_mode_none) {
+    if (gNet_mode != eNet_mode_none) {
+        SuspendPendingFlic();
+        DoErrorInterface(kMiscString_CannotSaveGameInNetworkPlay);
+    } else {
         DRS3StopOutletSound(gEffects_outlet);
         gProgram_state.saving = 1;
         gSave_allowed = pSave_allowed;
@@ -1038,8 +1041,5 @@ void DoSaveGame(int pSave_allowed) {
         }
         DisposeSavedGames();
         gProgram_state.saving = 0;
-    } else {
-        SuspendPendingFlic();
-        DoErrorInterface(kMiscString_CannotSaveGameInNetworkPlay);
     }
 }
