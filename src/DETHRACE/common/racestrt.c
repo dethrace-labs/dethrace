@@ -1037,7 +1037,9 @@ int DownPart(int* pCurrent_choice, int* pCurrent_mode) {
     RemoveTransientBitmaps(1);
     ErasePartsText(0);
 
-    gPart_index = (gPart_index == GetPartsMax()) ? 0 : (gPart_index + 1);
+    if (gPart_index++ == GetPartsMax()) {
+        gPart_index = 0;
+    }
 
     DropOutImageThruTop(
         GetPanelPixelmap(0),
@@ -1045,9 +1047,10 @@ int DownPart(int* pCurrent_choice, int* pCurrent_mode) {
         gCurrent_graf_data->parts_image_y,
         gCurrent_graf_data->parts_top_clip,
         gCurrent_graf_data->parts_bottom_clip);
+    pCurrent_choice = (int*)&gProgram_state.current_car.power_ups[gPart_category];
     ChangePanelFlic(0,
-        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_ptr,
-        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_length);
+        ((tParts_spec*)pCurrent_choice)->info[gPart_index].data_ptr,
+        ((tParts_spec*)pCurrent_choice)->info[gPart_index].data_length);
     DropInImageFromBottom(
         GetPanelPixelmap(0),
         gCurrent_graf_data->parts_image_x,
