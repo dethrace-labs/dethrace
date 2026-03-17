@@ -1542,15 +1542,14 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
 
     if (gProgram_state.view_type == eVT_Opponents) {
         the_opponent = &gOpponents[gCurrent_race.opponent_list[gOpponent_index].index];
-        for (j = 0; j < the_opponent->text_chunk_count; j++) {
-            the_chunk = &the_opponent->text_chunks[j];
+        for (j = 0, the_chunk = the_opponent->text_chunks; j < the_opponent->text_chunk_count; j++, the_chunk++) {
             if (GetPanelFlicFrameIndex(0) >= the_chunk->frame_cue && GetPanelFlicFrameIndex(0) < the_chunk->frame_end) {
-                y_coord = the_chunk->y_coord * gGraf_specs[gGraf_spec_index].total_height / 200
+                y_coord = the_chunk->y_coord * gGraf_specs[gGraf_spec_index].total_height / 200u
                     + gCurrent_graf_data->start_race_panel_top;
                 for (k = 0; k < the_chunk->line_count; k++) {
                     TransBrPixelmapText(
                         gBack_screen,
-                        the_chunk->x_coord * gGraf_specs[gGraf_spec_index].total_width / 320
+                        the_chunk->x_coord * gGraf_specs[gGraf_spec_index].total_width / 320u
                             + gCurrent_graf_data->start_race_panel_left,
                         y_coord,
                         201,
@@ -1561,15 +1560,14 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
             }
         }
     } else if (gProgram_state.view_type == eVT_Info) {
-        for (j = 0; j < gCurrent_race.text_chunk_count; j++) {
-            the_chunk = &gCurrent_race.text_chunks[j];
+        for (j = 0, the_chunk = gCurrent_race.text_chunks; j < gCurrent_race.text_chunk_count; j++, the_chunk++) {
             if (GetPanelFlicFrameIndex(0) >= the_chunk->frame_cue && GetPanelFlicFrameIndex(0) < the_chunk->frame_end) {
-                y_coord = the_chunk->y_coord * gGraf_specs[gGraf_spec_index].total_height / 200
+                y_coord = the_chunk->y_coord * gGraf_specs[gGraf_spec_index].total_height / 200u
                     + gCurrent_graf_data->start_race_panel_top;
                 for (k = 0; k < the_chunk->line_count; k++) {
                     TransBrPixelmapText(
                         gBack_screen,
-                        the_chunk->x_coord * gGraf_specs[gGraf_spec_index].total_width / 320
+                        the_chunk->x_coord * gGraf_specs[gGraf_spec_index].total_width / 320u
                             + gCurrent_graf_data->start_race_panel_left,
                         y_coord,
                         201,
@@ -1604,9 +1602,6 @@ void SelectRaceDraw(int pCurrent_choice, int pCurrent_mode) {
         char s[128];
         FILE* f;
         int i;
-
-        // Jeff
-        assert(strlen(gApplication_path) < 120);
 
         PathCat(s, gApplication_path, "ACTORS");
         PathCat(s, s, "PROG.ACT");
