@@ -301,16 +301,14 @@ int ClickOnRace(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY_
 
     GetMousePosition(&x_coord, &y_coord);
     race_delta = (y_coord - (gCurrent_graf_data->choose_race_curr_y - 5 * (gCurrent_graf_data->choose_race_y_pitch / 2) + gBig_font->glyph_y / 2)) / gCurrent_graf_data->choose_race_y_pitch - 2;
-    if (race_delta >= -2 && race_delta <= -1) {
+    if (race_delta > -3 && race_delta < 0) {
         do {
             UpRace(pCurrent_choice, pCurrent_mode);
-            race_delta++;
-        } while (race_delta != 0);
-    } else if (race_delta > 0 && race_delta < 3) {
+        } while (++race_delta);
+    } else if (race_delta < 3 && race_delta > 0) {
         do {
             DownRace(pCurrent_choice, pCurrent_mode);
-            race_delta--;
-        } while (race_delta != 0);
+        } while (--race_delta);
     }
     return 0;
 }
