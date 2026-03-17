@@ -2314,11 +2314,11 @@ int GridDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped
 
     if (pTimed_out) {
         return 0;
-    }
-    if (pEscaped) {
+    } else if (pEscaped) {
         return -1;
+    } else {
+        return pCurrent_choice;
     }
-    return pCurrent_choice;
 }
 
 // IDA: void __cdecl GridStart()
