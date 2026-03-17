@@ -1339,26 +1339,31 @@ int SelectRaceDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 // FUNCTION: CARM95 0x00450f2a
 int StartRaceGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 
-    if (*pCurrent_choice != 1 || *pCurrent_mode) {
-        return 1;
-    }
-    RemoveTransientBitmaps(1);
-    DismissSceneyMappyInfoVieweyThing();
-    gProgram_state.view_type++;
-    if (gProgram_state.view_type > eVT_Opponents) {
-        gProgram_state.view_type = eVT_Scene;
-    }
-    if (gProgram_state.view_type) {
-        if (gProgram_state.view_type == eVT_Info) {
-            RunFlic(210);
-        } else if (gProgram_state.view_type == eVT_Opponents) {
-            RunFlic(212);
+    if (*pCurrent_choice == 1) {
+        if (*pCurrent_mode == 0) {
+            RemoveTransientBitmaps(1);
+            DismissSceneyMappyInfoVieweyThing();
+            gProgram_state.view_type++;
+            if (gProgram_state.view_type > eVT_Opponents) {
+                gProgram_state.view_type = eVT_Scene;
+            }
+            switch (gProgram_state.view_type) {
+            case eVT_Scene:
+                RunFlic(213);
+                break;
+            case eVT_Info:
+                RunFlic(210);
+                break;
+            case eVT_Opponents:
+                RunFlic(212);
+                break;
+            }
+            DrawSceneyMappyInfoVieweyThing();
+            return 0;
+        } else {
         }
-    } else {
-        RunFlic(213);
     }
-    DrawSceneyMappyInfoVieweyThing();
-    return 0;
+    return 1;
 }
 
 // IDA: int __usercall TryToMoveToArrows@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
