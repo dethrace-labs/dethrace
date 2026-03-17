@@ -952,8 +952,9 @@ int PartsShopGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
         RemoveTransientBitmaps(1);
         DontLetFlicFuckWithPalettes();
         TurnFlicTransparencyOn();
+        flic_index = gStart_interface_spec->pushed_flics[*pCurrent_choice].flic_index;
         RunFlicAt(
-            gStart_interface_spec->pushed_flics[*pCurrent_choice].flic_index,
+            flic_index,
             gStart_interface_spec->pushed_flics[*pCurrent_choice].x[gGraf_data_index],
             gStart_interface_spec->pushed_flics[*pCurrent_choice].y[gGraf_data_index]);
         TurnFlicTransparencyOff();
@@ -966,8 +967,8 @@ int PartsShopGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
         RunFlic(261);
         AddToFlicQueue(
             gStart_interface_spec->flicker_on_flics[*pCurrent_choice].flic_index,
-            gStart_interface_spec->flicker_on_flics[*pCurrent_choice].x[gGraf_data_index],
-            gStart_interface_spec->flicker_on_flics[*pCurrent_choice].y[gGraf_data_index],
+            *(int*)((char*)gStart_interface_spec->flicker_on_flics + *pCurrent_choice * 20 + gGraf_data_index * 4 + 4),
+            *(int*)((char*)gStart_interface_spec->flicker_on_flics + *pCurrent_choice * 20 + gGraf_data_index * 4 + 12),
             1);
         DrawPartsLabel();
         SetPartsImage();
@@ -977,9 +978,9 @@ int PartsShopGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
         return 0;
     } else if (*pCurrent_mode == 1) {
         AddToFlicQueue(
-            gStart_interface_spec->flicker_on_flics[4].flic_index,
-            gStart_interface_spec->flicker_on_flics[4].x[gGraf_data_index],
-            gStart_interface_spec->flicker_on_flics[4].y[gGraf_data_index],
+            gStart_interface_spec->pushed_flics[4].flic_index,
+            gStart_interface_spec->pushed_flics[4].x[gGraf_data_index],
+            gStart_interface_spec->pushed_flics[4].y[gGraf_data_index],
             1);
         DoExchangePart();
         return 0;
