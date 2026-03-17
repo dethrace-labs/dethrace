@@ -1002,7 +1002,9 @@ int UpPart(int* pCurrent_choice, int* pCurrent_mode) {
     RemoveTransientBitmaps(1);
     ErasePartsText(0);
 
-    gPart_index = (gPart_index == 0) ? GetPartsMax() : (gPart_index - 1);
+    if (gPart_index-- == 0) {
+        gPart_index = GetPartsMax();
+    }
 
     DropOutImageThruBottom(
         GetPanelPixelmap(0),
