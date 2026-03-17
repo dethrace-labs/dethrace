@@ -514,59 +514,60 @@ int DoLoadGame(void) {
     };
     int result;
 
+#ifdef DETHRACE_FIX_BUGS
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         DoFeatureUnavailableInDemo();
         return 0;
     }
+#endif
 
-    if (gNet_mode == eNet_mode_none) {
-        if (!OriginalCarmaCDinDrive()) {
-            DoErrorInterface(kMiscString_PLEASE_INSERT_THE_CARMAGEDDON_CD);
-            return 0;
-        }
-        gProgram_state.loading = 1;
-        LoadSavedGames();
-        if (gGame_to_load >= 0) {
-            gProgram_state.last_slot = gGame_to_load;
-            gProgram_state.loaded = 1;
-            LoadTheGame(gGame_to_load);
-            gGame_to_load = -1;
-            gProgram_state.prog_status = eProg_game_starting;
-            DisposeSavedGames();
-            gProgram_state.loading = 0;
-            return 1;
-        } else {
-            result = DoInterfaceScreen(&interface_spec, gFaded_palette, gProgram_state.last_slot);
-            if (result != 8 && gSaved_games[result] == NULL) {
-                result = 8;
-                DRS3StartSound(gEffects_outlet, 3100);
-            }
-            if (result != 8) {
-                FadePaletteDown();
-                if (gProgram_state.racing) {
-                    gGame_to_load = result;
-                    gProgram_state.prog_status = eProg_idling;
-                } else {
-                    gProgram_state.last_slot = result;
-                    gProgram_state.loaded = 1;
-                    LoadTheGame(result);
-                }
-            } else {
-                if (gProgram_state.racing) {
-                    FadePaletteDown();
-                } else {
-                    RunFlic(72);
-                }
-            }
-            gProgram_state.loading = 0;
-            DisposeSavedGames();
-            return result != 8;
-        }
-    } else {
+    if (gNet_mode != eNet_mode_none) {
         SuspendPendingFlic();
         DoErrorInterface(kMiscString_CannotSaveGameInNetworkPlay);
         return 0;
     }
+
+    if (!OriginalCarmaCDinDrive()) {
+        DoErrorInterface(kMiscString_PLEASE_INSERT_THE_CARMAGEDDON_CD);
+        return 0;
+    }
+    gProgram_state.loading = 1;
+    LoadSavedGames();
+    if (gGame_to_load >= 0) {
+        gProgram_state.last_slot = gGame_to_load;
+        gProgram_state.loaded = 1;
+        LoadTheGame(gGame_to_load);
+        gGame_to_load = -1;
+        gProgram_state.prog_status = eProg_game_starting;
+        DisposeSavedGames();
+        gProgram_state.loading = 0;
+        return 1;
+    }
+    result = DoInterfaceScreen(&interface_spec, gFaded_palette, gProgram_state.last_slot);
+    if (result != 8 && gSaved_games[result] == NULL) {
+        result = 8;
+        DRS3StartSound(gEffects_outlet, 3100);
+    }
+    if (result == 8) {
+        if (gProgram_state.racing) {
+            FadePaletteDown();
+        } else {
+            RunFlic(72);
+        }
+    } else {
+        FadePaletteDown();
+        if (gProgram_state.racing) {
+            gGame_to_load = result;
+            gProgram_state.prog_status = eProg_idling;
+        } else {
+            gProgram_state.last_slot = result;
+            gProgram_state.loaded = 1;
+            LoadTheGame(result);
+        }
+    }
+    gProgram_state.loading = 0;
+    DisposeSavedGames();
+    return result != 8;
 }
 
 // IDA: void __usercall CorrectSaveByteOrdering(int pIndex@<EAX>)
@@ -1012,10 +1013,12 @@ int SaveGameInterface(int pDefault_choice) {
 // FUNCTION: CARM95 0x0044cdfd
 void DoSaveGame(int pSave_allowed) {
 
+#ifdef DETHRACE_FIX_BUGS
     if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
         DoFeatureUnavailableInDemo();
         return;
     }
+#endif
 
     if (gNet_mode == eNet_mode_none) {
         DRS3StopOutletSound(gEffects_outlet);
