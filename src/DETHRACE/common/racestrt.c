@@ -837,7 +837,6 @@ void DrawPartsLabel(void) {
         break;
     case eParts_offensive:
         RunFlicAt(264, gCurrent_graf_data->parts_label_x, gCurrent_graf_data->parts_label_y);
-        break;
     default:
         break;
     }
