@@ -2426,11 +2426,12 @@ int GridClickRight(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int 
 // FUNCTION: CARM95 0x0045378a
 int CheckChallenge(int* pCurrent_choice, int* pCurrent_mode) {
 
-    if (!gChallenge_time || PDGetTotalTime() < gChallenge_time) {
-        return 0;
-    }
-    *pCurrent_choice = -2;
-    return 1;
+    if (gChallenge_time && PDGetTotalTime() >= gChallenge_time) {
+        *pCurrent_choice = -2;
+        return 1;
+    } else
+        ;
+    return 0;
 }
 
 // IDA: int __usercall FindBestPos@<EAX>(int pOur_rank@<EAX>)
