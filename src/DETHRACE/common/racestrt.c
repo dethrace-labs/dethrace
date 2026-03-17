@@ -2610,15 +2610,14 @@ tSO_result DoGridPosition(void) {
             gChallenge_time = 0;
         }
         result = DoInterfaceScreen(&interface_spec, 0, 0);
-        if (result >= 0) {
-            FadePaletteDown();
-        } else {
+        if (result < 0) {
             RunFlic(291);
+        } else {
+            FadePaletteDown();
         }
         if (result == -1) {
             return eSO_main_menu_invoked;
-        }
-        if (result == -2) {
+        } else if (result == -2) {
             DoChallengeScreen();
         }
         DisposeGridIcons(&gCurrent_race);
