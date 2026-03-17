@@ -424,18 +424,20 @@ void DrawCar(int pCurrent_choice, int pCurrent_mode) {
 #pragma GCC diagnostic ignored "-Wformat-security"
 
     PollCarDetails(gChoose_car_net_game);
-    if (gChange_race_net_mode == 0) {
+    if (gChange_race_net_mode != 0) {
+        if (gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership == eCar_owner_someone) {
+            sprintf(s, "%s %s", GetMiscString(kMiscString_THIS_CAR_ALREADY_TAKEN_BY), gCar_details[gProgram_state.cars_available[gCurrent_car_index]].name);
+        } else {
+            sprintf(s, GetMiscString(kMiscString_AVAILABLE));
+        }
+    } else {
         if (gProgram_state.number_of_cars == 1) {
             sprintf(s, GetMiscString(kMiscString_NoOtherCarsToChooseFromYet));
-        } else if (gProgram_state.cars_available[gCurrent_car_index] == gProgram_state.frank_or_anniness) {
-            sprintf(s, GetMiscString(kMiscString_YourOriginalCar));
-        } else {
+        } else if (gProgram_state.cars_available[gCurrent_car_index] != gProgram_state.frank_or_anniness) {
             sprintf(s, "%s %s", GetMiscString(kMiscString_OriginalDriverWas), gOpponents[gProgram_state.cars_available[gCurrent_car_index]].name);
+        } else {
+            sprintf(s, GetMiscString(kMiscString_YourOriginalCar));
         }
-    } else if (gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership == eCar_owner_someone) {
-        sprintf(s, "%s %s", GetMiscString(kMiscString_THIS_CAR_ALREADY_TAKEN_BY), gCar_details[gProgram_state.cars_available[gCurrent_car_index]].name);
-    } else {
-        sprintf(s, GetMiscString(kMiscString_AVAILABLE));
     }
 
 #pragma GCC diagnostic pop
@@ -464,7 +466,7 @@ void DrawCar(int pCurrent_choice, int pCurrent_mode) {
         DRPixelmapRectangleMaskedCopy(
             gBack_screen,
             (gCurrent_graf_data->change_car_panel_left + gCurrent_graf_data->change_car_panel_right - gTaken_image->width) / 2,
-            (gCurrent_graf_data->change_car_panel_bottom + gCurrent_graf_data->change_car_panel_bottom - gTaken_image->height) / 2,
+            (gCurrent_graf_data->change_car_panel_top + gCurrent_graf_data->change_car_panel_bottom - gTaken_image->height) / 2,
             gTaken_image,
             0,
             0,
