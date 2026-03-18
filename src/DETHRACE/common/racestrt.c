@@ -2733,9 +2733,11 @@ void NetSynchStartDraw(int pCurrent_choice, int pCurrent_mode) {
 int NetSynchStartDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
 
     if (pEscaped) {
-        pCurrent_choice = -1;
-    } else if (pCurrent_choice == 0) {
-        gProgram_state.prog_status = eProg_idling;
+        return -1;
+    } else {
+        if (pCurrent_choice == 0) {
+            gProgram_state.prog_status = eProg_idling;
+        }
     }
     return pCurrent_choice;
 }
