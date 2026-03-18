@@ -317,10 +317,7 @@ void PratcamEventNow(int pIndex) {
 // FUNCTION: CARM95 0x0044d517
 void PratcamEvent(int pIndex) {
 
-    if (gRace_finished) {
-        return;
-    }
-    if (gInterface_within_race_mode) {
+    if (gRace_finished || gInterface_within_race_mode) {
         return;
     }
 #if defined(DETHRACE_FIX_BUGS)
@@ -329,13 +326,11 @@ void PratcamEvent(int pIndex) {
         return;
     }
 #endif
-    if (gPratcam_sequences[pIndex].precedence <= gCurrent_pratcam_precedence) {
-        return;
+    if (gPratcam_sequences[pIndex].precedence > gCurrent_pratcam_precedence) {
+        if (gRace_finished == 0 && gProgram_state.prat_cam_on) {
+            PratcamEventNow(pIndex);
+        }
     }
-    if (!gProgram_state.prat_cam_on) {
-        return;
-    }
-    PratcamEventNow(pIndex);
 }
 
 // IDA: int __cdecl HighResPratBufferWidth()
