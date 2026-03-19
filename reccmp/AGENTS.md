@@ -4,7 +4,8 @@ We want to generate assembly that matches the original retail binary. Each funct
 
 ## Rules
 
-- You cannot declare new variables or rename, reorder or remove their declarations
+- You CANNOT declare new variables or rename, reorder or remove variable declarations
+- You _are_ allowed to swap variable _usage_ (not declarations) to match the original variable slots.
 - You cannot change the function signature
 - We want c code that would be as close to what the original developers wrote, so avoid `volatile` casts and unnatural c code
 - You cannot change any code except in the function that we are trying to match
@@ -14,17 +15,13 @@ We want to generate assembly that matches the original retail binary. Each funct
 - Don't look back at previous commits. This code has never matched, so no point in doing this.
 - Don't add code that isn't x86/x64 compatible. Don't assume a pointer is 4 bytes. The original binary is x86 only, but our recompiled code needs to work correctly on 64 bit.
 - Reversed compare order changes will generally resolve by themselves - leave these till last. They are normally not fixable.
-- Inspect the corresponding `build_msvc42/*.asm` file before editing so local variable slots (`[ebp-*]`) are mapped correctly.
+- Run `python3 reccmp/get_stack_slots.py [function name]` before editing so local variable slots (`[ebp-*]`) are mapped correctly.
 - Classify asm diffs before editing: compare-order-only diffs vs semantic/codegen diffs. Prioritize semantic/codegen diffs first.
 - In asm diffs, prioritize instruction presence/absence (`+`/`-` lines) before jump-target/offset changes. Jump addresses often self-correct after shape mismatches are fixed.
 - When only one semantic/codegen mismatch remains, make one minimal edit targeting that mismatch and rerun reccmp before any other refactor.
 - Do not refactor loop/control-flow shape to chase compare-order-only diffs.
 - If a trial edit decreases match percentage, revert immediately and return to the last higher-percentage version for that exact trial.
 - Do not discard an entire strategy family after one regression; test close companion variants (for example `default: return` vs `default: break` + tail return, and flat vs nested `if/else` scaffolding) before abandoning it.
-
-## Stack variable slots
-
-Each .c file that we work on has a corresponding .asm file in `build_msvc42` which you can read to discover the local variable slots so that you can discover that [ebp-4] is "i" for example. You _are_ allowed to swap variable _usage_ (not declarations) to match the original variable slots.
 
 ## To see what assembly is different
 
@@ -50,7 +47,6 @@ Continue making changes and running the command until it shows a 100% match or y
 - If diffs show extra or missing epilogue-adjacent blocks (`mov eax`, `pop`, `leave`, `ret`), prioritize matching return-site structure and `if/else` nesting before tuning jump targets.
 - For loops often init and increment an index and a pointer like for (i = 0, ptr=x; .. ; i++, ptr++)
 
-
 ## Aborting
 
 In some cases, a match is not possible due to compiler entropy. This is more common with floating point instructions. For example:
@@ -75,4 +71,3 @@ In some cases, a match is not possible due to compiler entropy. This is more com
 We are generally unable to resolve a diff like this, so resolve the other diffs in the function, then abort.
 
 If you see any references to `harness` in the asm diff, abort immediately.
-
