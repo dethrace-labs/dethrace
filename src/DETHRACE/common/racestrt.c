@@ -2803,6 +2803,8 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
         { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 }, 0, 0, 0, NULL },
         { { 39, 112 }, { 172, 362 }, { 102, 182 }, { 192, 379 }, 1, 0, 0, NULL },
     };
+
+    // GLOBAL: CARM95 0x00510840
     static tInterface_spec interface_spec_hf = {
         0,
         203,
@@ -2867,6 +2869,7 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     static tMouse_area mouse_areas_hs[1] = {
         { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 }, 0, 0, 0, NULL },
     };
+    // GLOBAL: CARM95 0x005109E8
     static tInterface_spec interface_spec_hs = {
         0, 209, 0, 0, 0, 0, 8,
         { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
@@ -2891,6 +2894,8 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     static tMouse_area mouse_areas_c[1] = {
         { { 219, 112 }, { 172, 362 }, { 282, 182 }, { 192, 379 }, 0, 0, 0, NULL },
     };
+
+    // GLOBAL: CARM95 0x00510B90
     static tInterface_spec interface_spec_c = {
         0, 204, 0, 0, 0, 0, 8,
         { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
@@ -2904,7 +2909,6 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
         COUNT_OF(mouse_areas_c), mouse_areas_c, 0, NULL
     };
     int result;
-    int result_copy;
 
     if (pMode != eNet_synch_client) {
         if (gCurrent_net_game->status.stage == eNet_game_starting) {
@@ -2925,13 +2929,10 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     case eNet_synch_client:
         result = DoInterfaceScreen(&interface_spec_c, 0, -1);
         break;
-    default:
-        break;
     }
     TurnOffPaletteConversion();
     FadePaletteDown();
-    result_copy = result;
-    switch (result_copy) {
+    switch (result) {
     case -1:
     case 0:
         NetLeaveGame(gCurrent_net_game);
