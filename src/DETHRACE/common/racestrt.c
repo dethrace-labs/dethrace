@@ -2904,6 +2904,7 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
         COUNT_OF(mouse_areas_c), mouse_areas_c, 0, NULL
     };
     int result;
+    int result_copy;
 
     if (pMode != eNet_synch_client) {
         if (gCurrent_net_game->status.stage == eNet_game_starting) {
@@ -2913,6 +2914,7 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
         gNet_synch_start = PDGetTotalTime();
     }
     TurnOnPaletteConversion();
+
     switch (pMode) {
     case eNet_synch_host_first:
         result = DoInterfaceScreen(&interface_spec_hf, 0, 1);
@@ -2928,8 +2930,14 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     }
     TurnOffPaletteConversion();
     FadePaletteDown();
-    if (result > -2 && result < 1) {
+    result_copy = result;
+    switch (result_copy) {
+    case -1:
+    case 0:
         NetLeaveGame(gCurrent_net_game);
+        return eSO_continue;
+    case 1:
+        return eSO_continue;
     }
     return eSO_continue;
 }
