@@ -2803,6 +2803,8 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
         { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 }, 0, 0, 0, NULL },
         { { 39, 112 }, { 172, 362 }, { 102, 182 }, { 192, 379 }, 1, 0, 0, NULL },
     };
+
+    // GLOBAL: CARM95 0x00510840
     static tInterface_spec interface_spec_hf = {
         0,
         203,
@@ -2867,6 +2869,7 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     static tMouse_area mouse_areas_hs[1] = {
         { { 219, 480 }, { 172, 379 }, { 282, 182 }, { 192, 427 }, 0, 0, 0, NULL },
     };
+    // GLOBAL: CARM95 0x005109E8
     static tInterface_spec interface_spec_hs = {
         0, 209, 0, 0, 0, 0, 8,
         { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
@@ -2891,6 +2894,8 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     static tMouse_area mouse_areas_c[1] = {
         { { 219, 112 }, { 172, 362 }, { 282, 182 }, { 192, 379 }, 0, 0, 0, NULL },
     };
+
+    // GLOBAL: CARM95 0x00510B90
     static tInterface_spec interface_spec_c = {
         0, 204, 0, 0, 0, 0, 8,
         { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, 0 }, { NULL, NULL },
@@ -2913,6 +2918,7 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
         gNet_synch_start = PDGetTotalTime();
     }
     TurnOnPaletteConversion();
+
     switch (pMode) {
     case eNet_synch_host_first:
         result = DoInterfaceScreen(&interface_spec_hf, 0, 1);
@@ -2923,13 +2929,16 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     case eNet_synch_client:
         result = DoInterfaceScreen(&interface_spec_c, 0, -1);
         break;
-    default:
-        break;
     }
     TurnOffPaletteConversion();
     FadePaletteDown();
-    if (result > -2 && result < 1) {
+    switch (result) {
+    case -1:
+    case 0:
         NetLeaveGame(gCurrent_net_game);
+        return eSO_continue;
+    case 1:
+        return eSO_continue;
     }
     return eSO_continue;
 }
