@@ -2771,16 +2771,16 @@ int NetSynchStartGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 // FUNCTION: CARM95 0x0045412d
 int ExitWhenReady(int* pCurrent_choice, int* pCurrent_mode) {
 
-    if (!gSynch_race_start && gProgram_state.prog_status != eProg_game_starting) {
+    if (gSynch_race_start || gProgram_state.prog_status == eProg_game_starting) {
+        *pCurrent_choice = 1;
+        return 1;
+    } else {
         if (gProgram_state.prog_status == eProg_idling) {
             *pCurrent_choice = 0;
             return 1;
         } else {
             return 0;
         }
-    } else {
-        *pCurrent_choice = 1;
-        return 1;
     }
 }
 
