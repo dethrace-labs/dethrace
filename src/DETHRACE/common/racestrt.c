@@ -1775,6 +1775,7 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
     }
     gProgram_state.parts_shop_visited = 0;
     gProgram_state.dont_load = 1;
+    default_choice = 4;
     gDeceased_image = LoadPixelmap("DECEASED.PIX");
     InitialiseFlicPanel(
         0,
@@ -1787,26 +1788,14 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
         gProgram_state.view_type = 0;
         gOpponent_index = 0;
         gStart_interface_spec = &interface_spec;
-        if (gFaded_palette || gCurrent_splash) {
-            result = DoInterfaceScreen(&interface_spec, 1, 4);
-        } else {
-            result = DoInterfaceScreen(&interface_spec, 0, 4);
-        }
+        result = DoInterfaceScreen(&interface_spec, gFaded_palette || gCurrent_splash, default_choice);
+        default_choice = 4;
 
         if (result == 0 || result == 2 || result == 3) {
             DisposeFlicPanel(0);
 
-            if (result == 2) {
-                if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
-                    DoFeatureUnavailableInDemo();
-                } else {
-                    RunFlic(192);
-                    DoPartsShop(0);
-                }
-            } else if (result == 3) {
-                RunFlic(192);
-                DoChangeCar();
-            } else if (result == 0) {
+            switch (result) {
+            case 0:
                 RunFlic(192);
                 old_current_race = gProgram_state.current_race_index;
                 DoChangeRace();
@@ -1815,6 +1804,18 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
                     SelectOpponents(&gCurrent_race);
                     LoadRaceInfo(gProgram_state.current_race_index, &gCurrent_race);
                 }
+                default_choice = 4;
+                break;
+            case 2:
+                RunFlic(192);
+                DoPartsShop(0);
+                default_choice = 4;
+                break;
+            case 3:
+                RunFlic(192);
+                DoChangeCar();
+                default_choice = 4;
+                break;
             }
             InitialiseFlicPanel(
                 0,
@@ -1830,19 +1831,19 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
     DisposeFlicPanel(0);
     *pSecond_time_around = 1;
     gProgram_state.dont_load = 0;
-    if (result >= 0) {
-        *pSecond_time_around = 1;
-        if (gProgram_state.parts_shop_visited || !PartsShopRecommended()) {
-            FadePaletteDown();
-            return eSO_continue;
-        } else {
-            RunFlic(192);
-            return DoAutoPartsShop();
-        }
-    } else {
+    if (result < 0) {
         RunFlic(192);
         gDisallow_abandon_race = 1;
         return eSO_main_menu_invoked;
+    } else {
+        *pSecond_time_around = 1;
+        if (!gProgram_state.parts_shop_visited && PartsShopRecommended()) {
+            RunFlic(192);
+            return DoAutoPartsShop();
+        } else {
+            FadePaletteDown();
+            return eSO_continue;
+        }
     }
 }
 
