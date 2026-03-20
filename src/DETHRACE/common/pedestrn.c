@@ -294,11 +294,14 @@ int PedestrianActorIsPerson(br_actor* pActor) {
 // FUNCTION: CARM95 0x00455953
 br_actor* GetPedestrianActor(int pIndex) {
 
-    if (pIndex >= 0 && pIndex < gPed_count) {
-        return gPedestrian_array[pIndex].actor;
-    } else {
-        return NULL;
+    if (pIndex >= 0) {
+        if (pIndex >= gPed_count) {
+        } else {
+            return gPedestrian_array[pIndex].actor;
+        }
     }
+
+    return NULL;
 }
 
 // IDA: br_pixelmap* __usercall GetPedestrianTexture@<EAX>(br_actor *pActor@<EAX>, int *pFlipped@<EDX>)
