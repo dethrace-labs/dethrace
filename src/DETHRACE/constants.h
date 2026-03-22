@@ -2,7 +2,6 @@
 #define CONSTANTS_H
 
 // These names are not part of the symbol dump, so the names in this file are not original, except as noted.
-#define PHYSICS_STEP_TIME 40
 
 // Names derived from DATA/64X48X8/HEADUP.TXT (and context)
 typedef enum dr_headup_slot {
@@ -903,6 +902,8 @@ enum ExceptionFlags {
 #define SHADOW_MAX_RENDER_DISTANCE 36.0f
 
 #define DOUBLESIDED_USER_FLAG (void*)12345
+
+#define PHYSICS_STEP_TIME 40
 
 // average frame time in carm95
 #define MUNGE_ENGINE_INTERVAL 50

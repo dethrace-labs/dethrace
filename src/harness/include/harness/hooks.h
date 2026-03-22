@@ -76,4 +76,8 @@ FILE* Harness_Hook_fopen(const char* pathname, const char* mode);
 // Localization
 int Harness_Hook_isalnum(int c);
 
+// Scale things based on frame time, allowing us to run physics every frame
+int Harness_Hook_ScaleProbabilityWithDt(int min_inclusive, int max_inclusive, float dt_seconds);
+int Harness_Hook_ScaleEmissionCountWithDt(float count, float dt_seconds);
+
 #endif
