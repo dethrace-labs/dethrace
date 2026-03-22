@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
@@ -614,4 +615,52 @@ int Harness_Hook_isalnum(int c) {
     }
 
     return isalnum(c);
+}
+
+// For physics-per-frame. We are calling some functions more often (like SkidNoise), so need to reduce the probability
+// that each call does something to end up with visually similar behavior
+int Harness_Hook_ScaleProbabilityWithDt(int min_inclusive, int max_inclusive, br_scalar dt_seconds) {
+    br_scalar scaled_probability;
+    br_scalar step_seconds;
+    br_scalar step_ratio;
+    int range;
+
+    range = max_inclusive - min_inclusive + 1;
+    if (range <= 0) {
+        return 0;
+    }
+    step_seconds = PHYSICS_STEP_TIME / 1000.0f;
+    step_ratio = 1.0f;
+    if (dt_seconds > 0.0f && dt_seconds < step_seconds) {
+        step_ratio = dt_seconds / step_seconds;
+    }
+    scaled_probability = step_ratio / range;
+    return (rand() / (float)RAND_MAX) < scaled_probability;
+}
+
+// For physics-per-frame. We are calling some functions more often (like CreateSparks), so need to reduce
+// the number of things that each call emits to end up with visually similar behavior
+int Harness_Hook_ScaleEmissionCountWithDt(float count, float dt_seconds) {
+    float step_ratio;
+    float scaled_count;
+    float random_unit;
+    int emission_count;
+
+    step_ratio = 1.0f;
+    if (dt_seconds > 0.0f) {
+        step_ratio = dt_seconds / (PHYSICS_STEP_TIME / 1000.0f);
+    }
+    if (step_ratio < 0.0f) {
+        step_ratio = 0.0f;
+    } else if (step_ratio > 1.0f) {
+        step_ratio = 1.0f;
+    }
+
+    scaled_count = count * step_ratio;
+    emission_count = (int)scaled_count;
+    random_unit = rand() / (float)RAND_MAX;
+    if (random_unit < scaled_count - emission_count) {
+        emission_count++;
+    }
+    return emission_count;
 }

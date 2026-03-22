@@ -145,10 +145,10 @@ br_matrix34 gSmoke_camera_to_world;
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
-#define TEST_BIT(var, pos)   (var & (1 << pos))
-#define SET_BIT(var, pos)    (var |= (1 << pos))
-#define FLIP_BIT(var, pos)   (var ^= (1 << pos))
-#define CLEAR_BIT(var, pos)  (var &= ~(1 << pos))
+#define TEST_BIT(var, pos) (var & (1 << pos))
+#define SET_BIT(var, pos) (var |= (1 << pos))
+#define FLIP_BIT(var, pos) (var ^= (1 << pos))
+#define CLEAR_BIT(var, pos) (var &= ~(1 << pos))
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
@@ -609,6 +609,9 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
     if (num > 10) {
         num = 10;
     }
+#ifdef DETHRACE_FIX_BUGS
+    num = Harness_Hook_ScaleEmissionCountWithDt(num, gDt);
+#endif
     for (i = 0; i < num; i++) {
         BrVector3Copy(&gSparks[gNext_spark].pos, pos);
         BrVector3Copy(&gSparks[gNext_spark].normal, &normal);
@@ -638,6 +641,9 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
         if (num > 10) {
             num = 10;
         }
+#ifdef DETHRACE_FIX_BUGS
+        num = Harness_Hook_ScaleEmissionCountWithDt(num, gDt);
+#endif
         for (i = 0; i < num; i++) {
             BrVector3Copy(&gSparks[gNext_spark].pos, &pos2);
             BrVector3Copy(&gSparks[gNext_spark].normal, &norm);
@@ -690,6 +696,9 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
     BrMatrix34TApplyV(pos, &normal, &c->car_master_actor->t.t.mat);
     BrMatrix34TApplyV(&normal, pForce, &c->car_master_actor->t.t.mat);
     num = (ts / 10.f) + 3;
+#ifdef DETHRACE_FIX_BUGS
+    num = Harness_Hook_ScaleEmissionCountWithDt(num, gDt);
+#endif
     for (i = 0; i < num; i++) {
         BrVector3Copy(&gSparks[gNext_spark].pos, pos);
         BrVector3SetFloat(&gSparks[gNext_spark].normal, 0.f, 0.f, 0.f);

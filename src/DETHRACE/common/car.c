@@ -15,6 +15,7 @@
 #include "globvrpb.h"
 #include "graphics.h"
 #include "harness/config.h"
+#include "harness/hooks.h"
 #include "harness/trace.h"
 #include "netgame.h"
 #include "network.h"
@@ -3429,9 +3430,15 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
     if (gCurrent_race.material_modifiers[material].tyre_noise_index == -1) {
         return;
     }
+#ifdef DETHRACE_FIX_BUGS
+    if (!Harness_Hook_ScaleProbabilityWithDt(0, 4, gDt)) {
+        return;
+    }
+#else
     if (IRandomBetween(0, 4) != 0) {
         return;
     }
+#endif
 
     last_skid_vol[i] = pV * 10.0f;
     if ((pWheel_num & 1) != 0) {
