@@ -226,6 +226,8 @@ tU32 gMechanics_time_sync;
 // GLOBAL: CARM95 0x00550748
 int gNum_cars_and_non_cars;
 
+#define PHYSICS_STEP_COUNT 5
+
 // IDA: void __usercall DamageUnit(tCar_spec *pCar@<EAX>, int pUnit_type@<EDX>, int pDamage_amount@<EBX>)
 // FUNCTION: CARM95 0x004751c0
 void DamageUnit(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
@@ -870,8 +872,7 @@ void RememberSafePosition(tCar_spec* car, tU32 pTime) {
     for (j = 0; j < 5; j++) {
         BrVector3Sub(&r, &car->car_master_actor->t.t.translate.t, (br_vector3*)car->last_safe_positions[j].m[3]);
 
-        ts = BrVector3LengthSquared(&r);
-        if (ts < 8.4015961f) {
+        if (BrVector3LengthSquared(&r) < 8.4015961f) {
             return;
         }
     }
@@ -1107,9 +1108,9 @@ void FinishCars(tU32 pLast_frame_time, tU32 pTime) {
             if (gLast_mechanics_time > pLast_frame_time && gCar_to_view == car) {
                 BrVector3Sub(&car->old_v, &car->old_v, &car->v);
 #ifdef DETHRACE_FIX_BUGS
-                BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / harness_game_config.physics_step_time);
+                BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / (gDt * 1000.0f));
 #else
-                BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / 40.f);
+                BrVector3Scale(&car->old_v, &car->old_v, (gLast_mechanics_time - pLast_frame_time) / (float)PHYSICS_STEP_TIME);
 #endif
                 BrVector3Accumulate(&car->old_v, &car->v);
                 BrVector3Normalise(&car->direction, &car->old_v);
@@ -1290,6 +1291,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
 
     step_number = 0;
     frame_end_time = last_frame_time + pTime_difference;
+
     if (gFreeze_mechanics) {
         return;
     }
@@ -1297,10 +1299,11 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
         ForceRebuildActiveCarList();
     }
     if (gLast_mechanics_time < last_frame_time) {
+        gLast_mechanics_time = PHYSICS_STEP_TIME * (last_frame_time / PHYSICS_STEP_TIME);
 #ifdef DETHRACE_FIX_BUGS
-        gLast_mechanics_time = harness_game_config.physics_step_time * (last_frame_time / harness_game_config.physics_step_time);
-#else
-        gLast_mechanics_time = 40 * (last_frame_time / 40);
+        if (harness_game_config.physics_per_frame && pTime_difference < PHYSICS_STEP_TIME) {
+            gLast_mechanics_time = last_frame_time;
+        }
 #endif
     }
     GetNonCars();
@@ -1314,16 +1317,18 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     gDoing_physics = 1;
     PrepareCars(last_frame_time);
 
+    time_step = PHYSICS_STEP_TIME;
+    gDt = PHYSICS_STEP_TIME / 1000.0f;
+
 #ifdef DETHRACE_FIX_BUGS
-    time_step = harness_game_config.physics_step_time;
-    gDt = harness_game_config.physics_step_time / 1000.0;
-#else
-    time_step = 40;
-    gDt = 40 / 1000.0;
+    if (harness_game_config.physics_per_frame && pTime_difference < PHYSICS_STEP_TIME) {
+        time_step = pTime_difference > 0 ? pTime_difference : 1;
+        gDt = time_step / 1000.0f;
+    }
 #endif
 
     gMechanics_time_sync = pTime_difference - (gLast_mechanics_time - last_frame_time);
-    while (gLast_mechanics_time < frame_end_time && step_number < 5) {
+    while (gLast_mechanics_time < frame_end_time && step_number < PHYSICS_STEP_COUNT) {
         step_number++;
         ResetOldmat();
         BrVector3Copy(&gProgram_state.current_car.old_v, &gProgram_state.current_car.v);
@@ -1452,7 +1457,8 @@ void ResetCarSpecialVolume(tCollision_info* pCar) {
     if (t < 100.0f && material != NULL) {
         mat_id = material->identifier;
         if (mat_id) {
-            if (strlen(mat_id) != 0 && (*mat_id == '!' || *mat_id == '#')) {
+            id_len = strlen(mat_id);
+            if (id_len > 0 && (*mat_id == '!' || *mat_id == '#')) {
                 new_special_volume = GetDefaultSpecialVolumeForWater();
             }
         }
@@ -1545,35 +1551,31 @@ void MoveAndCollideCar(tCar_spec* car, br_scalar dt) {
     tCollision_info* car_info;
     int wheel;
 
-    car_info = (tCollision_info*)car;
     if (car->dt >= 0.f) {
         dt = car->dt;
     }
-    if (dt == 0.f) {
-        return;
-    }
-    if (gCar_flying && &gProgram_state.current_car == car) {
-        return;
-    }
-    car->new_skidding = 0;
-    if (car->water_d != 10000.0f) {
-        TestAutoSpecialVolume(car_info);
-    }
-    MungeSpecialVolume(car_info);
-    if (car->driver >= 3) {
-        CalcEngineForce(car, dt);
-        CalcForce(car, dt);
-        DoRevs(car, dt);
-    } else {
-        CalcForce(car, dt);
-    }
-    RotateCar(car_info, dt);
-    TranslateCar(car_info, dt);
-    CollideCarWithWall(car_info, dt);
-    BrMatrix34ApplyP(&car->pos, &car->cmpos, &car->car_master_actor->t.t.mat);
-    BrVector3InvScale(&car->pos, &car->pos, WORLD_SCALE);
-    for (wheel = 0; wheel < 4; wheel++) {
-        SkidMark(car, wheel);
+    if (dt != 0.f && (!gCar_flying || &gProgram_state.current_car != car)) {
+        car_info = (tCollision_info*)car;
+        car->new_skidding = 0;
+        if (car->water_d != 10000.0f) {
+            TestAutoSpecialVolume(car_info);
+        }
+        MungeSpecialVolume(car_info);
+        if (car->driver <= eDriver_oppo) {
+            CalcForce(car, dt);
+        } else {
+            CalcEngineForce(car, dt);
+            CalcForce(car, dt);
+            DoRevs(car, dt);
+        }
+        RotateCar(car_info, dt);
+        TranslateCar(car_info, dt);
+        CollideCarWithWall(car_info, dt);
+        BrMatrix34ApplyP(&car->pos, &car->cmpos, &car->car_master_actor->t.t.mat);
+        BrVector3InvScale(&car->pos, &car->pos, WORLD_SCALE);
+        for (wheel = 0; wheel < 4; wheel++) {
+            SkidMark(car, wheel);
+        }
     }
 }
 
@@ -1584,16 +1586,16 @@ void MoveAndCollideNonCar(tNon_car_spec* non_car, br_scalar dt) {
 
     car_info = &non_car->collision_info;
     if (car_info->water_d != 10000.f) {
-        TestAutoSpecialVolume(car_info);
+        TestAutoSpecialVolume(&non_car->collision_info);
     }
-    MungeSpecialVolume(car_info);
+    MungeSpecialVolume(&non_car->collision_info);
     if (car_info->dt >= 0.f) {
         dt = car_info->dt;
     }
     NonCarCalcForce(non_car, dt);
-    RotateCar(car_info, dt);
-    TranslateCar(car_info, dt);
-    CollideCarWithWall(car_info, dt);
+    RotateCar(&non_car->collision_info, dt);
+    TranslateCar(&non_car->collision_info, dt);
+    CollideCarWithWall(&non_car->collision_info, dt);
     BrMatrix34ApplyP(&car_info->pos, &car_info->cmpos, &car_info->car_master_actor->t.t.mat);
     BrVector3InvScale(&car_info->pos, &car_info->pos, WORLD_SCALE);
 }
@@ -1606,7 +1608,8 @@ int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
     if (gCollision_detection_on__car) {
         car->collision_flag = 0;
         while (CollCheck(car, dt)) {
-            if (car->collision_flag++ > 20) {
+            car->collision_flag++;
+            if (car->collision_flag - 1 > 20) {
                 car->collision_flag = 1;
                 BrVector3Set(&car->v, 0.f, 0.f, 0.f);
                 BrVector3Set(&car->omega, 0.f, 0.f, 0.f);
@@ -1648,6 +1651,7 @@ void ToggleControls(void) {
         break;
     default:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "New controls");
+        break;
     }
 }
 
@@ -1660,26 +1664,26 @@ void ControlCar2(tCar_spec* c, br_scalar dt) {
         c->acc_force = 7.f * c->M;
     }
     if (c->keys.dec) {
-        c->acc_force = -(7.f * c->M);
+        c->acc_force = -7.f * c->M;
     }
     if (c->keys.left) {
         if (c->turn_speed < 0.f) {
             c->turn_speed = 0.f;
         }
-        if (c->curvature < 0.f) {
-            c->turn_speed += 0.01 * dt / 0.04 / 2.0;
+        if (c->curvature >= 0.f) {
+            c->turn_speed += dt / (PHYSICS_STEP_TIME / 1000.0f) * (0.05f / (5.f + BrVector3Length(&c->v)) / 2.f);
         } else {
-            c->turn_speed += dt / 0.04f * (0.05f / (5.f + BrVector3Length(&c->v))) / 2.f;
+            c->turn_speed += 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f) / 2.f;
         }
     }
     if (c->keys.right) {
         if (c->turn_speed > 0.f) {
             c->turn_speed = 0.f;
         }
-        if (c->curvature > 0.f) {
-            c->turn_speed -= 0.01 * dt / 0.04 / 2.0;
+        if (c->curvature <= 0.f) {
+            c->turn_speed -= dt / (PHYSICS_STEP_TIME / 1000.0f) * (0.05f / (5.f + BrVector3Length(&c->v)) / 2.f);
         } else {
-            c->turn_speed -= dt / 0.04f * (0.05f / (5.f + BrVector3Length(&c->v))) / 2.f;
+            c->turn_speed -= 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f) / 2.f;
         }
     }
     if (!c->keys.left && !c->keys.right) {
@@ -1702,10 +1706,10 @@ void ControlCar3(tCar_spec* c, br_scalar dt) {
         if (c->turn_speed < 0.f) {
             c->turn_speed = 0.f;
         }
-        if (c->curvature < 0.f || c->omega.v[1] < 0.f) {
-            c->turn_speed += 0.01 * dt / 0.04 / 2.0 * 3.0;
+        if (c->curvature >= 0.f && c->omega.v[1] >= 0.f) {
+            c->turn_speed += dt / (PHYSICS_STEP_TIME / 1000.0f) * (0.05f / (5.f + BrVector3Length(&c->v)) / 2.f) * 0.75f;
         } else {
-            c->turn_speed += dt / 0.04f * (0.05f / (5.f + BrVector3Length(&c->v))) / 2.f * 0.75;
+            c->turn_speed += 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f) / 2.f * 3.f;
         }
     }
 
@@ -1713,10 +1717,10 @@ void ControlCar3(tCar_spec* c, br_scalar dt) {
         if (c->turn_speed > 0.f) {
             c->turn_speed = 0.f;
         }
-        if (c->curvature > 0.f || c->omega.v[1] > 0.f) {
-            c->turn_speed -= 0.01 * dt / 0.04 / 2.0 * 3.0;
+        if (c->curvature <= 0.f && c->omega.v[1] <= 0.f) {
+            c->turn_speed -= dt / (PHYSICS_STEP_TIME / 1000.0f) * (0.05f / (5.f + BrVector3Length(&c->v)) / 2.f) * 0.75f;
         } else {
-            c->turn_speed -= dt / 0.04f * (0.05f / (5.f + BrVector3Length(&c->v))) / 2.f * 0.75;
+            c->turn_speed -= 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f) / 2.f * 3.f;
         }
     }
     if (!c->keys.left && !c->keys.right) {
@@ -1741,13 +1745,17 @@ void ControlCar4(tCar_spec* c, br_scalar dt) {
             c->turn_speed = 0.f;
         }
         if (c->velocity_car_space.v[2] > 0.f) {
-            c->turn_speed += dt * 0.01f / .04f / 2.f * 2.f;
+            c->turn_speed += dt * 0.01f / (PHYSICS_STEP_TIME / 1000.0f) / 2.f * 2.f;
         } else if ((c->curvature >= 0.f && c->omega.v[1] >= -.001f) || c->turn_speed != 0.f) {
-            c->turn_speed += dt / .04f * (0.05f / (BrVector3Length(&c->v) + 5.f)) / 2.f * .5f;
+            c->turn_speed += dt / (PHYSICS_STEP_TIME / 1000.0f) * (0.05f / (BrVector3Length(&c->v) + 5.f)) / 2.f * .5f;
         } else {
-            c->turn_speed = dt / .04f * (.05f / (BrVector3Length(&c->v) + 5.f)) * 4.f / 2.f * .5f;
+            c->turn_speed = dt / (PHYSICS_STEP_TIME / 1000.0f) * (.05f / (BrVector3Length(&c->v) + 5.f)) * 4.f / 2.f * .5f;
             if (c->omega.v[1] < -.01f) {
-                c->turn_speed -= dt * .01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * c->omega.v[1] * 2.f;
+#ifdef DETHRACE_FIX_BUGS
+                c->turn_speed -= dt * .01f / gDt / 2.f * c->omega.v[1] * 2.f;
+#else
+                c->turn_speed -= dt * .01f / (PHYSICS_STEP_TIME / 1000.f) / 2.f * c->omega.v[1] * 2.f;
+#endif
             }
         }
     }
@@ -1756,13 +1764,17 @@ void ControlCar4(tCar_spec* c, br_scalar dt) {
             c->turn_speed = 0.f;
         }
         if (c->velocity_car_space.v[2] > 0.f) {
-            c->turn_speed -= dt * .01f / .04f / 2.f * 2.f;
+            c->turn_speed -= dt * .01f / (PHYSICS_STEP_TIME / 1000.0f) / 2.f * 2.f;
         } else if ((c->curvature <= 0.f && c->omega.v[1] <= .001f) || c->turn_speed != 0.f) {
-            c->turn_speed -= dt / .04f * (.05f / (BrVector3Length(&c->v) + 5.f)) / 2.f * .5f;
+            c->turn_speed -= dt / (PHYSICS_STEP_TIME / 1000.0f) * (.05f / (BrVector3Length(&c->v) + 5.f)) / 2.f * .5f;
         } else {
-            c->turn_speed = dt / .04f * (.05f / (BrVector3Length(&c->v) + 5.f)) * -4.f / 2.f * .5f;
+            c->turn_speed = dt / (PHYSICS_STEP_TIME / 1000.0f) * (.05f / (BrVector3Length(&c->v) + 5.f)) * -4.f / 2.f * .5f;
             if (c->omega.v[1] < -.01f) {
-                c->turn_speed -= dt * .01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * c->omega.v[1] * 2.f;
+#ifdef DETHRACE_FIX_BUGS
+                c->turn_speed -= dt * .01f / gDt / 2.f * c->omega.v[1] * 2.f;
+#else
+                c->turn_speed -= dt * .01f / (PHYSICS_STEP_TIME / 1000.f) / 2.f * c->omega.v[1] * 2.f;
+#endif
             }
         }
     }
@@ -1794,37 +1806,37 @@ void ControlCar5(tCar_spec* c, br_scalar dt) {
         c->acc_force = 7.f * c->M;
     }
     if (c->keys.dec) {
-        c->acc_force = -(7.f * c->M);
+        c->acc_force = -7.f * c->M;
     }
     if (c->keys.left) {
         if (c->turn_speed < 0.f) {
             c->turn_speed = 0.f;
         }
-        if (c->curvature < 0) {
-            c->turn_speed += 0.01 * dt / 0.04 / 2.0 * 0.5;
+        if (c->curvature >= 0) {
+            c->turn_speed += dt / (PHYSICS_STEP_TIME / 1000.0f) * (0.05f / (5.f + BrVector3Length(&c->v)) / 2.f) * 0.5f;
         } else {
-            c->turn_speed += dt / 0.04f * (0.05f / (5.f + (float)sqrt(c->v.v[1] * c->v.v[1] + c->v.v[2] * c->v.v[2] + c->v.v[0] * c->v.v[0]))) / 2.f * 0.5;
+            c->turn_speed += 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f) / 2.f * .5f;
         }
     }
     if (c->keys.right) {
         if (c->turn_speed > 0.f) {
             c->turn_speed = 0.f;
         }
-        if (c->curvature > 0) {
-            c->turn_speed -= 0.01 * dt / 0.04 / 2.0 * 0.5;
+        if (c->curvature <= 0) {
+            c->turn_speed -= dt / (PHYSICS_STEP_TIME / 1000.0f) * (0.05f / (5.f + BrVector3Length(&c->v)) / 2.f) * 0.5f;
         } else {
-            c->turn_speed -= dt / 0.04f * (0.05f / (5.f + (float)sqrt(c->v.v[1] * c->v.v[1] + c->v.v[2] * c->v.v[2] + c->v.v[0] * c->v.v[0]))) / 2.f * 0.5;
+            c->turn_speed -= 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f) / 2.f * .5f;
         }
     }
     if (!c->keys.left && !c->keys.right) {
         c->turn_speed = 0.f;
         if (c->curvature < 0.f && !c->keys.holdw) {
-            c->curvature += (0.05f / (5.f + (float)sqrt(c->v.v[1] * c->v.v[1] + c->v.v[2] * c->v.v[2] + c->v.v[0] * c->v.v[0]))) * (dt / 0.04f) / 2.f * 4.0;
+            c->curvature += dt / (PHYSICS_STEP_TIME / 1000.0f) * 0.05f / (5.f + BrVector3Length(&c->v)) / 2.f * 4.f;
             if (c->curvature > 0.f) {
                 c->curvature = 0.f;
             }
         } else if (c->curvature > 0.f && !c->keys.holdw) {
-            c->curvature -= (0.05f / (5.f + (float)sqrt(c->v.v[1] * c->v.v[1] + c->v.v[2] * c->v.v[2] + c->v.v[0] * c->v.v[0]))) * (dt / 0.04f) / 2.f * 4.0;
+            c->curvature -= dt / (PHYSICS_STEP_TIME / 1000.0f) * 0.05f / (5.f + BrVector3Length(&c->v)) / 2.f * 4.f;
             if (c->curvature < 0.f) {
                 c->curvature = 0.f;
             }
@@ -1853,16 +1865,16 @@ void ControlCar1(tCar_spec* c, br_scalar dt) {
     }
     if (c->keys.left) {
         if (c->curvature >= 0.f) {
-            c->curvature += dt / 0.04f * 0.05f / (5.f + BrVector3Length(&c->v));
+            c->curvature += dt / (PHYSICS_STEP_TIME / 1000.0f) * 0.05f / (5.f + BrVector3Length(&c->v));
         } else {
-            c->curvature += 0.01f * dt / 0.04f;
+            c->curvature += 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f);
         }
     }
     if (c->keys.right) {
         if (c->curvature <= 0.f) {
-            c->curvature -= dt / 0.04f * 0.05f / (5.f + BrVector3Length(&c->v));
+            c->curvature -= dt / (PHYSICS_STEP_TIME / 1000.0f) * 0.05f / (5.f + BrVector3Length(&c->v));
         } else {
-            c->curvature -= 0.01f * dt / 0.04f;
+            c->curvature -= 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f);
         }
     }
     if (c->curvature > c->maxcurve) {
@@ -1878,9 +1890,9 @@ void ControlCar1(tCar_spec* c, br_scalar dt) {
 void setrotate(br_vector3* wdt, br_matrix34* m) {
     br_euler e;
 
-    e.a = BrRadianToAngle(wdt->v[0]);
-    e.b = BrRadianToAngle(wdt->v[1]);
-    e.c = BrRadianToAngle(wdt->v[2]);
+    e.a = BR_ANGLE_RAD(wdt->v[0]);
+    e.b = BR_ANGLE_RAD(wdt->v[1]);
+    e.c = BR_ANGLE_RAD(wdt->v[2]);
     e.order = 0;
     BrEulerToMatrix34(m, &e);
 }
@@ -1956,7 +1968,7 @@ void RotateCarFirstOrder(tCollision_info* c, br_scalar dt) {
     br_scalar e2;
     static br_scalar max_rad;
 
-    rad_rate = sqrt(c->omega.v[1] * c->omega.v[1] + c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0]);
+    rad_rate = BrVector3Length(&c->omega);
     rad = rad_rate * dt;
 
     if (rad < .0001) {
@@ -1983,11 +1995,10 @@ void SimpleRotate(tCollision_info* c, br_scalar dt) {
 
     rad_rate = BrVector3Length(&c->omega);
     BrVector3InvScale(&axis, &c->omega, rad_rate);
-    rad = dt * rad_rate;
-    if (rad < 0.0001) {
-        return;
+    rad = rad_rate * dt;
+    if (rad >= 0.0001) {
+        BrMatrix34PreRotate(&c->car_master_actor->t.t.mat, BrRadianToAngle(rad), &axis);
     }
-    BrMatrix34PreRotate(&c->car_master_actor->t.t.mat, BrRadianToAngle(rad), &axis);
 }
 
 // IDA: void __usercall RotateCar(tCollision_info *c@<EAX>, br_scalar dt)
@@ -4630,18 +4641,9 @@ void MungeCarGraphics(tU32 pFrame_period) {
                 distance_from_camera = Vector3DistanceSquared(&the_car->car_master_actor->t.t.translate.t,
                                            (br_vector3*)gCamera_to_world.m[3])
                     / gCar_simplification_factor[gGraf_spec_index][gCar_simplification_level];
-#ifdef DETHRACE_FIX_BUGS
-// This avoids out-of-bounds access when having lots of cars
-#define CAR_IS_IT_OR_FOX(CAR) (gIt_or_fox >= 0 && gNet_players[gIt_or_fox].car == (CAR))
-#else
-#define CAR_IS_IT_OR_FOX(CAR) gNet_players[gIt_or_fox].car == (CAR)
-#endif
-                if (gNet_mode != eNet_mode_none && CAR_IS_IT_OR_FOX(the_car)) {
+                if (gNet_mode != eNet_mode_none && gNet_players[gIt_or_fox].car == the_car) {
                     distance_from_camera = 0.f;
                 }
-#ifdef DETHRACE_FIX_BUGS
-#undef CAR_IS_IT_OR_FOX
-#endif
                 for (i = 0; i < the_car->car_actor_count; i++) {
                     if (the_car->car_model_actors[i].min_distance_squared <= distance_from_camera) {
                         SwitchCarActor(the_car, i);
@@ -6473,8 +6475,13 @@ int CollideTwoCarsRepeatedly(tCollision_info* car1, tCollision_info* car2, br_sc
         car1->frame_collision_flag += 256;
         car2->frame_collision_flag += 256;
         if (gNet_mode == eNet_mode_host) {
-            car1->last_car_car_collision = gLast_mechanics_time + harness_game_config.physics_step_time;
-            car2->last_car_car_collision = gLast_mechanics_time + harness_game_config.physics_step_time;
+#ifdef DETHRACE_FIX_BUGS
+            car1->last_car_car_collision = gLast_mechanics_time + (gDt * 1000.f);
+            car2->last_car_car_collision = gLast_mechanics_time + (gDt * 1000.f);
+#else
+            car1->last_car_car_collision = gLast_mechanics_time + PHYSICS_STEP_TIME;
+            car2->last_car_car_collision = gLast_mechanics_time + PHYSICS_STEP_TIME;
+#endif
         }
     }
     ResetCarsMass(car1, car2);
@@ -7079,8 +7086,13 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     }
     if (car1->min_torque_squared != 0.0f && !car1->infinite_mass && BrVector3LengthSquared(&torque1) > car1->min_torque_squared) {
         BrVector3Scale(&car1->omega, &car1->omega, gDt);
-        car1->omega.v[0] += torque1.v[0] * 0.04f;
-        car1->omega.v[2] += torque1.v[2] * 0.04f;
+#ifdef DETHRACE_FIX_BUGS
+        car1->omega.v[0] += torque1.v[0] * gDt;
+        car1->omega.v[2] += torque1.v[2] * gDt;
+#else
+        car1->omega.v[0] += torque1.v[0] * (PHYSICS_STEP_TIME / 1000.0f);
+        car1->omega.v[2] += torque1.v[2] * (PHYSICS_STEP_TIME / 1000.0f);
+#endif
         if (BrVector3LengthSquared(&car1->omega) > car1->break_off_radians_squared) {
             car1->min_torque_squared = 0.0f;
             return 1;
@@ -7089,8 +7101,13 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     }
     if (car2->min_torque_squared != 0.0f && !car2->infinite_mass && BrVector3LengthSquared(&torque2) > car2->min_torque_squared) {
         BrVector3Scale(&car2->omega, &car2->omega, gDt);
-        car2->omega.v[0] += torque2.v[0] * 0.04f;
-        car2->omega.v[2] += torque2.v[2] * 0.04f;
+#ifdef DETHRACE_FIX_BUGS
+        car2->omega.v[0] += torque2.v[0] * gDt;
+        car2->omega.v[2] += torque2.v[2] * gDt;
+#else
+        car2->omega.v[0] += torque2.v[0] * (PHYSICS_STEP_TIME / 1000.0f);
+        car2->omega.v[2] += torque2.v[2] * (PHYSICS_STEP_TIME / 1000.0f);
+#endif
         if (BrVector3LengthSquared(&car2->omega) > car2->break_off_radians_squared) {
             car2->min_torque_squared = 0.0f;
             return 1;

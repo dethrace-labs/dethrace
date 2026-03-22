@@ -1,4 +1,5 @@
 #include "harness.h"
+#include "../DETHRACE/constants.h"
 #include "ascii_tables.h"
 #include "include/harness/config.h"
 #include "include/harness/hooks.h"
@@ -43,10 +44,10 @@ static const tPlatform_bootstrap* platform_bootstraps[] = {
 #endif
 };
 
-#define safe_strcpy(DEST, SRC) \
-    do { \
+#define safe_strcpy(DEST, SRC)                \
+    do {                                      \
         strncpy((DEST), (SRC), sizeof(DEST)); \
-        (DEST)[sizeof(DEST) - 1] = '\0'; \
+        (DEST)[sizeof(DEST) - 1] = '\0';      \
     } while (0)
 
 // SplatPack or Carmageddon. This is where we represent the code differences between the two. For example, the intro smack file.
@@ -275,8 +276,10 @@ int Harness_Init(int* argc, char* argv[]) {
 
     // disable the original CD check code
     harness_game_config.enable_cd_check = 0;
-    // original physics time step. Lower values seem to work better at 30+ fps
-    harness_game_config.physics_step_time = 40;
+    // original physics updates every 40ms, causing noticable camera juddering when cornering at slow speed
+    // this setting runs physics every frame, smoothing movement out.
+    // disabled by default for now until we are happy it doesn't cause other issues
+    harness_game_config.physics_per_frame = 0;
     // limit to 60 fps by default
     harness_game_config.fps = 60;
     // do not freeze timer
@@ -379,10 +382,21 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
             LOG_INFO2("debug level set to %d", harness_debug_level);
             consumed = 1;
         } else if (strstr(argv[i], "--physics-step-time=") != NULL) {
+            // backwards compat, see `physics-per-frame`
+            int val;
             char* s = strstr(argv[i], "=");
-            harness_game_config.physics_step_time = atoi(s + 1);
-            LOG_INFO2("Physics step time set to %d", harness_game_config.physics_step_time);
+            val = atoi(s + 1);
+            harness_game_config.physics_per_frame = val < PHYSICS_STEP_TIME;
+            if (harness_game_config.physics_per_frame) {
+                LOG_INFO("Physics per frame enabled");
+            }
             consumed = 1;
+#ifdef DETHRACE_FIX_BUGS
+        } else if (strcasecmp(argv[i], "--physics-per-frame") == 0) {
+            harness_game_config.physics_per_frame = 1;
+            LOG_INFO("Physics per frame enabled");
+            consumed = 1;
+#endif
         } else if (strstr(argv[i], "--fps=") != NULL) {
             char* s = strstr(argv[i], "=");
             harness_game_config.fps = atoi(s + 1);
@@ -493,6 +507,8 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
         gSausage_override = (value[0] == '1');
     } else if (MATCH("General", "Hires")) {
         gGraf_spec_index = (value[0] == '1');
+    } else if (MATCH("General", "PhysicsPerFrame")) {
+        harness_game_config.physics_per_frame = (value[0] == '1');
     }
 
     else if (MATCH("Cheats", "EditMode")) {
@@ -522,8 +538,9 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
     else if (MATCH("Developers", "Diagnostics")) {
         harness_game_config.enable_diagnostics = (value[0] == '1');
     } else if (MATCH("Developers", "PhysicsStepTime")) {
+        // backwards compat, see `PhysicsPerFrame`
         i = atoi(value);
-        harness_game_config.physics_step_time = i;
+        harness_game_config.physics_per_frame = i < PHYSICS_STEP_TIME;
     } else if (MATCH("Developers", "InstallSignalHandler")) {
         harness_game_config.install_signalhandler = (value[0] == '1');
     }
