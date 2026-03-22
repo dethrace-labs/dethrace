@@ -2,6 +2,7 @@
 #define CONSTANTS_H
 
 // These names are not part of the symbol dump, so the names in this file are not original, except as noted.
+#define PHYSICS_STEP_TIME 40
 
 // Names derived from DATA/64X48X8/HEADUP.TXT (and context)
 typedef enum dr_headup_slot {
