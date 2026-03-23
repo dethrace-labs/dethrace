@@ -396,7 +396,7 @@ void InitPedGibs(void) {
 // FUNCTION: CARM95 0x00455a76
 void SetPedMaterialForRender(br_actor* pActor) {
     tPedestrian_data* ped;
-    int changed;
+    int changed = 0;
 
     ped = ActorToPedestrianData(pActor);
     pActor->material->colour_map = ped->colour_map;
