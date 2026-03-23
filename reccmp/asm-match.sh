@@ -9,22 +9,6 @@ arg=()
 
 if [[ $# -gt 0 ]]; then
   arg+=(--verbose "$1")
-else
-  REPORT_URL="https://raw.githubusercontent.com/dethrace-labs/reccmp-report/main/report.json"
-  REPORT_FILE="$WORKDIR/reccmp-report-main.json"
-
-  curl -fsSL -o "$REPORT_FILE" "$REPORT_URL"
-
-  if [[ -s "$WORKDIR/reccmp-report-etag-new.txt" ]]; then
-    mv -f \
-      "$WORKDIR/reccmp-report-etag-new.txt" \
-      "$WORKDIR/reccmp-report-etag.txt"
-  fi
-
-  arg+=(--html /source/reccmp-report.html)
-  arg+=(--diff /source/reccmp-report-main.json)
-  # arg+=(--svg /source/reccmp/progress.svg)
-  # arg+=(--svg-icon /source/reccmp/carma_32x32_4.png)
 fi
 
 docker run --rm --platform linux/amd64 \
