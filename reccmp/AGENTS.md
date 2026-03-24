@@ -14,14 +14,10 @@ We want to generate assembly that matches the original retail binary. Each funct
 - Don't add goto statements or goto labels
 - Don't look back at previous commits. This code has never matched, so no point in doing this.
 - Don't add code that isn't x86/x64 compatible. Don't assume a pointer is 4 bytes. The original binary is x86 only, but our recompiled code needs to work correctly on 64 bit.
-- Reversed compare order changes will generally resolve by themselves - leave these till last. They are normally not fixable.
 - Run `python3 reccmp/get_stack_slots.py [function name]` before editing so local variable slots (`[ebp-*]`) are mapped correctly.
 - Classify asm diffs before editing: compare-order-only diffs vs semantic/codegen diffs. Prioritize semantic/codegen diffs first.
 - In asm diffs, prioritize instruction presence/absence (`+`/`-` lines) before jump-target/offset changes. Jump addresses often self-correct after shape mismatches are fixed.
 - When only one semantic/codegen mismatch remains, make one minimal edit targeting that mismatch and rerun reccmp before any other refactor.
-- Do not refactor loop/control-flow shape to chase compare-order-only diffs.
-- If a trial edit decreases match percentage, revert immediately and return to the last higher-percentage version for that exact trial.
-- Do not discard an entire strategy family after one regression; test close companion variants (for example `default: return` vs `default: break` + tail return, and flat vs nested `if/else` scaffolding) before abandoning it.
 
 ## To see what assembly is different
 
@@ -36,12 +32,17 @@ Continue making changes and running the command until it shows a 100% match or y
 ## Reccmp Matching Heuristics (important)
 
 - Prefer original control-flow shape over logical cleanup/safety refactors.
+- Reversed compare-order diffs are usually not directly fixable; leave compare-order-only issues until late.
+- Do not refactor control-flow shape only to chase compare-order-only diffs.
 - If asm diff shows extra post-loop compare/jump blocks (for example `+mov`/`+cmp` after a `for` loop), avoid `break`-then-check-index patterns; try early `return` in-loop.
+- If nested conditionals only guard a single write, test a flattened boolean form (`A && B`) to remove extra compare/jump blocks.
 - Avoid `do { ... } while (0)` wrappers in target functions unless proven necessary; they often add synthetic jump blocks.
 - Do not "fix" leaks or unreachable branches in matching work. Binary-faithful behavior wins over code quality.
 - Keep odd or redundant locals and branches if they help codegen, even when logically unnecessary.
 - Treat reccmp `+` and `-` lines as assembly-shape guidance, not direct C line add/remove instructions.
 - For matching tasks, make one control-flow change at a time and rerun reccmp after each change.
+- If a trial edit decreases match percentage, revert immediately and return to the last higher-percentage version for that exact trial.
+- Do not discard an entire strategy family after one regression; test close companion variants (for example `flat` vs nested `if/else` scaffolding) before abandoning it.
 - For enum-based `switch` matching, `default:` can change jump-table targets even when behavior is equivalent.
 - A `default: break;` often creates a separate shared break block; retail may instead route missing/unhandled entries directly to function epilogue.
 - If diffs show extra or missing epilogue-adjacent blocks (`mov eax`, `pop`, `leave`, `ret`), prioritize matching return-site structure and `if/else` nesting before tuning jump targets.
