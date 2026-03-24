@@ -1230,32 +1230,29 @@ void ChangeActionTo(tPedestrian_data* pPedestrian, int pAction_index, int pRedo_
     int the_sound;
     tU32 the_pitch;
 
-    if (pAction_index == pPedestrian->current_action || pAction_index >= pPedestrian->number_of_actions) {
-        return;
-    }
-
-    pPedestrian->last_action_change = GetTotalTime();
-    pPedestrian->current_action = pAction_index;
-    pPedestrian->current_frame = -1;
-    pPedestrian->last_frame = 0;
-    pPedestrian->done_initial = 0;
-    if (pRedo_frames_etc) {
-        MungePedestrianSequence(pPedestrian, 1);
-        MungePedestrianFrames(pPedestrian);
-        MungePedModel(pPedestrian);
-    }
-    the_action = &pPedestrian->action_list[pAction_index];
-    if (!gPed_sound_disable && the_action->number_of_sounds != 0) {
-        if (pAction_index == pPedestrian->last_sound_action && GetTotalTime() - pPedestrian->last_sound_make < 4000) {
-            return;
+    if (pAction_index != pPedestrian->current_action && pPedestrian->number_of_actions > pAction_index) {
+        pPedestrian->last_action_change = GetTotalTime();
+        pPedestrian->current_action = pAction_index;
+        pPedestrian->current_frame = -1;
+        pPedestrian->last_frame = 0;
+        pPedestrian->done_initial = 0;
+        if (pRedo_frames_etc) {
+            MungePedestrianSequence(pPedestrian, 1);
+            MungePedestrianFrames(pPedestrian);
+            MungePedModel(pPedestrian);
         }
-        DRS3StopSound(pPedestrian->last_sound);
-        the_sound = the_action->sounds[IRandomBetween(0, the_action->number_of_sounds - 1)];
-        the_pitch = 65536.f / gPed_scale_factor * gZombie_factor;
-        pPedestrian->last_sound = DRS3StartSound3D(gPedestrians_outlet, the_sound, &pPedestrian->pos, &gZero_v__pedestrn, 1, 255, the_pitch, -1);
-        pPedestrian->last_sound_action = pAction_index;
-        pPedestrian->last_sound_make = GetTotalTime();
-        PipeSingleSound(gPedestrians_outlet, the_sound, 255, 0, the_pitch, &pPedestrian->pos);
+        the_action = &pPedestrian->action_list[pAction_index];
+        if (!gPed_sound_disable && the_action->number_of_sounds != 0) {
+            if (pAction_index != pPedestrian->last_sound_action || GetTotalTime() - pPedestrian->last_sound_make >= 4000) {
+                DRS3StopSound(pPedestrian->last_sound);
+                the_sound = the_action->sounds[IRandomBetween(0, the_action->number_of_sounds - 1)];
+                the_pitch = 65536.f / gPed_scale_factor * gZombie_factor;
+                pPedestrian->last_sound = DRS3StartSound3D(gPedestrians_outlet, the_sound, &pPedestrian->pos, &gZero_v__pedestrn, 1, 255, the_pitch, -1);
+                pPedestrian->last_sound_action = pAction_index;
+                pPedestrian->last_sound_make = GetTotalTime();
+                PipeSingleSound(gPedestrians_outlet, the_sound, 255, 0, the_pitch, &pPedestrian->pos);
+            }
+        }
     }
 }
 
