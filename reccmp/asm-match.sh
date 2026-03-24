@@ -9,6 +9,7 @@ arg=()
 
 if [[ $# -gt 0 ]]; then
   arg+=(--verbose "$1")
+  arg+=(--no-color)
 else
   REPORT_URL="https://raw.githubusercontent.com/dethrace-labs/reccmp-report/main/report.json"
   REPORT_FILE="$WORKDIR/reccmp-report-main.json"
