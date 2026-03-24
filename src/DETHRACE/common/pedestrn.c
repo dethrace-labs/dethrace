@@ -666,8 +666,8 @@ void MungePedGibs(tU32 pFrame_period) {
 
     StartPipingSession(ePipe_chunk_ped_gib);
     the_time = GetTotalTime();
-    for (i = 0; i < COUNT_OF(gPed_gibs); i++) {
-        the_ped_gib = &gPed_gibs[i];
+    s_frame_period = pFrame_period;
+    for (i = 0, the_ped_gib = &gPed_gibs[0]; i < COUNT_OF(gPed_gibs); i++, the_ped_gib++) {
         if (the_ped_gib->size > 0) {
             if (the_time >= the_ped_gib->end_time) {
                 the_ped_gib->size = -1;
@@ -681,14 +681,17 @@ void MungePedGibs(tU32 pFrame_period) {
                 the_ped_gib->actor->render_style = BR_RSTYLE_FACES;
                 if ((the_time / the_ped_gib->flip_period) % 2 != 0) {
                     the_ped_gib->actor->t.t.mat.m[0][0] = 1.f / pedestrian->width;
-                    the_ped_gib->actor->t.t.mat.m[1][1] = 1.f / pedestrian->height2;
                 } else {
                     the_ped_gib->actor->t.t.mat.m[0][0] = -1.f / pedestrian->width;
+                }
+                if ((the_time / the_ped_gib->flip_period) % 2 != 0) {
+                    the_ped_gib->actor->t.t.mat.m[1][1] = 1.f / pedestrian->height2;
+                } else {
                     the_ped_gib->actor->t.t.mat.m[1][1] = -1.f / pedestrian->height2;
                 }
 
-                the_ped_gib->actor->t.t.translate.t.v[X] += the_ped_gib->x_speed * pFrame_period / pedestrian->width;
-                the_ped_gib->actor->t.t.translate.t.v[Y] += the_ped_gib->y_speed * pFrame_period / pedestrian->height2;
+                the_ped_gib->actor->t.t.translate.t.v[X] += the_ped_gib->x_speed * s_frame_period / pedestrian->width;
+                the_ped_gib->actor->t.t.translate.t.v[Y] += the_ped_gib->y_speed * s_frame_period / pedestrian->height2;
                 the_ped_gib->y_speed -= gFrame_period * gGravity_multiplier * 1.420289855072464e-6;
                 AddPedGibToPipingSession(i, &the_ped_gib->actor->t.t.mat, the_ped_gib->size, the_ped_gib->gib_index, the_ped_gib->parent_index);
             }
@@ -700,20 +703,21 @@ void MungePedGibs(tU32 pFrame_period) {
                 frame = the_ped_gib->last_frame + 1;
             }
             the_ped_gib->last_frame = frame;
-            if (frame < gPed_gib_materials[0].count) {
-                the_ped_gib->actor->t.t.mat.m[0][0] = 1.f / gPedestrian_array[the_ped_gib->parent_index].width;
-                the_ped_gib->actor->t.t.mat.m[1][1] = 1.f / gPedestrian_array[the_ped_gib->parent_index].height2;
+            if (frame >= gPed_gib_materials[0].count) {
+                the_ped_gib->size = -1;
+                BrActorRemove(the_ped_gib->actor);
+                the_ped_gib->actor->parent = NULL;
+                the_ped_gib->actor->render_style = BR_RSTYLE_NONE;
+            } else {
+                pedestrian = &gPedestrian_array[the_ped_gib->parent_index];
+                the_ped_gib->actor->t.t.mat.m[0][0] = 1.f / pedestrian->width;
+                the_ped_gib->actor->t.t.mat.m[1][1] = 1.f / pedestrian->height2;
                 the_ped_gib->actor->material = gPed_gib_materials[0].materials[frame];
                 MungeModelSize(the_ped_gib->actor, gExploding_ped_scale[frame]);
                 if (frame == 1 && the_ped_gib->actor->t.t.translate.t.v[Z] == 0.01f) {
                     the_ped_gib->actor->t.t.translate.t.v[Z] = -0.01f;
                 }
                 AddPedGibToPipingSession(i, &the_ped_gib->actor->t.t.mat, the_ped_gib->size, frame, the_ped_gib->parent_index);
-            } else {
-                the_ped_gib->size = -1;
-                BrActorRemove(the_ped_gib->actor);
-                the_ped_gib->actor->parent = NULL;
-                the_ped_gib->actor->render_style = BR_RSTYLE_NONE;
             }
         }
     }
