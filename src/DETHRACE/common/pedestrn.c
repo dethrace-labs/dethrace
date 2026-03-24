@@ -959,8 +959,8 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
         if (heading_difference <= the_action->sequences[i].max_bearing) {
             the_sequence = the_action->sequences[i].sequence_index;
             if (pPedestrian->current_sequence != the_sequence) {
-                i = the_sequence;
-                sequence_ptr = &pPedestrian->sequences[i];
+                // equivalent but doesn't produce matching asm
+                sequence_ptr = &pPedestrian->sequences[the_sequence];
                 current_looping = pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start;
                 if (pAction_changed || current_looping > pPedestrian->current_frame) {
                     pPedestrian->current_frame = -1;
@@ -971,7 +971,7 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
                     pPedestrian->current_frame = pPedestrian->current_frame + sequence_ptr->looping_frame_start - current_looping - 1;
                     pPedestrian->done_initial = 1;
                 } else if (pPedestrian->current_frame >= sequence_ptr->number_of_frames) {
-                        pPedestrian->current_frame = sequence_ptr->number_of_frames - 1;
+                    pPedestrian->current_frame = sequence_ptr->number_of_frames - 1;
                 }
                 pPedestrian->last_frame = 0;
                 pPedestrian->current_sequence = the_sequence;
