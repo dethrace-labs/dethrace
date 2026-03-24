@@ -624,8 +624,8 @@ void ResetAllPedGibs(void) {
     int i;
     tPed_gib* the_ped_gib;
 
-    for (i = 0; i < COUNT_OF(gPed_gibs); i++) {
-        the_ped_gib = &gPed_gibs[i];
+    the_ped_gib = &gPed_gibs[0];
+    for (i = 0; i < COUNT_OF(gPed_gibs); i++, the_ped_gib++) {
         if (the_ped_gib->size >= 0) {
             the_ped_gib->size = -1;
             if (the_ped_gib->actor->parent != NULL) {
