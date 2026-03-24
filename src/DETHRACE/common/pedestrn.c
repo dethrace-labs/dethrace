@@ -1027,16 +1027,22 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
     int new_frame;
     tU32 the_time;
 
-    the_time = GetTotalTime();
-    f_the_time = the_time;
+    f_the_time = GetTotalTime();
+    the_time = f_the_time;
     the_sequence = &pPedestrian->sequences[pPedestrian->current_sequence];
     if (pPedestrian->done_initial) {
-        frame_offset = the_sequence->number_of_frames - the_sequence->looping_frame_start;
-        if (frame_offset == 0 && pPedestrian->current_frame < the_sequence->looping_frame_start) {
-            pPedestrian->current_frame = the_sequence->looping_frame_start - 1;
+        number_of_frames = the_sequence->number_of_frames - the_sequence->looping_frame_start;
+        if (pPedestrian->current_frame < the_sequence->looping_frame_start) {
+            if (number_of_frames == 0) {
+                pPedestrian->current_frame = the_sequence->looping_frame_start - 1;
+            } else {
+                frame_offset = 0;
+            }
         }
-    } else {
+    }
+    else {
         frame_offset = the_sequence->looping_frame_start;
+        number_of_frames = the_sequence->looping_frame_start;
     }
     switch (the_sequence->frame_rate_type) {
     case ePed_frame_fixed:
@@ -1053,16 +1059,37 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
         frame_period = 1000.f / FRandomBetween(the_sequence->frame_rate_factor1, the_sequence->frame_rate_factor2);
         break;
     default:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
         break;
     }
     if (frame_period == 0.f) {
         pPedestrian->current_frame = 0;
-    } else if (!pPedestrian->done_initial) {
-        if (f_the_time - pPedestrian->last_frame >= frame_period) {
+    } else if (pPedestrian->done_initial) {
+        if (number_of_frames != 0) {
+            if (the_time - pPedestrian->last_frame >= frame_period) {
+                if (pPedestrian->reverse_frames) {
+                    pPedestrian->current_frame--;
+                    if (pPedestrian->current_frame < 0) {
+                        pPedestrian->reverse_frames = 0;
+                        ChangeActionTo(pPedestrian, 0, 1);
+                    }
+                } else {
+                    pPedestrian->current_frame++;
+                    if (pPedestrian->last_frame == 0 || the_sequence->frame_rate_type == ePed_frame_variable) {
+                        pPedestrian->last_frame = the_time;
+                    } else {
+                        pPedestrian->last_frame += frame_period;
+                    }
+                }
+            }
+            if (pPedestrian->current_frame >= the_sequence->looping_frame_start + number_of_frames) {
+                pPedestrian->current_frame = the_sequence->looping_frame_start;
+            }
+        }
+    } else {
+        if (the_time - pPedestrian->last_frame >= frame_period) {
             if (pPedestrian->actor->parent != gDont_render_actor
                 || !pPedestrian->mid_air
-                || pPedestrian->current_frame < frame_offset - 2
+                || pPedestrian->current_frame < number_of_frames - 2
                 || (pPedestrian->current_action != pPedestrian->fatal_ground_impact_action && pPedestrian->current_action != pPedestrian->fatal_car_impact_action)) {
                 if (pPedestrian->reverse_frames) {
                     pPedestrian->current_frame--;
@@ -1092,20 +1119,12 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
                 DRS3StartSound3D(gPedestrians_outlet, pPedestrian->action_list[1].sounds[0],
                     &pPedestrian->pos, &gZero_v__pedestrn, 1, 255, gZombie_factor * 65536.f, -1);
             }
-        } else if (frame_offset <= pPedestrian->current_frame) {
+        } else if (number_of_frames <= pPedestrian->current_frame) {
             pPedestrian->done_initial = 1;
             if (the_sequence->number_of_frames == the_sequence->looping_frame_start) {
                 pPedestrian->current_frame--;
             }
-            if (pPedestrian->current_action != pPedestrian->fatal_car_impact_action) {
-                if (pPedestrian->current_action != pPedestrian->non_fatal_car_impact_action
-                    && pPedestrian->current_action != pPedestrian->non_fatal_ground_impact_action) {
-                    MungePedestrianFrames(pPedestrian);
-                } else {
-                    ChangeActionTo(pPedestrian, pPedestrian->after_impact_action, 1);
-                    MungePedestrianPath(pPedestrian, gDanger_level, &gDanger_direction);
-                }
-            } else {
+            if (pPedestrian->current_action == pPedestrian->fatal_car_impact_action) {
                 if (pPedestrian->actor->parent != gDont_render_actor) {
                     pPedestrian->actor->t.t.translate.t = pPedestrian->offset;
                 }
@@ -1114,32 +1133,17 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
                 if (pPedestrian->ref_number >= 100) {
                     KillPedestrian(pPedestrian);
                 }
+            } else if (pPedestrian->current_action == pPedestrian->non_fatal_car_impact_action
+                || pPedestrian->current_action == pPedestrian->non_fatal_ground_impact_action) {
+                ChangeActionTo(pPedestrian, pPedestrian->after_impact_action, 1);
+                MungePedestrianPath(pPedestrian, gDanger_level, &gDanger_direction);
+            } else {
+                MungePedestrianFrames(pPedestrian);
             }
             return;
         }
-    } else if (frame_offset != 0) {
-        if (f_the_time - pPedestrian->last_frame >= frame_period) {
-            if (pPedestrian->reverse_frames) {
-                pPedestrian->current_frame--;
-                if (pPedestrian->current_frame < 0) {
-                    pPedestrian->reverse_frames = 0;
-                    ChangeActionTo(pPedestrian, 0, 1);
-                }
-            } else {
-                pPedestrian->current_frame++;
-                if (pPedestrian->last_frame == 0 || the_sequence->frame_rate_type == ePed_frame_variable) {
-                    pPedestrian->last_frame = the_time;
-                } else {
-                    pPedestrian->last_frame += frame_period;
-                }
-            }
-        }
-        if (pPedestrian->current_frame >= the_sequence->looping_frame_start + frame_offset) {
-            pPedestrian->current_frame = the_sequence->looping_frame_start;
-        }
     }
-    new_frame = pPedestrian->current_frame;
-    pPedestrian->colour_map = the_sequence->frames[MAX(0, new_frame)].pixelmap;
+    pPedestrian->colour_map = the_sequence->frames[MAX(0, pPedestrian->current_frame)].pixelmap;
 }
 
 // IDA: void __usercall MungePedModel(tPedestrian_data *pPedestrian@<EAX>)
