@@ -840,8 +840,11 @@ void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
     } else {
         gLast_camera_special_volume = FindSpecialVolume((br_vector3*)pCamera_to_world->m[3], gLast_camera_special_volume);
         if (gLast_camera_special_volume != NULL) {
-            if (gLast_camera_special_volume->camera_special_effect_index == 0) {
+            switch (gLast_camera_special_volume->camera_special_effect_index) {
+            case 0:
                 DoWobbleCamera(pCamera);
+            default:
+                break;
             }
         }
     }
