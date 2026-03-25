@@ -2091,33 +2091,29 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
 // FUNCTION: CARM95 0x0045c2f0
 void SendPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
     tNet_contents* the_contents;
-    tNet_message* the_message;
+    tNet_message* the_message = NULL;
     int size_decider;
 
-    if (!gSend_peds) {
+    if (!gSend_peds
+        || (pPedestrian->ref_number >= 100 && pPedestrian->hit_points > 0)
+        || pPedestrian->sent_dead_message > 3) {
         return;
     }
-    if (pPedestrian->ref_number >= 100 && pPedestrian->hit_points >= 1) {
-        return;
-    }
-    if (pPedestrian->sent_dead_message >= 4) {
-        return;
-    }
-    if (pPedestrian->hit_points >= 0 || pPedestrian->hit_points == -100) {
-        if (Vector3AreEqual(&pPedestrian->instruction_list[pPedestrian->current_instruction].data.point_data.position, &pPedestrian->to_pos)) {
-            size_decider = 0;
-        } else {
-            size_decider = 1;
-        }
-        the_message = NULL;
-        the_contents = NetGetBroadcastContents(NETMSGID_PEDESTRIAN, size_decider);
-    } else {
+    if (pPedestrian->hit_points < 0 && pPedestrian->hit_points != -100) {
         size_decider = 2;
         if (pPedestrian->current_frame == pPedestrian->sequences[pPedestrian->current_sequence].number_of_frames - 1) {
             pPedestrian->sent_dead_message++;
         }
         the_message = NetBuildMessage(NETMSGID_PEDESTRIAN, size_decider);
         the_contents = &the_message->contents;
+    } else {
+        if (!Vector3AreEqual(&pPedestrian->instruction_list[pPedestrian->current_instruction].data.point_data.position, &pPedestrian->to_pos)) {
+            size_decider = 1;
+        } else {
+            size_decider = 0;
+        }
+        the_message = NULL;
+        the_contents = NetGetBroadcastContents(NETMSGID_PEDESTRIAN, size_decider);
     }
     the_contents->data.pedestrian.index = pIndex;
     the_contents->data.pedestrian.action_instruction = (pPedestrian->current_instruction << 4) + pPedestrian->current_action + 1;
@@ -2142,16 +2138,16 @@ void SendPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
     if (size_decider == 2) {
         the_contents->data.pedestrian.flags |= 0x40;
     }
-    the_contents->data.pedestrian.pos = pPedestrian->pos;
+    BrVector3Copy(&the_contents->data.pedestrian.pos, &pPedestrian->pos);
     the_contents->data.pedestrian.speed = pPedestrian->current_speed;
     if (size_decider != 0) {
-        the_contents->data.pedestrian.to_pos = pPedestrian->to_pos;
+        BrVector3Copy(&the_contents->data.pedestrian.to_pos, &pPedestrian->to_pos);
         if (size_decider == 2) {
             the_contents->data.pedestrian.frame = pPedestrian->current_frame;
-            the_contents->data.pedestrian.offset = pPedestrian->offset;
+            BrVector3Copy(&the_contents->data.pedestrian.offset, &pPedestrian->offset);
             the_contents->data.pedestrian.murderer = pPedestrian->murderer;
             if (pPedestrian->ref_number < 100) {
-                the_contents->data.pedestrian.respawn_time_or_spin_period = pPedestrian->spin_period;
+                the_contents->data.pedestrian.respawn_time_or_spin_period = *(tU32*)&pPedestrian->spin_period;
             } else {
                 the_contents->data.pedestrian.respawn_time_or_spin_period = pPedestrian->respawn_time;
             }
