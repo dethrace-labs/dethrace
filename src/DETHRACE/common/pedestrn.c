@@ -2413,10 +2413,11 @@ void RevivePedestrian(tPedestrian_data* pPedestrian, int pAnimate) {
     pPedestrian->hit_points = 10;
     pPedestrian->current_instruction = pPedestrian->first_instruction;
     pPedestrian->killers_ID = -1;
+    pPedestrian->murderer = -1;
     pPedestrian->fate = NULL;
     gInitial_instruction = NULL;
     PedestrianNextInstruction(pPedestrian, 0.f, 1, 0);
-    BrVector3Copy(&pPedestrian->from_pos, &pPedestrian->actor->t.t.translate.t);
+    pPedestrian->from_pos = pPedestrian->actor->t.t.translate.t;
     MungePedModel(pPedestrian);
     pPedestrian->pos.v[Y] += pPedestrian->sequences[pPedestrian->current_sequence].frames[0].offset.v[Y];
 }
