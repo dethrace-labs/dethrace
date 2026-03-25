@@ -230,14 +230,14 @@ void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int
     }
 
     gProgram_state.current_depth_effect.sky_texture = pSky_texture;
-    gHorizon_material->colour_map = pSky_texture;
+    gHorizon_material->colour_map = gProgram_state.current_depth_effect.sky_texture;
     BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
     gProgram_state.current_depth_effect.type = pType;
     gProgram_state.current_depth_effect.start = pStart;
     gProgram_state.current_depth_effect.end = pEnd;
-    gProgram_state.default_depth_effect.type = pType;
-    gProgram_state.default_depth_effect.start = pStart;
-    gProgram_state.default_depth_effect.end = pEnd;
+    gProgram_state.default_depth_effect.type = gProgram_state.current_depth_effect.type;
+    gProgram_state.default_depth_effect.start = gProgram_state.current_depth_effect.start;
+    gProgram_state.default_depth_effect.end = gProgram_state.current_depth_effect.end;
 
 #ifdef DETHRACE_3DFX_PATCH
     if (gMaterial_fogging) {
