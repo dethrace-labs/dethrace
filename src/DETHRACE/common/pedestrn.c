@@ -173,6 +173,7 @@ int gTotal_peds;
 
 // GLOBAL: CARM95 0x00550aa0
 int gPedestrian_harvest;
+
 br_vector3 gPed_pos_camera;
 
 // GLOBAL: CARM95 0x00550aa4
@@ -223,6 +224,8 @@ int gCurrent_lollipop_index;
 
 // GLOBAL: CARM95 0x00536aa8
 int gVesuvians_this_time;
+
+// GLOBAL: CARM95 0x00550a9c
 int gNumber_of_ped_gibs;
 
 // GLOBAL: CARM95 0x00536b14
@@ -2440,7 +2443,7 @@ void MungePedestrians(tU32 pFrame_period) {
     tS32 diff;
 
     gVesuvians_this_time = 0;
-    gPed_other = 32;
+    gNumber_of_ped_gibs = 32;
     camera_ptr = gCamera->type_data;
     max_distance = ACTIVE_PED_DXDZ;
     gMax_distance_squared = 121.f;
@@ -2523,7 +2526,7 @@ void MungePedestrians(tU32 pFrame_period) {
     if (gCurrent_ped_path_actor != NULL) {
         SquirtPathVertex((br_vertex*)((char*)gCurrent_ped_path_actor->model->vertices
                              + ((gCurrent_ped_path_actor->model->nvertices * 5) << 3))
-                             - 4,
+                - 4,
             gOur_pos);
         BrModelUpdate(gCurrent_ped_path_actor->model, BR_MODU_ALL);
     }
