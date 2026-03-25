@@ -33,10 +33,10 @@ void DoDemo(void) {
     }
     count = GetAnInt(f);
     gLast_demo++;
-    if (gLast_demo >= count) {
+    if (count - gLast_demo <= 0) {
         gLast_demo = 0;
     }
-    for (i = 0; i <= gLast_demo; i++) {
+    for (i = 0; i < gLast_demo + 1; i++) {
         GetALineAndDontArgue(f, s);
     }
     fclose(f);
@@ -51,22 +51,21 @@ void DoDemo(void) {
     DRSetPalette(gRender_palette);
     FadePaletteUp();
 
-    while (1) {
+    do {
         SoundService();
         start_time = PDGetTotalTime();
         frame_time = ReadS32(f);
         fread(gBack_screen->pixels, gBack_screen->height * gBack_screen->width, 1, f);
         PDScreenBufferSwap(0);
-        while (frame_time > PDGetTotalTime() - start_time && !AnyKeyDown() && !EitherMouseButtonDown()) {
-            // FIXME: sleep? SoundService?
+        while (1) {
+            if (!(frame_time > PDGetTotalTime() - start_time && AnyKeyDown() == 0 && EitherMouseButtonDown() == 0)) {
+                break;
+            }
         }
         if (!S3SoundStillPlaying(song_tag)) {
             song_tag = S3StartSound(gEffects_outlet, 10000);
         }
-        if (AnyKeyDown() || EitherMouseButtonDown() || feof(f)) {
-            break;
-        }
-    }
+    } while (!AnyKeyDown() && !EitherMouseButtonDown() && !feof(f));
     S3StopSound(song_tag);
     S3StopOutletSound(gEffects_outlet);
     S3StopAllOutletSounds();
