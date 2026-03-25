@@ -3186,17 +3186,17 @@ void WriteOutPeds(void) {
         fprintf(f, "%d\t\t\t\t// Ref num\n", the_pedestrian->ref_number);
         fprintf(f, "%d\t\t\t\t// Number of instructions\n", the_pedestrian->number_of_instructions);
         fprintf(f, "%d\t\t\t\t// Initial instruction\n\n", the_pedestrian->first_instruction + 1);
-        for (j = 0, the_instruction = the_pedestrian->instruction_list; j < the_pedestrian->number_of_instructions; j++, the_instruction++) {
+        for (j = 0, the_instruction = the_pedestrian->instruction_list; j < gPedestrian_array[i].number_of_instructions; j++, the_instruction++) {
             switch (the_instruction->type) {
-            case ePed_instruc_point:
-                fprintf(f, "\tpoint\n");
+            case ePed_instruc_xpoint:
+                fprintf(f, "\txpoint\n");
                 fprintf(f, "\t%.3f,%.3f,%.3f\n",
                     the_instruction->data.point_data.position.v[X],
                     the_instruction->data.point_data.position.v[Y],
                     the_instruction->data.point_data.position.v[Z]);
                 break;
-            case ePed_instruc_xpoint:
-                fprintf(f, "\txpoint\n");
+            case ePed_instruc_point:
+                fprintf(f, "\tpoint\n");
                 fprintf(f, "\t%.3f,%.3f,%.3f\n",
                     the_instruction->data.point_data.position.v[X],
                     the_instruction->data.point_data.position.v[Y],
@@ -3215,7 +3215,6 @@ void WriteOutPeds(void) {
                 for (k = 0, the_choice = the_instruction->data.choice_data.choices; k < the_instruction->data.choice_data.number_of_choices; k++, the_choice++) {
                     fprintf(f, "%d,%d,%d,", the_choice->danger_level, the_choice->percentage_chance, the_choice->marker_ref);
                 }
-                break;
             case ePed_instruc_dead:
                 fprintf(f, "\tdead\n");
                 fprintf(f, "%d", the_instruction->data.death_data.death_sequence);
