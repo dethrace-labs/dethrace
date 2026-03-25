@@ -248,36 +248,6 @@ void OpenDiagnostics(void) {
 // This function is stripped from the retail binary, we've guessed at the implementation
 // FUNCTION: CARM95 0x00461645
 void dr_dprintf(char* fmt_string, ...) {
-    static tU32 first_time = 0;
-    va_list args;
-    tU32 the_time;
-
-    if (harness_game_config.enable_diagnostics == 0) {
-        return;
-    }
-
-    if (gDiagnostic_file == NULL) {
-        return;
-    }
-
-    if (first_time == 0) {
-        first_time = GetTotalTime();
-    }
-    the_time = GetTotalTime() - first_time;
-
-    fprintf(gDiagnostic_file, "%7d.%02d: ", the_time / 1000, the_time % 100);
-
-    va_start(args, fmt_string);
-    vfprintf(gDiagnostic_file, fmt_string, args);
-    va_end(args);
-    fputs("\n", gDiagnostic_file);
-    fflush(gDiagnostic_file);
-
-    // Added by dethrace for debugging
-    va_start(args, fmt_string);
-    vprintf(fmt_string, args);
-    va_end(args);
-    printf("\n");
 }
 
 // IDA: int __usercall DoErrorInterface@<EAX>(int pMisc_text_index@<EAX>)
