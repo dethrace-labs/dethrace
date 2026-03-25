@@ -148,14 +148,14 @@ br_scalar CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon) {
     br_scalar trunc_k;
     int int_k;
 
-    k = pYon * 1.3f * TAU / pValue;
+    k = (br_scalar)(pYon * 1.3f) * 6.2831855f / pValue;
     int_k = (int)k;
-    if (k - int_k <= .5f) {
-        trunc_k = int_k;
+    trunc_k = int_k;
+    if (k - trunc_k > .5f) {
+        return (trunc_k + 1.f) / 6.2831855f * pValue;
     } else {
-        trunc_k = int_k + 1.f;
+        return trunc_k / 6.2831855f * pValue;
     }
-    return trunc_k / TAU * pValue;
 }
 
 // IDA: br_scalar __usercall DepthCueingShiftToDistance@<ST0>(int pShift@<EAX>)
