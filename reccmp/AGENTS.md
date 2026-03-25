@@ -50,7 +50,9 @@ Continue making changes and running the command until it shows a 100% match or y
 
 ## Aborting
 
-In some cases, a match is not possible due to compiler entropy. This is more common with floating point instructions. For example:
+- If you see any references to `harness` in the asm diff, abort immediately.
+- If you see any references to unnamed variables like <OFFSET1>, abort immediately.
+- Likely unmatchable due to compiler entropy. This is more common with floating point instructions. For example:
 
 ```
 0x404f73	fsub dword ptr [eax + ecx + 8]
@@ -70,5 +72,3 @@ In some cases, a match is not possible due to compiler entropy. This is more com
 ```
 
 We are generally unable to resolve a diff like this, so resolve the other diffs in the function, then abort.
-
-If you see any references to `harness` in the asm diff, abort immediately.
