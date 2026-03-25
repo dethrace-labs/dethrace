@@ -57,7 +57,8 @@ br_size_t DRStdioRead(void* buf, br_size_t size, unsigned int n, void* f) {
 // FUNCTION: CARM95 0x0044cfd5
 br_size_t DRStdioWrite(void* buf, br_size_t size, unsigned int n, void* f) {
     br_size_t result;
-    return gOld_file_system->write(buf, size, n, f);
+    result = gOld_file_system->write(buf, size, n, f);
+    return result;
 }
 
 // IDA: void __cdecl InstallDRFileCalls()
