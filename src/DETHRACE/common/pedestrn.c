@@ -1161,17 +1161,20 @@ void MungePedModel(tPedestrian_data* pPedestrian) {
     tCar_spec* murderer;
     br_actor* old_parent;
 
+    model_changed = 0;
     old_parent = NULL;
-    CalcPedWidthNHeight(pPedestrian, pPedestrian->colour_map, &pPedestrian->height2, &pPedestrian->width);
+    current_pixel_bastard = pPedestrian->colour_map;
+    CalcPedWidthNHeight(pPedestrian, current_pixel_bastard, &pPedestrian->height2, &pPedestrian->width);
+    vertices = pPedestrian->actor->model->vertices;
     the_frame = &pPedestrian->sequences[pPedestrian->current_sequence].frames[MAX(pPedestrian->current_frame, 0)];
-    if (pPedestrian->ref_number >= 100 && pPedestrian->current_action == pPedestrian->fatal_car_impact_action) {
+    if (pPedestrian->ref_number < 100 || pPedestrian->current_action != pPedestrian->fatal_car_impact_action) {
+        x_offset = the_frame->offset.v[X];
+        y_offset = the_frame->offset.v[Y];
+    } else {
         x_offset = the_frame->offset.v[X] * 2.0f;
         y_offset = the_frame->offset.v[Y];
         pPedestrian->height2 *= 2.0f;
         pPedestrian->width *= 2.0f;
-    } else {
-        x_offset = the_frame->offset.v[X];
-        y_offset = the_frame->offset.v[Y];
     }
     pPedestrian->flipped = the_frame->flipped;
     if (pPedestrian->actor->parent != gDont_render_actor) {
@@ -1182,24 +1185,27 @@ void MungePedModel(tPedestrian_data* pPedestrian) {
     if (pPedestrian->spin_period != 0.0f && pPedestrian->actor->model != NULL) {
         height_over2 = pPedestrian->height2 / 2.0f;
         BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat, 0.0f, -height_over2, 0.0f);
-        if (pPedestrian->spin_period >= 0.0f) {
-            temp_scalar = (float)(GetTotalTime() - pPedestrian->last_action_change) / pPedestrian->spin_period * 360.0f;
+        if (pPedestrian->spin_period < 0.0f) {
+            DRMatrix34PostRotateZ(
+                &pPedestrian->actor->t.t.mat,
+                BrDegreeToAngle((GetTotalTime() - pPedestrian->last_action_change) / pPedestrian->spin_period * 360.0 + 360.0));
         } else {
-            temp_scalar = ((float)(GetTotalTime() - pPedestrian->last_action_change) / pPedestrian->spin_period * 360.0f + 360.0f);
+            DRMatrix34PostRotateZ(
+                &pPedestrian->actor->t.t.mat,
+                BrDegreeToAngle((GetTotalTime() - pPedestrian->last_action_change) / pPedestrian->spin_period * 360.0));
         }
-        DRMatrix34PostRotateZ(&pPedestrian->actor->t.t.mat, BrDegreeToAngle(temp_scalar));
         BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat, 0.0f, height_over2, 0.0f);
     }
-    temp_scalar = FastScalarArcTan2Angle(gCamera_to_world.m[2][0], gCamera_to_world.m[2][2]);
-    DRMatrix34PostRotateY(&pPedestrian->actor->t.t.mat, temp_scalar);
+    DRMatrix34PostRotateY(&pPedestrian->actor->t.t.mat, FastScalarArcTan2Angle(gCamera_to_world.m[2][0], gCamera_to_world.m[2][2]));
     if (old_parent != NULL
         && pPedestrian->current_action == pPedestrian->fatal_car_impact_action
         && !pPedestrian->done_initial
         && pPedestrian->actor->model != NULL) {
 
         y_offset += FastScalarSin(((br_scalar)MAX(pPedestrian->current_frame, 0)
-                        / (br_scalar)(pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start - 1) * 180.0f))
+                        / (br_scalar)(pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start - 1) * 180.0))
             * pPedestrian->jump_magnitude;
+    } else {
     }
     if (old_parent != NULL) {
         BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat,
@@ -1208,17 +1214,19 @@ void MungePedModel(tPedestrian_data* pPedestrian) {
             old_parent->t.t.translate.t.v[Z]);
         BrActorRelink(old_parent, pPedestrian->actor);
         BrVector3Accumulate(&pPedestrian->actor->t.t.translate.t, &pPedestrian->offset);
-    } else if (pPedestrian->spin_period == 0.0f) {
-        BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat,
-            pPedestrian->pos.v[X] + x_offset - pPedestrian->offset.v[X],
-            pPedestrian->pos.v[Y] + y_offset - pPedestrian->offset.v[Y],
-            pPedestrian->pos.v[Z]);
-        BrVector3Set(&pPedestrian->offset, x_offset, y_offset, 0.0f);
     } else {
-        BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat,
-            pPedestrian->offset.v[X] + x_offset,
-            pPedestrian->offset.v[Y] + y_offset,
-            pPedestrian->offset.v[Z]);
+        if (pPedestrian->spin_period != 0.0f) {
+            BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat,
+                pPedestrian->offset.v[X] + x_offset,
+                pPedestrian->offset.v[Y] + y_offset,
+                pPedestrian->offset.v[Z]);
+        } else {
+            BrMatrix34PostTranslate(&pPedestrian->actor->t.t.mat,
+                pPedestrian->pos.v[X] + x_offset - pPedestrian->offset.v[X],
+                pPedestrian->pos.v[Y] + y_offset - pPedestrian->offset.v[Y],
+                pPedestrian->pos.v[Z]);
+            BrVector3Set(&pPedestrian->offset, x_offset, y_offset, 0.0f);
+        }
     }
     gCurrent_lollipop_index = AddToLollipopQueue(pPedestrian->actor, gCurrent_lollipop_index);
 }
