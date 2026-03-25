@@ -3771,21 +3771,15 @@ void DisposePedestrians(void) {
     }
     for (i = 0; i < COUNT_OF(gPed_gib_materials); i++) {
         for (j = 0; j < gPed_size_counts[i]; j++) {
-            BrMapRemove(gPed_gib_materials[i].materials[j]->colour_map);
-            BrPixelmapFree(gPed_gib_materials[i].materials[j]->colour_map);
-            gPed_gib_materials[i].materials[j]->colour_map = NULL;
-            BrMaterialRemove(gPed_gib_materials[i].materials[j]);
-            BrMaterialFree(gPed_gib_materials[i].materials[j]);
+            BrMapRemove((gPed_gib_materials + i)->materials[j * 1]->colour_map);
+            BrPixelmapFree((gPed_gib_materials + i)->materials[j * 1]->colour_map);
+            (gPed_gib_materials + i)->materials[j * 1]->colour_map = NULL;
+            BrMaterialRemove((gPed_gib_materials + i)->materials[j * 1]);
+            BrMaterialFree((gPed_gib_materials + i)->materials[j * 1]);
         }
     }
 
-    // AddPed->CreatePedestrian needs the gPedestrian array.
-    if (gPed_instruc_count != 0) {
-        AddPed();
-    }
-
-    for (i = 0; i < gPed_count; i++) {
-        the_pedestrian = &gPedestrian_array[i];
+    for (i = 0, the_pedestrian = gPedestrian_array; i < gPed_count; i++, the_pedestrian++) {
         PossibleService();
         BrActorRemove(the_pedestrian->actor);
         BrActorFree(the_pedestrian->actor);
@@ -3799,6 +3793,12 @@ void DisposePedestrians(void) {
     BrMemFree(gPedestrian_array);
     BrTableRemove(gProx_ray_shade_table);
     BrPixelmapFree(gProx_ray_shade_table);
+
+    // AddPed->CreatePedestrian needs the gPedestrian array.
+    if (gPed_instruc_count != 0) {
+        AddPed();
+    }
+
     DisposePedPaths();
 }
 
