@@ -362,7 +362,7 @@ void CreateStainlessClasses(void) {
     for (i = 129; i < 246; i++) {
         gStainless_classes[i - 129].res_class = i;
         if (!BrResClassAdd(&gStainless_classes[i - 129])) {
-            FatalError(kFatalError_OOMCarmageddon_S, gStainless_classes[i - 129].identifier);
+            FatalError(kFatalError_OOMCarmageddon_S);
         }
     }
 }
