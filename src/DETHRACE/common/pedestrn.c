@@ -3058,8 +3058,10 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
     br_model* the_model;
     br_actor* the_actor;
 
-    vertex_count = 4;
-    face_count = 2;
+    vertex_count = 0;
+    face_count = 0;
+    vertex_count += 4;
+    face_count += 2;
     for (j = 0; j < pInstruc_count; j++) {
         if (pInstructions[j].type == ePed_instruc_point || pInstructions[j].type == ePed_instruc_xpoint) {
             vertex_count += 4;
@@ -3078,25 +3080,25 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
     point_count = 0;
     for (j = 0; j < pInstruc_count; j++) {
         if (pInstructions[j].type == ePed_instruc_point || pInstructions[j].type == ePed_instruc_xpoint) {
-            BrVector3Copy(&the_point, &pInstructions[j].data.point_data.position);
-            if (the_point.v[Y] < 500.f) {
-                the_mat = gPath_mat_normal;
-            } else {
+            the_point = pInstructions[j].data.point_data.position;
+            if (the_point.v[Y] >= 500.f) {
                 the_point.v[Y] -= 999.6f;
                 the_point.v[Y] = FindYVerticallyBelow2(&the_point);
                 if (the_point.v[Y] < -100.f) {
                     the_point.v[Y] = 1000.f;
                     the_point.v[Y] = FindYVerticallyBelow2(&the_point);
                 }
-                if (point_count == 0 || pInstructions[j - 1].data.point_data.position.v[Y] < 500.f) {
-                    the_mat = gPath_mat_normal;
-                } else {
+                if (point_count != 0 && pInstructions[j - 1].data.point_data.position.v[Y] >= 500.f) {
                     the_mat = gPath_mat_calc;
+                } else {
+                    the_mat = gPath_mat_normal;
                 }
+            } else {
+                the_mat = gPath_mat_normal;
             }
             SquirtPathVertex(&the_model->vertices[vertex_count], &the_point);
             vertex_count += 4;
-            if (point_count != 0) {
+            if (point_count++ != 0) {
                 // Connect previous path vertex cross with current path vertex cross
                 the_model->faces[face_count].vertices[0] = vertex_count - 4;
                 the_model->faces[face_count].vertices[1] = vertex_count - 3;
@@ -3119,22 +3121,24 @@ br_actor* BuildPedPaths(tPedestrian_instruction* pInstructions, int pInstruc_cou
                 the_model->faces[face_count].material = the_mat;
                 face_count++;
             }
-            point_count++;
             last_vertex_count = vertex_count;
             if (j == pInit_instruc) {
                 the_model->vertices[vertex_count].p = the_point;
                 the_model->vertices[vertex_count].p.v[Y] += .3f;
                 the_model->vertices[vertex_count].p.v[Z] += .05f;
-                the_model->vertices[vertex_count + 1].p = the_point;
-                the_model->vertices[vertex_count + 1].p.v[Y] += .3f;
-                the_model->vertices[vertex_count + 1].p.v[Z] += -.05f;
-                the_model->vertices[vertex_count + 2].p = the_point;
-                the_model->vertices[vertex_count + 2].p.v[Y] += .3f;
-                the_model->vertices[vertex_count + 2].p.v[X] += .05f;
-                the_model->vertices[vertex_count + 3].p = the_point;
-                the_model->vertices[vertex_count + 3].p.v[Y] += .3f;
-                the_model->vertices[vertex_count + 3].p.v[X] += -.05f;
-                vertex_count += 4;
+                vertex_count++;
+                the_model->vertices[vertex_count].p = the_point;
+                the_model->vertices[vertex_count].p.v[Y] += .3f;
+                the_model->vertices[vertex_count].p.v[Z] -= .05f;
+                vertex_count++;
+                the_model->vertices[vertex_count].p = the_point;
+                the_model->vertices[vertex_count].p.v[Y] += .3f;
+                the_model->vertices[vertex_count].p.v[X] += .05f;
+                vertex_count++;
+                the_model->vertices[vertex_count].p = the_point;
+                the_model->vertices[vertex_count].p.v[Y] += .3f;
+                the_model->vertices[vertex_count].p.v[X] -= .05f;
+                vertex_count++;
                 the_model->faces[face_count].vertices[0] = vertex_count - 8;
                 the_model->faces[face_count].vertices[1] = vertex_count - 4;
                 the_model->faces[face_count].vertices[2] = vertex_count - 3;
