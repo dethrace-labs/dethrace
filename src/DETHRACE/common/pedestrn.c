@@ -3932,7 +3932,7 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
 // FUNCTION: CARM95 0x00460ac5
 void AdjustProxRay(int pRay_index, tU16 pCar_ID, tU16 pPed_index, tU32 pTime) {
 
-    if ((pCar_ID & 0xff00) == 0) {
+    if ((pCar_ID >> 8) == 0) {
         gProximity_rays[pRay_index].car = &gProgram_state.current_car;
     } else {
         gProximity_rays[pRay_index].car = GetCarSpec(pCar_ID >> 8, pCar_ID & 0xff);
