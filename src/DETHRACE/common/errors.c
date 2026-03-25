@@ -232,16 +232,6 @@ void CloseDiagnostics(void) {
 // This function is stripped from the retail binary, we've guessed at the implementation
 // FUNCTION: CARM95 0x0046163a
 void OpenDiagnostics(void) {
-
-    if (harness_game_config.enable_diagnostics == 0) {
-        return;
-    }
-
-    gDiagnostic_file = fopen("DIAGNOST.TXT", "w");
-
-    fputs("DIAGNOSTIC OUTPUT\n", gDiagnostic_file);
-    // todo: generate a real date
-    fprintf(gDiagnostic_file, "Date / time : %s\n\n\n", "Mon Mar 24 16 : 32 : 33 1997");
 }
 
 // Renamed from dprintf to avoid collisions to stdio
