@@ -1046,20 +1046,8 @@ int GetSkyTextureOn(void) {
 // IDA: void __usercall SetSkyTextureOn(int pOn@<EAX>)
 // FUNCTION: CARM95 0x00463a93
 void SetSkyTextureOn(int pOn) {
-    br_pixelmap* tmp;
-
     if (pOn != gSky_on) {
-        tmp = gProgram_state.current_depth_effect.sky_texture;
-        gProgram_state.current_depth_effect.sky_texture = gSwap_sky_texture;
-        gProgram_state.default_depth_effect.sky_texture = gSwap_sky_texture;
-        gSwap_sky_texture = tmp;
-
-        if (gHorizon_material) {
-            if (gSwap_sky_texture) {
-                gHorizon_material->colour_map = gSwap_sky_texture;
-                BrMaterialUpdate(gHorizon_material, -1);
-            }
-        }
+        ToggleSkyQuietly();
     }
     gSky_on = pOn;
 }
