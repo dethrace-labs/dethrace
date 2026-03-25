@@ -3737,18 +3737,15 @@ void DeletePedPath(void) {
 // IDA: void __cdecl DeletePedPoint()
 // FUNCTION: CARM95 0x0046010f
 void DeletePedPoint(void) {
-
-    if (gPed_instruc_count == 0) {
-        return;
-    }
-    if (gPed_instruc_count == 1) {
-        ScrubPedestrian();
-    } else {
-        if (gInit_ped_instruc == gPed_instruc_count) {
-            gInit_ped_instruc--;
+    if (gPed_instruc_count != 0) {
+        if (gPed_instruc_count == 1) {
+            ScrubPedestrian();
+        } else {
+            if (gPed_instruc_count-- == gInit_ped_instruc) {
+                gInit_ped_instruc--;
+            }
+            MungeShowPedPath();
         }
-        gPed_instruc_count--;
-        MungeShowPedPath();
     }
 }
 
