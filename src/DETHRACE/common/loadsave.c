@@ -738,19 +738,19 @@ int SaveGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 
     if (gTyping_slot != 0) {
         sprintf(s1, VARLZEROINT, 2, gProgram_state.rank);
-        if (gSaved_games[*pCurrent_choice] == NULL) {
-            s2[0] = '\0';
-        } else {
+        if (gSaved_games[*pCurrent_choice] != NULL) {
             sprintf(s2, VARLZEROINT, 2, gSaved_games[*pCurrent_choice]->rank);
+        } else {
+            s2[0] = '\0';
         }
         ChangeTextTo(gCurrent_graf_data->save_slot_rank_x_offset,
             gCurrent_graf_data->save_slot_y_offset + *pCurrent_choice * gCurrent_graf_data->rolling_letter_y_pitch,
             s1, s2);
         sprintf(s1, VARLZEROINT, 6, gProgram_state.credits);
-        if (gSaved_games[*pCurrent_choice] == NULL) {
-            s2[0] = '\0';
-        } else {
+        if (gSaved_games[*pCurrent_choice] != NULL) {
             sprintf(s2, VARLZEROINT, 6, gSaved_games[*pCurrent_choice]->credits);
+        } else {
+            s2[0] = '\0';
         }
         ChangeTextTo(gCurrent_graf_data->save_slot_credits_x_offset,
             gCurrent_graf_data->save_slot_y_offset + *pCurrent_choice * gCurrent_graf_data->rolling_letter_y_pitch,
