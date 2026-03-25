@@ -220,12 +220,6 @@ void NonFatalError(int pStr_index, ...) {
 // This function is stripped from the retail binary, we've guessed at the implementation
 // FUNCTION: CARM95 0x0046162f
 void CloseDiagnostics(void) {
-
-    if (harness_game_config.enable_diagnostics == 0) {
-        return;
-    }
-
-    fclose(gDiagnostic_file);
 }
 
 // IDA: void __cdecl OpenDiagnostics()
