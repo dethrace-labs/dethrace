@@ -281,17 +281,18 @@ tS3_sound_tag DRS3StartSoundNoPiping(tS3_outlet_ptr pOutlet, tS3_sound_id pSound
 // FUNCTION: CARM95 0x00464656
 tS3_sound_tag DRS3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pLVolume, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
 
-    if (!gSound_enabled) {
+    if (gSound_enabled) {
+        if (pOutlet != gMusic_outlet
+            && pSound != 1000
+            && (pSound < 3000 || pSound > 3007)
+            && (pSound < 5300 || pSound > 5320)
+            && (pLVolume || pRVolume)) {
+            PipeSingleSound(pOutlet, pSound, pLVolume, pRVolume, pPitch, 0);
+        }
+        return S3StartSound2(pOutlet, pSound, pRepeats, pLVolume, pRVolume, pPitch, pSpeed);
+    } else {
         return 0;
     }
-    if (pOutlet != gMusic_outlet
-        && pSound != 1000
-        && (pSound < 3000 || pSound > 3007)
-        && (pSound < 5300 || pSound > 5320)
-        && (pLVolume || pRVolume)) {
-        PipeSingleSound(pOutlet, pSound, pLVolume, pRVolume, pPitch, 0);
-    }
-    return S3StartSound2(pOutlet, pSound, pRepeats, pLVolume, pRVolume, pPitch, pSpeed);
 }
 
 // IDA: int __usercall DRS3ChangeVolume@<EAX>(tS3_sound_tag pSound_tag@<EAX>, tS3_volume pNew_volume@<EDX>)
