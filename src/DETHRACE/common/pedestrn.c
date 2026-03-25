@@ -1273,49 +1273,52 @@ int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
     if (pPedestrian->current_action == pPedestrian->fatal_car_impact_action
         || pPedestrian->current_action == pPedestrian->non_fatal_car_impact_action
         || pPedestrian->current_action == pPedestrian->fatal_ground_impact_action
-        || pPedestrian->current_action == pPedestrian->non_fatal_car_impact_action
+        || pPedestrian->current_action == pPedestrian->non_fatal_ground_impact_action
         || pPedestrian->current_action == pPedestrian->giblets_action
         || pPedestrian->mid_air) {
         return 0;
     }
     time_diff = GetTotalTime() - pPedestrian->last_action_change;
+    if (pPedestrian->current_action_mode < 0) {
+        most_dangerous = -1.f;
+#if defined(DETHRACE_FIX_BUGS)
+        start_index = 0;
+        end_index = 0;
+#endif
+        for (i = 0; i < pPedestrian->number_of_actions; i++) {
+            if (pPedestrian->action_list[i].danger_level < 999.f
+                && pPedestrian->action_list[i].danger_level <= pDanger_level
+                && pPedestrian->action_list[i].reaction_time <= time_diff
+                && (gFlag_waving_bastard != pPedestrian || pPedestrian->current_action != 7 || pPedestrian->action_list[i].danger_level != 0.f)) {
+                if (pPedestrian->action_list[i].danger_level > most_dangerous) {
+                    most_dangerous = pPedestrian->action_list[i].danger_level;
+                    start_index = i;
+                    end_index = i;
+                } else if (pPedestrian->action_list[i].danger_level == most_dangerous) {
+                    end_index = i;
+                }
+            }
+        }
+        if (most_dangerous > -1.f) {
+            chance_value = FRandomBetween(0.f, 99.f);
+            choice = start_index;
+            for (i = start_index; i <= end_index; i++) {
+                chance_value -= pPedestrian->action_list[i].percentage_chance;
+                if (chance_value < 0.f) {
+                    choice = i;
+                    break;
+                }
+            }
+            ChangeActionTo(pPedestrian, choice, 1);
+            return 1;
+        }
+        return 0;
+    }
     if (pPedestrian->current_action_mode >= 0) {
         ChangeActionTo(pPedestrian, pPedestrian->current_action_mode, 0);
         return 1;
     }
-    most_dangerous = -1.f;
-#if defined(DETHRACE_FIX_BUGS)
-    start_index = 0;
-    end_index = 0;
-#endif
-    for (i = 0; i < pPedestrian->number_of_actions; i++) {
-        if (pPedestrian->action_list[i].danger_level < 999.f
-            && pPedestrian->action_list[i].danger_level <= pDanger_level
-            && pPedestrian->action_list[i].reaction_time <= time_diff
-            && (gFlag_waving_bastard != pPedestrian || pPedestrian->current_action != 7 || pPedestrian->action_list[i].danger_level != 0.f)) {
-            if (pPedestrian->action_list[i].danger_level > most_dangerous) {
-                most_dangerous = pPedestrian->action_list[i].danger_level;
-                start_index = i;
-                end_index = i;
-            } else if (pPedestrian->action_list[i].danger_level == most_dangerous) {
-                end_index = i;
-            }
-        }
-    }
-    if (most_dangerous <= -1.f) {
-        return 0;
-    }
-    chance_value = FRandomBetween(0.f, 99.f);
-    choice = start_index;
-    for (i = start_index; i <= end_index; i++) {
-        chance_value -= pPedestrian->action_list[i].percentage_chance;
-        if (chance_value < 0.f) {
-            choice = i;
-            break;
-        }
-    }
-    ChangeActionTo(pPedestrian, choice, 1);
-    return 1;
+    return 0;
 }
 
 // IDA: void __cdecl MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo()
