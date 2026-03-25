@@ -3610,6 +3610,7 @@ void GetPedPos(int* pPed_index, int* pPoint_index) {
 
     min_distance = BR_SCALAR_MAX;
     for (i = 0; i < gPed_count; i++) {
+        point_count = 0;
         for (j = 0; j < gPedestrian_array[i].number_of_instructions; j++) {
             if (gPedestrian_array[i].instruction_list[j].type == ePed_instruc_point || gPedestrian_array[i].instruction_list[j].type == ePed_instruc_xpoint) {
                 the_point = gPedestrian_array[i].instruction_list[j].data.point_data.position;
@@ -3623,12 +3624,12 @@ void GetPedPos(int* pPed_index, int* pPoint_index) {
                 }
                 the_distance = Vector3DistanceSquared(&the_point, gOur_pos);
                 if (the_distance < min_distance) {
+                    min_distance = the_distance;
                     *pPed_index = i;
                     *pPoint_index = j;
-                    min_distance = the_distance;
                 }
             }
-            // last_point = the_point;
+            last_point = the_point;
         }
     }
 }
