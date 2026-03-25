@@ -298,10 +298,11 @@ tS3_sound_tag DRS3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_r
 // FUNCTION: CARM95 0x00464724
 int DRS3ChangeVolume(tS3_sound_tag pSound_tag, tS3_volume pNew_volume) {
 
-    if (gSound_enabled == 0) {
+    if (gSound_enabled != 0) {
+        return S3ChangeVolume(pSound_tag, pNew_volume);
+    } else {
         return 0;
     }
-    return S3ChangeVolume(pSound_tag, pNew_volume);
 }
 
 // IDA: int __usercall DRS3ChangeLRVolume@<EAX>(tS3_sound_tag pSound_tag@<EAX>, tS3_volume pNew_Lvolume@<EDX>, tS3_volume pNew_Rvolume@<EBX>)
