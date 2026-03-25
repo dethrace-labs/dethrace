@@ -409,8 +409,6 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     int j;
     tU8 temp;
 
-#define PTABLE_PIXEL_AT(X, Y) ((tU8*)((*pTable)->pixels))[(X) + (Y) * (*pTable)->row_bytes]
-
     PathCat(the_path, gApplication_path, "SHADETAB");
     PathCat(the_path, the_path, pName);
     *pTable = DRPixelmapLoad(the_path);
@@ -420,13 +418,12 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     *pPower = Log2((*pTable)->height);
     for (i = 0; i < (*pTable)->width; i++) {
         for (j = 0; j < (*pTable)->height / 2; j++) {
-            temp = PTABLE_PIXEL_AT(i, j);
-            PTABLE_PIXEL_AT(i, j) = PTABLE_PIXEL_AT(i, ((*pTable)->height - j - 1));
-            PTABLE_PIXEL_AT(i, ((*pTable)->height - j - 1)) = temp;
+            temp = *((tU8*)(*pTable)->pixels + (*pTable)->row_bytes * j + i);
+            *((tU8*)(*pTable)->pixels + (*pTable)->row_bytes * j + i) =
+                *((tU8*)(*pTable)->pixels + (*pTable)->row_bytes * ((*pTable)->height - j - 1) + i);
+            *((tU8*)(*pTable)->pixels + (*pTable)->row_bytes * ((*pTable)->height - j - 1) + i) = temp;
         }
     }
-
-#undef PTABLE_PIXEL_AT
 }
 
 // IDA: void __cdecl InitDepthEffects()
