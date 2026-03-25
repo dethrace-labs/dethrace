@@ -2217,9 +2217,12 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
         MungePedestrianFrames(pPedestrian);
         if (pPedestrian->ref_number < 100) {
             MungePedestrianPath(pPedestrian, gDanger_level, &gDanger_direction);
-            if (Vector3AreEqual(&pPedestrian->pos, &old_pos)
-                && (gReally_stupid_ped_bug_enable || (pPedestrian->actor->parent == gDont_render_actor && pPedestrian->done_initial && pPedestrian->sequences[pPedestrian->current_sequence].frame_rate_type == ePed_frame_speed))) {
-                ChangeActionTo(pPedestrian, 0, 0);
+            if (old_pos.v[X] == pPedestrian->pos.v[X]
+                && old_pos.v[Y] == pPedestrian->pos.v[Y]
+                && pPedestrian->pos.v[Z] == old_pos.v[Z]) {
+                if (gReally_stupid_ped_bug_enable || (pPedestrian->actor->parent == gDont_render_actor && pPedestrian->done_initial && pPedestrian->sequences[pPedestrian->current_sequence].frame_rate_type == ePed_frame_speed)) {
+                    ChangeActionTo(pPedestrian, 0, 0);
+                }
             }
         }
         MungePedModel(pPedestrian);
@@ -2239,14 +2242,17 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
                 pPedestrian->jump_magnitude,
                 &pPedestrian->offset);
         }
-        if (gNet_mode != eNet_mode_none && !pPedestrian->reverse_frames
-            && !(Vector3AreEqual(&pPedestrian->pos, &old_pos)
-                && pPedestrian->current_speed == start_speed
-                && pPedestrian->current_instruction == start_ins
-                && pPedestrian->current_action == start_act
-                && pPedestrian->hit_points == start_hp
-                && pPedestrian->instruction_direction == start_ins_dir)) {
-            SendPedestrian(pPedestrian, pIndex);
+        if (gNet_mode != eNet_mode_none && !pPedestrian->reverse_frames) {
+            if (old_pos.v[X] != pPedestrian->pos.v[X]
+                || old_pos.v[Y] != pPedestrian->pos.v[Y]
+                || pPedestrian->pos.v[Z] != old_pos.v[Z]
+                || pPedestrian->current_speed != start_speed
+                || pPedestrian->current_instruction != start_ins
+                || pPedestrian->current_action != start_act
+                || pPedestrian->hit_points != start_hp
+                || pPedestrian->instruction_direction != start_ins_dir) {
+                SendPedestrian(pPedestrian, pIndex);
+            }
         }
     }
 }
