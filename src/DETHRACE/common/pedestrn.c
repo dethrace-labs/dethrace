@@ -505,30 +505,30 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
     }
 
     the_time = GetTotalTime();
-    size_threshold = COUNT_OF(gMin_ped_gib_speeds) - 1;
+    next_gib_index = 0;
+    the_ped_gib = &gPed_gibs[0];
+    max_size = COUNT_OF(gMin_ped_gib_speeds) - 1;
     for (i = 1; i < COUNT_OF(gMin_ped_gib_speeds); i++) {
         if (gMin_ped_gib_speeds[i] <= pSplattitudinalitude) {
-            size_threshold = i;
+            max_size = i;
             break;
         }
     }
     if (gExploding_pedestrians) {
-        size_threshold = 1;
-    } else if (size_threshold == 1 && (!pAllow_explosion || !PercentageChance(50))) {
-        size_threshold = 2;
+        max_size = 1;
+    } else if (max_size == 1 && (!pAllow_explosion || !PercentageChance(50))) {
+        max_size = 2;
     }
     gib_count = pSplattitudinalitude * 10000.f;
     if (gib_count > 15) {
         gib_count = 15;
     }
-    gib_index = 0;
-    the_ped_gib = &gPed_gibs[gib_index];
-    if (size_threshold == 1) {
+    if (max_size == 1) {
         while (the_ped_gib->size >= 0) {
-            gib_index++;
             the_ped_gib++;
-            if (gib_index >= COUNT_OF(gPed_gibs)) {
-                return 0;
+            next_gib_index++;
+            if (next_gib_index >= COUNT_OF(gPed_gibs)) {
+                return exploded;
             }
         }
         if (pPedestrian->number_of_exploding_sounds != 0) {
@@ -563,20 +563,20 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
         exploded = 1;
     }
     current_size = 4;
-    j = 0;
+    size_threshold = 0;
     for (i = 0; i < gib_count; i++) {
         while (the_ped_gib->size >= 0) {
-            gib_index++;
             the_ped_gib++;
-            if (gib_index >= COUNT_OF(gPed_gibs)) {
+            next_gib_index++;
+            if (next_gib_index >= COUNT_OF(gPed_gibs)) {
                 return exploded;
             }
         }
-        if (j <= i && size_threshold < current_size && current_size > 1) {
+        if (size_threshold <= i && max_size < current_size && current_size > 1) {
             current_size--;
-            j += gib_count * gPed_gib_distrib[current_size];
-            min_speed = gPed_gib_speeds[current_size] * pSplattitudinalitude * .003f + .00005f;
-            max_speed = gPed_gib_speeds[current_size] * pSplattitudinalitude * .2f + .00030f;
+            size_threshold += gib_count * gPed_gib_distrib[current_size];
+            min_speed = gPed_gib_speeds[current_size] * pSplattitudinalitude * .003 + .00005;
+            max_speed = gPed_gib_speeds[current_size] * pSplattitudinalitude * .2 + .00030;
         }
         the_ped_gib->size = current_size;
         the_ped_gib->start_time = the_time + 150;
@@ -598,11 +598,11 @@ int BurstPedestrian(tPedestrian_data* pPedestrian, float pSplattitudinalitude, i
         BrMatrix34Identity(&the_ped_gib->actor->t.t.mat);
         the_ped_gib->actor->t.t.translate.t.v[Y] += pPedestrian->actor->t.t.mat.m[1][1] / (pPedestrian->height2 * 2.f);
         do {
-            next_gib_index = IRandomBetween(0, gPed_gib_materials[the_ped_gib->size].count - 1);
-        } while (gPed_gib_maxes[the_ped_gib->size][next_gib_index] <= gPed_gib_counts[the_ped_gib->size][next_gib_index]);
-        gPed_gib_counts[the_ped_gib->size][next_gib_index]++;
-        the_ped_gib->actor->material = gPed_gib_materials[the_ped_gib->size].materials[next_gib_index];
-        the_ped_gib->gib_index = next_gib_index;
+            gib_index = IRandomBetween(0, gPed_gib_materials[the_ped_gib->size].count - 1);
+        } while (gPed_gib_counts[the_ped_gib->size][gib_index] >= gPed_gib_maxes[the_ped_gib->size][gib_index]);
+        gPed_gib_counts[the_ped_gib->size][gib_index]++;
+        the_ped_gib->actor->material = gPed_gib_materials[the_ped_gib->size].materials[gib_index];
+        the_ped_gib->gib_index = gib_index;
         the_ped_gib->parent_index = GET_PEDESTRIAN_INDEX(pPedestrian);
         MungeModelSize(the_ped_gib->actor, .0023f);
     }
