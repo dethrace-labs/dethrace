@@ -334,10 +334,11 @@ int DRS3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
 // FUNCTION: CARM95 0x00464845
 int DRS3StopSound(tS3_sound_tag pSound_tag) {
 
-    if (!gSound_enabled) {
+    if (gSound_enabled) {
+        return S3StopSound(pSound_tag);
+    } else {
         return 0;
     }
-    return S3StopSound(pSound_tag);
 }
 
 // IDA: int __usercall DRS3LoadSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)
