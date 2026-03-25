@@ -1019,6 +1019,10 @@ void DecreaseAngle(void) {
 void ToggleDepthMode(void) {
 
     switch (gProgram_state.current_depth_effect.type) {
+    case eDepth_effect_fog:
+        InstantDepthChange(eDepth_effect_none, gProgram_state.current_depth_effect.sky_texture, 0, 0);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Depth effects disabled");
+        break;
     case eDepth_effect_none:
         InstantDepthChange(eDepth_effect_darkness, gProgram_state.current_depth_effect.sky_texture, 8, 0);
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Darkness mode");
@@ -1027,10 +1031,6 @@ void ToggleDepthMode(void) {
         InstantDepthChange(eDepth_effect_none, gProgram_state.current_depth_effect.sky_texture, 0, 0);
         InstantDepthChange(eDepth_effect_fog, gProgram_state.current_depth_effect.sky_texture, 10, 0);
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Fog mode");
-        break;
-    case eDepth_effect_fog:
-        InstantDepthChange(eDepth_effect_none, gProgram_state.current_depth_effect.sky_texture, 0, 0);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Depth effects disabled");
         break;
     }
     gProgram_state.default_depth_effect.type = gProgram_state.current_depth_effect.type;
