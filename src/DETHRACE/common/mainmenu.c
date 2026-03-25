@@ -409,31 +409,35 @@ tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
     result = DoMainMenuInterface(pTime_out, pContinue_allowed);
     if (result < 0) {
         return eMM_timeout;
-    }
-    if (gProgram_state.prog_status == eProg_game_starting) {
-        return eMM_continue;
-    }
-    switch (result) {
-    case 1:
-        return eMM_end_game;
-    case 2:
-        return eMM_save;
-    case 3:
-        return eMM_loaded;
-    case 4:
-        return eMM_1_start;
-    case 5:
-        return eMM_n_start;
-    case 6:
-        return eMM_options;
-    case 7:
-        return eMM_quit;
-    case 8:
-        return eMM_recover;
-    case 9:
-        return eMM_abort_race;
-    default:
-        return eMM_continue;
+    } else {
+        if (gProgram_state.prog_status == eProg_game_starting) {
+            return eMM_continue;
+        } else {
+            switch (result) {
+            case 0:
+                return eMM_continue;
+            case 1:
+                return eMM_end_game;
+            case 2:
+                return eMM_save;
+            case 3:
+                return eMM_loaded;
+            case 4:
+                return eMM_1_start;
+            case 5:
+                return eMM_n_start;
+            case 6:
+                return eMM_options;
+            case 7:
+                return eMM_quit;
+            case 8:
+                return eMM_recover;
+            case 9:
+                return eMM_abort_race;
+            default:
+                return eMM_continue;
+            }
+        }
     }
 }
 
