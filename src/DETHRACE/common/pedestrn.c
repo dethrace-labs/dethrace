@@ -1516,16 +1516,15 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
     for (i = 0; i < gNum_active_cars; i++) {
         car = gActive_car_list[i];
         if (car->driver == eDriver_local_human) {
-            camera_view_angle = FastScalarArcTan2(ped_pos->v[X] - gCamera_to_world.m[3][X], ped_pos->v[Z] - gCamera_to_world.m[3][Z]);
-            pPedestrian->car_to_ped = camera_view_angle;
+            pPedestrian->car_to_ped = FastScalarArcTan2(ped_pos->v[X] - gCamera_to_world.m[3][X], ped_pos->v[Z] - gCamera_to_world.m[3][Z]);
         }
         if (gBlind_pedestrians) {
-            return car->keys.horn ? 100.f : 0.f;
+            return car->keys.horn ? 100 : 0;
         }
-        distance_squared = (ped_pos->v[X] - car->pos.v[X]) * (ped_pos->v[X] - car->pos.v[X])
-            + 10.f * (ped_pos->v[Y] - car->pos.v[Y]) * 10.f * (ped_pos->v[Y] - car->pos.v[Y])
-            + (ped_pos->v[Z] - car->pos.v[Z]) * (ped_pos->v[Z] - car->pos.v[Z]);
-        if (distance_squared < gMax_distance_squared) {
+        if ((distance_squared = (ped_pos->v[X] - car->pos.v[X]) * (ped_pos->v[X] - car->pos.v[X])
+                 + (10.f * (ped_pos->v[Y] - car->pos.v[Y])) * (10.f * (ped_pos->v[Y] - car->pos.v[Y]))
+                 + (ped_pos->v[Z] - car->pos.v[Z]) * (ped_pos->v[Z] - car->pos.v[Z]))
+            < gMax_distance_squared) {
             car_movement_angle = FastScalarArcTan2(car->direction.v[X], car->direction.v[Z]);
             car_to_pedestrian_angle = FastScalarArcTan2(ped_pos->v[X] - car->pos.v[X], ped_pos->v[Z] - car->pos.v[Z]);
             if (car_to_pedestrian_angle > car_movement_angle) {
@@ -1539,7 +1538,7 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
                 if (car->keys.horn) {
                     this_danger = 10.f / distance_squared;
                 } else {
-                    if (car->speed != 0.f) {
+                    if (fabs(car->speed) != 0.f) {
                         this_danger = 30.f - heading_difference + 5.f;
                     } else {
                         this_danger = 5.f;
