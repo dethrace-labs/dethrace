@@ -2194,7 +2194,9 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
         } else {
             pPedestrian->current_frame = old_frame;
         }
-        pPedestrian->colour_map = pPedestrian->sequences[MAX(pPedestrian->current_sequence, 0)].frames[MAX(pPedestrian->current_frame, 0)].pixelmap;
+        pPedestrian->colour_map = ((tPedestrian_sequence*)((char*)pPedestrian->sequences + (pPedestrian->current_sequence > 0 ? pPedestrian->current_sequence : 0) * sizeof(tPedestrian_sequence)))
+                                      ->frames[pPedestrian->current_frame > 0 ? pPedestrian->current_frame : 0]
+                                      .pixelmap;
         gCurrent_lollipop_index = -1;
         MungePedModel(pPedestrian);
     } else {
@@ -2219,7 +2221,7 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
             MungePedestrianPath(pPedestrian, gDanger_level, &gDanger_direction);
             if (old_pos.v[X] == pPedestrian->pos.v[X]
                 && old_pos.v[Y] == pPedestrian->pos.v[Y]
-                && pPedestrian->pos.v[Z] == old_pos.v[Z]) {
+                && old_pos.v[Z] == pPedestrian->pos.v[Z]) {
                 if (gReally_stupid_ped_bug_enable || (pPedestrian->actor->parent == gDont_render_actor && pPedestrian->done_initial && pPedestrian->sequences[pPedestrian->current_sequence].frame_rate_type == ePed_frame_speed)) {
                     ChangeActionTo(pPedestrian, 0, 0);
                 }
@@ -2245,7 +2247,7 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
         if (gNet_mode != eNet_mode_none && !pPedestrian->reverse_frames) {
             if (old_pos.v[X] != pPedestrian->pos.v[X]
                 || old_pos.v[Y] != pPedestrian->pos.v[Y]
-                || pPedestrian->pos.v[Z] != old_pos.v[Z]
+                || old_pos.v[Z] != pPedestrian->pos.v[Z]
                 || pPedestrian->current_speed != start_speed
                 || pPedestrian->current_instruction != start_ins
                 || pPedestrian->current_action != start_act
