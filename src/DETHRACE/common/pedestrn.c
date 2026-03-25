@@ -2476,7 +2476,9 @@ void MungePedestrians(tU32 pFrame_period) {
     tS32 diff;
 
     gVesuvians_this_time = 0;
-    // dword_550A9C = 32;
+    gPed_other = 32;
+    camera_ptr = gCamera->type_data;
+    max_distance = ACTIVE_PED_DXDZ;
     gMax_distance_squared = 121.f;
     if (!gAction_replay_mode) {
         MungePedGibs(pFrame_period);
@@ -2488,54 +2490,65 @@ void MungePedestrians(tU32 pFrame_period) {
     if (gSend_peds) {
         gLast_ped_message_send = PDGetTotalTime();
     }
-    // BrVector3(&br_vector3_00550ac0, 0.f, 0.f, 0.f);
+    BrVector3Set(&gCamera_direction, 0.f, 0.f, 0.f);
+    if (gProgram_state.mirror_on
+        && gProgram_state.cockpit_on
+        && gProgram_state.cockpit_image_index >= 0
+        && gProgram_state.which_view == eView_forward) {
+        mirror_on = 1;
+    } else {
+        mirror_on = 0;
+    }
     if (gAction_replay_mode) {
-        for (i = 0; i < gPed_count; i++) {
-            the_pedestrian = &gPedestrian_array[i];
-            x_delta = fabs(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
-            z_delta = fabs(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
-            if ((the_pedestrian->actor->parent != gDont_render_actor || (x_delta <= ACTIVE_PED_DXDZ && z_delta <= ACTIVE_PED_DXDZ))
-                && (gPedestrians_on || the_pedestrian->ref_number >= 100)
+        for (i = 0, the_pedestrian = gPedestrian_array; i < gPed_count; i++, the_pedestrian++) {
+            if (the_pedestrian->actor->parent == gDont_render_actor
+                && (fabs(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]) > max_distance
+                    || fabs(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]) > max_distance)) {
+                continue;
+            }
+            if ((gPedestrians_on || the_pedestrian->ref_number >= 100)
                 && the_pedestrian->hit_points != -100) {
                 gCurrent_lollipop_index = -1;
                 DoPedestrian(the_pedestrian, i);
             }
         }
     } else {
-        for (i = 0; i < gPed_count; i++) {
-            the_pedestrian = &gPedestrian_array[i];
-            x_delta = fabs(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
-            z_delta = fabs(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
+        for (i = 0, the_pedestrian = gPedestrian_array; i < gPed_count; i++, the_pedestrian++) {
             if (the_pedestrian->actor->parent == gDont_render_actor
-                && (x_delta > ACTIVE_PED_DXDZ || z_delta > ACTIVE_PED_DXDZ)) {
+                && (fabs(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]) > max_distance
+                    || fabs(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]) > max_distance)) {
                 the_pedestrian->active = 0;
-            } else if (the_pedestrian->hit_points == -100) {
-                if (the_pedestrian->respawn_time == 0) {
+                continue;
+            }
+            if (the_pedestrian->hit_points != -100) {
+                if (gPedestrians_on || the_pedestrian->ref_number >= 100) {
+                    if (the_pedestrian->mid_air && !the_pedestrian->active) {
+                        GroundPedestrian(the_pedestrian);
+                    } else {
+                        gCurrent_lollipop_index = -1;
+                        DoPedestrian(the_pedestrian, i);
+                    }
+                } else {
                     if (the_pedestrian->mid_air || the_pedestrian->actor->parent != gDont_render_actor) {
                         KillPedestrian(the_pedestrian);
                     }
                     the_pedestrian->active = 0;
-                } else {
-                    diff = GetRaceTime() - the_pedestrian->respawn_time;
-                    if (diff >= 0) {
-                        RevivePedestrian(the_pedestrian, diff < 1000);
-                    } else {
-                        if (the_pedestrian->mid_air || the_pedestrian->actor->parent != gDont_render_actor) {
-                            KillPedestrian(the_pedestrian);
-                        }
-                        the_pedestrian->active = 0;
-                    }
                 }
-            } else if (!gPedestrians_on && the_pedestrian->ref_number < 100) {
+            } else if (the_pedestrian->respawn_time != 0) {
+                diff = GetRaceTime() - the_pedestrian->respawn_time;
+                if (diff >= 0) {
+                    RevivePedestrian(the_pedestrian, diff < 1000);
+                } else {
+                    if (the_pedestrian->mid_air || the_pedestrian->actor->parent != gDont_render_actor) {
+                        KillPedestrian(the_pedestrian);
+                    }
+                    the_pedestrian->active = 0;
+                }
+            } else {
                 if (the_pedestrian->mid_air || the_pedestrian->actor->parent != gDont_render_actor) {
                     KillPedestrian(the_pedestrian);
                 }
                 the_pedestrian->active = 0;
-            } else if (!the_pedestrian->mid_air || the_pedestrian->active) {
-                gCurrent_lollipop_index = -1;
-                DoPedestrian(the_pedestrian, i);
-            } else {
-                GroundPedestrian(the_pedestrian);
             }
         }
     }
@@ -2544,7 +2557,9 @@ void MungePedestrians(tU32 pFrame_period) {
     }
     gVesuvians_last_time = gVesuvians_this_time;
     if (gCurrent_ped_path_actor != NULL) {
-        SquirtPathVertex(&gCurrent_ped_path_actor->model->vertices[gCurrent_ped_path_actor->model->nvertices - 4],
+        SquirtPathVertex((br_vertex*)((char*)gCurrent_ped_path_actor->model->vertices
+                             + ((gCurrent_ped_path_actor->model->nvertices * 5) << 3))
+                             - 4,
             gOur_pos);
         BrModelUpdate(gCurrent_ped_path_actor->model, BR_MODU_ALL);
     }
