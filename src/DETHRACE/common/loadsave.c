@@ -668,10 +668,10 @@ void MakeSavedGame(tSave_game** pSave_record) {
     (*pSave_record)->frank_or_annitude = gProgram_state.frank_or_anniness;
     (*pSave_record)->game_completed = gProgram_state.game_completed;
     (*pSave_record)->current_race_index = gProgram_state.current_race_index;
-    for (i = 0; i < gNumber_of_races; i++) {
+    for (i = 0; gNumber_of_races > i; i++) {
         (*pSave_record)->race_info[i].been_there_done_that = gRace_list[i].been_there_done_that;
     }
-    for (i = 0; i < gNumber_of_racers; i++) {
+    for (i = 0; gNumber_of_racers > i; i++) {
         (*pSave_record)->opponent_info[i].dead = gOpponents[i].dead;
     }
     (*pSave_record)->credits = gProgram_state.credits;
@@ -683,9 +683,7 @@ void MakeSavedGame(tSave_game** pSave_record) {
     (*pSave_record)->number_of_cars = gProgram_state.number_of_cars;
     (*pSave_record)->current_car_index = gProgram_state.current_car_index;
     (*pSave_record)->redo_race_index = gProgram_state.redo_race_index;
-    for (i = 0; i < COUNT_OF(gProgram_state.cars_available); i++) {
-        (*pSave_record)->cars_available[i] = gProgram_state.cars_available[i];
-    }
+    memcpy((*pSave_record)->cars_available, gProgram_state.cars_available, sizeof((*pSave_record)->cars_available));
     for (i = 0; i < COUNT_OF(gProgram_state.current_car.power_up_levels); i++) {
         (*pSave_record)->power_up_levels[i] = gProgram_state.current_car.power_up_levels[i];
     }
