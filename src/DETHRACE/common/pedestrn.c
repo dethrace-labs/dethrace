@@ -1661,16 +1661,21 @@ int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vect
     br_scalar dist_sqr;
     br_scalar size_sqr;
 
-    size_sqr = pSize + .05f;
-    dist_sqr = size_sqr * WORLD_SCALE * size_sqr * WORLD_SCALE;
+    ped_m_z = pPed_car->v[Z] * WORLD_SCALE;
+    ped_m_x = pPed_car->v[X] * WORLD_SCALE;
+    pSize += .05f;
+    size_sqr = (pSize * WORLD_SCALE) * (pSize * (br_scalar)WORLD_SCALE_D);
     squish = 0;
     for (wheel = 0; wheel < COUNT_OF(pCar->blood_remaining); wheel++) {
-        ped_m_x = pCar->wpos[wheel].v[X] - pPed_car->v[X] * WORLD_SCALE;
-        ped_m_z = pCar->wpos[wheel].v[Z] - pPed_car->v[Z] * WORLD_SCALE;
-        if (pCar->blood_remaining[wheel] == 0.f && ped_m_x * ped_m_x + ped_m_z * ped_m_z < dist_sqr) {
-            pCar->blood_remaining[wheel] = SRandomBetween(2.f, 8.f);
-            pCar->special_start[wheel] = *pPed_glob;
-            squish = 1;
+        if (pCar->blood_remaining[wheel] == 0.f) {
+            dist_sqr = pCar->wpos[wheel].v[Z] - ped_m_z;
+            dist_sqr *= dist_sqr;
+            dist_sqr = (br_scalar)(dist_sqr + (pCar->wpos[wheel].v[X] - ped_m_x) * (pCar->wpos[wheel].v[X] - ped_m_x));
+            if (dist_sqr < size_sqr) {
+                pCar->blood_remaining[wheel] = SRandomBetween(2.f, 8.f) * pSize;
+                pCar->special_start[wheel] = *pPed_glob;
+                squish = 1;
+            }
         }
     }
     return squish;
