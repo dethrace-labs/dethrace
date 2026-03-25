@@ -139,22 +139,23 @@ void LoadSavedGames(void) {
     for (i = 0; i < COUNT_OF(gSaved_games); i++) {
         the_path[strlen(the_path) - 1] = '0' + i;
         f = DRfopen(the_path, "rb");
-        if (f == NULL) {
-            continue;
-        }
-        the_size = GetFileLength(f);
-        if (the_size == sizeof(tSave_game)) {
-            gSaved_games[i] = BrMemCalloc(1, sizeof(tSave_game), kMem_saved_game);
-            fread(gSaved_games[i], 1, the_size, f);
-            CorrectLoadByteOrdering(i);
-            if (CalcLSChecksum(gSaved_games[i]) != gSaved_games[i]->checksum || gSaved_games[i]->version != SAVEGAME_VERSION) {
-                BrMemFree(gSaved_games[i]);
+        if (f != NULL) {
+            the_size = GetFileLength(f);
+            if (the_size != sizeof(tSave_game)) {
                 gSaved_games[i] = NULL;
+            } else {
+                gSaved_games[i] = BrMemCalloc(1, sizeof(tSave_game), kMem_saved_game);
+                fread(gSaved_games[i], 1, the_size, f);
+                CorrectLoadByteOrdering(i);
+                if (CalcLSChecksum(gSaved_games[i]) != gSaved_games[i]->checksum || gSaved_games[i]->version != SAVEGAME_VERSION) {
+                    BrMemFree(gSaved_games[i]);
+                    gSaved_games[i] = NULL;
+                }
             }
+            fclose(f);
         } else {
             gSaved_games[i] = NULL;
         }
-        fclose(f);
     }
 }
 
