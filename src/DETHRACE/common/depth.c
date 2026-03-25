@@ -587,46 +587,43 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     tan_half_fov = Tan(camera->field_of_view / 2);
     tan_half_hori_fov = tan_half_fov * camera->aspect;
 
+    tan_half_hori_sky = col_map->width * tan_half_hori_fov / pRender_buffer->width;
+    hori_sky = 2 * BrRadianToAngle(atan2(tan_half_hori_sky, 1.0f));
+    repetitions = (int)(1.f / BrFixedToFloat(hori_sky) + 0.5f);
+    hori_sky = BR_ANGLE_DEG(360) / repetitions;
     vert_sky = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
-    hori_sky = BrRadianToAngle(atan2(col_map->width * tan_half_hori_fov / (double)pRender_buffer->width, 1));
+    hshift = -BrFixedToFloat(vert_sky) / BrFixedToFloat(hori_sky);
 
-    tan_half_hori_sky = -BrFixedToFloat(vert_sky) / BrFixedToFloat(BR_ANGLE_DEG(360) / (int)(1.0f / BrFixedToFloat(2 * hori_sky) + 0.5f));
-
-    dx = col_map->width * tan_half_hori_sky;
-    while (dx < 0) {
-        dx += col_map->width;
+    src_x = col_map->width * hshift;
+    while (src_x < 0) {
+        src_x += col_map->width;
     }
-    while (dx > col_map->width) {
-        dx -= col_map->width;
+    while (src_x > col_map->width) {
+        src_x -= col_map->width;
     }
 
-    hshift = col_map->height - gSky_image_underground * col_map->height / gSky_image_height;
-    tan_pitch = sqrt(pCamera_to_world->m[2][0] * pCamera_to_world->m[2][0] + pCamera_to_world->m[2][2] * pCamera_to_world->m[2][2]);
-    hori_y = -(pCamera_to_world->m[2][1]
-                 / tan_pitch
-                 / tan_half_fov * pRender_buffer->height / 2.0f)
-        - hshift;
+    tan_pitch = pCamera_to_world->m[2][1]
+        / sqrt(pCamera_to_world->m[2][0] * pCamera_to_world->m[2][0] + pCamera_to_world->m[2][2] * pCamera_to_world->m[2][2]);
+    hori_y = tan_pitch / tan_half_fov * pRender_buffer->height / 2.0f;
+    hori_pixels = col_map->height - gSky_image_underground * col_map->height / gSky_image_height;
+    top_y = -hori_y - hori_pixels;
 
     while (dst_x < pRender_buffer->width) {
-        hori_pixels = col_map->width - dx;
-        if (hori_pixels > pRender_buffer->width - dst_x) {
-            hori_pixels = pRender_buffer->width - dst_x;
-        }
-        src_x = dx - col_map->origin_x;
-        DRPixelmapRectangleCopy(pRender_buffer, dst_x - pRender_buffer->origin_x, hori_y, col_map, src_x, -col_map->origin_y, hori_pixels, col_map->height);
-        dx = 0;
-        dst_x += hori_pixels;
+        dx = col_map->width - src_x;
+        dx = pRender_buffer->width - dst_x < dx ? pRender_buffer->width - dst_x : dx;
+        DRPixelmapRectangleCopy(pRender_buffer, dst_x - pRender_buffer->origin_x, top_y, col_map, src_x - col_map->origin_x, -col_map->origin_y, dx, col_map->height);
+        src_x = 0;
+        dst_x += dx;
     }
 
-    top_y = hori_y + pRender_buffer->origin_y;
-    if (top_y > 0) {
-        top_col = ((tU8*)col_map->pixels)[0];
-        DRPixelmapRectangleFill(pRender_buffer, -pRender_buffer->origin_x, -pRender_buffer->origin_y, pRender_buffer->width, top_y, top_col);
+    top_col = ((tU8*)col_map->pixels)[0];
+    if (pRender_buffer->origin_y + top_y > 0) {
+        DRPixelmapRectangleFill(pRender_buffer, -pRender_buffer->origin_x, -pRender_buffer->origin_y, pRender_buffer->width, pRender_buffer->origin_y + top_y, top_col);
     }
-    bot_height = pRender_buffer->height - pRender_buffer->origin_y - hori_y - col_map->height;
+    bot_col = ((tU8*)col_map->pixels)[col_map->row_bytes * (col_map->height - 1)];
+    bot_height = pRender_buffer->height - pRender_buffer->origin_y - top_y - col_map->height;
     if (bot_height > 0) {
-        bot_col = ((tU8*)col_map->pixels)[col_map->row_bytes * (col_map->height - 1)];
-        DRPixelmapRectangleFill(pRender_buffer, -pRender_buffer->origin_x, hori_y + col_map->height, pRender_buffer->width, bot_height, bot_col);
+        DRPixelmapRectangleFill(pRender_buffer, -pRender_buffer->origin_x, top_y + col_map->height, pRender_buffer->width, bot_height, bot_col);
     }
 }
 
