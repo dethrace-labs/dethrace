@@ -327,7 +327,7 @@ void PratcamEvent(int pIndex) {
     }
 #endif
     if (gPratcam_sequences[pIndex].precedence > gCurrent_pratcam_precedence) {
-        if (gRace_finished == 0 && gProgram_state.prat_cam_on) {
+        if (!gRace_finished && gProgram_state.prat_cam_on) {
             PratcamEventNow(pIndex);
         }
     }
