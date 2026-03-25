@@ -2327,8 +2327,7 @@ void ResetAllPedestrians(void) {
     int i;
     tPedestrian_data* the_pedestrian;
 
-    for (i = 0; i < gPed_count; i++) {
-        the_pedestrian = &gPedestrian_array[i];
+    for (i = 0, the_pedestrian = gPedestrian_array; i < gPed_count; i++, the_pedestrian++) {
         the_pedestrian->actor->render_style = BR_RSTYLE_NONE;
     }
 }
