@@ -157,6 +157,7 @@ tPed_gib_materials gPed_gib_materials[4];
 // GLOBAL: CARM95 0x00536b58
 tProximity_ray gProximity_rays[20];
 
+// GLOBAL: CARM95 0x00550AB0
 int gPed_colliding;
 
 // GLOBAL: CARM95 0x00550a90
@@ -173,6 +174,7 @@ int gTotal_peds;
 
 // GLOBAL: CARM95 0x00550aa0
 int gPedestrian_harvest;
+
 br_vector3 gPed_pos_camera;
 
 // GLOBAL: CARM95 0x00550aa4
@@ -195,6 +197,7 @@ br_material* gPath_mat_normal;
 
 // GLOBAL: CARM95 0x00536b1c
 br_material* gInit_pos_mat_calc;
+
 int gPed_other;
 
 // GLOBAL: CARM95 0x00550a98
@@ -223,6 +226,7 @@ int gCurrent_lollipop_index;
 
 // GLOBAL: CARM95 0x00536aa8
 int gVesuvians_this_time;
+
 int gNumber_of_ped_gibs;
 
 // GLOBAL: CARM95 0x00536b14
@@ -1756,12 +1760,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
     }
     for (norman = 0; norman <= 1; norman++) {
         for (i = 0; 1; i++) {
-            if (norman == 0) {
-                credits_value = gNum_active_non_cars;
-            } else {
-                credits_value = gNum_active_cars;
-            }
-            if (i >= credits_value) {
+            if (i >= (norman ? gNum_active_non_cars : gNum_active_cars)) {
                 break;
             }
             if (norman == 0) {
@@ -1772,125 +1771,132 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
             if (the_car->doing_nothing_flag && the_car->driver != eDriver_local_human) {
                 continue;
             }
-            car_actor = the_car->car_master_actor;
-            car_pos = &car_actor->t.t.translate.t;
+            car_pos = &the_car->car_master_actor->t.t.translate.t;
             impact_speed = fabs(the_car->speed);
             if (BrVector3Dot(&pPedestrian->direction, &the_car->direction) > 0.f
                 && fabs(pPedestrian->current_speed) <= fabs(the_car->speed)) {
                 impact_speed = 0.0f;
             }
             distance_squared = Vector3DistanceSquared(ped_pos, car_pos);
-            proximity_rayed = pPedestrian->ref_number < 100
+            gross_dismiss = (float)gFrame_period * (float)gFrame_period * impact_speed * impact_speed * 2.f;
+            if (gross_dismiss <= 1.44f) {
+                gross_dismiss = 1.44f;
+            }
+            if (pPedestrian->ref_number < 100
                 && pPedestrian->current_action != pPedestrian->fatal_car_impact_action
                 && pPedestrian->current_action != pPedestrian->fatal_ground_impact_action
                 && the_car->driver > eDriver_non_car
-                && !((tCar_spec*)the_car)->knackered
-                && !gCountdown
-                && distance_squared < ((tCar_spec*)the_car)->proxy_ray_distance;
-            fated = pPedestrian->fate == (tCar_spec*)the_car;
-            attitude = gFrame_period;
-            gross_dismiss = gFrame_period;
-            gross_dismiss *= attitude;
-            gross_dismiss *= impact_speed;
-            gross_dismiss *= impact_speed;
-            gross_dismiss *= 2.f;
-            if (gross_dismiss > 1.44f) {
-                gross_dismiss = 1.44f;
+                && !((tCar_spec*)the_car)->knackered) {
+
+                if (gCountdown) {
+                    proximity_rayed = 0;
+                } else {
+                    if (distance_squared < ((tCar_spec*)the_car)->proxy_ray_distance) {
+                        proximity_rayed = 1;
+                    } else {
+                        proximity_rayed = 0;
+                    }
+                }
             }
+
+            fated = pPedestrian->fate == (tCar_spec*)the_car;
+
             if (gross_dismiss <= distance_squared && !proximity_rayed && !fated) {
                 continue;
             }
+            car_actor = the_car->car_master_actor;
             if (car_actor == NULL) {
-                continue;
+                break;
             }
             BrActorToActorMatrix34(&ped_to_car, pPedestrian->actor, car_actor);
             BrMatrix34ApplyP(&min_ped_bounds_car, &min_ped_bounds, &ped_to_car);
             BrMatrix34ApplyP(&max_ped_bounds_car, &max_ped_bounds, &ped_to_car);
-        // use gross_dismiss as temporary
-        if (max_ped_bounds_car.v[X] < min_ped_bounds_car.v[X]) {
-            br_scalar temp;
-            SwapValuesUsingTemporary(min_ped_bounds_car.v[X], max_ped_bounds_car.v[X], temp);
-        }
-        if (max_ped_bounds_car.v[Y] < min_ped_bounds_car.v[Y]) {
-            br_scalar temp;
-            SwapValuesUsingTemporary(min_ped_bounds_car.v[Y], max_ped_bounds_car.v[Y], temp);
-        }
-        if (max_ped_bounds_car.v[Z] < min_ped_bounds_car.v[Z]) {
-            br_scalar temp;
-            SwapValuesUsingTemporary(min_ped_bounds_car.v[Z], max_ped_bounds_car.v[Z], temp);
-        }
-        car_bounds_min_x = the_car->bounds[0].min.v[X];
-        car_bounds_max_x = the_car->bounds[0].max.v[X];
-        car_bounds_min_z = the_car->bounds[0].min.v[Z];
-        car_bounds_max_z = the_car->bounds[0].max.v[Z];
-        prev_car_bounds_min_x = car_bounds_min_x - the_car->velocity_car_space.v[X] * scalar_frame_time;
-        prev_car_bounds_max_x = car_bounds_max_x - the_car->velocity_car_space.v[X] * scalar_frame_time;
-        prev_car_bounds_min_z = car_bounds_min_z - the_car->velocity_car_space.v[Z] * scalar_frame_time;
-        prev_car_bounds_max_z = car_bounds_max_z - the_car->velocity_car_space.v[Z] * scalar_frame_time;
-        if (!proximity_rayed) {
-            if (!fated) {
-                if (the_car->velocity_car_space.v[X] > 0.0f) {
-                    if (the_car->velocity_car_space.v[Z] > 0.0f) {
-                        if (max_ped_bounds_car.v[X] <= prev_car_bounds_min_x
+
+            if (max_ped_bounds_car.v[X] < min_ped_bounds_car.v[X]) {
+                br_scalar temp;
+                SwapValuesUsingTemporary(min_ped_bounds_car.v[X], max_ped_bounds_car.v[X], temp);
+            }
+            if (max_ped_bounds_car.v[Y] < min_ped_bounds_car.v[Y]) {
+                br_scalar temp;
+                SwapValuesUsingTemporary(min_ped_bounds_car.v[Y], max_ped_bounds_car.v[Y], temp);
+            }
+            if (max_ped_bounds_car.v[Z] < min_ped_bounds_car.v[Z]) {
+                br_scalar temp;
+                SwapValuesUsingTemporary(min_ped_bounds_car.v[Z], max_ped_bounds_car.v[Z], temp);
+            }
+            car_bounds_min_x = the_car->bounds[0].min.v[X];
+            car_bounds_max_x = the_car->bounds[0].max.v[X];
+            car_bounds_min_z = the_car->bounds[0].min.v[Z];
+            car_bounds_max_z = the_car->bounds[0].max.v[Z];
+            prev_car_bounds_min_x = car_bounds_min_x - the_car->velocity_car_space.v[X] * scalar_frame_time;
+            prev_car_bounds_max_x = car_bounds_max_x - the_car->velocity_car_space.v[X] * scalar_frame_time;
+            prev_car_bounds_min_z = car_bounds_min_z - the_car->velocity_car_space.v[Z] * scalar_frame_time;
+            prev_car_bounds_max_z = car_bounds_max_z - the_car->velocity_car_space.v[Z] * scalar_frame_time;
+            if (!proximity_rayed) {
+                if (!fated) {
+                    if (the_car->velocity_car_space.v[X] > 0.0f) {
+                        if (the_car->velocity_car_space.v[Z] > 0.0f) {
+                            if (max_ped_bounds_car.v[X] <= prev_car_bounds_min_x
+                                || min_ped_bounds_car.v[X] >= car_bounds_max_x
+                                || max_ped_bounds_car.v[Z] <= prev_car_bounds_min_z
+                                || min_ped_bounds_car.v[Z] >= car_bounds_max_z
+                                || (min_ped_bounds_car.v[X] > prev_car_bounds_max_x
+                                    && max_ped_bounds_car.v[Z] < car_bounds_min_z
+                                    && car_bounds_max_x - prev_car_bounds_max_x != 0.0f
+                                    && (car_bounds_min_z - prev_car_bounds_min_z) / (car_bounds_max_x - prev_car_bounds_max_x) > (max_ped_bounds_car.v[Z] - prev_car_bounds_min_z) / (min_ped_bounds_car.v[X] - prev_car_bounds_max_x))
+                                || (max_ped_bounds_car.v[X] < car_bounds_min_x
+                                    && min_ped_bounds_car.v[Z] > prev_car_bounds_max_z
+                                    && prev_car_bounds_min_x - car_bounds_min_x != 0.0f
+                                    && (prev_car_bounds_max_z - car_bounds_max_z) / (prev_car_bounds_min_x - car_bounds_min_x) > (min_ped_bounds_car.v[Z] - car_bounds_max_z) / (max_ped_bounds_car.v[X] - car_bounds_min_x))) {
+                                continue;
+                            }
+                        } else if (max_ped_bounds_car.v[X] <= prev_car_bounds_min_x
                             || min_ped_bounds_car.v[X] >= car_bounds_max_x
-                            || max_ped_bounds_car.v[Z] <= prev_car_bounds_min_z
-                            || min_ped_bounds_car.v[Z] >= car_bounds_max_z
-                            || (min_ped_bounds_car.v[X] > prev_car_bounds_max_x
-                                && max_ped_bounds_car.v[Z] < car_bounds_min_z
-                                && car_bounds_max_x - prev_car_bounds_max_x != 0.0f
-                                && (car_bounds_min_z - prev_car_bounds_min_z) / (car_bounds_max_x - prev_car_bounds_max_x) > (max_ped_bounds_car.v[Z] - prev_car_bounds_min_z) / (min_ped_bounds_car.v[X] - prev_car_bounds_max_x))
+                            || max_ped_bounds_car.v[Z] <= car_bounds_min_z
+                            || min_ped_bounds_car.v[Z] >= prev_car_bounds_max_z
                             || (max_ped_bounds_car.v[X] < car_bounds_min_x
-                                && min_ped_bounds_car.v[Z] > prev_car_bounds_max_z
+                                && max_ped_bounds_car.v[Z] < prev_car_bounds_min_z
                                 && prev_car_bounds_min_x - car_bounds_min_x != 0.0f
-                                && (prev_car_bounds_max_z - car_bounds_max_z) / (prev_car_bounds_min_x - car_bounds_min_x) > (min_ped_bounds_car.v[Z] - car_bounds_max_z) / (max_ped_bounds_car.v[X] - car_bounds_min_x))) {
+                                && (prev_car_bounds_min_z - car_bounds_min_z) / (prev_car_bounds_min_x - car_bounds_min_x) < (max_ped_bounds_car.v[Z] - car_bounds_min_z) / (max_ped_bounds_car.v[X] - car_bounds_min_x))
+                            || (min_ped_bounds_car.v[X] > prev_car_bounds_max_x
+                                && min_ped_bounds_car.v[Z] > car_bounds_max_z
+                                && car_bounds_max_x - prev_car_bounds_max_x != 0.0f
+                                && (car_bounds_max_z - prev_car_bounds_max_z) / (car_bounds_max_x - prev_car_bounds_max_x) < (min_ped_bounds_car.v[Z] - prev_car_bounds_max_z) / (min_ped_bounds_car.v[X] - prev_car_bounds_max_x))) {
                             continue;
                         }
-                    } else if (max_ped_bounds_car.v[X] <= prev_car_bounds_min_x
-                        || min_ped_bounds_car.v[X] >= car_bounds_max_x
+                    } else if (the_car->velocity_car_space.v[Z] > 0.0f) {
+                        if (max_ped_bounds_car.v[X] <= car_bounds_min_x
+                            || min_ped_bounds_car.v[X] >= prev_car_bounds_max_x
+                            || max_ped_bounds_car.v[Z] <= prev_car_bounds_min_z
+                            || min_ped_bounds_car.v[Z] >= car_bounds_max_z
+                            || (max_ped_bounds_car.v[X] < prev_car_bounds_min_x
+                                && max_ped_bounds_car.v[Z] < car_bounds_min_z
+                                && car_bounds_min_x - prev_car_bounds_min_x != 0.0f
+                                && ((car_bounds_min_z - prev_car_bounds_min_z) / (car_bounds_min_x - prev_car_bounds_min_x) < (max_ped_bounds_car.v[Z] - prev_car_bounds_min_z) / (max_ped_bounds_car.v[X] - prev_car_bounds_min_x)))
+                            || (min_ped_bounds_car.v[X] > car_bounds_max_x
+                                && min_ped_bounds_car.v[Z] > prev_car_bounds_max_z
+                                && prev_car_bounds_max_x - car_bounds_max_x != 0.0f
+                                && (prev_car_bounds_max_z - car_bounds_max_z) / (prev_car_bounds_max_x - car_bounds_max_x) < (min_ped_bounds_car.v[Z] - car_bounds_max_z) / (min_ped_bounds_car.v[X] - car_bounds_max_x))) {
+                            continue;
+                        }
+                    } else if (max_ped_bounds_car.v[X] <= car_bounds_min_x
+                        || min_ped_bounds_car.v[X] >= prev_car_bounds_max_x
                         || max_ped_bounds_car.v[Z] <= car_bounds_min_z
                         || min_ped_bounds_car.v[Z] >= prev_car_bounds_max_z
-                        || (max_ped_bounds_car.v[X] < car_bounds_min_x
-                            && max_ped_bounds_car.v[Z] < prev_car_bounds_min_z
-                            && prev_car_bounds_min_x - car_bounds_min_x != 0.0f
-                            && (prev_car_bounds_min_z - car_bounds_min_z) / (prev_car_bounds_min_x - car_bounds_min_x) < (max_ped_bounds_car.v[Z] - car_bounds_min_z) / (max_ped_bounds_car.v[X] - car_bounds_min_x))
-                        || (min_ped_bounds_car.v[X] > prev_car_bounds_max_x
-                            && min_ped_bounds_car.v[Z] > car_bounds_max_z
-                            && car_bounds_max_x - prev_car_bounds_max_x != 0.0f
-                            && (car_bounds_max_z - prev_car_bounds_max_z) / (car_bounds_max_x - prev_car_bounds_max_x) < (min_ped_bounds_car.v[Z] - prev_car_bounds_max_z) / (min_ped_bounds_car.v[X] - prev_car_bounds_max_x))) {
-                        continue;
-                    }
-                } else if (the_car->velocity_car_space.v[Z] > 0.0f) {
-                    if (max_ped_bounds_car.v[X] <= car_bounds_min_x
-                        || min_ped_bounds_car.v[X] >= prev_car_bounds_max_x
-                        || max_ped_bounds_car.v[Z] <= prev_car_bounds_min_z
-                        || min_ped_bounds_car.v[Z] >= car_bounds_max_z
-                        || (max_ped_bounds_car.v[X] < prev_car_bounds_min_x
-                            && max_ped_bounds_car.v[Z] < car_bounds_min_z
-                            && car_bounds_min_x - prev_car_bounds_min_x != 0.0f
-                            && ((car_bounds_min_z - prev_car_bounds_min_z) / (car_bounds_min_x - prev_car_bounds_min_x) < (max_ped_bounds_car.v[Z] - prev_car_bounds_min_z) / (max_ped_bounds_car.v[X] - prev_car_bounds_min_x)))
                         || (min_ped_bounds_car.v[X] > car_bounds_max_x
-                            && min_ped_bounds_car.v[Z] > prev_car_bounds_max_z
+                            && max_ped_bounds_car.v[Z] < prev_car_bounds_min_z
                             && prev_car_bounds_max_x - car_bounds_max_x != 0.0f
-                            && (prev_car_bounds_max_z - car_bounds_max_z) / (prev_car_bounds_max_x - car_bounds_max_x) < (min_ped_bounds_car.v[Z] - car_bounds_max_z) / (min_ped_bounds_car.v[X] - car_bounds_max_x))) {
+                            && (prev_car_bounds_min_z - car_bounds_min_z) / (prev_car_bounds_max_x - car_bounds_max_x) > (max_ped_bounds_car.v[Z] - car_bounds_min_z) / (min_ped_bounds_car.v[X] - car_bounds_max_x))
+                        || (max_ped_bounds_car.v[X] < prev_car_bounds_min_x
+                            && min_ped_bounds_car.v[Z] > car_bounds_max_z
+                            && car_bounds_min_x - prev_car_bounds_min_x != 0.0f
+                            && (car_bounds_max_z - prev_car_bounds_max_z) / (car_bounds_min_x - prev_car_bounds_min_x) > (min_ped_bounds_car.v[Z] - prev_car_bounds_max_z) / (max_ped_bounds_car.v[X] - prev_car_bounds_min_x))) {
                         continue;
                     }
-                } else if (max_ped_bounds_car.v[X] <= car_bounds_min_x
-                    || min_ped_bounds_car.v[X] >= prev_car_bounds_max_x
-                    || max_ped_bounds_car.v[Z] <= car_bounds_min_z
-                    || min_ped_bounds_car.v[Z] >= prev_car_bounds_max_z
-                    || (min_ped_bounds_car.v[X] > car_bounds_max_x
-                        && max_ped_bounds_car.v[Z] < prev_car_bounds_min_z
-                        && prev_car_bounds_max_x - car_bounds_max_x != 0.0f
-                        && (prev_car_bounds_min_z - car_bounds_min_z) / (prev_car_bounds_max_x - car_bounds_max_x) > (max_ped_bounds_car.v[Z] - car_bounds_min_z) / (min_ped_bounds_car.v[X] - car_bounds_max_x))
-                    || (max_ped_bounds_car.v[X] < prev_car_bounds_min_x
-                        && min_ped_bounds_car.v[Z] > car_bounds_max_z
-                        && car_bounds_min_x - prev_car_bounds_min_x != 0.0f
-                        && (car_bounds_max_z - prev_car_bounds_max_z) / (car_bounds_min_x - prev_car_bounds_min_x) > (min_ped_bounds_car.v[Z] - prev_car_bounds_max_z) / (max_ped_bounds_car.v[X] - prev_car_bounds_min_x))) {
-                    continue;
                 }
+                proximity_rayed = 0;
+                gPed_colliding = 'T';
             }
-            proximity_rayed = 0;
-        }
             if (pPedestrian->fate != (tCar_spec*)the_car
                 && !proximity_rayed
                 && (the_car->bounds[0].max.v[Y] < min_ped_bounds_car.v[Y]
@@ -1898,6 +1904,7 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
                 continue;
             }
             pPedestrian->fate = NULL;
+            gPed_colliding = 'Y';
             if (pPedestrian->current_action == pPedestrian->fatal_car_impact_action
                 || pPedestrian->current_action == pPedestrian->fatal_ground_impact_action) {
                 if (pPedestrian->ref_number < 100) {
@@ -1921,11 +1928,10 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
         return;
     }
     pPedestrian->killers_ID = the_car->car_ID;
+    gPed_colliding = 'M';
     ped_centre_x = (max_ped_bounds_car.v[X] + min_ped_bounds_car.v[X]) / 2.0f;
     ped_centre_y = (max_ped_bounds_car.v[Z] + min_ped_bounds_car.v[Z]) / 2.0f;
-    if (proximity_rayed) {
-        hit_pos = ePed_hit_unknown;
-    } else {
+    if (!proximity_rayed) {
         hit_pos = MoveToEdgeOfCar(pPedestrian,
             the_car,
             car_actor,
@@ -1938,6 +1944,8 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
             &min_ped_bounds_car,
             &max_ped_bounds_car);
         pPedestrian->mid_air = 0;
+    } else {
+        hit_pos = ePed_hit_unknown;
     }
     incident_actor = the_car->car_master_actor;
     if (the_car->driver <= eDriver_non_car && the_car->who_last_hit_me != NULL && pPedestrian->ref_number != 114) {
@@ -2013,25 +2021,18 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
             }
         }
     }
-    if (proximity_rayed
-        || ((impact_speed < 0.004 || !PercentageChance(50) || gPed_scale_factor != 1.0f) && !tossing)
-        || pPedestrian->ref_number >= 100
-        || gPedestrian_harvest) {
-        pPedestrian->spin_period = 0.0f;
-    } else if (PercentageChance(50)) {
-        if (tossing) {
-            pPedestrian->spin_period = FRandomBetween(100.0f, 300.0f);
+    if (!proximity_rayed
+        && ((impact_speed >= 0.004 && PercentageChance(50) && gPed_scale_factor == 1.0f) || tossing)
+        && pPedestrian->ref_number < 100
+        && !gPedestrian_harvest) {
+
+        if (PercentageChance(50)) {
+            pPedestrian->spin_period = tossing ? FRandomBetween(100.0f, 300.0f) : FRandomBetween(100.0f, 2000.0f);
         } else {
-            pPedestrian->spin_period = FRandomBetween(100.0f, 2000.0f);
+            pPedestrian->spin_period = -(tossing ? FRandomBetween(100.0f, 300.0f) : FRandomBetween(100.0f, 2000.0f));
         }
     } else {
-        if (tossing) {
-            attitude = FRandomBetween(100.0f, 300.0f);
-            pPedestrian->spin_period = -attitude;
-        } else {
-            attitude = FRandomBetween(100.0f, 2000.0f);
-            pPedestrian->spin_period = -attitude;
-        }
+        pPedestrian->spin_period = 0.0f;
     }
     if (proximity_rayed || tossing) {
         ChangeActionTo(pPedestrian, pPedestrian->fatal_ground_impact_action, 1);
@@ -2065,13 +2066,14 @@ void CheckPedestrianDeathScenario(tPedestrian_data* pPedestrian) {
             credits_value *= 2;
         }
         BrVector3Set(&up, 0.f, 1.f, 0.f);
+        attitude = BrVector3Dot(&the_car->car_master_actor->t.t.look_up.up, &up);
         if (billiards_shot) {
             credits_value *= 4;
             PratcamEvent(kPratcam_killed_lots_of_peds);
             DoFancyHeadup(kFancyHeadupNiceShotSir);
         } else if ((float)fabs(the_car->omega.v[X]) <= 5.0f
             && (float)fabs(the_car->omega.v[Z]) <= 5.0f
-            && the_car->car_master_actor->t.t.look_up.up.v[Y] >= 0.1f
+            && attitude >= 0.1f
             && pPedestrian->offset.v[1] >= -0.1f) {
             if (((hit_pos != ePed_hit_lside && hit_pos != ePed_hit_rside)
                     || (fabs(the_car->velocity_car_space.v[X]) <= fabs(the_car->velocity_car_space.v[Z])
