@@ -405,10 +405,11 @@ int DRS3OverallVolume(tS3_volume pVolume) {
 // IDA: int __usercall DRS3StopOutletSound@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
 // FUNCTION: CARM95 0x00464a39
 int DRS3StopOutletSound(tS3_outlet_ptr pOutlet) {
-    if (!gSound_enabled) {
+    if (gSound_enabled) {
+        return S3StopOutletSound(pOutlet);
+    } else {
         return 0;
     }
-    return S3StopOutletSound(pOutlet);
 }
 
 // IDA: int __cdecl DRS3StopAllOutletSounds()
