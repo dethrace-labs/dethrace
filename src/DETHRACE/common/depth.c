@@ -409,7 +409,7 @@ void LoadDepthTable(char* pName, br_pixelmap** pTable, int* pPower) {
     int j;
     tU8 temp;
 
-#define PTABLE_PIXEL_AT(X, Y) ((tU8*)((*pTable)->pixels))[(X) + (Y) * (*pTable)->row_bytes]
+#define PTABLE_PIXEL_AT(X, Y) *((tU8*)((*pTable)->pixels) + (*pTable)->row_bytes * (Y) + (X))
 
     PathCat(the_path, gApplication_path, "SHADETAB");
     PathCat(the_path, the_path, pName);
