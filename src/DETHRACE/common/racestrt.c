@@ -389,10 +389,10 @@ int ChangeRace(int* pRace_index, int pNet_mode, tNet_sequence_type pNet_race_seq
     gChange_race_net_mode = pNet_mode;
     gStart_interface_spec = &interface_spec;
     gCurrent_race_index = *pRace_index;
-    if (pNet_mode == 0) {
-        gBullet_image = LoadPixelmap("BULLET.PIX");
-    } else {
+    if (pNet_mode) {
         gBullet_image = NULL;
+    } else {
+        gBullet_image = LoadPixelmap("BULLET.PIX");
     }
     result = DoInterfaceScreen(&interface_spec, pNet_mode != 0, 0);
     if (result == 0) {
