@@ -366,51 +366,40 @@ void InitPratcam(void) {
     gWhirr_noise = 0;
     gPrat_flic.data = NULL;
     gCurrent_ambient_prat_sequence = -1;
-    switch (gGraf_data_index) {
-    case 0:
-        the_pixels = BrMemAllocate(52 * 46, kMem_pratcam_pixelmap);
-        break;
-    case 1:
+    if (gGraf_data_index != 0) {
 #ifdef DETHRACE_3DFX_PATCH
         the_pixels = BrMemAllocate(HighResPratBufferWidth() * HighResPratBufferHeight(), kMem_pratcam_pixelmap);
 #else
         the_pixels = BrMemAllocate(104 * 110, kMem_pratcam_pixelmap);
 #endif
-        break;
-    default:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
+    } else {
+        the_pixels = BrMemAllocate(52 * 46, kMem_pratcam_pixelmap);
     }
     if (gScreen->row_bytes < 0) {
         BrFatal("C:\\Msdev\\Projects\\DethRace\\Pratcam.c", 409, "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\Pratcam.c", 409);
     }
-    switch (gGraf_data_index) {
-    case 0:
-        gPrat_buffer = DRPixelmapAllocate(gScreen->type, 52, 46, the_pixels, 0);
-        break;
-    case 1:
+    if (gGraf_data_index != 0) {
 #ifdef DETHRACE_3DFX_PATCH
         gPrat_buffer = DRPixelmapAllocate(BR_PMT_INDEX_8, HighResPratBufferWidth(), HighResPratBufferHeight(), the_pixels, 0);
 #else
         gPrat_buffer = DRPixelmapAllocate(gScreen->type, 104, 110, the_pixels, 0);
 #endif
-        break;
-    default:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
+    } else {
+        gPrat_buffer = DRPixelmapAllocate(gScreen->type, 52, 46, the_pixels, 0);
     }
     gCurrent_pratcam_index = -1;
     gPending_ambient_prat = -1;
     gCurrent_pratcam_precedence = 0;
-    if (gNet_mode == eNet_mode_none) {
-        if (gProgram_state.frank_or_anniness == eFrankie) {
-            LoadPratcam("FRANK");
-        } else {
-            LoadPratcam("ANNIE");
-        }
-    } else if (gNet_players[gThis_net_player_index].car_index == 1 || gNet_players[gThis_net_player_index].car_index > 34) {
-        LoadPratcam("ANNIE");
-    } else {
-        LoadPratcam("FRANK");
-    }
+
+    LoadPratcam(
+        (gNet_mode != eNet_mode_none)
+            ? ((gNet_players[gThis_net_player_index].car_index == 1
+                   || gNet_players[gThis_net_player_index].car_index >= 35)
+                      ? "ANNIE"
+                      : "FRANK")
+            : ((gProgram_state.frank_or_anniness != eFrankie)
+                      ? "ANNIE"
+                      : "FRANK"));
 }
 
 // IDA: void __cdecl DisposePratcam()
