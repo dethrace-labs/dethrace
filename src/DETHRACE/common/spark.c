@@ -146,9 +146,9 @@ tShrapnel gShrapnel[15];
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
 void DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr) {
-
-    if (*depth_ptr > (1.0 - z) * 32768.0f) {
-        *depth_ptr = (1.0 - z) * 32768.0f;
+    z = (1.0f - z) * 32768.0f;
+    if (*depth_ptr > z) {
+        *depth_ptr = z;
         *scr_ptr = shade_ptr[*scr_ptr];
     }
 }
