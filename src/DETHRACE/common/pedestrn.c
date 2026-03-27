@@ -2342,12 +2342,12 @@ void SquirtPathVertex(br_vertex* pFirst_vertex, br_vector3* pPoint) {
     pFirst_vertex[1].p = *pPoint;
     pFirst_vertex[1].p.v[Y] += .1f;
     pFirst_vertex[2].p = *pPoint;
-    pFirst_vertex[2].p.v[X] += -.05f;
     pFirst_vertex[2].p.v[Y] += .05f;
-    pFirst_vertex[2].p.v[Z] += -.05f;
+    pFirst_vertex[2].p.v[X] -= .05f;
+    pFirst_vertex[2].p.v[Z] -= .05f;
     pFirst_vertex[3].p = *pPoint;
-    pFirst_vertex[3].p.v[X] += .05f;
     pFirst_vertex[3].p.v[Y] += .05f;
+    pFirst_vertex[3].p.v[X] += .05f;
     pFirst_vertex[3].p.v[Z] += .05f;
 }
 
