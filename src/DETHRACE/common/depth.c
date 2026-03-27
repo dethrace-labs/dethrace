@@ -521,7 +521,7 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
             depth_ptr += depth_line_skip;
         }
     } else if (depth_shift_amount < 0) {
-            depth_shift_amount = -depth_shift_amount;
+        depth_shift_amount = -depth_shift_amount;
         for (y = 0; pRender_buffer->height > y; ++y) {
             for (x = 0; pRender_buffer->width > x; ++x, ++render_ptr, ++depth_ptr) {
                 if (*depth_ptr != 0xFFFF) {
@@ -916,7 +916,7 @@ void IncreaseYon(void) {
 
     gCamera_yon = gCamera_yon + 5.f;
     AssertYons();
-    sprintf(s, GetMiscString(kMiscString_YonIncreasedTo_D), (int)CAMERA_PTR(gCamera_list[1])->yon_z);
+    sprintf(s, GetMiscString(kMiscString_YonIncreasedTo_D), (int)ACTOR_CAMERA(gCamera_list[1])->yon_z);
     NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s);
 }
 
