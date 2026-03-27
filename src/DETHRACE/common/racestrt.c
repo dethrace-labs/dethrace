@@ -1196,6 +1196,7 @@ void DoPartsShop(int pFade_away) {
         NULL
     };
     int result;
+
     LoadParts();
     gFade_away_parts_shop = pFade_away;
     InitialiseFlicPanel(0,
