@@ -478,35 +478,33 @@ void InitSoundSources(void) {
         ToggleSoundEnable();
         toggle = 1;
     }
-    gCamera_position = *(br_vector3*)&gCamera_to_world.m[3][0];
-    gCamera_left.v[0] = gCamera_to_world.m[0][0] * -1.0;
-    gCamera_left.v[1] = gCamera_to_world.m[0][1] * -1.0;
-    gCamera_left.v[2] = gCamera_to_world.m[0][2] * -1.0;
+    gCamera_position.v[0] = gCamera_to_world.m[3][0];
+    gCamera_position.v[1] = gCamera_to_world.m[3][1];
+    gCamera_position.v[2] = gCamera_to_world.m[3][2];
+    gCamera_left.v[0] = gCamera_to_world.m[0][0] * -1.0f;
+    gCamera_left.v[1] = gCamera_to_world.m[0][1] * -1.0f;
+    gCamera_left.v[2] = gCamera_to_world.m[0][2] * -1.0f;
     S3BindListenerPositionBRender(&gCamera_position);
     S3BindListenerVelocityBRender(&gCamera_velocity);
     S3BindListenerLeftBRender(&gCamera_left);
     if (!gSound_sources_inited) {
         for (cat = eVehicle_self; cat <= eVehicle_rozzer; ++cat) {
-            if (cat) {
-                car_count = GetCarCount(cat);
-            } else {
+            if (!cat) {
                 car_count = 1;
+            } else {
+                car_count = GetCarCount(cat);
             }
             for (i = 0; i < car_count; i++) {
                 PossibleService();
-                if (cat) {
-                    the_car = GetCarSpec(cat, i);
-                } else {
+                if (!cat) {
                     the_car = &gProgram_state.current_car;
+                } else {
+                    the_car = GetCarSpec(cat, i);
                 }
                 if (the_car->driver == eDriver_local_human || gSound_detail_level == 2 || cat == eVehicle_rozzer) {
                     the_car->sound_source = S3CreateSoundSourceBR(&the_car->pos, &the_car->velocity_bu_per_sec, gEngine_outlet);
                     if (the_car->sound_source) {
-                        if (cat == eVehicle_rozzer) {
-                            S3BindAmbientSoundToOutlet(gEngine_outlet, 5350, the_car->sound_source, 250.0, 0, 0, 0, 0x10000, 0x10000);
-                        } else {
-                            S3BindAmbientSoundToOutlet(gEngine_outlet, the_car->engine_noises[0], the_car->sound_source, 250.0, 0, 0, 0, 0x10000, 0x10000);
-                        }
+                        S3BindAmbientSoundToOutlet(gEngine_outlet, cat != eVehicle_rozzer ? the_car->engine_noises[0] : 5350, the_car->sound_source, 250.0, 0, 0, 0, 0x10000, 0x10000);
                     }
                 }
             }
