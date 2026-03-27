@@ -1086,12 +1086,12 @@ int PartsArrowsOn(int* pCurrent_choice, int* pCurrent_mode) {
 
     AddToFlicQueue(
         gStart_interface_spec->flicker_on_flics[5].flic_index,
-        gStart_interface_spec->flicker_on_flics[5].x[gGraf_data_index],
-        gStart_interface_spec->flicker_on_flics[5].y[gGraf_data_index],
+        gStart_interface_spec->flicker_on_flics[5].x[gGraf_data_index * 1],
+        gStart_interface_spec->flicker_on_flics[5].y[gGraf_data_index * 1],
         1);
     AddToFlicQueue(gStart_interface_spec->flicker_on_flics[6].flic_index,
-        gStart_interface_spec->flicker_on_flics[6].x[gGraf_data_index],
-        gStart_interface_spec->flicker_on_flics[6].y[gGraf_data_index],
+        gStart_interface_spec->flicker_on_flics[6].x[gGraf_data_index * 1],
+        gStart_interface_spec->flicker_on_flics[6].y[gGraf_data_index * 1],
         1);
     return 0;
 }
