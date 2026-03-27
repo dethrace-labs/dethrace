@@ -2088,15 +2088,12 @@ void DoGridTransition(int pFirst_index, int pSecond_index) {
     tU32 start_time;
     tU32 the_time;
 
-    if (pFirst_index != pSecond_index) {
+    if (pFirst_index == pSecond_index) {
+    } else {
         start_time = PDGetTotalTime();
         gSwap_grid_1 = pFirst_index;
         gSwap_grid_2 = pSecond_index;
-        while (1) {
-            the_time = PDGetTotalTime();
-            if (start_time + 150 <= the_time) {
-                break;
-            }
+        while ((the_time = PDGetTotalTime()) < start_time + 150) {
             RemoveTransientBitmaps(1);
             gGrid_transition_stage = 100 * (the_time - start_time) / 150;
             DrawGrid(gCurrent_graf_data->grid_x_pitch * CalcGridOffset(gOur_starting_position), 0);
