@@ -1807,6 +1807,11 @@ tSO_result DoSelectRace(int* pSecond_time_around) {
                 default_choice = 4;
                 break;
             case 2:
+#ifdef DETHRACE_FIX_BUGS
+                if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
+                    DoFeatureUnavailableInDemo();
+                }
+#endif
                 RunFlic(192);
                 DoPartsShop(0);
                 default_choice = 4;
