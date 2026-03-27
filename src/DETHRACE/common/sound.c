@@ -785,10 +785,10 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
 // FUNCTION: CARM95 0x00465848
 int DRS3StopCDA(void) {
 
-    if (gMusic_available && gCDA_tag != 0) {
-        S3StopSound(gCDA_tag);
-        gCDA_is_playing = 0;
+    if (gMusic_available && gCDA_is_playing != 0) {
+        S3StopSound(gCDA_is_playing);
         gCDA_tag = 0;
+        gCDA_is_playing = 0;
     }
     return gCDA_is_playing;
 }
