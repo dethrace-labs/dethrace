@@ -498,7 +498,8 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
     int depth_line_skip;
     int render_line_skip;
 
-    too_near = 0xffff - (1 << pStart);
+    depth_start = 0x10000 - (1 << pStart);
+    too_near = 0x10000 - depth_start;
     shade_table_pixels = pShade_table->pixels;
     depth_shift_amount = pShade_table_power + 8 - pStart - pEnd;
     render_ptr = (tU8*)pRender_buffer->pixels + pRender_buffer->base_x + pRender_buffer->base_y * pRender_buffer->row_bytes;
@@ -506,49 +507,42 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
     render_line_skip = pRender_buffer->row_bytes - pRender_buffer->width;
     depth_line_skip = pDepth_buffer->row_bytes / 2 - pRender_buffer->width;
 
-    if (depth_shift_amount <= 0) {
-        if (depth_shift_amount >= 0) {
-            for (y = 0; y < pRender_buffer->height; ++y) {
-                for (x = 0; x < pRender_buffer->width; ++x) {
-                    if (*depth_ptr != 0xFFFF) {
-                        depth_value = *depth_ptr - too_near;
-                        if (depth_value < -(tS16)too_near) {
-                            *render_ptr = shade_table_pixels[(depth_value & 0xFF00) + *render_ptr];
-                        }
-                    }
-                    ++render_ptr;
-                    ++depth_ptr;
-                }
-                render_ptr += render_line_skip;
-                depth_ptr += depth_line_skip;
-            }
-        } else {
-            for (y = 0; pRender_buffer->height > y; ++y) {
-                for (x = 0; pRender_buffer->width > x; ++x) {
-                    if (*depth_ptr != 0xFFFF) {
-                        depth_value = *depth_ptr - too_near;
-                        if (depth_value < -(tS16)too_near) {
-                            *render_ptr = shade_table_pixels[*render_ptr + ((depth_value >> (pEnd - (pShade_table_power + 8 - pStart))) & 0xFF00)];
-                        }
-                    }
-                    ++render_ptr;
-                    ++depth_ptr;
-                }
-                render_ptr += render_line_skip;
-                depth_ptr += depth_line_skip;
-            }
-        }
-    } else {
+    if (depth_shift_amount > 0) {
         for (y = 0; pRender_buffer->height > y; ++y) {
-            for (x = 0; pRender_buffer->width > x; ++x) {
+            for (x = 0; pRender_buffer->width > x; ++x, ++render_ptr, ++depth_ptr) {
                 if (*depth_ptr != 0xFFFF) {
-                    depth_value = *depth_ptr - too_near;
-                    if (depth_value < -(tS16)too_near) {
+                    depth_value = *depth_ptr - depth_start;
+                    if (depth_value < too_near) {
                         *render_ptr = shade_table_pixels[*render_ptr + ((depth_value << depth_shift_amount) & 0xFF00)];
                     }
                 }
-                ++render_ptr;
-                ++depth_ptr;
+            }
+            render_ptr += render_line_skip;
+            depth_ptr += depth_line_skip;
+        }
+    } else if (depth_shift_amount < 0) {
+            depth_shift_amount = -depth_shift_amount;
+        for (y = 0; pRender_buffer->height > y; ++y) {
+            for (x = 0; pRender_buffer->width > x; ++x, ++render_ptr, ++depth_ptr) {
+                if (*depth_ptr != 0xFFFF) {
+                    depth_value = *depth_ptr - depth_start;
+                    if (depth_value < too_near) {
+                        *render_ptr = shade_table_pixels[*render_ptr + ((depth_value >> depth_shift_amount) & 0xFF00)];
+                    }
+                }
+            }
+            render_ptr += render_line_skip;
+            depth_ptr += depth_line_skip;
+        }
+    } else {
+        for (y = 0; y < pRender_buffer->height; ++y) {
+            for (x = 0; x < pRender_buffer->width; ++x, ++render_ptr, ++depth_ptr) {
+                if (*depth_ptr != 0xFFFF) {
+                    depth_value = *depth_ptr - depth_start;
+                    if (depth_value < too_near) {
+                        *render_ptr = shade_table_pixels[(depth_value & 0xFF00) + *render_ptr];
+                    }
+                }
             }
             render_ptr += render_line_skip;
             depth_ptr += depth_line_skip;
