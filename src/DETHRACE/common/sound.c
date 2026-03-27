@@ -349,10 +349,11 @@ int DRS3LoadSound(tS3_sound_id pThe_sound) {
 // FUNCTION: CARM95 0x004648af
 int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
 
-    if (gSound_enabled == 0) {
+    if (gSound_enabled) {
+        return S3ReleaseSound(pThe_sound);
+    } else {
         return 0;
     }
-    return S3ReleaseSound(pThe_sound);
 }
 
 // IDA: void __cdecl DRS3Service()
