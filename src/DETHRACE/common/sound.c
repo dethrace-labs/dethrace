@@ -422,9 +422,10 @@ int DRS3StopOutletSound(tS3_outlet_ptr pOutlet) {
 int DRS3StopAllOutletSounds(void) {
 
     if (gSound_enabled) {
-        S3StopAllOutletSounds();
+        return S3StopAllOutletSounds();
+    } else {
+        return 0;
     }
-    return 0;
 }
 
 // IDA: void __cdecl ToggleSoundEnable()
