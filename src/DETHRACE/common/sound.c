@@ -537,22 +537,18 @@ void DisposeSoundSources(void) {
     }
     if (gSound_sources_inited) {
         DRS3StopOutletSound(gEngine_outlet);
-        if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
-            S3Service(1, 0);
-        } else {
-            S3Service(0, 0);
-        }
+        S3Service(gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0, 0);
         for (cat = eVehicle_self; cat <= eVehicle_rozzer; cat++) {
-            if (cat) {
-                car_count = GetCarCount(cat);
-            } else {
+            if (!cat) {
                 car_count = 1;
+            } else {
+                car_count = GetCarCount(cat);
             }
             for (i = 0; i < car_count; ++i) {
-                if (cat) {
-                    the_car = GetCarSpec(cat, i);
-                } else {
+                if (!cat) {
                     the_car = &gProgram_state.current_car;
+                } else {
+                    the_car = GetCarSpec(cat, i);
                 }
                 if (the_car->driver == eDriver_local_human || gSound_detail_level == 2 || cat == eVehicle_rozzer) {
                     if (the_car->sound_source) {
