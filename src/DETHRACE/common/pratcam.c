@@ -367,7 +367,6 @@ int HighResPratBufferHeight(void) {
 // IDA: void __cdecl InitPratcam()
 // FUNCTION: CARM95 0x0044d5b1
 void InitPratcam(void) {
-    char* folder_name;
     void* the_pixels;
 
     if (gAusterity_mode) {
@@ -400,20 +399,16 @@ void InitPratcam(void) {
     gCurrent_pratcam_index = -1;
     gPending_ambient_prat = -1;
     gCurrent_pratcam_precedence = 0;
-    if (gNet_mode != eNet_mode_none) {
-        if (gNet_players[gThis_net_player_index].car_index == 1 || gNet_players[gThis_net_player_index].car_index >= 35) {
-            folder_name = "ANNIE";
-        } else {
-            folder_name = "FRANK";
-        }
-    } else {
-        if (gProgram_state.frank_or_anniness != eFrankie) {
-            folder_name = "ANNIE";
-        } else {
-            folder_name = "FRANK";
-        }
-    }
-    LoadPratcam(folder_name);
+
+    LoadPratcam(
+        (gNet_mode != eNet_mode_none)
+            ? ((gNet_players[gThis_net_player_index].car_index == 1
+                   || gNet_players[gThis_net_player_index].car_index >= 35)
+                      ? "ANNIE"
+                      : "FRANK")
+            : ((gProgram_state.frank_or_anniness != eFrankie)
+                      ? "ANNIE"
+                      : "FRANK"));
 }
 
 // IDA: void __cdecl DisposePratcam()
