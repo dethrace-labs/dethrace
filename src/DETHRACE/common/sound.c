@@ -733,15 +733,11 @@ int GetIndexFromOutlet(tS3_outlet_ptr pOutlet) {
 int DRS3StartCDA(tS3_sound_id pCDA_id) {
 
     if (!gCD_is_disabled && gMusic_available) {
-        if (!gCDA_is_playing && !gCDA_tag) {
+        if (!gCDA_tag && !gCDA_is_playing) {
             if (S3CDAEnabled()) {
                 S3StopOutletSound(gMusic_outlet);
                 if (gSound_enabled) {
-                    if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
-                        S3Service(1, 0);
-                    } else {
-                        S3Service(0, 0);
-                    }
+                    S3Service(gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0, 0);
 #if defined(DETHRACE_FIX_BUGS)
                     int random_track = pCDA_id == 9999;
                     int retries_remaining = 5;
@@ -768,8 +764,8 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
                     // Initial CD music volume was not set correctly
                     DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);
 #endif
-                    gCDA_is_playing = gCDA_tag != 0;
-                    if (gCDA_tag == 0) {
+                    gCDA_is_playing = gCDA_tag;
+                    if (gCDA_is_playing == 0) {
                         gCD_is_disabled = 1;
                         S3DisableCDA();
                     }
