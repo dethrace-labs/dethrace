@@ -805,26 +805,24 @@ void DoAutoParts(void) {
     int cost;
     int current_level;
 
-    while (1) {
-        if (!PartsShopRecommended()) {
-            return;
-        }
+    while (PartsShopRecommended()) {
         lowest_yet = COUNT_OF(((tParts_spec*)NULL)->info);
         for (i = 0; i < eParts_count; i++) {
             current_level = gProgram_state.current_car.power_up_levels[i];
-            if (current_level + 1 < gProgram_state.current_car.power_ups[i].number_of_parts && (gProgram_state.rank <= gProgram_state.current_car.power_ups[i].info[current_level + 1].rank_required || gProgram_state.game_completed)) {
+            if (current_level < gProgram_state.current_car.power_ups[i].number_of_parts - 1 && (gProgram_state.rank <= gProgram_state.current_car.power_ups[i].info[current_level + 1].rank_required || gProgram_state.game_completed)) {
                 CalcPartPrice(i, current_level + 1, &price, &cost);
                 if (cost != 0 && cost <= gProgram_state.credits && current_level < lowest_yet) {
+                    lowest_yet = gProgram_state.current_car.power_up_levels[i] + 1;
                     lowest_one = i;
-                    lowest_yet = current_level + 1;
                 }
             }
         }
-        if (lowest_yet == COUNT_OF(((tParts_spec*)NULL)->info)) {
+        if (lowest_yet != COUNT_OF(((tParts_spec*)NULL)->info)) {
+            if (!BuyPart(lowest_one, lowest_yet)) {
+                break;
+            }
+        } else {
             break;
-        }
-        if (!BuyPart(lowest_one, lowest_yet)) {
-            return;
         }
     }
 }
