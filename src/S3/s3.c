@@ -197,6 +197,7 @@ void S3CloseDevices(void) {
     AudioBackend_UnInitCDA();
 }
 
+// FUNCTION: CARM95 0x004994b7
 int S3ReleaseSound(tS3_sound_id id) {
     tS3_channel* c;       // [esp+Ch] [ebp-10h]
     tS3_outlet* o;        // [esp+10h] [ebp-Ch]
