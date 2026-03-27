@@ -177,6 +177,11 @@ tU32 gLocal_buffer_size;
 
 #define SHOULD_SCAN_FORWARDS() gPipe_play_ptr == gPipe_record_ptr ? 0 : gPipe_play_ptr == gPipe_buffer_oldest ? 1 \
                                                                                                               : (GetReplayRate() != 0.0f ? GetReplayRate() > 0.0f : GetReplayDirection() > 0)
+#ifdef DETHRACE_FIX_BUGS
+#define PIPING_REQUIRE(V) do { if (!(V)) { dr_dprintf("Piping require failed: %s (%s:%d)", #V, __FILE__, __LINE__); assert(V); FatalError(kFatalError_PipingSystem); } } while (0)
+#else
+#define PIPING_REQUIRE(V)
+#endif
 
 // IDA: void __usercall GetReducedPos(br_vector3 *v@<EAX>, tReduced_pos *p@<EDX>)
 // FUNCTION: CARM95 0x00427ed0
@@ -399,6 +404,7 @@ void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
         ((tPipe_session*)gLocal_buffer)->pipe_magic1 = REPLAY_DEBUG_SESSION_MAGIC1;
 #endif
         gLocal_buffer_size = (tU8*)&((tPipe_session*)gLocal_buffer)->chunks - gLocal_buffer;
+        PIPING_REQUIRE(gLocal_buffer_size <= LOCAL_BUFFER_SIZE);
         gMr_chunky2 = (tPipe_chunk*)(gLocal_buffer + gLocal_buffer_size);
     }
 }
@@ -424,6 +430,7 @@ void EndPipingSession2(int pMunge_reentrancy) {
         gLocal_buffer_size = PIPE_ALIGN(gLocal_buffer_size);
         *(tU16*)&gLocal_buffer[gLocal_buffer_size - sizeof(tU16)] = gLocal_buffer_size - sizeof(tU16);
 #endif
+        PIPING_REQUIRE(gLocal_buffer_size <= LOCAL_BUFFER_SIZE);
         if (((tPipe_session*)gLocal_buffer)->number_of_chunks != 0 && gLocal_buffer_size <= LOCAL_BUFFER_SIZE) {
             if (gPipe_buffer_phys_end < gPipe_record_ptr + gLocal_buffer_size) {
                 // Put session at begin of pipe, as no place at end
@@ -481,6 +488,7 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
         if (temp_buffer_size < LOCAL_BUFFER_SIZE) {
             REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
             ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
+            PIPING_REQUIRE(((tPipe_session*)gLocal_buffer)->number_of_chunks != 0);
             gMr_chunky2->subject_index = pSubject_index;
 #if defined(DETHRACE_REPLAY_DEBUG)
             gMr_chunky2->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
@@ -489,6 +497,7 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
             memcpy(gMr_chunky2, pData, pData_length);
             gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + pData_length);
             gLocal_buffer_size = temp_buffer_size;
+            PIPING_REQUIRE(gLocal_buffer_size <= LOCAL_BUFFER_SIZE);
         } else {
             variable_for_breaking_on = 1;
         }
