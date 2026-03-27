@@ -368,7 +368,11 @@ void DRS3Service(void) {
 // IDA: int __usercall DRS3OutletSoundsPlaying@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
 // FUNCTION: CARM95 0x0046493a
 int DRS3OutletSoundsPlaying(tS3_outlet_ptr pOutlet) {
-    NOT_IMPLEMENTED();
+    if (gSound_enabled) {
+        return S3OutletSoundsPlaying(pOutlet);
+    } else {
+        return 0;
+    }
 }
 
 // IDA: int __usercall DRS3SoundStillPlaying@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
