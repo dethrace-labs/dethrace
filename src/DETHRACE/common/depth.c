@@ -148,14 +148,14 @@ br_scalar CalculateWrappingMultiplier(br_scalar pValue, br_scalar pYon) {
     br_scalar trunc_k;
     int int_k;
 
-    k = pYon * 1.3f * TAU / pValue;
+    k = (br_scalar)(pYon * 1.3f) * 6.2831855f / pValue;
     int_k = (int)k;
-    if (k - int_k <= .5f) {
-        trunc_k = int_k;
+    trunc_k = int_k;
+    if (k - trunc_k > .5f) {
+        return (trunc_k + 1.f) / 6.2831855f * pValue;
     } else {
-        trunc_k = int_k + 1.f;
+        return trunc_k / 6.2831855f * pValue;
     }
-    return trunc_k / TAU * pValue;
 }
 
 // IDA: br_scalar __usercall DepthCueingShiftToDistance@<ST0>(int pShift@<EAX>)
@@ -230,14 +230,14 @@ void InstantDepthChange(tDepth_effect_type pType, br_pixelmap* pSky_texture, int
     }
 
     gProgram_state.current_depth_effect.sky_texture = pSky_texture;
-    gHorizon_material->colour_map = pSky_texture;
+    gHorizon_material->colour_map = gProgram_state.current_depth_effect.sky_texture;
     BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
     gProgram_state.current_depth_effect.type = pType;
     gProgram_state.current_depth_effect.start = pStart;
     gProgram_state.current_depth_effect.end = pEnd;
-    gProgram_state.default_depth_effect.type = pType;
-    gProgram_state.default_depth_effect.start = pStart;
-    gProgram_state.default_depth_effect.end = pEnd;
+    gProgram_state.default_depth_effect.type = gProgram_state.current_depth_effect.type;
+    gProgram_state.default_depth_effect.start = gProgram_state.current_depth_effect.start;
+    gProgram_state.default_depth_effect.end = gProgram_state.current_depth_effect.end;
 
 #ifdef DETHRACE_3DFX_PATCH
     if (gMaterial_fogging) {
@@ -498,7 +498,8 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
     int depth_line_skip;
     int render_line_skip;
 
-    too_near = 0xffff - (1 << pStart);
+    depth_start = 0x10000 - (1 << pStart);
+    too_near = 0x10000 - depth_start;
     shade_table_pixels = pShade_table->pixels;
     depth_shift_amount = pShade_table_power + 8 - pStart - pEnd;
     render_ptr = (tU8*)pRender_buffer->pixels + pRender_buffer->base_x + pRender_buffer->base_y * pRender_buffer->row_bytes;
@@ -506,49 +507,42 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
     render_line_skip = pRender_buffer->row_bytes - pRender_buffer->width;
     depth_line_skip = pDepth_buffer->row_bytes / 2 - pRender_buffer->width;
 
-    if (depth_shift_amount <= 0) {
-        if (depth_shift_amount >= 0) {
-            for (y = 0; y < pRender_buffer->height; ++y) {
-                for (x = 0; x < pRender_buffer->width; ++x) {
-                    if (*depth_ptr != 0xFFFF) {
-                        depth_value = *depth_ptr - too_near;
-                        if (depth_value < -(tS16)too_near) {
-                            *render_ptr = shade_table_pixels[(depth_value & 0xFF00) + *render_ptr];
-                        }
-                    }
-                    ++render_ptr;
-                    ++depth_ptr;
-                }
-                render_ptr += render_line_skip;
-                depth_ptr += depth_line_skip;
-            }
-        } else {
-            for (y = 0; pRender_buffer->height > y; ++y) {
-                for (x = 0; pRender_buffer->width > x; ++x) {
-                    if (*depth_ptr != 0xFFFF) {
-                        depth_value = *depth_ptr - too_near;
-                        if (depth_value < -(tS16)too_near) {
-                            *render_ptr = shade_table_pixels[*render_ptr + ((depth_value >> (pEnd - (pShade_table_power + 8 - pStart))) & 0xFF00)];
-                        }
-                    }
-                    ++render_ptr;
-                    ++depth_ptr;
-                }
-                render_ptr += render_line_skip;
-                depth_ptr += depth_line_skip;
-            }
-        }
-    } else {
+    if (depth_shift_amount > 0) {
         for (y = 0; pRender_buffer->height > y; ++y) {
-            for (x = 0; pRender_buffer->width > x; ++x) {
+            for (x = 0; pRender_buffer->width > x; ++x, ++render_ptr, ++depth_ptr) {
                 if (*depth_ptr != 0xFFFF) {
-                    depth_value = *depth_ptr - too_near;
-                    if (depth_value < -(tS16)too_near) {
+                    depth_value = *depth_ptr - depth_start;
+                    if (depth_value < too_near) {
                         *render_ptr = shade_table_pixels[*render_ptr + ((depth_value << depth_shift_amount) & 0xFF00)];
                     }
                 }
-                ++render_ptr;
-                ++depth_ptr;
+            }
+            render_ptr += render_line_skip;
+            depth_ptr += depth_line_skip;
+        }
+    } else if (depth_shift_amount < 0) {
+            depth_shift_amount = -depth_shift_amount;
+        for (y = 0; pRender_buffer->height > y; ++y) {
+            for (x = 0; pRender_buffer->width > x; ++x, ++render_ptr, ++depth_ptr) {
+                if (*depth_ptr != 0xFFFF) {
+                    depth_value = *depth_ptr - depth_start;
+                    if (depth_value < too_near) {
+                        *render_ptr = shade_table_pixels[*render_ptr + ((depth_value >> depth_shift_amount) & 0xFF00)];
+                    }
+                }
+            }
+            render_ptr += render_line_skip;
+            depth_ptr += depth_line_skip;
+        }
+    } else {
+        for (y = 0; y < pRender_buffer->height; ++y) {
+            for (x = 0; x < pRender_buffer->width; ++x, ++render_ptr, ++depth_ptr) {
+                if (*depth_ptr != 0xFFFF) {
+                    depth_value = *depth_ptr - depth_start;
+                    if (depth_value < too_near) {
+                        *render_ptr = shade_table_pixels[(depth_value & 0xFF00) + *render_ptr];
+                    }
+                }
             }
             render_ptr += render_line_skip;
             depth_ptr += depth_line_skip;
@@ -639,37 +633,36 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     br_actor* actor;
 
     yaw = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
-    if (!gProgram_state.cockpit_on && !gAction_replay_mode && gAction_replay_camera_mode != eAction_replay_standard
+    if (gProgram_state.cockpit_on
+        || (gAction_replay_mode * gAction_replay_camera_mode) != 0
 
 #ifdef DETHRACE_3DFX_PATCH
-        && !gBlitting_is_slow
+        || gBlitting_is_slow
 #endif
     ) {
-        return;
-    }
-
-    if (gRendering_mirror) {
-        actor = gRearview_sky_actor;
-    } else {
-        actor = gForward_sky_actor;
-        if (ACTOR_CAMERA(gCamera)->field_of_view != gOld_fov || ACTOR_CAMERA(gCamera)->yon_z != gOld_yon) {
-            gOld_fov = ACTOR_CAMERA(gCamera)->field_of_view;
-            gOld_yon = ACTOR_CAMERA(gCamera)->yon_z;
-            MungeSkyModel(gCamera, gForward_sky_model);
+        if (gRendering_mirror) {
+            actor = gRearview_sky_actor;
+        } else {
+            actor = gForward_sky_actor;
+            if (ACTOR_CAMERA(gCamera)->field_of_view != gOld_fov || ACTOR_CAMERA(gCamera)->yon_z != gOld_yon) {
+                gOld_fov = ACTOR_CAMERA(gCamera)->field_of_view;
+                gOld_yon = ACTOR_CAMERA(gCamera)->yon_z;
+                MungeSkyModel(gCamera, gForward_sky_model);
+            }
         }
+        BrMatrix34RotateY(&actor->t.t.mat, yaw);
+        BrVector3Copy(&actor->t.t.translate.t, (br_vector3*)pCamera_to_world->m[3]);
+        gHorizon_material->map_transform.m[0][0] = 1.f;
+        gHorizon_material->map_transform.m[0][1] = 0.f;
+        gHorizon_material->map_transform.m[1][0] = 0.f;
+        gHorizon_material->map_transform.m[1][1] = 1.f;
+        gHorizon_material->map_transform.m[2][0] = -BrFixedToFloat(yaw) / BrFixedToFloat(gSky_image_width);
+        gHorizon_material->map_transform.m[2][1] = 0.f;
+        BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
+        actor->render_style = BR_RSTYLE_FACES;
+        BrZbSceneRenderAdd(actor);
+        actor->render_style = BR_RSTYLE_NONE;
     }
-    BrMatrix34RotateY(&actor->t.t.mat, yaw);
-    BrVector3Copy(&actor->t.t.translate.t, (br_vector3*)pCamera_to_world->m[3]);
-    gHorizon_material->map_transform.m[0][0] = 1.f;
-    gHorizon_material->map_transform.m[0][1] = 0.f;
-    gHorizon_material->map_transform.m[1][0] = 0.f;
-    gHorizon_material->map_transform.m[1][1] = 1.f;
-    gHorizon_material->map_transform.m[2][0] = -BrFixedToFloat(yaw) / BrFixedToFloat(gSky_image_width);
-    gHorizon_material->map_transform.m[2][1] = 0.f;
-    BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
-    actor->render_style = BR_RSTYLE_FACES;
-    BrZbSceneRenderAdd(actor);
-    actor->render_style = BR_RSTYLE_NONE;
 }
 
 // IDA: void __usercall DoDepthCue(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>)
@@ -840,8 +833,11 @@ void DoSpecialCameraEffect(br_actor* pCamera, br_matrix34* pCamera_to_world) {
     } else {
         gLast_camera_special_volume = FindSpecialVolume((br_vector3*)pCamera_to_world->m[3], gLast_camera_special_volume);
         if (gLast_camera_special_volume != NULL) {
-            if (gLast_camera_special_volume->camera_special_effect_index == 0) {
+            switch (gLast_camera_special_volume->camera_special_effect_index) {
+            case 0:
                 DoWobbleCamera(pCamera);
+            default:
+                break;
             }
         }
     }
@@ -938,9 +934,7 @@ void DecreaseYon(void) {
         gCamera_yon = 5.f;
     }
     AssertYons();
-    camera_ptr = gCamera_list[1]->type_data;
-    i = (int)camera_ptr->yon_z;
-    sprintf(s, GetMiscString(kMiscString_YonDecreasedTo_D), i);
+    sprintf(s, GetMiscString(kMiscString_YonDecreasedTo_D), (int)ACTOR_CAMERA(gCamera_list[1])->yon_z);
     NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s);
 }
 
@@ -1019,6 +1013,10 @@ void DecreaseAngle(void) {
 void ToggleDepthMode(void) {
 
     switch (gProgram_state.current_depth_effect.type) {
+    case eDepth_effect_fog:
+        InstantDepthChange(eDepth_effect_none, gProgram_state.current_depth_effect.sky_texture, 0, 0);
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Depth effects disabled");
+        break;
     case eDepth_effect_none:
         InstantDepthChange(eDepth_effect_darkness, gProgram_state.current_depth_effect.sky_texture, 8, 0);
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Darkness mode");
@@ -1027,10 +1025,6 @@ void ToggleDepthMode(void) {
         InstantDepthChange(eDepth_effect_none, gProgram_state.current_depth_effect.sky_texture, 0, 0);
         InstantDepthChange(eDepth_effect_fog, gProgram_state.current_depth_effect.sky_texture, 10, 0);
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Fog mode");
-        break;
-    case eDepth_effect_fog:
-        InstantDepthChange(eDepth_effect_none, gProgram_state.current_depth_effect.sky_texture, 0, 0);
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "Depth effects disabled");
         break;
     }
     gProgram_state.default_depth_effect.type = gProgram_state.current_depth_effect.type;
@@ -1046,20 +1040,8 @@ int GetSkyTextureOn(void) {
 // IDA: void __usercall SetSkyTextureOn(int pOn@<EAX>)
 // FUNCTION: CARM95 0x00463a93
 void SetSkyTextureOn(int pOn) {
-    br_pixelmap* tmp;
-
     if (pOn != gSky_on) {
-        tmp = gProgram_state.current_depth_effect.sky_texture;
-        gProgram_state.current_depth_effect.sky_texture = gSwap_sky_texture;
-        gProgram_state.default_depth_effect.sky_texture = gSwap_sky_texture;
-        gSwap_sky_texture = tmp;
-
-        if (gHorizon_material) {
-            if (gSwap_sky_texture) {
-                gHorizon_material->colour_map = gSwap_sky_texture;
-                BrMaterialUpdate(gHorizon_material, -1);
-            }
-        }
+        ToggleSkyQuietly();
     }
     gSky_on = pOn;
 }
@@ -1105,10 +1087,7 @@ int GetDepthCueingOn(void) {
 // FUNCTION: CARM95 0x00463bda
 void SetDepthCueingOn(int pOn) {
     if (pOn != gDepth_cueing_on && gHorizon_material) {
-        InstantDepthChange(gSwap_depth_effect_type, gProgram_state.current_depth_effect.sky_texture, gSwap_depth_effect_start, gSwap_depth_effect_end);
-        gSwap_depth_effect_type = gProgram_state.current_depth_effect.type;
-        gSwap_depth_effect_start = gProgram_state.current_depth_effect.start;
-        gSwap_depth_effect_end = gProgram_state.current_depth_effect.end;
+        ToggleDepthCueingQuietly();
     }
     gDepth_cueing_on = pOn;
 }

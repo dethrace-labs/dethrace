@@ -105,15 +105,10 @@ extern int gS3_last_error;
 // IDA: void __cdecl UsePathFileToDetermineIfFullInstallation()
 // FUNCTION: CARM95 0x00463fb0
 void UsePathFileToDetermineIfFullInstallation(void) {
-    // changed by dethrace for compatibility
-    // char line1[80];
-    // char line2[80];
-    // char line3[80];
-    // char path_file[80];
-    char line1[MAX_PATH_LENGTH];
-    char line2[MAX_PATH_LENGTH];
-    char line3[MAX_PATH_LENGTH];
-    char path_file[MAX_PATH_LENGTH];
+    char line1[80];
+    char line2[80];
+    char line3[80];
+    char path_file[80];
     FILE* fp;
 
     strcpy(path_file, gApplication_path);
@@ -156,7 +151,7 @@ void InitSound(void) {
         }
         if (gSound_override) {
             gSound_enabled = 0;
-            gSound_available = 0;
+            gSound_available = gSound_enabled;
         } else {
             gSound_enabled = S3Init(the_path, gAusterity_mode) == 0;
             gSound_available = gSound_enabled;
@@ -166,142 +161,139 @@ void InitSound(void) {
         gCD_is_disabled = 0;
         UsePathFileToDetermineIfFullInstallation();
     }
-    if (gSound_available == 0) {
-        return;
-    }
-    switch (gSound_detail_level) {
-    case 0:
-        engine_channel_count = 2;
-        car_channel_count = 2;
-        ped_channel_count = 3;
-        break;
-    case 1:
-        engine_channel_count = 2;
-        car_channel_count = 3;
-        ped_channel_count = 4;
-        break;
-    case 2:
-        engine_channel_count = 6;
-        car_channel_count = 4;
-        ped_channel_count = 5;
-        break;
-    default:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
-    }
-    if (gDriver_outlet == NULL) {
-        gDriver_outlet = S3CreateOutlet(1, 1);
-        gIndexed_outlets[0] = gDriver_outlet;
+    if (gSound_available != 0) {
+        if (gSound_detail_level == 0) {
+            engine_channel_count = 2;
+            car_channel_count = 2;
+            ped_channel_count = 3;
+        } else if (gSound_detail_level == 1) {
+            engine_channel_count = 2;
+            car_channel_count = 3;
+            ped_channel_count = 4;
+        } else if (gSound_detail_level == 2) {
+            engine_channel_count = 6;
+            car_channel_count = 4;
+            ped_channel_count = 5;
+        }
         if (gDriver_outlet == NULL) {
-            gSound_available = 0;
-            return;
-        }
-    }
-    if (!gMusic_outlet) {
-        gMusic_outlet = S3CreateOutlet(1, 1);
-        gIndexed_outlets[2] = gMusic_outlet;
-        gMusic_available = gMusic_outlet != 0;
-        DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);
-    }
-    if (gSound_detail_level != gOld_sound_detail_level) {
-        if (gCar_outlet) {
-            S3ReleaseOutlet(gCar_outlet);
-            gCar_outlet = 0;
-        }
-        if (gPedestrians_outlet) {
-            S3ReleaseOutlet(gPedestrians_outlet);
-            gPedestrians_outlet = 0;
-        }
-        if (gEngine_outlet) {
-            S3ReleaseOutlet(gEngine_outlet);
-            gEngine_outlet = 0;
-        }
-        if (gEngine_outlet == NULL) {
-            gEngine_outlet = S3CreateOutlet(engine_channel_count, engine_channel_count);
-            gIndexed_outlets[1] = gEngine_outlet;
-            if (!gEngine_outlet) {
+            gDriver_outlet = S3CreateOutlet(1, 1);
+            gIndexed_outlets[0] = gDriver_outlet;
+            if (gDriver_outlet == NULL) {
                 gSound_available = 0;
                 return;
             }
-            DRS3SetOutletVolume(gEngine_outlet, 42 * gProgram_state.effects_volume);
         }
-        if (gCar_outlet == NULL) {
-            gCar_outlet = S3CreateOutlet(car_channel_count, car_channel_count);
-            gIndexed_outlets[3] = gCar_outlet;
-            if (!gCar_outlet) {
+        if (!gMusic_outlet) {
+            gMusic_outlet = S3CreateOutlet(1, 1);
+            gIndexed_outlets[2] = gMusic_outlet;
+            gMusic_available = gIndexed_outlets[2] != 0;
+            DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);
+        }
+        if (gSound_detail_level != gOld_sound_detail_level) {
+            if (gCar_outlet) {
+                S3ReleaseOutlet(gCar_outlet);
+                gCar_outlet = 0;
+            }
+            if (gPedestrians_outlet) {
+                S3ReleaseOutlet(gPedestrians_outlet);
+                gPedestrians_outlet = 0;
+            }
+            if (gEngine_outlet) {
+                S3ReleaseOutlet(gEngine_outlet);
+                gEngine_outlet = 0;
+            }
+            if (gEngine_outlet == NULL) {
+                gEngine_outlet = S3CreateOutlet(engine_channel_count, engine_channel_count);
+                gIndexed_outlets[1] = gEngine_outlet;
+                if (!gEngine_outlet) {
+                    gSound_available = 0;
+                    return;
+                }
+                DRS3SetOutletVolume(gEngine_outlet, 42 * gProgram_state.effects_volume);
+            }
+            if (gCar_outlet == NULL) {
+                gCar_outlet = S3CreateOutlet(car_channel_count, car_channel_count);
+                gIndexed_outlets[3] = gCar_outlet;
+                if (!gCar_outlet) {
+                    gSound_available = 0;
+                    return;
+                }
+                DRS3SetOutletVolume(gCar_outlet, 42 * gProgram_state.effects_volume);
+            }
+            if (gPedestrians_outlet == NULL) {
+                gPedestrians_outlet = S3CreateOutlet(ped_channel_count, ped_channel_count);
+                gIndexed_outlets[4] = gPedestrians_outlet;
+                if (!gPedestrians_outlet) {
+                    gSound_available = 0;
+                    return;
+                }
+                DRS3SetOutletVolume(gPedestrians_outlet, 42 * gProgram_state.effects_volume);
+            }
+        }
+        if (gEffects_outlet == NULL) {
+            gEffects_outlet = S3CreateOutlet(2, 2);
+            gIndexed_outlets[5] = gEffects_outlet;
+            if (!gEffects_outlet) {
                 gSound_available = 0;
                 return;
             }
-            DRS3SetOutletVolume(gCar_outlet, 42 * gProgram_state.effects_volume);
+            DRS3SetOutletVolume(gEffects_outlet, 42 * gProgram_state.effects_volume);
         }
-        if (gPedestrians_outlet == NULL) {
-            gPedestrians_outlet = S3CreateOutlet(ped_channel_count, ped_channel_count);
-            gIndexed_outlets[4] = gPedestrians_outlet;
-            if (!gPedestrians_outlet) {
-                gSound_available = 0;
-                return;
-            }
-            DRS3SetOutletVolume(gPedestrians_outlet, 42 * gProgram_state.effects_volume);
-        }
+        gOld_sound_detail_level = gSound_detail_level;
+        SetSoundVolumes();
     }
-    if (gEffects_outlet == NULL) {
-        gEffects_outlet = S3CreateOutlet(2, 2);
-        gIndexed_outlets[5] = gEffects_outlet;
-        if (!gEffects_outlet) {
-            gSound_available = 0;
-            return;
-        }
-        DRS3SetOutletVolume(gEffects_outlet, 42 * gProgram_state.effects_volume);
-    }
-    gOld_sound_detail_level = gSound_detail_level;
-    SetSoundVolumes();
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSound@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>)
 // FUNCTION: CARM95 0x0046458b
 tS3_sound_tag DRS3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
-    if (!gSound_enabled) {
+    if (gSound_enabled) {
+        if (pSound != 1000 && (pSound < 3000 || pSound > 3007) && (pSound < 5300 || pSound > 5320)) {
+            PipeSingleSound(pOutlet, pSound, 0, 0, -1, 0);
+        }
+        return S3StartSound(pOutlet, pSound);
+    } else {
         return 0;
     }
-    if (pSound != 1000 && (pSound < 3000 || pSound > 3007) && (pSound < 5300 || pSound > 5320)) {
-        PipeSingleSound(pOutlet, pSound, 0, 0, -1, 0);
-    }
-    return S3StartSound(pOutlet, pSound);
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSoundNoPiping@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>)
 // FUNCTION: CARM95 0x0046461d
 tS3_sound_tag DRS3StartSoundNoPiping(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
-    if (!gSound_enabled) {
+    if (gSound_enabled) {
+        return S3StartSound(pOutlet, pSound);
+    } else {
         return 0;
     }
-    return S3StartSound(pOutlet, pSound);
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSound2@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>, tS3_repeats pRepeats@<EBX>, tS3_volume pLVolume@<ECX>, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed)
 // FUNCTION: CARM95 0x00464656
 tS3_sound_tag DRS3StartSound2(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, tS3_repeats pRepeats, tS3_volume pLVolume, tS3_volume pRVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
 
-    if (!gSound_enabled) {
+    if (gSound_enabled) {
+        if (pOutlet != gMusic_outlet
+            && pSound != 1000
+            && (pSound < 3000 || pSound > 3007)
+            && (pSound < 5300 || pSound > 5320)
+            && (pLVolume || pRVolume)) {
+            PipeSingleSound(pOutlet, pSound, pLVolume, pRVolume, pPitch, 0);
+        }
+        return S3StartSound2(pOutlet, pSound, pRepeats, pLVolume, pRVolume, pPitch, pSpeed);
+    } else {
         return 0;
     }
-    if (pOutlet != gMusic_outlet
-        && pSound != 1000
-        && (pSound < 3000 || pSound > 3007)
-        && (pSound < 5300 || pSound > 5320)
-        && (pLVolume || pRVolume)) {
-        PipeSingleSound(pOutlet, pSound, pLVolume, pRVolume, pPitch, 0);
-    }
-    return S3StartSound2(pOutlet, pSound, pRepeats, pLVolume, pRVolume, pPitch, pSpeed);
 }
 
 // IDA: int __usercall DRS3ChangeVolume@<EAX>(tS3_sound_tag pSound_tag@<EAX>, tS3_volume pNew_volume@<EDX>)
 // FUNCTION: CARM95 0x00464724
 int DRS3ChangeVolume(tS3_sound_tag pSound_tag, tS3_volume pNew_volume) {
 
-    if (gSound_enabled == 0) {
+    if (gSound_enabled != 0) {
+        return S3ChangeVolume(pSound_tag, pNew_volume);
+    } else {
         return 0;
     }
-    return S3ChangeVolume(pSound_tag, pNew_volume);
 }
 
 // IDA: int __usercall DRS3ChangeLRVolume@<EAX>(tS3_sound_tag pSound_tag@<EAX>, tS3_volume pNew_Lvolume@<EDX>, tS3_volume pNew_Rvolume@<EBX>)
@@ -324,20 +316,22 @@ int DRS3ChangeSpeed(tS3_sound_tag pTag, tS3_pitch pNew_speed) {
 // FUNCTION: CARM95 0x0046480c
 int DRS3ChangePitchSpeed(tS3_sound_tag pTag, tS3_pitch pNew_pitch) {
 
-    if (!gSound_enabled) {
+    if (gSound_enabled != 0) {
+        return S3ChangePitchSpeed(pTag, pNew_pitch);
+    } else {
         return 0;
     }
-    return S3ChangePitchSpeed(pTag, pNew_pitch);
 }
 
 // IDA: int __usercall DRS3StopSound@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
 // FUNCTION: CARM95 0x00464845
 int DRS3StopSound(tS3_sound_tag pSound_tag) {
 
-    if (!gSound_enabled) {
+    if (gSound_enabled) {
+        return S3StopSound(pSound_tag);
+    } else {
         return 0;
     }
-    return S3StopSound(pSound_tag);
 }
 
 // IDA: int __usercall DRS3LoadSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)
