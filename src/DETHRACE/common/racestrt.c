@@ -2042,15 +2042,12 @@ void MoveGrid(int pFrom, int pTo, tS32 pTime_to_move) {
     int pitch;
 
     pitch = gCurrent_graf_data->grid_x_pitch;
+    move_distance = (pTo - pFrom) * pitch;
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + pTime_to_move <= the_time) {
-            break;
-        }
-        DrawGrid(pitch * pFrom + pitch * (pTo - pFrom) * (the_time - start_time) / pTime_to_move, 1);
+    while (pTime_to_move + start_time > (the_time = PDGetTotalTime())) {
+        DrawGrid(move_distance * (the_time - start_time) / pTime_to_move + pFrom * pitch, 1);
     }
-    DrawGrid(pitch * pTo, 1);
+    DrawGrid(pTo * pitch, 1);
 }
 
 // IDA: int __usercall CalcGridOffset@<EAX>(int pPosition@<EAX>)
