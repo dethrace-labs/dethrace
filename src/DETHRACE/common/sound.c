@@ -338,10 +338,11 @@ int DRS3StopSound(tS3_sound_tag pSound_tag) {
 // FUNCTION: CARM95 0x0046487a
 int DRS3LoadSound(tS3_sound_id pThe_sound) {
 
-    if (!gSound_enabled) {
+    if (gSound_enabled) {
+        return S3LoadSample(pThe_sound);
+    } else {
         return 0;
     }
-    return S3LoadSample(pThe_sound);
 }
 
 // IDA: int __usercall DRS3ReleaseSound@<EAX>(tS3_sound_id pThe_sound@<EAX>)
