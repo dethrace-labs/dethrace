@@ -360,11 +360,7 @@ int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
 void DRS3Service(void) {
 
     if (gSound_enabled) {
-        if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
-            S3Service(1, 1);
-        } else {
-            S3Service(0, 1);
-        }
+        S3Service(gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0, 1);
     }
 }
 
