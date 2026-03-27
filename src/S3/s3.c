@@ -880,16 +880,15 @@ int S3ServiceChannel(tS3_channel* chan) {
 }
 
 // FUNCTION: CARM95 0x0049C7CF
-void S3StopAllOutletSounds(void) {
+int S3StopAllOutletSounds(void) {
     tS3_outlet* o; // [esp+Ch] [ebp-4h]
 
-    if (!gS3_enabled) {
-        return;
+    if (gS3_enabled) {
+        for (o = gS3_outlets; o; o = o->next) {
+            S3StopOutletSound(o);
+        }
     }
-
-    for (o = gS3_outlets; o; o = o->next) {
-        S3StopOutletSound(o);
-    }
+    return 0;
 }
 
 // FUNCTION: CARM95 0x004C84A0
