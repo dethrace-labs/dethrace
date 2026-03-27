@@ -2366,16 +2366,20 @@ int GridClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY
     int base_pos;
     int x_coord;
 
-    rel_pos = ((gCurrent_graf_data->grid_bottom_clip - gCurrent_graf_data->grid_top_clip) / 2) < pY_offset;
-    if (rel_pos) {
+    if (((gCurrent_graf_data->grid_bottom_clip - gCurrent_graf_data->grid_top_clip) / 2) < pY_offset) {
+        rel_pos = 1;
         pX_offset -= gCurrent_graf_data->grid_x_stagger;
+    } else {
+        rel_pos = 0;
     }
     x_coord = pX_offset / gCurrent_graf_data->grid_x_pitch;
     if (x_coord > 2) {
         x_coord = 2;
     }
-    new_pos = 2 * x_coord + rel_pos + (gOur_starting_position & ~1) - 2;
-    if (new_pos >= 0 && new_pos < gCurrent_race.number_of_racers && gProgram_state.rank < gCurrent_race.opponent_list[new_pos].ranking) {
+    rel_pos += 2 * x_coord;
+    base_pos = (gOur_starting_position & ~1) - 2;
+    new_pos = rel_pos + base_pos;
+    if (new_pos >= 0 && new_pos < gCurrent_race.number_of_racers && gProgram_state.rank <= gCurrent_race.opponent_list[new_pos].ranking) {
         DRS3StartSound(gEffects_outlet, 3000);
         DoGridTransition(gOur_starting_position, new_pos);
     }
