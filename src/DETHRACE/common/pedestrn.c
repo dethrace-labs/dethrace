@@ -269,10 +269,10 @@ int ActorIsPedestrian(br_actor* pActor) {
 // IDA: br_scalar __usercall PedHeightFromActor@<ST0>(br_actor *pActor@<EAX>)
 // FUNCTION: CARM95 0x004558b8
 br_scalar PedHeightFromActor(br_actor* pActor) {
-    if (!ActorIsPedestrian(pActor)) {
-        return 0.f;
-    }
-    return ActorToPedestrianData(pActor)->height2;
+    br_scalar height;
+
+    height = ActorIsPedestrian(pActor) ? ActorToPedestrianData(pActor)->height2 : 0;
+    return height;
 }
 
 // IDA: int __usercall GetPedestrianValue@<EAX>(br_actor *pActor@<EAX>)
