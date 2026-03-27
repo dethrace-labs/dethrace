@@ -938,7 +938,7 @@ void DecreaseYon(void) {
         gCamera_yon = 5.f;
     }
     AssertYons();
-    sprintf(s, GetMiscString(kMiscString_YonDecreasedTo_D), (int)((br_camera*)gCamera_list[1]->type_data)->yon_z);
+    sprintf(s, GetMiscString(kMiscString_YonDecreasedTo_D), (int)ACTOR_CAMERA(gCamera_list[1])->yon_z);
     NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s);
 }
 
