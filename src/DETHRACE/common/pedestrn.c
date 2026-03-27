@@ -4100,8 +4100,7 @@ void SendAllPedestrianPositions(tPlayer_ID pPlayer) {
     tNet_contents* the_contents;
 
     gSend_peds = 1;
-    for (i = 0; i < gPed_count; i++) {
-        the_pedestrian = &gPedestrian_array[i];
+    for (i = 0, the_pedestrian = gPedestrian_array; i < gPed_count; i++, the_pedestrian++) {
         if (the_pedestrian->munged) {
             SendPedestrian(the_pedestrian, i);
         }
