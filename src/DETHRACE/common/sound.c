@@ -391,10 +391,11 @@ void DRS3ShutDown(void) {
 // FUNCTION: CARM95 0x004649cb
 int DRS3SetOutletVolume(tS3_outlet_ptr pOutlet, tS3_volume pVolume) {
 
-    if (!gSound_enabled) {
+    if (gSound_enabled) {
+        return S3SetOutletVolume(pOutlet, pVolume);
+    } else {
         return 0;
     }
-    return S3SetOutletVolume(pOutlet, pVolume);
 }
 
 // IDA: int __usercall DRS3OverallVolume@<EAX>(tS3_volume pVolume@<EAX>)
