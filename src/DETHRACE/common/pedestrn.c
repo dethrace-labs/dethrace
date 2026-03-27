@@ -2147,7 +2147,13 @@ void SendPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
             BrVector3Copy(&the_contents->data.pedestrian.offset, &pPedestrian->offset);
             the_contents->data.pedestrian.murderer = pPedestrian->murderer;
             if (pPedestrian->ref_number < 100) {
+// copy float into the respawn_time_or_spin_period slot without converting it
+#ifdef DETHRACE_FIX_BUGS
+                // avoid type punning
+                memcpy(&the_contents->data.pedestrian.respawn_time_or_spin_period, &pPedestrian->spin_period, sizeof(pPedestrian->spin_period));
+#else
                 the_contents->data.pedestrian.respawn_time_or_spin_period = *(tU32*)&pPedestrian->spin_period;
+#endif
             } else {
                 the_contents->data.pedestrian.respawn_time_or_spin_period = pPedestrian->respawn_time;
             }
