@@ -147,18 +147,21 @@ void DrawRaceList(int pOffset) {
         gCurrent_graf_data->choose_race_y_bottom - gCurrent_graf_data->choose_race_y_top,
         0);
     pitch = gCurrent_graf_data->choose_race_y_pitch;
+    font_height = gBig_font->glyph_y;
     for (i = 0; i < gNumber_of_races; i++) {
         y = pitch * i + gCurrent_graf_data->choose_race_curr_y - pOffset;
-        if (gCurrent_graf_data->choose_race_y_top <= (y - (TranslationMode() ? 2 : 0)) && (y + gBig_font->glyph_y) < gCurrent_graf_data->choose_race_line_y) {
-            if ((gProgram_state.rank > gRace_list[i].rank_required || gProgram_state.rank < gRace_list[i].best_rank) && !gProgram_state.game_completed && !gChange_race_net_mode) {
+        if (gCurrent_graf_data->choose_race_y_top <= (y - (TranslationMode() ? 2 : 0)) && (y + font_height) < gCurrent_graf_data->choose_race_line_y) {
+            if (!((gProgram_state.rank > gRace_list[i].rank_required || gProgram_state.rank < gRace_list[i].best_rank) && !gProgram_state.game_completed && !gChange_race_net_mode)) {
+                if (gCurrent_graf_data->choose_race_curr_y == y) {
+                    rank_colour = 5;
+                    text_colour = 1;
+                } else {
+                    rank_colour = 198;
+                    text_colour = 201;
+                }
+            } else {
                 rank_colour = 44;
                 text_colour = 49;
-            } else if (gCurrent_graf_data->choose_race_curr_y == y) {
-                rank_colour = 5;
-                text_colour = 1;
-            } else {
-                rank_colour = 198;
-                text_colour = 201;
             }
             if (!gChange_race_net_mode) {
                 sprintf(rank_str, "%2d", gRace_list[i].rank_required);
@@ -183,7 +186,7 @@ void DrawRaceList(int pOffset) {
 #endif
                     gBack_screen,
                     gCurrent_graf_data->choose_race_bullet_left,
-                    y + (gBig_font->glyph_y - gBullet_image->height) / 2,
+                    y + (font_height - gBullet_image->height) / 2,
                     gBullet_image,
                     0,
                     0,
@@ -192,17 +195,10 @@ void DrawRaceList(int pOffset) {
             }
         }
     }
-    if (gChange_race_net_mode) {
-        strcpy(rank_str, GetMiscString(gNet_race_sequence__racestrt == 1 ? kMiscString_SUBSEQUENT_RACES_WILL_BE_RANDOM : kMiscString_RACES_WILL_CONTINUE_DOWN_THIS_LIST));
-        TransBrPixelmapText(gBack_screen,
-            (right_most + left_most - BrPixelmapTextWidth(gBack_screen, gBig_font, rank_str)) / 2,
-            gCurrent_graf_data->choose_race_current_text_y,
-            5,
-            gBig_font,
-            rank_str);
-    } else {
+    if (!gChange_race_net_mode) {
         sprintf(rank_str, "%s%d", GetMiscString(kMiscString_YourCurrentRankIs), gProgram_state.rank);
-        text_x = (gCurrent_graf_data->choose_race_left + gCurrent_graf_data->choose_race_right) / 2 - BrPixelmapTextWidth(gBack_screen, gBig_font, rank_str) / 2;
+        text_width = BrPixelmapTextWidth(gBack_screen, gBig_font, rank_str);
+        text_x = (gCurrent_graf_data->choose_race_left + gCurrent_graf_data->choose_race_right) / 2 - text_width / 2;
         TransBrPixelmapText(gBack_screen,
             text_x,
             gCurrent_graf_data->choose_race_current_text_y,
@@ -210,8 +206,17 @@ void DrawRaceList(int pOffset) {
             gBig_font,
             GetMiscString(kMiscString_YourCurrentRankIs));
         sprintf(rank_str, "%d", gProgram_state.rank);
+        text_width = BrPixelmapTextWidth(gBack_screen, gBig_font, GetMiscString(kMiscString_YourCurrentRankIs));
         TransBrPixelmapText(gBack_screen,
-            text_x + BrPixelmapTextWidth(gBack_screen, gBig_font, GetMiscString(kMiscString_YourCurrentRankIs)),
+            text_x + text_width,
+            gCurrent_graf_data->choose_race_current_text_y,
+            5,
+            gBig_font,
+            rank_str);
+    } else {
+        strcpy(rank_str, GetMiscString(gNet_race_sequence__racestrt == 1 ? kMiscString_SUBSEQUENT_RACES_WILL_BE_RANDOM : kMiscString_RACES_WILL_CONTINUE_DOWN_THIS_LIST));
+        TransBrPixelmapText(gBack_screen,
+            (right_most + left_most - BrPixelmapTextWidth(gBack_screen, gBig_font, rank_str)) / 2,
             gCurrent_graf_data->choose_race_current_text_y,
             5,
             gBig_font,
@@ -227,7 +232,7 @@ void DrawRaceList(int pOffset) {
         left_most,
         gCurrent_graf_data->choose_race_box_top - 1,
         right_most,
-        2 * gCurrent_graf_data->choose_race_curr_y - gCurrent_graf_data->choose_race_box_top + gBig_font->glyph_y,
+        box_bot = 2 * gCurrent_graf_data->choose_race_curr_y - gCurrent_graf_data->choose_race_box_top + font_height,
         3);
     PDScreenBufferSwap(0);
 }
