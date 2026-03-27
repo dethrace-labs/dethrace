@@ -424,7 +424,7 @@ void DrawCar(int pCurrent_choice, int pCurrent_mode) {
 #pragma GCC diagnostic ignored "-Wformat-security"
 
     PollCarDetails(gChoose_car_net_game);
-    if (gChange_race_net_mode != 0) {
+    if (gChange_race_net_mode) {
         if (gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership == eCar_owner_someone) {
             sprintf(s, "%s %s", GetMiscString(kMiscString_THIS_CAR_ALREADY_TAKEN_BY), gCar_details[gProgram_state.cars_available[gCurrent_car_index]].name);
         } else {
