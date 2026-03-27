@@ -1373,13 +1373,14 @@ int StartRaceGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 // FUNCTION: CARM95 0x0045110d
 int TryToMoveToArrows(int* pCurrent_choice, int* pCurrent_mode) {
 
-    if (gProgram_state.view_type != eVT_Opponents) {
+    if (gProgram_state.view_type == eVT_Opponents) {
+        *pCurrent_choice = 5;
+        *pCurrent_mode = 1;
+        DRS3StartSound(gEffects_outlet, 3000);
+        return 1;
+    } else {
         return 0;
     }
-    *pCurrent_choice = 5;
-    *pCurrent_mode = 1;
-    DRS3StartSound(gEffects_outlet, 3000);
-    return 1;
 }
 
 // IDA: int __usercall UpOpponent@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
