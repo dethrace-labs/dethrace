@@ -967,8 +967,8 @@ int PartsShopGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
         RunFlic(261);
         AddToFlicQueue(
             gStart_interface_spec->flicker_on_flics[*pCurrent_choice].flic_index,
-            *(int*)((char*)gStart_interface_spec->flicker_on_flics + *pCurrent_choice * 20 + gGraf_data_index * 4 + 4),
-            *(int*)((char*)gStart_interface_spec->flicker_on_flics + *pCurrent_choice * 20 + gGraf_data_index * 4 + 12),
+            gStart_interface_spec->flicker_on_flics[*pCurrent_choice].x[gGraf_data_index],
+            gStart_interface_spec->flicker_on_flics[*pCurrent_choice].y[gGraf_data_index],
             1);
         DrawPartsLabel();
         SetPartsImage();
