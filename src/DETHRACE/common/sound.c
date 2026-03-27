@@ -247,7 +247,7 @@ void InitSound(void) {
 // IDA: tS3_sound_tag __usercall DRS3StartSound@<EAX>(tS3_outlet_ptr pOutlet@<EAX>, tS3_sound_id pSound@<EDX>)
 // FUNCTION: CARM95 0x0046458b
 tS3_sound_tag DRS3StartSound(tS3_outlet_ptr pOutlet, tS3_sound_id pSound) {
-    if (gSound_enabled) {
+    if (gSound_enabled != 0) {
         if (pSound != 1000 && (pSound < 3000 || pSound > 3007) && (pSound < 5300 || pSound > 5320)) {
             PipeSingleSound(pOutlet, pSound, 0, 0, -1, 0);
         }
@@ -535,22 +535,18 @@ void DisposeSoundSources(void) {
     }
     if (gSound_sources_inited) {
         DRS3StopOutletSound(gEngine_outlet);
-        if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
-            S3Service(1, 0);
-        } else {
-            S3Service(0, 0);
-        }
+        S3Service(gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0, 0);
         for (cat = eVehicle_self; cat <= eVehicle_rozzer; cat++) {
-            if (cat) {
-                car_count = GetCarCount(cat);
-            } else {
+            if (!cat) {
                 car_count = 1;
+            } else {
+                car_count = GetCarCount(cat);
             }
             for (i = 0; i < car_count; ++i) {
-                if (cat) {
-                    the_car = GetCarSpec(cat, i);
-                } else {
+                if (!cat) {
                     the_car = &gProgram_state.current_car;
+                } else {
+                    the_car = GetCarSpec(cat, i);
                 }
                 if (the_car->driver == eDriver_local_human || gSound_detail_level == 2 || cat == eVehicle_rozzer) {
                     if (the_car->sound_source) {
@@ -573,13 +569,15 @@ void DisposeSoundSources(void) {
 tS3_sound_tag DRS3StartSound3D(tS3_outlet_ptr pOutlet, tS3_sound_id pSound, br_vector3* pInitial_position, br_vector3* pInitial_velocity, tS3_repeats pRepeats, tS3_volume pVolume, tS3_pitch pPitch, tS3_speed pSpeed) {
     tS3_sound_tag tag;
 
-    if (!gSound_enabled) {
+    if (gSound_enabled) {
+        if (pVolume && pSound != 1000 && (pSound < 3000 || pSound > 3007) && (pSound < 5300 || pSound > 5320)) {
+            PipeSingleSound(pOutlet, pSound, pVolume, 0, pPitch, pInitial_position);
+        }
+        tag = S3StartSound3D(pOutlet, pSound, (tS3_vector3*)pInitial_position, (tS3_vector3*)pInitial_velocity, pRepeats, pVolume, pPitch, pSpeed);
+        return tag;
+    } else {
         return 0;
     }
-    if (pVolume && pSound != 1000 && (pSound < 3000 || pSound > 3007) && (pSound < 5300 || pSound > 5320)) {
-        PipeSingleSound(pOutlet, pSound, pVolume, 0, pPitch, pInitial_position);
-    }
-    return S3StartSound3D(pOutlet, pSound, (tS3_vector3*)pInitial_position, (tS3_vector3*)pInitial_velocity, pRepeats, pVolume, pPitch, pSpeed);
 }
 
 // IDA: tS3_sound_tag __usercall DRS3StartSoundFromSource3@<EAX>(tS3_sound_source_ptr pSource@<EAX>, tS3_sound_id pSound@<EDX>, tS3_repeats pRepeats@<EBX>, tS3_volume pVolume@<ECX>, tS3_pitch pPitch, tS3_speed pSpeed)
