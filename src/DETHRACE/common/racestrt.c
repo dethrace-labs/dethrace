@@ -2206,15 +2206,13 @@ int CheckNextStage(int* pCurrent_choice, int* pCurrent_mode) {
 // FUNCTION: CARM95 0x004532f7
 int ChallengeDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pEscaped, int pTimed_out) {
 
-    if (!pEscaped || gDare_start_time) {
-        if (!pEscaped && gDare_start_time) {
-            ActuallySwapOrder(gOur_starting_position, gChallenger_position);
-            ChallengeOccurred(gChallenger_index__racestrt, 1);
-        }
-    } else {
+    if (pEscaped && !gDare_start_time) {
         DoGridTransition(gOur_starting_position, gOriginal_position);
         ActuallySwapOrder(gOur_starting_position, gOriginal_position);
         ChallengeOccurred(gChallenger_index__racestrt, 0);
+    } else if (!pEscaped && gDare_start_time) {
+        ActuallySwapOrder(gOur_starting_position, gChallenger_position);
+        ChallengeOccurred(gChallenger_index__racestrt, 1);
     }
     ChallengeOccurred(gChallenger_index__racestrt, pEscaped == 0);
     if (pTimed_out) {
