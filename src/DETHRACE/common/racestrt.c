@@ -1404,10 +1404,9 @@ int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
         gCurrent_graf_data->start_race_panel_top,
         gCurrent_graf_data->start_race_panel_top_clip,
         gCurrent_graf_data->start_race_panel_bottom_clip);
-    if (gOpponent_index == 0) {
-        gOpponent_index = gCurrent_race.number_of_racers;
+    if (gOpponent_index-- == 0) {
+        gOpponent_index = gCurrent_race.number_of_racers - 1;
     }
-    gOpponent_index--;
     SetOpponentFlic();
     DropInImageFromTop(GetPanelPixelmap(0),
         gCurrent_graf_data->start_race_panel_left,
