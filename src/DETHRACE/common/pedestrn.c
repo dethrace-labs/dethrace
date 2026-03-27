@@ -4010,7 +4010,7 @@ void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 p
                 the_pedestrian->instruction_direction = 1;
             }
             if (the_pedestrian->current_action != action
-                && (the_pedestrian->current_action + 0) != the_pedestrian->fatal_car_impact_action
+                && the_pedestrian->current_action != the_pedestrian->fatal_car_impact_action
                 && the_pedestrian->current_action != the_pedestrian->fatal_ground_impact_action) {
                 gPed_sound_disable = 1;
                 ChangeActionTo(the_pedestrian, action, 0);
@@ -4034,7 +4034,7 @@ void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 p
             }
             if (the_pedestrian->current_instruction != instruction) {
                 the_pedestrian->current_instruction = instruction;
-                if ((the_pedestrian->current_action + 0) != the_pedestrian->fatal_car_impact_action) {
+                if (the_pedestrian->current_action != the_pedestrian->fatal_car_impact_action) {
                     PedestrianNextInstruction(the_pedestrian, 0.f, 1, 0);
                 }
             }
@@ -4044,12 +4044,11 @@ void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 p
             if (pContents->data.pedestrian.flags & 0x20) {
                 BrVector3Copy(&the_pedestrian->to_pos, &pContents->data.pedestrian.to_pos);
             }
-        } else if ((the_pedestrian->current_action + 0) != the_pedestrian->fatal_car_impact_action
+        } else if (the_pedestrian->current_action != the_pedestrian->fatal_car_impact_action
             && action == the_pedestrian->fatal_car_impact_action
             && !the_pedestrian->reverse_frames) {
             the_pedestrian->fate = NetCarFromPlayerID(pContents->data.pedestrian.murderer);
-        } else if (the_pedestrian->action_list[the_pedestrian->current_action].danger_level
-            < ((tPedestrian_action*)((char*)the_pedestrian->action_list + action * sizeof(tPedestrian_action)))->danger_level) {
+        } else if (the_pedestrian->action_list[the_pedestrian->current_action].danger_level < the_pedestrian->action_list[action * 1].danger_level) {
             ChangeActionTo(the_pedestrian, action, 0);
         }
         if (pContents->data.pedestrian.flags & 0x40
