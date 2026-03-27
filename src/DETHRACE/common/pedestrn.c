@@ -3992,7 +3992,8 @@ void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 p
     int dead;
     tPedestrian_sequence* the_sequence;
 
-    if (pContents->data.pedestrian.index >= 0 && pContents->data.pedestrian.index < gPed_count) {
+    if (pContents->data.pedestrian.index < 0 || pContents->data.pedestrian.index >= gPed_count) {
+    } else {
         the_pedestrian = &gPedestrian_array[pContents->data.pedestrian.index];
         action = (pContents->data.pedestrian.action_instruction & 0xf) - 1;
         if (action < 0) {
@@ -4006,10 +4007,12 @@ void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 p
         } else if (instruction >= the_pedestrian->number_of_instructions) {
             instruction = the_pedestrian->number_of_instructions - 1;
         }
-        if (pContents->data.pedestrian.flags & 0x8) {
+        dead = pContents->data.pedestrian.flags & 0x8;
+        sender = NetPlayerFromID(pMessage->sender);
+        if (dead) {
             murderer = NetPlayerFromID(pContents->data.pedestrian.murderer);
             modified_action = action;
-            if (action == the_pedestrian->fatal_ground_impact_action) {
+            if (modified_action == the_pedestrian->fatal_ground_impact_action) {
                 modified_action = the_pedestrian->fatal_car_impact_action;
             }
             if (the_pedestrian->reverse_frames) {
@@ -4045,7 +4048,7 @@ void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 p
                 the_pedestrian->instruction_direction = 1;
             }
             if (the_pedestrian->current_action != action
-                && the_pedestrian->current_action != the_pedestrian->non_fatal_car_impact_action
+                && the_pedestrian->current_action != the_pedestrian->fatal_car_impact_action
                 && the_pedestrian->current_action != the_pedestrian->fatal_ground_impact_action) {
                 gPed_sound_disable = 1;
                 ChangeActionTo(the_pedestrian, action, 0);
@@ -4064,7 +4067,7 @@ void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 p
                     }
                     the_pedestrian->hit_points = -10;
                 } else {
-                    the_pedestrian->hit_points = 0;
+                    the_pedestrian->hit_points = 10;
                 }
             }
             if (the_pedestrian->current_instruction != instruction) {
@@ -4079,14 +4082,12 @@ void ReceivedPedestrian(tNet_contents* pContents, tNet_message* pMessage, tU32 p
             if (pContents->data.pedestrian.flags & 0x20) {
                 BrVector3Copy(&the_pedestrian->to_pos, &pContents->data.pedestrian.to_pos);
             }
-        } else if (the_pedestrian->current_action == the_pedestrian->fatal_car_impact_action
-            || action != the_pedestrian->fatal_car_impact_action
-            || the_pedestrian->reverse_frames) {
-            if (the_pedestrian->action_list[the_pedestrian->current_action].danger_level < the_pedestrian->action_list[action].danger_level) {
-                ChangeActionTo(the_pedestrian, action, 0);
-            }
-        } else {
+        } else if (the_pedestrian->current_action != the_pedestrian->fatal_car_impact_action
+            && action == the_pedestrian->fatal_car_impact_action
+            && !the_pedestrian->reverse_frames) {
             the_pedestrian->fate = NetCarFromPlayerID(pContents->data.pedestrian.murderer);
+        } else if (the_pedestrian->action_list[the_pedestrian->current_action].danger_level < the_pedestrian->action_list[action * 1].danger_level) {
+            ChangeActionTo(the_pedestrian, action, 0);
         }
         if (pContents->data.pedestrian.flags & 0x40
             && the_pedestrian->ref_number >= 100
