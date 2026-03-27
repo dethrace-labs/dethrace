@@ -639,37 +639,36 @@ void DoHorizon(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_actor
     br_actor* actor;
 
     yaw = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
-    if (!gProgram_state.cockpit_on && !gAction_replay_mode && gAction_replay_camera_mode != eAction_replay_standard
+    if (gProgram_state.cockpit_on
+        || (gAction_replay_mode * gAction_replay_camera_mode) != 0
 
 #ifdef DETHRACE_3DFX_PATCH
-        && !gBlitting_is_slow
+        || gBlitting_is_slow
 #endif
     ) {
-        return;
-    }
-
-    if (gRendering_mirror) {
-        actor = gRearview_sky_actor;
-    } else {
-        actor = gForward_sky_actor;
-        if (ACTOR_CAMERA(gCamera)->field_of_view != gOld_fov || ACTOR_CAMERA(gCamera)->yon_z != gOld_yon) {
-            gOld_fov = ACTOR_CAMERA(gCamera)->field_of_view;
-            gOld_yon = ACTOR_CAMERA(gCamera)->yon_z;
-            MungeSkyModel(gCamera, gForward_sky_model);
+        if (gRendering_mirror) {
+            actor = gRearview_sky_actor;
+        } else {
+            actor = gForward_sky_actor;
+            if (ACTOR_CAMERA(gCamera)->field_of_view != gOld_fov || ACTOR_CAMERA(gCamera)->yon_z != gOld_yon) {
+                gOld_fov = ACTOR_CAMERA(gCamera)->field_of_view;
+                gOld_yon = ACTOR_CAMERA(gCamera)->yon_z;
+                MungeSkyModel(gCamera, gForward_sky_model);
+            }
         }
+        BrMatrix34RotateY(&actor->t.t.mat, yaw);
+        BrVector3Copy(&actor->t.t.translate.t, (br_vector3*)pCamera_to_world->m[3]);
+        gHorizon_material->map_transform.m[0][0] = 1.f;
+        gHorizon_material->map_transform.m[0][1] = 0.f;
+        gHorizon_material->map_transform.m[1][0] = 0.f;
+        gHorizon_material->map_transform.m[1][1] = 1.f;
+        gHorizon_material->map_transform.m[2][0] = -BrFixedToFloat(yaw) / BrFixedToFloat(gSky_image_width);
+        gHorizon_material->map_transform.m[2][1] = 0.f;
+        BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
+        actor->render_style = BR_RSTYLE_FACES;
+        BrZbSceneRenderAdd(actor);
+        actor->render_style = BR_RSTYLE_NONE;
     }
-    BrMatrix34RotateY(&actor->t.t.mat, yaw);
-    BrVector3Copy(&actor->t.t.translate.t, (br_vector3*)pCamera_to_world->m[3]);
-    gHorizon_material->map_transform.m[0][0] = 1.f;
-    gHorizon_material->map_transform.m[0][1] = 0.f;
-    gHorizon_material->map_transform.m[1][0] = 0.f;
-    gHorizon_material->map_transform.m[1][1] = 1.f;
-    gHorizon_material->map_transform.m[2][0] = -BrFixedToFloat(yaw) / BrFixedToFloat(gSky_image_width);
-    gHorizon_material->map_transform.m[2][1] = 0.f;
-    BrMaterialUpdate(gHorizon_material, BR_MATU_ALL);
-    actor->render_style = BR_RSTYLE_FACES;
-    BrZbSceneRenderAdd(actor);
-    actor->render_style = BR_RSTYLE_NONE;
 }
 
 // IDA: void __usercall DoDepthCue(br_pixelmap *pRender_buffer@<EAX>, br_pixelmap *pDepth_buffer@<EDX>)
