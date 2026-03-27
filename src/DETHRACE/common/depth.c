@@ -1093,10 +1093,7 @@ int GetDepthCueingOn(void) {
 // FUNCTION: CARM95 0x00463bda
 void SetDepthCueingOn(int pOn) {
     if (pOn != gDepth_cueing_on && gHorizon_material) {
-        InstantDepthChange(gSwap_depth_effect_type, gProgram_state.current_depth_effect.sky_texture, gSwap_depth_effect_start, gSwap_depth_effect_end);
-        gSwap_depth_effect_type = gProgram_state.current_depth_effect.type;
-        gSwap_depth_effect_start = gProgram_state.current_depth_effect.start;
-        gSwap_depth_effect_end = gProgram_state.current_depth_effect.end;
+        ToggleDepthCueingQuietly();
     }
     gDepth_cueing_on = pOn;
 }
