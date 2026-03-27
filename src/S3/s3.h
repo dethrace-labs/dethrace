@@ -33,7 +33,7 @@ int S3StopChannel(tS3_channel* chan);
 
 void S3ReleaseOutlet(tS3_outlet* outlet);
 int S3StopOutletSound(tS3_outlet* pOutlet);
-void S3StopAllOutletSounds(void);
+int S3StopAllOutletSounds(void);
 
 int S3ReleaseSound(tS3_sound_id id);
 
