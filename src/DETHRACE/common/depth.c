@@ -916,9 +916,7 @@ void IncreaseYon(void) {
 
     gCamera_yon = gCamera_yon + 5.f;
     AssertYons();
-    camera_ptr = gCamera_list[1]->type_data;
-    i = (int)camera_ptr->yon_z;
-    sprintf(s, GetMiscString(kMiscString_YonIncreasedTo_D), i);
+    sprintf(s, GetMiscString(kMiscString_YonIncreasedTo_D), (int)CAMERA_PTR(gCamera_list[1])->yon_z);
     NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s);
 }
 
