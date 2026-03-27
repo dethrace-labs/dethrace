@@ -3215,6 +3215,7 @@ void WriteOutPeds(void) {
                 for (k = 0, the_choice = the_instruction->data.choice_data.choices; k < the_instruction->data.choice_data.number_of_choices; k++, the_choice++) {
                     fprintf(f, "%d,%d,%d,", the_choice->danger_level, the_choice->percentage_chance, the_choice->marker_ref);
                 }
+                // TODO: possible bug, no break in the original code. Should we always add a 'dead' instruction after an fchoice?
             case ePed_instruc_dead:
                 fprintf(f, "\tdead\n");
                 fprintf(f, "%d", the_instruction->data.death_data.death_sequence);
