@@ -271,11 +271,8 @@ int ActorIsPedestrian(br_actor* pActor) {
 // FUNCTION: CARM95 0x004558b8
 br_scalar PedHeightFromActor(br_actor* pActor) {
     br_scalar height;
-    if (ActorIsPedestrian(pActor)) {
-        height = ActorToPedestrianData(pActor)->height2;
-    } else {
-        height = 0;
-    }
+
+    height = ActorIsPedestrian(pActor) ? ActorToPedestrianData(pActor)->height2 : 0;
     return height;
 }
 
