@@ -428,25 +428,22 @@ void ReplaySparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
     br_vector3 new_pos;
 
     for (i = 0; i < COUNT_OF(gSparks); i++) {
-        if (TEST_BIT(gSpark_flags, i)) {
-            if (gSparks[i].car == NULL) {
-                BrVector3Copy(&pos, &gSparks[i].pos);
-            } else {
-                BrMatrix34ApplyP(&tv, &o, &gSparks[i].car->car_master_actor->t.t.mat);
-                BrVector3Copy(&o, &tv);
-                BrMatrix34ApplyP(&pos, &gSparks[i].pos, &gSparks[i].car->car_master_actor->t.t.mat);
-            }
-            BrVector3Add(&o, &pos, &gSparks[i].length);
-            BrVector3Sub(&tv, &pos, (br_vector3*)gCamera_to_world.m[3]);
-            BrMatrix34TApplyV(&new_pos, &tv, &gCamera_to_world);
-            BrVector3Sub(&tv, &o, (br_vector3*)gCamera_to_world.m[3]);
-            BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
-            if (gSparks[i].colour) {
-                DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gFog_shade_table);
-            } else {
-                DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gAcid_shade_table);
-            }
+        if (!TEST_BIT(gSpark_flags, i)) {
+            continue;
         }
+        if (gSparks[i].car != NULL) {
+            BrMatrix34ApplyP(&tv, &pos, &gSparks[i].car->car_master_actor->t.t.mat);
+            BrVector3Copy(&pos, &tv);
+            BrMatrix34ApplyP(&new_pos, &gSparks[i].pos, &gSparks[i].car->car_master_actor->t.t.mat);
+        } else {
+            BrVector3Copy(&new_pos, &gSparks[i].pos);
+        }
+        BrVector3Add(&pos, &new_pos, &gSparks[i].length);
+        BrVector3Sub(&tv, &new_pos, (br_vector3*)gCamera_to_world.m[3]);
+        BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
+        BrVector3Sub(&tv, &pos, (br_vector3*)gCamera_to_world.m[3]);
+        BrMatrix34TApplyV(&o, &tv, &gCamera_to_world);
+        DrawLine3D(&o, &p, pRender_screen, pDepth_buffer, gSparks[i].colour ? gFog_shade_table : gAcid_shade_table);
     }
 }
 
