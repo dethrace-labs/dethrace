@@ -241,12 +241,10 @@ void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move) {
     int pitch;
 
     pitch = gCurrent_graf_data->choose_race_y_pitch;
+    move_distance = (pTo - pFrom) * pitch;
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + pTime_to_move <= the_time)
-            break;
-        DrawRaceList((the_time - start_time) * (pTo - pFrom) * pitch / pTime_to_move + pitch * pFrom);
+    while (start_time + pTime_to_move > (the_time = PDGetTotalTime())) {
+        DrawRaceList((the_time - start_time) * move_distance / pTime_to_move + pitch * pFrom);
     }
     DrawRaceList(pitch * pTo);
 }
