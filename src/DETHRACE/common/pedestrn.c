@@ -3771,11 +3771,11 @@ void DisposePedestrians(void) {
     }
     for (i = 0; i < COUNT_OF(gPed_gib_materials); i++) {
         for (j = 0; j < gPed_size_counts[i]; j++) {
-            BrMapRemove((gPed_gib_materials + i)->materials[j * 1]->colour_map);
-            BrPixelmapFree((gPed_gib_materials + i)->materials[j * 1]->colour_map);
-            (gPed_gib_materials + i)->materials[j * 1]->colour_map = NULL;
-            BrMaterialRemove((gPed_gib_materials + i)->materials[j * 1]);
-            BrMaterialFree((gPed_gib_materials + i)->materials[j * 1]);
+            BrMapRemove(gPed_gib_materials[i].materials[j * 1]->colour_map);
+            BrPixelmapFree(gPed_gib_materials[i].materials[j * 1]->colour_map);
+            gPed_gib_materials[i].materials[j * 1]->colour_map = NULL;
+            BrMaterialRemove(gPed_gib_materials[i].materials[j * 1]);
+            BrMaterialFree(gPed_gib_materials[i].materials[j * 1]);
         }
     }
 
