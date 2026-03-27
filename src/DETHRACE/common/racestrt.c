@@ -1213,7 +1213,7 @@ void DoPartsShop(int pFade_away) {
     gJust_bought_part = 0;
     gRefund_rate = 75;
     CalcPartsIndex();
-    DoInterfaceScreen(&interface_spec, gFaded_palette, 3);
+    result = DoInterfaceScreen(&interface_spec, gFaded_palette, 3);
     DisposeFlicPanel(0);
     UnlockParts();
     gProgram_state.parts_shop_visited = 1;
