@@ -303,12 +303,12 @@ br_actor* GetPedestrianActor(int pIndex) {
 // IDA: br_pixelmap* __usercall GetPedestrianTexture@<EAX>(br_actor *pActor@<EAX>, int *pFlipped@<EDX>)
 // FUNCTION: CARM95 0x0045599e
 br_pixelmap* GetPedestrianTexture(br_actor* pActor, int* pFlipped) {
-
     if (!ActorIsPedestrian(pActor)) {
         return NULL;
+    } else {
+        *pFlipped = ActorToPedestrianData(pActor)->flipped;
+        return ActorToPedestrianData(pActor)->colour_map;
     }
-    *pFlipped = ActorToPedestrianData(pActor)->flipped;
-    return ActorToPedestrianData(pActor)->colour_map;
 }
 
 // IDA: void __cdecl TogglePedestrians()
