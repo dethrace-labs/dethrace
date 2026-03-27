@@ -495,12 +495,12 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
             gSparks[i].count = 0;
             CLEAR_BIT(gSpark_flags, i);
         }
-        ts = BrVector3Dot(&gSparks[i].normal, &gSparks[i].v);
+        ts = gSparks[i].normal.v[2] * gSparks[i].v.v[2] + gSparks[i].normal.v[1] * gSparks[i].v.v[1] + gSparks[i].normal.v[0] * gSparks[i].v.v[0];
         BrVector3Scale(&tv, &gSparks[i].normal, ts);
         BrVector3Sub(&gSparks[i].v, &gSparks[i].v, &tv);
         if (gSparks[i].time_sync) {
             BrVector3Scale(&pos, &gSparks[i].v, gSparks[i].time_sync / 1000.0f);
-            gSparks[i].count = gSparks[i].time_sync + gSparks[i].count + -pTime;
+            gSparks[i].count = gSparks[i].count + gSparks[i].time_sync + -pTime;
             gSparks[i].time_sync = 0;
         } else {
             BrVector3Scale(&pos, &gSparks[i].v, pTime / 1000.0f);
@@ -537,7 +537,7 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
         BrMatrix34TApplyV(&o, &tv, &gCamera_to_world);
         BrVector3SetFloat(&tv, FRandomBetween(-0.1f, 0.1f), FRandomBetween(-0.1f, 0.1f), FRandomBetween(-0.1f, 0.1f));
         BrVector3Accumulate(&gSparks[i].v, &tv);
-        ts = 1.0f - BrVector3Length(&gSparks[i].v) / 1.4f * pTime / 1000.0f;
+        ts = 1.0f - (br_scalar)sqrt(BrVector3LengthSquared(&gSparks[i].v)) / 1.4f * pTime / 1000.0f;
         if (ts < 0.1f) {
             ts = 0.1f;
         }
