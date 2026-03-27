@@ -482,10 +482,10 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
             REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
             ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
             gMr_chunky2->subject_index = pSubject_index;
-            gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + sizeof(tPipe_chunk*));
 #if defined(DETHRACE_REPLAY_DEBUG)
             gMr_chunky2->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
 #endif
+            gMr_chunky2 = (tPipe_chunk*)&gMr_chunky2->chunk_data;
             memcpy(gMr_chunky2, pData, pData_length);
             gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + pData_length);
             gLocal_buffer_size = temp_buffer_size;
