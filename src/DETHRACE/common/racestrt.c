@@ -779,16 +779,18 @@ int BuyPart(int pCategory, int pIndex) {
     int cost;
 
     CalcPartPrice(pCategory, pIndex, &price, &cost);
-    if (cost == 0) {
-        return 1;
-    } else if (gProgram_state.credits < cost) {
-        return 0;
-    } else {
-        gProgram_state.credits -= cost;
-        if (gProgram_state.credits > 999999) {
-            gProgram_state.credits = 999999;
+    if (cost != 0) {
+        if (gProgram_state.credits >= cost) {
+            gProgram_state.credits -= cost;
+            if (gProgram_state.credits > 999999) {
+                gProgram_state.credits = 999999;
+            }
+            gProgram_state.current_car.power_up_levels[pCategory] = pIndex;
+            return 1;
+        } else {
+            return 0;
         }
-        gProgram_state.current_car.power_up_levels[pCategory] = pIndex;
+    } else {
         return 1;
     }
 }
