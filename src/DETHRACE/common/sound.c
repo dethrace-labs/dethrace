@@ -374,7 +374,11 @@ int DRS3OutletSoundsPlaying(tS3_outlet_ptr pOutlet) {
 // FUNCTION: CARM95 0x0046496f
 int DRS3SoundStillPlaying(tS3_sound_tag pSound_tag) {
 
-    return gSound_enabled && S3SoundStillPlaying(pSound_tag);
+    if (gSound_enabled) {
+        return S3SoundStillPlaying(pSound_tag);
+    } else {
+        return 0;
+    }
 }
 
 // IDA: void __cdecl DRS3ShutDown()
