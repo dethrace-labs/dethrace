@@ -1051,9 +1051,12 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
     br_scalar aspect_squared;
     void (*line)(int, int, br_scalar, int, tU8*, tU16*, tU8*, br_scalar, br_scalar, br_scalar);
 
-    line = SmokeLine;
-    ox = pRender_screen->width / 2 + o->v[0];
-    oy = pRender_screen->height / 2 + o->v[1];
+    scr_ptr = (tU8*)pRender_screen->pixels + pRender_screen->base_x + pRender_screen->base_y * pRender_screen->row_bytes;
+    depth_ptr = (tU16*)pDepth_buffer->pixels;
+    ox = (int)o->v[0];
+    ox = pRender_screen->width / 2 + ox;
+    oy = (int)o->v[1];
+    oy = pRender_screen->height / 2 + oy;
     max_r_squared = r * r;
     zbuff = o->v[2];
     aspect_squared = pAspect * pAspect;
@@ -1062,6 +1065,7 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
         || ox + r < 0.0f) {
         return;
     }
+    line = SmokeLine;
     shade_ptr = (tU8*)pShade_table->pixels + pShade_table->row_bytes * (pShade_table->base_y + 1);
     shade_offset = strength * 14.99f;
     r_multiplier = shade_offset / (double)max_r_squared;
@@ -1070,14 +1074,13 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
     min_x = -ox;
     ry = r / pAspect;
     l = pRender_screen->height - oy - 1;
-    scr_ptr = pRender_screen->pixels;
-    scr_ptr += pRender_screen->base_x + pRender_screen->base_y * pRender_screen->row_bytes + ox + l * pRender_screen->row_bytes;
-    depth_ptr = (tU16*)pDepth_buffer->pixels + ox + l * (pDepth_buffer->row_bytes / 2);
+    scr_ptr += ox + l * pRender_screen->row_bytes;
+    depth_ptr += ox + l * (pDepth_buffer->row_bytes / 2);
     osp = scr_ptr;
     odp = depth_ptr;
-    if (pRender_screen->height > oy && oy + ry >= 0.0) {
+    if (pRender_screen->height > oy && oy + ry >= 0.0f) {
         r_squared = r * r;
-        inc = -r;
+        x = -r;
         y = 0;
         y_limit = ry;
         if (oy < 0) {
@@ -1085,34 +1088,36 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
             r_squared = (y * y) * aspect_squared;
             scr_ptr += oy * pRender_screen->row_bytes;
             depth_ptr += oy * (pDepth_buffer->row_bytes / 2);
-            inc = -sqrt(max_r_squared - r_squared);
-            r_squared += inc * inc;
+            x = sqrt(max_r_squared - r_squared);
+            x = -x;
+            r_squared += x * x;
         }
         if (pRender_screen->height < oy + ry) {
             y_limit = pRender_screen->height - oy - 1;
         }
-        l = -2 * inc;
-        scr_ptr += inc;
-        depth_ptr += inc;
+        l = -2 * x;
+        scr_ptr += x;
+        depth_ptr += x;
         gOffset = 0;
         while (1) {
-
-            x = inc + gOffset;
-            if (min_x <= inc + gOffset && l + x - 1 <= max_x) {
-                line(l, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
-            } else {
-                if (max_x < x || l + x < min_x) {
+            sx = gOffset + x;
+            if (min_x > sx || l + sx - 1 > max_x) {
+                if (max_x < sx || l + sx < min_x) {
                     break;
                 }
-                x2 = l;
-                if (l + x - 1 - max_x > 0) {
-                    x2 = max_x - (x - 1);
+                l2 = l;
+                x2 = l + sx - 1 - max_x;
+                if (x2 > 0) {
+                    l2 -= x2;
                 }
-                if (min_x - x <= 0) {
-                    line(x2, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
+                x2 = min_x - sx;
+                if (x2 > 0) {
+                    line(l2 - x2, x2 + x, zbuff, y * y + (x2 + x) * (x2 + x), &scr_ptr[x2], &depth_ptr[x2], shade_ptr, r_multiplier, z_multiplier, shade_offset);
                 } else {
-                    line(x2 - (min_x - x), min_x - x + inc, zbuff, y * y + (min_x - x + inc) * (min_x - x + inc), &scr_ptr[min_x - x], &depth_ptr[min_x - x], shade_ptr, r_multiplier, z_multiplier, shade_offset);
+                    line(l2, x, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
                 }
+            } else {
+                line(l, x, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
             }
             if (y_limit <= y) {
                 break;
@@ -1120,8 +1125,8 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
             y++;
             scr_ptr -= pRender_screen->row_bytes;
             depth_ptr -= pDepth_buffer->row_bytes / 2;
-            for (r_squared += (2 * y - 1) * aspect_squared; max_r_squared < r_squared && inc < 0; r_squared += 2 * inc - 1) {
-                inc++;
+            for (r_squared += (2 * y - 1) * aspect_squared; max_r_squared < r_squared && x < 0; r_squared += 2 * x - 1) {
+                x++;
                 scr_ptr++;
                 depth_ptr++;
                 l -= 2;
@@ -1135,13 +1140,13 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
             }
         }
     }
-    if (pAspect < 1.0) {
+    if (pAspect < 1.0f) {
         aspect_squared = 9.f;
         ry = r / 3.f;
     }
     if (oy > 0 && oy <= pRender_screen->height + ry - 2.f) {
         r_squared = (r * r);
-        inc = -r;
+        x = -r;
         y = 0;
         scr_ptr = osp;
         depth_ptr = odp;
@@ -1152,49 +1157,52 @@ void SmokeCircle(br_vector3* o, br_scalar r, br_scalar extra_z, br_scalar streng
             r_squared = y * y * aspect_squared;
             scr_ptr = &osp[l2 * pRender_screen->row_bytes];
             depth_ptr = &odp[l2 * (pDepth_buffer->row_bytes / 2)];
-            inc = -sqrt(max_r_squared - r_squared);
-            r_squared += inc * inc;
+            x = sqrt(max_r_squared - r_squared);
+            x = -x;
+            r_squared += x * x;
         }
         if (oy - ry < 0.f) {
             y_limit = oy;
         }
-        l = -2 * inc;
-        scr_ptr += inc;
-        depth_ptr += inc;
+        l = -2 * x;
+        scr_ptr += x;
+        depth_ptr += x;
         gOffset = 0;
         do {
             y--;
             scr_ptr += pRender_screen->row_bytes;
             depth_ptr += pDepth_buffer->row_bytes / 2;
-            for (r_squared -= (2 * y - 1) * aspect_squared; max_r_squared < r_squared && inc < 0; r_squared += 2 * inc - 1) {
-                inc++;
+            for (r_squared -= (2 * y - 1) * aspect_squared; max_r_squared < r_squared && x < 0; r_squared += 2 * x - 1) {
+                x++;
                 scr_ptr++;
                 depth_ptr++;
                 l -= 2;
             }
-            x = inc + gOffset;
-            if (min_x <= inc + gOffset && l + x - 1 <= max_x) {
-                line(l, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
-            } else {
-                if (max_x < x || l + x < min_x) {
+            sx = gOffset + x;
+            if (min_x > sx || l + sx - 1 > max_x) {
+                if (max_x < sx || l + sx < min_x) {
                     return;
                 }
-                x2 = l;
-                if (l + x - 1 - max_x > 0) {
-                    x2 = max_x - (x - 1);
+                l2 = l;
+                x2 = l + sx - 1 - max_x;
+                if (x2 > 0) {
+                    l2 -= x2;
                 }
-                if (min_x - x <= 0) {
-                    line(x2, inc, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
+                x2 = min_x - sx;
+                if (x2 > 0) {
+                    line(l2 - x2, x2 + x, zbuff, y * y + (x2 + x) * (x2 + x), &scr_ptr[x2], &depth_ptr[x2], shade_ptr, r_multiplier, z_multiplier, shade_offset);
                 } else {
-                    line(x2 - (min_x - x), min_x - x + inc, zbuff, y * y + (min_x - x + inc) * (min_x - x + inc), &scr_ptr[min_x - x], &depth_ptr[min_x - x], shade_ptr, r_multiplier, z_multiplier, shade_offset);
+                    line(l2, x, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
                 }
+            } else {
+                line(l, x, zbuff, r_squared, scr_ptr, depth_ptr, shade_ptr, r_multiplier, z_multiplier, shade_offset);
             }
             gOffset += IRandomBetween(-1, 1);
-            if (gOffset > r / 5.0) {
-                gOffset = r / 5.0;
+            if (gOffset > r / 5.0f) {
+                gOffset = r / 5.0f;
             }
-            if (gOffset < -(r / 5.0)) {
-                gOffset = -r / 5.0;
+            if (gOffset < -(r / 5.0f)) {
+                gOffset = -r / 5.0f;
             }
         } while (-y < y_limit);
     }
