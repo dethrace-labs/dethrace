@@ -4628,6 +4628,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                                            (br_vector3*)gCamera_to_world.m[3])
                     / gCar_simplification_factor[gGraf_spec_index][gCar_simplification_level];
 #ifdef DETHRACE_FIX_BUGS
+// This avoids out-of-bounds access when having lots of cars
 #define CAR_IS_IT_OR_FOX(CAR) (gIt_or_fox >= 0 && gNet_players[gIt_or_fox].car == (CAR))
 #else
 #define CAR_IS_IT_OR_FOX(CAR) gNet_players[gIt_or_fox].car == (CAR)
