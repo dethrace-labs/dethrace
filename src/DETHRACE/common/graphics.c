@@ -2310,7 +2310,6 @@ void MungePalette(void) {
     static float last_omega;
     static tU32 next_repair_time;
     static tU32 last_sound;
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl ResetPalette()
