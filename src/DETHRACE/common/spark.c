@@ -2185,21 +2185,24 @@ void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     br_vector3 tv;
     tU32 seed;
 
-    if (gColumn_flags) {
-        seed = rand();
-        srand(GetTotalTime());
-        for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
-            if (TEST_BIT(gColumn_flags, i) && gSmoke_column[i].colour <= 1) {
-                strength = 0.5f;
-                if (gSmoke_column[i].lifetime < 4000) {
-                    strength = gSmoke_column[i].lifetime * 0.5f / 4000.f;
-                }
-                BrVector3Set(&tv, gSmoke_column[i].pos.v[0], gSmoke_column[i].pos.v[1] + 0.02f, gSmoke_column[i].pos.v[2]);
-                SmokeCircle3D(&tv, 0.07f, strength, SRandomBetween(0.5f, 0.99f), pRender_screen, pDepth_buffer, gAcid_shade_table, pCamera);
-            }
-        }
-        srand(seed);
+    if (!gColumn_flags) {
+        return;
     }
+
+    seed = rand();
+    srand(GetTotalTime());
+    for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
+        if (!TEST_BIT(gColumn_flags, i) || gSmoke_column[i].colour > 1) {
+            continue;
+        }
+        strength = 0.5f;
+        if (gSmoke_column[i].lifetime < 4000) {
+            strength = gSmoke_column[i].lifetime * strength / 4000.f;
+        }
+        BrVector3Set(&tv, gSmoke_column[i].pos.v[0], gSmoke_column[i].pos.v[1] + 0.02, gSmoke_column[i].pos.v[2]);
+        SmokeCircle3D(&tv, 0.07f, strength, SRandomBetween(0.5f, 0.99f), pRender_screen, pDepth_buffer, gAcid_shade_table, pCamera);
+    }
+    srand(seed);
 }
 
 // IDA: void __usercall PipeInstantUnSmudge(tCar_spec *pCar@<EAX>)
