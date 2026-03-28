@@ -969,8 +969,9 @@ void DrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
     s = FastScalarSinAngle(r);
     c = FastScalarCosAngle(r);
     t = 1.0f - c;
-    txy = t * a->v[0] * a->v[1];
-    txz = t * a->v[0] * a->v[2];
+    txy = t * a->v[0];
+    txz = txy * a->v[2];
+    txy = a->v[1] * txy;
     tyz = t * a->v[1] * a->v[2];
     sx = a->v[0] * s;
     sy = a->v[1] * s;
