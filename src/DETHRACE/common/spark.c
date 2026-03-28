@@ -878,10 +878,10 @@ void DisposeShrapnel(void) {
         BrActorFree(gShrapnel[i].actor);
     }
     gShrapnel_flags = 0;
-    for (i = 0; i < COUNT_OF(gShrapnel_model); i++) {
-        BrModelRemove(gShrapnel_model[i]);
-        BrModelFree(gShrapnel_model[i]);
-    }
+    BrModelRemove(gShrapnel_model[0]);
+    BrModelRemove(gShrapnel_model[1]);
+    BrModelFree(gShrapnel_model[0]);
+    BrModelFree(gShrapnel_model[1]);
 }
 
 // IDA: void __usercall ReplayShrapnel(tU32 pTime@<EAX>)
