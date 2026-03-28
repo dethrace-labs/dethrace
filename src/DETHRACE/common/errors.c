@@ -158,31 +158,28 @@ void FatalError(int pStr_index, ...) {
     char* sub_str;
     char temp_str[1024];
     char* sub_pt;
-    va_list ap;
-    int i;
+    register int i;
 
-    va_start(ap, pStr_index);
-
+#if UINTPTR_MAX > UINT_MAX
     gLast_demo_end_anim = 0x20000000 + PDGetTotalTime();
-    strcpy(the_str, gError_messages[pStr_index]);
-    sub_pt = temp_str;
+#else
+    *(tS32*)"p\xa0\xfe\xff" "CUTSCENE" = 0x20000000 + PDGetTotalTime();
+#endif
+    strcpy(the_str + sizeof(char*), gError_messages[pStr_index]);
 
-    while (1) {
-
-        sub_pt = strchr(the_str, '%');
-        if (!sub_pt) {
-            break;
-        }
-        sub_str = va_arg(ap, char*);
+    *(int*)the_str = (int)((char*)&pStr_index + sizeof(pStr_index));
+    while ((sub_pt = strchr(the_str + sizeof(char*), '%')) != NULL) {
+        *(int*)the_str += sizeof(char*);
+        sub_str = *(char**)(*(int*)the_str - sizeof(char*));
         StripCR(sub_str);
         strcpy(temp_str, sub_pt + 1);
         strcpy(sub_pt, sub_str);
-        strcat(the_str, temp_str);
+        strcat(the_str + sizeof(char*), temp_str);
     }
-    va_end(ap);
-    dr_dprintf(the_str);
+    *(int*)the_str = 0;
+    dr_dprintf(the_str + sizeof(char*));
     FadePaletteUp();
-    PDFatalError(the_str);
+    PDFatalError(the_str + sizeof(char*));
 }
 
 // IDA: void __cdecl NonFatalError(int pStr_index, ...)
