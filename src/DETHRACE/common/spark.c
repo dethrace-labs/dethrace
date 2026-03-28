@@ -1789,7 +1789,9 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
     col = &gSmoke_column[c];
     actor = col->flame_actor;
     DRMatrix34RotateY(&actor->t.t.mat, FastScalarArcTan2Angle(gCamera_to_world.m[2][0], gCamera_to_world.m[2][2]));
-    actor->t.t.translate.t = *pPos;
+    actor->t.t.translate.t.v[0] = pPos->v[0];
+    actor->t.t.translate.t.v[1] = pPos->v[1];
+    actor->t.t.translate.t.v[2] = pPos->v[2];
     actor = actor->children;
 
     if (gAction_replay_mode) {
@@ -1813,20 +1815,20 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
             AddFlameToPipingSession(i + 16 * c, col->frame_count[i] + 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
             EndPipingSession();
             col->frame_count[i] = IRandomBetween(-5, -1);
-            col->scale_x[i] = (2 * IRandomBetween(0, 1) - 1) * SRandomBetween(1.0f, 1.5f) * 0.003f;
+            col->scale_x[i] = (SRandomBetween(1.0f, 1.5f) * (2 * IRandomBetween(0, 1) - 1)) * 0.003f;
             col->scale_y[i] = SRandomBetween(0.5f, 1.0f) * 0.003f;
             col->offset_x[i] = SRandomPosNeg(0.03f);
             col->offset_z[i] = SRandomBetween(-0.03f, 0.0);
             actor->type = BR_ACTOR_NONE;
         }
         if (col->frame_count[i] == 0) {
-            if (BrVector3LengthSquared(&col->car->v) >= 80.0f || col->lifetime <= 30 * pTime) {
-                col->frame_count[i] = -5;
-            } else {
+            if (!(BrVector3LengthSquared(&col->car->v) >= 80.0f || col->lifetime <= 30 * pTime)) {
                 actor->type = BR_ACTOR_MODEL;
                 StartPipingSession(ePipe_chunk_flame);
                 AddFlameToPipingSession(i + 16 * c, col->frame_count[i] - 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
                 EndPipingSession();
+            } else {
+                col->frame_count[i] = -5;
             }
         }
         if (col->frame_count[i] >= 0) {
