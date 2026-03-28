@@ -2910,38 +2910,61 @@ void DoTrueColModelThing(br_actor* actor, br_model* pModel, br_material* materia
 // IDA: void __cdecl DoModelThing(br_actor *actor, br_model *pModel, br_material *material, void *render_data, br_uint_8 style, int on_screen)
 // FUNCTION: CARM95 0x0046f52a
 void DoModelThing(br_actor* actor, br_model* pModel, br_material* material, void* render_data, br_uint_8 style, int on_screen) {
+    struct v11group_c95 {
+        void* stored;
+        void* faces;
+        br_colour* face_colours;
+        br_uint_16* face_user;
+        void* vertices;
+        br_colour* vertex_colours;
+        br_uint_16* vertex_user;
+        br_uint_16 nfaces;
+        br_uint_16 nvertices;
+        br_uint_16 nedges;
+    };
+#if UINTPTR_MAX > 0xffffffff
+#define DMT_NVERTS(model, g)            (V11MODEL(model)->groups[g].nvertices)
+#define DMT_VCOL(model, g, v)           (V11MODEL(model)->groups[g].vertex_colours[v])
+#define DMT_VUSER(model, g, v)          (V11MODEL(model)->groups[g].vertex_user[v])
+#else
+#define DMT_NVERTS(model, g)            (((struct v11group_c95*)V11MODEL(model)->groups)[g].nvertices)
+#define DMT_VCOL(model, g, v)           (((struct v11group_c95*)V11MODEL(model)->groups)[g].vertex_colours[v])
+#define DMT_VUSER(model, g, v)          (((struct v11group_c95*)V11MODEL(model)->groups)[g].vertex_user[v])
+#endif
     int j;
     int i;
     int group;
     tU32 t;
     int val;
 
-    GetRaceTime();
+    t = GetRaceTime();
     for (group = 0; group < V11MODEL(pModel)->ngroups; group++) {
-        for (j = 0; j < V11MODEL(pModel)->groups[group].nvertices; j++) {
-            if (!(((V11MODEL(pModel)->groups[group].vertex_colours[j]) >> 24) & 1)) {
-                if (((V11MODEL(pModel)->groups[group].vertex_colours[j]) >> 24) < 0xc9) {
-                    val = ((V11MODEL(pModel)->groups[group].vertex_colours[j]) >> 24) + 2 * IRandomBetween(5, 10);
-                    V11MODEL(pModel)->groups[group].vertex_colours[j] = BR_COLOUR_RGBA(0, 0, 0, val);
+        for (j = 0; j < DMT_NVERTS(pModel, group); j++) {
+            if (((DMT_VCOL(pModel, group, j)) >> 24) & 1) {
+                if (BR_ALPHA(DMT_VCOL(pModel, group, j)) < 20) {
+                    DMT_VCOL(pModel, group, j) = 0;
                     if (pModel->flags & BR_MODF_UPDATEABLE) {
-                        pModel->vertices[V11MODEL(pModel)->groups[group].vertex_user[j]].index = val;
+                        pModel->vertices[DMT_VUSER(pModel, group, j)].index = 0;
                     }
                 } else {
-                    V11MODEL(pModel)->groups[group].vertex_colours[j] = BR_COLOUR_RGBA(0, 0, 0, 0xc9);
+                    val = BR_ALPHA(DMT_VCOL(pModel, group, j)) - 2 * IRandomBetween(5, 10);
+                    DMT_VCOL(pModel, group, j) = val << 24;
                     if (pModel->flags & BR_MODF_UPDATEABLE) {
-                        pModel->vertices[V11MODEL(pModel)->groups[group].vertex_user[j]].index = 0xc9;
+                        pModel->vertices[DMT_VUSER(pModel, group, j)].index = val;
                     }
                 }
-            } else if ((V11MODEL(pModel)->groups[group].vertex_colours[j] >> 24) < 20) {
-                V11MODEL(pModel)->groups[group].vertex_colours[j] = 0;
-                if (pModel->flags & BR_MODF_UPDATEABLE) {
-                    pModel->vertices[V11MODEL(pModel)->groups[group].vertex_user[j]].index = 0;
-                }
             } else {
-                val = ((V11MODEL(pModel)->groups[group].vertex_colours[j] >> 24) - 2 * IRandomBetween(5, 10)) << 24;
-                V11MODEL(pModel)->groups[group].vertex_colours[j] = BR_COLOUR_RGBA(0, 0, 0, val);
-                if (pModel->flags & BR_MODF_UPDATEABLE) {
-                    pModel->vertices[V11MODEL(pModel)->groups[group].vertex_user[j]].index = val;
+                if (BR_ALPHA(DMT_VCOL(pModel, group, j)) > 0xc8) {
+                    DMT_VCOL(pModel, group, j) = 0xc9 << 24;
+                    if (pModel->flags & BR_MODF_UPDATEABLE) {
+                        pModel->vertices[DMT_VUSER(pModel, group, j)].index = 0xc9;
+                    }
+                } else {
+                    val = BR_ALPHA(DMT_VCOL(pModel, group, j)) + 2 * IRandomBetween(5, 10);
+                    DMT_VCOL(pModel, group, j) = val << 24;
+                    if (pModel->flags & BR_MODF_UPDATEABLE) {
+                        pModel->vertices[DMT_VUSER(pModel, group, j)].index = val;
+                    }
                 }
             }
         }
@@ -2951,6 +2974,9 @@ void DoModelThing(br_actor* actor, br_model* pModel, br_material* material, void
     }
     pModel->user = NULL;
     BrZbModelRender(actor, pModel, material, style, BrOnScreenCheck(&pModel->bounds), 0);
+#undef DMT_NVERTS
+#undef DMT_VCOL
+#undef DMT_VUSER
 }
 
 // IDA: void __usercall SetModelShade(br_actor *pActor@<EAX>, br_pixelmap *pShade@<EDX>)
