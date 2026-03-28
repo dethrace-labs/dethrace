@@ -436,12 +436,17 @@ void UpdateFramePeriod(tU32* pCamera_period) {
         gLast_tick_count += gFrame_period;
         error = new_tick_count - gLast_tick_count;
         gFrame_period = new_tick_count - gActual_last_tick_count;
-        if ((new_tick_count - gActual_last_tick_count) > 500 && new_tick_count - gRace_start > 2000) {
+        if (gFrame_period > 500 && new_tick_count - gRace_start > 2000) {
             gFrame_period = gAverage_frame_period / 10;
             gLast_tick_count = new_tick_count;
             if (gNet_mode) {
-                if (gNet_mode == eNet_mode_client) {
+                switch (gNet_mode) {
+                case eNet_mode_host:
+                    break;
+                case eNet_mode_client:
                     gProgram_state.current_car.last_car_car_collision = 0;
+                default:
+                    break;
                 }
             }
         }
@@ -449,32 +454,28 @@ void UpdateFramePeriod(tU32* pCamera_period) {
         if ((new_tick_count - gRace_start) > 2000) {
             gFrame_period = gAverage_frame_period / 10;
         }
-        if ((int)(error + gFrame_period) > 0) {
-            gFrame_period += error;
-        } else {
+        if ((int)(error + gFrame_period) <= 0) {
             gLast_tick_count = new_tick_count;
+        } else {
+            gFrame_period += error;
         }
         *pCamera_period = gFrame_period;
         gActual_last_tick_count = new_tick_count;
     }
-    if (gFrame_period >= 10) {
-        if (gFrame_period > 1000) {
-            gFrame_period = 1000;
-            gLast_tick_count = new_tick_count;
-        }
-    } else {
+    if (gFrame_period < 10) {
         // The following makes the timer go too fast when the real frame rate is high (=low frame period)
 #ifndef DETHRACE_FIX_BUGS
         gFrame_period = 10;
 #endif
         gLast_tick_count = new_tick_count;
+    } else if (gFrame_period > 1000) {
+        gFrame_period = 1000;
+        gLast_tick_count = new_tick_count;
     }
-    if (*pCamera_period >= 10) {
-        if (*pCamera_period > 1000) {
-            *pCamera_period = 1000;
-        }
-    } else {
+    if (*pCamera_period < 10) {
         *pCamera_period = 10;
+    } else if (*pCamera_period > 1000) {
+        *pCamera_period = 1000;
     }
 }
 
