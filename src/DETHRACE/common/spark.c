@@ -1761,11 +1761,9 @@ void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pSc
 void ReplayFlame(tSmoke_column* col, br_actor* actor) {
     int i;
 
-    for (i = 0; i < COUNT_OF(col->frame_count); i++, actor = actor->next) {
+    for (i = 0; i < COUNT_OF(col->frame_count); i++) {
         col->frame_count[i] += GetReplayRate();
-        if (col->frame_count[i] < 0 || col->frame_count[i] >= COUNT_OF(gFlame_map)) {
-            actor->type = BR_ACTOR_NONE;
-        } else {
+        if (col->frame_count[i] >= 0 && col->frame_count[i] < COUNT_OF(gFlame_map)) {
             actor->type = BR_ACTOR_MODEL;
             actor->material->colour_map = gFlame_map[col->frame_count[i]];
             BrMaterialUpdate(actor->material, BR_MATU_ALL);
@@ -1775,7 +1773,10 @@ void ReplayFlame(tSmoke_column* col, br_actor* actor) {
                 1.f);
             actor->t.t.translate.t.v[0] = col->offset_x[i];
             actor->t.t.translate.t.v[2] = col->offset_z[i];
+        } else {
+            actor->type = BR_ACTOR_NONE;
         }
+        actor = actor->next;
     }
 }
 
