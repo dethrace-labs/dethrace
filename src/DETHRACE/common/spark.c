@@ -1843,12 +1843,17 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
 // IDA: void __usercall DoSmokeColumn(int i@<EAX>, tU32 pTime@<EDX>, br_vector3 *pRet_car_pos@<EBX>)
 // FUNCTION: CARM95 0x0046b86d
 void DoSmokeColumn(int i, tU32 pTime, br_vector3* pRet_car_pos) {
+    typedef struct tSmoke_vertex {
+        br_vector3 p;
+        char padding[20];
+    } tSmoke_vertex;
     tCar_spec* c;
     br_actor* actor;
     br_actor* bonny;
     int group;
 
     c = gSmoke_column[i].car;
+    group = 0;
     if (c->car_master_actor->t.t.mat.m[1][1] > 0.1f) {
         gSmoke_column[i].upright = 1;
     }
@@ -1858,12 +1863,14 @@ void DoSmokeColumn(int i, tU32 pTime, br_vector3* pRet_car_pos) {
     actor = c->car_model_actors[c->principal_car_actor].actor;
     bonny = c->car_model_actors[c->car_actor_count - 1].actor;
 
-    BrVector3Add(pRet_car_pos, &V11MODEL(actor->model)->groups[0].position[gSmoke_column[i].vertex_index], &actor->t.t.translate.t);
+    pRet_car_pos->v[0] = ((tSmoke_vertex*)*(void**)((char*)V11MODEL(actor->model)->groups + group * 36 + 0x10))[gSmoke_column[i].vertex_index].p.v[0] + actor->t.t.translate.t.v[0];
+    pRet_car_pos->v[1] = ((tSmoke_vertex*)*(void**)((char*)V11MODEL(actor->model)->groups + group * 36 + 0x10))[gSmoke_column[i].vertex_index].p.v[1] + actor->t.t.translate.t.v[1];
+    pRet_car_pos->v[2] = ((tSmoke_vertex*)*(void**)((char*)V11MODEL(actor->model)->groups + group * 36 + 0x10))[gSmoke_column[i].vertex_index].p.v[2] + actor->t.t.translate.t.v[2];
     if (gProgram_state.cockpit_on && c->driver == eDriver_local_human) {
-        if (c->driver_z_offset + 0.2f <= pRet_car_pos->v[2]) {
-            pRet_car_pos->v[1] -= -0.07f;
+        if (c->driver_z_offset + 0.2 > pRet_car_pos->v[2]) {
+            BrMatrix34ApplyP(pRet_car_pos, &((tSmoke_vertex*)*(void**)((char*)V11MODEL(actor->model)->groups + group * 36 + 0x10))[gSmoke_column[i].vertex_index].p, &bonny->t.t.mat);
         } else {
-            BrMatrix34ApplyP(pRet_car_pos, &V11MODEL(actor->model)->groups[0].position[gSmoke_column[i].vertex_index], &bonny->t.t.mat);
+            pRet_car_pos->v[1] -= 0.07;
         }
     }
     if (!gSmoke_column[i].upright) {
