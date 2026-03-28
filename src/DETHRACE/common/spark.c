@@ -2282,6 +2282,30 @@ void PipeInstantUnSmudge(tCar_spec* pCar) {
 // IDA: void __usercall SmudgeCar(tCar_spec *pCar@<EAX>, int fire_point@<EDX>)
 // FUNCTION: CARM95 0x0046c72d
 void SmudgeCar(tCar_spec* pCar, int fire_point) {
+    struct smudge_vertex {
+        br_vector3 p;
+        br_vector2 map;
+        br_vector3 normal;
+    };
+    struct smudge_group {
+        void* stored;
+        void* faces;
+        void* face_colours;
+        void* face_user;
+        struct smudge_vertex* vertices;
+        br_colour* vertex_colours;
+        tU16* vertex_user;
+        tU16 nfaces;
+        tU16 nvertices;
+        tU16 nedges;
+    };
+    struct smudge_model {
+        int size;
+        tU32 flags;
+        tU16 ngroups;
+        br_vector3 pivot;
+        struct smudge_group* groups;
+    };
     int v;
     int j;
     int real_vertex_number;
@@ -2308,24 +2332,71 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
     bonny = pCar->car_model_actors[pCar->car_actor_count - 1].actor;
     n = 0;
     real_vertex_number = 0;
-    if ((model->flags & BR_MODF_KEEP_ORIGINAL) != 0 || (model->flags & BR_MODF_UPDATEABLE) != 0) {
-        point = V11MODEL(model)->groups[group].position[fire_point];
-        StartPipingSession(ePipe_chunk_smudge);
-        for (group = 0; group < V11MODEL(model)->ngroups; group++) {
-            for (j = 0; j < V11MODEL(model)->groups[group].nvertices; j++) {
-                BrVector3Sub(&tv, &V11MODEL(model)->groups[group].position[j], &point);
-                ts = (.0144f - BrVector3LengthSquared(&tv) / SRandomBetween(.5f, 1.f)) / .0144f * 127.f;
+    if ((model->flags & 0x2) == 0) {
+        if ((model->flags & 0x80) == 0) {
+            return;
+        }
+    }
+    point.v[0] = ((struct smudge_model*)model->prepared)->groups[group].vertices[v].p.v[0];
+    point.v[1] = ((struct smudge_model*)model->prepared)->groups[group].vertices[v].p.v[1];
+    point.v[2] = ((struct smudge_model*)model->prepared)->groups[group].vertices[v].p.v[2];
+    StartPipingSession(ePipe_chunk_smudge);
+    for (group = 0; group < ((struct smudge_model*)model->prepared)->ngroups; group++) {
+        for (j = 0; j < ((struct smudge_model*)model->prepared)->groups[group].nvertices; j++, real_vertex_number++) {
+            BrVector3Sub(&tv, &((struct smudge_model*)model->prepared)->groups[group].vertices[j].p, &point);
+            ts = (.0144f - (tv.v[1] * tv.v[1] + tv.v[2] * tv.v[2] + tv.v[0] * tv.v[0]) / SRandomBetween(.5f, 1.f)) / .0144f * 127.f;
+            if (ts > 0.f) {
+                ts += BR_ALPHA(((struct smudge_model*)model->prepared)->groups[group].vertex_colours[j]);
+                if (ts > 255.f) {
+                    ts = 255.f;
+                }
+                if (BR_ALPHA(((struct smudge_model*)model->prepared)->groups[group].vertex_colours[j]) != (int)ts) {
+                    data[n].vertex_index = real_vertex_number;
+                    data[n].light_index = (int)ts - BR_ALPHA(((struct smudge_model*)model->prepared)->groups[group].vertex_colours[j]);
+                    ((struct smudge_model*)model->prepared)->groups[group].vertex_colours[j] = (int)ts << 24;
+                    if ((model->flags & BR_MODF_UPDATEABLE) != 0) {
+                        model->vertices[((struct smudge_model*)model->prepared)->groups[group].vertex_user[j]].index = (int)ts;
+                    }
+                    n++;
+                    if (n >= COUNT_OF(data)) {
+                        break;
+                    }
+                }
+            }
+        }
+        if (n >= COUNT_OF(data)) {
+            break;
+        }
+    }
+    if (n != 0) {
+        AddSmudgeToPipingSession(pCar->car_ID, pCar->principal_car_actor, n, data);
+        // FIXME?
+        // Added by dethrace to update gpu-buffered vertices
+        // model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
+    }
+
+    n = 0;
+    real_vertex_number = 0;
+    if (actor != bonny) {
+        b_model = bonny->model;
+        BrVector3Add(&tv, &actor->t.t.translate.t, &point);
+        BrVector3Sub(&tv, &tv, &bonny->t.t.translate.t);
+        BrMatrix34TApplyV(&bonny_pos, &tv, &bonny->t.t.mat);
+        for (group = 0; group < ((struct smudge_model*)b_model->prepared)->ngroups; group++) {
+            for (j = 0; j < ((struct smudge_model*)b_model->prepared)->groups[group].nvertices; j++, real_vertex_number++) {
+                BrVector3Sub(&tv, &((struct smudge_model*)b_model->prepared)->groups[group].vertices[j].p, &bonny_pos);
+                ts = (.0144f - (tv.v[1] * tv.v[1] + tv.v[2] * tv.v[2] + tv.v[0] * tv.v[0]) / SRandomBetween(.5f, 1.f)) / .0144f * 127.f;
                 if (ts > 0.f) {
-                    ts += BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]);
+                    ts += BR_ALPHA(((struct smudge_model*)b_model->prepared)->groups[group].vertex_colours[j]);
                     if (ts > 255.f) {
                         ts = 255.f;
                     }
-                    if (BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]) != (int)ts) {
+                    if (BR_ALPHA(((struct smudge_model*)b_model->prepared)->groups[group].vertex_colours[j]) != (int)ts) {
                         data[n].vertex_index = real_vertex_number;
-                        data[n].light_index = (int)ts - BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]);
-                        V11MODEL(model)->groups[group].vertex_colours[j] = (int)ts << 24;
-                        if ((model->flags & BR_MODF_UPDATEABLE) != 0) {
-                            model->vertices[V11MODEL(model)->groups[group].vertex_user[j]].index = (int)ts;
+                        data[n].light_index = (int)ts - BR_ALPHA(((struct smudge_model*)b_model->prepared)->groups[group].vertex_colours[j]);
+                        ((struct smudge_model*)b_model->prepared)->groups[group].vertex_colours[j] = (int)ts << 24;
+                        if ((b_model->flags & BR_MODF_UPDATEABLE) != 0) {
+                            b_model->vertices[((struct smudge_model*)b_model->prepared)->groups[group].vertex_user[j]].index = (int)ts;
                         }
                         n++;
                         if (n >= COUNT_OF(data)) {
@@ -2333,64 +2404,19 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
                         }
                     }
                 }
-                real_vertex_number++;
             }
             if (n >= COUNT_OF(data)) {
                 break;
             }
         }
-        if (n > 0) {
-            AddSmudgeToPipingSession(pCar->car_ID, pCar->principal_car_actor, n, data);
+        if (n != 0) {
+            AddSmudgeToPipingSession(pCar->car_ID, pCar->car_actor_count - 1, n, data);
             // FIXME?
             // Added by dethrace to update gpu-buffered vertices
-            // model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
+            // b_model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
         }
-
-        n = 0;
-        real_vertex_number = 0;
-        if (actor != bonny) {
-            b_model = bonny->model;
-            BrVector3Add(&tv, &actor->t.t.translate.t, &point);
-            BrVector3Accumulate(&tv, &bonny->t.t.translate.t);
-            BrMatrix34TApplyV(&bonny_pos, &tv, &bonny->t.t.mat);
-            for (group = 0; group < V11MODEL(b_model)->ngroups; group++) {
-                j = 0;
-                for (j = 0; j < V11MODEL(b_model)->groups[group].nvertices; j++) {
-                    BrVector3Sub(&tv, &V11MODEL(b_model)->groups[group].position[j], &bonny_pos);
-                    ts = (.0144f - BrVector3LengthSquared(&tv) / SRandomBetween(.5f, 1.f)) / .0144f * 127.f;
-                    if (ts > 0.f) {
-                        ts += BR_ALPHA(V11MODEL(b_model)->groups[group].vertex_colours[j]);
-                        if (ts > 255.f) {
-                            ts = 255.f;
-                        }
-                        if (BR_ALPHA(V11MODEL(b_model)->groups[group].vertex_colours[j]) != (int)ts) {
-                            data[n].vertex_index = real_vertex_number;
-                            data[n].light_index = (int)ts - BR_ALPHA(V11MODEL(b_model)->groups[group].vertex_colours[j]);
-                            V11MODEL(b_model)->groups[group].vertex_colours[j] = (int)ts << 24;
-                            if ((b_model->flags & BR_MODF_UPDATEABLE) != 0) {
-                                b_model->vertices[V11MODEL(b_model)->groups[group].vertex_user[j]].index = (int)ts;
-                            }
-                            n++;
-                            if (n >= COUNT_OF(data)) {
-                                break;
-                            }
-                        }
-                    }
-                    real_vertex_number++;
-                }
-                if (n >= COUNT_OF(data)) {
-                    break;
-                }
-            }
-            if (n > 0) {
-                AddSmudgeToPipingSession(pCar->car_ID, pCar->car_actor_count - 1, n, data);
-                // FIXME?
-                // Added by dethrace to update gpu-buffered vertices
-                // b_model->flags |= BR_MODF_DETHRACE_FORCE_BUFFER_UPDATE;
-            }
-        }
-        EndPipingSession();
     }
+    EndPipingSession();
 }
 
 // IDA: void __cdecl ResetSmokeColumns()
