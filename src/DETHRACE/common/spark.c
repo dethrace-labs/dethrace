@@ -892,11 +892,12 @@ void ReplayShrapnel(tU32 pTime) {
 
     for (i = 0; i < COUNT_OF(gShrapnel); i++) {
         mat = &gShrapnel[i].actor->t.t.mat;
-        if (TEST_BIT(gShrapnel_flags, i)) {
-            gShrapnel[i].age += GetReplayRate() * pTime;
-            DrMatrix34Rotate(mat, gShrapnel[i].age * BrDegreeToAngle(1), &gShrapnel[i].axis);
-            BrMatrix34PreShearX(mat, gShrapnel[i].shear1, gShrapnel[i].shear2);
+        if (!TEST_BIT(gShrapnel_flags, i)) {
+            continue;
         }
+        gShrapnel[i].age += GetReplayRate() * pTime;
+        DrMatrix34Rotate(mat, gShrapnel[i].age * BrDegreeToAngle(1), &gShrapnel[i].axis);
+        BrMatrix34PreShearX(mat, gShrapnel[i].shear1, gShrapnel[i].shear2);
     }
 }
 
