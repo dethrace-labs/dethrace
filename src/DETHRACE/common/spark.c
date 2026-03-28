@@ -992,33 +992,37 @@ void DrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
 // FUNCTION: CARM95 0x00469fc0
 void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr, br_scalar r_multiplier, br_scalar z_multiplier, br_scalar shade_offset) {
     int i;
+#if defined(DETHRACE_FIX_BUGS)
     int offset; /* Added by dethrace. */
+#endif
     int r_multiplier_int;
     int shade_offset_int;
     tU16 z;
 
+    z = (1.f - zbuff) * 32768.0f;
     scr_ptr += gOffset;
     if (gProgram_state.cockpit_on) {
         depth_ptr += gOffset;
     }
-    z = (1.f - zbuff) * 32768.0f;
     r_multiplier_int = r_multiplier * 65536.0f;
     shade_offset_int = shade_offset * 65536.0f;
 
     for (i = 0; i < l; i++) {
         if (*depth_ptr > z) {
-            offset = ((shade_offset_int - r_squared * r_multiplier_int) >> 8) & 0xffffff00;
 #if defined(DETHRACE_FIX_BUGS)
+            offset = ((shade_offset_int - r_squared * r_multiplier_int) >> 8) & 0xffffff00;
             /* Prevent buffer underflows by capping negative offsets. */
             offset = MAX(0, offset);
-#endif
             *scr_ptr = shade_ptr[*scr_ptr + offset];
+#else
+            *scr_ptr = shade_ptr[*scr_ptr + (((shade_offset_int - r_squared * r_multiplier_int) >> 8) & 0xffffff00)];
+#endif
         }
-        r_multiplier = x + r_squared;
+        r_squared += x;
         scr_ptr++;
         x++;
         depth_ptr++;
-        r_squared = x + r_multiplier;
+        r_squared += x;
     }
 }
 
