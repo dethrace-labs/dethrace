@@ -431,8 +431,7 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
     int number_of_letters;
 
     let = &gRolling_letters[0];
-    for (i = 0; i < NBR_ROLLING_LETTERS; i++) {
-        let = &gRolling_letters[i];
+    for (i = 0; i < NBR_ROLLING_LETTERS; i++, let++) {
         if (let->number_of_letters < 0) {
             break;
         }
