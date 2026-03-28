@@ -178,6 +178,10 @@ int AudioBackend_SoundIsPlaying(void* type_struct_sample) {
     miniaudio = (tMiniaudio_sample*)type_struct_sample;
     assert(miniaudio != NULL);
 
+    if (!miniaudio->initialized) {
+        return 0;
+    }
+
     if (ma_sound_is_playing(&miniaudio->sound)) {
         return 1;
     }
