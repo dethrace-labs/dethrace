@@ -2084,6 +2084,7 @@ void InitFlame(void) {
 // FUNCTION: CARM95 0x0046ef01
 void InitSplash(FILE* pF) {
     int i;
+    int j;
     int num_files;
     int num;
     br_actor* actor;
@@ -2094,17 +2095,17 @@ void InitSplash(FILE* pF) {
     gSplash_flags = 0;
     gSplash_model = BrModelAllocate("Splash", 4, 2);
     if (pF != NULL) {
-        num = GetAnInt(pF);
+        i = GetAnInt(pF);
         gNum_splash_types = 0;
-        for (i = 0; num > i; ++i) {
+        for (j = 0; i > j; ++j) {
             GetAString(pF, s);
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, s);
-            num_files = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], 20 - gNum_splash_types);
-            if (num_files == 0) {
+            num = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], 20 - gNum_splash_types);
+            if (num == 0) {
                 FatalError(kFatalError_LoadPixelmapFile_S, the_path);
             }
-            gNum_splash_types += num_files;
+            gNum_splash_types += num;
         }
     } else {
         PathCat(the_path, gApplication_path, "PIXELMAP");
@@ -2112,13 +2113,14 @@ void InitSplash(FILE* pF) {
         gNum_splash_types = DRPixelmapLoadMany(the_path, splash_maps, 0x14u);
     }
     BrMapAddMany(splash_maps, gNum_splash_types);
-    for (i = 0; i < gNum_splash_types; ++i) {
-        gSplash_material[i] = BrMaterialAllocate(0);
-        gSplash_material[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT);
-        gSplash_material[i]->flags |= BR_MATF_ALWAYS_VISIBLE | BR_MATF_PERSPECTIVE;
-        gSplash_material[i]->index_blend = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
-        gSplash_material[i]->colour_map = splash_maps[i];
-        BrMaterialAdd(gSplash_material[i]);
+    num_files = (int)LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
+    for (j = 0; j < gNum_splash_types; ++j) {
+        gSplash_material[j] = BrMaterialAllocate(0);
+        gSplash_material[j]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT);
+        gSplash_material[j]->flags |= BR_MATF_ALWAYS_VISIBLE | BR_MATF_PERSPECTIVE;
+        gSplash_material[j]->index_blend = (br_pixelmap*)num_files;
+        gSplash_material[j]->colour_map = splash_maps[j];
+        BrMaterialAdd(gSplash_material[j]);
     }
     gSplash_model->nvertices = 4;
     BrVector3SetFloat(&gSplash_model->vertices[0].p, -0.5f, 0.0f, 0.0f);
@@ -2143,16 +2145,16 @@ void InitSplash(FILE* pF) {
     gSplash_model->faces[0].smoothing = 1;
     gSplash_model->faces[1].smoothing = 1;
     BrModelAdd(gSplash_model);
-    for (i = 0; i < COUNT_OF(gSplash); i++) {
-        gSplash[i].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-        actor = gSplash[i].actor;
+    for (j = 0; j < COUNT_OF(gSplash); j++) {
+        gSplash[j].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        actor = gSplash[j].actor;
         actor->model = gSplash_model;
         if (gNum_splash_types != 0) {
             actor->material = gSplash_material[IRandomBetween(0, gNum_splash_types - 1)];
         } else {
             actor->material = NULL;
         }
-        gSplash[i].scale_x = SRandomBetween(0.9f, 1.1f) * (2 * IRandomBetween(0, 1) - 1);
+        gSplash[j].scale_x = SRandomBetween(0.9f, 1.1f) * (float)(2 * IRandomBetween(0, 1) - 1);
     }
 }
 
