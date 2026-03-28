@@ -1415,6 +1415,12 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     tU32 seed;
     tU32 not_lonely;
 
+#ifdef DETHRACE_FIX_BUGS
+    // SetWorldToScreen sets gCameraToScreen matrix, which is used by SmokeCircle3D
+    gSpark_cam = pCamera->type_data;
+    SetWorldToScreen(pRender_screen);
+#endif
+
     BrVector3Set(&tv, 0, 0, 0);
     not_lonely = 0;
 #ifdef DETHRACE_3DFX_PATCH
