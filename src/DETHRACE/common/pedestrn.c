@@ -381,8 +381,8 @@ void InitPedGibs(void) {
             gPed_gib_materials[i].materials[j]->kd = the_material->kd;
             gPed_gib_materials[i].materials[j]->ks = the_material->ks;
             gPed_gib_materials[i].materials[j]->power = the_material->power;
-            gPed_gib_materials[i].materials[j]->index_base = the_material->index_base;
-            gPed_gib_materials[i].materials[j]->index_range = the_material->index_range;
+            ((br_uint_8*)&gPed_gib_materials[i].materials[j]->mode)[0] = ((br_uint_8*)&the_material->mode)[0];
+            ((br_uint_8*)&gPed_gib_materials[i].materials[j]->mode)[1] = ((br_uint_8*)&the_material->mode)[1];
             gPed_gib_materials[i].materials[j]->colour_map = the_pix;
             gPed_gib_materials[i].materials[j]->map_transform = the_material->map_transform;
             gPed_gib_materials[i].materials[j]->index_shade = the_material->index_shade;
