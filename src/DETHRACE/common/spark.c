@@ -1349,11 +1349,11 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     BrVector3Cross(&tv, &pCar->omega, &pCar->wpos[wheel]);
     BrVector3Scale(&vcs, &pCar->velocity_car_space, WORLD_SCALE * 1000.0f);
     BrVector3Accumulate(&vcs, &tv);
-    ts = BrVector3LengthSquared(&vcs);
+    ts = vcs.v[1] * vcs.v[1] + vcs.v[2] * vcs.v[2] + vcs.v[0] * vcs.v[0];
     if (ts < 25.0f) {
         return;
     }
-    decay_factor = sqrt(ts) / 25.0f;
+    decay_factor = (br_scalar)sqrt(ts) / 25.0f;
     if (decay_factor > 1.0f) {
         decay_factor = 1.0f;
     }
@@ -1361,17 +1361,17 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     tv.v[1] -= pCar->oldd[wheel] / WORLD_SCALE_D;
 
     alpha = -1000.0f;
-    if (vcs.v[2] > 0.0f) {
-        alpha = (pCar->bounds[0].min.v[2] - tv.v[2]) / vcs.v[2];
-    } else if (vcs.v[2] < 0.0f) {
+    if (vcs.v[2] < 0.0f) {
         alpha = (pCar->bounds[0].max.v[2] - tv.v[2]) / vcs.v[2];
+    } else if (vcs.v[2] > 0.0f) {
+        alpha = (pCar->bounds[0].min.v[2] - tv.v[2]) / vcs.v[2];
     }
 
     beta = -1000.0f;
-    if (vcs.v[0] > 0.0f) {
-        beta = (pCar->bounds[0].min.v[0] - tv.v[0]) / vcs.v[0];
-    } else if (vcs.v[0] < 0.0f) {
+    if (vcs.v[0] < 0.0f) {
         beta = (pCar->bounds[0].max.v[0] - tv.v[0]) / vcs.v[0];
+    } else if (vcs.v[0] > 0.0f) {
+        beta = (pCar->bounds[0].min.v[0] - tv.v[0]) / vcs.v[0];
     }
 
     ts = MAX(alpha, beta);
@@ -1380,7 +1380,7 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     BrMatrix34ApplyP(&pos, &tv, &pCar->car_master_actor->t.t.mat);
     BrMatrix34ApplyV(&v, &vcs, &pCar->car_master_actor->t.t.mat);
 
-    colour = gDust_rotate + gCurrent_race.material_modifiers[pCar->material_index[wheel]].smoke_type - 2;
+    colour = gCurrent_race.material_modifiers[pCar->material_index[wheel]].smoke_type - 2 + gDust_rotate;
     while (colour >= gNum_dust_tables) {
         colour -= gNum_dust_tables;
     }
