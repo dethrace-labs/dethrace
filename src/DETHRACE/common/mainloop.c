@@ -98,20 +98,21 @@ int gLast_credit_headup__mainloop; // suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x0046fd00
 void ToggleInfo(void) {
 
-    if (gProgram_state.game_completed) {
-        if (KeyIsDown(KEYMAP_CONTROL_ANY)) {
-            gAR_fudge_headups = !gAR_fudge_headups;
-        } else {
-            gInfo_on = !gInfo_on;
-            if (gInfo_on) {
+    if (!gProgram_state.game_completed) {
+        return;
+    }
+    if (KeyIsDown(KEYMAP_CONTROL_ANY)) {
+        gAR_fudge_headups = !gAR_fudge_headups;
+    } else {
+        gInfo_on = !gInfo_on;
+        if (gInfo_on) {
 #ifdef DETHRACE_3DFX_PATCH
-                if (PDKeyDown(KEY_SHIFT_ANY)) {
-                    gInfo_mode = (gInfo_mode + 1) % 3;
-                }
-#else
-                gInfo_mode = PDKeyDown(KEY_SHIFT_ANY);
-#endif
+            if (PDKeyDown(KEY_SHIFT_ANY)) {
+                gInfo_mode = (gInfo_mode + 1) % 3;
             }
+#else
+            gInfo_mode = PDKeyDown(KEY_SHIFT_ANY);
+#endif
         }
     }
 }
