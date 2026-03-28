@@ -2442,7 +2442,10 @@ void StopCarSmoking(tCar_spec* pCar) {
     int i;
 
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
-        if (gSmoke_column[i].car == pCar && gSmoke_column[i].lifetime > 2000) {
+        if (gSmoke_column[i].car != pCar) {
+            continue;
+        }
+        if (gSmoke_column[i].lifetime > 2000) {
             gSmoke_column[i].lifetime = 2000;
         }
     }
