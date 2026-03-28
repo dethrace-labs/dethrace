@@ -605,10 +605,13 @@ tRace_result MainGameLoop(void) {
         if (gHost_abandon_game || gProgram_state.prog_status == eProg_idling) {
             break;
         }
-        if (gNet_mode && gMap_mode
-            && ((gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox)
-                || (gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox))) {
-            ToggleMap();
+        if (gNet_mode) {
+            if ((gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox)
+                || (gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox)) {
+                if (gMap_mode) {
+                    ToggleMap();
+                }
+            }
         }
         ResetGrooveFlags();
         MungeEngineNoise();
@@ -619,19 +622,20 @@ tRace_result MainGameLoop(void) {
             DoPowerupPeriodics(gFrame_period);
         }
         ResetLollipopQueue();
+        MungePalette();
         if (!gAction_replay_mode) {
             MungeOpponents(gFrame_period);
             PollCarControls(gFrame_period);
         }
         PollCameraControls(camera_period);
-        if (gAction_replay_mode) {
-            DoActionReplay(gFrame_period);
-        } else {
+        if (!gAction_replay_mode) {
             ControlOurCar(gFrame_period);
             ApplyPhysicsToCars(gLast_tick_count - gRace_start, gFrame_period);
             PipeCarPositions();
             NetSendMessageStacks();
-            CheckRecoveryOfCars(gFrame_period + gLast_tick_count - gRace_start);
+            CheckRecoveryOfCars(gLast_tick_count - gRace_start + gFrame_period);
+        } else {
+            DoActionReplay(gFrame_period);
         }
         if (!gNasty_kludgey_cockpit_variable) {
             gNasty_kludgey_cockpit_variable = 1;
@@ -684,7 +688,7 @@ tRace_result MainGameLoop(void) {
             && !gPalette_fade_time
             && (gNet_mode == eNet_mode_none
                 || !gAction_replay_mode
-                || gProgram_state.current_car.car_master_actor->t.t.mat.m[3][0] < 500.0)) {
+                || gProgram_state.current_car.car_master_actor->t.t.mat.m[3][0] < 500.0f)) {
 
             EnsureRenderPalette();
             EnsurePaletteUp();
@@ -704,10 +708,10 @@ tRace_result MainGameLoop(void) {
                 AddLostTime(PDGetTotalTime() - start_menu_time);
             }
         }
-        if (gAction_replay_mode) {
-            PollActionReplayControls(gFrame_period);
-        } else {
+        if (!gAction_replay_mode) {
             CheckTimer();
+        } else {
+            PollActionReplayControls(gFrame_period);
         }
         if (!gAction_replay_mode && gKnobbled_frame_period) {
             while (GetTotalTime() - frame_start_time < gKnobbled_frame_period) {
@@ -767,10 +771,10 @@ tRace_result MainGameLoop(void) {
     } else {
         result = eRace_game_abandonned;
     }
-    if (result >= eRace_completed) {
-        gProgram_state.redo_race_index = -1;
-    } else {
+    if (result < eRace_completed) {
         gProgram_state.redo_race_index = gProgram_state.current_race_index;
+    } else {
+        gProgram_state.redo_race_index = -1;
     }
     gAbandon_game = 0;
     gSynch_race_start = 0;
