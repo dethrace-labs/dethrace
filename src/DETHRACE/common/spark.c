@@ -2803,11 +2803,12 @@ void RenderSplashes(void) {
     int i;
 
     for (i = 0; i < COUNT_OF(gSplash); i++) {
-        if (TEST_BIT(gSplash_flags, i)) {
-            BrActorRelink(gNon_track_actor, gSplash[i].actor);
-            BrZbSceneRenderAdd(gSplash[i].actor);
-            BrActorRelink(gDont_render_actor, gSplash[i].actor);
+        if (!TEST_BIT(gSplash_flags, i)) {
+            continue;
         }
+        BrActorRelink(gNon_track_actor, gSplash[i].actor);
+        BrZbSceneRenderAdd(gSplash[i].actor);
+        BrActorRelink(gDont_render_actor, gSplash[i].actor);
     }
 }
 
