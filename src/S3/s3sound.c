@@ -16,6 +16,7 @@ long gS3_last_file_length;
 tS3_sample_filter* gS3_sample_filter_func;
 tS3_sample_filter* gS3_sample_filter_disable_func;
 
+// FUNCTION: CARM95 0x004993A7
 int S3LoadSample(tS3_sound_id id) {
     // changed by dethrace for compatibility
     // char filename[80]; // [esp+10h] [ebp-5Ch] BYREF
@@ -85,6 +86,7 @@ int S3LoadSample(tS3_sound_id id) {
     return eS3_error_none;
 }
 
+// FUNCTION: CARM95 0x0049CC7B
 int S3ReadWavHeader_Win95(char* buf, tWAVEFORMATEX_** pWav_format, char** data_ptr, int* pData_size) {
     int riff_len;
     char* file_eof;         // [esp+10h] [ebp-14h]
@@ -146,6 +148,7 @@ int S3ReadWavHeader_Win95(char* buf, tWAVEFORMATEX_** pWav_format, char** data_p
     return 0;
 }
 
+// FUNCTION: CARM95 0x0049CE68
 void* S3LoadWavFile_DOS(char* pFile_name) {
     FILE* f;
     long file_len;
@@ -179,6 +182,7 @@ void* S3LoadWavFile_DOS(char* pFile_name) {
     return 0;
 }
 
+// xFUNCTION: CARM95 0x0049CE68
 void* S3LoadWavFile_Win95(char* pFile_name, tS3_sample* pSample) {
     FILE* f;           // [esp+Ch] [ebp-C8h]
     size_t bytes_read; // [esp+14h] [ebp-C0h] BYREF
@@ -257,6 +261,7 @@ void* S3LoadWavFile_Win95(char* pFile_name, tS3_sample* pSample) {
     return NULL;
 }
 
+// FUNCTION: CARM95 0x0049D69C
 int S3StopSample(tS3_channel* chan) {
     if (chan->tag == 0) {
         return 1;
@@ -275,6 +280,7 @@ int S3StopSample(tS3_channel* chan) {
     return 1;
 }
 
+// FUNCTION: CARM95 0x004C94EE
 int S3ExecuteSampleFilterFuncs(tS3_channel* chan) {
     if (((chan->descriptor->special_fx == 0) & gS3_sample_filter_funcs_registered) != 0) {
         gS3_sample_filter_func(1, chan->tag);
@@ -300,6 +306,7 @@ int S3GetSampleLength(tS3_sound_tag tag) {
     }
 }
 
+// FUNCTION: CARM95 0x0049D71C
 int S3PlaySample(tS3_channel* chan) {
     tS3_sample* sound_data;
 
@@ -366,6 +373,7 @@ int S3ReleaseTypeStructs(tS3_channel* chan) {
     return 1;
 }
 
+// FUNCTION: CARM95 0x0049D22D
 int S3SyncSampleVolumeAndPan(tS3_channel* chan) {
 
     float pan_ratio; // [esp+38h] [ebp-8h]
@@ -409,6 +417,7 @@ int S3SyncSampleVolumeAndPan(tS3_channel* chan) {
     return 1;
 }
 
+// FUNCTION: CARM95 0x0049D468
 int S3SyncSampleRate(tS3_channel* chan) {
     int new_rate;
     tS3_sample* sound_data;

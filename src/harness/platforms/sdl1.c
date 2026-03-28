@@ -51,8 +51,7 @@ ELF_NOTE_DLOPEN(
     "Platform-specific operations such as creating windows and handling events",
     ELF_NOTE_DLOPEN_PRIORITY_SUGGESTED,
     "libSDL-1.2.so.0",
-    "libSDL-1.2.so"
-);
+    "libSDL-1.2.so");
 #endif
 static const char* const possible_locations[] = {
     "libSDL-1.2.so.0",
@@ -293,12 +292,6 @@ static void SDL1_Harness_GetViewport(int* x, int* y, float* width_multipler, flo
     *height_multiplier = viewport.scale_y;
 }
 
-static void SDL1_Harness_GetPrefPath(char* path, char* app_name) {
-    // SDL_GetPrefPath not in SDL1. We could implement it if we really needed to.
-    // for now, just return the current path
-    strcpy(path, ".");
-}
-
 static int SDL1_Harness_Platform_Init(tHarness_platform* platform) {
     if (SDL1_LoadSymbols() != 0) {
         return 1;
@@ -320,7 +313,6 @@ static int SDL1_Harness_Platform_Init(tHarness_platform* platform) {
     platform->PaletteChanged = SDL1_Harness_PaletteChanged;
     platform->GL_GetProcAddress = SDL1_GL_GetProcAddress;
     platform->GetViewport = SDL1_Harness_GetViewport;
-    platform->GetPrefPath = SDL1_Harness_GetPrefPath;
     return 0;
 }
 

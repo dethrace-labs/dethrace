@@ -308,6 +308,7 @@ void InitializeBRenderEnvironment(void) {
     br_model* arrow_model;
 
     gBr_initialized = 1;
+    PDInstallErrorHandlers();
     InstallDRMemCalls();
     InstallDRFileCalls();
     SetBRenderScreenAndBuffers(0, 0, 0, 0);

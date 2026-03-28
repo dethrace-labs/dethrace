@@ -72,6 +72,9 @@ target_sources(dethrace_obj PRIVATE
     common/loading.c
     common/piping.c
     common/powerup.c
+    common/netgame.c
+    common/world.c
+    common/network.c
 
     common/brucetrk.c
     common/brucetrk.h
@@ -127,10 +130,7 @@ target_sources(dethrace_obj PRIVATE
     common/mainloop.h
     common/mainmenu.c
     common/mainmenu.h
-    common/netgame.c
-    common/netgame.h
-    common/network.c
-    common/network.h
+
     common/newgame.c
     common/newgame.h
     common/oppocar.c
@@ -158,8 +158,7 @@ target_sources(dethrace_obj PRIVATE
     common/trig.h
     common/utility.c
     common/utility.h
-    common/world.c
-    common/world.h
+
     constants.h
     dr_types.h
     pd/net.h
@@ -177,25 +176,26 @@ target_sources(dethrace_obj PRIVATE
     # pc-dos/dossys.c
 )
 
-if(DETHRACE_NET_ENABLED)
+if(MSVC_42_FOR_RECCMP)
+    target_sources(dethrace_obj PRIVATE pc-win95/win95net.c)
+else()
     # dethrace-added cross platform sys and network implementation
     target_sources(dethrace_obj PRIVATE pc-all/allnet.c)
-else()
-    target_sources(dethrace_obj PRIVATE pc-none/nonet.c)
 endif()
 
 # Create our main game binary.
 if(MSVC_42_FOR_RECCMP)
     add_executable(dethrace WIN32)
 
-    set(CMAKE_C_FLAGS_DEBUG "/Oi /Zi /MLd /G5")
+    set(CMAKE_C_FLAGS_DEBUG "/Oi /Zi /MLd /G5 /w")
 
     add_compile_definitions(_DEBUG)
     set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
     target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
+    target_link_libraries(dethrace PRIVATE ws2_32)
 
-    set_source_files_properties(common/powerup.c PROPERTIES COMPILE_FLAGS "/FAs")
-    set_source_files_properties(common/netgame.c PROPERTIES COMPILE_FLAGS "/FAs")
+    file(GLOB DETHRACE_COMMON_C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/common/*.c")
+    set_source_files_properties(${DETHRACE_COMMON_C_FILES} PROPERTIES COMPILE_FLAGS "/FAs")
 
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()
@@ -236,7 +236,7 @@ endif()
 if(DETHRACE_INSTALL)
     install(TARGETS dethrace
         BUNDLE DESTINATION . COMPONENT Runtime
-        RUNTIME DESTINATION . COMPONENT Runtime
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT Runtime
     )
 
     if(APPLE)

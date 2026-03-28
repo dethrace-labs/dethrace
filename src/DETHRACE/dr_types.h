@@ -454,22 +454,22 @@ typedef struct tCrush_data {
     tCrush_point_spec* crush_points;
 } tCrush_data;
 
-typedef struct tSpecial_volume {
-    br_matrix34 mat;
-    br_matrix34 inv_mat;
-    br_bounds bounds;
-    br_scalar gravity_multiplier;
-    br_scalar viscosity_multiplier;
-    float car_damage_per_ms;
-    float ped_damage_per_ms;
-    int no_mat;
-    int camera_special_effect_index;
-    int sky_col;
-    int entry_noise;
-    int exit_noise;
-    int engine_noise_index;
-    br_material* screen_material;
-    int material_modifier_index;
+typedef struct tSpecial_volume {     // size: 0xa8
+    br_matrix34 mat;                 // @0x0
+    br_matrix34 inv_mat;             // @0x30
+    br_bounds bounds;                // @0x60
+    br_scalar gravity_multiplier;    // @0x78
+    br_scalar viscosity_multiplier;  // @0x7c
+    float car_damage_per_ms;         // @0x80
+    float ped_damage_per_ms;         // @0x84
+    int no_mat;                      // @0x88
+    int camera_special_effect_index; // @0x8c
+    int sky_col;                     // @0x90
+    int entry_noise;                 // @0x94
+    int exit_noise;                  // @0x98
+    int engine_noise_index;          // @0x9c
+    br_material* screen_material;    // @0xa0
+    int material_modifier_index;     // @0xa4
 } tSpecial_volume;
 
 typedef struct tReduced_matrix {
@@ -2751,21 +2751,39 @@ typedef struct tHeadup_pair {
     int out_of_game;
 } tHeadup_pair;
 
+#ifdef DETHRACE_FIX_BUGS
+
+// these structs hold data plus a void*. For 64 bits, we cannot assume a pointer is 4 bytes
 typedef struct tMax_message {
-    // char buffer[516];  // 512 + sizeof(void*)
-    char buffer[520];
+    char buffer[512];
+    void *ptr;
 } tMax_message;
 
 typedef struct tMid_message {
-    // char buffer[132];  // 128 + sizeof(void*)
-    char buffer[136];
+    char buffer[132];
+    void *ptr;
 } tMid_message;
 
 typedef struct tMin_message {
-    // char buffer[36];   // 32 + sizeof(void*)
-    char buffer[40];
+    char buffer[32];
+    void *ptr;
 } tMin_message;
 
+#else
+
+typedef struct tMax_message {
+    char buffer[516];
+} tMax_message;
+
+typedef struct tMid_message {
+    char buffer[132];
+} tMid_message;
+
+typedef struct tMin_message {
+    char buffer[36];
+} tMin_message;
+
+#endif
 typedef struct tGuaranteed_message {        // size: 0x2c
     tNet_message* message;                  // @0x0
     tU32 send_time;                         // @0x4

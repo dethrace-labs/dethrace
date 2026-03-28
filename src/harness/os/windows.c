@@ -22,6 +22,7 @@
 #include <errno.h> /* errno, strerror */
 #include <io.h>    /* _access_s, F_OK */
 #include <locale.h>
+#include <shlobj.h>
 #include <stddef.h>
 #include <stdio.h>  /* errno_t, FILE, fgets, fopen_s, fprintf*/
 #include <stdlib.h> /* _splitpath */
@@ -411,6 +412,27 @@ char* OS_Basename(const char* path) {
 
 char* OS_GetWorkingDirectory(char* argv0) {
     return OS_Dirname(argv0);
+}
+
+int OS_GetPrefPath(char* dest, char* app) {
+    const char* base = NULL;
+    char path[1024];
+    char full[1024];
+
+    static char appdata[MAX_PATH];
+    if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_APPDATA, NULL, 0, appdata))) {
+        base = appdata;
+    }
+
+    if (base == NULL) {
+        return -1;
+    }
+
+    snprintf(full, sizeof(full), "%s/%s/", base, app);
+    CreateDirectoryA(full, NULL);
+
+    strcpy(dest, full);
+    return 0;
 }
 
 int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {

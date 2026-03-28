@@ -37,21 +37,21 @@ extern br_pixelmap* gBack_screen;
 
 #ifdef DETHRACE_SDL_DYNAMIC
 #ifdef _WIN32
-static const char * const possible_locations[] = {
+static const char* const possible_locations[] = {
     "SDL3.dll",
 };
 #elif defined(__APPLE__)
 #define SHARED_OBJECT_NAME "libSDL3"
 #define SDL3_LIBNAME "libSDL3.dylib"
 #define SDL3_FRAMEWORK "SDL3.framework/Versions/A/SDL3"
-static const char * const possible_locations[] = {
-    "@loader_path/" SDL3_LIBNAME, /* MyApp.app/Contents/MacOS/libSDL3_dylib */
-    "@loader_path/../Frameworks/" SDL3_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL3_framework */
-    "@executable_path/" SDL3_LIBNAME, /* MyApp.app/Contents/MacOS/libSDL3_dylib */
+static const char* const possible_locations[] = {
+    "@loader_path/" SDL3_LIBNAME,                     /* MyApp.app/Contents/MacOS/libSDL3_dylib */
+    "@loader_path/../Frameworks/" SDL3_FRAMEWORK,     /* MyApp.app/Contents/Frameworks/SDL3_framework */
+    "@executable_path/" SDL3_LIBNAME,                 /* MyApp.app/Contents/MacOS/libSDL3_dylib */
     "@executable_path/../Frameworks/" SDL3_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL3_framework */
-    NULL,  /* /Users/username/Library/Frameworks/SDL3_framework */
-    "/Library/Frameworks" SDL3_FRAMEWORK, /* /Library/Frameworks/SDL3_framework */
-    SDL3_LIBNAME /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
+    NULL,                                             /* /Users/username/Library/Frameworks/SDL3_framework */
+    "/Library/Frameworks" SDL3_FRAMEWORK,             /* /Library/Frameworks/SDL3_framework */
+    SDL3_LIBNAME                                      /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
 #include "elfdlopennote.h"
@@ -61,16 +61,15 @@ ELF_NOTE_DLOPEN(
     "Platform-specific operations such as creating windows and handling events",
     ELF_NOTE_DLOPEN_PRIORITY_RECOMMENDED,
     "libSDL3.so.0",
-    "libSDL3.so"
-);
+    "libSDL3.so");
 #endif
-static const char * const possible_locations[] = {
+static const char* const possible_locations[] = {
     "libSDL3.so.0",
     "libSDL3.so",
 };
 #endif
 
-static void *sdl3_so;
+static void* sdl3_so;
 #endif
 
 #define SDL_NAME "SDL3"
@@ -244,6 +243,7 @@ static int SDL3_Harness_ShowErrorMessage(char* text, char* caption) {
 
 static void SDL3_Harness_CreateWindow(const char* title, int width, int height, tHarness_window_type window_type) {
     int window_width, window_height;
+    SDL_WindowFlags extra_window_flags;
 
     render_width = width;
     render_height = height;
@@ -261,22 +261,28 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
         LOG_PANIC2("SDL_INIT_VIDEO error: %s", SDL3_GetError());
     }
 
+    extra_window_flags = SDL_WINDOW_RESIZABLE;
+
+    if (harness_game_config.start_full_screen) {
+        extra_window_flags |= SDL_WINDOW_FULLSCREEN;
+    }
+
     if (window_type == eWindow_type_opengl) {
+        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
         window = SDL3_CreateWindow(title,
             window_width, window_height,
-            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+            extra_window_flags | SDL_WINDOW_OPENGL);
 
         if (window == NULL) {
             LOG_PANIC2("Failed to create window: %s", SDL3_GetError());
         }
-
-        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
         gl_context = SDL3_GL_CreateContext(window);
 
         if (gl_context == NULL) {
+            // FIXME: recreate window (perhaps first create a hidden window)
             LOG_WARN2("Failed to create OpenGL core profile: %s. Trying OpenGLES...", SDL3_GetError());
             SDL3_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
             SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -291,7 +297,7 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
     } else {
         window = SDL3_CreateWindow(title,
             window_width, window_height,
-            SDL_WINDOW_RESIZABLE);
+            extra_window_flags);
         if (window == NULL) {
             LOG_PANIC2("Failed to create window: %s", SDL3_GetError());
         }
@@ -306,7 +312,7 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
 
         screen_texture = SDL3_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
         if (screen_texture == NULL) {
-            const SDL_PixelFormat *renderer_formats = NULL;
+            const SDL_PixelFormat* renderer_formats = NULL;
             SDL_PropertiesID renderer_props = SDL3_GetRendererProperties(renderer);
             if (renderer_props) {
                 renderer_formats = SDL3_GetPointerProperty(renderer_props, SDL_PROP_RENDERER_TEXTURE_FORMATS_POINTER, NULL);
@@ -326,10 +332,6 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
     viewport.y = 0;
     viewport.scale_x = 1;
     viewport.scale_y = 1;
-
-    if (harness_game_config.start_full_screen) {
-        SDL3_SetWindowFullscreen(window, true);
-    }
 }
 
 static void SDL3_Harness_Swap(br_pixelmap* back_buffer) {
@@ -377,15 +379,6 @@ static void SDL3_Harness_GetViewport(int* x, int* y, float* width_multipler, flo
     *height_multiplier = viewport.scale_y;
 }
 
-static void SDL3_Harness_GetPrefPath(char* path, char* app_name) {
-    char* sdl_path = SDL3_GetPrefPath(NULL, app_name);
-    if (sdl_path == NULL) {
-        LOG_PANIC("Failed to get preferences path (%s)", SDL3_GetError());
-    }
-    strcpy(path, sdl_path);
-    SDL3_free(sdl_path);
-}
-
 static uint32_t SDL3_Harness_GetTicks(void) {
     return SDL3_GetTicks();
 }
@@ -424,7 +417,6 @@ static int SDL3_Harness_Platform_Init(tHarness_platform* platform) {
     platform->PaletteChanged = SDL3_Harness_PaletteChanged;
     platform->GL_GetProcAddress = SDL3_Harness_GL_GetProcAddress;
     platform->GetViewport = SDL3_Harness_GetViewport;
-    platform->GetPrefPath = SDL3_Harness_GetPrefPath;
     return 0;
 };
 

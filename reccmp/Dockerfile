@@ -35,7 +35,7 @@ RUN unzip -q ninja-win.zip -d $WINEPREFIX/drive_c/ninja
 RUN rm ninja-win.zip
 
 # Install reccmp
-RUN pip install --break-system-packages git+https://github.com/isledecomp/reccmp
+RUN pip install --break-system-packages git+https://github.com/jeff-1amstudios/reccmp@9942ebc
 
 # Set up entrypoint script to perform the build
 COPY entrypoint.sh entrypoint.sh

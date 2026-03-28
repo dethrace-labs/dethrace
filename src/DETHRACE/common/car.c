@@ -393,10 +393,10 @@ void InitialiseCar2(tCar_spec* pCar, int pClear_disabled_flag) {
         pCar->car_model_actors[pCar->current_car_actor].actor->render_style = BR_RSTYLE_NONE;
     }
     SwitchCarActor(pCar, pCar->current_car_actor);
-    if (strcmp(pCar->name, "STELLA.TXT") != 0) {
+    if (!CAR_HAS_BUILTIN_PROX_RAY(pCar)) {
         pCar->proxy_ray_distance = 0.0f;
     } else {
-        pCar->proxy_ray_distance = 6.0f;
+        pCar->proxy_ray_distance = CAR_PROX_RAY_DISTANCE;
     }
     pCar->last_special_volume = NULL;
     pCar->auto_special_volume = NULL;

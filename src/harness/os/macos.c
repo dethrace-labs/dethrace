@@ -24,9 +24,11 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
 #include <time.h>
+#include <unistd.h>
 #include <unistd.h> // for close()
 #include <unistd.h>
 
@@ -330,6 +332,27 @@ char* OS_GetWorkingDirectory(char* argv0) {
         *bundlePath = '\0';
     }
     return OS_Dirname(argv0);
+}
+
+int OS_GetPrefPath(char* dest, char* app) {
+    const char* base = NULL;
+    char path[1024];
+    char full[1024];
+
+    base = getenv("HOME");
+    if (base) {
+        snprintf(path, sizeof(path), "%s/Library/Application Support", base);
+        mkdir(path, 0755);
+        base = path;
+    } else {
+        return -1;
+    }
+
+    snprintf(full, sizeof(full), "%s/%s/", base, app);
+    mkdir(full, 0755);
+
+    strcpy(dest, full);
+    return 0;
 }
 
 int OS_GetAdapterAddress(char* name, void* pSockaddr_in) {

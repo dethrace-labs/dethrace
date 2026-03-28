@@ -328,7 +328,7 @@ void ReceivedCopInfo(tNet_contents* pContents) {
     if (c == NULL) {
         return;
     }
-    if (pContents->data.cop_info.time > c->message.time) {
+    if (c->message.time > pContents->data.cop_info.time) {
         return;
     }
 
@@ -596,7 +596,7 @@ void ReinitialiseCar(tCar_spec* pCar) {
     InitialiseCar(pCar);
     TotallyRepairACar(pCar);
     if (pCar->driver == eDriver_local_human) {
-        gLast_it_change = PDGetTotalTime() + 2000;
+        gTime_for_punishment = PDGetTotalTime() + 2000;
     }
 }
 

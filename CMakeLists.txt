@@ -13,6 +13,7 @@ if(MSVC)
     set(CMAKE_INSTALL_DOCDIR "." CACHE PATH "Documentation root")
 endif()
 
+include(GNUInstallDirs)
 include(CheckCCompilerFlag)
 include(CMakeDependentOption)
 
@@ -171,7 +172,7 @@ endif()
 
 if(DETHRACE_INSTALL)
     install(FILES LICENSE
-        DESTINATION "."
+        DESTINATION "${CMAKE_INSTALL_DOCDIR}"
     )
 
     set(DETHRACE_PACKAGE_PLATFORM "" CACHE STRING "Dethrace binary package platform")

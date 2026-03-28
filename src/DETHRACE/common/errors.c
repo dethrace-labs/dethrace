@@ -193,27 +193,18 @@ void NonFatalError(int pStr_index, ...) {
     char temp_str[256];
     char* sub_pt;
     va_list ap;
-    int i;
-
+    strcpy(the_str, gError_messages[pStr_index]);
     va_start(ap, pStr_index);
 
-    strcpy(the_str, gError_messages[pStr_index - 1]);
-    sub_pt = temp_str;
-
-    for (i = 0; i < strlen(the_str); i++) {
-        if (the_str[i] == '%') {
-            sub_str = va_arg(ap, char*);
-            StripCR(sub_str);
-            strcpy(sub_pt, sub_str);
-            sub_pt += strlen(sub_str);
-        } else {
-            *sub_pt = the_str[i];
-            sub_pt++;
-        }
+    while ((sub_pt = strchr(the_str, '%')) != NULL) {
+        sub_str = va_arg(ap, char*);
+        StripCR(sub_str);
+        strcpy(temp_str, sub_pt + 1);
+        strcpy(sub_pt, sub_str);
+        strcat(the_str, temp_str);
     }
-    *sub_pt = 0;
     va_end(ap);
-    PDNonFatalError(temp_str);
+    PDNonFatalError(the_str);
 }
 
 // IDA: void __cdecl CloseDiagnostics()
