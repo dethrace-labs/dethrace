@@ -877,10 +877,9 @@ void KillCursor(int pSlot_index) {
     if (gCurrent_position < gVisible_length && gCurrent_position >= 0) {
         y_coord = gLetter_y_coords[pSlot_index];
         x_coord = gCurrent_graf_data->rolling_letter_x_pitch * gCurrent_position + gLetter_x_coords[pSlot_index];
-        for (i = 0; i < NBR_ROLLING_LETTERS; i++) {
-            let = &gRolling_letters[i];
+        for (let = gRolling_letters, j = 0; j < NBR_ROLLING_LETTERS; j++, let++) {
             if (let->number_of_letters >= 0 && x_coord == let->x_coord && y_coord == let->y_coord) {
-                gRolling_letters[i].number_of_letters = -1;
+                gRolling_letters[j].number_of_letters = -1;
                 break;
             }
         }
