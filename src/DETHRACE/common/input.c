@@ -856,11 +856,11 @@ void SetSlotXY(int pSlot_index, int pX_coord, int pY_coord) {
 // FUNCTION: CARM95 0x00473434
 void GetTypedName(char* pDestn, int pMax_length) {
 
-    if (strlen(gCurrent_typing) <= pMax_length) {
-        strcpy(pDestn, gCurrent_typing);
-    } else {
+    if (strlen(gCurrent_typing) > pMax_length) {
         memcpy(pDestn, gCurrent_typing, pMax_length);
         pDestn[pMax_length] = 0;
+    } else {
+        strcpy(pDestn, gCurrent_typing);
     }
 }
 
