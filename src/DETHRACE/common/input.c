@@ -752,36 +752,37 @@ void DoRLTypeLetter(int pChar, int pSlot_index) {
     int new_len;
 
     // v2 = pSlot_index;
-    if (pChar >= 32) {
-        if (gInsert_mode) {
-            new_len = strlen(gCurrent_typing) + 1;
-            if (new_len > 100) {
-                new_len = 100;
-                DoErrorInterface(kMiscString_FIXED_THAT_YOU_TWISTED_BASTARD);
-            }
-            for (i = new_len - 1; i > gCurrent_position; i--) {
-                gCurrent_typing[i] = gCurrent_typing[i - 1];
-                ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
-            }
-        } else if (strlen(gCurrent_typing) == gCurrent_position) {
-            new_len = strlen(gCurrent_typing) + 1;
-        } else {
-            new_len = strlen(gCurrent_typing);
-        }
+    if (pChar < 32) {
+        return;
+    }
+    if (gInsert_mode) {
+        new_len = strlen(gCurrent_typing) + 1;
         if (new_len > 100) {
             new_len = 100;
             DoErrorInterface(kMiscString_FIXED_THAT_YOU_TWISTED_BASTARD);
         }
-
-        gCurrent_typing[new_len] = 0;
-        if (new_len - 1 < gCurrent_position) {
-            gCurrent_position = new_len - 1;
+        for (i = new_len - 1; i > gCurrent_position; i--) {
+            gCurrent_typing[i] = gCurrent_typing[i - 1];
+            ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
         }
-        gCurrent_typing[gCurrent_position] = pChar;
-        ChangeCharTo(pSlot_index, gCurrent_position, pChar);
-        gCurrent_position++;
-        SetRollingCursor(pSlot_index);
+    } else if (strlen(gCurrent_typing) == gCurrent_position) {
+        new_len = strlen(gCurrent_typing) + 1;
+    } else {
+        new_len = strlen(gCurrent_typing);
     }
+    if (new_len > 100) {
+        new_len = 100;
+        DoErrorInterface(kMiscString_FIXED_THAT_YOU_TWISTED_BASTARD);
+    }
+
+    gCurrent_typing[new_len] = 0;
+    if (new_len - 1 < gCurrent_position) {
+        gCurrent_position = new_len - 1;
+    }
+    gCurrent_typing[gCurrent_position] = pChar;
+    ChangeCharTo(pSlot_index, gCurrent_position, pChar);
+    gCurrent_position++;
+    SetRollingCursor(pSlot_index);
 }
 
 // IDA: void __usercall StopTyping(int pSlot_index@<EAX>)
