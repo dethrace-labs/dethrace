@@ -258,6 +258,7 @@ tU32* KevKeyService(void) {
     static int last_single_key = -1;
     // GLOBAL: CARM95 0x53a1fc
     static tU32 last_time = 0;
+    // GLOBAL: CARM95 0x00514CA0
     static tU32 return_val[2];
     tU32 keys;
 
@@ -266,31 +267,31 @@ tU32* KevKeyService(void) {
     return_val[0] = 0;
     return_val[1] = 0;
 
-    if (keys < 0x6B) {
-        last_single_key = gKeys_pressed;
+    if (keys >= 0x6B) {
+        if (keys <= 0x6b00) {
+            if ((keys & 0xff) != last_single_key && keys >> 8 != last_single_key) {
+                sum = 0;
+                code = 0;
+                return return_val;
+            }
+            if ((keys & 0xff) == last_single_key) {
+                keys >>= 8;
+            } else if (keys >> 8 != last_single_key) {
+                sum = 0;
+                code = 0;
+                return return_val;
+            }
+            keys &= 0xff;
+        } else {
+            sum = 0;
+            code = 0;
+            return return_val;
+        }
     } else {
-        if (keys > 0x6b00) {
-            sum = 0;
-            code = 0;
-            return return_val;
-        }
-        if ((keys & 0xff) != last_single_key && keys >> 8 != last_single_key) {
-            sum = 0;
-            code = 0;
-            return return_val;
-        }
-        if (keys >> 8 != last_single_key) {
-            sum = 0;
-            code = 0;
-            return return_val;
-        }
-        if ((keys & 0xff) == last_single_key) {
-            keys = keys >> 8;
-        }
-        keys = keys & 0xff;
+        last_single_key = keys;
     }
 
-    if (keys && keys != last_key) {
+    if (last_key != keys && keys > 0) {
         sum += keys;
         code += keys << 11;
         code = (code >> 17) + (code << 4);
