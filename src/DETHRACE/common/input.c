@@ -626,7 +626,7 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
     new_type = eRT_looping_random;
 #endif
 
-    for (i = 0; !(i >= len); i++) {
+    for (i = 0; i < len; i++) {
         x_coord = gCurrent_graf_data->rolling_letter_x_pitch * i + pXcoord;
         if (len2 <= i) {
             new_char = ' ';
