@@ -1703,10 +1703,10 @@ void ControlCar3(tCar_spec* c, br_scalar dt) {
         if (c->turn_speed < 0.f) {
             c->turn_speed = 0.f;
         }
-        if (c->curvature >= 0.f && c->omega.v[1] >= 0.f) {
-            c->turn_speed += dt / 0.04f * (0.05f / (5.f + BrVector3Length(&c->v)) / 2.f) * 0.75f;
+        if (c->curvature < 0.f || c->omega.v[1] < 0.f) {
+            c->turn_speed += 0.01 * dt / 0.04 / 2.0 * 3.0;
         } else {
-            c->turn_speed += 0.01f * dt / 0.04f / 2.f * 3.f;
+            c->turn_speed += dt / 0.04f * (0.05f / (5.f + BrVector3Length(&c->v))) / 2.f * 0.75;
         }
     }
 
@@ -1714,10 +1714,10 @@ void ControlCar3(tCar_spec* c, br_scalar dt) {
         if (c->turn_speed > 0.f) {
             c->turn_speed = 0.f;
         }
-        if (c->curvature <= 0.f && c->omega.v[1] <= 0.f) {
-            c->turn_speed -= dt / 0.04f * (0.05f / (5.f + BrVector3Length(&c->v)) / 2.f) * 0.75f;
+        if (c->curvature > 0.f || c->omega.v[1] > 0.f) {
+            c->turn_speed -= 0.01 * dt / 0.04 / 2.0 * 3.0;
         } else {
-            c->turn_speed -= 0.01f * dt / 0.04f / 2.f * 3.f;
+            c->turn_speed -= dt / 0.04f * (0.05f / (5.f + BrVector3Length(&c->v))) / 2.f * 0.75;
         }
     }
     if (!c->keys.left && !c->keys.right) {
