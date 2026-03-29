@@ -835,11 +835,11 @@ void TypeKey(int pSlot_index, char pKey) {
     case KEY_BACKSPACE:
         DoRLBackspace(pSlot_index);
         break;
-    case KEY_INSERT:
-        DoRLInsert(pSlot_index);
-        break;
     case KEY_DELETE:
         DoRLDelete(pSlot_index);
+        break;
+    case KEY_INSERT:
+        DoRLInsert(pSlot_index);
         break;
     case KEY_LEFT:
         DoRLCursorLeft(pSlot_index);
