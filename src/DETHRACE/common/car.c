@@ -1794,37 +1794,37 @@ void ControlCar5(tCar_spec* c, br_scalar dt) {
         c->acc_force = 7.f * c->M;
     }
     if (c->keys.dec) {
-        c->acc_force = -7.f * c->M;
+        c->acc_force = -(7.f * c->M);
     }
     if (c->keys.left) {
         if (c->turn_speed < 0.f) {
             c->turn_speed = 0.f;
         }
-        if (c->curvature >= 0) {
-            c->turn_speed += dt / 0.04f * (0.05f / (5.f + BrVector3Length(&c->v)) / 2.f) * 0.5f;
+        if (c->curvature < 0) {
+            c->turn_speed += 0.01 * dt / 0.04 / 2.0 * 0.5;
         } else {
-            c->turn_speed += 0.01f * dt / 0.04f / 2.f * .5f;
+            c->turn_speed += dt / 0.04f * (0.05f / (5.f + (float)sqrt(c->v.v[1] * c->v.v[1] + c->v.v[2] * c->v.v[2] + c->v.v[0] * c->v.v[0]))) / 2.f * 0.5;
         }
     }
     if (c->keys.right) {
         if (c->turn_speed > 0.f) {
             c->turn_speed = 0.f;
         }
-        if (c->curvature <= 0) {
-            c->turn_speed -= dt / 0.04f * (0.05f / (5.f + BrVector3Length(&c->v)) / 2.f) * 0.5f;
+        if (c->curvature > 0) {
+            c->turn_speed -= 0.01 * dt / 0.04 / 2.0 * 0.5;
         } else {
-            c->turn_speed -= 0.01f * dt / 0.04f / 2.f * .5f;
+            c->turn_speed -= dt / 0.04f * (0.05f / (5.f + (float)sqrt(c->v.v[1] * c->v.v[1] + c->v.v[2] * c->v.v[2] + c->v.v[0] * c->v.v[0]))) / 2.f * 0.5;
         }
     }
     if (!c->keys.left && !c->keys.right) {
         c->turn_speed = 0.f;
         if (c->curvature < 0.f && !c->keys.holdw) {
-            c->curvature += dt / 0.04f * 0.05f / (5.f + BrVector3Length(&c->v)) / 2.f * 4.f;
+            c->curvature += (0.05f / (5.f + (float)sqrt(c->v.v[1] * c->v.v[1] + c->v.v[2] * c->v.v[2] + c->v.v[0] * c->v.v[0]))) * (dt / 0.04f) / 2.f * 4.0;
             if (c->curvature > 0.f) {
                 c->curvature = 0.f;
             }
         } else if (c->curvature > 0.f && !c->keys.holdw) {
-            c->curvature -= dt / 0.04f * 0.05f / (5.f + BrVector3Length(&c->v)) / 2.f * 4.f;
+            c->curvature -= (0.05f / (5.f + (float)sqrt(c->v.v[1] * c->v.v[1] + c->v.v[2] * c->v.v[2] + c->v.v[0] * c->v.v[0]))) * (dt / 0.04f) / 2.f * 4.0;
             if (c->curvature < 0.f) {
                 c->curvature = 0.f;
             }
