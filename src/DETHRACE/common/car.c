@@ -893,8 +893,7 @@ void ControlOurCar(tU32 pTime_difference) {
 
     car = &gProgram_state.current_car;
     if (gCar_flying) {
-        i = gNet_mode;
-        if (i == 0) {
+        if (!gNet_mode) {
             BrVector3Scale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
             FlyCar(car, pTime_difference / 1000.f);
             BrVector3InvScale(&car->car_master_actor->t.t.translate.t, &car->car_master_actor->t.t.translate.t, WORLD_SCALE);
