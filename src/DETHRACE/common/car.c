@@ -1029,13 +1029,12 @@ void CalcEngineForce(tCar_spec* c, br_scalar dt) {
     }
     if (c->brake_force != 0.0f) {
         c->revs = c->target_revs;
-    } else {
-        if (c->revs - 1.0f > c->target_revs || c->revs + 1.0f < c->target_revs) {
-            ts = (c->torque * dt / 0.0002) + (c->revs - c->target_revs);
-            ts2 = (1.0 / (c->speed_revs_ratio * c->M) / (float)c->gear + 1.0 / (c->force_torque_ratio * 0.0002) * (double)c->gear) * dt;
-            c->acc_force += ts / ts2;
-        }
+    } else if (c->revs - 1.0f > c->target_revs || c->revs + 1.0f < c->target_revs) {
+        ts = (c->torque * dt / 0.0002) + (c->revs - c->target_revs);
+        ts2 = (1.0 / (c->speed_revs_ratio * c->M) / (float)c->gear + 1.0 / (c->force_torque_ratio * 0.0002) * (double)c->gear) * dt;
+        c->acc_force += ts / ts2;
     }
+    return;
 }
 
 // IDA: void __usercall PrepareCars(tU32 pFrame_start_time@<EAX>)
