@@ -684,15 +684,14 @@ void DoRLBackspace(int pSlot_index) {
 
     if (gCurrent_position != 0) {
         if (strlen(gCurrent_typing) == gCurrent_position) {
-            new_len = strlen(gCurrent_typing);
+            ChangeCharTo(pSlot_index, strlen(gCurrent_typing), ' ');
         } else {
-            new_len = strlen(gCurrent_typing) - 1;
+            ChangeCharTo(pSlot_index, strlen(gCurrent_typing) - 1, ' ');
         }
-        ChangeCharTo(pSlot_index, new_len, ' ');
         new_len = strlen(gCurrent_typing) - 1;
         for (i = gCurrent_position - 1; i < new_len; i++) {
-            ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
             gCurrent_typing[i] = gCurrent_typing[i + 1];
+            ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
         }
         gCurrent_typing[new_len] = 0;
         gCurrent_position = gCurrent_position - 1;
