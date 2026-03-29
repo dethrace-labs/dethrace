@@ -706,10 +706,10 @@ void DoRLDelete(int pSlot_index) {
     int i;
     int new_len;
 
-    if (gCurrent_position <= ((int)strlen(gCurrent_typing) - 1)) {
+    if (gCurrent_position < strlen(gCurrent_typing) - 1) {
+        ChangeCharTo(pSlot_index, strlen(gCurrent_typing) - 1, ' ');
         new_len = strlen(gCurrent_typing) - 1;
-        ChangeCharTo(pSlot_index, new_len, ' ');
-        for (i = gCurrent_position; i < new_len; i++) {
+        for (i = gCurrent_position; new_len > i; i++) {
             gCurrent_typing[i] = gCurrent_typing[i + 1];
             ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
         }
