@@ -376,11 +376,10 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         } else {
             selection_changed = 0;
         }
-        if (pSpec->time_out) {
-            the_max = pSpec->time_out + gStart_time;
-            timed_out = PDGetTotalTime() >= the_max;
-        } else {
-            timed_out = 0;
+
+        // added the `*1` to force asm matching
+        timed_out = pSpec->time_out && (PDGetTotalTime() >= (gStart_time + pSpec->time_out) * 1);
+        if (!timed_out) {
         }
         RemoveTransientBitmaps(1);
         RecopyAreas(pSpec, copy_areas);
@@ -478,21 +477,22 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                     PDScreenBufferSwap(0);
                 }
             }
-        }
-        if (gTyping_slot >= 0 && !escaped) {
-            if (!go_ahead) {
-                the_key = PDAnyKeyDown();
-                if (the_key != -1 && (!gAlways_typing || (the_key != KEY_LEFT && the_key != KEY_RIGHT && the_key != KEY_UP && the_key != KEY_DOWN))) {
-                    if (gCurrent_choice != gTyping_slot && !gAlways_typing) {
-                        ChangeSelection(pSpec, &gCurrent_choice, &gTyping_slot, gCurrent_mode, 0);
-                        for (i = 0; i < 2; i++) {
-                            if (pSpec->typeable[i]) {
-                                gCurrent_mode = i;
-                                break;
+        } else {
+            if (gTyping_slot >= 0 && !escaped) {
+                if (!go_ahead) {
+                    the_key = PDAnyKeyDown();
+                    if (the_key != -1 && (!gAlways_typing || (the_key != KEY_LEFT && the_key != KEY_RIGHT && the_key != KEY_UP && the_key != KEY_DOWN))) {
+                        if (gCurrent_choice != gTyping_slot && !gAlways_typing) {
+                            ChangeSelection(pSpec, &gCurrent_choice, &gTyping_slot, gCurrent_mode, 0);
+                            for (i = 0; i < 2; i++) {
+                                if (pSpec->typeable[i]) {
+                                    gCurrent_mode = i;
+                                    break;
+                                }
                             }
                         }
+                        TypeKey(gAlways_typing ? 0 : gCurrent_choice, the_key);
                     }
-                    TypeKey(gAlways_typing ? 0 : gCurrent_choice, the_key);
                 }
             }
         }
