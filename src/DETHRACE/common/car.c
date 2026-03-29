@@ -1648,7 +1648,6 @@ void ToggleControls(void) {
         break;
     default:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_ORANGHED, "New controls");
-        break;
     }
 }
 
