@@ -1983,10 +1983,11 @@ void SimpleRotate(tCollision_info* c, br_scalar dt) {
 
     rad_rate = BrVector3Length(&c->omega);
     BrVector3InvScale(&axis, &c->omega, rad_rate);
-    rad = rad_rate * dt;
-    if (rad >= 0.0001) {
-        BrMatrix34PreRotate(&c->car_master_actor->t.t.mat, BrRadianToAngle(rad), &axis);
+    rad = dt * rad_rate;
+    if (rad < 0.0001) {
+        return;
     }
+    BrMatrix34PreRotate(&c->car_master_actor->t.t.mat, BrRadianToAngle(rad), &axis);
 }
 
 // IDA: void __usercall RotateCar(tCollision_info *c@<EAX>, br_scalar dt)
