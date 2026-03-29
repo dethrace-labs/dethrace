@@ -1956,7 +1956,7 @@ void RotateCarFirstOrder(tCollision_info* c, br_scalar dt) {
     br_scalar e2;
     static br_scalar max_rad;
 
-    rad_rate = BrVector3Length(&c->omega);
+    rad_rate = sqrt(c->omega.v[1] * c->omega.v[1] + c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0]);
     rad = rad_rate * dt;
 
     if (rad < .0001) {
