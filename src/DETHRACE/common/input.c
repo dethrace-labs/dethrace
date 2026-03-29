@@ -353,9 +353,9 @@ int KeyIsDown(int pKey_index) {
 // FUNCTION: CARM95 0x0047232b
 void WaitForNoKeys(void) {
 
-    while (AnyKeyDown() || EitherMouseButtonDown()) {
+    do {
         CheckQuit();
-    }
+    } while (AnyKeyDown() || EitherMouseButtonDown());
     CheckQuit();
 }
 
