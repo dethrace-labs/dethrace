@@ -820,8 +820,8 @@ void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
 
     gThe_length = pVisible_length;
     strcpy(gCurrent_typing, pText);
-    gVisible_length = pVisible_length;
     gCurrent_position = strlen(gCurrent_typing);
+    gVisible_length = pVisible_length;
     SetRollingCursor(pSlot_index);
 }
 
