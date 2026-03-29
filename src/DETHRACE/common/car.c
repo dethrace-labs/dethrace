@@ -870,7 +870,8 @@ void RememberSafePosition(tCar_spec* car, tU32 pTime) {
     for (j = 0; j < 5; j++) {
         BrVector3Sub(&r, &car->car_master_actor->t.t.translate.t, (br_vector3*)car->last_safe_positions[j].m[3]);
 
-        if (BrVector3LengthSquared(&r) < 8.4015961f) {
+        ts = BrVector3LengthSquared(&r);
+        if (ts < 8.4015961f) {
             return;
         }
     }
