@@ -1483,34 +1483,34 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
     mat = &pCar->car_master_actor->t.t.mat;
     highest_p = 0.f;
     for (i = 0; i < 3; i++) {
-        highest_p += BrVector3Dot((br_vector3*)mat->m[i], &pCar->water_normal) * pCar->bounds[0].min.v[i];
+        highest_p += (mat->m[i][2] * pCar->water_normal.v[2] - -(mat->m[i][1] * pCar->water_normal.v[1]) + mat->m[i][0] * pCar->water_normal.v[0]) * pCar->bounds[0].min.v[i];
     }
-    highest_p += BrVector3Dot((br_vector3*)mat->m[3], &pCar->water_normal) / WORLD_SCALE;
+    highest_p += BrVector3Dot((br_vector3*)&pCar->water_normal, (br_vector3*)mat->m[3]) / 6.9;
     lowest_p = highest_p;
     for (i = 0; i < 3; i++) {
-        val = (pCar->bounds[0].max.v[i] - pCar->bounds[0].min.v[i]) * BrVector3Dot((br_vector3*)mat->m[i], &pCar->water_normal);
-        if (val >= 0.f) {
-            highest_p += val;
-        } else {
+        val = (pCar->bounds[0].max.v[i] - pCar->bounds[0].min.v[i]) * (mat->m[i][2] * pCar->water_normal.v[2] - -(mat->m[i][1] * pCar->water_normal.v[1]) + mat->m[i][0] * pCar->water_normal.v[0]);
+        if (val < 0.f) {
             lowest_p += val;
+        } else {
+            highest_p = (0.f + highest_p) + val;
         }
     }
 
-    if (pCar->water_d > lowest_p) {
-        if (pCar->water_d >= highest_p) {
-            pCar->water_depth_factor = 1.f;
-        } else {
+    if (pCar->water_d <= lowest_p) {
+        pCar->auto_special_volume = NULL;
+        pCar->water_depth_factor = 1.f;
+    } else {
+        if (pCar->water_d < highest_p) {
             pCar->water_depth_factor = (pCar->water_d - lowest_p) / (highest_p - lowest_p);
+        } else {
+            pCar->water_depth_factor = 1.f;
         }
         if (pCar->auto_special_volume == NULL) {
             vol = GetDefaultSpecialVolumeForWater();
-            if (vol == NULL) {
-                pCar->water_depth_factor = 1.f;
-                pCar->auto_special_volume = NULL;
-            } else {
-                BrVector3Scale(&tv, &pCar->bounds[0].min, WORLD_SCALE);
+            if (vol != NULL) {
+                BrVector3Scale(&tv, &pCar->bounds[0].min, 6.9);
                 BrMatrix34ApplyP(&lp, &tv, mat);
-                BrVector3InvScale(&lp, &lp, WORLD_SCALE);
+                BrVector3InvScale(&lp, &lp, 6.9);
                 BrVector3Copy(&hp, &lp);
                 for (i = 0; i < 3; i++) {
                     val = pCar->bounds[0].max.v[i] - pCar->bounds[0].min.v[i];
@@ -1526,17 +1526,17 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
                 FindFloorInBoxBU(&lp, &dir, &tv, &d, pCar);
                 EnablePlingMaterials();
                 FindFloorInBoxBU(&pos, &dir, &tv, &d2, pCar);
-                if (d2 <= d) {
+                if (d2 > d) {
+                    pCar->auto_special_volume = vol;
+                } else {
                     pCar->water_depth_factor = 1.f;
                     pCar->auto_special_volume = NULL;
-                } else {
-                    pCar->auto_special_volume = vol;
                 }
+            } else {
+                pCar->water_depth_factor = 1.f;
+                pCar->auto_special_volume = NULL;
             }
         }
-    } else {
-        pCar->auto_special_volume = NULL;
-        pCar->water_depth_factor = 1.f;
     }
 }
 
