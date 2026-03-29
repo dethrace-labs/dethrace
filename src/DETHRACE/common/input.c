@@ -588,7 +588,12 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
         for (let = gRolling_letters, j = 0; j < NBR_ROLLING_LETTERS; j++, let++) {
             if (let->number_of_letters >= 0 && x_coord == let->x_coord && y_coord == let->y_coord) {
                 if (pNew_char != ROLLING_LETTER_LOOP_RANDOM) {
+#ifdef DETHRACE_FIX_BUGS
+                    /* Internationalization - the (tU8) cast makes sure extended ASCII is positive. */
+                    let->letters[0] = (tU8)pNew_char;
+#else
                     let->letters[0] = pNew_char;
+#endif
                 }
                 if (pNew_char == ' ') {
                     let->letters[0] = pNew_char;
