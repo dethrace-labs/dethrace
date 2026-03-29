@@ -123,6 +123,7 @@ void CalculateFrameRate(void) {
     // GLOBAL: CARM95 0x53a0ec
     static tU32 last_time;
     tU32 new_time;
+    // GLOBAL: CARM95 0x0053A128
     static int last_rates[30];
     int new_rate;
     int i;
