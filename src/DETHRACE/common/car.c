@@ -1878,9 +1878,9 @@ void ControlCar1(tCar_spec* c, br_scalar dt) {
 void setrotate(br_vector3* wdt, br_matrix34* m) {
     br_euler e;
 
-    e.a = BR_ANGLE_RAD(wdt->v[0]);
-    e.b = BR_ANGLE_RAD(wdt->v[1]);
-    e.c = BR_ANGLE_RAD(wdt->v[2]);
+    e.a = BrRadianToAngle(wdt->v[0]);
+    e.b = BrRadianToAngle(wdt->v[1]);
+    e.c = BrRadianToAngle(wdt->v[2]);
     e.order = 0;
     BrEulerToMatrix34(m, &e);
 }
