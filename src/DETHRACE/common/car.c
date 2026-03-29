@@ -1607,8 +1607,7 @@ int CollideCarWithWall(tCollision_info* car, br_scalar dt) {
     if (gCollision_detection_on__car) {
         car->collision_flag = 0;
         while (CollCheck(car, dt)) {
-            car->collision_flag++;
-            if (car->collision_flag - 1 > 20) {
+            if (car->collision_flag++ > 20) {
                 car->collision_flag = 1;
                 BrVector3Set(&car->v, 0.f, 0.f, 0.f);
                 BrVector3Set(&car->omega, 0.f, 0.f, 0.f);
