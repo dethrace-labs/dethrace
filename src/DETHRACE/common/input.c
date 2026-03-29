@@ -627,10 +627,11 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
 #endif
 
     for (i = 0; i < len; i++) {
-        if (i < len2) {
-            new_char = pNew_str[i];
-        } else {
+        x_coord = gCurrent_graf_data->rolling_letter_x_pitch * i + pXcoord;
+        if (len2 <= i) {
             new_char = ' ';
+        } else {
+            new_char = pNew_str[i];
         }
         if (new_char == ROLLING_LETTER_LOOP_RANDOM) {
             new_type = eRT_looping_random;
@@ -639,14 +640,13 @@ void ChangeTextTo(int pXcoord, int pYcoord, char* pNew_str, char* pOld_str) {
         } else {
             new_type = eRT_alpha;
         }
-        x_coord = gCurrent_graf_data->rolling_letter_x_pitch * i + pXcoord;
-        for (j = 0, let = gRolling_letters; j < NBR_ROLLING_LETTERS; j++, let++) {
+        for (let = gRolling_letters, j = 0; j < NBR_ROLLING_LETTERS; j++, let++) {
             if (let->number_of_letters >= 0 && let->x_coord == x_coord && let->y_coord == pYcoord) {
                 if (new_char != ROLLING_LETTER_LOOP_RANDOM) {
                     let->letters[0] = new_char;
                 }
                 if (new_char == ' ') {
-                    let->letters[0] = ' ';
+                    let->letters[0] = new_char;
                 }
                 let->current_offset = let->number_of_letters * gCurrent_graf_data->save_slot_letter_height;
                 let->rolling_type = new_type;
