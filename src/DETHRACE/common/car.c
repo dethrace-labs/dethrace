@@ -1289,7 +1289,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     tU32 frame_end_time;
 
     step_number = 0;
-    frame_end_time = last_frame_time + pTime_difference;
+    frame_end_time = pTime_difference + last_frame_time;
     if (gFreeze_mechanics) {
         return;
     }
@@ -1330,7 +1330,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
         if (&gProgram_state.current_car != gCar_to_view) {
             BrVector3Copy(&gCar_to_view->old_v, &gCar_to_view->v);
         }
-        for (i = 0; i < gNum_active_cars; i++) {
+        for (i = 0; i <= gNum_active_cars - 1; i++) {
             car = gActive_car_list[i];
             car_info = (tCollision_info*)car;
             car->dt = -1.f;
@@ -1341,7 +1341,8 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
                 if (car->dt < gDt - 0.0001) {
                     if (gNet_mode != eNet_mode_host) {
                         for (dam_index = 0; dam_index < COUNT_OF(car->damage_units); dam_index++) {
-                            if (car->damage_units[dam_index].damage_level < car->message.damage[dam_index]) {
+                            old_num_cars = dam_index;
+                            if ((int)car->damage_units[dam_index].damage_level < (unsigned char)car->message.damage[old_num_cars]) {
                                 car->dt = -1.f;
                                 break;
                             }
