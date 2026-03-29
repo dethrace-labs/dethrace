@@ -1452,8 +1452,7 @@ void ResetCarSpecialVolume(tCollision_info* pCar) {
     if (t < 100.0f && material != NULL) {
         mat_id = material->identifier;
         if (mat_id) {
-            id_len = strlen(mat_id);
-            if (id_len > 0 && (*mat_id == '!' || *mat_id == '#')) {
+            if (strlen(mat_id) != 0 && (*mat_id == '!' || *mat_id == '#')) {
                 new_special_volume = GetDefaultSpecialVolumeForWater();
             }
         }
