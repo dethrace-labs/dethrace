@@ -156,7 +156,7 @@ void EnableChoice(int pChoice) {
 
     for (i = 0; i < gDisabled_count; i++) {
         if (gDisabled_choices[i] == pChoice) {
-            memmove(&gDisabled_choices[i], &gDisabled_choices[i + 1], (gDisabled_count - i - 1) * sizeof(gDisabled_choices[0]));
+            memcpy(&gDisabled_choices[i], &gDisabled_choices[i + 1], (gDisabled_count - i - 1) * sizeof(gDisabled_choices[0]));
             gDisabled_count--;
             break;
         }
