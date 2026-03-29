@@ -796,11 +796,7 @@ void StopTyping(int pSlot_index) {
     int i;
 
     for (i = 0; i < gThe_length; i++) {
-        if (i < (strlen(gCurrent_typing) - 1)) {
-            ChangeCharTo(pSlot_index, i, gCurrent_typing[i]);
-        } else {
-            ChangeCharTo(pSlot_index, i, ' ');
-        }
+        ChangeCharTo(pSlot_index, i, i < strlen(gCurrent_typing) ? gCurrent_typing[i] : ' ');
     }
 }
 
