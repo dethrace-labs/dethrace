@@ -1546,31 +1546,35 @@ void MoveAndCollideCar(tCar_spec* car, br_scalar dt) {
     tCollision_info* car_info;
     int wheel;
 
+    car_info = (tCollision_info*)car;
     if (car->dt >= 0.f) {
         dt = car->dt;
     }
-    if (dt != 0.f && (!gCar_flying || &gProgram_state.current_car != car)) {
-        car_info = (tCollision_info*)car;
-        car->new_skidding = 0;
-        if (car->water_d != 10000.0f) {
-            TestAutoSpecialVolume(car_info);
-        }
-        MungeSpecialVolume(car_info);
-        if (car->driver <= eDriver_oppo) {
-            CalcForce(car, dt);
-        } else {
-            CalcEngineForce(car, dt);
-            CalcForce(car, dt);
-            DoRevs(car, dt);
-        }
-        RotateCar(car_info, dt);
-        TranslateCar(car_info, dt);
-        CollideCarWithWall(car_info, dt);
-        BrMatrix34ApplyP(&car->pos, &car->cmpos, &car->car_master_actor->t.t.mat);
-        BrVector3InvScale(&car->pos, &car->pos, WORLD_SCALE);
-        for (wheel = 0; wheel < 4; wheel++) {
-            SkidMark(car, wheel);
-        }
+    if (dt == 0.f) {
+        return;
+    }
+    if (gCar_flying && &gProgram_state.current_car == car) {
+        return;
+    }
+    car->new_skidding = 0;
+    if (car->water_d != 10000.0f) {
+        TestAutoSpecialVolume(car_info);
+    }
+    MungeSpecialVolume(car_info);
+    if (car->driver >= 3) {
+        CalcEngineForce(car, dt);
+        CalcForce(car, dt);
+        DoRevs(car, dt);
+    } else {
+        CalcForce(car, dt);
+    }
+    RotateCar(car_info, dt);
+    TranslateCar(car_info, dt);
+    CollideCarWithWall(car_info, dt);
+    BrMatrix34ApplyP(&car->pos, &car->cmpos, &car->car_master_actor->t.t.mat);
+    BrVector3InvScale(&car->pos, &car->pos, WORLD_SCALE);
+    for (wheel = 0; wheel < 4; wheel++) {
+        SkidMark(car, wheel);
     }
 }
 
