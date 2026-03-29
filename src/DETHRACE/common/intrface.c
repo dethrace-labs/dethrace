@@ -122,7 +122,7 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
 void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
     int i;
 
-    for (i = 0; i < pSpec->number_of_recopy_areas; i++) {
+    for (i = 0; i < pSpec->number_of_recopy_areas; ++i) {
         BrPixelmapRectangleCopy(
             gBack_screen,
             pSpec->recopy_areas[i].left[gGraf_data_index],
@@ -130,8 +130,8 @@ void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
             pCopy_areas[i],
             0,
             0,
-            pSpec->recopy_areas[i].right[gGraf_data_index] - pSpec->recopy_areas[i].left[gGraf_data_index],
-            pSpec->recopy_areas[i].bottom[gGraf_data_index] - pSpec->recopy_areas[i].top[gGraf_data_index]);
+            pSpec->recopy_areas[i].right[gGraf_data_index] + -pSpec->recopy_areas[i].left[gGraf_data_index],
+            pSpec->recopy_areas[i].bottom[gGraf_data_index] + -pSpec->recopy_areas[i].top[gGraf_data_index]);
     }
 }
 
