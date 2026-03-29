@@ -129,6 +129,13 @@ br_material* gBlack_material;
 // GLOBAL: CARM95 0x00538b50
 tShrapnel gShrapnel[15];
 
+#ifdef DETHRACE_FIX_BUGS
+// Smoke in mirror should use correct transform matrix
+br_matrix34 gSmoke_camera_to_world;
+#else
+#define gSmoke_camera_to_world gCamera_to_world
+#endif
+
 // gSmoke_column has 25 elements but all the code just checks the first 5 elements
 #define MAX_SMOKE_COLUMNS 5
 
@@ -1299,8 +1306,8 @@ void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAs
     }
 
     srand(o->v[2] * 16777216.0f + o->v[1] * 65536.0f + o->v[0] * 256.0f + r);
-    BrVector3Sub(&tv, o, (br_vector3*)gCamera_to_world.m[3]);
-    BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
+    BrVector3Sub(&tv, o, (br_vector3*)gSmoke_camera_to_world.m[3]);
+    BrMatrix34TApplyV(&p, &tv, &gSmoke_camera_to_world);
 
     if (-p.v[2] >= cam->hither_z && -p.v[2] <= cam->yon_z) {
         scaled_r = gCameraToScreen.m[0][0] * r / -p.v[2];
@@ -1316,6 +1323,15 @@ void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAs
 void ReplaySmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera) {
     br_scalar aspect;
     int i;
+
+#ifdef DETHRACE_FIX_BUGS
+    // Smoke in mirror should use correct transform matrix
+    if (gRendering_mirror) {
+        gSmoke_camera_to_world = gRearview_camera_to_world;
+    } else {
+        gSmoke_camera_to_world = gCamera_to_world;
+    }
+#endif
 
     for (i = 0; i < COUNT_OF(gSmoke_column); i++) {
         if (TEST_BIT(gSmoke_flags, i)) {
@@ -1416,9 +1432,13 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     tU32 not_lonely;
 
 #ifdef DETHRACE_FIX_BUGS
+    // Fix opponent smoke rendering in cockpit view with rearview mirror enabled
     // SetWorldToScreen sets gCameraToScreen matrix, which is used by SmokeCircle3D
     gSpark_cam = pCamera->type_data;
     SetWorldToScreen(pRender_screen);
+
+    // Smoke in mirror should use correct transform matrix
+    gSmoke_camera_to_world = *pCamera_to_world;
 #endif
 
     BrVector3Set(&tv, 0, 0, 0);
