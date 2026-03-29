@@ -573,39 +573,34 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
     tRolling_letter* let;
     tRolling_type new_type;
 
-    if (pChar_index >= gVisible_length || pChar_index < 0) {
-        return -1;
-    }
-    y_coord = gLetter_y_coords[pSlot_index];
-    x_coord = gCurrent_graf_data->rolling_letter_x_pitch * pChar_index + gLetter_x_coords[pSlot_index];
+    if (pChar_index < gVisible_length && pChar_index >= 0) {
+        y_coord = gLetter_y_coords[pSlot_index];
+        x_coord = gCurrent_graf_data->rolling_letter_x_pitch * pChar_index + gLetter_x_coords[pSlot_index];
 
-    if (pNew_char == ROLLING_LETTER_LOOP_RANDOM) {
-        new_type = eRT_looping_random;
-    } else if (pNew_char >= '0' && pNew_char <= '9') {
-        new_type = eRT_numeric;
-    } else {
-        new_type = eRT_alpha;
-    }
-
-    for (i = 0; i < NBR_ROLLING_LETTERS; i++) {
-        let = &gRolling_letters[i];
-        if (let->number_of_letters >= 0 && x_coord == let->x_coord && y_coord == let->y_coord) {
-            break;
+        if (pNew_char == ROLLING_LETTER_LOOP_RANDOM) {
+            new_type = eRT_looping_random;
+        } else if (pNew_char >= '0' && pNew_char <= '9') {
+            new_type = eRT_numeric;
+        } else {
+            new_type = eRT_alpha;
         }
-    }
-    if (i >= NBR_ROLLING_LETTERS) {
+
+        for (let = gRolling_letters, j = 0; j < NBR_ROLLING_LETTERS; j++, let++) {
+            if (let->number_of_letters >= 0 && x_coord == let->x_coord && y_coord == let->y_coord) {
+                if (pNew_char != ROLLING_LETTER_LOOP_RANDOM) {
+                    let->letters[0] = pNew_char;
+                }
+                if (pNew_char == ' ') {
+                    let->letters[0] = pNew_char;
+                }
+                let->current_offset = gCurrent_graf_data->save_slot_letter_height * let->number_of_letters;
+                let->rolling_type = new_type;
+                return j;
+            }
+        }
         return AddRollingLetter(pNew_char, x_coord, y_coord, new_type);
     }
-    if (pNew_char != ROLLING_LETTER_LOOP_RANDOM) {
-        /* The (tU8) cast makes sure extended ASCII is positive. */
-        let->letters[0] = (tU8)pNew_char;
-    }
-    if (pNew_char == ' ') {
-        let->letters[0] = ' ';
-    }
-    let->rolling_type = new_type;
-    let->current_offset = gCurrent_graf_data->save_slot_letter_height * let->number_of_letters;
-    return i;
+    return -1;
 }
 
 // IDA: void __usercall ChangeTextTo(int pXcoord@<EAX>, int pYcoord@<EDX>, char *pNew_str@<EBX>, char *pOld_str@<ECX>)
