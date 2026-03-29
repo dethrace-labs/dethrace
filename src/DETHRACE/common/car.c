@@ -603,7 +603,7 @@ void SetInitialPosition(tRace_info* pThe_race, int pCar_index, int pGrid_index) 
         start_i = i = IRandomBetween(0, pThe_race->number_of_net_start_points - 1);
         do {
             PossibleService();
-            for (j = 0; j + 1 <= gNumber_of_net_players; j++) {
+            for (j = 0; j < gNumber_of_net_players; j++) {
                 if (j != pCar_index) {
                     BrVector3Copy(&real_pos, &pThe_race->opponent_list[j].car_spec->car_master_actor->t.t.translate.t);
                     if (real_pos.v[0] > 500.f) {
