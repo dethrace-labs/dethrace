@@ -2558,10 +2558,7 @@ void MungePedestrians(tU32 pFrame_period) {
     }
     gVesuvians_last_time = gVesuvians_this_time;
     if (gCurrent_ped_path_actor != NULL) {
-        SquirtPathVertex((br_vertex*)((char*)gCurrent_ped_path_actor->model->vertices
-                             + ((gCurrent_ped_path_actor->model->nvertices * 5) << 3))
-                - 4,
-            gOur_pos);
+        SquirtPathVertex(gCurrent_ped_path_actor->model->vertices + gCurrent_ped_path_actor->model->nvertices - 4, gOur_pos);
         BrModelUpdate(gCurrent_ped_path_actor->model, BR_MODU_ALL);
     }
 }
