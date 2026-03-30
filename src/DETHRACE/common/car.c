@@ -1753,7 +1753,7 @@ void ControlCar4(tCar_spec* c, br_scalar dt) {
         } else {
             c->turn_speed = dt / (PHYSICS_STEP_TIME / 1000.0f) * (.05f / (BrVector3Length(&c->v) + 5.f)) * 4.f / 2.f * .5f;
             if (c->omega.v[1] < -.01f) {
-                c->turn_speed -= dt * .01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * c->omega.v[1] * 2.f;
+                c->turn_speed -= dt * .01f / (PHYSICS_STEP_TIME / 1000.f) / 2.f * c->omega.v[1] * 2.f;
             }
         }
     }
@@ -1768,7 +1768,7 @@ void ControlCar4(tCar_spec* c, br_scalar dt) {
         } else {
             c->turn_speed = dt / (PHYSICS_STEP_TIME / 1000.0f) * (.05f / (BrVector3Length(&c->v) + 5.f)) * -4.f / 2.f * .5f;
             if (c->omega.v[1] < -.01f) {
-                c->turn_speed -= dt * .01f / (harness_game_config.physics_step_time / 1000.f) / 2.f * c->omega.v[1] * 2.f;
+                c->turn_speed -= dt * .01f / (PHYSICS_STEP_TIME / 1000.f) / 2.f * c->omega.v[1] * 2.f;
             }
         }
     }
