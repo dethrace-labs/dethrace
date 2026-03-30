@@ -903,6 +903,8 @@ enum ExceptionFlags {
 
 #define DOUBLESIDED_USER_FLAG (void*)12345
 
+#define PHYSICS_STEP_TIME 40
+
 // average frame time in carm95
 #define MUNGE_ENGINE_INTERVAL 50
 
