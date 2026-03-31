@@ -492,7 +492,7 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
 #ifdef DETHRACE_FIX_BUGS
             // Avoid unaligned access of gMr_chunky2
             tChunk_subject_index tmp_subject_index = pSubject_index;
-            memcpy(&gMr_chunky2->subject_index, &tmp_subject_index, sizeof(tmp_subject_index));
+            memcpy((tU8*)gMr_chunky2 + offsetof(tPipe_chunk, subject_index), &tmp_subject_index, sizeof(tmp_subject_index));
 #else
             gMr_chunky2->subject_index = pSubject_index;
 #endif
