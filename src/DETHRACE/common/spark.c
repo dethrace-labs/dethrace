@@ -2365,7 +2365,12 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
                     if (BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]) != (int)ts) {
                         data[n].vertex_index = real_vertex_number;
                         data[n].light_index = (int)ts - BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]);
+#ifdef DETHRACE_FIX_BUGS
+                        // Fixes ubsan runtime error: shifting number in sign bit of signed number is UB
+                        V11MODEL(model)->groups[group].vertex_colours[j] = (unsigned)ts << 24;
+#else
                         V11MODEL(model)->groups[group].vertex_colours[j] = (int)ts << 24;
+#endif
                         if ((model->flags & BR_MODF_UPDATEABLE) != 0) {
                             model->vertices[V11MODEL(model)->groups[group].vertex_user[j]].index = (int)ts;
                         }
