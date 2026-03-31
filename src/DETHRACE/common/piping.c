@@ -734,7 +734,12 @@ void AddSoundToPipingSession(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volum
     } else {
         BrVector3Set(&data.position, 0.f, 0.f, 0.f);
     }
+#ifdef DETHRACE_FIX_BUGS
+    // Fixes ubsan runtime error: shifting negative number is UB
+    data.volume = ((unsigned)pR_volume << 8) + (unsigned)pL_volume;
+#else
     data.volume = (pR_volume << 8) + pL_volume;
+#endif
     data.outlet_index = GetIndexFromOutlet(pOutlet);
     AddDataToSession(pSound_index, &data, sizeof(tPipe_sound_data));
 }
