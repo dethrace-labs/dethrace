@@ -145,10 +145,17 @@ br_matrix34 gSmoke_camera_to_world;
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
+#ifdef DETHRACE_FIX_BUGS
+#define TEST_BIT(var, pos) (var & (1u << pos))
+#define SET_BIT(var, pos) (var |= (1u << pos))
+#define FLIP_BIT(var, pos) (var ^= (1u << pos))
+#define CLEAR_BIT(var, pos) (var &= ~(1u << pos))
+#else
 #define TEST_BIT(var, pos) (var & (1 << pos))
 #define SET_BIT(var, pos) (var |= (1 << pos))
 #define FLIP_BIT(var, pos) (var ^= (1 << pos))
 #define CLEAR_BIT(var, pos) (var &= ~(1 << pos))
+#endif
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
