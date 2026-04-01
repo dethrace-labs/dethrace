@@ -3677,54 +3677,54 @@ void CrushBoundingBox(tCar_spec* c, int crush_only) {
         return;
     }
     actor = c->car_model_actors[c->principal_car_actor].actor;
-    max.v[0] = c->wpos[2].v[2] - c->non_driven_wheels_circum / 6.2f;
-    min.v[0] = c->driven_wheels_circum / 6.2f + c->wpos[0].v[2];
-    max.v[0] /= WORLD_SCALE;
-    min.v[0] /= WORLD_SCALE;
+    min.v[2] = c->wpos[2].v[2] - c->non_driven_wheels_circum / 6.2f;
+    max.v[2] = c->driven_wheels_circum / 6.2f + c->wpos[0].v[2];
+    min.v[2] /= 6.9;
+    max.v[2] /= 6.9;
     for (i = 0; i < actor->model->nvertices; i++) {
-        if (actor->model->vertices[i].p.v[2] < max.v[0]) {
-            max.v[0] = actor->model->vertices[i].p.v[2];
+        if (actor->model->vertices[i].p.v[2] < min.v[2]) {
+            min.v[2] = actor->model->vertices[i].p.v[2];
         }
-        if (actor->model->vertices[i].p.v[2] > min.v[0]) {
-            min.v[0] = actor->model->vertices[i].p.v[2];
+        if (actor->model->vertices[i].p.v[2] > max.v[2]) {
+            max.v[2] = actor->model->vertices[i].p.v[2];
         }
     }
-    max.v[0] *= WORLD_SCALE;
-    min.v[0] *= WORLD_SCALE;
+    min.v[2] *= 6.9;
+    max.v[2] *= 6.9;
     if (crush_only) {
-        if (c->bounds[1].min.v[2] > max.v[0]) {
-            max.v[0] = c->bounds[1].min.v[2];
+        if (c->bounds[1].min.v[2] > min.v[2]) {
+            min.v[2] = c->bounds[1].min.v[2];
         }
-        if (c->bounds[1].max.v[2] < min.v[0]) {
-            min.v[0] = c->bounds[1].max.v[2];
+        if (c->bounds[1].max.v[2] < max.v[2]) {
+            max.v[2] = c->bounds[1].max.v[2];
         }
     } else {
-        if (c->max_bounds[1].min.v[2] > max.v[0]) {
-            max.v[0] = c->max_bounds[1].min.v[2];
+        if (c->max_bounds[1].min.v[2] > min.v[2]) {
+            min.v[2] = c->max_bounds[1].min.v[2];
         }
-        if (c->max_bounds[1].max.v[2] < min.v[0]) {
-            min.v[0] = c->max_bounds[1].max.v[2];
+        if (c->max_bounds[1].max.v[2] < max.v[2]) {
+            max.v[2] = c->max_bounds[1].max.v[2];
         }
     }
-    c->bounds[1].min.v[2] = max.v[0];
-    c->bounds[1].max.v[2] = min.v[0];
+    c->bounds[1].min.v[2] = min.v[2];
+    c->bounds[1].max.v[2] = max.v[2];
     for (i = 0; i < c->extra_point_num; i++) {
-        if (c->max_bounds[1].max.v[2] + 0.01f >= c->original_extra_points_z[i] && c->max_bounds[1].min.v[2] - 0.01f <= c->original_extra_points_z[i]) {
-            if (c->original_extra_points_z[i] > min.v[0]) {
-                c->extra_points[i].v[2] = min.v[0];
-            } else if (c->original_extra_points_z[i] >= max.v[0]) {
-                c->extra_points[i].v[2] = c->original_extra_points_z[i];
-            } else {
-                c->extra_points[i].v[2] = max.v[0];
-            }
-            if (c->extra_points[i].v[2] > min.v[0]) {
-                c->extra_points[i].v[2] = min.v[0];
-            }
-            if (c->extra_points[i].v[2] < max.v[0]) {
-                c->extra_points[i].v[2] = max.v[0];
-            }
-        } else {
+        if (c->max_bounds[1].max.v[2] + 0.01 < c->original_extra_points_z[i] || c->max_bounds[1].min.v[2] - 0.01 > c->original_extra_points_z[i]) {
             c->extra_points[i].v[2] = c->original_extra_points_z[i];
+        } else {
+            if (c->original_extra_points_z[i] > max.v[2]) {
+                c->extra_points[i].v[2] = max.v[2];
+            } else if (c->original_extra_points_z[i] < min.v[2]) {
+                c->extra_points[i].v[2] = min.v[2];
+            } else {
+                c->extra_points[i].v[2] = c->original_extra_points_z[i];
+            }
+            if (c->extra_points[i].v[2] > max.v[2]) {
+                c->extra_points[i].v[2] = max.v[2];
+            }
+            if (c->extra_points[i].v[2] < min.v[2]) {
+                c->extra_points[i].v[2] = min.v[2];
+            }
         }
     }
 }
