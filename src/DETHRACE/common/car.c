@@ -4329,21 +4329,37 @@ int GetBoundsEdge(br_vector3* pos, br_vector3* edge, br_bounds* pB, int plane1, 
     return 1;
 }
 
-// IDA: void __usercall oldMoveOurCar(tU32 pTime_difference@<EAX>)
+// IDA: void __usercall oldMoveOurCar(br_scalar pNew_y@<EAX>, tU32 pTime_difference@<EDX>, br_model *pThe_model@<EBX>, int pFace_index@<ECX>)
 // FUNCTION: CARM95 0x00485bea
-void oldMoveOurCar(tU32 pTime_difference) {
-    br_vector3 thrust_vector;
-    br_matrix34 direction_matrix;
-    br_matrix34 old_mat;
-    double rotate_amount;
-    br_scalar nearest_y_above;
-    br_scalar nearest_y_below;
-    br_scalar speed;
+void oldMoveOurCar(br_scalar pNew_y, tU32 pTime_difference, br_model* pThe_model, int pFace_index) {
     int below_face_index;
     int above_face_index;
-    br_model* below_model;
-    br_model* above_model;
-    NOT_IMPLEMENTED();
+    br_scalar speed;
+    br_matrix34 direction_matrix;
+    br_vector3 thrust_vector;
+
+    speed = (gSelf->t.t.translate.t.v[1] - pNew_y) * 100.0f;
+    if (pTime_difference == 0
+        || speed / pTime_difference > 0.6f) {
+        gSelf->t.t.translate.t.v[1] -= pTime_difference * 0.6f / 100.0f;
+    } else {
+        gSelf->t.t.translate.t.v[1] = pNew_y;
+        gGround_normal__car = gNew_ground_normal__car;
+    }
+
+    below_face_index = ((int)BrDegreeToAngle(gOur_yaw__car)) & 0xffff;
+    thrust_vector.v[0] = -cos(BrAngleToRadian(below_face_index));
+    thrust_vector.v[1] = 0.f;
+    above_face_index = ((int)BrDegreeToAngle(gOur_yaw__car)) & 0xffff;
+    thrust_vector.v[2] = sin(BrAngleToRadian(above_face_index));
+
+    ((br_transform*)&direction_matrix)->type = BR_TRANSFORM_LOOK_UP;
+    ((br_transform*)&direction_matrix)->t.look_up.look.v[0] = thrust_vector.v[1] * gGround_normal__car.v[2] - thrust_vector.v[2] * gGround_normal__car.v[1];
+    ((br_transform*)&direction_matrix)->t.look_up.look.v[1] = thrust_vector.v[2] * gGround_normal__car.v[0] - gGround_normal__car.v[2] * thrust_vector.v[0];
+    ((br_transform*)&direction_matrix)->t.look_up.look.v[2] = gGround_normal__car.v[1] * thrust_vector.v[0] - thrust_vector.v[1] * gGround_normal__car.v[0];
+    ((br_transform*)&direction_matrix)->t.look_up.up = gGround_normal__car;
+    ((br_transform*)&direction_matrix)->t.look_up.t = gSelf->t.t.translate.t;
+    BrTransformToTransform(&gSelf->t, (br_transform*)&direction_matrix);
 }
 
 // IDA: void __cdecl ToggleCollisionDetection()
