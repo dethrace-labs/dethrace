@@ -4739,16 +4739,15 @@ tCar_spec* GetRaceLeader(void) {
     int score;
     tCar_spec* car;
 
+    score = gNet_players[0].last_score_index;
+    car = gNet_players[0].car;
     if ((gCurrent_net_game->type == eNet_game_type_foxy || gCurrent_net_game->type == eNet_game_type_tag) && gIt_or_fox >= 0 && gIt_or_fox < gNumber_of_net_players) {
-        car = gNet_players[gIt_or_fox].car;
-    } else {
-        car = gNet_players[0].car;
-        score = gNet_players[0].last_score_index;
-        for (i = 1; i < gNumber_of_net_players; i++) {
-            if (score > gNet_players[i].last_score_index) {
-                score = gNet_players[i].last_score_index;
-                car = gNet_players[i].car;
-            }
+        return gNet_players[gIt_or_fox].car;
+    }
+    for (i = 1; i < gNumber_of_net_players; i++) {
+        if (score > gNet_players[i].last_score_index) {
+            score = gNet_players[i].last_score_index;
+            car = gNet_players[i].car;
         }
     }
     return car;
