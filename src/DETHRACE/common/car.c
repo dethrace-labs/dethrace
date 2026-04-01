@@ -5384,11 +5384,12 @@ void SetUpPanningCamera(tCar_spec* c) {
 // FUNCTION: CARM95 0x0048949c
 void SaveCameraPosition(int i) {
 
-    if (gSave_camera[i].saved != 1) {
-        gSave_camera[i].zoom = gCamera_zoom;
-        gSave_camera[i].yaw = gCamera_yaw;
-        gSave_camera[i].saved = 1;
+    if (gSave_camera[i].saved == 1) {
+        return;
     }
+    gSave_camera[i].zoom = gCamera_zoom;
+    gSave_camera[i].yaw = gCamera_yaw;
+    gSave_camera[i].saved = 1;
 }
 
 // IDA: void __usercall RestoreCameraPosition(int i@<EAX>)
