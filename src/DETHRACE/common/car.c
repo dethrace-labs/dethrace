@@ -5921,22 +5921,24 @@ int CollideCameraWithOtherCars(br_vector3* car_pos, br_vector3* cam_pos) {
     br_bounds bnds;
 
     for (i = 0; i < gNum_cars_and_non_cars; i++) {
-        if (BoundsTest(&gActive_car_list[i]->bounds_world_space, cam_pos)) {
-            c = gActive_car_list[i];
-            BrVector3Sub(&tv, cam_pos, &c->car_master_actor->t.t.translate.t);
-            BrMatrix34TApplyV(&p, &tv, &c->car_master_actor->t.t.mat);
-            if (BoundsTest(&c->bounds[0], &p)) {
-                BrVector3Sub(&tv, cam_pos, car_pos);
-                BrMatrix34TApplyV(&dir, &tv, &c->car_master_actor->t.t.mat);
-                BrVector3Add(&pos_car_space, &p, &dir);
-                BrVector3SetFloat(&tv, 0.03f, 0.03f, 0.03f);
-                BrVector3Sub(&bnds.min, &c->bounds[0].min, &tv);
-                BrVector3Add(&bnds.max, &c->bounds[0].max, &tv);
-                plane = LineBoxColl(&pos_car_space, &p, &bnds, &tv);
-                BrMatrix34ApplyP(cam_pos, &tv, &c->car_master_actor->t.t.mat);
-                return 1;
-            }
+        if (!BoundsTest(&gActive_car_list[i]->bounds_world_space, cam_pos)) {
+            continue;
         }
+        c = gActive_car_list[i];
+        BrVector3Sub(&tv, cam_pos, &c->car_master_actor->t.t.translate.t);
+        BrMatrix34TApplyV(&pos_car_space, &tv, &c->car_master_actor->t.t.mat);
+        if (!BoundsTest(&c->bounds[0], &pos_car_space)) {
+            continue;
+        }
+        BrVector3Sub(&tv, cam_pos, car_pos);
+        BrMatrix34TApplyV(&dir, &tv, &c->car_master_actor->t.t.mat);
+        BrVector3Add(&p, &pos_car_space, &dir);
+        BrVector3SetFloat(&tv, 0.03f, 0.03f, 0.03f);
+        BrVector3Sub(&bnds.min, &c->bounds[0].min, &tv);
+        BrVector3Add(&bnds.max, &c->bounds[0].max, &tv);
+        plane = LineBoxColl(&p, &pos_car_space, &bnds, &tv);
+        BrMatrix34ApplyP(cam_pos, &tv, &c->car_master_actor->t.t.mat);
+        return 1;
     }
     return 0;
 }
