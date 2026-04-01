@@ -3807,9 +3807,12 @@ br_scalar ThreePointColl(br_scalar* f, br_matrix4* m, br_scalar* d) {
     br_scalar ts;
 
     BrMatrix4Copy(&mc, m);
-    memset(&mc.m[2][3], 0, 16);
-    mc.m[1][3] = 0.0f;
-    mc.m[0][3] = 0.0f;
+    mc.m[2][3] = 0.0f;
+    mc.m[1][3] = mc.m[2][3];
+    mc.m[0][3] = mc.m[1][3];
+    mc.m[3][2] = mc.m[0][3];
+    mc.m[3][1] = mc.m[3][2];
+    mc.m[3][0] = mc.m[3][1];
     mc.m[3][3] = 1.0f;
     ts = DrMatrix4Inverse(&mi, &mc);
     BrMatrix4TApply((br_vector4*)f, (br_vector4*)d, &mi);
