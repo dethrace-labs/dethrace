@@ -3736,24 +3736,23 @@ void AddCollPoint(br_scalar dist, br_vector3* p, br_vector3* norm, br_vector3* r
     int i;
     int furthest;
 
-    if (num < 4) {
-        d[num] = dist;
-        n[num] = *norm;
-        BrVector3Sub(&r[num], p, &c->cmpos);
-        return;
-    }
-    furthest = 0;
-    for (i = 1; i < 4; i++) {
-        if (d[furthest] < d[i]) {
-            furthest = i;
+    if (num >= 4) {
+        furthest = 0;
+        for (i = 1; i < 4; i++) {
+            if (d[furthest] < d[i]) {
+                furthest = i;
+            }
         }
-    }
-    if (d[furthest] >= dist) {
+        if (d[furthest] < dist) {
+            return;
+        }
         num = furthest;
-        d[num] = dist;
-        n[num] = *norm;
-        BrVector3Sub(&r[num], p, &c->cmpos);
     }
+    d[num] = dist;
+    n[num].v[0] = norm->v[0];
+    n[num].v[1] = norm->v[1];
+    n[num].v[2] = norm->v[2];
+    BrVector3Sub(&r[num], p, &c->cmpos);
 }
 
 // IDA: br_scalar __usercall SinglePointColl@<ST0>(br_scalar *f@<EAX>, br_matrix4 *m@<EDX>, br_scalar *d@<EBX>)
