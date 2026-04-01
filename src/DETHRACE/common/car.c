@@ -3278,9 +3278,9 @@ br_scalar AddFriction(tCollision_info* c, br_vector3* vel, br_vector3* normal_fo
     br_scalar point_vel;
 
     ts = BrVector3Dot(normal_force, vel) / BrVector3Dot(normal_force, normal_force);
-    BrVector3Scale(&tv, normal_force, ts);
-    BrVector3Sub(vel, vel, &tv);
-    point_vel = total_force * 0.35f * gCurrent_race.material_modifiers[gMaterial_index].car_wall_friction;
+    BrVector3Scale(&norm, normal_force, ts);
+    BrVector3Sub(vel, vel, &norm);
+    total_force = gCurrent_race.material_modifiers[gMaterial_index].car_wall_friction * total_force * 0.35f;
     ts = BrVector3Length(vel);
     if (ts < 0.0001f) {
         BrVector3Set(max_friction, 0.f, 0.f, 0.f);
@@ -3292,24 +3292,24 @@ br_scalar AddFriction(tCollision_info* c, br_vector3* vel, br_vector3* normal_fo
     ftau.v[0] = ftau.v[0] / c->I.v[0];
     ftau.v[1] = ftau.v[1] / c->I.v[1];
     ftau.v[2] = ftau.v[2] / c->I.v[2];
-    ts = 1.0 / c->M;
-    norm.v[0] = pos->v[2] * ftau.v[1] - pos->v[1] * ftau.v[2];
-    norm.v[1] = pos->v[0] * ftau.v[2] - pos->v[2] * ftau.v[0];
-    norm.v[2] = pos->v[1] * ftau.v[0] - pos->v[0] * ftau.v[1];
-    ts = max_friction->v[0] * norm.v[0] + max_friction->v[1] * norm.v[1] + max_friction->v[2] * norm.v[2] + ts;
+    ts = 1.0f / c->M;
+    tv.v[0] = pos->v[2] * ftau.v[1] - pos->v[1] * ftau.v[2];
+    tv.v[1] = pos->v[0] * ftau.v[2] - pos->v[2] * ftau.v[0];
+    tv.v[2] = pos->v[1] * ftau.v[0] - pos->v[0] * ftau.v[1];
+    ts = max_friction->v[0] * tv.v[0] + max_friction->v[1] * tv.v[1] + max_friction->v[2] * tv.v[2] + ts;
     if (fabs(ts) <= 0.0001f) {
         ts = 0.0f;
     } else {
         ts = -BrVector3Dot(max_friction, vel) / ts;
     }
-    if (ts > point_vel) {
-        ts = point_vel;
+    if (ts > total_force) {
+        ts = total_force;
     }
     BrVector3Scale(max_friction, max_friction, ts);
     BrVector3Cross(&tv, pos, max_friction);
     BrVector3Scale(&tv, &tv, c->M);
     ApplyTorque((tCar_spec*)c, &tv);
-    return point_vel;
+    return total_force;
 }
 
 // IDA: void __usercall AddFrictionCarToCar(tCollision_info *car1@<EAX>, tCollision_info *car2@<EDX>, br_vector3 *vel1@<EBX>, br_vector3 *vel2@<ECX>, br_vector3 *normal_force1, br_vector3 *pos1, br_vector3 *pos2, br_scalar total_force, br_vector3 *max_friction)
