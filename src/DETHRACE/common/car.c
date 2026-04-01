@@ -3868,35 +3868,39 @@ br_scalar FourPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* t
     br_scalar ts;
 
     ts = ThreePointColl(f, m, d);
-    if (f[0] < 0.0 || f[1] < 0.0 || f[2] < 0.0 || ts < 0.000001) {
-        if (ts < 0.000001) {
-            j = 3;
-        } else if (f[0] < 0.0) {
-            j = 0;
-        } else if (f[1] >= 0.0) {
-            j = 2;
-        } else {
-            j = 1;
-        }
-        for (i = j; i < 3; ++i) {
-            for (l = 0; l < 4; ++l) {
-                m->m[i][l] = m->m[i + 1][l];
-            }
-            d[i] = d[i + 1];
-            tau[i] = tau[i + 1];
-            n[i] = n[i + 1];
-            d[i] = d[i + 1];
-        }
-        for (i = j; i < 3; ++i) {
-            for (l = 0; l < 3; ++l) {
-                m->m[l][i] = m->m[l][i + 1];
-            }
-        }
-        return ThreePointCollRec(f, m, d, tau, n, c);
-    } else {
+    if (f[0] >= 0.0f && f[1] >= 0.0f && f[2] >= 0.0f && ts >= 0.000001) {
         c->infinite_mass = 256;
         return ts;
     }
+    if (ts < 0.000001) {
+        i = 3;
+    } else if (f[0] < 0.0f) {
+        i = 0;
+    } else if (f[1] < 0.0f) {
+        i = 1;
+    } else {
+        i = 2;
+    }
+    for (j = i; j < 3; ++j) {
+        for (l = 0; l < 4; ++l) {
+            m->m[j][l] = m->m[j + 1][l];
+        }
+        d[j] = d[j + 1];
+        tau[j].v[0] = tau[j + 1].v[0];
+        tau[j].v[1] = tau[j + 1].v[1];
+        tau[j].v[2] = tau[j + 1].v[2];
+        n[j].v[0] = n[j + 1].v[0];
+        n[j].v[1] = n[j + 1].v[1];
+        n[j].v[2] = n[j + 1].v[2];
+        d[j] = d[j + 1];
+    }
+    for (j = i; j < 3; ++j) {
+        for (l = 0; l < 3; ++l) {
+            m->m[l][j] = m->m[l][j + 1];
+        }
+    }
+    ts = ThreePointCollRec(f, m, d, tau, n, c);
+    return ts;
 }
 
 // IDA: void __usercall MultiFindFloorInBoxM(int pNum_rays@<EAX>, br_vector3 *a@<EDX>, br_vector3 *b@<EBX>, br_vector3 *nor@<ECX>, br_scalar *d, tCar_spec *c, int *mat_ref)
