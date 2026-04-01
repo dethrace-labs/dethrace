@@ -4965,23 +4965,29 @@ void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
         camera_ptr->field_of_view = BrDegreeToAngle(gCamera_angle);
         old_camera_mode = -1;
     }
-    if (!gProgram_state.cockpit_on) {
+    if (gProgram_state.cockpit_on) {
+    } else {
         if (gOpponent_viewing_mode && gAction_replay_mode) {
             c = &gProgram_state.current_car;
         } else {
             c = gCar_to_view;
         }
-        if (c->car_master_actor->t.t.translate.t.v[0] <= 500.0) {
-            if (gAction_replay_mode && gAction_replay_camera_mode) {
-                if (gAction_replay_camera_mode == eAction_replay_action) {
-                    CheckDisablePlingMaterials(c);
-                    if (IncidentCam(c, pTime)) {
-                        SetPanningFieldOfView();
-                        EnablePlingMaterials();
-                        old_camera_mode = gAction_replay_camera_mode;
-                        return;
-                    }
+        if (c->car_master_actor->t.t.translate.t.v[0] > 500.0f) {
+        } else {
+            switch (gAction_replay_camera_mode * gAction_replay_mode) {
+            case 0:
+                NormalPositionExternalCamera(c, pTime);
+                break;
+            case eAction_replay_action:
+                CheckDisablePlingMaterials(c);
+                if (IncidentCam(c, pTime)) {
+                    SetPanningFieldOfView();
+                    EnablePlingMaterials();
+                    old_camera_mode = gAction_replay_camera_mode;
+                    return;
                 }
+                /* fall through */
+            default:
                 CheckDisablePlingMaterials(c);
                 SetPanningFieldOfView();
                 if (gAction_replay_camera_mode != old_camera_mode) {
@@ -4990,8 +4996,7 @@ void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
                 }
                 PanningExternalCamera(c, pTime);
                 EnablePlingMaterials();
-            } else {
-                NormalPositionExternalCamera(c, pTime);
+                break;
             }
         }
     }
