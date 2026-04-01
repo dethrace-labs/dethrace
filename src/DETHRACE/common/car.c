@@ -4023,36 +4023,33 @@ int FindFloorInBoxBU2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* 
     j = 0; // added to keep compiler happy
 #endif
     *d = 2.f;
-    for (i = c->box_face_start; i < c->box_face_end; i++) {
-        face_ref = &gFace_list__car[i];
-        if (!gEliminate_faces || SLOBYTE(face_ref->flags) >= 0) {
-            CheckSingleFace(face_ref, a, b, &nor2, &dist);
-            if (*d > dist) {
-                if (face_ref->material->user == DOUBLESIDED_USER_FLAG || (face_ref->material->flags & (BR_MATF_ALWAYS_VISIBLE | BR_MATF_TWO_SIDED)) != 0) {
-                    BrVector3Sub(&tv, &c->pos, a);
-                    if (BrVector3Dot(&tv, &nor2) >= 0.f) {
-                        *d = dist;
-                        j = i;
-                        BrVector3Copy(nor, &nor2);
-                    }
-                } else {
+    for (i = c->box_face_start, face_ref = &gFace_list__car[i]; i < c->box_face_end; i++, face_ref++) {
+        if (gEliminate_faces) {
+            if ((face_ref->flags & 0x80) != 0) {
+                continue;
+            }
+        }
+        CheckSingleFace(face_ref, a, b, &nor2, &dist);
+        if (*d > dist) {
+            if (*(br_int_32*)&face_ref->material->depth_bias == (br_int_32)DOUBLESIDED_USER_FLAG || (face_ref->material->flags & (BR_MATF_ALWAYS_VISIBLE | BR_MATF_TWO_SIDED)) != 0) {
+                BrVector3Sub(&tv, &c->pos, a);
+                if (BrVector3Dot(&tv, &nor2) >= 0.f) {
                     *d = dist;
                     j = i;
                     BrVector3Copy(nor, &nor2);
                 }
+            } else {
+                *d = dist;
+                j = i;
+                BrVector3Copy(nor, &nor2);
             }
         }
-        face_ref++;
     }
     if (*d >= 2.f) {
         return 0;
     }
     i = gFace_list__car[j].material->identifier[0] - ('0' - 1);
-    if (i < 0 || i >= 11) {
-        return 0;
-    } else {
-        return i;
-    }
+    return (i < 0 || i >= 11) ? 0 : i;
 }
 
 // IDA: int __usercall FindFloorInBoxM2@<EAX>(br_vector3 *a@<EAX>, br_vector3 *b@<EDX>, br_vector3 *nor@<EBX>, br_scalar *d@<ECX>, tCollision_info *c)
