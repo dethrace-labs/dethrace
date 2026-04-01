@@ -5395,11 +5395,12 @@ void SaveCameraPosition(int i) {
 // FUNCTION: CARM95 0x004894f8
 void RestoreCameraPosition(int i) {
 
-    if (gSave_camera[i].saved != 0) {
-        gCamera_zoom = gSave_camera[i].zoom;
-        gCamera_yaw = gSave_camera[i].yaw;
-        gSave_camera[i].saved = 0;
+    if (gSave_camera[i].saved == 0) {
+        return;
     }
+    gCamera_zoom = gSave_camera[i].zoom;
+    gCamera_yaw = gSave_camera[i].yaw;
+    gSave_camera[i].saved = 0;
 }
 
 // IDA: void __usercall NormalPositionExternalCamera(tCar_spec *c@<EAX>, tU32 pTime@<EDX>)
