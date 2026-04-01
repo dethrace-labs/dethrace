@@ -3931,18 +3931,20 @@ void MultiFindFloorInBoxBU(int pNum_rays, br_vector3* a, br_vector3* b, br_vecto
     br_scalar dist[4];
     tFace_ref* face_ref;
 
-    for (i = c->box_face_start; i < c->box_face_end; i++) {
-        face_ref = &gFace_list__car[i];
-        if (!gEliminate_faces || (face_ref->flags & 0x80) == 0x0) {
-            MultiRayCheckSingleFace(pNum_rays, face_ref, a, b, &nor2, dist);
-            for (j = 0; j < pNum_rays; ++j) {
-                if (d[j] > dist[j]) {
-                    d[j] = dist[j];
-                    nor[j] = nor2;
-                    l = *gFace_list__car[i].material->identifier - 47;
-                    if (l >= 0 && l < 11) {
-                        mat_ref[j] = l;
-                    }
+    for (i = c->box_face_start, face_ref = &gFace_list__car[i]; i < c->box_face_end; i++, face_ref++) {
+        if (gEliminate_faces && (face_ref->flags & 0x80) != 0x0) {
+            continue;
+        }
+        MultiRayCheckSingleFace(pNum_rays, face_ref, a, b, &nor2, dist);
+        for (l = 0; l < pNum_rays; ++l) {
+            if (d[l] > dist[l]) {
+                d[l] = dist[l];
+                nor[l].v[0] = nor2.v[0];
+                nor[l].v[1] = nor2.v[1];
+                nor[l].v[2] = nor2.v[2];
+                j = *gFace_list__car[i].material->identifier - 47;
+                if (j >= 0 && j < 11) {
+                    mat_ref[l] = j;
                 }
             }
         }
