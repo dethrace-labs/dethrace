@@ -3385,16 +3385,11 @@ void ScrapeNoise(br_scalar vel, br_vector3* position, int material) {
     br_vector3 velocity;
     br_vector3 position_in_br;
 
-    vol = vel * 7.0;
+    vol = vel * 7.0f;
     if (gCurrent_race.material_modifiers[material].scrape_noise_index == -1) {
         return;
     }
-    if ((scrape_tag && DRS3SoundStillPlaying(scrape_tag)) || vol <= 30) {
-        if (last_scrape_vol < vol) {
-            DRS3ChangeVolume(scrape_tag, vol);
-            last_scrape_vol = vol;
-        }
-    } else {
+    if ((!scrape_tag || !DRS3SoundStillPlaying(scrape_tag)) && vol > 30) {
         BrVector3Set(&velocity, 0.f, 0.f, 0.f);
         scrape_tag = DRS3StartSound3D(
             gCar_outlet,
@@ -3405,6 +3400,9 @@ void ScrapeNoise(br_scalar vel, br_vector3* position, int material) {
             vol,
             IRandomBetween(49152, 81920),
             0x10000);
+        last_scrape_vol = vol;
+    } else if (vol > last_scrape_vol) {
+        DRS3ChangeVolume(scrape_tag, vol);
         last_scrape_vol = vol;
     }
 }
