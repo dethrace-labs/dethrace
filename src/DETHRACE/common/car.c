@@ -3630,33 +3630,32 @@ int ExpandBoundingBox(tCar_spec* c) {
     l = 0;
     min_z = c->bounds[1].min.v[2];
     max_z = c->bounds[1].max.v[2];
-    old_pos = *(br_vector3*)&c->oldmat.m[3][0];
+    memcpy(&old_pos, c->oldmat.m + 3, sizeof(old_pos));
     CrushBoundingBox(c, 0);
-    for (l = 0; l < 5; l++) {
-        if (TestForCarInSensiblePlace(c)) {
-            break;
-        }
-        if (c->old_point.v[2] <= 0.0f) {
-            dist = min_z - c->bounds[1].min.v[2];
-        } else {
+    l = 0;
+    while (l < 5 && !TestForCarInSensiblePlace(c)) {
+        if (c->old_point.v[2] > 0.0f) {
             dist = c->bounds[1].max.v[2] - max_z;
+        } else {
+            dist = min_z - c->bounds[1].min.v[2];
         }
-        if (dist >= 0.0f) {
-            dist += 0.005f;
+        if (dist < 0.0f) {
+            l = 5;
+        } else {
+            dist += BR_SCALAR(0.005);
             BrVector3Scale(&c->old_norm, &c->old_norm, dist);
             BrMatrix34ApplyV(&tv, &c->old_norm, &c->car_master_actor->t.t.mat);
             c->oldmat.m[3][0] += tv.v[0];
             c->oldmat.m[3][1] += tv.v[1];
             c->oldmat.m[3][2] += tv.v[2];
             l++;
-        } else {
-            l = 5;
         }
+        l++;
     }
     if (l < 5) {
         return 1;
     }
-    *(br_vector3*)&c->oldmat.m[3][0] = old_pos;
+    memcpy(c->oldmat.m + 3, &old_pos, sizeof(old_pos));
     c->bounds[1].min.v[2] = min_z;
     c->bounds[1].max.v[2] = max_z;
     if (c->driver == eDriver_local_human) {
