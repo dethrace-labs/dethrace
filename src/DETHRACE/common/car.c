@@ -5012,6 +5012,7 @@ void CameraBugFix(tCar_spec* c, tU32 pTime) {
     br_matrix34* m2;
     br_vector3 tv;
 
+    m2 = &gCamera->t.t.mat;
     if (gAction_replay_mode && gAction_replay_camera_mode != eAction_replay_standard && gPed_actor != NULL && !gProgram_state.cockpit_on) {
         IncidentCam(c, pTime);
     }
