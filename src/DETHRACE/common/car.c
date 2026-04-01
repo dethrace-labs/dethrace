@@ -4810,7 +4810,8 @@ void AmIGettingBoredWatchingCameraSpin(void) {
 // FUNCTION: CARM95 0x004870d8
 void ViewNetPlayer(void) {
 
-    if (gOpponent_viewing_mode) {
+    if (!gOpponent_viewing_mode) {
+    } else {
         if (gProgram_state.cockpit_on) {
             ToggleCockpit();
         }
@@ -4818,10 +4819,10 @@ void ViewNetPlayer(void) {
         if (gNumber_of_net_players <= gNet_player_to_view_index) {
             gNet_player_to_view_index = -1;
         }
-        if (gNet_player_to_view_index < 0) {
-            gCar_to_view = GetRaceLeader();
-        } else {
+        if (gNet_player_to_view_index >= 0) {
             gCar_to_view = gNet_players[gNet_player_to_view_index].car;
+        } else {
+            gCar_to_view = GetRaceLeader();
         }
         gCamera_yaw = 0;
         InitialiseExternalCamera();
