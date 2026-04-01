@@ -4775,7 +4775,8 @@ void AmIGettingBoredWatchingCameraSpin(void) {
     } else if (time_of_death == 0) {
         time_of_death = GetRaceTime();
     } else {
-        if (GetRaceTime() >= time_of_death + 10000) {
+        if (GetRaceTime() < time_of_death + 10000) {
+        } else {
             if (gOpponent_viewing_mode == 0) {
                 gOpponent_viewing_mode = 1;
                 gNet_player_to_view_index = -2;
@@ -4785,19 +4786,27 @@ void AmIGettingBoredWatchingCameraSpin(void) {
                 gNet_player_to_view_index = -2;
                 ViewNetPlayer();
             }
-            if (gNet_player_to_view_index < 0 && gCar_to_view != GetRaceLeader()) {
-                gNet_player_to_view_index = -2;
-                ViewNetPlayer();
+            if (gNet_player_to_view_index < 0) {
+                car = GetRaceLeader();
+                if (gCar_to_view != car) {
+                    gNet_player_to_view_index = -2;
+                    ViewNetPlayer();
+                }
             }
             if ((GetRaceTime() > headup_timer + 1000 || headup_timer > GetRaceTime()) && gRace_over_reason == eRace_not_over_yet) {
                 strcpy(s, GetMiscString(kMiscString_WATCHING));
                 strcat(s, " ");
-                if (gNet_player_to_view_index >= 0) {
-                    strcat(s, gNet_players[gNet_player_to_view_index].player_name);
-                } else if (gCurrent_net_game->type == eNet_game_type_tag) {
-                    strcat(s, GetMiscString(kMiscString_QUOTE_IT_QUOTE));
+                if (gNet_player_to_view_index < 0) {
+                    switch (gCurrent_net_game->type) {
+                    case eNet_game_type_tag:
+                        strcat(s, GetMiscString(kMiscString_QUOTE_IT_QUOTE));
+                        break;
+                    default:
+                        strcat(s, GetMiscString(kMiscString_RACE_LEADER));
+                        break;
+                    }
                 } else {
-                    strcat(s, GetMiscString(kMiscString_RACE_LEADER));
+                    strcat(s, gNet_players[gNet_player_to_view_index].player_name);
                 }
                 headup_timer = GetRaceTime();
                 NewTextHeadupSlot(eHeadupSlot_fancies, 0, 500, -kFont_MEDIUMHD, s);
