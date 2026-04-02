@@ -4086,10 +4086,10 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
     br_face* face;
 
     n = 0;
-    BrVector3InvScale(&bnds.min, &pB->min, WORLD_SCALE);
-    BrVector3InvScale(&bnds.max, &pB->max, WORLD_SCALE);
-    BrVector3InvScale(&pos, (br_vector3*)pM->m[3], WORLD_SCALE);
-    BrVector3InvScale((br_vector3*)pMold->m[3], (br_vector3*)pMold->m[3], WORLD_SCALE);
+    BrVector3Scale(&bnds.min, &pB->min, 1 / WORLD_SCALE);
+    BrVector3Scale(&bnds.max, &pB->max, 1 / WORLD_SCALE);
+    BrVector3Scale(&pos, (br_vector3*)pM->m[3], 1 / WORLD_SCALE);
+    BrVector3Scale((br_vector3*)pMold->m[3], (br_vector3*)pMold->m[3], 1 / WORLD_SCALE);
 
     i = c->box_face_start;
     f_ref = &gFace_list__car[c->box_face_start];
