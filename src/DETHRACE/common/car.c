@@ -4942,9 +4942,7 @@ void CheckDisablePlingMaterials(tCar_spec* pCar) {
     int i;
 
     height = 0.f;
-    if (pCar->water_d == 10000.f) {
-        DisablePlingMaterials();
-    } else {
+    if (pCar->water_d != 10000.f) {
         mat = &pCar->car_master_actor->t.t.mat;
         for (i = 0; i < 3; i++) {
             if (mat->m[i][1] > 0.f) {
@@ -4953,9 +4951,12 @@ void CheckDisablePlingMaterials(tCar_spec* pCar) {
                 height += pCar->bounds[0].min.v[i] * mat->m[i][1];
             }
         }
-        if (mat->m[3][1] / WORLD_SCALE + height < pCar->water_d) {
+        height += mat->m[3][1] / WORLD_SCALE;
+        if (height < pCar->water_d) {
             DisablePlingMaterials();
         }
+    } else {
+        DisablePlingMaterials();
     }
 }
 
