@@ -6093,12 +6093,12 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
 // FUNCTION: CARM95 0x0048c718
 void DrVector3RotateY(br_vector3* v, br_angle t) {
     br_scalar c;
-    br_scalar s;
+    volatile br_scalar s;
     br_scalar ts;
 
     c = cos(BrAngleToRadian(t));
     s = sin(BrAngleToRadian(t));
-    ts = v->v[0] * c + v->v[2] * s;
+    ts = v->v[2] * s + v->v[0] * c;
     v->v[2] = v->v[2] * c - v->v[0] * s;
     v->v[0] = ts;
 }
