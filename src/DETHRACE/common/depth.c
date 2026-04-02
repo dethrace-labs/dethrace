@@ -31,16 +31,16 @@ int gDepth_cueing_on;
 // GLOBAL: CARM95 0x00513438
 tDepth_effect_type gSwap_depth_effect_type;
 
-// GLOBAL: CARM95 0x00537930
+// GLOBAL: CARM95 0x00537944
 br_scalar gSky_height;
 
-// GLOBAL: CARM95 0x0053794c
+// GLOBAL: CARM95 0x00537950
 br_scalar gSky_x_multiplier;
 
-// GLOBAL: CARM95 0x00537944
+// GLOBAL: CARM95 0x00537930
 br_scalar gSky_width;
 
-// GLOBAL: CARM95 0x00537950
+// GLOBAL: CARM95 0x0053794c
 br_scalar gSky_y_multiplier;
 
 tU32 gLast_depth_change;
@@ -298,10 +298,10 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     half_diag_fov = BrRadianToAngle(atan2(horizon_half_diag, sky_distance));
     edge_u = EdgeU(gSky_image_width, 2 * half_diag_fov, BR_ANGLE_DEG(10));
     narrow_u = edge_u / 2.f;
-    gSky_width = horizon_half_height * 2.f;
-    gSky_height = horizon_half_width * 2.f;
-    gSky_x_multiplier = CalculateWrappingMultiplier(gSky_width, camera_data->yon_z);
+    gSky_height = horizon_half_height * 2.f;
+    gSky_width = horizon_half_width * 2.f;
     gSky_y_multiplier = CalculateWrappingMultiplier(gSky_height, camera_data->yon_z);
+    gSky_x_multiplier = CalculateWrappingMultiplier(gSky_width, camera_data->yon_z);
 
     for (vertex = 0; vertex < 4 * (nbands + 1); vertex += 4) {
         pModel->vertices[vertex].map.v[0] = -edge_u;
