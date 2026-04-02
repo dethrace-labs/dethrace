@@ -1747,7 +1747,7 @@ void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pSc
     br_actor* actor;
 
     i = pIndex & 0xf;
-    col = &gSmoke_column[(pIndex & -16) >> 4];
+    col = &gSmoke_column[(pIndex & ~0xf) >> 4];
     col->frame_count[i] = pFrame_count;
     col->scale_x[i] = pScale_x;
     col->scale_y[i] = pScale_y;
