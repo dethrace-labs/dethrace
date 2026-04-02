@@ -4497,6 +4497,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
                 the_car->car_master_actor->render_style = BR_RSTYLE_DEFAULT;
             } else {
                 the_car->car_master_actor->render_style = BR_RSTYLE_NONE;
+                continue;
             }
         }
     }
@@ -4524,9 +4525,7 @@ void MungeCarGraphics(tU32 pFrame_period) {
         }
         if (the_car->driver < eDriver_net_human && (!gAction_replay_mode || !ReplayIsPaused())) {
             if (gCountdown) {
-                sine_angle = FRandomBetween(0.4f, 1.6f) * ((double)GetTotalTime() / ((double)gCountdown * 100.0f));
-                sine_angle = frac(sine_angle) * 360.0f;
-                sine_angle = FastScalarSin(sine_angle);
+                sine_angle = FastScalarSin((frac(FRandomBetween(0.4f, 1.6f) * (GetTotalTime() / ((float)gCountdown * 100.0f))) * 360.0));
                 raw_revs = the_car->red_line * fabs(sine_angle);
                 rev_reducer = (11.0 - (double)gCountdown) / 10.0;
                 the_car->revs = rev_reducer * raw_revs;
@@ -4588,18 +4587,20 @@ void MungeCarGraphics(tU32 pFrame_period) {
                 abs_omega_z = (fabs(the_car->I.v[2]) + 0.44) / 2.0 * fabs(the_car->omega.v[2]);
                 spinning_wildly = abs_omega_x > 26.4f || abs_omega_y > 49.98f || abs_omega_z > 3.52f;
                 if (spinning_wildly && the_time - gLast_cunning_stunt > 10000) {
-                    if (!gWild_start
-                        || (the_car->last_special_volume != NULL && the_car->last_special_volume->gravity_multiplier != 1.0)) {
+                    if (gWild_start && (!the_car->last_special_volume || the_car->last_special_volume->gravity_multiplier == 1.0)) {
+                        if (the_time - gWild_start >= 500) {
+                            DoFancyHeadup(9);
+                            EarnCredits(gCunning_stunt_bonus[gProgram_state.skill_level]);
+                            gLast_cunning_stunt = the_time;
+                            gOn_me_wheels_start = 0;
+                            gQuite_wild_end = 0;
+                            gQuite_wild_start = 0;
+                            gWoz_upside_down_at_all = 0;
+                        }
+                    } else {
                         gWild_start = the_time;
-                    } else if (the_time - gWild_start >= 500) {
-                        DoFancyHeadup(kFancyHeadupCunningStuntBonus);
-                        EarnCredits(gCunning_stunt_bonus[gProgram_state.skill_level]);
-                        gLast_cunning_stunt = the_time;
-                        gOn_me_wheels_start = 0;
-                        gQuite_wild_end = 0;
-                        gQuite_wild_start = 0;
-                        gWoz_upside_down_at_all = 0;
                     }
+
                 } else {
                     gWild_start = 0;
                     spinning_mildly = abs_omega_x > 1.65f || abs_omega_z > 0.22f;
@@ -4612,23 +4613,25 @@ void MungeCarGraphics(tU32 pFrame_period) {
                             || gQuite_wild_end - gQuite_wild_start < 2000
                             || gQuite_wild_start > gWoz_upside_down_at_all
                             || gQuite_wild_end < gWoz_upside_down_at_all
-                            || (!gOn_me_wheels_start && the_time - gQuite_wild_end >= 300)) {
-                            gQuite_wild_end = 0;
-                            gQuite_wild_start = 0;
-                            gOn_me_wheels_start = 0;
-                            gWoz_upside_down_at_all = 0;
-                        } else if (!gOn_me_wheels_start) {
-                            gOn_me_wheels_start = the_time;
-                        } else if (the_time - gOn_me_wheels_start > 500
-                            && (the_car->last_special_volume == NULL
-                                || the_car->last_special_volume->gravity_multiplier == 1.0)) {
-                            DoFancyHeadup(kFancyHeadupCunningStuntBonus);
-                            EarnCredits(gCunning_stunt_bonus[gProgram_state.skill_level]);
-                            gLast_cunning_stunt = PDGetTotalTime();
-                            gQuite_wild_end = 0;
-                            gQuite_wild_start = 0;
-                            gOn_me_wheels_start = 0;
-                            gWoz_upside_down_at_all = 0;
+                            || (!gOn_me_wheels_start && the_time - gQuite_wild_end < 300)) {
+                            if (!gOn_me_wheels_start) {
+                                gOn_me_wheels_start = the_time;
+                            } else if (the_time - gOn_me_wheels_start > 500
+                                && (the_car->last_special_volume == NULL
+                                    || the_car->last_special_volume->gravity_multiplier == 1.0)) {
+                                DoFancyHeadup(kFancyHeadupCunningStuntBonus);
+                                EarnCredits(gCunning_stunt_bonus[gProgram_state.skill_level]);
+                                gLast_cunning_stunt = PDGetTotalTime();
+                                gQuite_wild_end = 0;
+                                gQuite_wild_start = 0;
+                                gOn_me_wheels_start = 0;
+                                gWoz_upside_down_at_all = 0;
+                            } else {
+                                gQuite_wild_end = 0;
+                                gQuite_wild_start = 0;
+                                gOn_me_wheels_start = 0;
+                                gWoz_upside_down_at_all = 0;
+                            }
                         }
                     } else {
                         gOn_me_wheels_start = 0;
@@ -4649,22 +4652,22 @@ void MungeCarGraphics(tU32 pFrame_period) {
             MungeSpecialVolume((tCollision_info*)the_car);
         }
         if (the_car->driver != eDriver_local_human && the_car->car_model_variable) {
-            distance_from_camera = (the_car->car_master_actor->t.t.translate.t.v[0] - gCamera_to_world.m[3][0])
-                * (the_car->car_master_actor->t.t.translate.t.v[0] - gCamera_to_world.m[3][0]);
-            distance_from_camera += (the_car->car_master_actor->t.t.translate.t.v[2] - gCamera_to_world.m[3][2])
-                * (the_car->car_master_actor->t.t.translate.t.v[2] - gCamera_to_world.m[3][2]);
-            distance_from_camera += (the_car->car_master_actor->t.t.translate.t.v[1] - gCamera_to_world.m[3][1])
-                * (the_car->car_master_actor->t.t.translate.t.v[1] - gCamera_to_world.m[3][1]);
-            distance_from_camera /= gCar_simplification_factor[gGraf_spec_index][gCar_simplification_level];
+            distance_from_camera = ((the_car->car_master_actor->t.t.translate.t.v[0] - gCamera_to_world.m[3][0])
+                    * (the_car->car_master_actor->t.t.translate.t.v[0] - gCamera_to_world.m[3][0])
+                + (the_car->car_master_actor->t.t.translate.t.v[2] - gCamera_to_world.m[3][2])
+                    * (the_car->car_master_actor->t.t.translate.t.v[2] - gCamera_to_world.m[3][2])
+                + (the_car->car_master_actor->t.t.translate.t.v[1] - gCamera_to_world.m[3][1])
+                    * (the_car->car_master_actor->t.t.translate.t.v[1] - gCamera_to_world.m[3][1]));
+            distance_from_camera /= gCar_simplification_factor[gGraf_spec_index][gCar_simplification_level * 1];
 #ifdef DETHRACE_FIX_BUGS
 // This avoids out-of-bounds access when having lots of cars
 #define CAR_IS_IT_OR_FOX(CAR) (gIt_or_fox >= 0 && gNet_players[gIt_or_fox].car == (CAR))
 #else
 #define CAR_IS_IT_OR_FOX(CAR) gNet_players[gIt_or_fox].car == (CAR)
 #endif
-                if (gNet_mode != eNet_mode_none && CAR_IS_IT_OR_FOX(the_car)) {
-                    distance_from_camera = 0.f;
-                }
+            if (gNet_mode != eNet_mode_none && CAR_IS_IT_OR_FOX(the_car)) {
+                distance_from_camera = 0.f;
+            }
 #ifdef DETHRACE_FIX_BUGS
 #undef CAR_IS_IT_OR_FOX
 #endif
