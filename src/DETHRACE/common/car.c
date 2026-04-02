@@ -4045,11 +4045,13 @@ int FindFloorInBoxBU2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* 
             }
         }
     }
-    if (*d >= 2.f) {
-        return 0;
+    if (*d < 2.f) {
+        i = gFace_list__car[j].material->identifier[0] - ('0' - 1);
+        if (i >= 0 && i < 11) {
+            return i;
+        }
     }
-    i = gFace_list__car[j].material->identifier[0] - ('0' - 1);
-    return (i < 0 || i >= 11) ? 0 : i;
+    return 0;
 }
 
 // IDA: int __usercall FindFloorInBoxM2@<EAX>(br_vector3 *a@<EAX>, br_vector3 *b@<EDX>, br_vector3 *nor@<EBX>, br_scalar *d@<ECX>, tCollision_info *c)
