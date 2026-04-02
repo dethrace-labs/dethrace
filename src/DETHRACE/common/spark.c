@@ -1792,14 +1792,13 @@ void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pSc
     tSmoke_column* col;
     br_actor* actor;
 
-    i = pIndex >> 4;
-    j = pIndex & 0xf;
-    col = &gSmoke_column[i];
-    col->frame_count[j] = pFrame_count;
-    col->scale_x[j] = pScale_x;
-    col->scale_y[j] = pScale_y;
-    col->offset_x[j] = pOffset_x;
-    col->offset_z[j] = pOffset_z;
+    i = pIndex & 0xf;
+    col = &gSmoke_column[(pIndex & ~0xf) >> 4];
+    col->frame_count[i] = pFrame_count;
+    col->scale_x[i] = pScale_x;
+    col->scale_y[i] = pScale_y;
+    col->offset_x[i] = pOffset_x;
+    col->offset_z[i] = pOffset_z;
 }
 
 // IDA: void __usercall ReplayFlame(tSmoke_column *col@<EAX>, br_actor *actor@<EDX>)
