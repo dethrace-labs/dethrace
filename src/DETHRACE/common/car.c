@@ -5325,13 +5325,13 @@ void SetUpPanningCamera(tCar_spec* c) {
     m1 = &c->car_master_actor->t.t.mat;
     ScanCarsPositions(c, &c->pos, 411.678222f, -1, 5000, &pos, &time);
     BrVector3Sub(&dir, &pos, &c->pos);
-    if (GetTotalTime() < time) {
+    if (GetTotalTime() >= time) {
         time_step = GetTotalTime() - time;
     } else {
         time_step = time - GetTotalTime();
     }
     time_step *= SRandomBetween(0.8f, 1.5f);
-    if ((ts = BrVector3LengthSquared(&dir)) < .01 || time == 0) {
+    if (BrVector3LengthSquared(&dir) < .01 || time == 0) {
         BrVector3Negate(&dir, (br_vector3*)&m1->m[2]);
         BrVector3Copy(&car_centre, &c->pos);
         time_step = 0;
@@ -5350,7 +5350,8 @@ void SetUpPanningCamera(tCar_spec* c) {
     ts = 2.f / ts;
     ts *= SRandomBetween(0.33333334f, 1.f);
     BrVector3Scale(&perp, &perp, ts);
-    BrVector3Set(&tv, 0.f, 2 * SRandomBetween(0.33333334f, 1.f), 0.f);
+    ts = SRandomBetween(0.33333334f, 1.f) * 2.f;
+    BrVector3Set(&tv, 0.f, ts, 0.f);
     BrVector3Add(&tv, &car_centre, &tv);
     BrVector3Add(&left, &tv, &perp);
     BrVector3Sub(&right, &tv, &perp);
@@ -5358,8 +5359,7 @@ void SetUpPanningCamera(tCar_spec* c) {
     CollideCamera2(&car_centre, &right, NULL, 1);
     BrVector3Sub(&tv, &left, &car_centre);
     BrVector3Sub(&tv2, &right, &car_centre);
-    left_score = BrVector3LengthSquared(&tv) + SRandomPosNeg(.01f) <= BrVector3LengthSquared(&tv2);
-    if (left_score) {
+    if (BrVector3LengthSquared(&tv) + SRandomPosNeg(.01f) > BrVector3LengthSquared(&tv2)) {
         BrVector3Copy(&gCamera->t.t.translate.t, &left);
     } else {
         BrVector3Copy(&gCamera->t.t.translate.t, &right);
@@ -5377,12 +5377,13 @@ void SetUpPanningCamera(tCar_spec* c) {
             BrVector3Copy(&tv, &tv2);
         } while (!CheckForWall(&tv, &gCamera->t.t.translate.t) && t < GetTotalTime() + 5000);
         gSwitch_time = t;
+    } else {
+        if (time == 0) {
+            time = 5000;
+        }
+        gSwitch_time = time;
         return;
     }
-    if (time == 0) {
-        time = 5000;
-    }
-    gSwitch_time = time;
 }
 
 // IDA: void __usercall SaveCameraPosition(int i@<EAX>)
