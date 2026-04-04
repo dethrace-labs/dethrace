@@ -4086,42 +4086,44 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
     br_face* face;
 
     n = 0;
-    BrVector3InvScale(&bnds.min, &pB->min, WORLD_SCALE);
-    BrVector3InvScale(&bnds.max, &pB->max, WORLD_SCALE);
-    BrVector3InvScale(&pos, (br_vector3*)pM->m[3], WORLD_SCALE);
-    BrVector3InvScale((br_vector3*)pMold->m[3], (br_vector3*)pMold->m[3], WORLD_SCALE);
+    BrVector3Scale(&bnds.min, &pB->min, 1 / WORLD_SCALE);
+    BrVector3Scale(&bnds.max, &pB->max, 1 / WORLD_SCALE);
+    BrVector3Scale(&pos, (br_vector3*)pM->m[3], 1 / WORLD_SCALE);
+    BrVector3Scale((br_vector3*)pMold->m[3], (br_vector3*)pMold->m[3], 1 / WORLD_SCALE);
 
-    for (i = c->box_face_start; i < c->box_face_end && i < c->box_face_start + 50; i++) {
-        f_ref = &gFace_list__car[i];
-        if (SLOBYTE(f_ref->flags) >= 0 && f_ref->material->identifier[0] != '!') {
-            BrVector3Sub(&tv, &f_ref->v[0], &pos);
-            BrMatrix34TApplyV(&p[0], &tv, pM);
-            BrVector3Sub(&tv, &f_ref->v[1], &pos);
-            BrMatrix34TApplyV(&p[1], &tv, pM);
-            BrVector3Sub(&tv, &f_ref->v[2], &pos);
-            BrMatrix34TApplyV(&p[2], &tv, pM);
-            j = n;
-            if ((f_ref->flags & 1) == 0) {
-                n += AddEdgeCollPoints(&p[0], &p[1], &bnds, pMold, pPoint_list, pNorm_list, n, pMax_pnts, c);
-            }
-            if ((f_ref->flags & 2) == 0) {
-                n += AddEdgeCollPoints(&p[1], &p[2], &bnds, pMold, pPoint_list, pNorm_list, n, pMax_pnts, c);
-            }
-            if ((f_ref->flags & 4) == 0) {
-                n += AddEdgeCollPoints(&p[2], &p[0], &bnds, pMold, pPoint_list, pNorm_list, n, pMax_pnts, c);
-            }
-            if (n > j) {
-                if (gMaterial_index == 0) {
-                    m = f_ref->material->identifier[0] - '/';
-                    if (m > 0 && m < 11) {
-                        gMaterial_index = m;
-                    }
+    i = c->box_face_start;
+    f_ref = &gFace_list__car[c->box_face_start];
+    for (; i < c->box_face_end && i < c->box_face_start + 50; i++, f_ref++) {
+        if ((f_ref->flags & 0x80) != 0 || f_ref->material->identifier[0] == '!') {
+            continue;
+        }
+        BrVector3Sub(&tv, &f_ref->v[0], &pos);
+        BrMatrix34TApplyV(&p[0], &tv, pM);
+        BrVector3Sub(&tv, &f_ref->v[1], &pos);
+        BrMatrix34TApplyV(&p[1], &tv, pM);
+        BrVector3Sub(&tv, &f_ref->v[2], &pos);
+        BrMatrix34TApplyV(&p[2], &tv, pM);
+        j = n;
+        if ((f_ref->flags & 1) == 0) {
+            n += AddEdgeCollPoints(&p[0], &p[1], &bnds, pMold, pPoint_list, pNorm_list, n, pMax_pnts, c);
+        }
+        if ((f_ref->flags & 2) == 0) {
+            n += AddEdgeCollPoints(&p[1], &p[2], &bnds, pMold, pPoint_list, pNorm_list, n, pMax_pnts, c);
+        }
+        if ((f_ref->flags & 4) == 0) {
+            n += AddEdgeCollPoints(&p[2], &p[0], &bnds, pMold, pPoint_list, pNorm_list, n, pMax_pnts, c);
+        }
+        if (n > j) {
+            if (gMaterial_index == 0) {
+                m = f_ref->material->identifier[0] - '/';
+                if (m > 0 && m < 11) {
+                    gMaterial_index = m;
                 }
-                while (j < n) {
-                    BrVector3Scale(&pPoint_list[j], &pPoint_list[j], WORLD_SCALE);
-                    BrVector3Sub(&pPoint_list[j], &pPoint_list[j], &c->cmpos);
-                    j++;
-                }
+            }
+            while (j < n) {
+                BrVector3Scale(&pPoint_list[j], &pPoint_list[j], WORLD_SCALE);
+                BrVector3Sub(&pPoint_list[j], &pPoint_list[j], &c->cmpos);
+                j++;
             }
         }
     }
@@ -4130,12 +4132,17 @@ int BoxFaceIntersect(br_bounds* pB, br_matrix34* pM, br_matrix34* pMold, br_vect
         for (i = 0; i < n - 1; i++) {
             flag = 1;
             for (j = i + 1; j < n; j++) {
-                if (fabs(pPoint_list[i].v[0] - pPoint_list[j].v[0]) <= 0.001f
-                    && fabs(pPoint_list[i].v[1] - pPoint_list[j].v[1]) <= 0.001f
-                    && fabs(pPoint_list[i].v[2] - pPoint_list[j].v[2]) <= 0.001f) {
-                    flag = 0;
-                    break;
+                if (fabs(pPoint_list[i].v[0] - pPoint_list[j].v[0]) > 0.001) {
+                    continue;
                 }
+                if (fabs(pPoint_list[i].v[1] - pPoint_list[j].v[1]) > 0.001) {
+                    continue;
+                }
+                if (fabs(pPoint_list[i].v[2] - pPoint_list[j].v[2]) > 0.001) {
+                    continue;
+                }
+                flag = 0;
+                break;
             }
             if (flag) {
                 BrVector3Copy(&pPoint_list[m], &pPoint_list[i]);
