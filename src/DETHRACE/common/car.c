@@ -5273,19 +5273,19 @@ void PanningExternalCamera(tCar_spec* c, tU32 pTime) {
     // GLOBAL: CARM95 0x514e80
     static int inside_camera_zone = 1;
 
-    BrVector3Sub(&tv, &gCamera->t.t.translate.t, &c->pos);
+    m2 = &gCamera->t.t.mat;
+    m1 = &c->car_master_actor->t.t.mat;
+    BrVector3Sub(&tv, (br_vector3*)m2->m[3], &c->pos);
     ts = BrVector3LengthSquared(&tv);
-    if (ts > 102.91955471539592f || (gSwitch_time != 0 && (PipeSearchForwards() ? (gSwitch_time <= GetTotalTime()) : (gSwitch_time >= GetTotalTime())))) {
-        if ((inside_camera_zone || ts > 205.83910943079184f) && (ts > 25.f || CheckForWall(&c->pos, &gCamera->t.t.translate.t))) {
+    if (ts > 102.91955471539592 || (gSwitch_time != 0 && (PipeSearchForwards() ? (gSwitch_time <= GetTotalTime()) : (gSwitch_time >= GetTotalTime())))) {
+        if ((inside_camera_zone || ts > 205.83910943079184) && (ts > 25.f || CheckForWall(&c->pos, &gCamera->t.t.translate.t))) {
             SetUpPanningCamera(c);
             inside_camera_zone = 0;
         }
     } else {
         inside_camera_zone = 1;
     }
-    m1 = &c->car_master_actor->t.t.mat;
-    m2 = &gCamera->t.t.mat;
-    PointCameraAtCar(c, m1, m2);
+    PointCameraAtCar(c, &c->car_master_actor->t.t.mat, &gCamera->t.t.mat);
 }
 
 // IDA: int __usercall CheckForWall@<EAX>(br_vector3 *start@<EAX>, br_vector3 *end@<EDX>)
