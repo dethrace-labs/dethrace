@@ -446,12 +446,14 @@ void ToggleSoundEnable(void) {
 // IDA: void __cdecl SoundService()
 // FUNCTION: CARM95 0x00464adc
 void SoundService(void) {
+    tU32 this_service;
     br_matrix34 mat;
 
     if (gSound_enabled && !gServicing_sound) {
         gServicing_sound = 1;
-        gLast_sound_service = PDGetTotalTime();
-        if (gCDA_tag) {
+        this_service = PDGetTotalTime();
+        gLast_sound_service = this_service;
+        if (gCDA_is_playing) {
             if (!S3IsCDAPlaying()) {
                 StopMusic();
                 StartMusic();
