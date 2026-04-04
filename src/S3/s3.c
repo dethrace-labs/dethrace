@@ -1224,12 +1224,10 @@ int S3OutletSoundsPlaying(tS3_outlet* pOutlet) {
     if (!gS3_enabled) {
         return 0;
     }
-    c = pOutlet->channel_list;
-    while (c) {
+    for (c = pOutlet->channel_list; c != NULL; c = c->next) {
         if (c->active) {
             sound_count++;
         }
-        c = c->next;
     }
     return sound_count;
 }
