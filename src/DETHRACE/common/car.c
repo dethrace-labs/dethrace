@@ -5322,62 +5322,68 @@ void SetUpPanningCamera(tCar_spec* c) {
     int left_score;
     int right_score;
 
-    ScanCarsPositions(c, &c->pos, 411.6782f, -1, 5000, &car_centre, &t);
-    BrVector3Sub(&dir, &car_centre, &c->pos);
-    time_step = ((t > GetTotalTime()) ? t - GetTotalTime() : GetTotalTime() - t) * SRandomBetween(0.8f, 1.5f);
-    if (BrVector3LengthSquared(&dir) >= .01f && t != 0) {
-        ScanCarsPositions(c, &c->pos, 102.9196f, -1, time_step / 2, &pos, &t2);
-        if (t2 == 0) {
-            BrVector3Copy(&pos, &c->pos);
-        }
+    m2 = &gCamera->t.t.mat;
+    m1 = &c->car_master_actor->t.t.mat;
+    ScanCarsPositions(c, &c->pos, 411.678222f, -1, 5000, &pos, &time);
+    BrVector3Sub(&dir, &pos, &c->pos);
+    if (GetTotalTime() >= time) {
+        time_step = GetTotalTime() - time;
     } else {
-        BrVector3Negate(&dir, (br_vector3*)&c->car_master_actor->t.t.mat.m[2]);
-        BrVector3Copy(&pos, &c->pos);
+        time_step = time - GetTotalTime();
+    }
+    time_step *= SRandomBetween(0.8f, 1.5f);
+    if (BrVector3LengthSquared(&dir) < .01 || time == 0) {
+        BrVector3Negate(&dir, (br_vector3*)&m1->m[2]);
+        BrVector3Copy(&car_centre, &c->pos);
         time_step = 0;
+    } else {
+        ScanCarsPositions(c, &c->pos, 102.919556f, -1, time_step / 2, &car_centre, &t);
+        if (t == 0) {
+            BrVector3Copy(&car_centre, &c->pos);
+        }
     }
     BrVector3SetFloat(&tv, 0.f, 1.f, 0.f);
     BrVector3Cross(&perp, &tv, &dir);
     ts = BrVector3Length(&perp);
-    if (ts >= .1f) {
-        BrVector3Scale(&perp, &perp, 2.f / ts * SRandomBetween(0.3333333f, 1.f));
-        BrVector3Set(&tv2, 0.f, 2 * SRandomBetween(0.3333333f, 1.f), 0.f);
-        BrVector3Add(&tv, &pos, &tv2);
-        BrVector3Add(&left, &tv, &perp);
-        BrVector3Sub(&right, &tv, &perp);
-        CollideCamera2(&pos, &left, NULL, 1);
-        CollideCamera2(&pos, &right, NULL, 1);
-        BrVector3Sub(&tv, &left, &pos);
-        BrVector3Sub(&tv2, &right, &pos);
-        if (BrVector3LengthSquared(&tv) + SRandomPosNeg(.01f) <= BrVector3LengthSquared(&tv2)) {
-            BrVector3Copy(&gCamera->t.t.translate.t, &right);
-        } else {
-            BrVector3Copy(&gCamera->t.t.translate.t, &left);
+    if (ts < .1f) {
+        return;
+    }
+    ts = 2.f / ts;
+    ts *= SRandomBetween(0.33333334f, 1.f);
+    BrVector3Scale(&perp, &perp, ts);
+    ts = SRandomBetween(0.33333334f, 1.f) * 2.f;
+    BrVector3Set(&tv, 0.f, ts, 0.f);
+    BrVector3Add(&tv, &car_centre, &tv);
+    BrVector3Add(&left, &tv, &perp);
+    BrVector3Sub(&right, &tv, &perp);
+    CollideCamera2(&car_centre, &left, NULL, 1);
+    CollideCamera2(&car_centre, &right, NULL, 1);
+    BrVector3Sub(&tv, &left, &car_centre);
+    BrVector3Sub(&tv2, &right, &car_centre);
+    if (BrVector3LengthSquared(&tv) + SRandomPosNeg(.01f) > BrVector3LengthSquared(&tv2)) {
+        BrVector3Copy(&gCamera->t.t.translate.t, &left);
+    } else {
+        BrVector3Copy(&gCamera->t.t.translate.t, &right);
+    }
+    if (time != 0 && CheckForWall(&c->pos, &gCamera->t.t.translate.t)) {
+        ScanCarsPositions(c, &c->pos, 10000.f, -1, 1000, &tv, &t2);
+        CollideCamera2(&tv, &gCamera->t.t.translate.t, NULL, 1);
+    }
+    if (time != 0 && CheckForWall(&pos, &gCamera->t.t.translate.t)) {
+        time_step = time_step / 16;
+        BrVector3Copy(&tv, &car_centre);
+        do {
+            ScanCarsPositions(c, &tv, 10000.f, abs(t - GetTotalTime()), time_step, &tv2, &t2);
+            t += (GetReplayDirection() ? 1 : -1) * time_step;
+            BrVector3Copy(&tv, &tv2);
+        } while (!CheckForWall(&tv, &gCamera->t.t.translate.t) && t < GetTotalTime() + 5000);
+        gSwitch_time = t;
+    } else {
+        if (time == 0) {
+            time = 5000;
         }
-        if (t != 0 && CheckForWall(&c->pos, &gCamera->t.t.translate.t)) {
-            ScanCarsPositions(c, &c->pos, 10000.f, -1, 1000, &tv, &time);
-            CollideCamera2(&tv, &gCamera->t.t.translate.t, NULL, 1);
-        }
-        if (t != 0 && CheckForWall(&car_centre, &gCamera->t.t.translate.t)) {
-            time_step = time_step / 16;
-            BrVector3Copy(&tv, &pos);
-            while (1) {
-                ScanCarsPositions(c, &tv, 10000.f, abs(t2 - GetTotalTime()), time_step, &tv2, &time);
-                t2 += (GetReplayDirection() ? 1 : -1) * time_step;
-                BrVector3Copy(&tv, &tv2);
-                if (CheckForWall(&tv, &gCamera->t.t.translate.t)) {
-                    break;
-                }
-                if (t2 >= GetTotalTime() + 5000) {
-                    break;
-                }
-            }
-            gSwitch_time = t2;
-        } else {
-            if (t == 0) {
-                t = 5000;
-            }
-            gSwitch_time = t;
-        }
+        gSwitch_time = time;
+        return;
     }
 }
 
