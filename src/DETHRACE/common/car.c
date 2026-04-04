@@ -3987,26 +3987,26 @@ int FindFloorInBoxBU(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d
     j = 0; // added to keep compiler happy
 #endif
     *d = 2.0;
-    for (i = c->box_face_start; i < c->box_face_end; i++) {
-        face_ref = &gFace_list__car[i];
-        if (!gEliminate_faces || SLOBYTE(face_ref->flags) >= 0) {
-            CheckSingleFace(face_ref, a, b, &nor2, &dist);
-            if (*d > dist) {
-                *d = dist;
-                j = i;
-                BrVector3Copy(nor, &nor2);
-            }
+    i = c->box_face_start;
+    face_ref = &gFace_list__car[i];
+    for (; i < c->box_face_end; i++, face_ref++) {
+        if (gEliminate_faces && (face_ref->flags & 0x80) != 0) {
+            continue;
+        }
+        CheckSingleFace(face_ref, a, b, &nor2, &dist);
+        if (*d > dist) {
+            *d = dist;
+            j = i;
+            BrVector3Copy(nor, &nor2);
         }
     }
-    if (*d >= 2.f) {
-        return 0;
+    if (*d < 2.f) {
+        i = gFace_list__car[j].material->identifier[0] - ('0' - 1);
+        if (i >= 0 && i < 11) {
+            return i;
+        }
     }
-    i = gFace_list__car[j].material->identifier[0] - ('0' - 1);
-    if (i < 0 || i >= 11) {
-        return 0;
-    } else {
-        return i;
-    }
+    return 0;
 }
 
 // IDA: int __usercall FindFloorInBoxBU2@<EAX>(br_vector3 *a@<EAX>, br_vector3 *b@<EDX>, br_vector3 *nor@<EBX>, br_scalar *d@<ECX>, tCollision_info *c)
