@@ -4002,10 +4002,8 @@ int FindFloorInBoxBU(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* d
     }
     if (*d < 2.f) {
         i = gFace_list__car[j].material->identifier[0] - ('0' - 1);
-        if (i >= 0) {
-            if (i < 11) {
-                return i;
-            }
+        if (i >= 0 && i < 11) {
+            return i;
         }
     }
     return 0;
