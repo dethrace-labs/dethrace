@@ -561,5 +561,6 @@ void ChangeSelectionTo(int pNew_choice, int pNew_mode) {
 
     last_choice = gCurrent_choice;
     gCurrent_choice = pNew_choice;
-    ChangeSelection(gSpec, &last_choice, &gCurrent_choice, (gCurrent_mode = pNew_mode), 1);
+    gCurrent_mode = pNew_mode;
+    ChangeSelection(gSpec, &last_choice, &gCurrent_choice, gCurrent_mode, 1);
 }
