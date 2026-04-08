@@ -6398,11 +6398,14 @@ int BoundsOverlapTest_car(br_bounds* b1, br_bounds* b2) {
 // FUNCTION: CARM95 0x0048d28f
 int SimpleCarCarCollisionTest(tCollision_info* car1, tCollision_info* car2) {
 
-    if (car1->bounds_ws_type == eBounds_ws && car2->bounds_ws_type == eBounds_ws) {
-        return BoundsOverlapTest_car(&car1->bounds_world_space, &car2->bounds_world_space);
+    if (car1->bounds_ws_type == eBounds_ws) {
+        if (eBounds_ws != car2->bounds_ws_type) {
+            return 1;
+        }
     } else {
         return 1;
     }
+    return BoundsOverlapTest_car(&car1->bounds_world_space, &car2->bounds_world_space);
 }
 
 // IDA: int __usercall CollideTwoCarsWithWalls@<EAX>(tCollision_info *car1@<EAX>, tCollision_info *car2@<EDX>, br_scalar dt)
