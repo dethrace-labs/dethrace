@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+// GLOBAL: CARM95 0x0051D424
 tS32 gLast_demo_end_anim = -90000;
 
 // IDA: void __usercall ShowCutScene(int pIndex@<EAX>, int pWait_end@<EDX>, int pSound_ID@<EBX>, br_scalar pDelay)

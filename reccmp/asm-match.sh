@@ -9,6 +9,7 @@ arg=()
 
 if [[ $# -gt 0 ]]; then
   arg+=(--verbose "$1")
+  arg+=("--no-color")
 fi
 
 docker run --rm --platform linux/amd64 \
