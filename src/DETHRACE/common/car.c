@@ -3679,8 +3679,8 @@ void CrushBoundingBox(tCar_spec* c, int crush_only) {
     actor = c->car_model_actors[c->principal_car_actor].actor;
     min.v[2] = c->wpos[2].v[2] - c->non_driven_wheels_circum / 6.2f;
     max.v[2] = c->driven_wheels_circum / 6.2f + c->wpos[0].v[2];
-    min.v[2] /= 6.9;
-    max.v[2] /= 6.9;
+    min.v[2] /= WORLD_SCALE_D;
+    max.v[2] /= WORLD_SCALE_D;
     for (i = 0; i < actor->model->nvertices; i++) {
         if (actor->model->vertices[i].p.v[2] < min.v[2]) {
             min.v[2] = actor->model->vertices[i].p.v[2];
@@ -3689,8 +3689,8 @@ void CrushBoundingBox(tCar_spec* c, int crush_only) {
             max.v[2] = actor->model->vertices[i].p.v[2];
         }
     }
-    min.v[2] *= 6.9;
-    max.v[2] *= 6.9;
+    min.v[2] *= WORLD_SCALE_D;
+    max.v[2] *= WORLD_SCALE_D;
     if (crush_only) {
         if (c->bounds[1].min.v[2] > min.v[2]) {
             min.v[2] = c->bounds[1].min.v[2];
