@@ -2136,12 +2136,8 @@ void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scala
     tMaterial_modifiers* mat_list;
 
     mat_list = gCurrent_race.material_modifiers;
-    tv.v[0] = c->nor[n].v[0] * d[n];
-    tv.v[1] = c->nor[n].v[1] * d[n];
-    tv.v[2] = c->nor[n].v[2] * d[n];
-    tv.v[0] += wheel_pos[n].v[0];
-    tv.v[1] += wheel_pos[n].v[1];
-    tv.v[2] += wheel_pos[n].v[2];
+    BrVector3Scale(&tv, &c->nor[n], d[n]);
+    BrVector3Accumulate(&tv, &wheel_pos[n]);
 
     x = abs((int)(512.0f * tv.v[0])) % 2048;
     y = abs((int)(512.0f * tv.v[2])) % 2048;
