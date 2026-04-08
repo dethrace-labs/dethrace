@@ -2785,27 +2785,23 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
 
     ts = -BrVector3Dot((br_vector3*)c->car_master_actor->t.t.mat.m[2], &c->v);
 
-    if (c->gear) {
-        c->target_revs = ts / c->speed_revs_ratio / (double)c->gear;
+    if (!c->gear) {
+        c->target_revs = 0.0f;
     } else {
-        c->target_revs = 0.0;
+        c->target_revs = ts / c->speed_revs_ratio / (double)c->gear;
     }
-    if (c->target_revs < 0.0) {
-        c->target_revs = 0.0;
+    if (c->target_revs < 0.0f) {
+        c->target_revs = 0.0f;
         c->gear = 0;
     }
     if (!c->number_of_wheels_on_ground || ((c->wheel_slip & 2) + 1) != 0 || !c->gear) {
-        if (c->number_of_wheels_on_ground) {
-            wheel_spin_force = c->force_torque_ratio * c->torque - (double)c->gear * c->acc_force;
-        } else {
+        if (!c->number_of_wheels_on_ground) {
             wheel_spin_force = c->force_torque_ratio * c->torque;
-        }
-        if (c->gear) {
-            if (c->gear < 2 && (c->keys.dec || c->joystick.dec > 0) && fabs(ts) < 1.0 && c->revs > 1000.0) {
-                c->gear = -c->gear;
-            }
         } else {
-            if (c->revs > 1000.0 && !c->keys.brake && (c->keys.acc || c->joystick.acc > 0) && !gCountdown) {
+            wheel_spin_force = c->force_torque_ratio * c->torque - (double)c->gear * c->acc_force;
+        }
+        if (!c->gear) {
+            if (c->revs > 1000.0f && !c->keys.brake && (c->keys.acc || c->joystick.acc > 0) && !gCountdown) {
                 if (c->keys.backwards) {
                     c->gear = -1;
                 } else {
@@ -2813,29 +2809,35 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
                 }
             }
             wheel_spin_force = c->force_torque_ratio * c->torque;
+        } else {
+            if (c->gear < 2 && (c->keys.dec || c->joystick.dec > 0) && (ts < 0.0f ? -ts : ts) < 1.0f && c->revs > 1000.0f) {
+                c->gear *= -1;
+            }
         }
         c->revs = wheel_spin_force / c->force_torque_ratio * dt / 0.0002 + c->revs;
 
-        if (c->traction_control && wheel_spin_force > 0.0 && c->revs > c->target_revs && c->gear && c->target_revs > 1000.0) {
-            c->revs = c->target_revs;
+        if (c->traction_control && wheel_spin_force > 0.0f) {
+            if (c->revs > c->target_revs && c->gear && c->target_revs > 1000.0f) {
+                c->revs = c->target_revs;
+            }
         }
-        if (c->revs <= 0.0) {
-            c->revs = 0.0;
+        if (c->revs <= 0.0f) {
+            c->revs = 0.0f;
         }
     }
-    if ((c->wheel_slip & 2) == 0 && c->target_revs > 6000.0 && c->revs > 6000.0 && c->gear < c->max_gear && c->gear > 0 && !c->just_changed_gear) {
+    if ((c->wheel_slip & 2) == 0 && c->target_revs > 6000.0f && c->revs > 6000.0f && c->gear < c->max_gear && c->gear > 0 && !c->just_changed_gear) {
         c->gear++;
     }
-    if (c->gear > 1 && c->target_revs < 3000.0 && !c->just_changed_gear) {
+    if (c->gear > 1 && c->target_revs < 3000.0f && !c->just_changed_gear) {
         c->gear--;
     }
-    if (c->revs < 200.0 && c->target_revs < 200.0 && c->gear <= 1 && !c->keys.acc && c->joystick.acc <= 0 && !c->just_changed_gear) {
+    if (c->revs < 200.0f && c->target_revs < 200.0f && c->gear <= 1 && !c->keys.acc && c->joystick.acc <= 0 && !c->just_changed_gear) {
         c->gear = 0;
     }
-    if (c->just_changed_gear && c->revs < 6000.0 && c->revs > 200.0 && (c->gear < 2 || c->revs >= 3000.0)) {
+    if (c->just_changed_gear && c->revs < 6000.0f && c->revs > 200.0f && (c->gear < 2 || c->revs >= 3000.0f)) {
         c->just_changed_gear = 0;
     }
-    if (c->revs >= 6000.0 && (c->keys.acc || c->joystick.acc > 0)) {
+    if (c->revs >= 6000.0f && (c->keys.acc || c->joystick.acc > 0)) {
         c->just_changed_gear = 0;
     }
 }
