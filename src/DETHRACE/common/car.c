@@ -3826,11 +3826,11 @@ br_scalar ThreePointCollRec(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector
     br_scalar ts;
 
     ts = ThreePointColl(f, m, d);
-    if (f[0] >= 0.0f && f[1] >= 0.0f && f[2] >= 0.0f && ts >= 0.000001f) {
+    if (f[0] >= 0.0f && f[1] >= 0.0f && f[2] >= 0.0f && ts >= 0.000001) {
         c->infinite_mass = 256;
         return ts;
     }
-    if (ts < 0.000001f) {
+    if (ts < 0.000001) {
         i = 0;
         j = 1;
     } else if (f[0] < 0.0f) {
@@ -3845,14 +3845,14 @@ br_scalar ThreePointCollRec(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector
     } else {
         return 0.0f;
     }
-    m->m[0][0] = ((float*)m->m)[5 * i];
+    m->m[0][0] = m->m[i][i];
     m->m[1][0] = m->m[j][i];
     m->m[0][1] = m->m[i][j];
-    m->m[1][1] = ((float*)m->m)[5 * j];
-    tau[0] = tau[i];
-    tau[1] = tau[j];
-    n[0] = n[i];
-    n[1] = n[j];
+    m->m[1][1] = m->m[j][j];
+    BrVector3Copy(&tau[0], &tau[i]);
+    BrVector3Copy(&tau[1], &tau[j]);
+    BrVector3Copy(&n[0], &n[i]);
+    BrVector3Copy(&n[1], &n[j]);
     d[0] = d[i];
     d[1] = d[j];
     ts = TwoPointColl(f, m, d, tau, n);
