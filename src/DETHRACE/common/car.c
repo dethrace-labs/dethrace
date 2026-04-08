@@ -6127,20 +6127,20 @@ void CrashCarsTogether(br_scalar dt) {
     int i;
     tCollison_data collide_list[32];
 
-    for (i = 0; i < gNum_cars_and_non_cars; i++) {
+    pass = 0;
+    k = 0;
+    for (i = 0; !(i >= gNum_cars_and_non_cars); i++) {
         collide_list[i].car = NULL;
         collide_list[i].ref = gNum_cars_and_non_cars - 1;
         gActive_car_list[i]->infinite_mass = 0;
     }
-    for (pass = 0; pass < 5; pass++) {
+    do {
         k = CrashCarsTogetherSinglePass(dt, pass, collide_list);
-        if (k <= 0) {
-            break;
-        }
-    }
+        pass++;
+    } while (pass < 5 && k > 0);
     if (k > 0) {
-        for (i = 0; i < gNum_cars_and_non_cars; i++) {
-            BringCarToAGrindingHalt((tCollision_info*)gActive_car_list[i]);
+        for (pass = 0; pass < gNum_cars_and_non_cars; pass++) {
+            BringCarToAGrindingHalt((tCollision_info*)gActive_car_list[pass]);
         }
     }
 }
