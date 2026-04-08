@@ -156,7 +156,12 @@ void EnableChoice(int pChoice) {
 
     for (i = 0; i < gDisabled_count; i++) {
         if (gDisabled_choices[i] == pChoice) {
+#ifdef DETHRACE_FIX_BUGS
+            // Use memmove because destination and source overlap
             memmove(&gDisabled_choices[i], &gDisabled_choices[i + 1], (gDisabled_count - i - 1) * sizeof(gDisabled_choices[0]));
+#else
+            memcpy(&gDisabled_choices[i], &gDisabled_choices[i + 1], (gDisabled_count - i - 1) * sizeof(gDisabled_choices[0]));
+#endif
             gDisabled_count--;
             break;
         }
@@ -575,5 +580,5 @@ void ChangeSelectionTo(int pNew_choice, int pNew_mode) {
     last_choice = gCurrent_choice;
     gCurrent_choice = pNew_choice;
     gCurrent_mode = pNew_mode;
-    ChangeSelection(gSpec, &last_choice, &gCurrent_choice, pNew_mode, 1);
+    ChangeSelection(gSpec, &last_choice, &gCurrent_choice, gCurrent_mode, 1);
 }
