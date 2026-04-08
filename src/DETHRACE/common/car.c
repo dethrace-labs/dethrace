@@ -6129,7 +6129,7 @@ void CrashCarsTogether(br_scalar dt) {
 
     pass = 0;
     k = 0;
-    for (i = 0; !(i >= gNum_cars_and_non_cars); i++) {
+    for (i = 0; i < gNum_cars_and_non_cars; i++) {
         collide_list[i].car = NULL;
         collide_list[i].ref = gNum_cars_and_non_cars - 1;
         gActive_car_list[i]->infinite_mass = 0;
