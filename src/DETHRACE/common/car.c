@@ -3732,6 +3732,7 @@ void CrushBoundingBox(tCar_spec* c, int crush_only) {
 // IDA: void __cdecl AddCollPoint(br_scalar dist, br_vector3 *p, br_vector3 *norm, br_vector3 *r, br_vector3 *n, br_vector3 *dir, int num, tCollision_info *c)
 // FUNCTION: CARM95 0x00483152
 void AddCollPoint(br_scalar dist, br_vector3* p, br_vector3* norm, br_vector3* r, br_vector3* n, br_vector3* dir, int num, tCollision_info* c) {
+    // GLOBAL: CARM95 0x0053A5A0
     static br_scalar d[4];
     int i;
     int furthest;
