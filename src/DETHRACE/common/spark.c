@@ -138,10 +138,10 @@ tShrapnel gShrapnel[15];
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
-#define TEST_BIT(var, pos)   (var & (1 << pos))
-#define SET_BIT(var, pos)    (var |= (1 << pos))
-#define FLIP_BIT(var, pos)   (var ^= (1 << pos))
-#define CLEAR_BIT(var, pos)  (var &= ~(1 << pos))
+#define TEST_BIT(var, pos) (var & (1 << pos))
+#define SET_BIT(var, pos) (var |= (1 << pos))
+#define FLIP_BIT(var, pos) (var ^= (1 << pos))
+#define CLEAR_BIT(var, pos) (var &= ~(1 << pos))
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
@@ -2084,24 +2084,24 @@ void InitFlame(void) {
 // FUNCTION: CARM95 0x0046ef01
 void InitSplash(FILE* pF) {
     int i;
-    int j;
     int num_files;
     int num;
     br_actor* actor;
     char the_path[256];
     char s[256];
+    br_pixelmap* the_blend_table; // dethrace: name not defined in symbol dump
     br_pixelmap* splash_maps[20];
 
     gSplash_flags = 0;
     gSplash_model = BrModelAllocate("Splash", 4, 2);
     if (pF != NULL) {
-        i = GetAnInt(pF);
+        num_files = GetAnInt(pF);
         gNum_splash_types = 0;
-        for (j = 0; i > j; ++j) {
+        for (i = 0; i < num_files; i++) {
             GetAString(pF, s);
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, s);
-            num = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], 20 - gNum_splash_types);
+            num = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], COUNT_OF(splash_maps) - gNum_splash_types);
             if (num == 0) {
                 FatalError(kFatalError_LoadPixelmapFile_S, the_path);
             }
@@ -2113,14 +2113,14 @@ void InitSplash(FILE* pF) {
         gNum_splash_types = DRPixelmapLoadMany(the_path, splash_maps, 0x14u);
     }
     BrMapAddMany(splash_maps, gNum_splash_types);
-    num_files = (int)LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
-    for (j = 0; j < gNum_splash_types; ++j) {
-        gSplash_material[j] = BrMaterialAllocate(0);
-        gSplash_material[j]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT);
-        gSplash_material[j]->flags |= BR_MATF_ALWAYS_VISIBLE | BR_MATF_PERSPECTIVE;
-        gSplash_material[j]->index_blend = (br_pixelmap*)num_files;
-        gSplash_material[j]->colour_map = splash_maps[j];
-        BrMaterialAdd(gSplash_material[j]);
+    the_blend_table = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
+    for (i = 0; i < gNum_splash_types; i++) {
+        gSplash_material[i] = BrMaterialAllocate(0);
+        gSplash_material[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT);
+        gSplash_material[i]->flags |= BR_MATF_ALWAYS_VISIBLE | BR_MATF_PERSPECTIVE;
+        gSplash_material[i]->index_blend = the_blend_table;
+        gSplash_material[i]->colour_map = splash_maps[i];
+        BrMaterialAdd(gSplash_material[i]);
     }
     gSplash_model->nvertices = 4;
     BrVector3SetFloat(&gSplash_model->vertices[0].p, -0.5f, 0.0f, 0.0f);
@@ -2145,16 +2145,16 @@ void InitSplash(FILE* pF) {
     gSplash_model->faces[0].smoothing = 1;
     gSplash_model->faces[1].smoothing = 1;
     BrModelAdd(gSplash_model);
-    for (j = 0; j < COUNT_OF(gSplash); j++) {
-        gSplash[j].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
-        actor = gSplash[j].actor;
+    for (i = 0; i < COUNT_OF(gSplash); i++) {
+        gSplash[i].actor = BrActorAllocate(BR_ACTOR_MODEL, NULL);
+        actor = gSplash[i].actor;
         actor->model = gSplash_model;
         if (gNum_splash_types != 0) {
             actor->material = gSplash_material[IRandomBetween(0, gNum_splash_types - 1)];
         } else {
             actor->material = NULL;
         }
-        gSplash[j].scale_x = SRandomBetween(0.9f, 1.1f) * (float)(2 * IRandomBetween(0, 1) - 1);
+        gSplash[i].scale_x = SRandomBetween(0.9f, 1.1f) * (2 * IRandomBetween(0, 1) - 1);
     }
 }
 
