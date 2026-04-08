@@ -3783,12 +3783,8 @@ br_scalar TwoPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* ta
         f[1] = 0.0f;
     } else if (f[0] < 0.0f) {
         m->m[0][0] = m->m[1][1];
-        tau[0].v[0] = tau[1].v[0];
-        tau[0].v[1] = tau[1].v[1];
-        tau[0].v[2] = tau[1].v[2];
-        n[0].v[0] = n[1].v[0];
-        n[0].v[1] = n[1].v[1];
-        n[0].v[2] = n[1].v[2];
+        BrVector3Copy(&tau[0], &tau[1]);
+        BrVector3Copy(&n[0], &n[1]);
         d[0] = d[1];
         ts = SinglePointColl(f, m, d);
         f[1] = 0.0;
