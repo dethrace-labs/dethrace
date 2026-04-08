@@ -4032,7 +4032,7 @@ int FindFloorInBoxBU2(br_vector3* a, br_vector3* b, br_vector3* nor, br_scalar* 
         }
         CheckSingleFace(face_ref, a, b, &nor2, &dist);
         if (*d > dist) {
-            if (*(br_int_32*)&face_ref->material->depth_bias == (br_int_32)DOUBLESIDED_USER_FLAG || (face_ref->material->flags & (BR_MATF_ALWAYS_VISIBLE | BR_MATF_TWO_SIDED)) != 0) {
+            if (face_ref->material->colour_map_1 == DOUBLESIDED_USER_FLAG || (face_ref->material->flags & (BR_MATF_ALWAYS_VISIBLE | BR_MATF_TWO_SIDED)) != 0) {
                 BrVector3Sub(&tv, &c->pos, a);
                 if (BrVector3Dot(&tv, &nor2) >= 0.f) {
                     *d = dist;
