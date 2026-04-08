@@ -145,10 +145,17 @@ br_matrix34 gSmoke_camera_to_world;
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
+#ifdef DETHRACE_FIX_BUGS
+#define TEST_BIT(var, pos) (var & (1u << pos))
+#define SET_BIT(var, pos) (var |= (1u << pos))
+#define FLIP_BIT(var, pos) (var ^= (1u << pos))
+#define CLEAR_BIT(var, pos) (var &= ~(1u << pos))
+#else
 #define TEST_BIT(var, pos) (var & (1 << pos))
 #define SET_BIT(var, pos) (var |= (1 << pos))
 #define FLIP_BIT(var, pos) (var ^= (1 << pos))
 #define CLEAR_BIT(var, pos) (var &= ~(1 << pos))
+#endif
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
@@ -1785,14 +1792,13 @@ void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pSc
     tSmoke_column* col;
     br_actor* actor;
 
-    i = pIndex >> 4;
-    j = pIndex & 0xf;
-    col = &gSmoke_column[i];
-    col->frame_count[j] = pFrame_count;
-    col->scale_x[j] = pScale_x;
-    col->scale_y[j] = pScale_y;
-    col->offset_x[j] = pOffset_x;
-    col->offset_z[j] = pOffset_z;
+    i = pIndex & 0xf;
+    col = &gSmoke_column[(pIndex & ~0xf) >> 4];
+    col->frame_count[i] = pFrame_count;
+    col->scale_x[i] = pScale_x;
+    col->scale_y[i] = pScale_y;
+    col->offset_x[i] = pOffset_x;
+    col->offset_z[i] = pOffset_z;
 }
 
 // IDA: void __usercall ReplayFlame(tSmoke_column *col@<EAX>, br_actor *actor@<EDX>)
@@ -1800,11 +1806,9 @@ void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pSc
 void ReplayFlame(tSmoke_column* col, br_actor* actor) {
     int i;
 
-    for (i = 0; i < COUNT_OF(col->frame_count); i++, actor = actor->next) {
+    for (i = 0; i < COUNT_OF(col->frame_count); i++) {
         col->frame_count[i] += GetReplayRate();
-        if (col->frame_count[i] < 0 || col->frame_count[i] >= COUNT_OF(gFlame_map)) {
-            actor->type = BR_ACTOR_NONE;
-        } else {
+        if (col->frame_count[i] >= 0 && col->frame_count[i] < COUNT_OF(gFlame_map)) {
             actor->type = BR_ACTOR_MODEL;
             actor->material->colour_map = gFlame_map[col->frame_count[i]];
             BrMaterialUpdate(actor->material, BR_MATU_ALL);
@@ -1814,7 +1818,10 @@ void ReplayFlame(tSmoke_column* col, br_actor* actor) {
                 1.f);
             actor->t.t.translate.t.v[0] = col->offset_x[i];
             actor->t.t.translate.t.v[2] = col->offset_z[i];
+        } else {
+            actor->type = BR_ACTOR_NONE;
         }
+        actor = actor->next;
     }
 }
 
@@ -2124,22 +2131,23 @@ void InitSplash(FILE* pF) {
     br_actor* actor;
     char the_path[256];
     char s[256];
+    br_pixelmap* the_blend_table; // dethrace: name not defined in symbol dump
     br_pixelmap* splash_maps[20];
 
     gSplash_flags = 0;
     gSplash_model = BrModelAllocate("Splash", 4, 2);
     if (pF != NULL) {
-        num = GetAnInt(pF);
+        num_files = GetAnInt(pF);
         gNum_splash_types = 0;
-        for (i = 0; num > i; ++i) {
+        for (i = 0; i < num_files; i++) {
             GetAString(pF, s);
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, s);
-            num_files = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], 20 - gNum_splash_types);
-            if (num_files == 0) {
+            num = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], COUNT_OF(splash_maps) - gNum_splash_types);
+            if (num == 0) {
                 FatalError(kFatalError_LoadPixelmapFile_S, the_path);
             }
-            gNum_splash_types += num_files;
+            gNum_splash_types += num;
         }
     } else {
         PathCat(the_path, gApplication_path, "PIXELMAP");
@@ -2147,11 +2155,12 @@ void InitSplash(FILE* pF) {
         gNum_splash_types = DRPixelmapLoadMany(the_path, splash_maps, 0x14u);
     }
     BrMapAddMany(splash_maps, gNum_splash_types);
-    for (i = 0; i < gNum_splash_types; ++i) {
+    the_blend_table = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
+    for (i = 0; i < gNum_splash_types; i++) {
         gSplash_material[i] = BrMaterialAllocate(0);
         gSplash_material[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT);
         gSplash_material[i]->flags |= BR_MATF_ALWAYS_VISIBLE | BR_MATF_PERSPECTIVE;
-        gSplash_material[i]->index_blend = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
+        gSplash_material[i]->index_blend = the_blend_table;
         gSplash_material[i]->colour_map = splash_maps[i];
         BrMaterialAdd(gSplash_material[i]);
     }
@@ -2358,7 +2367,12 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
                     if (BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]) != (int)ts) {
                         data[n].vertex_index = real_vertex_number;
                         data[n].light_index = (int)ts - BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]);
+#ifdef DETHRACE_FIX_BUGS
+                        // Fixes ubsan runtime error: shifting number in sign bit of signed number is UB
+                        V11MODEL(model)->groups[group].vertex_colours[j] = (unsigned)ts << 24;
+#else
                         V11MODEL(model)->groups[group].vertex_colours[j] = (int)ts << 24;
+#endif
                         if ((model->flags & BR_MODF_UPDATEABLE) != 0) {
                             model->vertices[V11MODEL(model)->groups[group].vertex_user[j]].index = (int)ts;
                         }

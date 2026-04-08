@@ -934,7 +934,12 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
                 if (counting_blanks != (*next_byte == 0))
                     break;
                 if (!counting_blanks) {
+#ifdef DETHRACE_FIX_BUGS
+                    // Avoid an unaligned write
+                    memcpy(&new_line[new_line_length], &palette_entry[byte], sizeof(tU16));
+#else
                     *(tU16*)&new_line[new_line_length] = palette_entry[byte];
+#endif
                     new_line_length += 2;
                 }
                 next_byte++;
