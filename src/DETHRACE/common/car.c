@@ -3654,7 +3654,7 @@ int ExpandBoundingBox(tCar_spec* c) {
     if (l < 5) {
         return 1;
     } else {
-        BrVector3Copy((br_vector3*)&c->oldmat.m[3][0], &old_pos);
+        BrVector3Copy((br_vector3*)c->oldmat.m[3], &old_pos);
         c->bounds[1].min.v[2] = min_z;
         c->bounds[1].max.v[2] = max_z;
         if (c->driver == eDriver_local_human) {
