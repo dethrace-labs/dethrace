@@ -2811,8 +2811,7 @@ void DoRevs(tCar_spec* c, br_scalar dt) {
             wheel_spin_force = c->force_torque_ratio * c->torque;
         } else {
             if (c->gear < 2 && (c->keys.dec || c->joystick.dec > 0) && (ts < 0.0f ? -ts : ts) < 1.0f && c->revs > 1000.0f) {
-                revs_increase = c->gear;
-                c->gear = -(revs_increase + revs_increase - revs_increase);
+                c->gear *= -1;
             }
         }
         c->revs = wheel_spin_force / c->force_torque_ratio * dt / 0.0002 + c->revs;
