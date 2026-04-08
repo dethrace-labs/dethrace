@@ -3630,10 +3630,10 @@ int ExpandBoundingBox(tCar_spec* c) {
     l = 0;
     min_z = c->bounds[1].min.v[2];
     max_z = c->bounds[1].max.v[2];
-    memcpy(&old_pos, c->oldmat.m + 3, sizeof(old_pos));
+    BrVector3Copy(&old_pos, (br_vector3*)&c->oldmat.m[3][0]);
     CrushBoundingBox(c, 0);
-    l = 0;
-    while (l < 5 && !TestForCarInSensiblePlace(c)) {
+
+    while (!TestForCarInSensiblePlace(c) && l < 5) {
         if (c->old_point.v[2] > 0.0f) {
             dist = c->bounds[1].max.v[2] - max_z;
         } else {
@@ -3641,27 +3641,27 @@ int ExpandBoundingBox(tCar_spec* c) {
         }
         if (dist < 0.0f) {
             l = 5;
-        } else {
-            dist += BR_SCALAR(0.005);
-            BrVector3Scale(&c->old_norm, &c->old_norm, dist);
-            BrMatrix34ApplyV(&tv, &c->old_norm, &c->car_master_actor->t.t.mat);
-            c->oldmat.m[3][0] += tv.v[0];
-            c->oldmat.m[3][1] += tv.v[1];
-            c->oldmat.m[3][2] += tv.v[2];
-            l++;
+            continue;
         }
+        dist += 0.005;
+        BrVector3Scale(&c->old_norm, &c->old_norm, dist);
+        BrMatrix34ApplyV(&tv, &c->old_norm, &c->car_master_actor->t.t.mat);
+        c->oldmat.m[3][0] += tv.v[0];
+        c->oldmat.m[3][1] += tv.v[1];
+        c->oldmat.m[3][2] += tv.v[2];
         l++;
     }
     if (l < 5) {
         return 1;
+    } else {
+        BrVector3Copy((br_vector3*)&c->oldmat.m[3][0], &old_pos);
+        c->bounds[1].min.v[2] = min_z;
+        c->bounds[1].max.v[2] = max_z;
+        if (c->driver == eDriver_local_human) {
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_RepairObstructed));
+        }
+        return 0;
     }
-    memcpy(c->oldmat.m + 3, &old_pos, sizeof(old_pos));
-    c->bounds[1].min.v[2] = min_z;
-    c->bounds[1].max.v[2] = max_z;
-    if (c->driver == eDriver_local_human) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_RepairObstructed));
-    }
-    return 0;
 }
 
 // IDA: void __usercall CrushBoundingBox(tCar_spec *c@<EAX>, int crush_only@<EDX>)
