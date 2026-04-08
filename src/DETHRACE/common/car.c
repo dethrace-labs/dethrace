@@ -5535,12 +5535,12 @@ void MoveWithWheels(tCar_spec* c, br_vector3* vn, int manual_swing) {
 
     if (c->speed <= 0.0001f && !gCamera_mode) {
         if (manual_swing) {
-            if (gCamera_yaw > 32760) {
-                yaw = gCamera_yaw - 32760;
+            if (gCamera_yaw > BR_ANGLE_DEG(180)) {
+                yaw = gCamera_yaw - BR_ANGLE_DEG(180);
             } else {
                 yaw = gCamera_yaw;
             }
-            if (yaw > 0x1ffe && yaw < 0x5ffa) {
+            if (yaw > BR_ANGLE_DEG(45) && yaw < BR_ANGLE_DEG(135)) {
                 if (move_with_wheels) {
                     gCamera_yaw += (-2 * gCamera_sign + 1) * BrRadianToAngle(atan2(c->wpos[0].v[2] * c->curvature, 1.0f));
                     move_with_wheels = 0;
