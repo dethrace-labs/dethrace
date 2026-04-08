@@ -3772,17 +3772,17 @@ br_scalar TwoPointColl(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* ta
 
     ts = m->m[1][1] * m->m[0][0] - m->m[0][1] * m->m[1][0];
 
-    if (fabs(ts) >= 0.000001f) {
+    if (fabs(ts) >= 0.000001) {
         f[0] = (m->m[1][1] * d[0] - m->m[0][1] * d[1]) / ts;
-        f[1] = (m->m[1][0] * d[0] - m->m[0][0] * d[1]) / -ts;
+        f[1] = (m->m[1][0] * d[0] - m->m[0][0] * d[1]) / (-ts);
     }
-    if (f[1] < 0.0f || fabs(ts) < 0.000001f) {
+    if (f[1] < 0.0f || fabs(ts) < 0.000001) {
         ts = SinglePointColl(f, m, d);
         f[1] = 0.0f;
     } else if (f[0] < 0.0f) {
         m->m[0][0] = m->m[1][1];
-        tau[0] = tau[1];
-        n[0] = n[1];
+        BrVector3Copy(&tau[0], &tau[1]);
+        BrVector3Copy(&n[0], &n[1]);
         d[0] = d[1];
         ts = SinglePointColl(f, m, d);
         f[1] = 0.0;
