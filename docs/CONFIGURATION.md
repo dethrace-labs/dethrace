@@ -43,6 +43,10 @@ DemoTimeout = 240
 ; Which directory in the [Games] section to run
 DefaultGame = c1
 
+; Original physics updates every 40ms, causing noticable camera juddering when cornering at slow speed
+; Enabling this runs physics every frame, smoothing movement out
+PhysicsPerFrame = 1
+
 [Games]
 c1 = /opt/carma/c1
 c1demo = /opt/carma/c1demo
