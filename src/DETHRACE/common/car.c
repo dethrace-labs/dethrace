@@ -6153,8 +6153,8 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
     int l;
     int m;
     int n;
-    int collided;
     int k;
+    int collided;
     int ref1;
     int ref2;
     int c1im;
@@ -6165,7 +6165,7 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
     tCollision_info* car_in_middle;
     tCollision_info* car_on_wall;
 
-    collided = 0;
+    k = 0;
     for (i = 0; i < gNum_cars_and_non_cars - 1; i++) {
         car_1 = (tCollision_info*)gActive_car_list[i];
         for (j = i + 1; j < gNum_cars_and_non_cars; j++) {
@@ -6180,15 +6180,15 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
                                 BringCarToAGrindingHalt(car_2);
                             } else {
                                 car_2->infinite_mass = 0;
-                                k = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                                collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
                                 car_2->infinite_mass = 256;
-                                if (k < 0) {
+                                if (collided < 0) {
                                     BringCarToAGrindingHalt(car_2);
                                 }
                             }
                             collide_list[j].ref = gNum_cars_and_non_cars - 2;
                             collide_list[j].car = car_1;
-                            collided++;
+                            k++;
                         }
                     } else if (car_2->infinite_mass == -1 && car_1->infinite_mass > 0) {
                         if (CollideTwoCars(car_1, car_2, -1)) {
@@ -6196,103 +6196,37 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
                                 BringCarToAGrindingHalt(car_1);
                             } else {
                                 car_1->infinite_mass = 0;
-                                k = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                                collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
                                 car_1->infinite_mass = 256;
-                                if (k < 0) {
+                                if (collided < 0) {
                                     BringCarToAGrindingHalt(car_1);
                                 }
                             }
                             collide_list[i].ref = gNum_cars_and_non_cars - 2;
                             collide_list[i].car = car_2;
-                            collided++;
+                            k++;
                         }
-                    } else if (collide_list[i].car || collide_list[j].car) {
-                        if ((collide_list[j].car == NULL) == (collide_list[i].car == NULL)) {
-                            if (collide_list[j].car != collide_list[i].car || (car_1->infinite_mass && car_2->infinite_mass)) {
-                                if (collide_list[i].car && collide_list[j].car) {
-                                    if (car_1->infinite_mass && car_2->infinite_mass) {
-                                        if ((car_1->infinite_mass != -1 || car_2->infinite_mass != -1) && CollideTwoCars(car_1, car_2, -1)) {
-                                            collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                                            collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                            if (car_1->infinite_mass && car_2->infinite_mass) {
-                                                BringCarToAGrindingHalt(car_1);
-                                                BringCarToAGrindingHalt(car_2);
-                                            } else {
-                                                k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                                                if (k >= 0) {
-                                                    if (k) {
-                                                        if (car_1->infinite_mass >= 0) {
-                                                            car_1->infinite_mass++;
-                                                        }
-                                                        if (car_2->infinite_mass >= 0) {
-                                                            car_2->infinite_mass++;
-                                                        }
-                                                        collided++;
-                                                    }
-                                                } else {
-                                                    BringCarToAGrindingHalt(car_1);
-                                                    BringCarToAGrindingHalt(car_2);
-                                                    collided++;
-                                                }
-                                            }
-                                            collided++;
-                                        }
-                                    } else {
-                                        c1im = car_1->infinite_mass;
-                                        c2im = car_2->infinite_mass;
-                                        k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                                        if (k > -1) {
-                                            if (k) {
-                                                if (!c2im) {
-                                                    collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                                }
-                                                if (!c1im) {
-                                                    collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                                                }
-                                                collided++;
-                                                if (car_1->infinite_mass >= 0) {
-                                                    car_1->infinite_mass++;
-                                                }
-                                                if (car_2->infinite_mass >= 0) {
-                                                    car_2->infinite_mass++;
-                                                }
-                                            }
-                                        } else {
-                                            BringCarToAGrindingHalt(car_1);
-                                            BringCarToAGrindingHalt(car_2);
-                                            if (c1im >= 0) {
-                                                collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                                            }
-                                            if (c2im >= 0) {
-                                                collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                            }
-                                            collided++;
-                                        }
-                                    }
-                                }
-                            } else {
-                                k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                                if (k) {
+                    } else {
+                        if (collide_list[i].car == NULL && collide_list[j].car == NULL) {
+                            collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                            if (collided) {
+                                collide_list[i].car = car_2;
+                                collide_list[j].car = car_1;
+                                collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                                collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                                if (collided == -1) {
+                                    BringCarToAGrindingHalt(car_1);
+                                    BringCarToAGrindingHalt(car_2);
                                     collide_list[i].ref = gNum_cars_and_non_cars - 2;
                                     collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                    if (k == -1) {
-                                        BringCarToAGrindingHalt(car_1);
-                                        BringCarToAGrindingHalt(car_2);
-                                    }
-                                    collided++;
-                                    if (car_1->infinite_mass >= 0) {
-                                        car_1->infinite_mass++;
-                                    }
-                                    if (car_2->infinite_mass >= 0) {
-                                        car_2->infinite_mass++;
-                                    }
                                 }
+                                k++;
                             }
-                        } else {
+                        } else if ((collide_list[j].car == NULL) != (collide_list[i].car == NULL)) {
                             c1im = car_1->infinite_mass;
                             c2im = car_2->infinite_mass;
-                            k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                            if (k == -1) {
+                            collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                            if (collided == -1) {
                                 if (collide_list[i].car) {
                                     car_3 = collide_list[i].car;
                                 } else {
@@ -6316,20 +6250,20 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
                                     }
                                     car_in_middle->infinite_mass = 0;
                                     car_3->infinite_mass = 0;
-                                    k = CollideTwoCarsWithWalls(car_on_wall, car_in_middle, dt);
+                                    collided = CollideTwoCarsWithWalls(car_on_wall, car_in_middle, dt);
                                     car_in_middle->infinite_mass = 2;
                                     car_on_wall->infinite_mass++;
                                     collide_list[i].ref = gNum_cars_and_non_cars - 2;
                                     collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                    if (k < 0) {
+                                    if (collided < 0) {
                                         BringCarToAGrindingHalt(car_1);
                                         BringCarToAGrindingHalt(car_2);
                                     }
                                 }
                                 collide_list[i].car = car_2;
                                 collide_list[j].car = car_1;
-                                collided++;
-                            } else if (k) {
+                                k++;
+                            } else if (collided) {
                                 collide_list[i].car = car_2;
                                 collide_list[j].car = car_1;
                                 if (!c2im) {
@@ -6338,7 +6272,7 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
                                 if (!c1im) {
                                     collide_list[i].ref = gNum_cars_and_non_cars - 2;
                                 }
-                                collided++;
+                                k++;
                                 if (car_1->infinite_mass >= 0) {
                                     car_1->infinite_mass++;
                                 }
@@ -6346,21 +6280,87 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
                                     car_2->infinite_mass++;
                                 }
                             }
-                        }
-                    } else {
-                        k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                        if (k) {
-                            collide_list[i].car = car_2;
-                            collide_list[j].car = car_1;
-                            collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                            collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                            if (k == -1) {
-                                BringCarToAGrindingHalt(car_1);
-                                BringCarToAGrindingHalt(car_2);
-                                collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                                collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                        } else {
+                            if (collide_list[j].car == collide_list[i].car && (!car_1->infinite_mass || !car_2->infinite_mass)) {
+                                collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                                if (collided) {
+                                    collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                                    collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                                    if (collided == -1) {
+                                        BringCarToAGrindingHalt(car_1);
+                                        BringCarToAGrindingHalt(car_2);
+                                    }
+                                    k++;
+                                    if (car_1->infinite_mass >= 0) {
+                                        car_1->infinite_mass++;
+                                    }
+                                    if (car_2->infinite_mass >= 0) {
+                                        car_2->infinite_mass++;
+                                    }
+                                }
+                            } else {
+                                if (collide_list[i].car && collide_list[j].car) {
+                                    if (car_1->infinite_mass && car_2->infinite_mass) {
+                                        if ((car_1->infinite_mass != -1 || car_2->infinite_mass != -1) && CollideTwoCars(car_1, car_2, -1)) {
+                                            collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                                            collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                                            if (car_1->infinite_mass && car_2->infinite_mass) {
+                                                BringCarToAGrindingHalt(car_1);
+                                                BringCarToAGrindingHalt(car_2);
+                                            } else {
+                                                collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                                                if (collided >= 0) {
+                                                    if (collided) {
+                                                        if (car_1->infinite_mass >= 0) {
+                                                            car_1->infinite_mass++;
+                                                        }
+                                                        if (car_2->infinite_mass >= 0) {
+                                                            car_2->infinite_mass++;
+                                                        }
+                                                        k++;
+                                                    }
+                                                } else {
+                                                    BringCarToAGrindingHalt(car_1);
+                                                    BringCarToAGrindingHalt(car_2);
+                                                    k++;
+                                                }
+                                            }
+                                            k++;
+                                        }
+                                    } else {
+                                        c1im = car_1->infinite_mass;
+                                        c2im = car_2->infinite_mass;
+                                        collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                                        if (collided > -1) {
+                                            if (collided) {
+                                                if (!c2im) {
+                                                    collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                                                }
+                                                if (!c1im) {
+                                                    collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                                                }
+                                                k++;
+                                                if (car_1->infinite_mass >= 0) {
+                                                    car_1->infinite_mass++;
+                                                }
+                                                if (car_2->infinite_mass >= 0) {
+                                                    car_2->infinite_mass++;
+                                                }
+                                            }
+                                        } else {
+                                            BringCarToAGrindingHalt(car_1);
+                                            BringCarToAGrindingHalt(car_2);
+                                            if (c1im >= 0) {
+                                                collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                                            }
+                                            if (c2im >= 0) {
+                                                collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                                            }
+                                            k++;
+                                        }
+                                    }
+                                }
                             }
-                            collided++;
                         }
                     }
                     CrashEarnings((tCar_spec*)car_1, (tCar_spec*)car_2);
@@ -6368,7 +6368,7 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
             }
         }
     }
-    return collided;
+    return k;
 }
 
 // IDA: void __usercall BringCarToAGrindingHalt(tCollision_info *car@<EAX>)
