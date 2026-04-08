@@ -1413,20 +1413,20 @@ void MungeSpecialVolume(tCollision_info* pCar) {
 
     new_special_volume = FindSpecialVolume(&pCar->pos, pCar->last_special_volume);
     car = (tCar_spec*)pCar;
-    if (((tCollision_info*)car)->auto_special_volume != NULL && (new_special_volume == NULL || new_special_volume->gravity_multiplier == 1.f)) {
+    if (car->auto_special_volume != NULL && (new_special_volume == NULL || new_special_volume->gravity_multiplier == 1.f)) {
         if (((tCollision_info*)car)->water_d == 10000.f && pCar->water_depth_factor != 1.f) {
-            ((tCollision_info*)car)->auto_special_volume = NULL;
+            car->auto_special_volume = NULL;
         } else {
-            new_special_volume = ((tCollision_info*)car)->auto_special_volume;
+            new_special_volume = car->auto_special_volume;
         }
     }
-    if (((tCollision_info*)car)->last_special_volume != new_special_volume && ((tCollision_info*)car)->driver == eDriver_local_human) {
-        if (((tCollision_info*)car)->last_special_volume != NULL && ((tCollision_info*)car)->last_special_volume->exit_noise >= 0
-            && (new_special_volume == NULL || ((tCollision_info*)car)->last_special_volume->exit_noise != new_special_volume->exit_noise)) {
-            DRS3StartSound(gCar_outlet, ((tCollision_info*)car)->last_special_volume->exit_noise);
+    if (car->last_special_volume != new_special_volume && car->driver == eDriver_local_human) {
+        if (car->last_special_volume != NULL && car->last_special_volume->exit_noise >= 0
+            && (new_special_volume == NULL || car->last_special_volume->exit_noise != new_special_volume->exit_noise)) {
+            DRS3StartSound(gCar_outlet, car->last_special_volume->exit_noise);
         }
         if (new_special_volume != NULL && new_special_volume->entry_noise >= 0
-            && (((tCollision_info*)car)->last_special_volume == NULL || ((tCollision_info*)car)->last_special_volume->entry_noise != new_special_volume->entry_noise)) {
+            && (car->last_special_volume == NULL || car->last_special_volume->entry_noise != new_special_volume->entry_noise)) {
             DRS3StartSound(gCar_outlet, new_special_volume->entry_noise);
         }
     }
