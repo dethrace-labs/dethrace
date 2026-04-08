@@ -3805,98 +3805,57 @@ void DisposePedestrians(void) {
 // IDA: void __cdecl DoPedReport()
 // FUNCTION: CARM95 0x004603d6
 void DoPedReport(void) {
-    int i;
     FILE* f;
     tPath_name the_path;
     time_t the_bloody_time;
+    int i;
     int j;
-    int count;
-    int last_ref_num;
-    int ped_count;     // added by dethrace
-    int powerup_count; // added by dethrace
-    char s[256];       // added by dethrace
 
-    j = 0;
-    count = 0;
+    int count;
+    int peds_count;     // added by dethrace
+    int powerups_count; // added by dethrace
+    int last_ref_num;
+    char s[256]; // added by dethrace
+
+    powerups_count = 0;
+    peds_count = 0;
     PathCat(the_path, gApplication_path, "PEDINFO.TXT");
-#if UINTPTR_MAX > 0xffffffff
     f = fopen(the_path, "at");
-#else
-    i = (int)(uintptr_t)fopen(the_path, "at");
-#endif
     time(&the_bloody_time);
-#if UINTPTR_MAX > 0xffffffff
     fprintf(f, "PEDESTRIAN REPORT FOR '%s' ON %s\n\n", gCurrent_race.name, ctime(&the_bloody_time));
     fprintf(f, "RefNum   Count\n===============================\n");
-#else
-    fprintf((FILE*)(uintptr_t)i, "PEDESTRIAN REPORT FOR '%s' ON %s\n\n", gCurrent_race.name, ctime(&the_bloody_time));
-    fprintf((FILE*)(uintptr_t)i, "RefNum   Count\n===============================\n");
-#endif
     last_ref_num = -1;
-    for (ped_count = 0; ped_count < gPed_count; ped_count++) {
-        if (last_ref_num < gPedestrian_array[ped_count].ref_number) {
-            last_ref_num = gPedestrian_array[ped_count].ref_number;
+    for (i = 0; i < gPed_count; i++) {
+        if (last_ref_num < gPedestrian_array[i].ref_number) {
+            last_ref_num = gPedestrian_array[i].ref_number;
         }
     }
-    for (ped_count = 0; ped_count <= last_ref_num; ped_count++) {
-        if (ped_count == 100) {
-#if UINTPTR_MAX > 0xffffffff
+    for (i = 0; i <= last_ref_num; i++) {
+        if (i == 100) {
             fprintf(f, "\n");
-#else
-            fprintf((FILE*)(uintptr_t)i, "\n");
-#endif
         }
-#if UINTPTR_MAX > 0xffffffff
-        i = 0;
-#else
-        f = NULL;
-#endif
-        for (powerup_count = 0; powerup_count < gPed_count; powerup_count++) {
-            if (gPedestrian_array[powerup_count].ref_number == ped_count) {
-#if UINTPTR_MAX > 0xffffffff
-                i++;
-#else
-                f = (FILE*)((uintptr_t)f + 1);
-#endif
+        count = 0;
+        for (j = 0; j < gPed_count; j++) {
+            if (gPedestrian_array[j].ref_number == j) {
+                count++;
             }
         }
-#if UINTPTR_MAX > 0xffffffff
-        if (i != 0) {
-            if (ped_count >= 100) {
-                GetPowerupMessage(ped_count - 100, s);
-                count += i;
-            } else {
+        if (count != 0) {
+            if (i < 100) {
                 s[0] = '\0';
-                j += i;
-            }
-            fprintf(f, "%6d    %5d      %s\n", ped_count, i, s);
-        }
-#else
-        if (f != NULL) {
-            if (ped_count >= 100) {
-                GetPowerupMessage(ped_count - 100, s);
-                count += (int)(uintptr_t)f;
+                peds_count += count;
             } else {
-                s[0] = '\0';
-                j += (int)(uintptr_t)f;
+                GetPowerupMessage(i - 100, s);
+                powerups_count += count;
             }
-            fprintf((FILE*)(uintptr_t)i, "%6d    %5d      %s\n", ped_count, (int)(uintptr_t)f, s);
+            fprintf(f, "%6d    %5d      %s\n", i, count, s);
         }
-#endif
     }
-#if UINTPTR_MAX > 0xffffffff
     fprintf(f, "\n\nSUMMARY:\n\n");
-    fprintf(f, "Peds:     %5d\n", j);
-    fprintf(f, "Powerups: %5d\n", count);
+    fprintf(f, "Peds:     %5d\n", peds_count);
+    fprintf(f, "Powerups: %5d\n", powerups_count);
     fprintf(f, "\n\n\n\n");
     fclose(f);
-#else
-    fprintf((FILE*)(uintptr_t)i, "\n\nSUMMARY:\n\n");
-    fprintf((FILE*)(uintptr_t)i, "Peds:     %5d\n", j);
-    fprintf((FILE*)(uintptr_t)i, "Powerups: %5d\n", count);
-    fprintf((FILE*)(uintptr_t)i, "\n\n\n\n");
-    fclose((FILE*)(uintptr_t)i);
-#endif
 }
 
 // IDA: void __usercall RenderProximityRays(br_pixelmap *pRender_screen@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, tU32 pTime)
