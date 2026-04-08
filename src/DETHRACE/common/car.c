@@ -3630,7 +3630,7 @@ int ExpandBoundingBox(tCar_spec* c) {
     l = 0;
     min_z = c->bounds[1].min.v[2];
     max_z = c->bounds[1].max.v[2];
-    BrVector3Copy(&old_pos, (br_vector3*)&c->oldmat.m[3][0]);
+    BrVector3Copy(&old_pos, (br_vector3*)c->oldmat.m[3]);
     CrushBoundingBox(c, 0);
 
     while (!TestForCarInSensiblePlace(c) && l < 5) {
