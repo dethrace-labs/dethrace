@@ -3737,9 +3737,9 @@ void AddCollPoint(br_scalar dist, br_vector3* p, br_vector3* norm, br_vector3* r
     int i;
     int furthest;
 
-    if (num >= 4) {
+    if (num >= COUNT_OF(d)) {
         furthest = 0;
-        for (i = 1; i < 4; i++) {
+        for (i = 1; i < COUNT_OF(d); i++) {
             if (d[furthest] < d[i]) {
                 furthest = i;
             }
@@ -3750,9 +3750,7 @@ void AddCollPoint(br_scalar dist, br_vector3* p, br_vector3* norm, br_vector3* r
         num = furthest;
     }
     d[num] = dist;
-    n[num].v[0] = norm->v[0];
-    n[num].v[1] = norm->v[1];
-    n[num].v[2] = norm->v[2];
+    BrVector3Copy(&n[num], norm);
     BrVector3Sub(&r[num], p, &c->cmpos);
 }
 
