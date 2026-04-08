@@ -3939,9 +3939,7 @@ void MultiFindFloorInBoxBU(int pNum_rays, br_vector3* a, br_vector3* b, br_vecto
         for (l = 0; l < pNum_rays; ++l) {
             if (d[l] > dist[l]) {
                 d[l] = dist[l];
-                nor[l].v[0] = nor2.v[0];
-                nor[l].v[1] = nor2.v[1];
-                nor[l].v[2] = nor2.v[2];
+                BrVector3Copy(&nor[l], &nor2);
                 j = *gFace_list__car[i].material->identifier - 47;
                 if (j >= 0 && j < 11) {
                     mat_ref[l] = j;
