@@ -3731,28 +3731,26 @@ void CrushBoundingBox(tCar_spec* c, int crush_only) {
 // IDA: void __cdecl AddCollPoint(br_scalar dist, br_vector3 *p, br_vector3 *norm, br_vector3 *r, br_vector3 *n, br_vector3 *dir, int num, tCollision_info *c)
 // FUNCTION: CARM95 0x00483152
 void AddCollPoint(br_scalar dist, br_vector3* p, br_vector3* norm, br_vector3* r, br_vector3* n, br_vector3* dir, int num, tCollision_info* c) {
+    // GLOBAL: CARM95 0x0053A5A0
     static br_scalar d[4];
     int i;
     int furthest;
 
-    if (num < 4) {
-        d[num] = dist;
-        n[num] = *norm;
-        BrVector3Sub(&r[num], p, &c->cmpos);
-        return;
-    }
-    furthest = 0;
-    for (i = 1; i < 4; i++) {
-        if (d[furthest] < d[i]) {
-            furthest = i;
+    if (num >= COUNT_OF(d)) {
+        furthest = 0;
+        for (i = 1; i < COUNT_OF(d); i++) {
+            if (d[furthest] < d[i]) {
+                furthest = i;
+            }
         }
-    }
-    if (d[furthest] >= dist) {
+        if (d[furthest] < dist) {
+            return;
+        }
         num = furthest;
-        d[num] = dist;
-        n[num] = *norm;
-        BrVector3Sub(&r[num], p, &c->cmpos);
     }
+    d[num] = dist;
+    BrVector3Copy(&n[num], norm);
+    BrVector3Sub(&r[num], p, &c->cmpos);
 }
 
 // IDA: br_scalar __usercall SinglePointColl@<ST0>(br_scalar *f@<EAX>, br_matrix4 *m@<EDX>, br_scalar *d@<EBX>)
