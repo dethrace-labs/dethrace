@@ -3428,11 +3428,11 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
 #ifdef DETHRACE_FIX_BUGS
     if (Harness_Hook_ScaleProbabilityWithDt(0, 4, gDt)) {
 #else
-    if (IRandomBetween(0, 4) == 0) {
+    if (!IRandomBetween(0, 4)) {
 #endif
 
         last_skid_vol[i] = pV * 10.0f;
-        if ((pWheel_num & 1) != 0) {
+        if (pWheel_num & 1) {
             pos.v[0] = pC->bounds[1].max.v[0];
         } else {
             pos.v[0] = pC->bounds[1].min.v[0];
@@ -3459,7 +3459,7 @@ void SkidNoise(tCar_spec* pC, int pWheel_num, br_scalar pV, int material) {
             BrVector3Add(&wv, &wv, &pC->velocity_car_space);
             ts = -(BrVector3Dot(&wv, &pC->road_normal));
             BrVector3Scale(&wvw, &pC->road_normal, ts);
-            BrVector3Add(&wv, &wv, &wvw);
+            BrVector3Accumulate(&wv, &wvw);
             BrMatrix34ApplyV(&wvw, &wv, &pC->car_master_actor->t.t.mat);
             CreatePuffOfSmoke(&world_pos, &wvw, pV / 25.0f, 1.0, 4, pC);
         }
