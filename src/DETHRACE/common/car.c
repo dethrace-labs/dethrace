@@ -3280,13 +3280,14 @@ br_scalar AddFriction(tCollision_info* c, br_vector3* vel, br_vector3* normal_fo
     ts = BrVector3Dot(normal_force, vel) / BrVector3Dot(normal_force, normal_force);
     BrVector3Scale(&norm, normal_force, ts);
     BrVector3Sub(vel, vel, &norm);
-    total_force = gCurrent_race.material_modifiers[gMaterial_index].car_wall_friction * total_force * 0.35f;
-    ts = BrVector3Length(vel);
-    if (ts < 0.0001f) {
+    total_force = (total_force * 0.35f) * gCurrent_race.material_modifiers[gMaterial_index].car_wall_friction;
+    point_vel = BrVector3Length(vel);
+    if (point_vel < 0.0001f) {
         BrVector3Set(max_friction, 0.f, 0.f, 0.f);
         return 0.0;
     }
-    BrVector3InvScale(max_friction, vel, -ts);
+    ts = 1.0f / (-point_vel);
+    BrVector3Scale(max_friction, vel, ts);
     BrVector3Cross(&ftau, pos, max_friction);
     BrVector3Scale(&ftau, &ftau, c->M);
     ftau.v[0] = ftau.v[0] / c->I.v[0];
@@ -3296,19 +3297,19 @@ br_scalar AddFriction(tCollision_info* c, br_vector3* vel, br_vector3* normal_fo
     tv.v[0] = pos->v[2] * ftau.v[1] - pos->v[1] * ftau.v[2];
     tv.v[1] = pos->v[0] * ftau.v[2] - pos->v[2] * ftau.v[0];
     tv.v[2] = pos->v[1] * ftau.v[0] - pos->v[0] * ftau.v[1];
-    ts = max_friction->v[0] * tv.v[0] + max_friction->v[1] * tv.v[1] + max_friction->v[2] * tv.v[2] + ts;
-    if (fabs(ts) <= 0.0001f) {
-        ts = 0.0f;
-    } else {
+    ts = BrVector3Dot(max_friction, &tv) + ts;
+    if ((float)fabs(ts) > 0.0001f) {
         ts = -BrVector3Dot(max_friction, vel) / ts;
+    } else {
+        ts = 0.0f;
     }
     if (ts > total_force) {
         ts = total_force;
     }
     BrVector3Scale(max_friction, max_friction, ts);
-    BrVector3Cross(&tv, pos, max_friction);
-    BrVector3Scale(&tv, &tv, c->M);
-    ApplyTorque((tCar_spec*)c, &tv);
+    BrVector3Cross(&norm, pos, max_friction);
+    BrVector3Scale(&norm, &norm, c->M);
+    ApplyTorque((tCar_spec*)c, &norm);
     return total_force;
 }
 
