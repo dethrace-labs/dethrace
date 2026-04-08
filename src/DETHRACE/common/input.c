@@ -362,16 +362,9 @@ void WaitForNoKeys(void) {
 // IDA: void __cdecl WaitForAKey()
 // FUNCTION: CARM95 0x0047235a
 void WaitForAKey(void) {
-
-    while (1) {
+    do {
         CheckQuit();
-        if (AnyKeyDown()) {
-            break;
-        }
-        if (EitherMouseButtonDown()) {
-            break;
-        }
-    }
+    } while (!AnyKeyDown() && !EitherMouseButtonDown());
     CheckQuit();
     WaitForNoKeys();
 }

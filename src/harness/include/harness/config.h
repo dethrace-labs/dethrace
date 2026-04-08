@@ -44,7 +44,7 @@ typedef struct tHarness_game_dir {
 
 typedef struct tHarness_game_config {
     int enable_cd_check;
-    int physics_step_time;
+    int physics_per_frame;
     float fps;
     int freeze_timer;
     unsigned demo_timeout;
