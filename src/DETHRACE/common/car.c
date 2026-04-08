@@ -3487,18 +3487,20 @@ void CrashNoise(br_vector3* pForce, br_vector3* position, int material) {
     tS3_volume vol;
     br_vector3 velocity;
 
-    vol = 60.f * BrVector3Length(pForce);
-    if (gCurrent_race.material_modifiers[material].crash_noise_index != -1) {
-        if (vol >= 256) {
+    vol = 60.0 * BrVector3Length(pForce);
+    if (gCurrent_race.material_modifiers[material].crash_noise_index == -1) {
+    } else {
+        if (vol > 255) {
             vol = 255;
         }
-        if (crunch_tag == 0 || (!DRS3SoundStillPlaying(crunch_tag) && vol > 30)) {
-            last_crunch_vol = vol;
-            (void)last_crunch_vol;
-            BrVector3Set(&velocity, 0.f, 0.f, 0.f);
-            crunch_tag = DRS3StartSound3D(gCar_outlet,
-                gMetal_crunch_sound_id__car[IRandomBetween(0, COUNT_OF(gMetal_crunch_sound_id__car) - 1)],
-                position, &velocity, 1, vol, IRandomBetween(49152, 81920), 0x10000);
+        if (crunch_tag == 0 || !DRS3SoundStillPlaying(crunch_tag)) {
+            if (vol > 30) {
+                last_crunch_vol = vol;
+                BrVector3Set(&velocity, 0.f, 0.f, 0.f);
+                crunch_tag = DRS3StartSound3D(gCar_outlet,
+                    gMetal_crunch_sound_id__car[IRandomBetween(0, COUNT_OF(gMetal_crunch_sound_id__car) - 1)],
+                    position, &velocity, 1, vol, IRandomBetween(49152, 81920), 0x10000);
+            }
         }
     }
 }
