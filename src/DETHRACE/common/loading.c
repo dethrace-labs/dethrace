@@ -1793,7 +1793,7 @@ int RemoveDoubleSided(br_model* pModel) {
 
         for (i = 0, face = pModel->faces; i < pModel->nfaces; i++, face++) {
             if (face->material) {
-                if (face->material->user == DOUBLESIDED_USER_FLAG) {
+                if (face->material->colour_map_1 == DOUBLESIDED_USER_FLAG) {
                     num_double_sided_faces++;
                 }
             }
@@ -1804,7 +1804,7 @@ int RemoveDoubleSided(br_model* pModel) {
             orig_nfaces = pModel->nfaces;
 
             for (i = 0, face = pModel->faces; i < orig_nfaces; i++, face++) {
-                if (face->material && face->material->user == DOUBLESIDED_USER_FLAG) {
+                if (face->material && face->material->colour_map_1 == DOUBLESIDED_USER_FLAG) {
                     faces[pModel->nfaces].vertices[0] = face->vertices[1];
                     faces[pModel->nfaces].vertices[1] = face->vertices[0];
                     faces[pModel->nfaces].vertices[2] = face->vertices[2];
@@ -2269,7 +2269,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
                 if (its_a_floorpan) {
                     pStorage_space->materials[i]->flags &= ~BR_MATF_TWO_SIDED;
                 } else {
-                    pStorage_space->materials[i]->user = DOUBLESIDED_USER_FLAG;
+                    pStorage_space->materials[i]->colour_map_1 = DOUBLESIDED_USER_FLAG;
                     pStorage_space->materials[i]->flags &= ~BR_MATF_TWO_SIDED;
                 }
             }
