@@ -2134,8 +2134,9 @@ void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scala
     int y;
     tMaterial_modifiers* mat_list;
 
-    tv.v[0] = c->nor[n].v[0] * d[n] + wheel_pos[n].v[0];
-    tv.v[2] = c->nor[n].v[2] * d[n] + wheel_pos[n].v[2];
+    mat_list = gCurrent_race.material_modifiers;
+    BrVector3Scale(&tv, &c->nor[n], d[n]);
+    BrVector3Accumulate(&tv, &wheel_pos[n]);
 
     x = abs((int)(512.0f * tv.v[0])) % 2048;
     y = abs((int)(512.0f * tv.v[2])) % 2048;
@@ -2146,16 +2147,15 @@ void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scala
     if (y > 1024) {
         y = 2048 - y;
     }
-    if (x + y <= 1024) {
-        delta = x + y;
-    } else {
+    if (x + y > 1024) {
         delta = 2048 - x - y;
+    } else {
+        delta = x + y;
     }
     delta -= 400;
     if (delta < 0) {
         delta = 0;
     }
-    mat_list = gCurrent_race.material_modifiers;
     d[n] = delta * mat_list[c->material_index[n]].bumpiness / 42400.0f * norm[n].v[1] + d[n];
 }
 
