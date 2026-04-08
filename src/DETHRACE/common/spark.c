@@ -2131,22 +2131,23 @@ void InitSplash(FILE* pF) {
     br_actor* actor;
     char the_path[256];
     char s[256];
+    br_pixelmap* the_blend_table; // dethrace: name not defined in symbol dump
     br_pixelmap* splash_maps[20];
 
     gSplash_flags = 0;
     gSplash_model = BrModelAllocate("Splash", 4, 2);
     if (pF != NULL) {
-        num = GetAnInt(pF);
+        num_files = GetAnInt(pF);
         gNum_splash_types = 0;
-        for (i = 0; num > i; ++i) {
+        for (i = 0; i < num_files; i++) {
             GetAString(pF, s);
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, s);
-            num_files = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], 20 - gNum_splash_types);
-            if (num_files == 0) {
+            num = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], COUNT_OF(splash_maps) - gNum_splash_types);
+            if (num == 0) {
                 FatalError(kFatalError_LoadPixelmapFile_S, the_path);
             }
-            gNum_splash_types += num_files;
+            gNum_splash_types += num;
         }
     } else {
         PathCat(the_path, gApplication_path, "PIXELMAP");
@@ -2154,11 +2155,12 @@ void InitSplash(FILE* pF) {
         gNum_splash_types = DRPixelmapLoadMany(the_path, splash_maps, 0x14u);
     }
     BrMapAddMany(splash_maps, gNum_splash_types);
-    for (i = 0; i < gNum_splash_types; ++i) {
+    the_blend_table = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
+    for (i = 0; i < gNum_splash_types; i++) {
         gSplash_material[i] = BrMaterialAllocate(0);
         gSplash_material[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT);
         gSplash_material[i]->flags |= BR_MATF_ALWAYS_VISIBLE | BR_MATF_PERSPECTIVE;
-        gSplash_material[i]->index_blend = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
+        gSplash_material[i]->index_blend = the_blend_table;
         gSplash_material[i]->colour_map = splash_maps[i];
         BrMaterialAdd(gSplash_material[i]);
     }
