@@ -12,7 +12,7 @@ from typing import Optional
 
 def find_function_file(function_name: str, build_dir: Path) -> Optional[Path]:
     """Find which .asm file contains the given function."""
-    search_pattern = f"_{function_name} PROC"
+    search_pattern = f"_{function_name}.*PROC"
     asm_files = glob.glob(str(build_dir / "*.asm"))
 
     if not asm_files:
@@ -36,7 +36,7 @@ def find_function_file(function_name: str, build_dir: Path) -> Optional[Path]:
 
 def extract_stack_slots(asm_file: Path, function_name: str) -> list[str]:
     """Extract stack slot definitions for the given function."""
-    proc_pattern = f"_{function_name} PROC"
+    proc_pattern = f"_{function_name}"
     slot_pattern = re.compile(r'^(_[\w$]+) = (-?\d+)$')
 
     with open(asm_file, 'r') as f:

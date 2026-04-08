@@ -159,20 +159,13 @@ void FatalError(int pStr_index, ...) {
     char temp_str[1024];
     char* sub_pt;
     va_list ap;
-    int i;
-
-    va_start(ap, pStr_index);
 
     gLast_demo_end_anim = 0x20000000 + PDGetTotalTime();
     strcpy(the_str, gError_messages[pStr_index]);
-    sub_pt = temp_str;
+    va_start(ap, pStr_index);
 
-    while (1) {
+    while ((sub_pt = strchr(the_str, '%'))) {
 
-        sub_pt = strchr(the_str, '%');
-        if (!sub_pt) {
-            break;
-        }
         sub_str = va_arg(ap, char*);
         StripCR(sub_str);
         strcpy(temp_str, sub_pt + 1);
