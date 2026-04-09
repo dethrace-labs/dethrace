@@ -1304,7 +1304,7 @@ void CheckHornLocal(tCar_spec* pCar) {
     if (pCar->keys.horn == 1 && pCar->horn_sound_tag == 0) {
         pCar->horn_sound_tag = DRS3StartSound(gEffects_outlet, 5209);
     } else if (pCar->keys.horn == 0 && pCar->horn_sound_tag != 0) {
-        if (S3SoundStillPlaying(pCar->horn_sound_tag) != 0) {
+        while (S3SoundStillPlaying(pCar->horn_sound_tag) != 0) {
             DRS3StopSound(pCar->horn_sound_tag);
             DRS3StopOutletSound(gEffects_outlet);
         }
