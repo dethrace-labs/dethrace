@@ -6635,19 +6635,11 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
                     j--;
                 } else {
                     if (j != i) {
-                        r[2 * j].v[0] = r[2 * i].v[0];
-                        r[2 * j].v[1] = r[2 * i].v[1];
-                        r[2 * j].v[2] = r[2 * i].v[2];
+                        BrVector3Copy(&r[2 * j], &r[2 * i]);
                     }
-                    n[2 * j].v[0] = n[2 * i].v[0];
-                    n[2 * j].v[1] = n[2 * i].v[1];
-                    n[2 * j].v[2] = n[2 * i].v[2];
-                    r[2 * j + 1].v[0] = r[2 * i + 1].v[0];
-                    r[2 * j + 1].v[1] = r[2 * i + 1].v[1];
-                    r[2 * j + 1].v[2] = r[2 * i + 1].v[2];
-                    n[2 * j + 1].v[0] = n[2 * i + 1].v[0];
-                    n[2 * j + 1].v[1] = n[2 * i + 1].v[1];
-                    n[2 * j + 1].v[2] = n[2 * i + 1].v[2];
+                    BrVector3Copy(&n[2 * j], &n[2 * i]);
+                    BrVector3Copy(&r[2 * j + 1], &r[2 * i + 1]);
+                    BrVector3Copy(&n[2 * j + 1], &n[2 * i + 1]);
                 }
             }
             k = j;
@@ -6669,33 +6661,17 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
                 }
             }
             if (add_point) {
-                r[2 * k].v[0] = oldr1.v[0];
-                r[2 * k].v[1] = oldr1.v[1];
-                r[2 * k].v[2] = oldr1.v[2];
-                r[2 * k + 1].v[0] = oldr2.v[0];
-                r[2 * k + 1].v[1] = oldr2.v[1];
-                r[2 * k + 1].v[2] = oldr2.v[2];
-                n[2 * k].v[0] = oldn1.v[0];
-                n[2 * k].v[1] = oldn1.v[1];
-                n[2 * k].v[2] = oldn1.v[2];
-                n[2 * k + 1].v[0] = oldn2.v[0];
-                n[2 * k + 1].v[1] = oldn2.v[1];
-                n[2 * k + 1].v[2] = oldn2.v[2];
+                BrVector3Copy(&r[2 * k], &oldr1);
+                BrVector3Copy(&r[2 * k + 1], &oldr2);
+                BrVector3Copy(&n[2 * k], &oldn1);
+                BrVector3Copy(&n[2 * k + 1], &oldn2);
                 k++;
             }
         }
-        oldr1.v[0] = r[0].v[0];
-        oldr1.v[1] = r[0].v[1];
-        oldr1.v[2] = r[0].v[2];
-        oldr2.v[0] = r[1].v[0];
-        oldr2.v[1] = r[1].v[1];
-        oldr2.v[2] = r[1].v[2];
-        oldn1.v[0] = n[0].v[0];
-        oldn1.v[1] = n[0].v[1];
-        oldn1.v[2] = n[0].v[2];
-        oldn2.v[0] = n[1].v[0];
-        oldn2.v[1] = n[1].v[1];
-        oldn2.v[2] = n[1].v[2];
+        BrVector3Copy(&oldr1, &r[0]);
+        BrVector3Copy(&oldr2, &r[1]);
+        BrVector3Copy(&oldn1, &n[0]);
+        BrVector3Copy(&oldn2, &n[1]);
         if (k < 3) {
             if (car1->collision_flag && !car1->infinite_mass) {
 
@@ -6705,12 +6681,8 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
                     }
                 }
                 if (!car1->infinite_mass) {
-                    r[2 * k].v[0] = car1->old_point.v[0];
-                    r[2 * k].v[1] = car1->old_point.v[1];
-                    r[2 * k].v[2] = car1->old_point.v[2];
-                    n[2 * k].v[0] = car1->old_norm.v[0];
-                    n[2 * k].v[1] = car1->old_norm.v[1];
-                    n[2 * k].v[2] = car1->old_norm.v[2];
+                    BrVector3Copy(&r[2 * k], &car1->old_point);
+                    BrVector3Copy(&n[2 * k], &car1->old_norm);
                     BrVector3SetFloat(&n[2 * k + 1], 0.0f, 0.0f, 0.0f);
                     BrVector3SetFloat(&r[2 * k + 1], 0.0f, 0.0f, 0.0f);
                     k++;
@@ -6723,12 +6695,8 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
                     }
                 }
                 if (!car2->infinite_mass) {
-                    r[2 * k + 1].v[0] = car2->old_point.v[0];
-                    r[2 * k + 1].v[1] = car2->old_point.v[1];
-                    r[2 * k + 1].v[2] = car2->old_point.v[2];
-                    n[2 * k + 1].v[0] = car2->old_norm.v[0];
-                    n[2 * k + 1].v[1] = car2->old_norm.v[1];
-                    n[2 * k + 1].v[2] = car2->old_norm.v[2];
+                    BrVector3Copy(&r[2 * k + 1], &car2->old_point);
+                    BrVector3Copy(&n[2 * k + 1], &car2->old_norm);
                     BrVector3SetFloat(&n[2 * k], 0.0f, 0.0f, 0.0f);
                     BrVector3SetFloat(&r[2 * k], 0.0f, 0.0f, 0.0f);
                     k++;
