@@ -6386,12 +6386,16 @@ void BringCarToAGrindingHalt(tCollision_info* car) {
 // FUNCTION: CARM95 0x0048d2e3
 int BoundsOverlapTest_car(br_bounds* b1, br_bounds* b2) {
 
-    return b2->max.v[0] >= b1->min.v[0]
-        && b1->max.v[0] >= b2->min.v[0]
-        && b2->max.v[1] >= b1->min.v[1]
-        && b1->max.v[1] >= b2->min.v[1]
-        && b2->max.v[2] >= b1->min.v[2]
-        && b1->max.v[2] >= b2->min.v[2];
+    if (b2->max.v[0] < b1->min.v[0]
+        || b1->max.v[0] < b2->min.v[0]
+        || b2->max.v[1] < b1->min.v[1]
+        || b1->max.v[1] < b2->min.v[1]
+        || b2->max.v[2] < b1->min.v[2]
+        || b1->max.v[2] < b2->min.v[2]) {
+        return 0;
+    } else {
+        return 1;
+    }
 }
 
 // IDA: int __usercall SimpleCarCarCollisionTest@<EAX>(tCollision_info *car1@<EAX>, tCollision_info *car2@<EDX>)
