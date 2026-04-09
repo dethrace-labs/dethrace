@@ -529,13 +529,14 @@ br_scalar FindYVerticallyBelow2(br_vector3* pCast_point) {
     int number_of_attempts;
     br_vector3 cast_point;
 
+    number_of_attempts = 0;
+#if 0
     BrVector3Copy(&cast_point, pCast_point);
-    for (number_of_attempts = 0; number_of_attempts <= 10; number_of_attempts++) {
+#endif
+    cast_point = *pCast_point;
+    do {
         result = FindYVerticallyBelow(&cast_point);
         cast_point.v[Y] += .2f;
-        if (result >= -100.f) {
-            return result;
-        }
-    }
+    } while (result < -100.f && number_of_attempts++ < 10);
     return result;
 }
