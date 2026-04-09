@@ -881,7 +881,11 @@ void StripControls(unsigned char* pStr) {
     len = strlen((char*)pStr);
     for (i = 0; i < len; i++) {
         if (pStr[i] < ' ') {
+#ifdef DETHRACE_FIX_BUGS
+            memmove(&pStr[i], &pStr[i] + 1, (len - i) * sizeof(char));
+#else
             memcpy(&pStr[i], &pStr[i] + 1, (len - i) * sizeof(char));
+#endif
             len--;
 #ifdef DETHRACE_FIX_BUGS
             // correctly handle stripping multiple control characters
