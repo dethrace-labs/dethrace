@@ -505,9 +505,10 @@ br_scalar FindYVerticallyBelow(br_vector3* pPosition) {
     track_spec = &gProgram_state.track_spec;
     XZToColumnXZ(&cx, &cz, pPosition->v[X], pPosition->v[Z], track_spec);
     gHighest_y_below = BR_SCALAR_MIN;
+    gY_picking_camera->t.t.translate.t = *pPosition;
     BrVector3Copy(&gY_picking_camera->t.t.translate.t, pPosition);
-    for (x = MAX(cx - 1, 0); x < MIN(cx + 2, track_spec->ncolumns_x); x++) {
-        for (z = MAX(cz - 1, 0); z < MIN(cz + 2, track_spec->ncolumns_z); z++) {
+    for (x = MAX(cx - 1, 0); x < cx + 2 && x < track_spec->ncolumns_x; x++) {
+        for (z = MAX(cz - 1, 0); z < cz + 2 && z < track_spec->ncolumns_z; z++) {
             if (track_spec->columns[z][x] != NULL) {
                 if (track_spec->blends[z][x] != NULL) {
                     track_spec->blends[z][x]->render_style = BR_RSTYLE_FACES;
