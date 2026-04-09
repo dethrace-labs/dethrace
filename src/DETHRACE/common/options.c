@@ -935,23 +935,27 @@ void SaveOrigKeyMapping(void) {
 void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box) {
     int col;
 
-    if (pIndex >= 0) {
-        col = gKey_count + 1;
-        *pY = (pIndex % ((gKey_count + 1) / 2)) * gCurrent_graf_data->key_assign_y_pitch + gCurrent_graf_data->key_assign_y;
-        if (pIndex < col / 2) {
-            *pName_x = gCurrent_graf_data->key_assign_col_1;
-            *pKey_x = gCurrent_graf_data->key_assign_col_1_a;
-            *pEnd_box = gCurrent_graf_data->key_assign_col_2 - 7;
-        } else {
-            *pName_x = gCurrent_graf_data->key_assign_col_2;
-            *pKey_x = gCurrent_graf_data->key_assign_col_2_a;
-            *pEnd_box = gCurrent_graf_data->key_assign_col_2 + gCurrent_graf_data->key_assign_col_2 - gCurrent_graf_data->key_assign_col_1 - 7;
-        }
-    } else {
+    if (pIndex < 0) {
         *pName_x = gCurrent_graf_data->key_assign_col_1;
         *pKey_x = 0;
         *pEnd_box = gCurrent_graf_data->key_assign_col_2 + gCurrent_graf_data->key_assign_col_2 - gCurrent_graf_data->key_assign_col_1 - 7;
         *pY = gCurrent_graf_data->key_assign_key_map_y;
+    } else {
+        if ((gKey_count + 1) / 2 <= pIndex) {
+            col = 1;
+        } else {
+            col = 0;
+        }
+        *pY = (pIndex % ((gKey_count + 1) / 2)) * gCurrent_graf_data->key_assign_y_pitch + gCurrent_graf_data->key_assign_y;
+        if (col != 0) {
+            *pName_x = gCurrent_graf_data->key_assign_col_2;
+            *pKey_x = gCurrent_graf_data->key_assign_col_2_a;
+            *pEnd_box = gCurrent_graf_data->key_assign_col_2 + gCurrent_graf_data->key_assign_col_2 - gCurrent_graf_data->key_assign_col_1 - 7;
+        } else {
+            *pName_x = gCurrent_graf_data->key_assign_col_1;
+            *pKey_x = gCurrent_graf_data->key_assign_col_1_a;
+            *pEnd_box = gCurrent_graf_data->key_assign_col_2 - 7;
+        }
     }
 }
 
