@@ -7344,29 +7344,30 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
         return ts;
     }
     if (f[0] < 0.0f) {
-        l = 0;
+        i = 0;
     } else if (f[1] < 0.0f) {
-        l = 1;
+        i = 1;
     } else {
-        l = 2;
+        i = 2;
     }
-    for (i = l; i < 3; i++) {
-        for (j = 0; j < 4; j++) {
-            m->m[i][j] = m->m[i + 1][j];
+    for (j = i; j < 3; j++) {
+        for (l = 0; l < 4; l++) {
+            m->m[j][l] = m->m[j + 1][l];
         }
-        d[i] = d[i + 1];
-        tau[i] = tau[i + 1];
-        tau[i + 4] = tau[i + 5];
-        n[2 * i] = n[2 * i + 2];
-        n[2 * i + 1] = n[2 * i + 3];
-        d[i] = d[i + 1];
+        d[j] = d[j + 1];
+        BrVector3Copy(&tau[j], &tau[j + 1]);
+        BrVector3Copy(&tau[j + 4], &tau[j + 5]);
+        BrVector3Copy(&n[2 * j], &n[2 * j + 2]);
+        BrVector3Copy(&n[2 * j + 1], &n[2 * j + 3]);
+        d[j] = d[j + 1];
     }
-    for (i = l; i < 3; i++) {
-        for (j = 0; j < 3; j++) {
-            m->m[j][i] = m->m[j][i + 1];
+    for (j = i; j < 3; j++) {
+        for (l = 0; l < 3; l++) {
+            m->m[l][j] = m->m[l][j + 1];
         }
     }
-    return ThreePointCollRecB(f, m, d, tau, n);
+    ts = ThreePointCollRecB(f, m, d, tau, n);
+    return ts;
 }
 
 // IDA: int __usercall TestForNan@<EAX>(float *f@<EAX>)
