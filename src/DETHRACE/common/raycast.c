@@ -473,11 +473,12 @@ void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_heig
 int FindYVerticallyBelowPolyCallBack(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     br_scalar the_y;
 
-    if (pMaterial->identifier == NULL || pMaterial->identifier[0] != '!') {
-        the_y = pPoint->v[Y];
-        if (the_y > gHighest_y_below) {
-            gHighest_y_below = the_y;
-        }
+    if (pMaterial->identifier != NULL && pMaterial->identifier[0] == '!') {
+        return 0;
+    }
+    the_y = pPoint->v[Y];
+    if (the_y > gHighest_y_below) {
+        gHighest_y_below = the_y;
     }
     return 0;
 }
