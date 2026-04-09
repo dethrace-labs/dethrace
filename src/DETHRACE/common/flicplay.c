@@ -1653,28 +1653,27 @@ int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
     FILE* f;
     tPath_name the_path;
 
-    if (*pData != NULL) {
-        MAMSLock((void**)pData);
-        return 1;
-    }
-    if (gPlay_from_disk) {
-        return 1;
-    }
-    PossibleService();
-    PathCat(the_path, gApplication_path, "ANIM");
-    PathCat(the_path, the_path, pName);
-    f = DRfopen(the_path, "rb");
-    if (f == NULL) {
-        return 0;
-    }
-    *pData_length = GetFileLength(f);
-    *pData = BrMemAllocate(*pData_length, kMem_flic_data_2);
     if (*pData == NULL) {
-        fclose(f);
-        return 0;
+        if (!gPlay_from_disk) {
+            PossibleService();
+            PathCat(the_path, gApplication_path, "ANIM");
+            PathCat(the_path, the_path, pName);
+            f = DRfopen(the_path, "rb");
+            if (f == NULL) {
+                return 0;
+            }
+            *pData_length = GetFileLength(f);
+            *pData = BrMemAllocate(*pData_length, kMem_flic_data_2);
+            if (*pData == NULL) {
+                fclose(f);
+                return 0;
+            }
+            fread(*pData, 1, *pData_length, f);
+            fclose(f);
+        }
+        return 1;
     }
-    fread(*pData, 1, *pData_length, f);
-    fclose(f);
+    MAMSLock((void**)pData);
     return 1;
 }
 
