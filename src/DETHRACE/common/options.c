@@ -1180,26 +1180,28 @@ int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
 int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode) {
 
     if (*pCurrent_mode == 0) {
-        if (*pCurrent_choice >= 2) {
-            gCurrent_key = (gKey_count + 1) / 2;
-        } else {
+        if (*pCurrent_choice < 2) {
             gCurrent_key = 0;
+        } else {
+            gCurrent_key = (gKey_count + 1) / 2;
         }
         *pCurrent_choice = 4;
         *pCurrent_mode = 1;
     } else if (gCurrent_key < 0) {
         *pCurrent_choice = 0;
         *pCurrent_mode = 0;
-    } else if (gCurrent_key < (gKey_count + 1) / 2) {
-        if (gCurrent_key < ((gKey_count + 1) / 2 - 1)) {
+    } else {
+        if ((gKey_count + 1) / 2 <= gCurrent_key) {
+            if (gCurrent_key < gKey_count - 1) {
+                gCurrent_key += 1;
+            } else {
+                gCurrent_key = -1;
+            }
+        } else if (gCurrent_key < ((gKey_count + 1) / 2 - 1)) {
             gCurrent_key += 1;
         } else {
             gCurrent_key = -1;
         }
-    } else if (gCurrent_key < gKey_count - 1) {
-        gCurrent_key += 1;
-    } else {
-        gCurrent_key = -1;
     }
     DRS3StartSound(gEffects_outlet, 3000);
     return 1;
