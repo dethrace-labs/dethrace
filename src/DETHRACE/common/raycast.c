@@ -427,16 +427,17 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
 int FindHighestPolyCallBack__raycast(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     br_scalar the_y;
 
-    if (pPoint->v[1] > gCurrent_y) {
-        if (gLowest_y_above > pPoint->v[1]) {
-            gLowest_y_above = pPoint->v[1];
-            gAbove_face_index = pF;
-            gAbove_model = pModel;
+    the_y = pPoint->v[1];
+    if (the_y <= gCurrent_y) {
+        if (the_y > gHighest_y_below) {
+            gHighest_y_below = the_y;
+            gBelow_face_index = pF;
+            gBelow_model = pModel;
         }
-    } else if (pPoint->v[1] > gHighest_y_below) {
-        gHighest_y_below = pPoint->v[1];
-        gBelow_face_index = pF;
-        gBelow_model = pModel;
+    } else if (gLowest_y_above > the_y) {
+        gLowest_y_above = the_y;
+        gAbove_face_index = pF;
+        gAbove_model = pModel;
     }
     return 0;
 }
