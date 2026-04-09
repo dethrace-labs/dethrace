@@ -1243,15 +1243,14 @@ void DoRunLengthX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
         number_of_packets = MemReadU8(&pFlic_info->data);
         for (j = 0; j < number_of_packets; j++) {
             size_count = MemReadS8(&pFlic_info->data);
-            if (size_count >= 0) {
-                the_byte = MemReadU8(&pFlic_info->data);
-                for (k = 0; k < size_count; k++) {
-                    *line_pixel_ptr = the_byte;
+            if (size_count < 0) {
+                for (k = 0; k < -size_count; k++) {
+                    *line_pixel_ptr = MemReadU8(&pFlic_info->data);
                     line_pixel_ptr++;
                 }
             } else {
-                for (k = 0; k < -size_count; k++) {
-                    the_byte = MemReadU8(&pFlic_info->data);
+                the_byte = MemReadU8(&pFlic_info->data);
+                for (k = 0; k < size_count; k++) {
                     *line_pixel_ptr = the_byte;
                     line_pixel_ptr++;
                 }
