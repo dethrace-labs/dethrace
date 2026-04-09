@@ -645,8 +645,8 @@ void DisableTranslationText(void) {
 // FUNCTION: CARM95 0x004959ba
 void SetFlicSound(int pSound_ID, tU32 pSound_time) {
 
-    gSound_time = pSound_time;
     gSound_ID = pSound_ID;
+    gSound_time = pSound_time;
 }
 
 // IDA: int __cdecl TranslationMode()
