@@ -1104,7 +1104,9 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
         ChangeKeyMapIndex(new_index);
         RadioChanged(12, new_index);
         DRS3StartSound(gEffects_outlet, 3000);
-    } else {
+        return 1;
+    }
+    else {
         if (gCurrent_key >= (gKey_count + 1) / 2) {
             gCurrent_key -= (gKey_count + 1) / 2;
         } else {
@@ -1114,8 +1116,8 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
             }
         }
         DRS3StartSound(gEffects_outlet, 3000);
+        return 1;
     }
-    return 1;
 }
 
 // IDA: int __usercall KeyAssignRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
