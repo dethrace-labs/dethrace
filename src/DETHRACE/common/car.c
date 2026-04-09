@@ -7355,18 +7355,10 @@ br_scalar FourPointCollB(br_scalar* f, br_matrix4* m, br_scalar* d, br_vector3* 
             m->m[j][l] = m->m[j + 1][l];
         }
         d[j] = d[j + 1];
-        tau[j].v[0] = tau[j + 1].v[0];
-        tau[j].v[1] = tau[j + 1].v[1];
-        tau[j].v[2] = tau[j + 1].v[2];
-        tau[j + 4].v[0] = tau[j + 5].v[0];
-        tau[j + 4].v[1] = tau[j + 5].v[1];
-        tau[j + 4].v[2] = tau[j + 5].v[2];
-        n[2 * j].v[0] = n[2 * j + 2].v[0];
-        n[2 * j].v[1] = n[2 * j + 2].v[1];
-        n[2 * j].v[2] = n[2 * j + 2].v[2];
-        n[2 * j + 1].v[0] = n[2 * j + 3].v[0];
-        n[2 * j + 1].v[1] = n[2 * j + 3].v[1];
-        n[2 * j + 1].v[2] = n[2 * j + 3].v[2];
+        BrVector3Copy(&tau[j], &tau[j + 1]);
+        BrVector3Copy(&tau[j + 4], &tau[j + 5]);
+        BrVector3Copy(&n[2 * j], &n[2 * j + 2]);
+        BrVector3Copy(&n[2 * j + 1], &n[2 * j + 3]);
         d[j] = d[j + 1];
     }
     for (j = i; j < 3; j++) {
