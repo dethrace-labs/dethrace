@@ -591,27 +591,28 @@ void F4Key(void) {
     tEdit_mode old_edit_mode;
 
     old_edit_mode = gWhich_edit_mode;
-    if (gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none)) {
-        if (PDKeyDown(KEY_SHIFT_ANY)) {
-            gWhich_edit_mode--;
-            if ((int)gWhich_edit_mode < 0) {
-                gWhich_edit_mode = COUNT_OF(gEdit_funcs) - 1;
-            }
+    if (gI_am_cheating != 0xa11ee75d && (gI_am_cheating != 0x564e78b9 || gNet_mode != eNet_mode_none)) {
+        gWhich_edit_mode = eEdit_mode_options;
+        return;
+    }
+    if (PDKeyDown(KEY_SHIFT_ANY)) {
+        if (gWhich_edit_mode == 0) {
+            gWhich_edit_mode = COUNT_OF(gEdit_funcs) - 1;
         } else {
-            gWhich_edit_mode++;
-            if (gWhich_edit_mode >= COUNT_OF(gEdit_funcs)) {
-                gWhich_edit_mode = 0;
-            }
-        }
-        sprintf(s, "Edit mode: %s", gEdit_mode_names[gWhich_edit_mode]);
-        NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s, 0);
-        if (gWhich_edit_mode == eEdit_mode_spec_vol && old_edit_mode != eEdit_mode_spec_vol) {
-            ShowSpecialVolumes();
-        } else if (gWhich_edit_mode != eEdit_mode_spec_vol && old_edit_mode == eEdit_mode_spec_vol) {
-            HideSpecialVolumes();
+            gWhich_edit_mode--;
         }
     } else {
-        gWhich_edit_mode = eEdit_mode_options;
+        gWhich_edit_mode++;
+        if (gWhich_edit_mode >= COUNT_OF(gEdit_funcs)) {
+            gWhich_edit_mode = 0;
+        }
+    }
+    sprintf(s, "Edit mode: %s", gEdit_mode_names[gWhich_edit_mode]);
+    NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s, 0);
+    if (gWhich_edit_mode == eEdit_mode_spec_vol && old_edit_mode != eEdit_mode_spec_vol) {
+        ShowSpecialVolumes();
+    } else if (gWhich_edit_mode != eEdit_mode_spec_vol && old_edit_mode == eEdit_mode_spec_vol) {
+        HideSpecialVolumes();
     }
 }
 
