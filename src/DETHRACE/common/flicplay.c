@@ -1844,8 +1844,7 @@ void FlushFlicQueue(void) {
     the_flic = gFirst_flic;
     while (the_flic != NULL) {
         EndFlic(the_flic);
-        old_flic = the_flic;
-        the_flic = the_flic->next;
+        the_flic = (old_flic = the_flic, old_flic->next);
         BrMemFree(old_flic);
     }
     gFirst_flic = NULL;
