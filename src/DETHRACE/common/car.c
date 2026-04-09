@@ -7406,17 +7406,19 @@ void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_s
     br_scalar ratio;
     int i;
 
+#define UNK_SUSPENION_FACTOR 5.0f
+
     front_give = pCar->susp_give[1] * pFront_give_factor;
     front_give *= WORLD_SCALE;
     rear_give = pCar->susp_give[0] * pRear_give_factor;
     rear_give *= WORLD_SCALE;
     damping = pCar->damping * pDamping_factor;
     ratio = fabs((pCar->wpos[0].v[2] - pCar->cmpos.v[2]) / (pCar->wpos[2].v[2] - pCar->cmpos.v[2]));
-    pCar->sk[0] = pCar->M / (ratio + 1.0f) * 5.0f / rear_give;
-    pCar->sb[0] = pCar->M / (ratio + 1.0f) * sqrt(5.0f) / sqrt(rear_give);
+    pCar->sk[0] = pCar->M / (ratio + 1.0f) * UNK_SUSPENION_FACTOR / rear_give;
+    pCar->sb[0] = pCar->M / (ratio + 1.0f) * sqrt(UNK_SUSPENION_FACTOR) / sqrt(rear_give);
     ratio = 1.0 / ratio;
-    pCar->sk[1] = pCar->M / (ratio + 1.0f) * 5.0f / front_give;
-    pCar->sb[1] = pCar->M / (ratio + 1.0f) * sqrt(5.0f) / sqrt(front_give);
+    pCar->sk[1] = pCar->M / (ratio + 1.0f) * UNK_SUSPENION_FACTOR / front_give;
+    pCar->sb[1] = pCar->M / (ratio + 1.0f) * sqrt(UNK_SUSPENION_FACTOR) / sqrt(front_give);
 
     pCar->sb[0] *= damping;
     pCar->sb[1] *= damping;
@@ -7425,6 +7427,8 @@ void SetCarSuspGiveAndHeight(tCar_spec* pCar, br_scalar pFront_give_factor, br_s
 
     pCar->bounds[0].min.v[1] = (front_give <= rear_give ? -rear_give : -front_give) + (pExtra_front_height <= pExtra_rear_height ? -pExtra_rear_height : -pExtra_front_height);
     pCar->bounds[0].min.v[1] /= WORLD_SCALE;
+
+#undef UNK_SUSPENION_FACTOR
 }
 
 // IDA: int __usercall TestForCarInSensiblePlace@<EAX>(tCar_spec *car@<EAX>)
