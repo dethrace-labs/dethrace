@@ -1743,9 +1743,7 @@ void SortOutRecover(tCar_spec* pCar) {
         gPalette_fade_time = 0;
         old_time = 0;
     }
-    if (the_time < 500) {
-        val = 256 - (the_time * 256) / 500;
-    } else {
+    if (the_time >= 500) {
         if (old_time < 500) {
             FlipUpCar(pCar);
             PipeSingleSpecial(ePipe_special_fade);
@@ -1758,10 +1756,10 @@ void SortOutRecover(tCar_spec* pCar) {
             old_time = 0;
             pCar->doing_nothing_flag = 0;
         }
+    } else {
+        val = 256 - (the_time * 256) / 500;
     }
-    if (val <= 0) {
-        val = 0;
-    }
+    val = val > 0 ? val : 0;
     SetFadedPalette(val);
     old_time = the_time;
 }
