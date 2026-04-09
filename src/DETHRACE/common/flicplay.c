@@ -1640,10 +1640,11 @@ int LoadFlic(int pIndex) {
 // IDA: void __usercall UnlockFlic(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x00497683
 void UnlockFlic(int pIndex) {
-    if (pIndex >= 0) {
-        if (gMain_flic_list[pIndex].data_ptr != NULL) {
-            MAMSUnlock((void**)&gMain_flic_list[pIndex].data_ptr);
-        }
+    if (pIndex < 0) {
+        return;
+    }
+    if (gMain_flic_list[pIndex].data_ptr != NULL) {
+        MAMSUnlock((void**)&gMain_flic_list[pIndex].data_ptr);
     }
 }
 
