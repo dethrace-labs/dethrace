@@ -1489,9 +1489,7 @@ void ExplodeCar(tCar_spec* pCar) {
     br_vector3 pos;
 
     pCar->last_car_car_collision = 0;
-    tv.v[0] = .14492753f * pCar->cmpos.v[0];
-    tv.v[1] = .14492753f * pCar->cmpos.v[1];
-    tv.v[2] = .14492753f * pCar->cmpos.v[2];
+    BrVector3Scale(&tv, &pCar->cmpos, .14492753f);
     tv.v[2] = pCar->bounds[0].min.v[2] + .3 * (pCar->bounds[0].max.v[2] - pCar->bounds[0].min.v[2]);
     BrMatrix34ApplyP(&pos, &tv, &pCar->car_master_actor->t.t.mat);
     CreatePuffOfSmoke(&pos, &pCar->v, 1.f, 1.f, 7, pCar);
