@@ -1124,25 +1124,25 @@ int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
 
     if (gCurrent_key < 0) {
-        if (gKey_map_index < 3) {
-            new_index = gKey_map_index + 1;
-        } else {
+        if (gKey_map_index >= 3) {
             new_index = 0;
+        } else {
+            new_index = gKey_map_index + 1;
         }
         ChangeKeyMapIndex(new_index);
         RadioChanged(12, new_index);
         DRS3StartSound(gEffects_outlet, 3000);
-    } else {
-        if (gCurrent_key >= (gKey_count + 1) / 2) {
-            gCurrent_key -= (gKey_count + 1) / 2;
-        } else {
-            gCurrent_key += (gKey_count + 1) / 2;
-            if (gCurrent_key >= gKey_count) {
-                gCurrent_key -= (gKey_count + 1) / 2;
-            }
-        }
-        DRS3StartSound(gEffects_outlet, 3000);
+        return 1;
     }
+    if (gCurrent_key >= (gKey_count + 1) / 2) {
+        gCurrent_key -= (gKey_count + 1) / 2;
+    } else {
+        gCurrent_key += (gKey_count + 1) / 2;
+        if (gCurrent_key >= gKey_count) {
+            gCurrent_key -= (gKey_count + 1) / 2;
+        }
+    }
+    DRS3StartSound(gEffects_outlet, 3000);
     return 1;
 }
 
