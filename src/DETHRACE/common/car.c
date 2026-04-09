@@ -6559,7 +6559,7 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     br_vector3 n[16];
     br_vector3 sep;
     br_vector3 tv;
-    int add_point = pPass;
+    int add_point;
     // GLOBAL: CARM95 0x53cff0
     static br_vector3 oldr1;
     // GLOBAL: CARM95 0x53a568
@@ -6570,6 +6570,7 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     static br_vector3 oldn2;
     static int is_old_point_available;
 
+    add_point = pPass;
     if (!gCar_car_collisions) {
         return 0;
     }
