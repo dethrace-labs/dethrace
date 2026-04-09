@@ -1536,13 +1536,11 @@ int PlayFlic(int pIndex, tU32 pSize, tS8* pData_ptr, br_pixelmap* pDest_pixelmap
     last_frame = 0;
     while ((!pInterruptable || !AnyKeyDown()) && !finished_playing) {
         new_time = PDGetTotalTime();
-        frame_period = new_time - last_frame;
-
         if (gSound_time != 0 && new_time >= gSound_time) {
             DRS3StartSound(gEffects_outlet, gSound_ID);
             gSound_time = 0;
         }
-        if (frame_period >= the_flic.frame_period) {
+        if (new_time - last_frame >= the_flic.frame_period) {
             last_frame = new_time;
             finished_playing = PlayNextFlicFrame(&the_flic);
             DoPerFrame();
