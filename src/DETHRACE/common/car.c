@@ -1419,7 +1419,7 @@ void MungeSpecialVolume(tCollision_info* pCar) {
     new_special_volume = FindSpecialVolume(&pCar->pos, pCar->last_special_volume);
     car = (tCar_spec*)pCar;
     if (car->auto_special_volume != NULL && (new_special_volume == NULL || new_special_volume->gravity_multiplier == 1.f)) {
-        if (((tCollision_info*)car)->water_d == 10000.f && pCar->water_depth_factor != 1.f) {
+        if (car->water_d == 10000.f && pCar->water_depth_factor != 1.f) {
             car->auto_special_volume = NULL;
         } else {
             new_special_volume = car->auto_special_volume;
