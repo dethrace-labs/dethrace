@@ -7534,21 +7534,22 @@ int TestOldMats(tCollision_info* c1, tCollision_info* c2, int newmats) {
     }
     for (i = 0; i < 4; i++) {
         if (i == 3) {
-            BrVector3Copy(&edge, &b2->min);
+            BrVector3Copy(&p1, &b2->min);
         } else {
-            BrVector3Copy(&edge, &b2->max);
-            edge.v[i] = b2->min.v[i];
+            BrVector3Copy(&p1, &b2->max);
+            p1.v[i] = b2->min.v[i];
         }
         for (j = 0; j < 3; j++) {
-            BrVector3Copy(&tp1, &edge);
-            if (b2->max.v[j] == tp1.v[j]) {
-                tp1.v[j] = b2->min.v[j];
+            BrVector3Copy(&p2, &p1);
+            if (b2->max.v[j] == p2.v[j]) {
+                p2.v[j] = b2->min.v[j];
             } else {
-                tp1.v[j] = b2->max.v[j];
+                p2.v[j] = b2->max.v[j];
             }
-            BrMatrix34ApplyP(&p1, &edge, &mat21);
-            BrMatrix34ApplyP(&p2, &tp1, &mat21);
-            if (LineBoxColl(&p1, &p2, b1, &hp1)) {
+            BrMatrix34ApplyP(&tp1, &p1, &mat21);
+            BrMatrix34ApplyP(&tp2, &p2, &mat21);
+            plane1 = LineBoxColl(&tp1, &tp2, b1, &hp1);
+            if (plane1 != 0) {
                 n++;
             }
         }
