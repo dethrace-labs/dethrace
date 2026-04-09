@@ -1375,33 +1375,35 @@ void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
     int width;
     int right_edge;
 
-    for (i = 0; i < gTranslation_count; i++) {
-        trans = &gTranslations[i];
-        if (trans->flic_index == pFlic_info->the_index && (trans->every_frame || pLast_frame)) {
-            width = DRTextWidth(gTrans_fonts[trans->font_index], trans->text);
-            switch (trans->justification) {
-            case eJust_left:
-                x = trans->x;
-                right_edge = x + width;
-                break;
-            case eJust_right:
-                x = trans->x - width;
-                right_edge = x;
-                break;
-            case eJust_centre:
-                x = trans->x - width / 2;
-                right_edge = x + width / 2;
-                break;
-            default:
-                TELL_ME_IF_WE_PASS_THIS_WAY();
+    for (i = 0, trans = gTranslations; i < gTranslation_count; i++, trans++) {
+        if (trans->flic_index == pFlic_info->the_index) {
+            if (trans->every_frame || pLast_frame) {
+                width = DRTextWidth(gTrans_fonts[trans->font_index], trans->text);
+                switch (trans->justification) {
+                case eJust_left:
+                    x = trans->x;
+                    right_edge = x + width;
+                    break;
+                case eJust_right:
+                    x = trans->x - width;
+                    right_edge = x;
+                    break;
+                case eJust_centre:
+                    x = trans->x - width / 2;
+                    right_edge = x + width / 2;
+                    break;
+                }
+                if (!trans->global) {
+                    x += pFlic_info->x_offset;
+                }
+                TransDRPixelmapText(
+                    pFlic_info->the_pixelmap,
+                    x,
+                    trans->y + (trans->global ? 0 : pFlic_info->y_offset),
+                    gTrans_fonts[trans->font_index],
+                    trans->text,
+                    right_edge);
             }
-            TransDRPixelmapText(
-                pFlic_info->the_pixelmap,
-                x + (trans->global ? 0 : pFlic_info->x_offset),
-                trans->y + (trans->global ? 0 : pFlic_info->y_offset),
-                gTrans_fonts[trans->font_index],
-                trans->text,
-                right_edge);
         }
     }
 }
