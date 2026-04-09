@@ -109,27 +109,29 @@ int PickBoundsTestRay__raycast(br_bounds* b, br_vector3* rp, br_vector3* rd, br_
     float t;
 
     for (i = 0; i < 3; i++) {
-        if (rd->v[i] > 0.00000023841858) {
-            s = (1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-            if (s > BR_SCALAR_MAX) {
+        if (rd->v[i] > 0.00000023841858f) {
+            s = 1.0f / rd->v[i];
+            t = (rp->v[i] - b->max.v[i]) * s;
+            if (t > BR_SCALAR_MAX) {
                 t_near = BR_SCALAR_MAX;
-            } else if (s > t_near) {
-                t_near = s;
+            } else if (t > t_near) {
+                t_near = t;
             }
-            t = (1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
+            t = (rp->v[i] - b->min.v[i]) * s;
             if (t < BR_SCALAR_MIN) {
                 t_far = BR_SCALAR_MIN;
             } else if (t < t_far) {
                 t_far = t;
             }
-        } else if (rd->v[i] < -0.00000023841858) {
-            s = (1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-            if (s < BR_SCALAR_MIN) {
+        } else if (rd->v[i] < -0.00000023841858f) {
+            s = 1.0f / rd->v[i];
+            t = (rp->v[i] - b->max.v[i]) * s;
+            if (t < BR_SCALAR_MIN) {
                 t_far = BR_SCALAR_MIN;
-            } else if (s < t_far) {
-                t_far = s;
+            } else if (t < t_far) {
+                t_far = t;
             }
-            t = (1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
+            t = (rp->v[i] - b->min.v[i]) * s;
             if (t > BR_SCALAR_MAX) {
                 t_near = BR_SCALAR_MAX;
             } else if (t > t_near) {
@@ -139,12 +141,13 @@ int PickBoundsTestRay__raycast(br_bounds* b, br_vector3* rp, br_vector3* rd, br_
             return 0;
         }
     }
-    if (t_far < t_near) {
+    if (t_far >= t_near) {
+        *new_t_near = t_near;
+        *new_t_far = t_far;
+        return 1;
+    } else {
         return 0;
     }
-    *new_t_near = t_near;
-    *new_t_far = t_far;
-    return 1;
 }
 
 // IDA: int __usercall ActorPick2D@<EAX>(br_actor *ap@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, dr_pick2d_cbfn *callback@<ECX>, void *arg)
