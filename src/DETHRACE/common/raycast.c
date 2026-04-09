@@ -273,7 +273,7 @@ int DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, v
     camera_data = (br_camera*)camera->type_data;
     DRActorToRoot(camera, world, &camera_tfm);
     BrMatrix34Inverse(&gPick_model_to_view__raycast, &camera_tfm);
-    scale = cos(BrAngleToRadian(camera_data->field_of_view / 2)) / sin(BrAngleToRadian(camera_data->field_of_view / 2));
+    scale = cos(BrAngleToRadian((unsigned short)(camera_data->field_of_view / 2))) / sin(BrAngleToRadian((unsigned short)(camera_data->field_of_view / 2)));
 
     BrMatrix34PostScale(&gPick_model_to_view__raycast, scale / camera_data->aspect, scale, 1.0f);
     return ActorPick2D(world, model_unk1, material_unk1, callback, arg);
