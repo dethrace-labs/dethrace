@@ -1770,13 +1770,13 @@ void SortOutRecover(tCar_spec* pCar) {
 // FUNCTION: CARM95 0x004a22f4
 void SetFlipUpCar(tCar_spec* pCar) {
 
-    if (gNet_mode != eNet_mode_none && pCar->driver == eDriver_local_human) {
-        DisableCar(pCar);
-        gPalette_fade_time = GetRaceTime();
-        NetPlayerStatusChanged(ePlayer_status_recovering);
-    } else {
+    if (gNet_mode == eNet_mode_none || pCar->driver != eDriver_local_human) {
         FlipUpCar(pCar);
+        return;
     }
+    DisableCar(pCar);
+    gPalette_fade_time = GetRaceTime();
+    NetPlayerStatusChanged(ePlayer_status_recovering);
 }
 
 // IDA: void __usercall FlipUpCar(tCar_spec *car@<EAX>)
