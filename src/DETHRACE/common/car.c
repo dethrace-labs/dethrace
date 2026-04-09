@@ -6417,22 +6417,16 @@ int CollideTwoCarsWithWalls(tCollision_info* car1, tCollision_info* car2, br_sca
     int im1;
     int im2;
 
-    l = 0;
     m = 0;
+    n = 0;
     p = 0;
     im1 = car1->infinite_mass;
     im2 = car2->infinite_mass;
     do {
-        n = CollideTwoCarsRepeatedly(car1, car2, dt);
-        if (n <= 0) {
-            if (n == -1) {
-                return -1;
-            }
-            l = 0;
-            m = 0;
-        } else {
+        l = CollideTwoCarsRepeatedly(car1, car2, dt);
+        if (l > 0) {
             ++p;
-            if (n >= 5) {
+            if (l >= 5) {
                 if (p >= 10 || car1->infinite_mass || car2->infinite_mass) {
                     return -1;
                 }
@@ -6442,46 +6436,49 @@ int CollideTwoCarsWithWalls(tCollision_info* car1, tCollision_info* car2, br_sca
                 BrVector3Scale(&mom2, &car2->v, car2->M);
                 BrVector3Accumulate(&mom1, &mom2);
                 BrVector3InvScale(&car1->v, &mom1, car2->M + car1->M);
-                car2->v = car1->v;
+                car2->v.v[0] = car1->v.v[0];
+                car2->v.v[1] = car1->v.v[1];
+                car2->v.v[2] = car1->v.v[2];
                 RotateCar(car1, dt);
                 TranslateCar(car1, dt);
                 RotateCar(car2, dt);
                 TranslateCar(car2, dt);
                 if (CollideTwoCars(car1, car2, -1)) {
                     return -1;
-                }
-                if (im1 || im2) {
+                } else if (im1 || im2) {
                     return -1;
                 }
             }
             if (!im1) {
-                l = CollideCarWithWall(car1, dt);
+                m = CollideCarWithWall(car1, dt);
             }
             if (!im2) {
-                m = CollideCarWithWall(car2, dt);
+                n = CollideCarWithWall(car2, dt);
             }
             if (p < 3) {
                 car1->infinite_mass = im1;
                 car2->infinite_mass = im2;
             }
             if (p > 5) {
-                if (l) {
-                    car1->infinite_mass |= 0x100u;
-                }
                 if (m) {
-                    car2->infinite_mass |= 0x100u;
+                    car1->infinite_mass |= 0x100;
+                }
+                if (n) {
+                    car2->infinite_mass |= 0x100;
                 }
             }
             if (car1->infinite_mass && car2->infinite_mass) {
                 return -1;
             }
+        } else {
+            if (l == -1) {
+                return -1;
+            }
+            m = 0;
+            n = 0;
         }
-    } while ((l || m) && p < 10);
-    if (p < 10) {
-        return p;
-    } else {
-        return -1;
-    }
+    } while ((m || n) && p < 10);
+    return p < 10 ? p : -1;
 }
 
 // IDA: int __usercall CollideTwoCarsRepeatedly@<EAX>(tCollision_info *car1@<EAX>, tCollision_info *car2@<EDX>, br_scalar dt)
