@@ -6127,20 +6127,20 @@ void CrashCarsTogether(br_scalar dt) {
     int i;
     tCollison_data collide_list[32];
 
+    pass = 0;
+    k = 0;
     for (i = 0; i < gNum_cars_and_non_cars; i++) {
         collide_list[i].car = NULL;
         collide_list[i].ref = gNum_cars_and_non_cars - 1;
         gActive_car_list[i]->infinite_mass = 0;
     }
-    for (pass = 0; pass < 5; pass++) {
+    do {
         k = CrashCarsTogetherSinglePass(dt, pass, collide_list);
-        if (k <= 0) {
-            break;
-        }
-    }
+        pass++;
+    } while (pass < 5 && k > 0);
     if (k > 0) {
-        for (i = 0; i < gNum_cars_and_non_cars; i++) {
-            BringCarToAGrindingHalt((tCollision_info*)gActive_car_list[i]);
+        for (pass = 0; pass < gNum_cars_and_non_cars; pass++) {
+            BringCarToAGrindingHalt((tCollision_info*)gActive_car_list[pass]);
         }
     }
 }
@@ -6386,23 +6386,25 @@ void BringCarToAGrindingHalt(tCollision_info* car) {
 // FUNCTION: CARM95 0x0048d2e3
 int BoundsOverlapTest_car(br_bounds* b1, br_bounds* b2) {
 
-    return b2->max.v[0] >= b1->min.v[0]
-        && b1->max.v[0] >= b2->min.v[0]
-        && b2->max.v[1] >= b1->min.v[1]
-        && b1->max.v[1] >= b2->min.v[1]
-        && b2->max.v[2] >= b1->min.v[2]
-        && b1->max.v[2] >= b2->min.v[2];
+    if (b2->max.v[0] < b1->min.v[0]
+        || b1->max.v[0] < b2->min.v[0]
+        || b2->max.v[1] < b1->min.v[1]
+        || b1->max.v[1] < b2->min.v[1]
+        || b2->max.v[2] < b1->min.v[2]
+        || b1->max.v[2] < b2->min.v[2]) {
+        return 0;
+    } else {
+        return 1;
+    }
 }
 
 // IDA: int __usercall SimpleCarCarCollisionTest@<EAX>(tCollision_info *car1@<EAX>, tCollision_info *car2@<EDX>)
 // FUNCTION: CARM95 0x0048d28f
 int SimpleCarCarCollisionTest(tCollision_info* car1, tCollision_info* car2) {
-
-    if (car1->bounds_ws_type == eBounds_ws && car2->bounds_ws_type == eBounds_ws) {
-        return BoundsOverlapTest_car(&car1->bounds_world_space, &car2->bounds_world_space);
-    } else {
+    if (car1->bounds_ws_type != eBounds_ws || car2->bounds_ws_type != eBounds_ws) {
         return 1;
     }
+    return BoundsOverlapTest_car(&car1->bounds_world_space, &car2->bounds_world_space);
 }
 
 // IDA: int __usercall CollideTwoCarsWithWalls@<EAX>(tCollision_info *car1@<EAX>, tCollision_info *car2@<EDX>, br_scalar dt)
@@ -7576,11 +7578,11 @@ int DoPullActorFromWorld(br_actor* pActor) {
     }
     if (non_car && non_car->collision_info.driver == eDriver_non_car) {
         non_car = gProgram_state.non_cars;
-        for (i = 0; i < NONCAR_UNUSED_SLOTS; i++) {
-            if (non_car->collision_info.driver == eDriver_non_car_unused_slot) {
+        for (i = 0; i < NONCAR_UNUSED_SLOTS; i++, non_car++) {
+            c = (tCollision_info*)non_car;
+            if (c->driver == eDriver_non_car_unused_slot) {
                 break;
             }
-            non_car++;
         }
         if (i == NONCAR_UNUSED_SLOTS) {
             non_car = NULL;
@@ -7588,36 +7590,35 @@ int DoPullActorFromWorld(br_actor* pActor) {
             memcpy(non_car, &gProgram_state.non_cars[gNon_car_spec_list[num] + NONCAR_UNUSED_SLOTS - 1], sizeof(tNon_car_spec));
         }
     }
-    if (non_car != NULL) {
-        pActor->type_data = non_car;
-        c = &non_car->collision_info;
-        c->driver = eDriver_non_car;
-        c->doing_nothing_flag = 1;
-        BrActorRemove(pActor);
-        BrActorAdd(gNon_track_actor, pActor);
-        c->car_master_actor = pActor;
-        c->car_ID = 100 * (pActor->identifier[5] - '0') + 10 * (pActor->identifier[6] - '0') + 1 * (pActor->identifier[7] - '0');
-        gActive_non_car_list[gNum_active_non_cars] = non_car;
-        gNum_active_non_cars++;
-        gActive_car_list[gNum_cars_and_non_cars] = (tCar_spec*)non_car;
-        gNum_cars_and_non_cars++;
-        GetNewBoundingBox(&c->bounds_world_space, c->bounds, &pActor->t.t.mat);
-        non_car->collision_info.bounds_ws_type = eBounds_ws;
-        InitialiseNonCar(non_car);
-        ResetCarSpecialVolume((tCollision_info*)non_car);
-        if (gDoing_physics) {
-            BrVector3Scale((br_vector3*)&pActor->t.t.mat.m[3][0], (br_vector3*)&pActor->t.t.mat.m[3][0], WORLD_SCALE);
-        }
-        BrMatrix34Copy(&c->oldmat, &pActor->t.t.mat);
-        if (!gDoing_physics) {
-            BrVector3Scale((br_vector3*)&c->oldmat.m[3][0], (br_vector3*)&c->oldmat.m[3][0], WORLD_SCALE);
-        }
-        PipeSingleNonCar((tCollision_info*)non_car);
-        return 1;
-    } else {
+    if (non_car == NULL) {
         pActor->identifier[1] = 'x';
         return 0;
     }
+    pActor->type_data = non_car;
+    c = &non_car->collision_info;
+    c->driver = eDriver_non_car;
+    c->doing_nothing_flag = 1;
+    BrActorRemove(pActor);
+    BrActorAdd(gNon_track_actor, pActor);
+    c->car_master_actor = pActor;
+    c->car_ID = 100 * (pActor->identifier[5] - '0') + 10 * (pActor->identifier[6] - '0') + 1 * (pActor->identifier[7] - '0');
+    gActive_non_car_list[gNum_active_non_cars] = non_car;
+    gNum_active_non_cars++;
+    gActive_car_list[gNum_cars_and_non_cars] = (tCar_spec*)c;
+    gNum_cars_and_non_cars++;
+    GetNewBoundingBox(&c->bounds_world_space, c->bounds, &pActor->t.t.mat);
+    c->bounds_ws_type = eBounds_ws;
+    InitialiseNonCar(non_car);
+    ResetCarSpecialVolume(c);
+    if (gDoing_physics) {
+        BrVector3Scale((br_vector3*)&pActor->t.t.mat.m[3][0], (br_vector3*)&pActor->t.t.mat.m[3][0], WORLD_SCALE);
+    }
+    BrMatrix34Copy(&c->oldmat, &pActor->t.t.mat);
+    if (!gDoing_physics) {
+        BrVector3Scale((br_vector3*)&c->oldmat.m[3][0], (br_vector3*)&c->oldmat.m[3][0], WORLD_SCALE);
+    }
+    PipeSingleNonCar(c);
+    return 1;
 }
 
 // IDA: void __usercall CheckForDeAttachmentOfNonCars(tU32 pTime@<EAX>)

@@ -88,7 +88,7 @@ void InitRayCasting(void) {
 // FUNCTION: CARM95 0x004952ca
 int BadDiv__raycast(br_scalar a, br_scalar b) {
     //
-    return fabs(b) < 1.0 && fabs(a) > fabs(b) * BR_SCALAR_MAX;
+    return (float)fabs(b) < 1.0f && (float)fabs(a) > (float)fabs(b) * BR_SCALAR_MAX;
 }
 
 // IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
@@ -473,11 +473,12 @@ void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_heig
 int FindYVerticallyBelowPolyCallBack(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     br_scalar the_y;
 
-    if (pMaterial->identifier == NULL || pMaterial->identifier[0] != '!') {
-        the_y = pPoint->v[Y];
-        if (the_y > gHighest_y_below) {
-            gHighest_y_below = the_y;
-        }
+    if (pMaterial->identifier != NULL && pMaterial->identifier[0] == '!') {
+        return 0;
+    }
+    the_y = pPoint->v[Y];
+    if (the_y > gHighest_y_below) {
+        gHighest_y_below = the_y;
     }
     return 0;
 }
@@ -529,13 +530,11 @@ br_scalar FindYVerticallyBelow2(br_vector3* pCast_point) {
     int number_of_attempts;
     br_vector3 cast_point;
 
-    BrVector3Copy(&cast_point, pCast_point);
-    for (number_of_attempts = 0; number_of_attempts <= 10; number_of_attempts++) {
+    number_of_attempts = 0;
+    cast_point = *pCast_point;
+    do {
         result = FindYVerticallyBelow(&cast_point);
         cast_point.v[Y] += .2f;
-        if (result >= -100.f) {
-            return result;
-        }
-    }
+    } while (result < -100.f && number_of_attempts++ < 10);
     return result;
 }
