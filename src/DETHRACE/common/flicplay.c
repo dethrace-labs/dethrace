@@ -1797,14 +1797,14 @@ void ProcessFlicQueue(tU32 pInterval) {
     DontLetFlicFuckWithPalettes();
     TurnFlicTransparencyOn();
     the_flic = gFirst_flic;
-    last_flic = NULL;
     new_time = PDGetTotalTime();
+    last_flic = NULL;
     while (the_flic != NULL) {
-        if (new_time - the_flic->last_frame < the_flic->frame_period) {
-            finished_playing = 0;
-        } else {
+        if (new_time - the_flic->last_frame >= the_flic->frame_period) {
             the_flic->last_frame = new_time;
             finished_playing = PlayNextFlicFrame(the_flic);
+        } else {
+            finished_playing = 0;
         }
         if (finished_playing) {
             EndFlic(the_flic);
