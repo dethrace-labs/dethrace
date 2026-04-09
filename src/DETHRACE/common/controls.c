@@ -1428,10 +1428,11 @@ void CheckMapRenderMove(void) {
     float old_x;
     float old_y;
 
-    old_y = gMap_render_y;
     old_x = gMap_render_x;
+    old_y = gMap_render_y;
     if (gMap_mode) {
-        amount = gFrame_period * .1f;
+        amount = gFrame_period * .1;
+        shift_down = KeyIsDown(KEYMAP_SHIFT_ANY);
         if (KeyIsDown(KEYMAP_MOVE_UP)) {
             gMap_render_y -= amount;
         } else if (KeyIsDown(KEYMAP_MOVE_DOWN)) {
@@ -1442,39 +1443,40 @@ void CheckMapRenderMove(void) {
         } else if (KeyIsDown(KEYMAP_MOVE_RIGHT)) {
             gMap_render_x += amount;
         }
-        if (gMap_render_x != old_x || gMap_render_y != old_y) {
-            SetIntegerMapRenders();
-            if (gMap_render_x_i < gCurrent_graf_data->map_render_x_marg) {
-                if (gReal_graf_data_index == 0) {
-                    gMap_render_x = (gCurrent_graf_data->map_render_x_marg + 3) & ~3;
-                } else {
-                    gMap_render_x = ((gCurrent_graf_data->map_render_x_marg + 3) & ~3) / 2;
-                }
-            }
-            if (gMap_render_y_i < gCurrent_graf_data->map_render_y_marg) {
-                if (gReal_graf_data_index == 0) {
-                    gMap_render_y = (gCurrent_graf_data->map_render_y_marg + 1) & ~1;
-                } else {
-                    gMap_render_y = (((gCurrent_graf_data->map_render_y_marg + 1) & ~1) - 40) / 2;
-                }
-            }
-            if (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i < gMap_render_x_i) {
-                if (gReal_graf_data_index == 0) {
-                    gMap_render_x = (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3;
-                } else {
-                    gMap_render_x = ((gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3) / 2;
-                }
-            }
-            if (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i < gMap_render_y_i) {
-                if (gReal_graf_data_index == 0) {
-                    gMap_render_y = (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~1;
-                } else {
-                    gMap_render_y = (((gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~3) - 40) / 2;
-                }
-            }
-            SetIntegerMapRenders();
-            AdjustRenderScreenSize();
+        if (gMap_render_x == old_x && old_y == gMap_render_y) {
+            return;
         }
+        SetIntegerMapRenders();
+        if (gMap_render_x_i < gCurrent_graf_data->map_render_x_marg) {
+            if (gReal_graf_data_index != 0) {
+                gMap_render_x = ((gCurrent_graf_data->map_render_x_marg + 3) & ~3) / 2;
+            } else {
+                gMap_render_x = (gCurrent_graf_data->map_render_x_marg + 3) & ~3;
+            }
+        }
+        if (gMap_render_y_i < gCurrent_graf_data->map_render_y_marg) {
+            if (gReal_graf_data_index != 0) {
+                gMap_render_y = (((gCurrent_graf_data->map_render_y_marg + 1) & ~1) - 40) / 2;
+            } else {
+                gMap_render_y = (gCurrent_graf_data->map_render_y_marg + 1) & ~1;
+            }
+        }
+        if (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i < gMap_render_x_i) {
+            if (gReal_graf_data_index != 0) {
+                gMap_render_x = ((gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3) / 2;
+            } else {
+                gMap_render_x = (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3;
+            }
+        }
+        if (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i < gMap_render_y_i) {
+            if (gReal_graf_data_index != 0) {
+                gMap_render_y = (((gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~1) - 40) / 2;
+            } else {
+                gMap_render_y = (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~1;
+            }
+        }
+        SetIntegerMapRenders();
+        AdjustRenderScreenSize();
     }
 }
 
