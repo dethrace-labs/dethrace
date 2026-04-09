@@ -2012,15 +2012,15 @@ void ServicePanelFlics(int pCopy_to_buffer) {
 void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
 
     EndFlic(&gPanel_flic[pIndex]);
-    gPanel_flic_data[pIndex] = pData;
-    gPanel_flic_data_length[pIndex] = pData_length;
+    gPanel_flic_data[pIndex] = (tU8*)pData_length;
+    gPanel_flic_data_length[pIndex] = (tU32)pData;
     BrPixelmapFill(gPanel_buffer[pIndex], 0);
     StartFlic(
         gPanel_flic[pIndex].file_name,
         pIndex,
         &gPanel_flic[pIndex],
-        gPanel_flic_data_length[pIndex],
-        (tS8*)gPanel_flic_data[pIndex],
+        (tU32)gPanel_flic_data[pIndex],
+        (tS8*)gPanel_flic_data_length[pIndex],
         gPanel_buffer[pIndex],
         0,
         0,
