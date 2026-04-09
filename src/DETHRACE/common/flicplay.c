@@ -1854,47 +1854,48 @@ void FlushFlicQueue(void) {
 // IDA: void __usercall AddToFlicQueue(int pIndex@<EAX>, int pX@<EDX>, int pY@<EBX>, int pMust_finish@<ECX>)
 // FUNCTION: CARM95 0x00497bec
 void AddToFlicQueue(int pIndex, int pX, int pY, int pMust_finish) {
-    tFlic_descriptor* the_flic = NULL;
+    tFlic_descriptor* the_flic;
     tFlic_descriptor* new_flic = NULL;
-    tFlic_descriptor* last_flic = NULL;
-    tFlic_descriptor* doomed_flic = NULL;
+    tFlic_descriptor* last_flic;
+    tFlic_descriptor* doomed_flic;
 
     the_flic = gFirst_flic;
+    last_flic = NULL;
     while (the_flic != NULL) {
         if (pX == the_flic->x_offset && pY == the_flic->y_offset) {
+            EndFlic(the_flic);
+            if (last_flic != NULL) {
+                last_flic->next = the_flic->next;
+            } else {
+                gFirst_flic = the_flic->next;
+            }
             doomed_flic = the_flic;
+            the_flic = the_flic->next;
+            BrMemFree(doomed_flic);
             break;
         }
         last_flic = the_flic;
         the_flic = the_flic->next;
     }
 
-    if (doomed_flic != NULL) {
-        EndFlic(doomed_flic);
-        if (last_flic != NULL) {
-            last_flic->next = doomed_flic->next;
-        } else {
-            gFirst_flic = doomed_flic->next;
-        }
-        BrMemFree(doomed_flic);
-    }
-
     LoadFlic(pIndex);
-    new_flic = BrMemAllocate(sizeof(tFlic_descriptor), kMem_queued_flic);
-    new_flic->next = NULL;
+    if (new_flic == NULL) {
+        new_flic = BrMemAllocate(sizeof(tFlic_descriptor), kMem_queued_flic);
+        new_flic->next = NULL;
+    }
     the_flic = gFirst_flic;
-    if (gFirst_flic != NULL) {
+    if (the_flic == NULL) {
+        gFirst_flic = new_flic;
+    } else {
         while (the_flic->next != NULL) {
             the_flic = the_flic->next;
         }
         the_flic->next = new_flic;
-    } else {
-        gFirst_flic = new_flic;
     }
     new_flic->last_frame = 0;
-    new_flic->data_start = NULL;
     new_flic->the_index = pIndex;
     new_flic->must_finish = pMust_finish;
+    new_flic->data_start = NULL;
 
     StartFlic(
         gMain_flic_list[pIndex].file_name,
