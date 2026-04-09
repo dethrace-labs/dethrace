@@ -88,7 +88,7 @@ void InitRayCasting(void) {
 // FUNCTION: CARM95 0x004952ca
 int BadDiv__raycast(br_scalar a, br_scalar b) {
     //
-    return fabs(b) < 1.0 && fabs(a) > fabs(b) * BR_SCALAR_MAX;
+    return (float)fabs(b) < 1.0f && (float)fabs(a) > (float)fabs(b) * BR_SCALAR_MAX;
 }
 
 // IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
