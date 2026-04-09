@@ -35,28 +35,38 @@ void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3* p4, br
     br_scalar tmp3;
     br_scalar tmp4;
 
+    #if 0
     BrVector3Sub(&rel1, p6, p5);
-    rel1.v[1] = 0.f;
     BrVector3Sub(&rel3, p4, p5);
+    #endif
+    rel1.v[2] = p6->v[2] - p5->v[2];
+    rel1.v[0] = p6->v[0] - p5->v[0];
+    rel1.v[1] = 0.f;
+    rel3.v[2] = p4->v[2] - p5->v[2];
+    rel3.v[0] = p4->v[0] - p5->v[0];
     rel3.v[1] = 0.f;
     *p3 = BrVector3Length(&rel3);
-    if (*p3 <= BR_SCALAR_EPSILON) {
+    if (*p3 <= 1.1920928955078125e-6f) {
         *p2 = 0.001f;
         *p3 = 0.001f;
     }
+    #if 0
     tmp = BrVector3Dot(&rel1, &rel3);
     BrVector3Cross(&rot1, &rel1, &rel3);
-    tmp2 = sqrt(tmp * tmp + rot1.v[1] * rot1.v[1]);
-    tmp3 = fabs(rot1.v[1] / tmp2);
-    tmp4 = p10 * tmp / tmp2 + p9;
-    if ((tmp3 < 1.f && fabs(tmp4) > tmp3 * 1000.f) || tmp3 < 0.001f) {
+    #endif
+    tmp = rel1.v[2] * rel3.v[2] + rel1.v[0] * rel3.v[0];
+    rel1.v[1] = rel1.v[2] * rel3.v[0] - rel1.v[0] * rel3.v[2];
+    rel3.v[1] = sqrt(tmp * tmp + rel1.v[1] * rel1.v[1]);
+    rot1.v[0] = fabs(rel1.v[1] / rel3.v[1]);
+    rot1.v[1] = p10 * tmp / rel3.v[1] + p9;
+    if ((rot1.v[0] < 1.f && fabs(rot1.v[1]) > rot1.v[0] * 1000.f) || rot1.v[0] < 0.001f) {
         *p1 = 1000.f;
         *p2 = 1000.f;
     } else {
-        tmp4 = tmp4 / tmp3;
-        tmp3 = tmp3 / (tmp / tmp2 + 1.f);
-        *p2 = tmp3 * p10 + sqrt(tmp3 * p10) + tmp4;
-        *p1 = *p2 * tmp3;
+        rot1.v[1] = rot1.v[1] / rot1.v[0];
+        rot1.v[0] = rot1.v[0] / (tmp / rel3.v[1] + 1.f);
+        *p2 = rot1.v[0] * p10 + sqrt((rot1.v[0] * rot1.v[0] * p10 + 2.f * rot1.v[0] * rot1.v[1] - p10) * p10) + rot1.v[1];
+        *p1 = *p2 * rot1.v[0];
     }
 }
 
