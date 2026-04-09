@@ -1489,15 +1489,16 @@ void ExplodeCar(tCar_spec* pCar) {
     br_vector3 pos;
 
     pCar->last_car_car_collision = 0;
-    pos.v[0] = .1449275f * pCar->cmpos.v[0];
-    pos.v[1] = .1449275f * pCar->cmpos.v[1];
-    pos.v[2] = pCar->bounds[0].min.v[2] + .3f * (pCar->bounds[0].max.v[2] - pCar->bounds[0].min.v[2]);
-    BrMatrix34ApplyP(&tv, &pos, &pCar->car_master_actor->t.t.mat);
-    CreatePuffOfSmoke(&tv, &pCar->v, 1.f, 1.f, 7, pCar);
+    tv.v[0] = .14492753f * pCar->cmpos.v[0];
+    tv.v[1] = .14492753f * pCar->cmpos.v[1];
+    tv.v[2] = .14492753f * pCar->cmpos.v[2];
+    tv.v[2] = pCar->bounds[0].min.v[2] + .3 * (pCar->bounds[0].max.v[2] - pCar->bounds[0].min.v[2]);
+    BrMatrix34ApplyP(&pos, &tv, &pCar->car_master_actor->t.t.mat);
+    CreatePuffOfSmoke(&pos, &pCar->v, 1.f, 1.f, 7, pCar);
 
-    pos.v[2] = pCar->bounds[0].min.v[2] + .7f * (pCar->bounds[0].max.v[2] - pCar->bounds[0].min.v[2]);
-    BrMatrix34ApplyP(&tv, &pos, &pCar->car_master_actor->t.t.mat);
-    CreatePuffOfSmoke(&tv, &pCar->v, 1.f, 1.f, 7, pCar);
+    tv.v[2] = pCar->bounds[0].min.v[2] + .7 * (pCar->bounds[0].max.v[2] - pCar->bounds[0].min.v[2]);
+    BrMatrix34ApplyP(&pos, &tv, &pCar->car_master_actor->t.t.mat);
+    CreatePuffOfSmoke(&pos, &pCar->v, 1.f, 1.f, 7, pCar);
 
     DisableCar(pCar);
 }
