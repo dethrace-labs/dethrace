@@ -569,13 +569,13 @@ tFlic_bunch gFlic_bunch[9] = {
 // GLOBAL: CARM95 0x00518758
 char gLast_flic_name[14];
 
-// GLOBAL: CARM95 0x0053d060
+// GLOBAL: CARM95 0x0053d0b8
 tU32 gPanel_flic_data_length[2];
 
 // GLOBAL: CARM95 0x0053d1b8
 tU32 gLast_panel_frame_time[2];
 
-// GLOBAL: CARM95 0x0053d0b8
+// GLOBAL: CARM95 0x0053d060
 tU8* gPanel_flic_data[2];
 
 // GLOBAL: CARM95 0x0053d0c0
@@ -2015,8 +2015,8 @@ void ServicePanelFlics(int pCopy_to_buffer) {
 void ChangePanelFlic(int pIndex, tU8* pData, tU32 pData_length) {
 
     EndFlic(&gPanel_flic[pIndex]);
-    gPanel_flic_data[pIndex] = pData;
     gPanel_flic_data_length[pIndex] = pData_length;
+    gPanel_flic_data[pIndex] = pData;
     BrPixelmapFill(gPanel_buffer[pIndex], 0);
     StartFlic(
         gPanel_flic[pIndex].file_name,
@@ -2155,7 +2155,6 @@ void LoadInterfaceStrings(void) {
         fclose(f);
 #endif
     }
-
 }
 
 // IDA: void __cdecl FlushInterfaceFonts()
