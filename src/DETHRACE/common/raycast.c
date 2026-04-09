@@ -324,8 +324,8 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
         grp_ptr = &V11MODEL(model)->groups[group];
         for (f = 0; f < V11MODEL(model)->groups[group].nfaces; f++) {
             eqn = &V11MODEL(model)->groups[group].eqn[f];
-            if (V11MODEL(model)->groups[group].face_colours != NULL) {
-                this_material = (br_material*)(uintptr_t)V11MODEL(model)->groups[group].face_colours[0];
+            if (V11MODEL(model)->groups[group].user != NULL) {
+                this_material = V11MODEL(model)->groups[group].user;
             } else {
                 this_material = material;
             }
@@ -342,19 +342,15 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
                         if (fabs(eqn->v[2]) > fabs(eqn->v[axis_m])) {
                             axis_m = 2;
                         }
-                        switch (axis_m) {
-                        case 0:
+                        if (axis_m == 0) {
                             axis_0 = 1;
                             axis_1 = 2;
-                            break;
-                        case 1:
+                        } else if (axis_m == 1) {
                             axis_0 = 0;
                             axis_1 = 2;
-                            break;
-                        case 2:
+                        } else if (axis_m == 2) {
                             axis_0 = 0;
                             axis_1 = 1;
-                            break;
                         }
 
                         v0 = grp_ptr->position[grp_ptr->vertex_numbers[f].v[0]].v[axis_0];
