@@ -1352,8 +1352,10 @@ void DoUncompressedTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 #endif
             if (the_byte != '\0') {
                 *line_pixel_ptr = the_byte;
+                line_pixel_ptr++;
+            } else {
+                line_pixel_ptr++;
             }
-            line_pixel_ptr++;
         }
         pixel_ptr += the_row_bytes;
     }
