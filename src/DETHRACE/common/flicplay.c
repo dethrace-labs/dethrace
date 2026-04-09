@@ -1919,10 +1919,10 @@ void InitialiseFlicPanel(int pIndex, int pLeft, int pTop, int pWidth, int pHeigh
     the_pixels = BrMemAllocate(pHeight * ((pWidth + 3) & ~3), kFlic_panel_pixels);
     if (gScreen->row_bytes < 0) {
         BrFatal(
-            "..\\..\\source\\common\\flicplay.c",
+            "C:\\Msdev\\Projects\\DethRace\\Flicplay.c",
             2116,
-            "Bruce bug at line %d, file ..\\..\\source\\common\\flicplay.c",
-            68);
+            "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\Flicplay.c",
+            2116);
     }
     gPanel_buffer[pIndex] = DRPixelmapAllocate(
 #ifdef DETHRACE_3DFX_PATCH
