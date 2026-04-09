@@ -7643,12 +7643,11 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
     tTrack_spec* track_spec;
     br_matrix34 mat;
 
+    last_free_slot = 0;
+    track_spec = &gProgram_state.track_spec;
     if (gNum_active_non_cars == 0) {
         return;
     }
-
-    last_free_slot = 0;
-    track_spec = &gProgram_state.track_spec;
 
     StartPipingSession(ePipe_chunk_non_car);
     for (i = 0; i < gNum_active_non_cars; i++) {
@@ -7663,7 +7662,7 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
         return;
     }
     total_time = 0;
-    for (i = 0; i < gNum_active_non_cars; i++) {
+    for (i = 0; i < gNum_active_non_cars; i++, last_free_slot++) {
         c = &gActive_non_car_list[i]->collision_info;
         if (c->car_master_actor->t.t.translate.t.v[1] < gMin_world_y) {
             c->doing_nothing_flag = 1;
@@ -7676,37 +7675,43 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
         }
         actor = c->car_master_actor;
         gActive_non_car_list[last_free_slot] = gActive_non_car_list[i];
-        if (c->doing_nothing_flag) {
-            drop = 1;
-            for (j = 0; j < gNum_cars_and_non_cars; j++) {
-                c2 = (tCollision_info*)gActive_car_list[j];
-                if (c2 != c && !c2->doing_nothing_flag) {
-                    BrMatrix34Mul(&mat, &actor->t.t.mat, &c2->last_box_inv_mat);
-                    GetNewBoundingBox(&bnds, &actor->model->bounds, &mat);
-                    if (c2->last_box.max.v[0] >= bnds.min.v[0]
-                        && c2->last_box.max.v[1] >= bnds.min.v[1]
-                        && c2->last_box.max.v[2] >= bnds.min.v[2]
-                        && c2->last_box.min.v[0] <= bnds.max.v[0]
-                        && c2->last_box.min.v[1] <= bnds.max.v[1]
-                        && c2->last_box.min.v[2] <= bnds.max.v[2]) {
+        if (!c->doing_nothing_flag) {
+            continue;
+        }
+        drop = 1;
+        for (j = 0; j < gNum_cars_and_non_cars; j++) {
+            c2 = (tCollision_info*)gActive_car_list[j];
+            if (c2 == c) {
+                continue;
+            }
+            if (c2->doing_nothing_flag) {
+                continue;
+            }
+            BrMatrix34Mul(&mat, &actor->t.t.mat, &c2->last_box_inv_mat);
+            GetNewBoundingBox(&bnds, &actor->model->bounds, &mat);
+            if (c2->last_box.max.v[0] >= bnds.min.v[0]
+                && c2->last_box.max.v[1] >= bnds.min.v[1]
+                && c2->last_box.max.v[2] >= bnds.min.v[2]
+                && c2->last_box.min.v[0] <= bnds.max.v[0]) {
+                if (c2->last_box.min.v[1] <= bnds.max.v[1]) {
+                    if (c2->last_box.min.v[2] <= bnds.max.v[2]) {
                         drop = 0;
                         break;
                     }
                 }
             }
-            if (drop) {
-                BrActorRemove(actor);
-                c->driver = eDriver_non_car_unused_slot;
-                last_free_slot--;
-                XZToColumnXZ(&cx, &cz, actor->t.t.mat.m[3][0], actor->t.t.mat.m[3][2], track_spec);
-                if (track_spec->columns[cz][cx] != NULL) {
-                    BrActorAdd(track_spec->columns[cz][cx], actor);
-                } else {
-                    BrActorAdd(gTrack_actor, actor);
-                }
+        }
+        if (drop) {
+            BrActorRemove(actor);
+            c->driver = eDriver_non_car_unused_slot;
+            last_free_slot--;
+            XZToColumnXZ(&cx, &cz, actor->t.t.mat.m[3][0], actor->t.t.mat.m[3][2], track_spec);
+            if (track_spec->columns[cz][cx] != NULL) {
+                BrActorAdd(track_spec->columns[cz][cx], actor);
+            } else {
+                BrActorAdd(gTrack_actor, actor);
             }
         }
-        last_free_slot++;
     }
     gNum_active_non_cars = last_free_slot;
 }
