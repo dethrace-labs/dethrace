@@ -901,22 +901,22 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
         palette_pixels = (tU8*)gPalette_pixels + current_colour * sizeof(br_int_32);
         for (j = 0; j < change_count; j++) {
             red = MemReadU8(&pFlic_info->data) * 4;
-            blue = MemReadU8(&pFlic_info->data) * 4;
             green = MemReadU8(&pFlic_info->data) * 4;
+            blue = MemReadU8(&pFlic_info->data) * 4;
             // argb
 #if BR_ENDIAN_BIG
             palette_pixels++;
             *palette_pixels = red;
             palette_pixels++;
-            *palette_pixels = blue;
-            palette_pixels++;
             *palette_pixels = green;
+            palette_pixels++;
+            *palette_pixels = blue;
             palette_pixels -= 3;
             *palette_pixels = 0;
 #else
-            *palette_pixels = green;
-            palette_pixels++;
             *palette_pixels = blue;
+            palette_pixels++;
+            *palette_pixels = green;
             palette_pixels++;
             *palette_pixels = red;
             palette_pixels++;
@@ -2156,7 +2156,6 @@ void LoadInterfaceStrings(void) {
         fclose(f);
 #endif
     }
-
 }
 
 // IDA: void __cdecl FlushInterfaceFonts()
