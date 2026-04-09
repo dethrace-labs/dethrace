@@ -1167,11 +1167,11 @@ int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
     } else if (gCurrent_key == (gKey_count + 1) / 2) {
         *pCurrent_choice = 0;
         *pCurrent_mode = 0;
-    } else if (gCurrent_key == 0) {
+    } else if (gCurrent_key != 0) {
+        gCurrent_key -= 1;
+    } else {
         *pCurrent_choice = 0;
         *pCurrent_mode = 0;
-    } else {
-        gCurrent_key -= 1;
     }
     DRS3StartSound(gEffects_outlet, 3000);
     return 1;
