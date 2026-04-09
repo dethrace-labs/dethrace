@@ -6879,43 +6879,50 @@ int FacePointCarCarCollide(tCollision_info* car1, tCollision_info* car2, br_matr
     br_bounds* pMove_box;
 
     k = 0;
-    pStat_box = &car2->bounds[1];
-    BrVector3Add(&centre, &car2->bounds[1].max, &car2->bounds[1].min);
+    pStat_box = &car1->bounds[1];
+    pMove_box = &car2->bounds[1];
+    BrVector3Add(&centre, &pMove_box->max, &pMove_box->min);
     BrVector3InvScale(&centre, &centre, 2.0f);
     for (i = 0; i < car2->extra_point_num + 8; i++) {
-        if (i >= 8) {
-            a = car2->extra_points[i - 8];
+        if (i < 8) {
+            a1.v[0] = ((i & 2) == 0) * pMove_box->min.v[0] + ((i & 2) >> 1) * pMove_box->max.v[0];
+            a1.v[1] = ((i & 1) == 0) * pMove_box->min.v[1] + (i & 1) * pMove_box->max.v[1];
+            a1.v[2] = ((i & 4) == 0) * pMove_box->max.v[2] + ((i & 4) >> 2) * pMove_box->min.v[2];
         } else {
-            a.v[0] = ((i & 2) == 0) * pStat_box->min.v[0] + ((i & 2) >> 1) * pStat_box->max.v[0];
-            a.v[1] = ((i & 1) == 0) * pStat_box->min.v[1] + (i & 1) * pStat_box->max.v[1];
-            a.v[2] = ((i & 4) == 0) * pStat_box->max.v[2] + ((i & 4) >> 2) * pStat_box->min.v[2];
+            a1.v[0] = car2->extra_points[i - 8].v[0];
+            a1.v[1] = car2->extra_points[i - 8].v[1];
+            a1.v[2] = car2->extra_points[i - 8].v[2];
         }
-        BrMatrix34ApplyP(&aa, &a, pMms);
-        BrMatrix34ApplyP(&bb, &a, pMoms);
-        BrVector3Sub(&aa, &aa, &bb);
-        dist = BrVector3Length(&aa);
-        if (dist >= 0.00001f) {
-            BrVector3Scale(&a1, &aa, (0.05f / WORLD_SCALE) / dist); // 0.0072463769 * 6.9 = 0.05
-            BrVector3Accumulate(&aa, &a1);
-            BrVector3Accumulate(&aa, &bb);
-            plane = LineBoxCollWithSphere(&bb, &aa, &car1->bounds[1], &hp);
-            if ((plane & 7) != 0) {
-                GetPlaneNormal(&norm, plane);
+        BrMatrix34ApplyP(&bb, &a1, pMms);
+        BrMatrix34ApplyP(&aa, &a1, pMoms);
+        BrVector3Sub(&bb, &bb, &aa);
+        dist = BrVector3Length(&bb);
+        if (dist < 0.00001) {
+            continue;
+        }
+        BrVector3Scale(&a, &bb, (0.05f / WORLD_SCALE) / dist); // 0.0072463769 * 6.9 = 0.05
+        BrVector3Accumulate(&bb, &a);
+        BrVector3Accumulate(&bb, &aa);
+        plane = LineBoxCollWithSphere(&aa, &bb, pStat_box, &hp);
+        if ((plane & 7) != 0) {
+            GetPlaneNormal(&norm, plane);
 
-                j = 2 * k + order;
-                l = 2 * k + (order == 0);
-                BrMatrix34ApplyV(&pNorm_list[j], &norm, pMsos);
-                BrMatrix34TApplyV(&pNorm_list[l], &pNorm_list[j], pMoms);
-                BrVector3Negate(&pNorm_list[l], &pNorm_list[l]);
-                if ((pNorm_list[l].v[0] >= 0.0f) != (centre.v[0] <= a.v[0]) || (pNorm_list[l].v[1] >= 0.0f) != (centre.v[1] <= a.v[1]) || (pNorm_list[l].v[2] >= 0.0f) != (a.v[2] >= centre.v[2])
-                    || !TestOldMats(car1, car2, 0)) {
-                    pPoint_list[l] = a;
-                    pPoint_list[j] = hp;
-                    k++;
-                    if (pMax == k) {
-                        return k;
-                    }
-                }
+            BrMatrix34ApplyV(&pNorm_list[2 * k + order], &norm, pMsos);
+            BrMatrix34TApplyV(&pNorm_list[2 * k + (order == 0)], &pNorm_list[2 * k + order], pMoms);
+            BrVector3Negate(&pNorm_list[2 * k + (order == 0)], &pNorm_list[2 * k + (order == 0)]);
+            if ((pNorm_list[2 * k + (order == 0)].v[0] >= 0.0f) != (a1.v[0] <= centre.v[0]) || (pNorm_list[2 * k + (order == 0)].v[1] >= 0.0f) != (a1.v[1] <= centre.v[1]) || (pNorm_list[2 * k + (order == 0)].v[2] >= 0.0f) != (a1.v[2] >= centre.v[2])
+                || TestOldMats(car1, car2, 0)) {
+                continue;
+            }
+            pPoint_list[2 * k + (order == 0)].v[0] = a1.v[0];
+            pPoint_list[2 * k + (order == 0)].v[1] = a1.v[1];
+            pPoint_list[2 * k + (order == 0)].v[2] = a1.v[2];
+            pPoint_list[2 * k + order].v[0] = hp.v[0];
+            pPoint_list[2 * k + order].v[1] = hp.v[1];
+            pPoint_list[2 * k + order].v[2] = hp.v[2];
+            k++;
+            if (k == pMax) {
+                return k;
             }
         }
     }
