@@ -7581,11 +7581,11 @@ int DoPullActorFromWorld(br_actor* pActor) {
     }
     if (non_car && non_car->collision_info.driver == eDriver_non_car) {
         non_car = gProgram_state.non_cars;
-        for (i = 0; i < NONCAR_UNUSED_SLOTS; i++) {
-            if (non_car->collision_info.driver == eDriver_non_car_unused_slot) {
+        for (i = 0; i < NONCAR_UNUSED_SLOTS; i++, non_car++) {
+            c = (tCollision_info*)non_car;
+            if (c->driver == eDriver_non_car_unused_slot) {
                 break;
             }
-            non_car++;
         }
         if (i == NONCAR_UNUSED_SLOTS) {
             non_car = NULL;
@@ -7593,36 +7593,35 @@ int DoPullActorFromWorld(br_actor* pActor) {
             memcpy(non_car, &gProgram_state.non_cars[gNon_car_spec_list[num] + NONCAR_UNUSED_SLOTS - 1], sizeof(tNon_car_spec));
         }
     }
-    if (non_car != NULL) {
-        pActor->type_data = non_car;
-        c = &non_car->collision_info;
-        c->driver = eDriver_non_car;
-        c->doing_nothing_flag = 1;
-        BrActorRemove(pActor);
-        BrActorAdd(gNon_track_actor, pActor);
-        c->car_master_actor = pActor;
-        c->car_ID = 100 * (pActor->identifier[5] - '0') + 10 * (pActor->identifier[6] - '0') + 1 * (pActor->identifier[7] - '0');
-        gActive_non_car_list[gNum_active_non_cars] = non_car;
-        gNum_active_non_cars++;
-        gActive_car_list[gNum_cars_and_non_cars] = (tCar_spec*)non_car;
-        gNum_cars_and_non_cars++;
-        GetNewBoundingBox(&c->bounds_world_space, c->bounds, &pActor->t.t.mat);
-        non_car->collision_info.bounds_ws_type = eBounds_ws;
-        InitialiseNonCar(non_car);
-        ResetCarSpecialVolume((tCollision_info*)non_car);
-        if (gDoing_physics) {
-            BrVector3Scale((br_vector3*)&pActor->t.t.mat.m[3][0], (br_vector3*)&pActor->t.t.mat.m[3][0], WORLD_SCALE);
-        }
-        BrMatrix34Copy(&c->oldmat, &pActor->t.t.mat);
-        if (!gDoing_physics) {
-            BrVector3Scale((br_vector3*)&c->oldmat.m[3][0], (br_vector3*)&c->oldmat.m[3][0], WORLD_SCALE);
-        }
-        PipeSingleNonCar((tCollision_info*)non_car);
-        return 1;
-    } else {
+    if (non_car == NULL) {
         pActor->identifier[1] = 'x';
         return 0;
     }
+    pActor->type_data = non_car;
+    c = &non_car->collision_info;
+    c->driver = eDriver_non_car;
+    c->doing_nothing_flag = 1;
+    BrActorRemove(pActor);
+    BrActorAdd(gNon_track_actor, pActor);
+    c->car_master_actor = pActor;
+    c->car_ID = 100 * (pActor->identifier[5] - '0') + 10 * (pActor->identifier[6] - '0') + 1 * (pActor->identifier[7] - '0');
+    gActive_non_car_list[gNum_active_non_cars] = non_car;
+    gNum_active_non_cars++;
+    gActive_car_list[gNum_cars_and_non_cars] = (tCar_spec*)c;
+    gNum_cars_and_non_cars++;
+    GetNewBoundingBox(&c->bounds_world_space, c->bounds, &pActor->t.t.mat);
+    c->bounds_ws_type = eBounds_ws;
+    InitialiseNonCar(non_car);
+    ResetCarSpecialVolume(c);
+    if (gDoing_physics) {
+        BrVector3Scale((br_vector3*)&pActor->t.t.mat.m[3][0], (br_vector3*)&pActor->t.t.mat.m[3][0], WORLD_SCALE);
+    }
+    BrMatrix34Copy(&c->oldmat, &pActor->t.t.mat);
+    if (!gDoing_physics) {
+        BrVector3Scale((br_vector3*)&c->oldmat.m[3][0], (br_vector3*)&c->oldmat.m[3][0], WORLD_SCALE);
+    }
+    PipeSingleNonCar(c);
+    return 1;
 }
 
 // IDA: void __usercall CheckForDeAttachmentOfNonCars(tU32 pTime@<EAX>)
