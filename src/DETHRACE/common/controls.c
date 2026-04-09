@@ -657,22 +657,22 @@ void ShowSpecialVolumesIfRequ(void) {
 void DoEditModeKey(int pIndex) {
     int modifiers;
 
-    if (gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none)) {
-        modifiers = 0;
-        if (PDKeyDown(KEY_SHIFT_ANY)) {
-            modifiers |= 4;
+    if (gI_am_cheating != 0xa11ee75d) {
+        if (gI_am_cheating != 0x564e78b9 || gNet_mode != eNet_mode_none) {
+            gWhich_edit_mode = eEdit_mode_options;
+            return;
         }
-        if (PDKeyDown(KEY_ALT_ANY)) {
-            modifiers |= 2;
-        }
-        if (PDKeyDown(KEY_CTRL_ANY)) {
-            modifiers |= 1;
-        }
-        if (gEdit_funcs[gWhich_edit_mode][pIndex][modifiers] != NULL) {
-            gEdit_funcs[gWhich_edit_mode][pIndex][modifiers]();
-        }
+    }
+
+    if (PDKeyDown(KEY_SHIFT_ANY)) {
+        modifiers = 4;
     } else {
-        gWhich_edit_mode = eEdit_mode_options;
+        modifiers = 0;
+    }
+    modifiers = PDKeyDown(KEY_ALT_ANY) ? modifiers | 2 : modifiers;
+    modifiers = PDKeyDown(KEY_CTRL_ANY) ? modifiers | 1 : modifiers;
+    if (gEdit_funcs[gWhich_edit_mode][pIndex][modifiers] != NULL) {
+        (*gEdit_funcs[gWhich_edit_mode][pIndex][modifiers])();
     }
 }
 
