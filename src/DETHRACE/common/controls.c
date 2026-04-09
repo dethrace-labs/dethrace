@@ -1231,9 +1231,10 @@ int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around) {
                 if (FindYVerticallyBelow2(&car_pos) < -100.f) {
                     BrVector3Set(&offset_c, 0.f, 1.f, 0.f);
                     BrMatrix34ApplyV(&offset_w, &offset_c, &pCar->car_master_actor->t.t.mat);
-                    car_pos.v[0] = pCar->car_master_actor->t.t.translate.t.v[0] + offset_w.v[0];
-                    car_pos.v[1] = pCar->car_master_actor->t.t.translate.t.v[1] + offset_w.v[1];
-                    car_pos.v[2] = pCar->car_master_actor->t.t.translate.t.v[2] + offset_w.v[2];
+                    BrVector3Copy(&car_pos, &pCar->car_master_actor->t.t.translate.t);
+                    car_pos.v[0] += offset_w.v[0];
+                    car_pos.v[1] += offset_w.v[1];
+                    car_pos.v[2] += offset_w.v[2];
                     if (FindYVerticallyBelow2(&car_pos) < -100.f) {
                         if (pCheck_around) {
                             pCar->car_master_actor->t.t.translate.t.v[0] += 0.05f;
