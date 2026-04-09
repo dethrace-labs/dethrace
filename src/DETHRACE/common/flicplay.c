@@ -889,34 +889,40 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
     tU8 green;
     tU8 blue;
 
-    palette_pixels = gPalette_pixels;
-
     packet_count = MemReadU16(&pFlic_info->data);
     for (i = 0; i < packet_count; i++) {
         skip_count = MemReadU8(&pFlic_info->data);
         change_count = MemReadU8(&pFlic_info->data);
-        if (!change_count) {
+        if (change_count) {
+        } else {
             change_count = 256;
         }
-        palette_pixels += skip_count * sizeof(br_int_32);
         current_colour += skip_count;
+        palette_pixels = (tU8*)gPalette_pixels + current_colour * sizeof(br_int_32);
         for (j = 0; j < change_count; j++) {
-            red = MemReadU8(&pFlic_info->data);
-            blue = MemReadU8(&pFlic_info->data);
-            green = MemReadU8(&pFlic_info->data);
+            red = MemReadU8(&pFlic_info->data) * 4;
+            blue = MemReadU8(&pFlic_info->data) * 4;
+            green = MemReadU8(&pFlic_info->data) * 4;
             // argb
 #if BR_ENDIAN_BIG
-            palette_pixels[3] = green * 4;
-            palette_pixels[2] = blue * 4;
-            palette_pixels[1] = red * 4;
-            palette_pixels[0] = 0;
+            palette_pixels++;
+            *palette_pixels = red;
+            palette_pixels++;
+            *palette_pixels = blue;
+            palette_pixels++;
+            *palette_pixels = green;
+            palette_pixels -= 3;
+            *palette_pixels = 0;
 #else
-            palette_pixels[0] = green * 4;
-            palette_pixels[1] = blue * 4;
-            palette_pixels[2] = red * 4;
-            palette_pixels[3] = 0;
+            *palette_pixels = green;
+            palette_pixels++;
+            *palette_pixels = blue;
+            palette_pixels++;
+            *palette_pixels = red;
+            palette_pixels++;
+            *palette_pixels = 0;
 #endif
-            palette_pixels += 4;
+            palette_pixels++;
         }
         if (!gPalette_fuck_prevention) {
             DRSetPaletteEntries(gPalette, current_colour, change_count);
