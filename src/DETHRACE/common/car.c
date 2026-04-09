@@ -7748,12 +7748,13 @@ void PipeSingleNonCar(tCollision_info* c) {
 // FUNCTION: CARM95 0x004941a2
 int GetPrecalculatedFacesUnderCar(tCar_spec* pCar, tFace_ref** pFace_refs) {
 
-    if (pCar->box_face_ref == gFace_num__car
-        || (pCar->box_face_ref == gFace_num__car - 1 && pCar->box_face_start > gFace_count)) {
-        *pFace_refs = &gFace_list__car[pCar->box_face_start];
-        return pCar->box_face_end - pCar->box_face_start;
+    if (pCar->box_face_ref != gFace_num__car) {
+        if (pCar->box_face_ref != gFace_num__car - 1 || pCar->box_face_start <= gFace_count) {
+            return 0;
+        }
     }
-    return 0;
+    *pFace_refs = &gFace_list__car[pCar->box_face_start];
+    return pCar->box_face_end - pCar->box_face_start;
 }
 
 // IDA: br_material* __cdecl SomeNearbyMaterial()
