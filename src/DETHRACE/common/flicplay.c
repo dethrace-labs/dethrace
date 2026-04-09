@@ -943,30 +943,30 @@ void DoDifferenceX(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     first_line = MemReadU16(&pFlic_info->data);
     line_count = MemReadU16(&pFlic_info->data);
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
-    line_pixel_ptr = pFlic_info->first_pixel + first_line * the_row_bytes;
+    pixel_ptr = pFlic_info->first_pixel + first_line * the_row_bytes;
     for (i = 0; i < line_count; i++) {
-        pixel_ptr = line_pixel_ptr;
+        line_pixel_ptr = pixel_ptr;
         number_of_packets = MemReadU8(&pFlic_info->data);
         for (j = 0; j < number_of_packets; j++) {
             skip_count = MemReadU8(&pFlic_info->data);
             size_count = MemReadS8(&pFlic_info->data);
-            pixel_ptr += skip_count;
+            line_pixel_ptr += skip_count;
             if (size_count >= 0) {
                 for (k = 0; k < size_count; k++) {
-                    *pixel_ptr = *pFlic_info->data;
+                    *line_pixel_ptr = *pFlic_info->data;
                     pFlic_info->data++;
-                    pixel_ptr++;
+                    line_pixel_ptr++;
                 }
             } else {
                 the_byte = *pFlic_info->data;
                 pFlic_info->data++;
                 for (k = 0; k < -size_count; k++) {
-                    *pixel_ptr = the_byte;
-                    pixel_ptr++;
+                    *line_pixel_ptr = the_byte;
+                    line_pixel_ptr++;
                 }
             }
         }
-        line_pixel_ptr += the_row_bytes;
+        pixel_ptr += the_row_bytes;
     }
 }
 
