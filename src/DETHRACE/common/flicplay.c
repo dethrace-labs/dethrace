@@ -772,24 +772,22 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
             FatalError(kFatalError_LoadFlicFile_S, pFile_name);
         }
         total_size = GetFileLength(pFlic_info->f);
-        if (total_size >= 75000) {
-            pFlic_info->bytes_in_buffer = 75000;
-        } else {
+        if (total_size < 75000) {
             pFlic_info->bytes_in_buffer = total_size;
+        } else {
+            pFlic_info->bytes_in_buffer = 75000;
         }
         if (pFlic_info->data_start == NULL) {
             pFlic_info->data_start = BrMemAllocate(pFlic_info->bytes_in_buffer, kMem_flic_data);
         }
 
         pFlic_info->data = pFlic_info->data_start;
+        fread(pFlic_info->data, 1, pFlic_info->bytes_in_buffer, pFlic_info->f);
         strcpy(gLast_flic_name, pFile_name);
-        fread(pFlic_info->data_start, 1, pFlic_info->bytes_in_buffer, pFlic_info->f);
         pFlic_info->bytes_still_to_be_read = total_size - pFlic_info->bytes_in_buffer;
     } else {
-        pFlic_info->f = NULL;
         pFlic_info->data = (char*)pData_ptr;
-        // TODO: remove this - we added this line because of the padding hack in PlayNextFlicFrame2
-        pFlic_info->data_start = (char*)pData_ptr;
+        pFlic_info->f = NULL;
     }
     pFlic_info->bytes_remaining = MemReadU32(&pFlic_info->data);
     magic_number = MemReadU16(&pFlic_info->data);
@@ -813,19 +811,23 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     MemSkipBytes(&pFlic_info->data, 0x6e);
     pFlic_info->the_pixelmap = pDest_pixelmap;
 
-    if (pX_offset != -1) {
+    if (pX_offset == -1) {
+        if (pDest_pixelmap != NULL) {
+            pFlic_info->x_offset = (pDest_pixelmap->width - pFlic_info->width) / 2;
+        } else {
+            pFlic_info->x_offset = 0;
+        }
+    } else {
         pFlic_info->x_offset = pX_offset;
-    } else if (pDest_pixelmap != NULL) {
-        pFlic_info->x_offset = (pDest_pixelmap->width - pFlic_info->width) / 2;
-    } else {
-        pFlic_info->x_offset = 0;
     }
-    if (pY_offset != -1) {
-        pFlic_info->y_offset = pY_offset;
-    } else if (pDest_pixelmap != NULL) {
-        pFlic_info->y_offset = (pDest_pixelmap->height - pFlic_info->height) / 2;
+    if (pY_offset == -1) {
+        if (pDest_pixelmap != NULL) {
+            pFlic_info->y_offset = (pDest_pixelmap->height - pFlic_info->height) / 2;
+        } else {
+            pFlic_info->y_offset = 0;
+        }
     } else {
-        pFlic_info->y_offset = 0;
+        pFlic_info->y_offset = pY_offset;
     }
 
     if (pFrame_rate != 0) {
