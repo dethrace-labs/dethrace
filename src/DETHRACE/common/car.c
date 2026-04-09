@@ -3353,7 +3353,7 @@ void AddFrictionCarToCar(tCollision_info* car1, tCollision_info* car2, br_vector
         }
         BrVector3Cross(&tv, &tau1, pos1);
         BrVector3Cross(&tv2, &tau2, pos2);
-        ts = BrVector3Dot(&tv, &v_diff1) + BrVector3Dot(&tv2, &v_diff2) + 1.f / car2->M + 1.f / car1->M;
+        ts = BrVector3Dot(&tv, &v_diff1) + BrVector3Dot(&tv2, &v_diff2) + 1.0 / car2->M + 1.0 / car1->M;
         if (ts < 0.0001f) {
             BrVector3Set(max_friction, 0.f, 0.f, 0.f);
         } else {
