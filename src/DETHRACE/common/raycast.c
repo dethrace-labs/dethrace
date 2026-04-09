@@ -530,9 +530,6 @@ br_scalar FindYVerticallyBelow2(br_vector3* pCast_point) {
     br_vector3 cast_point;
 
     number_of_attempts = 0;
-#if 0
-    BrVector3Copy(&cast_point, pCast_point);
-#endif
     cast_point = *pCast_point;
     do {
         result = FindYVerticallyBelow(&cast_point);
