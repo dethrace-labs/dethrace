@@ -2705,14 +2705,13 @@ void InitAbuseomatic(void) {
         if (fgets(s, COUNT_OF(s) - 1, f) == NULL) {
             break;
         }
-        len = strlen(s);
-        if (len > 63) {
+        if (strlen(s) > 63) {
             s[63] = '\0';
         }
         len = strlen(s);
         while (len != 0 && s[len - 1] < ' ') {
-            s[len - 1] = '\0';
             len--;
+            s[len] = '\0';
         }
         gAbuse_text[i] = BrMemAllocate(strlen(s) + 1, kMem_abuse_text);
         strcpy(gAbuse_text[i], s);
