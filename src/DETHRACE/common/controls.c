@@ -2141,15 +2141,15 @@ void SetFlag2(int i) {
 // FUNCTION: CARM95 0x004a460c
 void ToggleFlying(void) {
 
-    if (gAllow_car_flying && gNet_mode == eNet_mode_none) {
-        gCar_flying = !gCar_flying;
-        if (gCar_flying) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_MEDIUMHD, "We have lift off!!");
-        } else {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_MEDIUMHD, "Back down to Earth");
-        }
-    } else {
+    if (!gAllow_car_flying || gNet_mode != eNet_mode_none) {
         gCar_flying = 0;
+        return;
+    }
+    gCar_flying = !gCar_flying;
+    if (gCar_flying) {
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_MEDIUMHD, "We have lift off!!");
+    } else {
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_MEDIUMHD, "Back down to Earth");
     }
 }
 
@@ -2348,10 +2348,15 @@ void CycleRoadTexturingLevel(void) {
     new_level = (GetRoadTexturingLevel() + 1) % 3;
     ReallySetRoadTexturingLevel(new_level);
     SetRoadTexturingLevel(new_level);
-    if (new_level == eRTL_none) {
+    switch (new_level) {
+    case eRTL_none:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_NoRoadTextures));
-    } else if (new_level == eRTL_full) {
+        break;
+    case eRTL_full:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_RoadTextures));
+        break;
+
+        DETHRACE_DEFAULT_BREAK;
     }
 }
 
@@ -2429,9 +2434,10 @@ void CycleCarSimplificationLevel(void) {
     char* src;
     char* dst;
 
-    gCar_simplification_level = (gCar_simplification_level + 1) % 5;
+    gCar_simplification_level++;
+    gCar_simplification_level = gCar_simplification_level % 5u;
     src = GetMiscString(kMiscString_CarSimplificationLevel_D);
-    dst = BrMemAllocate(strlen(src), kMem_simp_level);
+    dst = BrMemAllocate(strlen(src) + 21, kMem_simp_level);
     sprintf(dst, src, gCar_simplification_level);
     NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, dst);
     BrMemFree(dst);
@@ -2645,8 +2651,8 @@ void DisplayUserMessage(void) {
     int len;
     tDR_font* font;
 
-    font = &gFonts[FONT_NEWHITE];
     the_message = &gString[20];
+    font = &gFonts[FONT_NEWHITE];
     if (!gEntering_message || gNet_mode == eNet_mode_none) {
         return;
     }
@@ -2663,7 +2669,7 @@ void DisplayUserMessage(void) {
         gCurrent_graf_data->net_message_enter_y + 6 * font->height,
         1);
 
-    TransDRPixelmapText(gBack_screen, 20 * gBack_screen->width / 100, gCurrent_graf_data->net_message_enter_y, font, GetMiscString(kMiscString_ENTER_MESSAGE), 100);
+    TransDRPixelmapText(gBack_screen, 20 * gBack_screen->width / 100, gCurrent_graf_data->net_message_enter_y, &gFonts[FONT_NEWHITE], GetMiscString(kMiscString_ENTER_MESSAGE), 100);
     OoerrIveGotTextInMeBoxMissus(
         FONT_NEWHITE,
         the_message,
