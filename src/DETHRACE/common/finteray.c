@@ -533,9 +533,7 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
         return;
     }
     *rt = t;
-    normal->v[0] = pFace->normal.v[0];
-    normal->v[1] = pFace->normal.v[1];
-    normal->v[2] = pFace->normal.v[2];
+    BrVector3Copy(normal, &pFace->normal);
     if (d > 0.0f) {
         BrVector3Negate(normal, normal);
     }
