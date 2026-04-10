@@ -139,9 +139,7 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
             memcpy(&gMr_blendy->model->faces[gMr_blendy->model->nfaces], face, sizeof(br_face));
             gMr_blendy->model->nfaces++;
             if (i < (pModel->nfaces - 1)) {
-                // this is a memcpy call in the original code. Cannot figure out how to make it not be replaced with
-                // intrinsic memcpy
-                memmove(pModel->faces + i, pModel->faces + i + 1, (pModel->nfaces - i - 1) * sizeof(br_face));
+                ((void*(__cdecl*)(void*, const void*, size_t))memcpy)(pModel->faces + i, pModel->faces + i + 1, (pModel->nfaces - i - 1) * sizeof(br_face));
             }
             pModel->nfaces--;
             changed_one = 1;
