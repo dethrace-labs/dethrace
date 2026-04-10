@@ -1830,6 +1830,10 @@ int AlreadyBlended(br_material* pMaterial) {
 void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
     char* s;
 
+#ifdef DETHRACE_FIX_BUGS
+    s = NULL;
+#endif
+
     switch (pPercent) {
     case 25:
         s = "BLEND75.TAB";
