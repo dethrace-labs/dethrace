@@ -162,19 +162,30 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
         pPosition = &pos;
         pDir = &dir;
     }
-    if (ap->type == BR_ACTOR_MODEL) {
+    switch (ap->type) {
+    case BR_ACTOR_MODEL:
         if (PickBoundsTestRay__finteray(&this_model->bounds, pPosition, pDir, t_near, t_far, &t_near, &t_far)) {
             t_near = 0.0;
             t_far = MIN(1.f, gNearest_T);
             r = callback(ap, this_model, this_material, pPosition, pDir, t_near, t_far, arg);
             if (r) {
-                return r;
+                break;
             }
         }
         if (r) {
-            return r;
+            break;
         }
-    } else if (ap->type >= BR_ACTOR_BOUNDS && ap->type <= BR_ACTOR_BOUNDS_CORRECT) {
+        /* fall through */
+    default:
+        for (a = ap->children; a != NULL; a = a->next) {
+            r = ActorRayPick2D(a, pPosition, pDir, this_model, this_material, callback);
+            if (r) {
+                break;
+            }
+        }
+        break;
+    case BR_ACTOR_BOUNDS:
+    case BR_ACTOR_BOUNDS_CORRECT:
         if (PickBoundsTestRay__finteray((br_bounds*)ap->type_data, pPosition, pDir, t_near, t_far, &t_near, &t_far)) {
             for (a = ap->children; a != NULL; a = a->next) {
                 r = ActorRayPick2D(a, pPosition, pDir, this_model, this_material, callback);
@@ -183,13 +194,7 @@ int ActorRayPick2D(br_actor* ap, br_vector3* pPosition, br_vector3* pDir, br_mod
                 }
             }
         }
-        return r;
-    }
-    for (a = ap->children; a != NULL; a = a->next) {
-        r = ActorRayPick2D(a, pPosition, pDir, this_model, this_material, callback);
-        if (r) {
-            break;
-        }
+        break;
     }
     return r;
 }
