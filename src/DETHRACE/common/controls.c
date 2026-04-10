@@ -591,27 +591,28 @@ void F4Key(void) {
     tEdit_mode old_edit_mode;
 
     old_edit_mode = gWhich_edit_mode;
-    if (gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none)) {
-        if (PDKeyDown(KEY_SHIFT_ANY)) {
-            gWhich_edit_mode--;
-            if ((int)gWhich_edit_mode < 0) {
-                gWhich_edit_mode = COUNT_OF(gEdit_funcs) - 1;
-            }
+    if (gI_am_cheating != 0xa11ee75d && (gI_am_cheating != 0x564e78b9 || gNet_mode != eNet_mode_none)) {
+        gWhich_edit_mode = eEdit_mode_options;
+        return;
+    }
+    if (PDKeyDown(KEY_SHIFT_ANY)) {
+        if (gWhich_edit_mode == 0) {
+            gWhich_edit_mode = COUNT_OF(gEdit_funcs) - 1;
         } else {
-            gWhich_edit_mode++;
-            if (gWhich_edit_mode >= COUNT_OF(gEdit_funcs)) {
-                gWhich_edit_mode = 0;
-            }
-        }
-        sprintf(s, "Edit mode: %s", gEdit_mode_names[gWhich_edit_mode]);
-        NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s, 0);
-        if (gWhich_edit_mode == eEdit_mode_spec_vol && old_edit_mode != eEdit_mode_spec_vol) {
-            ShowSpecialVolumes();
-        } else if (gWhich_edit_mode != eEdit_mode_spec_vol && old_edit_mode == eEdit_mode_spec_vol) {
-            HideSpecialVolumes();
+            gWhich_edit_mode--;
         }
     } else {
-        gWhich_edit_mode = eEdit_mode_options;
+        gWhich_edit_mode++;
+        if (gWhich_edit_mode >= COUNT_OF(gEdit_funcs)) {
+            gWhich_edit_mode = 0;
+        }
+    }
+    sprintf(s, "Edit mode: %s", gEdit_mode_names[gWhich_edit_mode]);
+    NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s, 0);
+    if (gWhich_edit_mode == eEdit_mode_spec_vol && old_edit_mode != eEdit_mode_spec_vol) {
+        ShowSpecialVolumes();
+    } else if (gWhich_edit_mode != eEdit_mode_spec_vol && old_edit_mode == eEdit_mode_spec_vol) {
+        HideSpecialVolumes();
     }
 }
 
@@ -656,22 +657,22 @@ void ShowSpecialVolumesIfRequ(void) {
 void DoEditModeKey(int pIndex) {
     int modifiers;
 
-    if (gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none)) {
-        modifiers = 0;
-        if (PDKeyDown(KEY_SHIFT_ANY)) {
-            modifiers |= 4;
+    if (gI_am_cheating != 0xa11ee75d) {
+        if (gI_am_cheating != 0x564e78b9 || gNet_mode != eNet_mode_none) {
+            gWhich_edit_mode = eEdit_mode_options;
+            return;
         }
-        if (PDKeyDown(KEY_ALT_ANY)) {
-            modifiers |= 2;
-        }
-        if (PDKeyDown(KEY_CTRL_ANY)) {
-            modifiers |= 1;
-        }
-        if (gEdit_funcs[gWhich_edit_mode][pIndex][modifiers] != NULL) {
-            gEdit_funcs[gWhich_edit_mode][pIndex][modifiers]();
-        }
+    }
+
+    if (PDKeyDown(KEY_SHIFT_ANY)) {
+        modifiers = 4;
     } else {
-        gWhich_edit_mode = eEdit_mode_options;
+        modifiers = 0;
+    }
+    modifiers = PDKeyDown(KEY_ALT_ANY) ? modifiers | 2 : modifiers;
+    modifiers = PDKeyDown(KEY_CTRL_ANY) ? modifiers | 1 : modifiers;
+    if (gEdit_funcs[gWhich_edit_mode][pIndex][modifiers] != NULL) {
+        (*gEdit_funcs[gWhich_edit_mode][pIndex][modifiers])();
     }
 }
 
@@ -1223,41 +1224,36 @@ int CarWorldOffFallenCheckThingy(tCar_spec* pCar, int pCheck_around) {
     br_vector3 offset_w;
     int result;
 
-    if (pCar->number_of_wheels_on_ground != 0) {
-        return 0;
+    if (pCar->number_of_wheels_on_ground == 0) {
+        if (!gCar_flying || pCar->driver != eDriver_local_human) {
+            if (!gAction_replay_mode) {
+                BrVector3Copy(&car_pos, &pCar->car_master_actor->t.t.translate.t);
+                car_pos.v[1] += 0.5f;
+                if (FindYVerticallyBelow2(&car_pos) < -100.f) {
+                    BrVector3Set(&offset_c, 0.f, 1.f, 0.f);
+                    BrMatrix34ApplyV(&offset_w, &offset_c, &pCar->car_master_actor->t.t.mat);
+                    BrVector3Add(&car_pos, &pCar->car_master_actor->t.t.translate.t, &offset_w);
+                    if (FindYVerticallyBelow2(&car_pos) < -100.f) {
+                        if (pCheck_around) {
+                            pCar->car_master_actor->t.t.translate.t.v[0] += 0.05f;
+                            result = CarWorldOffFallenCheckThingy(pCar, 0);
+                            pCar->car_master_actor->t.t.translate.t.v[0] -= 0.05f;
+                            if (!result) {
+                                return 0;
+                            }
+                            pCar->car_master_actor->t.t.translate.t.v[2] += 0.05f;
+                            result = CarWorldOffFallenCheckThingy(pCar, 0);
+                            pCar->car_master_actor->t.t.translate.t.v[2] -= 0.05f;
+                            return result;
+                        } else {
+                            return 1;
+                        }
+                    }
+                }
+            }
+        }
     }
-    if (pCar->driver == eDriver_local_human && gCar_flying) {
-        return 0;
-    }
-    if (gAction_replay_mode) {
-        return 0;
-    }
-    BrVector3Copy(&car_pos, &pCar->car_master_actor->t.t.translate.t);
-    if (FindYVerticallyBelow2(&car_pos) >= -100.f) {
-        return 0;
-    }
-    BrVector3Set(&offset_c, 0.f, 1.f, 0.f);
-    BrMatrix34ApplyV(&offset_w, &offset_c, &pCar->car_master_actor->t.t.mat);
-    if (FindYVerticallyBelow2(&car_pos) >= -100.f) {
-        // FIXME: testing twice using `FindYVerticallyBelow2' is meaningless
-        return 0;
-    }
-    if (!pCheck_around) {
-        return 1;
-    }
-    pCar->car_master_actor->t.t.translate.t.v[0] += 0.05f;
-    result = CarWorldOffFallenCheckThingy(pCar, 0);
-    pCar->car_master_actor->t.t.translate.t.v[0] -= 0.05f;
-    if (!result) {
-        return 0;
-    }
-    pCar->car_master_actor->t.t.translate.t.v[2] += 0.05f;
-    result = CarWorldOffFallenCheckThingy(pCar, 0);
-    pCar->car_master_actor->t.t.translate.t.v[2] -= 0.05f;
-    if (!result) {
-        return 0;
-    }
-    return 1;
+    return 0;
 }
 
 // IDA: int __usercall HasCarFallenOffWorld@<EAX>(tCar_spec *pCar@<EAX>)
@@ -1308,7 +1304,7 @@ void CheckHornLocal(tCar_spec* pCar) {
     if (pCar->keys.horn == 1 && pCar->horn_sound_tag == 0) {
         pCar->horn_sound_tag = DRS3StartSound(gEffects_outlet, 5209);
     } else if (pCar->keys.horn == 0 && pCar->horn_sound_tag != 0) {
-        if (S3SoundStillPlaying(pCar->horn_sound_tag) != 0) {
+        while (S3SoundStillPlaying(pCar->horn_sound_tag) != 0) {
             DRS3StopSound(pCar->horn_sound_tag);
             DRS3StopOutletSound(gEffects_outlet);
         }
@@ -1432,10 +1428,11 @@ void CheckMapRenderMove(void) {
     float old_x;
     float old_y;
 
-    old_y = gMap_render_y;
     old_x = gMap_render_x;
+    old_y = gMap_render_y;
     if (gMap_mode) {
-        amount = gFrame_period * .1f;
+        amount = gFrame_period * .1;
+        shift_down = KeyIsDown(KEYMAP_SHIFT_ANY);
         if (KeyIsDown(KEYMAP_MOVE_UP)) {
             gMap_render_y -= amount;
         } else if (KeyIsDown(KEYMAP_MOVE_DOWN)) {
@@ -1446,39 +1443,40 @@ void CheckMapRenderMove(void) {
         } else if (KeyIsDown(KEYMAP_MOVE_RIGHT)) {
             gMap_render_x += amount;
         }
-        if (gMap_render_x != old_x || gMap_render_y != old_y) {
-            SetIntegerMapRenders();
-            if (gMap_render_x_i < gCurrent_graf_data->map_render_x_marg) {
-                if (gReal_graf_data_index == 0) {
-                    gMap_render_x = (gCurrent_graf_data->map_render_x_marg + 3) & ~3;
-                } else {
-                    gMap_render_x = ((gCurrent_graf_data->map_render_x_marg + 3) & ~3) / 2;
-                }
-            }
-            if (gMap_render_y_i < gCurrent_graf_data->map_render_y_marg) {
-                if (gReal_graf_data_index == 0) {
-                    gMap_render_y = (gCurrent_graf_data->map_render_y_marg + 1) & ~1;
-                } else {
-                    gMap_render_y = (((gCurrent_graf_data->map_render_y_marg + 1) & ~1) - 40) / 2;
-                }
-            }
-            if (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i < gMap_render_x_i) {
-                if (gReal_graf_data_index == 0) {
-                    gMap_render_x = (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3;
-                } else {
-                    gMap_render_x = ((gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3) / 2;
-                }
-            }
-            if (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i < gMap_render_y_i) {
-                if (gReal_graf_data_index == 0) {
-                    gMap_render_y = (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~1;
-                } else {
-                    gMap_render_y = (((gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~3) - 40) / 2;
-                }
-            }
-            SetIntegerMapRenders();
-            AdjustRenderScreenSize();
+        if (gMap_render_x == old_x && old_y == gMap_render_y) {
+            return;
         }
+        SetIntegerMapRenders();
+        if (gMap_render_x_i < gCurrent_graf_data->map_render_x_marg) {
+            if (gReal_graf_data_index != 0) {
+                gMap_render_x = ((gCurrent_graf_data->map_render_x_marg + 3) & ~3) / 2;
+            } else {
+                gMap_render_x = (gCurrent_graf_data->map_render_x_marg + 3) & ~3;
+            }
+        }
+        if (gMap_render_y_i < gCurrent_graf_data->map_render_y_marg) {
+            if (gReal_graf_data_index != 0) {
+                gMap_render_y = (((gCurrent_graf_data->map_render_y_marg + 1) & ~1) - 40) / 2;
+            } else {
+                gMap_render_y = (gCurrent_graf_data->map_render_y_marg + 1) & ~1;
+            }
+        }
+        if (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i < gMap_render_x_i) {
+            if (gReal_graf_data_index != 0) {
+                gMap_render_x = ((gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3) / 2;
+            } else {
+                gMap_render_x = (gBack_screen->width - gCurrent_graf_data->map_render_x_marg - gMap_render_width_i) & ~3;
+            }
+        }
+        if (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i < gMap_render_y_i) {
+            if (gReal_graf_data_index != 0) {
+                gMap_render_y = (((gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~1) - 40) / 2;
+            } else {
+                gMap_render_y = (gBack_screen->height - gCurrent_graf_data->map_render_y_marg - gMap_render_height_i) & ~1;
+            }
+        }
+        SetIntegerMapRenders();
+        AdjustRenderScreenSize();
     }
 }
 
@@ -1489,15 +1487,14 @@ void ExplodeCar(tCar_spec* pCar) {
     br_vector3 pos;
 
     pCar->last_car_car_collision = 0;
-    pos.v[0] = .1449275f * pCar->cmpos.v[0];
-    pos.v[1] = .1449275f * pCar->cmpos.v[1];
-    pos.v[2] = pCar->bounds[0].min.v[2] + .3f * (pCar->bounds[0].max.v[2] - pCar->bounds[0].min.v[2]);
-    BrMatrix34ApplyP(&tv, &pos, &pCar->car_master_actor->t.t.mat);
-    CreatePuffOfSmoke(&tv, &pCar->v, 1.f, 1.f, 7, pCar);
+    BrVector3Scale(&tv, &pCar->cmpos, .14492753f);
+    tv.v[2] = pCar->bounds[0].min.v[2] + .3 * (pCar->bounds[0].max.v[2] - pCar->bounds[0].min.v[2]);
+    BrMatrix34ApplyP(&pos, &tv, &pCar->car_master_actor->t.t.mat);
+    CreatePuffOfSmoke(&pos, &pCar->v, 1.f, 1.f, 7, pCar);
 
-    pos.v[2] = pCar->bounds[0].min.v[2] + .7f * (pCar->bounds[0].max.v[2] - pCar->bounds[0].min.v[2]);
-    BrMatrix34ApplyP(&tv, &pos, &pCar->car_master_actor->t.t.mat);
-    CreatePuffOfSmoke(&tv, &pCar->v, 1.f, 1.f, 7, pCar);
+    tv.v[2] = pCar->bounds[0].min.v[2] + .7 * (pCar->bounds[0].max.v[2] - pCar->bounds[0].min.v[2]);
+    BrMatrix34ApplyP(&pos, &tv, &pCar->car_master_actor->t.t.mat);
+    CreatePuffOfSmoke(&pos, &pCar->v, 1.f, 1.f, 7, pCar);
 
     DisableCar(pCar);
 }
@@ -1743,9 +1740,7 @@ void SortOutRecover(tCar_spec* pCar) {
         gPalette_fade_time = 0;
         old_time = 0;
     }
-    if (the_time < 500) {
-        val = 256 - (the_time * 256) / 500;
-    } else {
+    if (the_time >= 500) {
         if (old_time < 500) {
             FlipUpCar(pCar);
             PipeSingleSpecial(ePipe_special_fade);
@@ -1758,10 +1753,10 @@ void SortOutRecover(tCar_spec* pCar) {
             old_time = 0;
             pCar->doing_nothing_flag = 0;
         }
+    } else {
+        val = 256 - (the_time * 256) / 500;
     }
-    if (val <= 0) {
-        val = 0;
-    }
+    val = val > 0 ? val : 0;
     SetFadedPalette(val);
     old_time = the_time;
 }
@@ -1770,13 +1765,13 @@ void SortOutRecover(tCar_spec* pCar) {
 // FUNCTION: CARM95 0x004a22f4
 void SetFlipUpCar(tCar_spec* pCar) {
 
-    if (gNet_mode != eNet_mode_none && pCar->driver == eDriver_local_human) {
-        DisableCar(pCar);
-        gPalette_fade_time = GetRaceTime();
-        NetPlayerStatusChanged(ePlayer_status_recovering);
-    } else {
+    if (gNet_mode == eNet_mode_none || pCar->driver != eDriver_local_human) {
         FlipUpCar(pCar);
+        return;
     }
+    DisableCar(pCar);
+    gPalette_fade_time = GetRaceTime();
+    NetPlayerStatusChanged(ePlayer_status_recovering);
 }
 
 // IDA: void __usercall FlipUpCar(tCar_spec *car@<EAX>)

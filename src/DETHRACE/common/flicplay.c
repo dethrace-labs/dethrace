@@ -1040,35 +1040,32 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     tU8 blue;
 
     current_colour = 0;
-    palette_pixels = gPalette_pixels;
 
     packet_count = MemReadU16(&pFlic_info->data);
     for (i = 0; i < packet_count; i++) {
         skip_count = MemReadU8(&pFlic_info->data);
         change_count = MemReadU8(&pFlic_info->data);
-        if (!change_count) {
+        if (change_count != 0) {
             change_count = 256;
         }
-        palette_pixels += skip_count * sizeof(br_int_32);
         current_colour += skip_count;
+        palette_pixels = (tU8*)gPalette_pixels + current_colour * sizeof(br_int_32);
         for (j = 0; j < change_count; j++) {
             red = MemReadU8(&pFlic_info->data);
-            blue = MemReadU8(&pFlic_info->data);
             green = MemReadU8(&pFlic_info->data);
+            blue = MemReadU8(&pFlic_info->data);
             // argb
 #if BR_ENDIAN_BIG
-            palette_pixels[3] = green;
-            palette_pixels[2] = blue;
-            palette_pixels[1] = red;
-            palette_pixels[0] = 0;
+            *palette_pixels++ = 0;
+            *palette_pixels++ = red;
+            *palette_pixels++ = green;
+            *palette_pixels++ = blue;
 #else
-            palette_pixels[0] = green;
-            palette_pixels[1] = blue;
-            palette_pixels[2] = red;
-            palette_pixels[3] = 0;
+            *palette_pixels++ = blue;
+            *palette_pixels++ = green;
+            *palette_pixels++ = red;
+            *palette_pixels++ = 0;
 #endif
-            palette_pixels += 4;
-            // LOG_DEBUG("color %d", current_colour);
         }
         if (!gPalette_fuck_prevention) {
             DRSetPaletteEntries(gPalette, current_colour, change_count);
