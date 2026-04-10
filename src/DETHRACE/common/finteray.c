@@ -205,7 +205,7 @@ int DRSceneRayPick2D(br_actor* world, br_vector3* pPosition, br_vector3* pDir, d
 
     BrMatrix34Inverse(&gPick_model_to_view__finteray, &world->t.t.mat);
     // LOG_WARN_ONCE("Missing material and model pointers to ActorRayPick2D");
-    return ActorRayPick2D(world, pPosition, pDir, NULL, NULL, callback);
+    return ActorRayPick2D(world, pPosition, pDir, model_unk1, material_unk1, callback);
 }
 
 // IDA: int __usercall DRModelPick2D@<EAX>(br_model *model@<EAX>, br_material *material@<EDX>, br_vector3 *ray_pos@<EBX>, br_vector3 *ray_dir@<ECX>, br_scalar t_near, br_scalar t_far, dr_modelpick2d_cbfn *callback, void *arg)
