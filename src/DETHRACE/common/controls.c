@@ -2147,15 +2147,15 @@ void SetFlag2(int i) {
 // FUNCTION: CARM95 0x004a460c
 void ToggleFlying(void) {
 
-    if (gAllow_car_flying && gNet_mode == eNet_mode_none) {
-        gCar_flying = !gCar_flying;
-        if (gCar_flying) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_MEDIUMHD, "We have lift off!!");
-        } else {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_MEDIUMHD, "Back down to Earth");
-        }
-    } else {
+    if (!gAllow_car_flying || gNet_mode != eNet_mode_none) {
         gCar_flying = 0;
+        return;
+    }
+    gCar_flying = !gCar_flying;
+    if (gCar_flying) {
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_MEDIUMHD, "We have lift off!!");
+    } else {
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 500, -kFont_MEDIUMHD, "Back down to Earth");
     }
 }
 
