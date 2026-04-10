@@ -1578,7 +1578,7 @@ void ShowFlic(int pIndex) {
             gMain_flic_list[pIndex].interruptable,
             gMain_flic_list[pIndex].frame_rate);
     } while (gMain_flic_list[pIndex].repeat && !AnyKeyDown());
-    gLast_flic_name[0] = *""; // byte_10344C;
+    strcpy(gLast_flic_name, "");
 }
 
 // IDA: void __cdecl InitFlics()
@@ -2152,7 +2152,6 @@ void LoadInterfaceStrings(void) {
         fclose(f);
 #endif
     }
-
 }
 
 // IDA: void __cdecl FlushInterfaceFonts()
