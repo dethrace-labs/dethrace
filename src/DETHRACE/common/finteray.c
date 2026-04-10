@@ -745,22 +745,30 @@ int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
     int i;
     int j;
 
-    a.v[0] = (bnds->original_bounds.min.v[0] + bnds->original_bounds.max.v[0]) * .5f;
-    a.v[1] = (bnds->original_bounds.min.v[1] + bnds->original_bounds.max.v[1]) * .5f;
-    a.v[2] = (bnds->original_bounds.min.v[2] + bnds->original_bounds.max.v[2]) * .5f;
+    b.v[0] = bnds->original_bounds.min.v[0] + bnds->original_bounds.max.v[0];
+    b.v[1] = bnds->original_bounds.min.v[1] + bnds->original_bounds.max.v[1];
+    b.v[2] = bnds->original_bounds.min.v[2] + bnds->original_bounds.max.v[2];
+    a.v[0] = b.v[0] * 0.5f;
+    a.v[1] = b.v[1] * 0.5f;
+    a.v[2] = b.v[2] * 0.5f;
     BrMatrix34ApplyP(&bnds->box_centre, &a, bnds->mat);
-    BrVector3Sub(&b, &bnds->original_bounds.max, &bnds->original_bounds.min);
-    bnds->radius = BrVector3Length(&b) / 2.f;
+    BrVector3Sub(&a, &bnds->original_bounds.max, &bnds->original_bounds.min);
+    bnds->radius = BrVector3Length(&a) / 2.f;
     BrMatrix34ApplyP(&bnds->real_bounds.min, &bnds->original_bounds.min, bnds->mat);
     BrVector3Copy(&bnds->real_bounds.max, &bnds->real_bounds.min);
-    for (i = 0; i < 3; i++) {
-        BrVector3Scale(&c[i], (br_vector3*)bnds->mat->m[i], b.v[i]);
+    for (j = 0; j < 3; j++) {
+        BrVector3Scale(&c[j], (br_vector3*)&bnds->mat->m[j][0], a.v[j]);
     }
-    for (i = 0; i < 3; i++) {
-        bnds->real_bounds.min.v[i] += MIN(0.f, c[0].v[i]) + MIN(0.f, c[1].v[i]) + MIN(0.f, c[2].v[i]);
-        bnds->real_bounds.max.v[i] += MAX(0.f, c[0].v[i]) + MAX(0.f, c[1].v[i]) + MAX(0.f, c[2].v[i]);
+    for (j = 0; j < 3; j++) {
+        bnds->real_bounds.min.v[j] += ((float)(c[2].v[j] < 0.f) * c[2].v[j]
+            + (float)(c[0].v[j] < 0.f) * c[0].v[j])
+            + (float)(c[1].v[j] < 0.f) * c[1].v[j];
+        bnds->real_bounds.max.v[j] += ((float)(c[2].v[j] > 0.f) * c[2].v[j]
+            + (float)(c[0].v[j] > 0.f) * c[0].v[j])
+            + (float)(c[1].v[j] > 0.f) * c[1].v[j];
     }
-    return max_face - ActorBoxPick(bnds, gTrack_actor, model_unk1, material_unk1, face_list, max_face, NULL);
+    i = ActorBoxPick(bnds, gTrack_actor, model_unk1, material_unk1, face_list, max_face, NULL);
+    return max_face - i;
 }
 
 // IDA: int __usercall ActorBoxPick@<EAX>(tBounds *bnds@<EAX>, br_actor *ap@<EDX>, br_model *model@<EBX>, br_material *material@<ECX>, tFace_ref *face_list, int max_face, br_matrix34 *pMat)
