@@ -2354,10 +2354,13 @@ void CycleRoadTexturingLevel(void) {
     new_level = (GetRoadTexturingLevel() + 1) % 3;
     ReallySetRoadTexturingLevel(new_level);
     SetRoadTexturingLevel(new_level);
-    if (new_level == eRTL_none) {
+    switch (new_level) {
+    case eRTL_none:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_NoRoadTextures));
-    } else if (new_level == eRTL_full) {
+        break;
+    case eRTL_full:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_RoadTextures));
+        break;
     }
 }
 
