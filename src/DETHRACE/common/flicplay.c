@@ -1843,8 +1843,9 @@ void FlushFlicQueue(void) {
     }
     the_flic = gFirst_flic;
     while (the_flic != NULL) {
+        old_flic = the_flic;
         EndFlic(the_flic);
-        the_flic = (old_flic = the_flic, old_flic->next);
+        the_flic = old_flic->next;
         BrMemFree(old_flic);
     }
     gFirst_flic = NULL;
@@ -2151,7 +2152,6 @@ void LoadInterfaceStrings(void) {
         fclose(f);
 #endif
     }
-
 }
 
 // IDA: void __cdecl FlushInterfaceFonts()
