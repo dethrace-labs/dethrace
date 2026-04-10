@@ -573,8 +573,6 @@ int gInstant_handbrake;
 // GLOBAL: CARM95 0x00550554
 int gAuto_repair;
 
-int _unittest_controls_lastGetPowerup = 0;
-
 // IDA: void __cdecl AbortRace()
 // FUNCTION: CARM95 0x004a0c70
 void AbortRace(void) {
@@ -1883,10 +1881,6 @@ void FlipUpCar(tCar_spec* car) {
 // IDA: void __usercall GetPowerup(int pNum@<EAX>)
 // FUNCTION: CARM95 0x004a291d
 void GetPowerup(int pNum) {
-
-    // FIXME: remove unittest variables from dethrace
-    _unittest_controls_lastGetPowerup = pNum;
-
     GotPowerup(&gProgram_state.current_car, pNum);
 }
 
