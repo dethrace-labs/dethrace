@@ -1132,7 +1132,12 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
                     if (the_byte && the_byte2) {
                         the_word = *((tU16*)pFlic_info->data - 1);
                         for (k = 0; k < -size_count; k++) {
+#ifdef DETHRACE_FIX_BUGS
+                            // Avoid unaligned memory access
+                            memcpy(line_pixel_ptr, &the_word, 2);
+#else
                             *line_pixel_ptr = the_word;
+#endif
                             line_pixel_ptr++;
                         }
                     } else {
