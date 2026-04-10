@@ -639,9 +639,7 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
                 continue;
             }
             rt[i] = t[i];
-            normal->v[0] = pFace->normal.v[0];
-            normal->v[1] = pFace->normal.v[1];
-            normal->v[2] = pFace->normal.v[2];
+            BrVector3Copy(normal, &pFace->normal);
             if (d > 0.0f) {
                 normal->v[0] = -pFace->normal.v[0];
                 normal->v[1] = -pFace->normal.v[1];
