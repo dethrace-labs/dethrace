@@ -507,7 +507,7 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
             }
             if (beta >= -0.0001 && alpha >= -0.0001 && alpha + beta <= 1.0001) {
                 *rt = t;
-                *normal = pFace->normal;
+                BrVector3Copy(normal, &pFace->normal);
                 if (d > 0.0) {
                     BrVector3Negate(normal, normal);
                 }
@@ -597,11 +597,9 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
                         LABEL_43:
                             if (f_d >= -0.0001 && alpha >= -0.0001 && alpha + f_d <= 1.0001) {
                                 rt[i] = t[i];
-                                *normal = pFace->normal;
+                                BrVector3Copy(normal, &pFace->normal);
                                 if (d > 0.0) {
-                                    normal->v[0] = -pFace->normal.v[0];
-                                    normal->v[1] = -pFace->normal.v[1];
-                                    normal->v[2] = -pFace->normal.v[2];
+                                    BrVector3Negate(normal, normal);
                                 }
                             }
                         }
