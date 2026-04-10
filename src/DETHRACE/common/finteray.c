@@ -452,67 +452,92 @@ void CheckSingleFace(tFace_ref* pFace, br_vector3* ray_pos, br_vector3* ray_dir,
     *rt = 100.0;
 
     d = pFace->normal.v[1] * ray_dir->v[1] + ray_dir->v[2] * pFace->normal.v[2] + ray_dir->v[0] * pFace->normal.v[0];
-    if ((this_material == NULL || (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) != 0 || d <= 0.0)
-        && (!this_material || !this_material->identifier || *this_material->identifier != '!' || !gPling_materials)
-        && fabs(d) >= 0.00000023841858) {
-        BrVector3Sub(&p, ray_pos, &pFace->v[0]);
-        numerator = BrVector3Dot(&pFace->normal, &p);
-        if (!BadDiv__finteray(numerator, d)) {
-            if (d > 0.0) {
-                if (-numerator < -0.001 || -numerator > d + 0.003) {
-                    return;
-                }
-            } else if (numerator < -0.001 || 0.003 - d < numerator) {
-                return;
-            }
-            t = -(numerator / d);
-            if (t > 1.0) {
-                t = 1.0;
-            }
-            BrVector3Scale(&tv, ray_dir, t);
-            BrVector3Accumulate(&tv, ray_pos);
-            axis_m = fabs(pFace->normal.v[0]) < fabs(pFace->normal.v[1]);
-            if (fabs(pFace->normal.v[2]) > fabs(pFace->normal.v[axis_m])) {
-                axis_m = 2;
-            }
-            if (axis_m) {
-                axis_0 = 0;
-                if (axis_m == 1) {
-                    axis_1 = 2;
-                } else {
-                    axis_1 = 1;
-                }
-            } else {
-                axis_0 = 1;
-                axis_1 = 2;
-            }
-            v0i1 = pFace->v[0].v[axis_0];
-            v0i2 = pFace->v[0].v[axis_1];
-            u0 = pFace->v[1].v[axis_0] - v0i1;
-            u1 = pFace->v[1].v[axis_1] - v0i2;
-            v0 = pFace->v[2].v[axis_0] - v0i1;
-            v1 = pFace->v[2].v[axis_1] - v0i2;
-            u2 = tv.v[axis_0] - v0i1;
-            v2 = tv.v[axis_1] - v0i2;
-            if (fabs(u0) > 0.0000002384185791015625) {
-                f_d = v1 * u0 - u1 * v0;
-                if (f_d == 0) {
-                    return;
-                }
-                alpha = (v2 * u0 - u1 * u2) / f_d;
-                beta = (u2 - alpha * v0) / u0;
-            } else {
-                alpha = u2 / v0;
-                beta = (v2 - alpha * v1) / u1;
-            }
-            if (beta >= -0.0001 && alpha >= -0.0001 && alpha + beta <= 1.0001) {
-                *rt = t;
-                *normal = pFace->normal;
-                if (d > 0.0) {
-                    BrVector3Negate(normal, normal);
-                }
-            }
+    if (this_material != NULL && (this_material->flags & (BR_MATF_TWO_SIDED | BR_MATF_ALWAYS_VISIBLE)) == 0 && d > 0.0f) {
+        return;
+    }
+    if (this_material != NULL && this_material->identifier != NULL && *this_material->identifier == '!' && gPling_materials) {
+        return;
+    }
+    if ((float)fabs(d) < 0.00000023841858f) {
+        return;
+    }
+
+    BrVector3Sub(&tv, ray_pos, &pFace->v[0]);
+    numerator = BrVector3Dot(&pFace->normal, &tv);
+    if (BadDiv__finteray(numerator, d)) {
+        return;
+    }
+
+    if (d <= 0.0f) {
+        if (numerator < -0.001 || numerator > -d + 0.003) {
+            return;
         }
+    } else {
+        if (-numerator < -0.001 || -numerator > d + 0.003) {
+            return;
+        }
+    }
+    t = -(numerator / d);
+    if (t > 1.0f) {
+        t = 1.0f;
+    }
+
+    BrVector3Scale(&p, ray_dir, t);
+    BrVector3Accumulate(&p, ray_pos);
+
+    axis_m = 0;
+    if (fabs(pFace->normal.v[0]) < fabs(pFace->normal.v[1])) {
+        axis_m = 1;
+    }
+    if (fabs(pFace->normal.v[2]) > fabs(pFace->normal.v[axis_m])) {
+        axis_m = 2;
+    }
+    switch (axis_m) {
+    case 0:
+        axis_0 = 1;
+        axis_1 = 2;
+        break;
+    case 1:
+        axis_0 = 0;
+        axis_1 = 2;
+        break;
+    case 2:
+        axis_0 = 0;
+        axis_1 = 1;
+        break;
+    }
+
+    v0i1 = pFace->v[0].v[axis_0];
+    v0i2 = pFace->v[0].v[axis_1];
+    u1 = pFace->v[1].v[axis_0] - v0i1;
+    v1 = pFace->v[1].v[axis_1] - v0i2;
+    u2 = pFace->v[2].v[axis_0] - v0i1;
+    v2 = pFace->v[2].v[axis_1] - v0i2;
+    u0 = p.v[axis_0] - v0i1;
+    v0 = p.v[axis_1] - v0i2;
+    if (fabs(u1) <= 0.0000002384185791015625) {
+        beta = u0 / u2;
+        f_numerator = v0 - v2 * beta;
+        alpha = f_numerator / v1;
+    } else {
+        f_n = v0 * u1 - u0 * v1;
+        f_d = u1 * v2 - v1 * u2;
+        if (f_d == 0) {
+            return;
+        }
+        beta = f_n / f_d;
+        f_numerator = u0 - beta * u2;
+        alpha = f_numerator / u1;
+    }
+    if (alpha < -0.0001 || beta < -0.0001 || alpha + beta > 1.0001) {
+        return;
+    }
+    *rt = t;
+    normal->v[0] = pFace->normal.v[0];
+    normal->v[1] = pFace->normal.v[1];
+    normal->v[2] = pFace->normal.v[2];
+    if (d > 0.0f) {
+        BrVector3Negate(normal, normal);
     }
 }
 
