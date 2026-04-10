@@ -1965,47 +1965,46 @@ void ServicePanelFlics(int pCopy_to_buffer) {
     DontLetFlicFuckWithPalettes();
     TurnFlicTransparencyOn();
 
-    for (i = 0; i < COUNT_OF(gPanel_flic); i++) {
-        old_last_time[i] = gLast_panel_frame_time[i];
-        if (gPanel_buffer[i] != NULL && gPanel_flic[i].data != NULL) {
-            if (old_last_time[i] != 0) {
-                time_diff = the_time - old_last_time[i];
-                iteration_count = time_diff / gPanel_flic[i].frame_period;
+    for (j = 0; j < COUNT_OF(gPanel_flic); j++) {
+        old_last_time[j] = gLast_panel_frame_time[j];
+        if (gPanel_buffer[j] != NULL && gPanel_flic[j].data != NULL) {
+            if (old_last_time[j] != 0) {
+                iteration_count = (the_time - old_last_time[j]) / gPanel_flic[j].frame_period;
             } else {
                 iteration_count = 1;
             }
-            for (j = 0; j < iteration_count; j++) {
-                finished = PlayNextFlicFrame2(&gPanel_flic[i], 1);
+            for (i = 0; i < iteration_count; i++) {
+                finished = PlayNextFlicFrame2(&gPanel_flic[j], 1);
                 if (finished) {
-                    EndFlic(&gPanel_flic[i]);
+                    EndFlic(&gPanel_flic[j]);
                     StartFlic(
-                        gPanel_flic[i].file_name,
-                        gPanel_flic[i].the_index,
-                        &gPanel_flic[i],
-                        gPanel_flic_data_length[i],
-                        (tS8*)gPanel_flic_data[i],
-                        gPanel_buffer[i],
+                        gPanel_flic[j].file_name,
+                        gPanel_flic[j].the_index,
+                        &gPanel_flic[j],
+                        gPanel_flic_data_length[j],
+                        gPanel_flic_data[j],
+                        gPanel_buffer[j],
                         0,
                         0,
                         0);
                 }
-                gLast_panel_frame_time[i] = the_time;
+                gLast_panel_frame_time[j] = the_time;
             }
             if (pCopy_to_buffer) {
                 BrPixelmapRectangleCopy(
                     gBack_screen,
-                    gPanel_flic_left[i],
-                    gPanel_flic_top[i],
-                    gPanel_buffer[i],
+                    gPanel_flic_left[j],
+                    gPanel_flic_top[j],
+                    gPanel_buffer[j],
                     0,
                     0,
-                    gPanel_buffer[i]->width,
-                    gPanel_buffer[i]->height);
+                    gPanel_buffer[j]->width,
+                    gPanel_buffer[j]->height);
             }
         }
     }
-    TurnFlicTransparencyOff();
     LetFlicFuckWithPalettes();
+    TurnFlicTransparencyOff();
 }
 
 // IDA: void __usercall ChangePanelFlic(int pIndex@<EAX>, tU8 *pData@<EDX>, tU32 pData_length@<EBX>)
