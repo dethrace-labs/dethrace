@@ -51,7 +51,7 @@ tFace_ref* gPling_face;
 // FUNCTION: CARM95 0x004abe0c
 int BadDiv__finteray(br_scalar a, br_scalar b) {
     //
-    return fabs(b) < 1.0f && fabs(a) > fabs(b) * BR_SCALAR_MAX;
+    return (float)fabs(b) < 1.0f && (float)fabs(a) > (float)fabs(b) * BR_SCALAR_MAX;
 }
 
 // IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
