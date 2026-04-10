@@ -103,27 +103,27 @@ void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
 
     start_time = PDGetTotalTime();
     DrawDial(pWhich_one, pNew_stage < 24 ? pNew_stage + 1 : 22);
-    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    while (PDGetTotalTime() - start_time < 20) {
     }
 
     start_time = PDGetTotalTime();
-    DrawDial(pWhich_one, pNew_stage == 0 ? 2 : pNew_stage - 1);
-    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    DrawDial(pWhich_one, pNew_stage != 0 ? pNew_stage - 1 : pNew_stage + 2);
+    while (PDGetTotalTime() - start_time < 20) {
     }
 
     start_time = PDGetTotalTime();
     DrawDial(pWhich_one, pNew_stage < 24 ? pNew_stage + 1 : 22);
-    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    while (PDGetTotalTime() - start_time < 20) {
     }
 
     start_time = PDGetTotalTime();
     DrawDial(pWhich_one, pNew_stage);
-    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    while (PDGetTotalTime() - start_time < 20) {
     }
 
     start_time = PDGetTotalTime();
-    DrawDial(pWhich_one, pNew_stage == 0 ? 2 : pNew_stage - 1);
-    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    DrawDial(pWhich_one, pNew_stage != 0 ? pNew_stage - 1 : pNew_stage + 2);
+    while (PDGetTotalTime() - start_time < 20) {
     }
     DrawDial(pWhich_one, pNew_stage);
 }
