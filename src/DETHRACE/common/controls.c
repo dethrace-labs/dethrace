@@ -2651,8 +2651,8 @@ void DisplayUserMessage(void) {
     int len;
     tDR_font* font;
 
-    font = &gFonts[FONT_NEWHITE];
     the_message = &gString[20];
+    font = &gFonts[FONT_NEWHITE];
     if (!gEntering_message || gNet_mode == eNet_mode_none) {
         return;
     }
@@ -2669,7 +2669,7 @@ void DisplayUserMessage(void) {
         gCurrent_graf_data->net_message_enter_y + 6 * font->height,
         1);
 
-    TransDRPixelmapText(gBack_screen, 20 * gBack_screen->width / 100, gCurrent_graf_data->net_message_enter_y, font, GetMiscString(kMiscString_ENTER_MESSAGE), 100);
+    TransDRPixelmapText(gBack_screen, 20 * gBack_screen->width / 100, gCurrent_graf_data->net_message_enter_y, &gFonts[FONT_NEWHITE], GetMiscString(kMiscString_ENTER_MESSAGE), 100);
     OoerrIveGotTextInMeBoxMissus(
         FONT_NEWHITE,
         the_message,
