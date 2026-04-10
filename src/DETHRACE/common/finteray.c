@@ -681,34 +681,36 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
     tU8 cz_max;
     tTrack_spec* track_spec;
 
-    j = 0;
+    i = 0;
     track_spec = &gProgram_state.track_spec;
-    BrVector3Add(&a, &bnds->original_bounds.min, &bnds->original_bounds.max);
-    BrVector3Scale(&a, &a, 0.5f);
+    b.v[0] = bnds->original_bounds.min.v[0] + bnds->original_bounds.max.v[0];
+    b.v[1] = bnds->original_bounds.min.v[1] + bnds->original_bounds.max.v[1];
+    b.v[2] = bnds->original_bounds.min.v[2] + bnds->original_bounds.max.v[2];
+    BrVector3Scale(&a, &b, .5f);
     BrMatrix34ApplyP(&bnds->box_centre, &a, bnds->mat);
-    BrVector3Sub(&b, &bnds->original_bounds.max, &bnds->original_bounds.min);
-    bnds->radius = BrVector3Length(&b) / 2.f;
+    BrVector3Sub(&a, &bnds->original_bounds.max, &bnds->original_bounds.min);
+    bnds->radius = BrVector3Length(&a) / 2.f;
     BrMatrix34ApplyP(&bnds->real_bounds.min, &bnds->original_bounds.min, bnds->mat);
     BrVector3Copy(&bnds->real_bounds.max, &bnds->real_bounds.min);
-    for (i = 0; i < 3; ++i) {
-        c[i].v[0] = bnds->mat->m[i][0] * b.v[i];
-        c[i].v[1] = bnds->mat->m[i][1] * b.v[i];
-        c[i].v[2] = bnds->mat->m[i][2] * b.v[i];
+    for (j = 0; j < 3; j++) {
+        c[j].v[0] = a.v[j] * ((br_vector3*)bnds->mat->m)[j].v[0];
+        c[j].v[1] = a.v[j] * ((br_vector3*)bnds->mat->m)[j].v[1];
+        c[j].v[2] = a.v[j] * ((br_vector3*)bnds->mat->m)[j].v[2];
     }
-    for (i = 0; i < 3; ++i) {
-        bnds->real_bounds.min.v[i] += MIN(c[0].v[i], 0.f)
-            + MIN(c[1].v[i], 0.f)
-            + MIN(c[2].v[i], 0.f);
-        bnds->real_bounds.max.v[i] += MAX(c[0].v[i], 0.f)
-            + MAX(c[1].v[i], 0.f)
-            + MAX(c[2].v[i], 0.f);
+    for (j = 0; j < 3; j++) {
+        bnds->real_bounds.min.v[j] += ((float)(c[2].v[j] < 0.f) * c[2].v[j]
+            + (float)(c[1].v[j] < 0.f) * c[1].v[j])
+            + (float)(c[0].v[j] < 0.f) * c[0].v[j];
+        bnds->real_bounds.max.v[j] += ((float)(c[2].v[j] > 0.f) * c[2].v[j]
+            + (float)(c[1].v[j] > 0.f) * c[1].v[j])
+            + (float)(c[0].v[j] > 0.f) * c[0].v[j];
     }
     XZToColumnXZ(&cx_min, &cz_min, bnds->real_bounds.min.v[0], bnds->real_bounds.min.v[2], track_spec);
     XZToColumnXZ(&cx_max, &cz_max, bnds->real_bounds.max.v[0], bnds->real_bounds.max.v[2], track_spec);
-    if (cx_min != 0) {
+    if (cx_min > 0) {
         cx_min--;
     }
-    if (cz_min != 0) {
+    if (cz_min > 0) {
         cz_min--;
     }
     if (cx_max + 1 < track_spec->ncolumns_x) {
@@ -723,17 +725,17 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
                 if (track_spec->blends[z][x] != NULL) {
                     track_spec->blends[z][x]->render_style = BR_RSTYLE_FACES;
                 }
-                j = max_face - ActorBoxPick(bnds, track_spec->columns[z][x], model_unk1, material_unk1, &face_list[j], max_face - j, NULL);
+                i = max_face - ActorBoxPick(bnds, track_spec->columns[z][x], model_unk1, material_unk1, &face_list[i], max_face - i, NULL);
                 if (track_spec->blends[z][x] != NULL) {
                     track_spec->blends[z][x]->render_style = BR_RSTYLE_NONE;
                 }
             }
             if (track_spec->lollipops[z][x] != NULL) {
-                j = max_face - ActorBoxPick(bnds, track_spec->lollipops[z][x], model_unk1, material_unk1, &face_list[j], max_face - j, NULL);
+                i = max_face - ActorBoxPick(bnds, track_spec->lollipops[z][x], model_unk1, material_unk1, &face_list[i], max_face - i, NULL);
             }
         }
     }
-    return j;
+    return i;
 }
 
 // IDA: int __usercall FindFacesInBox2@<EAX>(tBounds *bnds@<EAX>, tFace_ref *face_list@<EDX>, int max_face@<EBX>)
