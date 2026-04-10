@@ -92,6 +92,7 @@ void XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tT
     *pColumn_z = z;
 }
 
+typedef void* (*MEMCPY_PTR)(void*, const void*, size_t);
 // IDA: void __usercall StripBlendedFaces(br_actor *pActor@<EAX>, br_model *pModel@<EDX>)
 // FUNCTION: CARM95 0x004a8d47
 void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
@@ -142,7 +143,9 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
 #ifdef DETHRACE_FIX_BUGS
                 memmove(pModel->faces + i, pModel->faces + i + 1, (pModel->nfaces - i - 1) * sizeof(br_face));
 #else
-                ((void*(__cdecl*)(void*, const void*, size_t))memcpy)(pModel->faces + i, pModel->faces + i + 1, (pModel->nfaces - i - 1) * sizeof(br_face));
+                // force memcpy function call
+                ((MEMCPY_PTR)memcpy)(pModel->faces + i, pModel->faces + i + 1, (pModel->nfaces - i - 1) * sizeof(br_face));
+
 #endif
             }
             pModel->nfaces--;
