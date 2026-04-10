@@ -905,24 +905,16 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
             blue = MemReadU8(&pFlic_info->data) * 4;
             // argb
 #if BR_ENDIAN_BIG
-            palette_pixels++;
-            *palette_pixels = red;
-            palette_pixels++;
-            *palette_pixels = green;
-            palette_pixels++;
-            *palette_pixels = blue;
-            palette_pixels -= 3;
-            *palette_pixels = 0;
+            *palette_pixels++ = 0;
+            *palette_pixels++ = red;
+            *palette_pixels++ = green;
+            *palette_pixels++ = blue;
 #else
-            *palette_pixels = blue;
-            palette_pixels++;
-            *palette_pixels = green;
-            palette_pixels++;
-            *palette_pixels = red;
-            palette_pixels++;
-            *palette_pixels = 0;
+            *palette_pixels++ = blue;
+            *palette_pixels++ = green;
+            *palette_pixels++ = red;
+            *palette_pixels++ = 0;
 #endif
-            palette_pixels++;
         }
         if (!gPalette_fuck_prevention) {
             DRSetPaletteEntries(gPalette, current_colour, change_count);
