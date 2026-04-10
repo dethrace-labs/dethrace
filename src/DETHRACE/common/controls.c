@@ -2435,9 +2435,10 @@ void CycleCarSimplificationLevel(void) {
     char* src;
     char* dst;
 
-    gCar_simplification_level = (gCar_simplification_level + 1) % 5;
+    gCar_simplification_level++;
+    gCar_simplification_level = gCar_simplification_level % 5u;
     src = GetMiscString(kMiscString_CarSimplificationLevel_D);
-    dst = BrMemAllocate(strlen(src), kMem_simp_level);
+    dst = BrMemAllocate(strlen(src) + 21, kMem_simp_level);
     sprintf(dst, src, gCar_simplification_level);
     NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, dst);
     BrMemFree(dst);
