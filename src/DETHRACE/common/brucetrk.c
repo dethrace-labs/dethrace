@@ -92,6 +92,7 @@ void XZToColumnXZ(tU8* pColumn_x, tU8* pColumn_z, br_scalar pX, br_scalar pZ, tT
     *pColumn_z = z;
 }
 
+typedef void* (*MEMCPY_PTR)(void*, const void*, size_t);
 // IDA: void __usercall StripBlendedFaces(br_actor *pActor@<EAX>, br_model *pModel@<EDX>)
 // FUNCTION: CARM95 0x004a8d47
 void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
@@ -139,9 +140,13 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
             memcpy(&gMr_blendy->model->faces[gMr_blendy->model->nfaces], face, sizeof(br_face));
             gMr_blendy->model->nfaces++;
             if (i < (pModel->nfaces - 1)) {
-                // this is a memcpy call in the original code. Cannot figure out how to make it not be replaced with
-                // intrinsic memcpy
+#ifdef DETHRACE_FIX_BUGS
                 memmove(pModel->faces + i, pModel->faces + i + 1, (pModel->nfaces - i - 1) * sizeof(br_face));
+#else
+                // force memcpy function call
+                ((MEMCPY_PTR)memcpy)(pModel->faces + i, pModel->faces + i + 1, (pModel->nfaces - i - 1) * sizeof(br_face));
+
+#endif
             }
             pModel->nfaces--;
             changed_one = 1;
