@@ -1361,10 +1361,7 @@ void Scale(int pD, int factor) {
     br_vertex* verts;
     br_face* faces;
 
-    if (gSelected_model == NULL) {
-        return;
-    }
-    if (gSelected_model->nfaces != gNfaces) {
+    if (gSelected_model == NULL || gSelected_model->nfaces != gNfaces) {
         return;
     }
     verts = gSelected_model->vertices;
@@ -1378,7 +1375,7 @@ void Scale(int pD, int factor) {
         for (f = 0; f < gSelected_model->nfaces; f++) {
             if (faces[f].material == gSub_material
                 && (faces[f].vertices[0] == v || faces[f].vertices[1] == v || faces[f].vertices[2] == v)) {
-                verts[v].map.v[pD] = (factor + d) / d * verts[v].map.v[pD];
+                verts[v].map.v[pD] *= (factor + d) / d;
                 break;
             }
         }
