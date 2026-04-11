@@ -1168,15 +1168,14 @@ void DefaultNetSettings(void) {
 
     PathCat(the_path, gApplication_path, "NETDEFLT.TXT");
     f = DRfopen(the_path, "rt");
-    if (f == NULL) {
-        return;
+    if (f != NULL) {
+        ReadNetworkSettings(f, gNet_settings);
+        rewind(f);
+        for (i = 0; i < COUNT_OF(gNet_settings) - 1; i++) {
+            ReadNetworkSettings(f, &gNet_settings[i] + 1);
+        }
+        fclose(f);
     }
-    ReadNetworkSettings(f, gNet_settings);
-    rewind(f);
-    for (i = 0; i < COUNT_OF(gNet_settings) - 1; i++) {
-        ReadNetworkSettings(f, &gNet_settings[i + 1]);
-    }
-    fclose(f);
 }
 
 // IDA: int __usercall NetOptGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
