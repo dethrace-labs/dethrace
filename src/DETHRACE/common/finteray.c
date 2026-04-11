@@ -2,6 +2,7 @@
 #include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
+#include "depth.h"
 #include "formats.h"
 #include "globvars.h"
 #include "harness/trace.h"
@@ -1318,7 +1319,50 @@ void SelectFace(br_vector3* pDir) {
     br_scalar t;
     br_model* old_model;
     int i;
-    NOT_IMPLEMENTED();
+
+    c = &gProgram_state.current_car;
+    old_model = gSelected_model;
+
+    if (gSub_material == NULL) {
+        gSub_material = BrMaterialAllocate("");
+        if (gSub_material == NULL) {
+            return;
+        }
+        gSub_material->index_shade = gAcid_shade_table;
+        BrMaterialAdd(gSub_material);
+    }
+
+    if (gSelected_model != NULL && gSelected_model->nfaces == gNfaces) {
+        for (i = 0; i < gSelected_model->nfaces; i++) {
+            if (gSelected_model->faces[(unsigned short)i].material == gSub_material) {
+                gSelected_model->faces[(unsigned short)i].material = gReal_material;
+            }
+        }
+        BrModelUpdate(gSelected_model, 0x7fff);
+    }
+
+    gSelected_model = NULL;
+
+    dir.v[0] = pDir->v[0];
+    dir.v[1] = pDir->v[1];
+    dir.v[2] = pDir->v[2];
+
+    FindFace(&c->pos, &dir, &normal, &t, &gReal_material);
+    if (t > 1.f) {
+        return;
+    }
+
+    if (gNearest_model == old_model) {
+        return;
+    }
+
+    gSelected_model = gNearest_model;
+    gNfaces = gSelected_model->nfaces;
+    gSub_material->colour_map = gReal_material->colour_map;
+    gSub_material->flags = gReal_material->flags | 0x5;
+    BrMaterialUpdate(gSub_material, 0x7fff);
+    SetFacesGroup(gNearest_face);
+    BrModelUpdate(gSelected_model, 0x7fff);
 }
 
 // IDA: void __usercall GetTilingLimits(br_vector2 *min@<EAX>, br_vector2 *max@<EDX>)
