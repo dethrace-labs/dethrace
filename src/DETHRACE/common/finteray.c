@@ -1343,9 +1343,7 @@ void SelectFace(br_vector3* pDir) {
 
     gSelected_model = NULL;
 
-    dir.v[0] = pDir->v[0];
-    dir.v[1] = pDir->v[1];
-    dir.v[2] = pDir->v[2];
+    BrVector3Copy(&dir, pDir);
 
     FindFace(&c->pos, &dir, &normal, &t, &gReal_material);
     if (t > 1.f) {
