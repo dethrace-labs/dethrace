@@ -1235,19 +1235,19 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
 int SphereBoxIntersection(br_bounds* pB, br_vector3* pC, br_scalar pR_squared, br_vector3* pHit_point) {
     int i;
     br_scalar d;
+    br_vector3 hit_point;
 
     d = 0.f;
     for (i = 0; i < 3; i++) {
-        if (pC->v[i] <= pB->min.v[i]) {
-            pHit_point->v[i] = pB->min.v[i];
-        } else if (pC->v[i] > pB->max.v[i]) {
-            pHit_point->v[i] = pB->max.v[i];
+        if (pC->v[i] > pB->min.v[i]) {
+            hit_point.v[i] = pB->max.v[i] < pC->v[i] ? pB->max.v[i] : pC->v[i];
         } else {
-            pHit_point->v[i] = pC->v[i];
+            hit_point.v[i] = pB->min.v[i];
         }
-        d += (pC->v[i] - pHit_point->v[i]) * (pC->v[i] - pHit_point->v[i]);
+        d += (pC->v[i] - hit_point.v[i]) * (pC->v[i] - hit_point.v[i]);
     }
-    return d <= pR_squared;
+    BrVector3Copy(pHit_point, &hit_point);
+    return (pR_squared + 0.f) >= d;
 }
 
 // IDA: int __usercall LineBoxCollWithSphere@<EAX>(br_vector3 *o@<EAX>, br_vector3 *p@<EDX>, br_bounds *pB@<EBX>, br_vector3 *pHit_point@<ECX>)
