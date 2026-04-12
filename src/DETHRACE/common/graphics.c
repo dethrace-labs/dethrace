@@ -538,14 +538,12 @@ void DrawNumberAt(br_pixelmap* gImage, int pX, int pY, int pX_pitch, int pY_pitc
 void BuildColourTable(br_pixelmap* pPalette) {
     int i;
     int j;
-    int nearest_index = 0;
+    int nearest_index;
     int red;
     int green;
     int blue;
     float nearest_distance;
     float distance;
-
-#define SQR(i) i* i
 
     for (i = 0; i < COUNT_OF(gRGB_colours); i++) {
         nearest_distance = 196608.f;
@@ -553,12 +551,12 @@ void BuildColourTable(br_pixelmap* pPalette) {
         green = (gRGB_colours[i] >> 8) & 0xFF;
         blue = gRGB_colours[i] & 0xFF;
         for (j = 0; j < 256; j++) {
-            distance = SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j + 2) - red));
-            distance += SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j) - blue));
-            distance += SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j + 1) - green));
-            if (distance < nearest_distance) {
-                nearest_index = j;
+            if ((distance = (sqr((double)(signed int)(((br_uint_8*)pPalette->pixels)[4 * j + 2] - red))
+                             + sqr((double)(signed int)(((br_uint_8*)pPalette->pixels)[4 * j] - blue)))
+                                + sqr((double)(signed int)(((br_uint_8*)pPalette->pixels)[4 * j + 1] - green)))
+                < nearest_distance) {
                 nearest_distance = distance;
+                nearest_index = j;
             }
         }
         gColours[i] = nearest_index;
