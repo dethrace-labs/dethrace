@@ -3381,19 +3381,11 @@ void TellyInImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 the_time;
 
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + 100 <= the_time) {
-            break;
-        }
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
         DrawTellyLine(pImage, pLeft, pTop, 100 * (the_time - start_time) / 100);
     }
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + 100 <= the_time) {
-            break;
-        }
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
         DrawTellyImage(pImage, pLeft, pTop, 100 * (the_time - start_time) / 100);
     }
     DrawTellyImage(pImage, pLeft, pTop, 100);
