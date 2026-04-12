@@ -4975,7 +4975,7 @@ void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
         if (c->car_master_actor->t.t.translate.t.v[0] > 500.0f) {
         } else {
             switch (gAction_replay_camera_mode * gAction_replay_mode) {
-            case 0:
+            case eAction_replay_standard:
                 NormalPositionExternalCamera(c, pTime);
                 break;
             case eAction_replay_action:
