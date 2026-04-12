@@ -1159,9 +1159,9 @@ int BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M) {
         < b2->min.v[1]) {
         return 0;
     }
-    if ((M->m[0][1] < 0.0 ? M->m[0][1] * o.v[0] : 0.0)
-            + (M->m[1][1] < 0.0 ? M->m[1][1] * o.v[1] : 0.0)
-            + (M->m[2][1] < 0.0 ? M->m[2][1] * o.v[2] : 0.0)
+    if ((M->m[0][1] < 0.0f ? M->m[0][1] * o.v[0] : 0.0f)
+            + (M->m[1][1] < 0.0f ? M->m[1][1] * o.v[1] : 0.0f)
+            + (M->m[2][1] < 0.0f ? M->m[2][1] * o.v[2] : 0.0f)
             + val
         > b2->max.v[1]) {
         return 0;
@@ -1184,53 +1184,50 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
     inside = 1;
     BrVector3Sub(&dir, p, o);
     for (i = 0; i < 3; ++i) {
-        if (pB->min.v[i] <= o->v[i]) {
-            if (pB->max.v[i] >= o->v[i]) {
-                quad[i] = 2;
-            } else {
-                quad[i] = 0;
-                max_t[i] = pB->max.v[i];
-                inside = 0;
-            }
-        } else {
+        if (pB->min.v[i] > o->v[i]) {
             quad[i] = 1;
-            max_t[i] = pB->min.v[i];
+            cp[i] = pB->min.v[i];
             inside = 0;
+        } else if (pB->max.v[i] < o->v[i]) {
+            quad[i] = 0;
+            cp[i] = pB->max.v[i];
+            inside = 0;
+        } else {
+            quad[i] = 2;
         }
     }
     if (inside) {
         BrVector3Copy(pHit_point, o);
         return 8;
-    } else {
-        for (i = 0; i < 3; ++i) {
-            if (quad[i] == 2 || dir.v[i] == 0.0) {
-                cp[i] = -1.0;
-            } else {
-                cp[i] = (max_t[i] - o->v[i]) / dir.v[i];
-            }
-        }
-        which_plane = 0;
-        for (i = 1; i < 3; ++i) {
-            if (cp[which_plane] < cp[i]) {
-                which_plane = i;
-            }
-        }
-        if (cp[which_plane] >= 0.0 && cp[which_plane] <= 1.0) {
-            for (i = 0; i < 3; ++i) {
-                if (which_plane == i) {
-                    pHit_point->v[i] = max_t[i];
-                } else {
-                    pHit_point->v[i] = dir.v[i] * cp[which_plane] + o->v[i];
-                    if (pHit_point->v[i] < pB->min.v[i] || pB->max.v[i] < pHit_point->v[i]) {
-                        return 0;
-                    }
-                }
-            }
-            return which_plane + 4 * quad[which_plane] + 1;
+    }
+
+    for (i = 0; i < 3; ++i) {
+        if (quad[i] != 2 && dir.v[i] != 0.0f) {
+            max_t[i] = (cp[i] - o->v[i]) / dir.v[i];
         } else {
-            return 0;
+            max_t[i] = -1.0f;
         }
     }
+    which_plane = 0;
+    for (i = 1; i < 3; ++i) {
+        if (max_t[i] > max_t[which_plane]) {
+            which_plane = i;
+        }
+    }
+    if (max_t[which_plane] < 0.0f || max_t[which_plane] > 1.0f) {
+        return 0;
+    }
+    for (i = 0; i < 3; ++i) {
+        if (which_plane != i) {
+            pHit_point->v[i] = dir.v[i] * max_t[which_plane] + o->v[i];
+            if (pHit_point->v[i] < pB->min.v[i] || pB->max.v[i] < pHit_point->v[i]) {
+                return 0;
+            }
+        } else {
+            pHit_point->v[i] = cp[i];
+        }
+    }
+    return which_plane + 4 * quad[which_plane] + 1;
 }
 
 // IDA: int __usercall SphereBoxIntersection@<EAX>(br_bounds *pB@<EAX>, br_vector3 *pC@<EDX>, br_scalar pR_squared, br_vector3 *pHit_point)
@@ -1238,19 +1235,19 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
 int SphereBoxIntersection(br_bounds* pB, br_vector3* pC, br_scalar pR_squared, br_vector3* pHit_point) {
     int i;
     br_scalar d;
+    br_vector3 hit_point;
 
     d = 0.f;
     for (i = 0; i < 3; i++) {
-        if (pC->v[i] <= pB->min.v[i]) {
-            pHit_point->v[i] = pB->min.v[i];
-        } else if (pC->v[i] > pB->max.v[i]) {
-            pHit_point->v[i] = pB->max.v[i];
+        if (pC->v[i] > pB->min.v[i]) {
+            hit_point.v[i] = pB->max.v[i] < pC->v[i] ? pB->max.v[i] : pC->v[i];
         } else {
-            pHit_point->v[i] = pC->v[i];
+            hit_point.v[i] = pB->min.v[i];
         }
-        d += (pC->v[i] - pHit_point->v[i]) * (pC->v[i] - pHit_point->v[i]);
+        d += (pC->v[i] - hit_point.v[i]) * (pC->v[i] - hit_point.v[i]);
     }
-    return d <= pR_squared;
+    BrVector3Copy(pHit_point, &hit_point);
+    return (pR_squared + 0.f) >= d;
 }
 
 // IDA: int __usercall LineBoxCollWithSphere@<EAX>(br_vector3 *o@<EAX>, br_vector3 *p@<EDX>, br_bounds *pB@<EBX>, br_vector3 *pHit_point@<ECX>)
@@ -1264,18 +1261,19 @@ int LineBoxCollWithSphere(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector
     if (plane != 0) {
         return plane;
     }
-    if (!SphereBoxIntersection(pB, p, 2.5e-5f, pHit_point)) {
+    if (SphereBoxIntersection(pB, p, 2.5e-5f, pHit_point)) {
+        for (i = 0; i < 3; i++) {
+            if (pB->max.v[i] == pHit_point->v[i] && p->v[i] <= o->v[i]) {
+                return i + 1;
+            }
+            if (pHit_point->v[i] == pB->min.v[i] && p->v[i] >= o->v[i]) {
+                return i + 5;
+            }
+        }
+        return 0;
+    } else {
         return 0;
     }
-    for (i = 0; i < 3; i++) {
-        if (pB->max.v[i] == pHit_point->v[i] && p->v[i] <= o->v[i]) {
-            return i + 1;
-        }
-        if (pHit_point->v[i] == pB->min.v[i] && p->v[i] >= o->v[i]) {
-            return i + 5;
-        }
-    }
-    return 0;
 }
 
 // IDA: int __usercall CompVert@<EAX>(int v1@<EAX>, int v2@<EDX>)
@@ -1285,10 +1283,10 @@ int CompVert(int v1, int v2) {
     br_vector3 tv;
     br_vector2 tv2;
 
+    vl = gSelected_model->vertices;
     if (v1 == v2) {
         return 1;
     }
-    vl = gSelected_model->vertices;
     BrVector3Sub(&tv, &vl[v1].p, &vl[v2].p);
     if (BrVector3LengthSquared(&tv) > 1e-5f) {
         return 0;
@@ -1361,10 +1359,7 @@ void Scale(int pD, int factor) {
     br_vertex* verts;
     br_face* faces;
 
-    if (gSelected_model == NULL) {
-        return;
-    }
-    if (gSelected_model->nfaces != gNfaces) {
+    if (gSelected_model == NULL || gSelected_model->nfaces != gNfaces) {
         return;
     }
     verts = gSelected_model->vertices;
@@ -1378,7 +1373,7 @@ void Scale(int pD, int factor) {
         for (f = 0; f < gSelected_model->nfaces; f++) {
             if (faces[f].material == gSub_material
                 && (faces[f].vertices[0] == v || faces[f].vertices[1] == v || faces[f].vertices[2] == v)) {
-                verts[v].map.v[pD] = (factor + d) / d * verts[v].map.v[pD];
+                verts[v].map.v[pD] *= (factor + d) / d;
                 break;
             }
         }

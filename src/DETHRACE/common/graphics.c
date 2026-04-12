@@ -1045,8 +1045,8 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
 // FUNCTION: CARM95 0x004b3f3a
 void SetScreenWobble(int pWobble_x, int pWobble_y) {
 
-    gScreen_wobble_y = pWobble_y;
     gScreen_wobble_x = pWobble_x;
+    gScreen_wobble_y = pWobble_y;
 }
 
 // IDA: void __cdecl ResetScreenWobble()
@@ -1175,19 +1175,21 @@ int OppositeColour(int pColour) {
     int brightness;
 
     if (pColour < 224) {
-        if ((pColour & 0x7) < 4) {
-            brightness = 255;
+        brightness = pColour & 0x7;
+        if (brightness < 4) {
+            pColour = 255;
         } else {
-            brightness = 0;
+            pColour = 0;
         }
     } else {
-        if ((pColour & 0xf) < 8) {
-            brightness = 255;
+        brightness = pColour & 0xf;
+        if (brightness < 8) {
+            pColour = 255;
         } else {
-            brightness = 0;
+            pColour = 0;
         }
     }
-    return brightness;
+    return pColour;
 }
 
 // IDA: void __usercall DrawMapBlip(tCar_spec *pCar@<EAX>, tU32 pTime@<EDX>, br_matrix34 *pTrans@<EBX>, br_vector3 *pPos@<ECX>, int pColour)
@@ -2310,6 +2312,10 @@ void MungePalette(void) {
     static float last_omega;
     static tU32 next_repair_time;
     static tU32 last_sound;
+
+    if (1) {
+        return;
+    }
 }
 
 // IDA: void __cdecl ResetPalette()
@@ -2325,7 +2331,8 @@ void ResetPalette(void) {
 void Darken(tU8* pPtr, unsigned int pDarken_amount) {
     unsigned int value;
 
-    *pPtr = (pDarken_amount * *pPtr) / 256;
+    value = *pPtr;
+    *pPtr = (value * pDarken_amount) / 256;
 }
 
 // IDA: void __usercall SetFadedPalette(int pDegree@<EAX>)
@@ -2490,7 +2497,7 @@ void ChangeAmbience(br_scalar pDelta) {
 void InitAmbience(void) {
 
     gCurrent_ambience = gAmbient_adjustment;
-    ChangeAmbience(gAmbient_adjustment);
+    ChangeAmbience(gCurrent_ambience);
 }
 
 // IDA: void __usercall DRPixelmapRectangleMaskedCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight)
@@ -3227,30 +3234,31 @@ void DrawDropImage(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int 
         pImage->width,
         pBottom_clip - pTop_clip,
         0);
-    if (pOffset != 1000) {
-        src_y = 0;
-        src_height = pImage->height;
-        y = pOffset + pTop;
-        y_diff = pTop_clip - y;
-        if (y_diff > 0) {
-            src_height -= y_diff;
-            y += y_diff;
-            src_y = y_diff;
-        }
-        y_diff = pBottom_clip - y - pImage->height;
-        if (y_diff < 0) {
-            src_height += y_diff;
-        }
-        BrPixelmapRectangleCopy(gBack_screen,
-            pLeft,
-            y,
-            pImage,
-            0,
-            src_y,
-            pImage->width,
-            src_height);
-        PDScreenBufferSwap(0);
+    if (pOffset == 1000) {
+        return;
     }
+    src_y = 0;
+    src_height = pImage->height;
+    y = pOffset + pTop;
+    y_diff = pTop_clip - y;
+    if (y_diff > 0) {
+        src_y += y_diff;
+        src_height -= y_diff;
+        y += y_diff;
+    }
+    y_diff = pBottom_clip - y - pImage->height;
+    if (y_diff < 0) {
+        src_height += y_diff;
+    }
+    BrPixelmapRectangleCopy(gBack_screen,
+        pLeft,
+        y,
+        pImage,
+        0,
+        src_y,
+        pImage->width,
+        src_height);
+    PDScreenBufferSwap(0);
 }
 
 // IDA: void __usercall DropInImageFromTop(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip)
@@ -3260,13 +3268,9 @@ void DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip,
     tS32 the_time;
     int drop_distance;
 
-    start_time = PDGetTotalTime();
     drop_distance = pImage->height - pTop_clip + pTop;
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (the_time >= start_time + 100) {
-            break;
-        }
+    start_time = PDGetTotalTime();
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
         DrawDropImage(pImage,
             pLeft,
             pTop,
@@ -3284,13 +3288,9 @@ void DropOutImageThruBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_c
     tS32 the_time;
     int drop_distance;
 
-    start_time = PDGetTotalTime();
     drop_distance = pBottom_clip - pTop;
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (the_time >= start_time + 100) {
-            break;
-        }
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime()) < start_time + 100) {
         DrawDropImage(pImage,
             pLeft,
             pTop,
@@ -3308,13 +3308,9 @@ void DropInImageFromBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_cl
     tS32 the_time;
     int drop_distance;
 
-    start_time = PDGetTotalTime();
     drop_distance = pBottom_clip - pTop;
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (the_time >= start_time + 100) {
-            break;
-        }
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime()) < start_time + 100) {
         DrawDropImage(pImage,
             pLeft,
             pTop,
@@ -3332,13 +3328,9 @@ void DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip
     tS32 the_time;
     int drop_distance;
 
-    start_time = PDGetTotalTime();
     drop_distance = pImage->height - pTop_clip + pTop;
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (the_time >= start_time + 100) {
-            break;
-        }
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime()) < start_time + 100) {
         DrawDropImage(pImage,
             pLeft,
             pTop,
@@ -3389,19 +3381,11 @@ void TellyInImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 the_time;
 
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + 100 <= the_time) {
-            break;
-        }
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
         DrawTellyLine(pImage, pLeft, pTop, 100 * (the_time - start_time) / 100);
     }
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + 100 <= the_time) {
-            break;
-        }
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
         DrawTellyImage(pImage, pLeft, pTop, 100 * (the_time - start_time) / 100);
     }
     DrawTellyImage(pImage, pLeft, pTop, 100);
