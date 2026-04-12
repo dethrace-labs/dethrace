@@ -2428,36 +2428,39 @@ void SplashScreenWith(char* pPixmap_name) {
     br_pixelmap* the_map;
 
     the_map = BrMapFind(pPixmap_name);
-    if (gCurrent_splash == NULL || the_map != gCurrent_splash) {
-        FadePaletteDown();
-        EnsureRenderPalette();
+    if (gCurrent_splash != NULL && the_map == gCurrent_splash) {
+        return;
+    }
 
+    FadePaletteDown();
+    EnsureRenderPalette();
+
+    if (gCurrent_splash != NULL) {
+        KillSplashScreen();
+    }
+    gCurrent_splash = the_map;
+    if (gCurrent_splash == NULL) {
+        gCurrent_splash = LoadPixelmap(pPixmap_name);
         if (gCurrent_splash != NULL) {
-            KillSplashScreen();
+            BrMapAdd(gCurrent_splash);
         }
-        gCurrent_splash = the_map;
-        if (the_map == NULL) {
-            the_map = LoadPixelmap(pPixmap_name);
-            gCurrent_splash = the_map;
-            if (the_map != NULL) {
-                BrMapAdd(the_map);
-            }
-        }
-        if (gCurrent_splash != NULL) {
-            BrPixelmapRectangleCopy(
-                gBack_screen,
-                0,
-                0,
-                gCurrent_splash,
-                0,
-                0,
-                gCurrent_splash->width,
-                gCurrent_splash->height);
-            PDScreenBufferSwap(0);
-            if (gFaded_palette) {
-                FadePaletteUp();
-            }
-        }
+    }
+    if (gCurrent_splash != NULL) {
+        BrPixelmapRectangleCopy(
+            gBack_screen,
+            0,
+            0,
+            gCurrent_splash,
+            0,
+            0,
+            gCurrent_splash->width,
+            gCurrent_splash->height);
+    } else {
+        return;
+    }
+    PDScreenBufferSwap(0);
+    if (gFaded_palette) {
+        FadePaletteUp();
     }
 }
 
