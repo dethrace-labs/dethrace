@@ -727,15 +727,27 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
                 x_byte += destn_width;
                 if (old_x_byte < 0) {
                     if (x_byte > 0) {
+#ifdef DETHRACE_FIX_BUGS
+                        memmove(destn_ptr2, &pSource[-old_x_byte], destn_width + old_x_byte);
+#else
                         memcpy(destn_ptr2, &pSource[-old_x_byte], destn_width + old_x_byte);
+#endif
                         destn_ptr2 += destn_width + old_x_byte;
                     }
                 } else {
                     if (pDest->width >= x_byte) {
+#ifdef DETHRACE_FIX_BUGS
+                        memmove(destn_ptr2, pSource, destn_width);
+#else
                         memcpy(destn_ptr2, pSource, destn_width);
+#endif
                         destn_ptr2 += destn_width;
                     } else if (old_x_byte < pDest->width) {
+#ifdef DETHRACE_FIX_BUGS
+                        memmove(destn_ptr2, pSource, pDest->width - old_x_byte);
+#else
                         memcpy(destn_ptr2, pSource, pDest->width - old_x_byte);
+#endif
                     }
                 }
                 pSource += destn_width;
