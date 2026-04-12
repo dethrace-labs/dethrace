@@ -496,28 +496,24 @@ int NewNetGameDown(int* pCurrent_choice, int* pCurrent_mode) {
     }
 
     new_sel = -1;
-    for (i = gLast_graph_sel__newgame - 1; i < COUNT_OF(gGames_to_join); i++) {
-        gLast_graph_sel__newgame = i;
-        if (gGames_to_join[i].game == NULL) {
-            continue;
+    for (i = gLast_graph_sel__newgame + 1; i < COUNT_OF(gGames_to_join); i++) {
+        if (gGames_to_join[i].game != NULL) {
+            if (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet) {
+                if (gGames_to_join[i].game->num_players < 6) {
+                    new_sel = i;
+                    break;
+                }
+            }
         }
-        if (!gGames_to_join[i].game->options.open_game && !gGames_to_join[i].game->no_races_yet) {
-            continue;
-        }
-        if (gGames_to_join[i].game->num_players > 5) {
-            continue;
-        }
-        new_sel = i;
-        break;
     }
-    if (new_sel < 0) {
-        gLast_graph_sel__newgame = -1;
-        *pCurrent_choice = 0;
-        *pCurrent_mode = 0;
-    } else {
+    if (new_sel >= 0) {
         gLast_graph_sel__newgame = new_sel;
         *pCurrent_choice = 2;
         *pCurrent_mode = 1;
+    } else {
+        *pCurrent_choice = 0;
+        *pCurrent_mode = 0;
+        gLast_graph_sel__newgame = -1;
     }
     return 1;
 }
