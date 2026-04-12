@@ -591,7 +591,7 @@ void F4Key(void) {
     tEdit_mode old_edit_mode;
 
     old_edit_mode = gWhich_edit_mode;
-    if (gI_am_cheating != 0xa11ee75d && (gI_am_cheating != 0x564e78b9 || gNet_mode != eNet_mode_none)) {
+    if (!(gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none))) {
         gWhich_edit_mode = eEdit_mode_options;
         return;
     }
@@ -657,11 +657,9 @@ void ShowSpecialVolumesIfRequ(void) {
 void DoEditModeKey(int pIndex) {
     int modifiers;
 
-    if (gI_am_cheating != 0xa11ee75d) {
-        if (gI_am_cheating != 0x564e78b9 || gNet_mode != eNet_mode_none) {
-            gWhich_edit_mode = eEdit_mode_options;
-            return;
-        }
+    if (!(gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none))) {
+        gWhich_edit_mode = eEdit_mode_options;
+        return;
     }
 
     if (PDKeyDown(KEY_SHIFT_ANY)) {

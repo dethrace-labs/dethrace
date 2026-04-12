@@ -372,7 +372,7 @@ int DRModelPick2D__finteray(br_model* model, br_material* material, br_vector3* 
 // FUNCTION: CARM95 0x004abe8d
 int FindHighestPolyCallBack__finteray(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
 
-    if ((pT) < gNearest_T) {
+    if (pT < gNearest_T) {
         gNearest_T = pT;
         gNearest_model = pModel;
         gNearest_face = pF;

@@ -1045,7 +1045,7 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     for (i = 0; i < packet_count; i++) {
         skip_count = MemReadU8(&pFlic_info->data);
         change_count = MemReadU8(&pFlic_info->data);
-        if (change_count != 0) {
+        if (change_count == 0) {
             change_count = 256;
         }
         current_colour += skip_count;

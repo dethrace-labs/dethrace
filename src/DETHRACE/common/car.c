@@ -3945,7 +3945,7 @@ void MultiFindFloorInBoxBU(int pNum_rays, br_vector3* a, br_vector3* b, br_vecto
             if (d[l] > dist[l]) {
                 d[l] = dist[l];
                 BrVector3Copy(&nor[l], &nor2);
-                j = *gFace_list__car[i].material->identifier - 47;
+                j = *gFace_list__car[i].material->identifier - '0' + 1;
                 if (j >= 0 && j < 11) {
                     mat_ref[l] = j;
                 }
@@ -7622,11 +7622,11 @@ int DoPullActorFromWorld(br_actor* pActor) {
     InitialiseNonCar(non_car);
     ResetCarSpecialVolume(c);
     if (gDoing_physics) {
-        BrVector3Scale((br_vector3*)&pActor->t.t.mat.m[3][0], (br_vector3*)&pActor->t.t.mat.m[3][0], WORLD_SCALE);
+        BrVector3Scale((br_vector3*)pActor->t.t.mat.m[3], (br_vector3*)pActor->t.t.mat.m[3], WORLD_SCALE);
     }
     BrMatrix34Copy(&c->oldmat, &pActor->t.t.mat);
     if (!gDoing_physics) {
-        BrVector3Scale((br_vector3*)&c->oldmat.m[3][0], (br_vector3*)&c->oldmat.m[3][0], WORLD_SCALE);
+        BrVector3Scale((br_vector3*)c->oldmat.m[3], (br_vector3*)c->oldmat.m[3], WORLD_SCALE);
     }
     PipeSingleNonCar(c);
     return 1;
@@ -7699,13 +7699,12 @@ void CheckForDeAttachmentOfNonCars(tU32 pTime) {
             if (c2->last_box.max.v[0] >= bnds.min.v[0]
                 && c2->last_box.max.v[1] >= bnds.min.v[1]
                 && c2->last_box.max.v[2] >= bnds.min.v[2]
-                && c2->last_box.min.v[0] <= bnds.max.v[0]) {
-                if (c2->last_box.min.v[1] <= bnds.max.v[1]) {
-                    if (c2->last_box.min.v[2] <= bnds.max.v[2]) {
-                        drop = 0;
-                        break;
-                    }
-                }
+                && c2->last_box.min.v[0] <= bnds.max.v[0]
+                && c2->last_box.min.v[1] <= bnds.max.v[1]
+                && c2->last_box.min.v[2] <= bnds.max.v[2]) {
+
+                drop = 0;
+                break;
             }
         }
         if (drop) {
