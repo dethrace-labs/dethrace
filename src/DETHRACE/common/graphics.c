@@ -3356,9 +3356,9 @@ void DrawTellyLine(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_height;
 
     the_width = pImage->width;
-    the_height = pImage->height / 2 + pTop;
-    BrPixelmapLine(gBack_screen, pLeft, the_height, pLeft + the_width, the_height, 0);
-    BrPixelmapLine(gBack_screen, the_width / 2 + pLeft - pPercentage * the_width / 200, the_height, the_width / 2 + pLeft + pPercentage * the_width / 200, the_height, 1);
+    the_height = pImage->height;
+    BrPixelmapLine(gBack_screen, pLeft, the_height / 2 + pTop, pLeft + the_width, the_height / 2 + pTop, 0);
+    BrPixelmapLine(gBack_screen, the_width / 2 + pLeft - pPercentage * the_width / 200, the_height / 2 + pTop, the_width / 2 + pLeft + pPercentage * the_width / 200, the_height / 2 + pTop, 1);
     PDScreenBufferSwap(0);
 }
 
