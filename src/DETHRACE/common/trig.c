@@ -313,9 +313,9 @@ br_angle FastFloatArcTan2Angle(float pY, float pX) {
     abs_y = fabs(pY);
     if (pX == 0.0f) {
         if (pY < 0.0f) {
-            return -16396;
+            return BR_ANGLE_DEG(270);
         } else if (pY > 0.0f) {
-            return 16380;
+            return BR_ANGLE_DEG(90);
         } else {
             return 0;
         }
