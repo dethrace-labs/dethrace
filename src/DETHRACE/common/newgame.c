@@ -675,10 +675,7 @@ void DisposeJoinList(int pExemption) {
     int i;
 
     for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
-        if (i == pExemption) {
-            continue;
-        }
-        if (gGames_to_join[i].game != NULL) {
+        if (i != pExemption && gGames_to_join[i].game != NULL) {
             DisposeJoinableGame(i);
         }
     }
