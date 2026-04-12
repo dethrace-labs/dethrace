@@ -2497,7 +2497,7 @@ void ChangeAmbience(br_scalar pDelta) {
 void InitAmbience(void) {
 
     gCurrent_ambience = gAmbient_adjustment;
-    ChangeAmbience(gAmbient_adjustment);
+    ChangeAmbience(gCurrent_ambience);
 }
 
 // IDA: void __usercall DRPixelmapRectangleMaskedCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight)
