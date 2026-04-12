@@ -103,27 +103,27 @@ void MoveDialFromTo(int pWhich_one, int pOld_stage, int pNew_stage) {
 
     start_time = PDGetTotalTime();
     DrawDial(pWhich_one, pNew_stage < 24 ? pNew_stage + 1 : 22);
-    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    while (PDGetTotalTime() - start_time < 20) {
     }
 
     start_time = PDGetTotalTime();
-    DrawDial(pWhich_one, pNew_stage == 0 ? 2 : pNew_stage - 1);
-    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    DrawDial(pWhich_one, pNew_stage != 0 ? pNew_stage - 1 : pNew_stage + 2);
+    while (PDGetTotalTime() - start_time < 20) {
     }
 
     start_time = PDGetTotalTime();
     DrawDial(pWhich_one, pNew_stage < 24 ? pNew_stage + 1 : 22);
-    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    while (PDGetTotalTime() - start_time < 20) {
     }
 
     start_time = PDGetTotalTime();
     DrawDial(pWhich_one, pNew_stage);
-    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    while (PDGetTotalTime() - start_time < 20) {
     }
 
     start_time = PDGetTotalTime();
-    DrawDial(pWhich_one, pNew_stage == 0 ? 2 : pNew_stage - 1);
-    while ((time_diff = PDGetTotalTime() - start_time) < 20) {
+    DrawDial(pWhich_one, pNew_stage != 0 ? pNew_stage - 1 : pNew_stage + 2);
+    while (PDGetTotalTime() - start_time < 20) {
     }
     DrawDial(pWhich_one, pNew_stage);
 }
@@ -174,18 +174,17 @@ int SoundOptionsRight(int* pCurrent_choice, int* pCurrent_mode) {
     int old_value;
     int* the_value;
 
-    if (*pCurrent_choice == 2) {
-        return 0;
+    if (*pCurrent_choice != 2) {
+        the_value = (*pCurrent_choice == 0) ? &gProgram_state.music_volume : &gProgram_state.effects_volume;
+        old_value = *the_value;
+        *the_value += 1;
+        if (*the_value > 6) {
+            *the_value = 6;
+        }
+        SetSoundVolumes();
+        DRS3StartSound(gEffects_outlet, 3000);
+        MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
     }
-    the_value = (*pCurrent_choice == 0) ? &gProgram_state.music_volume : &gProgram_state.effects_volume;
-    old_value = *the_value;
-    *the_value += 1;
-    if (*the_value >= 6) {
-        *the_value = 6;
-    }
-    SetSoundVolumes();
-    DRS3StartSound(gEffects_outlet, 3000);
-    MoveDialFromTo(*pCurrent_choice, 4 * old_value, 4 * *the_value);
     return 0;
 }
 
@@ -881,7 +880,11 @@ void StripControls(unsigned char* pStr) {
     len = strlen((char*)pStr);
     for (i = 0; i < len; i++) {
         if (pStr[i] < ' ') {
-            memmove(&pStr[i], &pStr[i + 1], (len - i) * sizeof(char));
+#ifdef DETHRACE_FIX_BUGS
+            memmove(&pStr[i], &pStr[i] + 1, (len - i) * sizeof(char));
+#else
+            memcpy(&pStr[i], &pStr[i] + 1, (len - i) * sizeof(char));
+#endif
             len--;
 #ifdef DETHRACE_FIX_BUGS
             // correctly handle stripping multiple control characters
@@ -935,23 +938,27 @@ void SaveOrigKeyMapping(void) {
 void GetKeyCoords(int pIndex, int* pY, int* pName_x, int* pKey_x, int* pEnd_box) {
     int col;
 
-    if (pIndex >= 0) {
-        col = gKey_count + 1;
-        *pY = (pIndex % ((gKey_count + 1) / 2)) * gCurrent_graf_data->key_assign_y_pitch + gCurrent_graf_data->key_assign_y;
-        if (pIndex < col / 2) {
-            *pName_x = gCurrent_graf_data->key_assign_col_1;
-            *pKey_x = gCurrent_graf_data->key_assign_col_1_a;
-            *pEnd_box = gCurrent_graf_data->key_assign_col_2 - 7;
-        } else {
-            *pName_x = gCurrent_graf_data->key_assign_col_2;
-            *pKey_x = gCurrent_graf_data->key_assign_col_2_a;
-            *pEnd_box = gCurrent_graf_data->key_assign_col_2 + gCurrent_graf_data->key_assign_col_2 - gCurrent_graf_data->key_assign_col_1 - 7;
-        }
-    } else {
+    if (pIndex < 0) {
         *pName_x = gCurrent_graf_data->key_assign_col_1;
         *pKey_x = 0;
         *pEnd_box = gCurrent_graf_data->key_assign_col_2 + gCurrent_graf_data->key_assign_col_2 - gCurrent_graf_data->key_assign_col_1 - 7;
         *pY = gCurrent_graf_data->key_assign_key_map_y;
+    } else {
+        if ((gKey_count + 1) / 2 <= pIndex) {
+            col = 1;
+        } else {
+            col = 0;
+        }
+        *pY = (pIndex % ((gKey_count + 1) / 2)) * gCurrent_graf_data->key_assign_y_pitch + gCurrent_graf_data->key_assign_y;
+        if (col != 0) {
+            *pName_x = gCurrent_graf_data->key_assign_col_2;
+            *pKey_x = gCurrent_graf_data->key_assign_col_2_a;
+            *pEnd_box = gCurrent_graf_data->key_assign_col_2 + gCurrent_graf_data->key_assign_col_2 - gCurrent_graf_data->key_assign_col_1 - 7;
+        } else {
+            *pName_x = gCurrent_graf_data->key_assign_col_1;
+            *pKey_x = gCurrent_graf_data->key_assign_col_1_a;
+            *pEnd_box = gCurrent_graf_data->key_assign_col_2 - 7;
+        }
     }
 }
 
@@ -1104,7 +1111,9 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
         ChangeKeyMapIndex(new_index);
         RadioChanged(12, new_index);
         DRS3StartSound(gEffects_outlet, 3000);
-    } else {
+        return 1;
+    }
+    else {
         if (gCurrent_key >= (gKey_count + 1) / 2) {
             gCurrent_key -= (gKey_count + 1) / 2;
         } else {
@@ -1114,8 +1123,8 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
             }
         }
         DRS3StartSound(gEffects_outlet, 3000);
+        return 1;
     }
-    return 1;
 }
 
 // IDA: int __usercall KeyAssignRight@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -1124,25 +1133,25 @@ int KeyAssignRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_index;
 
     if (gCurrent_key < 0) {
-        if (gKey_map_index < 3) {
-            new_index = gKey_map_index + 1;
-        } else {
+        if (gKey_map_index >= 3) {
             new_index = 0;
+        } else {
+            new_index = gKey_map_index + 1;
         }
         ChangeKeyMapIndex(new_index);
         RadioChanged(12, new_index);
         DRS3StartSound(gEffects_outlet, 3000);
-    } else {
-        if (gCurrent_key >= (gKey_count + 1) / 2) {
-            gCurrent_key -= (gKey_count + 1) / 2;
-        } else {
-            gCurrent_key += (gKey_count + 1) / 2;
-            if (gCurrent_key >= gKey_count) {
-                gCurrent_key -= (gKey_count + 1) / 2;
-            }
-        }
-        DRS3StartSound(gEffects_outlet, 3000);
+        return 1;
     }
+    if (gCurrent_key >= (gKey_count + 1) / 2) {
+        gCurrent_key -= (gKey_count + 1) / 2;
+    } else {
+        gCurrent_key += (gKey_count + 1) / 2;
+        if (gCurrent_key >= gKey_count) {
+            gCurrent_key -= (gKey_count + 1) / 2;
+        }
+    }
+    DRS3StartSound(gEffects_outlet, 3000);
     return 1;
 }
 
@@ -1165,11 +1174,11 @@ int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
     } else if (gCurrent_key == (gKey_count + 1) / 2) {
         *pCurrent_choice = 0;
         *pCurrent_mode = 0;
-    } else if (gCurrent_key == 0) {
+    } else if (gCurrent_key != 0) {
+        gCurrent_key -= 1;
+    } else {
         *pCurrent_choice = 0;
         *pCurrent_mode = 0;
-    } else {
-        gCurrent_key -= 1;
     }
     DRS3StartSound(gEffects_outlet, 3000);
     return 1;
@@ -1180,26 +1189,28 @@ int KeyAssignUp(int* pCurrent_choice, int* pCurrent_mode) {
 int KeyAssignDown(int* pCurrent_choice, int* pCurrent_mode) {
 
     if (*pCurrent_mode == 0) {
-        if (*pCurrent_choice >= 2) {
-            gCurrent_key = (gKey_count + 1) / 2;
-        } else {
+        if (*pCurrent_choice < 2) {
             gCurrent_key = 0;
+        } else {
+            gCurrent_key = (gKey_count + 1) / 2;
         }
         *pCurrent_choice = 4;
         *pCurrent_mode = 1;
     } else if (gCurrent_key < 0) {
         *pCurrent_choice = 0;
         *pCurrent_mode = 0;
-    } else if (gCurrent_key < (gKey_count + 1) / 2) {
-        if (gCurrent_key < ((gKey_count + 1) / 2 - 1)) {
+    } else {
+        if ((gKey_count + 1) / 2 <= gCurrent_key) {
+            if (gCurrent_key < gKey_count - 1) {
+                gCurrent_key += 1;
+            } else {
+                gCurrent_key = -1;
+            }
+        } else if (gCurrent_key < ((gKey_count + 1) / 2 - 1)) {
             gCurrent_key += 1;
         } else {
             gCurrent_key = -1;
         }
-    } else if (gCurrent_key < gKey_count - 1) {
-        gCurrent_key += 1;
-    } else {
-        gCurrent_key = -1;
     }
     DRS3StartSound(gEffects_outlet, 3000);
     return 1;

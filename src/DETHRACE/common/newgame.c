@@ -675,10 +675,7 @@ void DisposeJoinList(int pExemption) {
     int i;
 
     for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
-        if (i == pExemption) {
-            continue;
-        }
-        if (gGames_to_join[i].game != NULL) {
+        if (i != pExemption && gGames_to_join[i].game != NULL) {
             DisposeJoinableGame(i);
         }
     }
@@ -1168,15 +1165,14 @@ void DefaultNetSettings(void) {
 
     PathCat(the_path, gApplication_path, "NETDEFLT.TXT");
     f = DRfopen(the_path, "rt");
-    if (f == NULL) {
-        return;
+    if (f != NULL) {
+        ReadNetworkSettings(f, gNet_settings);
+        rewind(f);
+        for (i = 0; i < COUNT_OF(gNet_settings) - 1; i++) {
+            ReadNetworkSettings(f, &gNet_settings[i] + 1);
+        }
+        fclose(f);
     }
-    ReadNetworkSettings(f, gNet_settings);
-    rewind(f);
-    for (i = 0; i < COUNT_OF(gNet_settings) - 1; i++) {
-        ReadNetworkSettings(f, &gNet_settings[i + 1]);
-    }
-    fclose(f);
 }
 
 // IDA: int __usercall NetOptGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -1379,9 +1375,7 @@ void DrawNetChooseInitial(void) {
 // FUNCTION: CARM95 0x004b1d9c
 int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 
-    if (*pCurrent_mode == 0) {
-        return 1;
-    } else {
+    if (*pCurrent_mode != 0) {
         if (*pCurrent_choice - 4 != gCurrent_game_selection) {
             RemoveTransientBitmaps(1);
             DontLetFlicFuckWithPalettes();
@@ -1402,6 +1396,8 @@ int NetChooseGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
             }
         }
         return 0;
+    } else {
+        return 1;
     }
 }
 
@@ -1887,6 +1883,9 @@ int DoMultiPlayerStart(void) {
             return 1;
         }
     case eJoin_or_host_host:
+#if defined(DETHRACE_FIX_BUGS)
+        gCar_details = BrMemCalloc(gNumber_of_racers, sizeof(tCar_detail_info), kMem_net_car_spec);
+#endif
 #if defined(DETHRACE_FIX_BUGS)
         /* Don't allow hosting a game when the game is launched with --no-bind */
         if (harness_game_config.no_bind) {

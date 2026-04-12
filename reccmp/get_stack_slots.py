@@ -12,7 +12,7 @@ from typing import Optional
 
 def find_function_file(function_name: str, build_dir: Path) -> Optional[Path]:
     """Find which .asm file contains the given function."""
-    search_pattern = f"_{function_name} PROC"
+    search_pattern = f"_{function_name}.*PROC"
     asm_files = glob.glob(str(build_dir / "*.asm"))
 
     if not asm_files:
@@ -36,8 +36,8 @@ def find_function_file(function_name: str, build_dir: Path) -> Optional[Path]:
 
 def extract_stack_slots(asm_file: Path, function_name: str) -> list[str]:
     """Extract stack slot definitions for the given function."""
-    proc_pattern = f"_{function_name} PROC"
-    slot_pattern = re.compile(r'^(_\w+)\$ = (-?\d+)$')
+    proc_pattern = f"_{function_name}"
+    slot_pattern = re.compile(r'^(_[\w$]+) = (-?\d+)$')
 
     with open(asm_file, 'r') as f:
         lines = f.readlines()
@@ -78,15 +78,18 @@ def extract_stack_slots(asm_file: Path, function_name: str) -> list[str]:
             else:
                 hex_str = f"[ebp + {hex(offset)}]"
 
-            stack_slots.append(f"{clean_var_name} = {hex_str}")
+            stack_slots.append((offset, f"{clean_var_name} = {hex_str}"))
         elif line and not line.startswith(';'):
             # Non-empty, non-comment line that doesn't match pattern - stop
             # But allow empty lines and comments to continue
             if not (line == "" or line.startswith(";")):
                 break
 
-    # Reverse to get original order (top to bottom)
-    return list(reversed(stack_slots))
+    # Sort by offset (highest first, i.e., positive offsets first, then negative from highest to lowest)
+    stack_slots.sort(key=lambda x: x[0], reverse=True)
+
+    # Return just the formatted strings
+    return [slot[1] for slot in stack_slots]
 
 
 def main():
