@@ -1159,9 +1159,9 @@ int BoundsTransformTest(br_bounds* b1, br_bounds* b2, br_matrix34* M) {
         < b2->min.v[1]) {
         return 0;
     }
-    if ((M->m[0][1] < 0.0 ? M->m[0][1] * o.v[0] : 0.0)
-            + (M->m[1][1] < 0.0 ? M->m[1][1] * o.v[1] : 0.0)
-            + (M->m[2][1] < 0.0 ? M->m[2][1] * o.v[2] : 0.0)
+    if ((M->m[0][1] < 0.0f ? M->m[0][1] * o.v[0] : 0.0f)
+            + (M->m[1][1] < 0.0f ? M->m[1][1] * o.v[1] : 0.0f)
+            + (M->m[2][1] < 0.0f ? M->m[2][1] * o.v[2] : 0.0f)
             + val
         > b2->max.v[1]) {
         return 0;
