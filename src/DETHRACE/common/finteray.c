@@ -1283,10 +1283,10 @@ int CompVert(int v1, int v2) {
     br_vector3 tv;
     br_vector2 tv2;
 
+    vl = gSelected_model->vertices;
     if (v1 == v2) {
         return 1;
     }
-    vl = gSelected_model->vertices;
     BrVector3Sub(&tv, &vl[v1].p, &vl[v2].p);
     if (BrVector3LengthSquared(&tv) > 1e-5f) {
         return 0;
