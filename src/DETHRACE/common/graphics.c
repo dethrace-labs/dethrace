@@ -2675,68 +2675,90 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
         dest_ptr -= pDest_y * pDest->row_bytes;
         pDest_y = 0;
     }
-    if (pDest->height > pDest_y) {
-        if (pDest_y + pHeight > pDest->height) {
-            pHeight = pDest->height - pDest_y;
+    if (pDest->height <= pDest_y) {
+        return;
+    }
+    if (pDest_y + pHeight > pDest->height) {
+        pHeight -= pDest_y + pHeight - pDest->height;
+    }
+    if (pDest_x < 0) {
+        pWidth += pDest_x;
+        if (pWidth <= 0) {
+            return;
         }
+        source_ptr -= pDest_x;
+        dest_ptr -= pDest_x;
+        source_row_wrap -= pDest_x;
+        dest_row_wrap -= pDest_x;
+        pDest_x = 0;
+    }
+    if (pDest->width <= pDest_x) {
+        return;
+    }
+#if !defined(DETHRACE_FIX_BUGS)
+    /*
+     * The OG compares against pWidth instead of pWidth_orig, which
+     * ends up clipped to the dest pixelmap width. This effectively
+     * clips the consecutive rows of pixels along the shear, leaving
+     * a visible gap on the screen. Instead, when comparing against
+     * pWidth_orig, the clip takes place vertically along the dest
+     * pixelmap edge, allowing all pixels to be displayed.
+     *
+     * Simulate OG behavior by overwriting pWidth_orig with pWidth.
+     */
+    pWidth_orig = pWidth;
+#endif
+    if (pDest_x + pWidth > pDest->width) {
+        shear_x_difference = pDest_x + pWidth - pDest->width;
+        pWidth -= shear_x_difference;
+        source_row_wrap += shear_x_difference;
+        dest_row_wrap += shear_x_difference;
+    }
+    for (y_count = 0; y_count < pHeight; y_count++) {
+#if !defined(DETHRACE_FIX_BUGS)
+        /*
+         * The OG compares against pWidth instead of pWidth_orig, which
+         * ends up clipped to the dest pixelmap width. This effectively
+         * clips the consecutive rows of pixels along the shear, leaving
+         * a visible gap on the screen. Instead, when comparing against
+         * pWidth_orig, the clip takes place vertically along the dest
+         * pixelmap edge, allowing all pixels to be displayed.
+         *
+         * Simulate OG behavior by overwriting pWidth_orig with pWidth.
+         */
+        pWidth_orig = pWidth;
+#endif
+        for (x_count = 0; x_count < pWidth; x_count++) {
+            the_byte = *source_ptr;
+            source_ptr++;
+            if (the_byte) {
+                *dest_ptr = the_byte;
+            }
+            dest_ptr++;
+        }
+        current_shear_x = current_shear >> 16;
+        shear_x_difference = current_shear_x - last_shear_x;
+        dest_ptr += shear_x_difference + dest_row_wrap;
+        last_shear_x = current_shear_x;
+        source_ptr += source_row_wrap;
+        current_shear += pShear;
+        pDest_x += shear_x_difference;
         if (pDest_x < 0) {
             pWidth += pDest_x;
-            if (pWidth <= 0) {
-                return;
-            }
             source_ptr -= pDest_x;
             dest_ptr -= pDest_x;
             source_row_wrap -= pDest_x;
             dest_row_wrap -= pDest_x;
             pDest_x = 0;
         }
-        if (pDest->width > pDest_x) {
-            pWidth_orig = pWidth;
-            for (y_count = 0; pHeight > y_count; ++y_count) {
-#if !defined(DETHRACE_FIX_BUGS)
-                /*
-                 * The OG compares against pWidth instead of pWidth_orig, which
-                 * ends up clipped to the dest pixelmap width. This effectively
-                 * clips the consecutive rows of pixels along the shear, leaving
-                 * a visible gap on the screen. Instead, when comparing against
-                 * pWidth_orig, the clip takes place vertically along the dest
-                 * pixelmap edge, allowing all pixels to be displayed.
-                 *
-                 * Simulate OG behavior by overwriting pWidth_orig with pWidth.
-                 */
-                pWidth_orig = pWidth;
-#endif
-                if (pDest_x + pWidth_orig > pDest->width) {
-                    shear_x_difference = pDest_x + pWidth - pDest->width;
-                    pWidth = pDest->width - pDest_x;
-                    source_row_wrap += shear_x_difference;
-                    dest_row_wrap += shear_x_difference;
-                }
-                for (x_count = 0; pWidth > x_count; ++x_count) {
-                    the_byte = *source_ptr++;
-                    if (the_byte) {
-                        *dest_ptr = the_byte;
-                    }
-                    ++dest_ptr;
-                }
-                current_shear_x = (current_shear >> 16) - last_shear_x;
-                dest_ptr += dest_row_wrap + current_shear_x;
-                last_shear_x = current_shear >> 16;
-                source_ptr += source_row_wrap;
-                current_shear += pShear;
-                pDest_x += current_shear_x;
-                if (pDest_x < 0) {
-                    pWidth += pDest_x;
-                    source_ptr -= pDest_x;
-                    dest_ptr -= pDest_x;
-                    source_row_wrap -= pDest_x;
-                    dest_row_wrap -= pDest_x;
-                    pDest_x = 0;
-                }
-                if (pDest->width <= pDest_x) {
-                    break;
-                }
-            }
+        if (pDest->width <= pDest_x) {
+            break;
+        }
+        if (pDest_x + pWidth > pDest->width) {
+            shear_x_difference = pDest_x + pWidth - pDest->width;
+            pWidth -= shear_x_difference;
+            source_row_wrap += shear_x_difference;
+            dest_row_wrap += shear_x_difference;
         }
     }
 }
