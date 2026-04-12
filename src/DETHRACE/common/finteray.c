@@ -1261,18 +1261,19 @@ int LineBoxCollWithSphere(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector
     if (plane != 0) {
         return plane;
     }
-    if (!SphereBoxIntersection(pB, p, 2.5e-5f, pHit_point)) {
+    if (SphereBoxIntersection(pB, p, 2.5e-5f, pHit_point)) {
+        for (i = 0; i < 3; i++) {
+            if (pB->max.v[i] == pHit_point->v[i] && p->v[i] <= o->v[i]) {
+                return i + 1;
+            }
+            if (pHit_point->v[i] == pB->min.v[i] && p->v[i] >= o->v[i]) {
+                return i + 5;
+            }
+        }
+        return 0;
+    } else {
         return 0;
     }
-    for (i = 0; i < 3; i++) {
-        if (pB->max.v[i] == pHit_point->v[i] && p->v[i] <= o->v[i]) {
-            return i + 1;
-        }
-        if (pHit_point->v[i] == pB->min.v[i] && p->v[i] >= o->v[i]) {
-            return i + 5;
-        }
-    }
-    return 0;
 }
 
 // IDA: int __usercall CompVert@<EAX>(int v1@<EAX>, int v2@<EDX>)
