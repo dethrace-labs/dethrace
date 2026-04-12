@@ -3234,30 +3234,31 @@ void DrawDropImage(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int 
         pImage->width,
         pBottom_clip - pTop_clip,
         0);
-    if (pOffset != 1000) {
-        src_y = 0;
-        src_height = pImage->height;
-        y = pOffset + pTop;
-        y_diff = pTop_clip - y;
-        if (y_diff > 0) {
-            src_height -= y_diff;
-            y += y_diff;
-            src_y = y_diff;
-        }
-        y_diff = pBottom_clip - y - pImage->height;
-        if (y_diff < 0) {
-            src_height += y_diff;
-        }
-        BrPixelmapRectangleCopy(gBack_screen,
-            pLeft,
-            y,
-            pImage,
-            0,
-            src_y,
-            pImage->width,
-            src_height);
-        PDScreenBufferSwap(0);
+    if (pOffset == 1000) {
+        return;
     }
+    src_y = 0;
+    src_height = pImage->height;
+    y = pOffset + pTop;
+    y_diff = pTop_clip - y;
+    if (y_diff > 0) {
+        src_y += y_diff;
+        src_height -= y_diff;
+        y += y_diff;
+    }
+    y_diff = pBottom_clip - y - pImage->height;
+    if (y_diff < 0) {
+        src_height += y_diff;
+    }
+    BrPixelmapRectangleCopy(gBack_screen,
+        pLeft,
+        y,
+        pImage,
+        0,
+        src_y,
+        pImage->width,
+        src_height);
+    PDScreenBufferSwap(0);
 }
 
 // IDA: void __usercall DropInImageFromTop(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip)
