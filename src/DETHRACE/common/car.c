@@ -6576,6 +6576,7 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     static br_vector3 oldn2;
     static int is_old_point_available;
 
+    add_point = pPass;
     if (!gCar_car_collisions) {
         return 0;
     }
@@ -6583,13 +6584,12 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
         return 0;
     }
 
-    add_point = pPass;
     mat1 = &car1->car_master_actor->t.t.mat;
     mat2 = &car2->car_master_actor->t.t.mat;
     oldmat1 = &car1->oldmat;
     oldmat2 = &car2->oldmat;
-    BrMatrix34LPInverse(&inv_oldmat1, &car1->oldmat);
-    BrMatrix34LPInverse(&inv_oldmat2, &car2->oldmat);
+    BrMatrix34LPInverse(&inv_oldmat1, oldmat1);
+    BrMatrix34LPInverse(&inv_oldmat2, oldmat2);
     BrMatrix34Mul(&car1_to_old_car1, mat1, &inv_oldmat1);
     BrMatrix34Mul(&car2_to_old_car2, mat2, &inv_oldmat2);
     BrMatrix34Mul(&old_car2_to_car1, oldmat2, &inv_oldmat1);
@@ -6623,7 +6623,7 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
     BrMatrix34Mul(&car2_to_old_car2, mat2, &inv_oldmat2);
     do {
         k = 0;
-        k += FacePointCarCarCollide(car1, car2, &car2_to_car1, &old_car2_to_car1, &car1_to_old_car1, r, n, 8, 0);
+        k += FacePointCarCarCollide(car1, car2, &car2_to_car1, &old_car2_to_car1, &car1_to_old_car1, r, n, 8 - k, 0);
         k += FacePointCarCarCollide(car2, car1, &car1_to_car2, &old_car1_to_car2, &car2_to_old_car2, &r[2 * k], &n[2 * k], 8 - k, 1);
         old_k = k;
 
@@ -6639,19 +6639,17 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
         if (k > 4) {
             i = old_k;
             j = old_k;
-            while (i < k) {
-                if (BrVector3Dot(&n[2 * i + 1], &r[2 * i + 1]) <= 0.0f || i - j >= k - 4) {
-                    if (j != i) {
-                        r[2 * j] = r[2 * i];
-                    }
-                    n[2 * j] = n[2 * i];
-                    r[2 * j + 1] = r[2 * i + 1];
-                    n[2 * j + 1] = n[2 * i + 1];
-                } else {
+            for (; i < k; i++, j++) {
+                if (BrVector3Dot(&r[2 * i + 1], &n[2 * i + 1]) > 0.0f && i - j < k - 4) {
                     j--;
+                } else {
+                    if (j != i) {
+                        BrVector3Copy(&r[2 * j], &r[2 * i]);
+                    }
+                    BrVector3Copy(&n[2 * j], &n[2 * i]);
+                    BrVector3Copy(&r[2 * j + 1], &r[2 * i + 1]);
+                    BrVector3Copy(&n[2 * j + 1], &n[2 * i + 1]);
                 }
-                i++;
-                j++;
             }
             k = j;
         }
@@ -6672,28 +6670,28 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
                 }
             }
             if (add_point) {
-                r[2 * k] = oldr1;
-                r[2 * k + 1] = oldr2;
-                n[2 * k] = oldn1;
-                n[2 * k + 1] = oldn2;
+                BrVector3Copy(&r[2 * k], &oldr1);
+                BrVector3Copy(&r[2 * k + 1], &oldr2);
+                BrVector3Copy(&n[2 * k], &oldn1);
+                BrVector3Copy(&n[2 * k + 1], &oldn2);
                 k++;
             }
         }
-        oldr1 = r[0];
-        oldr2 = r[1];
-        oldn1 = n[0];
-        oldn2 = n[1];
+        BrVector3Copy(&oldr1, &r[0]);
+        BrVector3Copy(&oldr2, &r[1]);
+        BrVector3Copy(&oldn1, &n[0]);
+        BrVector3Copy(&oldn2, &n[1]);
         if (k < 3) {
             if (car1->collision_flag && !car1->infinite_mass) {
 
                 for (i = 0; i < k; i++) {
                     if (BrVector3Dot(&n[2 * i], &car1->old_norm) < -0.9f) {
-                        car1->infinite_mass |= 0x100u;
+                        car1->infinite_mass |= 0x100;
                     }
                 }
                 if (!car1->infinite_mass) {
-                    r[2 * k] = car1->old_point;
-                    n[2 * k] = car1->old_norm;
+                    BrVector3Copy(&r[2 * k], &car1->old_point);
+                    BrVector3Copy(&n[2 * k], &car1->old_norm);
                     BrVector3SetFloat(&n[2 * k + 1], 0.0f, 0.0f, 0.0f);
                     BrVector3SetFloat(&r[2 * k + 1], 0.0f, 0.0f, 0.0f);
                     k++;
@@ -6702,12 +6700,12 @@ int CollideTwoCars(tCollision_info* car1, tCollision_info* car2, int pPass) {
             if (car2->collision_flag && !car2->infinite_mass) {
                 for (i = 0; i < k; i++) {
                     if (BrVector3Dot(&n[2 * i + 1], &car2->old_norm) < -0.9f) {
-                        car2->infinite_mass |= 0x100u;
+                        car2->infinite_mass |= 0x100;
                     }
                 }
                 if (!car2->infinite_mass) {
-                    r[2 * k + 1] = car2->old_point;
-                    n[2 * k + 1] = car2->old_norm;
+                    BrVector3Copy(&r[2 * k + 1], &car2->old_point);
+                    BrVector3Copy(&n[2 * k + 1], &car2->old_norm);
                     BrVector3SetFloat(&n[2 * k], 0.0f, 0.0f, 0.0f);
                     BrVector3SetFloat(&r[2 * k], 0.0f, 0.0f, 0.0f);
                     k++;
