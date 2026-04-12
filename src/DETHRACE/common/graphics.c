@@ -2325,7 +2325,8 @@ void ResetPalette(void) {
 void Darken(tU8* pPtr, unsigned int pDarken_amount) {
     unsigned int value;
 
-    *pPtr = (pDarken_amount * *pPtr) / 256;
+    value = *pPtr;
+    *pPtr = (value * pDarken_amount) / 256;
 }
 
 // IDA: void __usercall SetFadedPalette(int pDegree@<EAX>)
