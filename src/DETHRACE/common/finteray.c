@@ -1184,53 +1184,50 @@ int LineBoxColl(br_vector3* o, br_vector3* p, br_bounds* pB, br_vector3* pHit_po
     inside = 1;
     BrVector3Sub(&dir, p, o);
     for (i = 0; i < 3; ++i) {
-        if (pB->min.v[i] <= o->v[i]) {
-            if (pB->max.v[i] >= o->v[i]) {
-                quad[i] = 2;
-            } else {
-                quad[i] = 0;
-                max_t[i] = pB->max.v[i];
-                inside = 0;
-            }
-        } else {
+        if (pB->min.v[i] > o->v[i]) {
             quad[i] = 1;
-            max_t[i] = pB->min.v[i];
+            cp[i] = pB->min.v[i];
             inside = 0;
+        } else if (pB->max.v[i] < o->v[i]) {
+            quad[i] = 0;
+            cp[i] = pB->max.v[i];
+            inside = 0;
+        } else {
+            quad[i] = 2;
         }
     }
     if (inside) {
         BrVector3Copy(pHit_point, o);
         return 8;
-    } else {
-        for (i = 0; i < 3; ++i) {
-            if (quad[i] == 2 || dir.v[i] == 0.0) {
-                cp[i] = -1.0;
-            } else {
-                cp[i] = (max_t[i] - o->v[i]) / dir.v[i];
-            }
-        }
-        which_plane = 0;
-        for (i = 1; i < 3; ++i) {
-            if (cp[which_plane] < cp[i]) {
-                which_plane = i;
-            }
-        }
-        if (cp[which_plane] >= 0.0 && cp[which_plane] <= 1.0) {
-            for (i = 0; i < 3; ++i) {
-                if (which_plane == i) {
-                    pHit_point->v[i] = max_t[i];
-                } else {
-                    pHit_point->v[i] = dir.v[i] * cp[which_plane] + o->v[i];
-                    if (pHit_point->v[i] < pB->min.v[i] || pB->max.v[i] < pHit_point->v[i]) {
-                        return 0;
-                    }
-                }
-            }
-            return which_plane + 4 * quad[which_plane] + 1;
+    }
+
+    for (i = 0; i < 3; ++i) {
+        if (quad[i] != 2 && dir.v[i] != 0.0f) {
+            max_t[i] = (cp[i] - o->v[i]) / dir.v[i];
         } else {
-            return 0;
+            max_t[i] = -1.0f;
         }
     }
+    which_plane = 0;
+    for (i = 1; i < 3; ++i) {
+        if (max_t[i] > max_t[which_plane]) {
+            which_plane = i;
+        }
+    }
+    if (max_t[which_plane] < 0.0f || max_t[which_plane] > 1.0f) {
+        return 0;
+    }
+    for (i = 0; i < 3; ++i) {
+        if (which_plane != i) {
+            pHit_point->v[i] = dir.v[i] * max_t[which_plane] + o->v[i];
+            if (pHit_point->v[i] < pB->min.v[i] || pB->max.v[i] < pHit_point->v[i]) {
+                return 0;
+            }
+        } else {
+            pHit_point->v[i] = cp[i];
+        }
+    }
+    return which_plane + 4 * quad[which_plane] + 1;
 }
 
 // IDA: int __usercall SphereBoxIntersection@<EAX>(br_bounds *pB@<EAX>, br_vector3 *pC@<EDX>, br_scalar pR_squared, br_vector3 *pHit_point)
