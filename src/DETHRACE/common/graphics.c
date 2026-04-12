@@ -1045,8 +1045,8 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
 // FUNCTION: CARM95 0x004b3f3a
 void SetScreenWobble(int pWobble_x, int pWobble_y) {
 
-    gScreen_wobble_y = pWobble_y;
     gScreen_wobble_x = pWobble_x;
+    gScreen_wobble_y = pWobble_y;
 }
 
 // IDA: void __cdecl ResetScreenWobble()
