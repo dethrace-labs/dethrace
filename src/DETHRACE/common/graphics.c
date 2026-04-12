@@ -912,7 +912,8 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
         PDSetPalette(pThe_palette);
     }
     if (pThe_palette != gRender_palette) {
-        gPalette_munged |= 1u;
+        gPalette_munged |= 1;
+    } else {
     }
 }
 
