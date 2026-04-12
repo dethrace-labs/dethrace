@@ -2516,6 +2516,8 @@ void DrawSomeText2(tDR_font* pFont) {
 // IDA: void __cdecl DrawSomeText()
 // FUNCTION: CARM95 0x00485d80
 void DrawSomeText(void) {
+#ifdef DETHRACE_FIX_BUGS
+    // Font test present in DOS version, but disabled by default
     DrawSomeText2(&gFonts[kFont_ORANGHED]);
     DrawSomeText2(&gFonts[kFont_BLUEHEAD]);
     DrawSomeText2(&gFonts[kFont_GREENHED]);
@@ -2523,6 +2525,7 @@ void DrawSomeText(void) {
     DrawSomeText2(&gFonts[kFont_NEWHITE]);
     DrawSomeText2(&gFonts[kFont_NEWRED]);
     DrawSomeText2(&gFonts[kFont_NEWBIGGR]);
+#endif
 }
 
 // IDA: void __cdecl SaySorryYouLittleBastard()
