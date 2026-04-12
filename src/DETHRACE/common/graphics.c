@@ -452,16 +452,17 @@ void ResetLollipopQueue(void) {
 // FUNCTION: CARM95 0x004b305f
 int AddToLollipopQueue(br_actor* pActor, int pIndex) {
 
-    if (pIndex >= 0) {
-        gLollipops[pIndex] = pActor;
-    } else if (gNumber_of_lollipops >= 100) {
-        pIndex = -1;
+    if (pIndex < 0) {
+        if (gNumber_of_lollipops < 100) {
+            gLollipops[gNumber_of_lollipops] = pActor;
+            gNumber_of_lollipops++;
+            return gNumber_of_lollipops - 1;
+        }
+        return -1;
     } else {
-        gLollipops[gNumber_of_lollipops] = pActor;
-        pIndex = gNumber_of_lollipops;
-        gNumber_of_lollipops++;
+        gLollipops[pIndex] = pActor;
+        return pIndex;
     }
-    return pIndex;
 }
 
 // IDA: void __cdecl RenderLollipops()
