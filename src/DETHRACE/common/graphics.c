@@ -3260,13 +3260,9 @@ void DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip,
     tS32 the_time;
     int drop_distance;
 
-    start_time = PDGetTotalTime();
     drop_distance = pImage->height - pTop_clip + pTop;
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (the_time >= start_time + 100) {
-            break;
-        }
+    start_time = PDGetTotalTime();
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
         DrawDropImage(pImage,
             pLeft,
             pTop,
