@@ -6425,27 +6425,27 @@ int CollideTwoCarsWithWalls(tCollision_info* car1, tCollision_info* car2, br_sca
     do {
         l = CollideTwoCarsRepeatedly(car1, car2, dt);
         if (l > 0) {
-            ++p;
+            p++;
             if (l >= 5) {
-                if (p >= 10 || car1->infinite_mass || car2->infinite_mass) {
+                if (p < 10 && !car1->infinite_mass && !car2->infinite_mass) {
+                    BrVector3Set(&car1->omega, 0.0f, 0.0f, 0.0f);
+                    BrVector3Set(&car2->omega, 0.0f, 0.0f, 0.0f);
+                    BrVector3Scale(&mom1, &car1->v, car1->M);
+                    BrVector3Scale(&mom2, &car2->v, car2->M);
+                    BrVector3Accumulate(&mom1, &mom2);
+                    BrVector3InvScale(&car1->v, &mom1, car2->M + car1->M);
+                    BrVector3Copy(&car2->v, &car1->v);
+                    RotateCar(car1, dt);
+                    TranslateCar(car1, dt);
+                    RotateCar(car2, dt);
+                    TranslateCar(car2, dt);
+                    if (CollideTwoCars(car1, car2, -1)) {
+                        return -1;
+                    }
+                } else {
                     return -1;
                 }
-                BrVector3Set(&car1->omega, 0.0f, 0.0f, 0.0f);
-                BrVector3Set(&car2->omega, 0.0f, 0.0f, 0.0f);
-                BrVector3Scale(&mom1, &car1->v, car1->M);
-                BrVector3Scale(&mom2, &car2->v, car2->M);
-                BrVector3Accumulate(&mom1, &mom2);
-                BrVector3InvScale(&car1->v, &mom1, car2->M + car1->M);
-                car2->v.v[0] = car1->v.v[0];
-                car2->v.v[1] = car1->v.v[1];
-                car2->v.v[2] = car1->v.v[2];
-                RotateCar(car1, dt);
-                TranslateCar(car1, dt);
-                RotateCar(car2, dt);
-                TranslateCar(car2, dt);
-                if (CollideTwoCars(car1, car2, -1)) {
-                    return -1;
-                } else if (im1 || im2) {
+                if (im1 || im2) {
                     return -1;
                 }
             }
