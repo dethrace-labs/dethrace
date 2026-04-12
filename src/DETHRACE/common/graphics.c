@@ -1175,19 +1175,21 @@ int OppositeColour(int pColour) {
     int brightness;
 
     if (pColour < 224) {
-        if ((pColour & 0x7) < 4) {
-            brightness = 255;
+        brightness = pColour & 0x7;
+        if (brightness < 4) {
+            pColour = 255;
         } else {
-            brightness = 0;
+            pColour = 0;
         }
     } else {
-        if ((pColour & 0xf) < 8) {
-            brightness = 255;
+        brightness = pColour & 0xf;
+        if (brightness < 8) {
+            pColour = 255;
         } else {
-            brightness = 0;
+            pColour = 0;
         }
     }
-    return brightness;
+    return pColour;
 }
 
 // IDA: void __usercall DrawMapBlip(tCar_spec *pCar@<EAX>, tU32 pTime@<EDX>, br_matrix34 *pTrans@<EBX>, br_vector3 *pPos@<ECX>, int pColour)
