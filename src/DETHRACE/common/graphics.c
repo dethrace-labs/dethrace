@@ -2338,9 +2338,9 @@ void SetFadedPalette(int pDegree) {
     memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
     for (j = 0; j < 256; j++) {
         Darken((tU8*)&gScratch_pixels[4 * j], pDegree);
-        Darken((tU8*)&gScratch_pixels[4 * j + 1], pDegree);
-        Darken((tU8*)&gScratch_pixels[4 * j + 2], pDegree);
-        Darken((tU8*)&gScratch_pixels[4 * j + 3], pDegree);
+        Darken((tU8*)(&gScratch_pixels[4 * j]) + 1, pDegree);
+        Darken((tU8*)(&gScratch_pixels[4 * j]) + 2, pDegree);
+        Darken((tU8*)(&gScratch_pixels[4 * j]) + 3, pDegree);
     }
     DRSetPalette2(gScratch_palette, 0);
 }
