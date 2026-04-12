@@ -6,7 +6,6 @@
 #include "depth.h"
 #include "displays.h"
 #include "drmem.h"
-#include "errors.h"
 #include "flicplay.h"
 #include "globvars.h"
 #include "globvrkm.h"
