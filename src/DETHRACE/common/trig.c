@@ -258,37 +258,37 @@ float FastFloatArcTan2(float pY, float pX) {
     if (pX == 0.0f) {
         if (pY < 0.0f) {
             return 270.0;
-        } else if (pY == 0.0f) {
-            return 0.0f;
-        } else {
+        } else if (pY > 0.0f) {
             return 90.0f;
+        } else {
+            return 0.0f;
         }
-    } else if (pX > 0.0f) {
-        if (pY >= 0.0) {
-            if (abs_y <= abs_x) {
-                return abs_y / abs_x * 45.0f;
+    } else if (pX < 0.0f) {
+        if (pY < 0.0f) {
+            if (abs_y > abs_x) {
+                return (6.0f - abs_x / abs_y) * 45.0;
             } else {
-                return (2.0f - abs_x / abs_y) * 45.0f;
+                return (abs_y / abs_x + 4.0f) * 45.0;
             }
         } else {
-            if (abs_y <= abs_x) {
-                return (8.0f - abs_y / abs_x) * 45.0f;
+            if (abs_y > abs_x) {
+                return (abs_x / abs_y + 2.0f) * 45.0;
             } else {
-                return (abs_x / abs_y + 6.0f) * 45.0f;
+                return (4.0f - abs_y / abs_x) * 45.0;
             }
         }
     } else {
-        if (pY >= 0.0f) {
-            if (abs_y <= abs_x) {
-                return (4.0f - abs_y / abs_x) * 45.0f;
+        if (pY < 0.0f) {
+            if (abs_y > abs_x) {
+                return (abs_x / abs_y + 6.0f) * 45.0;
             } else {
-                return (abs_x / abs_y + 2.0f) * 45.0f;
+                return (8.0f - abs_y / abs_x) * 45.0;
             }
         } else {
-            if (abs_y <= abs_x) {
-                return (abs_y / abs_x + 4.0f) * 45.0f;
+            if (abs_y > abs_x) {
+                return (2.0f - abs_x / abs_y) * 45.0;
             } else {
-                return (6.0f - abs_x / abs_y) * 45.0f;
+                return abs_y / abs_x * 45.0;
             }
         }
     }
@@ -311,38 +311,40 @@ br_angle FastFloatArcTan2Angle(float pY, float pX) {
 
     abs_x = fabs(pX);
     abs_y = fabs(pY);
-    if (pX == 0.0) {
-        if (pY >= 0.0) {
-            if (pY <= 0.0) {
-                return 0;
+    if (pX == 0.0f) {
+        if (pY < 0.0f) {
+            return BR_ANGLE_DEG(270);
+        } else if (pY > 0.0f) {
+            return BR_ANGLE_DEG(90);
+        } else {
+            return 0;
+        }
+    } else if (pX < 0.0f) {
+        if (pY < 0.0f) {
+            if (abs_y > abs_x) {
+                return ((6.0f - abs_x / abs_y) * 8192.0f);
             } else {
-                return 16380;
+                return ((abs_y / abs_x + 4.0f) * 8192.0f);
             }
+        } else if (abs_y > abs_x) {
+            return ((abs_x / abs_y + 2.0f) * 8192.0f);
         } else {
-            return -16396;
+            return ((4.0f - abs_y / abs_x) * 8192.0f);
         }
-    } else if (pX >= 0.0) {
-        if (pY >= 0.0) {
-            if (abs_y <= (double)abs_x) {
-                return (abs_y / abs_x * 8192.0);
-            } else {
-                return ((2.0 - abs_x / abs_y) * 8192.0f);
-            }
-        } else if (abs_y <= abs_x) {
-            return ((8.0 - abs_y / abs_x) * 8192.0f);
-        } else {
-            return ((abs_x / abs_y + 6.0) * 8192.0f);
-        }
-    } else if (pY >= 0.0) {
-        if (abs_y <= abs_x) {
-            return ((4.0 - abs_y / abs_x) * 8192.0f);
-        } else {
-            return ((abs_x / abs_y + 2.0) * 8192.0f);
-        }
-    } else if (abs_y <= abs_x) {
-        return ((abs_y / abs_x + 4.0) * 8192.0f);
     } else {
-        return ((6.0 - abs_x / abs_y) * 8192.0f);
+        if (pY < 0.0f) {
+            if (abs_y > abs_x) {
+                return ((abs_x / abs_y + 6.0f) * 8192.0f);
+            } else {
+                return ((8.0f - abs_y / abs_x) * 8192.0f);
+            }
+        } else {
+            if (abs_y > abs_x) {
+                return ((2.0f - abs_x / abs_y) * 8192.0f);
+            } else {
+                return (abs_y / abs_x * 8192.0f);
+            }
+        }
     }
 }
 
