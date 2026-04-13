@@ -7110,15 +7110,15 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
             car1_point = i;
         } else {
             ts = f[i] / car1->M;
-            BrVector3Scale(&tv2, &n[2 * i], ts);
-            BrVector3Accumulate(&f1, &tv2);
+            BrVector3Scale(&tv, &n[2 * i], ts);
+            BrVector3Accumulate(&f1, &tv);
             ts = f[i] / car2->M;
-            BrVector3Scale(&tv2, &n[2 * i + 1], ts);
-            BrVector3Accumulate(&f2, &tv2);
-            BrVector3Scale(&tv2, &r[2 * i], f[i]);
-            BrVector3Accumulate(&pos1, &tv2);
-            BrVector3Scale(&tv2, &r[2 * i + 1], f[i]);
-            BrVector3Accumulate(&pos2, &tv2);
+            BrVector3Scale(&tv, &n[2 * i + 1], ts);
+            BrVector3Accumulate(&f2, &tv);
+            BrVector3Scale(&tv, &r[2 * i], f[i]);
+            BrVector3Accumulate(&pos1, &tv);
+            BrVector3Scale(&tv, &r[2 * i + 1], f[i]);
+            BrVector3Accumulate(&pos2, &tv);
             tforce += f[i];
         }
     }
