@@ -611,22 +611,6 @@ void* gPalette_pixels;
 // GLOBAL: CARM95 0x0053d0ac
 tFlic_descriptor* gFirst_flic;
 
-// Use this function to avoid unaligned memory access.
-// Added by DethRace
-tU16 mem_read_u16(void* memory) {
-    tU16 u16;
-
-    memcpy(&u16, memory, sizeof(tU16));
-    return u16;
-}
-
-// Use this function to avoid unaligned memory access
-// Added by DethRace
-void mem_write_u16(void* memory, tU16 u16) {
-
-    memcpy(memory, &u16, sizeof(tU16));
-}
-
 // IDA: void __cdecl EnableTranslationText()
 // FUNCTION: CARM95 0x00495990
 void EnableTranslationText(void) {
@@ -1097,19 +1081,19 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
     pixel_ptr = pFlic_info->first_pixel;
 
-    for (i = 0; !(line_count <= i);) {
+    for (i = 0; i < line_count;) {
         line_pixel_ptr = (tU16*)pixel_ptr;
         number_of_packets = MemReadS16(&pFlic_info->data);
 
         if (number_of_packets < 0) {
             pixel_ptr = pixel_ptr + the_row_bytes * -number_of_packets;
         } else {
-            for (j = 0; !(number_of_packets <= j); j++) {
+            for (j = 0; j < number_of_packets; j++) {
                 skip_count = MemReadU8(&pFlic_info->data);
                 size_count = MemReadS8(&pFlic_info->data);
                 line_pixel_ptr += skip_count / 2;
                 if (size_count >= 0) {
-                    for (k = 0; !(size_count <= k); k++) {
+                    for (k = 0; k < size_count; k++) {
                         the_byte = *pFlic_info->data++;
                         if (the_byte) {
                             *(tU8*)line_pixel_ptr = the_byte;
@@ -2169,7 +2153,6 @@ void LoadInterfaceStrings(void) {
         fclose(f);
 #endif
     }
-
 }
 
 // IDA: void __cdecl FlushInterfaceFonts()
