@@ -51,9 +51,6 @@ target_sources(harness PRIVATE
     harness.c
     harness.h
 
-    platforms/null.c
-    platforms/null.h
-
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
@@ -135,5 +132,4 @@ if(DETHRACE_PLATFORM_SDL_DYNAMIC)
     target_compile_definitions(harness PRIVATE DETHRACE_SDL_DYNAMIC)
     target_link_libraries(harness PRIVATE ${CMAKE_DL_LIBS})
 endif()
-
 
