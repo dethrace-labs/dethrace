@@ -7012,7 +7012,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     BrMatrix34TApplyV(&car1->velocity_car_space, &car1->v, mat1);
     BrMatrix34TApplyV(&car2->velocity_car_space, &car2->v, mat2);
     need_to_fudge = 1;
-    for (i = 0; i <= k - 1; ++i) {
+    for (i = 0; i < k; ++i) {
         BrVector3Cross(&tau1[i], &r[2 * i], &n[2 * i]);
         BrVector3Cross(&tau2[i], &r[2 * i + 1], &n[2 * i + 1]);
         Vector3Div(&tau1[i], &tau1[i], &car1->I);
@@ -7071,13 +7071,12 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
         ts = FourPointCollB(f, &M, d, tau1, n);
         break;
     default:
-        ts = 0;
         break;
     }
     if (k > 3) {
         k = 3;
     }
-    if (fabs(ts) <= 0.000001f) {
+    if (fabs(ts) <= 0.000001) {
         return 0;
     }
     BrVector3SetFloat(&f1, 0.0f, 0.0f, 0.0f);
@@ -7094,13 +7093,13 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
         if (f[i] == 0.0f && k != 0) {
             break;
         }
-        if (f[i] < 0.001f) {
+        if (f[i] < 0.001) {
             f[i] = 0.001f;
         }
         if (f[i] > 10.0f) {
             ts = 0.0f;
         }
-        f[i] += 0.1f;
+        f[i] += 0.1;
         BrVector3Scale(&tau1[i], &tau1[i], f[i]);
         BrVector3Scale(&tau2[i], &tau2[i], f[i]);
         BrVector3Accumulate(&torque1, &tau1[i]);
@@ -7255,7 +7254,7 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     BrVector3Scale(&f1, &f1, 5.0f);
     CrashNoise(&f1, &tv, 0);
     BrVector3Add(&tv2, &car1->v, &car2->v);
-    BrVector3Scale(&tv2, &tv2, 0.25 / 6.9);
+    BrVector3Scale(&tv2, &tv2, 0.25 / WORLD_SCALE_D);
     BrVector3Scale(&a, &a, car2->M * 3.0f);
     CreateSparkShower(&tv, &tv2, &a, CAR(car1), CAR(car2));
     return 0;
