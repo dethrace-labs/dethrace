@@ -7023,12 +7023,12 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
         BrVector3Cross(&tau2[i], &r[2 * i + 1], &n[2 * i + 1]);
         Vector3Div(&tau1[i], &tau1[i], &car1->I);
         Vector3Div(&tau2[i], &tau2[i], &car2->I);
-        BrVector3Cross(&tv, &car1->omega, &r[2 * i]);
-        BrVector3Accumulate(&tv, &car1->velocity_car_space);
-        d[i] = -BrVector3Dot(&n[2 * i], &tv);
-        BrVector3Cross(&tv, &car2->omega, &r[2 * i + 1]);
-        BrVector3Accumulate(&tv, &car2->velocity_car_space);
-        d[i] -= BrVector3Dot(&n[2 * i + 1], &tv);
+        BrVector3Cross(&a, &car1->omega, &r[2 * i]);
+        BrVector3Accumulate(&a, &car1->velocity_car_space);
+        d[i] = -BrVector3Dot(&n[2 * i], &a);
+        BrVector3Cross(&a, &car2->omega, &r[2 * i + 1]);
+        BrVector3Accumulate(&a, &car2->velocity_car_space);
+        d[i] = -BrVector3Dot(&n[2 * i + 1], &a) + d[i];
         if (d[i] > 0.0f) {
             need_to_fudge = 0;
         }
@@ -7046,18 +7046,18 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     for (i = 0; i < k; i++) {
         for (j = 0; j < k; j++) {
             if (move_car1) {
-                BrVector3Cross(&tv, &tau1[j], &r[2 * i]);
+                BrVector3Cross(&a, &tau1[j], &r[2 * i]);
                 BrVector3InvScale(&norm, &n[2 * j], car1->M);
-                BrVector3Accumulate(&tv, &norm);
-                M.m[i][j] = BrVector3Dot(&n[2 * i], &tv);
+                BrVector3Accumulate(&a, &norm);
+                M.m[i][j] = BrVector3Dot(&n[2 * i], &a);
             } else {
                 M.m[i][j] = 0.0f;
             }
             if (move_car2) {
-                BrVector3Cross(&tv, &tau2[j], &r[2 * i + 1]);
+                BrVector3Cross(&a, &tau2[j], &r[2 * i + 1]);
                 BrVector3InvScale(&norm, &n[2 * j + 1], car2->M);
-                BrVector3Accumulate(&tv, &norm);
-                M.m[i][j] += BrVector3Dot(&n[2 * i + 1], &tv);
+                BrVector3Accumulate(&a, &norm);
+                M.m[i][j] += BrVector3Dot(&n[2 * i + 1], &a);
             }
             M.m[i][j] *= factor;
         }
@@ -7077,13 +7077,12 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
         ts = FourPointCollB(f, &M, d, tau1, n);
         break;
     default:
-        ts = 0;
         break;
     }
     if (k > 3) {
         k = 3;
     }
-    if (fabs(ts) <= 0.000001f) {
+    if (fabs(ts) <= 0.000001) {
         return 0;
     }
     BrVector3SetFloat(&f1, 0.0f, 0.0f, 0.0f);
@@ -7100,13 +7099,13 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
         if (f[i] == 0.0f && k != 0) {
             break;
         }
-        if (f[i] < 0.001f) {
+        if (f[i] < 0.001) {
             f[i] = 0.001f;
         }
         if (f[i] > 10.0f) {
             ts = 0.0f;
         }
-        f[i] += 0.1f;
+        f[i] += 0.1;
         BrVector3Scale(&tau1[i], &tau1[i], f[i]);
         BrVector3Scale(&tau2[i], &tau2[i], f[i]);
         BrVector3Accumulate(&torque1, &tau1[i]);
@@ -7117,15 +7116,15 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
             car1_point = i;
         } else {
             ts = f[i] / car1->M;
-            BrVector3Scale(&tv2, &n[2 * i], ts);
-            BrVector3Accumulate(&f1, &tv2);
+            BrVector3Scale(&tv, &n[2 * i], ts);
+            BrVector3Accumulate(&f1, &tv);
             ts = f[i] / car2->M;
-            BrVector3Scale(&tv2, &n[2 * i + 1], ts);
-            BrVector3Accumulate(&f2, &tv2);
-            BrVector3Scale(&tv2, &r[2 * i], f[i]);
-            BrVector3Accumulate(&pos1, &tv2);
-            BrVector3Scale(&tv2, &r[2 * i + 1], f[i]);
-            BrVector3Accumulate(&pos2, &tv2);
+            BrVector3Scale(&tv, &n[2 * i + 1], ts);
+            BrVector3Accumulate(&f2, &tv);
+            BrVector3Scale(&tv, &r[2 * i], f[i]);
+            BrVector3Accumulate(&pos1, &tv);
+            BrVector3Scale(&tv, &r[2 * i + 1], f[i]);
+            BrVector3Accumulate(&pos2, &tv);
             tforce += f[i];
         }
     }
@@ -7168,102 +7167,102 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
     BrVector3InvScale(&pos1, &pos1, tforce);
     BrVector3InvScale(&pos2, &pos2, tforce);
     if (pPass == 0) {
-        if (car1_point >= 0 && move_car1) {
+        if (car1_point > -1 && move_car1) {
             f[car1_point] = f[car1_point] / car1->M;
             BrVector3Scale(&n[2 * car1_point], &n[2 * car1_point], f[car1_point]);
-            BrVector3Cross(&tv2, &car1->oldomega, &r[2 * car1_point]);
-            BrVector3Accumulate(&tv2, &car1->velocity_car_space);
-            ts = BrVector3Length(&tv2);
-            if (ts > 0.0001f && (car1->driver <= eDriver_non_car || !CAR(car1)->wall_climber_mode)) {
-                AddFriction(car1, &tv2, &n[2 * car1_point], &r[2 * car1_point], f[car1_point], &max_friction);
+            BrVector3Cross(&tv, &car1->oldomega, &r[2 * car1_point]);
+            BrVector3Accumulate(&tv, &car1->velocity_car_space);
+            ts = BrVector3Length(&tv);
+            if (ts > 0.0001 && (car1->driver <= eDriver_non_car || !CAR(car1)->wall_climber_mode)) {
+                AddFriction(car1, &tv, &n[2 * car1_point], &r[2 * car1_point], f[car1_point], &max_friction);
                 BrVector3Accumulate(&n[2 * car1_point], &max_friction);
             }
-            BrMatrix34ApplyV(&tv, &n[2 * car1_point], mat1);
-            BrVector3Accumulate(&car1->v, &tv);
+            BrMatrix34ApplyV(&a, &n[2 * car1_point], mat1);
+            BrVector3Accumulate(&car1->v, &a);
         }
-        if (car2_point >= 0 && move_car2) {
+        if (car2_point > -1 && move_car2) {
             f[car2_point] = f[car2_point] / car2->M;
             BrVector3Scale(&n[2 * car2_point + 1], &n[2 * car2_point + 1], f[car2_point]);
-            BrVector3Cross(&tv2, &car2->oldomega, &r[2 * car2_point + 1]);
-            BrVector3Accumulate(&tv2, &car2->velocity_car_space);
-            ts = BrVector3Length(&tv2);
+            BrVector3Cross(&tv, &car2->oldomega, &r[2 * car2_point + 1]);
+            BrVector3Accumulate(&tv, &car2->velocity_car_space);
+            ts = BrVector3Length(&tv);
 
-            if (ts > 0.0001f && (car1->driver <= eDriver_non_car || !(CAR(car1)->wall_climber_mode))) {
-                AddFriction(car2, &tv2, &n[2 * car2_point + 1], &r[2 * car2_point + 1], f[car2_point], &max_friction);
+            if (ts > 0.0001 && (car1->driver <= eDriver_non_car || !(CAR(car1)->wall_climber_mode))) {
+                AddFriction(car2, &tv, &n[2 * car2_point + 1], &r[2 * car2_point + 1], f[car2_point], &max_friction);
                 BrVector3Accumulate(&n[2 * car2_point + 1], &max_friction);
             }
-            BrMatrix34ApplyV(&tv, &n[2 * car2_point + 1], mat2);
-            BrVector3Accumulate(&car2->v, &tv);
+            BrMatrix34ApplyV(&a, &n[2 * car2_point + 1], mat2);
+            BrVector3Accumulate(&car2->v, &a);
         }
         if (tforce != 0.0f) {
             BrVector3Cross(&point_vel1, &car1->oldomega, &pos1);
-            BrVector3Sub(&a, &car1->v, &car2->v);
-            BrMatrix34TApplyV(&tv2, &a, mat1);
-            BrVector3Accumulate(&point_vel1, &tv2);
+            BrVector3Sub(&tv2, &car1->v, &car2->v);
+            BrMatrix34TApplyV(&tv, &tv2, mat1);
+            BrVector3Accumulate(&point_vel1, &tv);
             BrVector3Cross(&point_vel2, &car2->oldomega, &pos2);
             AddFrictionCarToCar(car1, car2, &point_vel1, &point_vel2, &f1, &pos1, &pos2, tforce, &max_friction);
             if (TestForNan(max_friction.v) || TestForNan(&max_friction.v[1]) || TestForNan(&max_friction.v[2])) {
                 BrVector3SetFloat(&max_friction, 0.0f, 0.0f, 0.0f);
             }
-            BrVector3InvScale(&tv2, &max_friction, car1->M);
-            BrVector3Accumulate(&f1, &tv2);
-            BrMatrix34ApplyV(&tv2, &max_friction, mat1);
-            BrMatrix34TApplyV(&max_friction, &tv2, mat2);
-            BrVector3InvScale(&tv2, &max_friction, car2->M);
-            BrVector3Accumulate(&f2, &tv2);
+            BrVector3InvScale(&tv, &max_friction, car1->M);
+            BrVector3Accumulate(&f1, &tv);
+            BrMatrix34ApplyV(&tv, &max_friction, mat1);
+            BrMatrix34TApplyV(&max_friction, &tv, mat2);
+            BrVector3InvScale(&tv, &max_friction, car2->M);
+            BrVector3Accumulate(&f2, &tv);
         }
     }
     if (tforce == 0.0f) {
         return 0;
     }
-    BrMatrix34ApplyV(&tv, &f1, mat1);
+    BrMatrix34ApplyV(&a, &f1, mat1);
     if (move_car1) {
-        BrVector3Accumulate(&car1->v, &tv);
+        BrVector3Accumulate(&car1->v, &a);
     }
     CrushAndDamageCar(CAR(car1), &pos1, &f1, CAR(car2));
     if ((car1->infinite_mass & 0x100) != 0) {
-        BrVector3Sub(&tv2, &car1->cmpos, &pos1);
-        BrVector3Accumulate(&tv2, &car1->cmpos);
+        BrVector3Sub(&tv, &car1->cmpos, &pos1);
+        BrVector3Accumulate(&tv, &car1->cmpos);
         ts = BrVector3Length(&f1);
-        if (ts > 0.0001f) {
+        if (ts > 0.0001) {
             ts = 5.0f / ts;
-            BrVector3Scale(&a, &f1, ts);
-            BrVector3Accumulate(&tv2, &a);
-            plane = LineBoxColl(&tv2, &pos1, &car1->bounds[1], &a);
+            BrVector3Scale(&tv2, &f1, ts);
+            BrVector3Accumulate(&tv, &tv2);
+            plane = LineBoxColl(&tv, &pos1, &car1->bounds[1], &tv2);
             if (plane) {
                 BrVector3Negate(&f12, &f1);
-                CrushAndDamageCar(CAR(car1), &a, &f12, CAR(car2));
+                CrushAndDamageCar(CAR(car1), &tv2, &f12, CAR(car2));
             }
         }
     }
-    BrMatrix34ApplyV(&tv, &f2, mat2);
+    BrMatrix34ApplyV(&a, &f2, mat2);
     if (move_car2) {
-        BrVector3Accumulate(&car2->v, &tv);
+        BrVector3Accumulate(&car2->v, &a);
     }
     CrushAndDamageCar(CAR(car2), &pos2, &f2, CAR(car1));
     if ((car2->infinite_mass & 0x100) != 0) {
-        BrVector3Sub(&tv2, &car2->cmpos, &pos2);
-        BrVector3Accumulate(&tv2, &car2->cmpos);
+        BrVector3Sub(&tv, &car2->cmpos, &pos2);
+        BrVector3Accumulate(&tv, &car2->cmpos);
         ts = BrVector3Length(&f2);
-        if (ts > 0.0001f) {
+        if (ts > 0.0001) {
             ts = 5.0f / ts;
-            BrVector3Scale(&a, &f2, ts);
-            BrVector3Accumulate(&tv2, &a);
-            plane = LineBoxColl(&tv2, &pos2, &car2->bounds[1], &a);
+            BrVector3Scale(&tv2, &f2, ts);
+            BrVector3Accumulate(&tv, &tv2);
+            plane = LineBoxColl(&tv, &pos2, &car2->bounds[1], &tv2);
             if (plane) {
                 BrVector3Negate(&f22, &f2);
-                CrushAndDamageCar(CAR(car2), &a, &f22, CAR(car1));
+                CrushAndDamageCar(CAR(car2), &tv2, &f22, CAR(car1));
             }
         }
     }
-    BrMatrix34ApplyP(&tv2, &pos1, mat1);
-    BrVector3InvScale(&tv2, &tv2, WORLD_SCALE);
+    BrMatrix34ApplyP(&tv, &pos1, mat1);
+    BrVector3InvScale(&tv, &tv, WORLD_SCALE);
     BrVector3Scale(&f1, &f1, 5.0f);
-    CrashNoise(&f1, &tv2, 0);
-    BrVector3Add(&a, &car2->v, &car1->v);
-    BrVector3Scale(&a, &a, 0.25f / WORLD_SCALE);
-    BrVector3Scale(&tv, &tv, car2->M * 3.0f);
-    CreateSparkShower(&tv2, &a, &tv, CAR(car1), CAR(car2));
+    CrashNoise(&f1, &tv, 0);
+    BrVector3Add(&tv2, &car1->v, &car2->v);
+    BrVector3Scale(&tv2, &tv2, 0.25 / WORLD_SCALE_D);
+    BrVector3Scale(&a, &a, car2->M * 3.0f);
+    CreateSparkShower(&tv, &tv2, &a, CAR(car1), CAR(car2));
     return 0;
 }
 
