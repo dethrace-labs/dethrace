@@ -611,22 +611,6 @@ void* gPalette_pixels;
 // GLOBAL: CARM95 0x0053d0ac
 tFlic_descriptor* gFirst_flic;
 
-// Use this function to avoid unaligned memory access.
-// Added by DethRace
-tU16 mem_read_u16(void* memory) {
-    tU16 u16;
-
-    memcpy(&u16, memory, sizeof(tU16));
-    return u16;
-}
-
-// Use this function to avoid unaligned memory access
-// Added by DethRace
-void mem_write_u16(void* memory, tU16 u16) {
-
-    memcpy(memory, &u16, sizeof(tU16));
-}
-
 // IDA: void __cdecl EnableTranslationText()
 // FUNCTION: CARM95 0x00495990
 void EnableTranslationText(void) {
@@ -1095,8 +1079,8 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     pixel_ptr = pFlic_info->first_pixel;
 
     for (i = 0; i < line_count;) {
-        number_of_packets = MemReadS16(&pFlic_info->data);
         line_pixel_ptr = (tU16*)pixel_ptr;
+        number_of_packets = MemReadS16(&pFlic_info->data);
 
         if (number_of_packets < 0) {
             pixel_ptr = pixel_ptr + the_row_bytes * -number_of_packets;
@@ -1105,41 +1089,58 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
                 skip_count = MemReadU8(&pFlic_info->data);
                 size_count = MemReadS8(&pFlic_info->data);
                 line_pixel_ptr += skip_count / 2;
-                if (size_count < 0) {
+                if (size_count >= 0) {
+                    for (k = 0; k < size_count; k++) {
+                        the_byte = *pFlic_info->data++;
+                        if (the_byte) {
+                            *(tU8*)line_pixel_ptr = the_byte;
+                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                        } else {
+                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                        }
+                        the_byte = *pFlic_info->data++;
+                        if (the_byte) {
+                            *(tU8*)line_pixel_ptr = the_byte;
+                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                        } else {
+                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                        }
+                    }
+                } else {
                     the_byte = *pFlic_info->data++;
                     the_byte2 = *pFlic_info->data++;
 
                     if (the_byte && the_byte2) {
                         the_word = *((tU16*)pFlic_info->data - 1);
                         for (k = 0; k < -size_count; k++) {
-                            mem_write_u16(line_pixel_ptr, the_word);
+#ifdef DETHRACE_FIX_BUGS
+                            // Avoid unaligned memory access
+                            memcpy(line_pixel_ptr, &the_word, 2);
+#else
+                            *line_pixel_ptr = the_word;
+#endif
                             line_pixel_ptr++;
                         }
                     } else {
                         for (k = 0; k < -size_count; k++) {
                             if (the_byte) {
                                 *(tU8*)line_pixel_ptr = the_byte;
+                                line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                            } else {
+                                line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
                             }
-                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
                             if (the_byte2) {
                                 *(tU8*)line_pixel_ptr = the_byte2;
+                                line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                            } else {
+                                line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
                             }
-                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
                         }
-                    }
-                } else {
-                    for (k = 0; k < size_count; k++) {
-                        the_word = *(tU16*)pFlic_info->data;
-                        pFlic_info->data += 2;
-                        if (the_word) {
-                            mem_write_u16(line_pixel_ptr, the_word);
-                        }
-                        line_pixel_ptr++;
                     }
                 }
             }
-            pixel_ptr = pixel_ptr + the_row_bytes;
             i++;
+            pixel_ptr = pixel_ptr + the_row_bytes;
         }
     }
 }
