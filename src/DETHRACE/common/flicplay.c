@@ -1475,7 +1475,6 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
             default:
                 LOG_WARN("unrecognized chunk type");
                 MemSkipBytes(&pFlic_info->data, chunk_length - 6);
-                break;
             }
             // Align on even byte
             pFlic_info->data = (char*)((uintptr_t)(pFlic_info->data + 1) & (~(uintptr_t)1));
@@ -1488,19 +1487,28 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     }
     pFlic_info->current_frame++;
     pFlic_info->frames_left--;
+    if (pFlic_info->frames_left == 0) {
+        last_frame = 1;
+    } else {
+        last_frame = 0;
+    }
     if (gTrans_enabled && gTranslation_count != 0 && !pPanel_flic) {
-        DrawTranslations(pFlic_info, pFlic_info->frames_left == 0);
+        DrawTranslations(pFlic_info, last_frame);
     }
     if (pFlic_info->f != NULL && pFlic_info->bytes_still_to_be_read) {
         data_knocked_off = pFlic_info->data - pFlic_info->data_start;
+#ifdef DETHRACE_FIX_BUGS
         memmove(pFlic_info->data_start, pFlic_info->data, pFlic_info->bytes_in_buffer - data_knocked_off);
+#else
+        memcpy(pFlic_info->data_start, pFlic_info->data, pFlic_info->bytes_in_buffer - data_knocked_off);
+#endif
         pFlic_info->data = pFlic_info->data_start;
         pFlic_info->bytes_in_buffer -= data_knocked_off;
 
-        if (pFlic_info->bytes_still_to_be_read > data_knocked_off) {
-            read_amount = data_knocked_off;
-        } else {
+        if (pFlic_info->bytes_still_to_be_read <= data_knocked_off) {
             read_amount = pFlic_info->bytes_still_to_be_read;
+        } else {
+            read_amount = data_knocked_off;
         }
         if (read_amount != 0) {
             fread(&pFlic_info->data_start[pFlic_info->bytes_in_buffer], 1, read_amount, pFlic_info->f);
@@ -1508,7 +1516,7 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
         pFlic_info->bytes_in_buffer += read_amount;
         pFlic_info->bytes_still_to_be_read -= read_amount;
     }
-    return pFlic_info->frames_left == 0;
+    return last_frame;
 }
 
 // IDA: int __usercall PlayNextFlicFrame@<EAX>(tFlic_descriptor *pFlic_info@<EAX>)
