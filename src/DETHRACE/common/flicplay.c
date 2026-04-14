@@ -1494,7 +1494,11 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     }
     if (pFlic_info->f != NULL && pFlic_info->bytes_still_to_be_read) {
         data_knocked_off = pFlic_info->data - pFlic_info->data_start;
+#ifdef DETHRACE_FIX_BUGS
+        memmove(pFlic_info->data_start, pFlic_info->data, pFlic_info->bytes_in_buffer - data_knocked_off);
+#else
         memcpy(pFlic_info->data_start, pFlic_info->data, pFlic_info->bytes_in_buffer - data_knocked_off);
+#endif
         pFlic_info->data = pFlic_info->data_start;
         pFlic_info->bytes_in_buffer -= data_knocked_off;
 
