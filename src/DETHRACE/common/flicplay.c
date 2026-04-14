@@ -1316,10 +1316,10 @@ void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
     pixel_ptr = pFlic_info->first_pixel;
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
-    the_width = pFlic_info->width;
+    the_width = pFlic_info->width / 4;
     for (i = 0; i < pFlic_info->height; i++) {
         line_pixel_ptr = (tU32*)pixel_ptr;
-        for (j = 0; j < the_width / 4; j++) {
+        for (j = 0; j < the_width; j++) {
             *line_pixel_ptr = MemReadU32(&pFlic_info->data);
             line_pixel_ptr++;
         }
