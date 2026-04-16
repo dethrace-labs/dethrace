@@ -2342,12 +2342,21 @@ void SetFadedPalette(int pDegree) {
     br_pixelmap* the_palette;
     char* the_pixels;
 
-    memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
+    if ((char*)gScratch_pixels < (char*)gCurrent_palette->pixels + 0x400u
+        && (char*)gCurrent_palette->pixels < (char*)gScratch_pixels + 0x400u) {
+#ifdef DETHRACE_FIX_BUGS
+        memmove(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
+#else
+        memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
+#endif
+    } else {
+        memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
+    }
     for (j = 0; j < 256; j++) {
         Darken((tU8*)&gScratch_pixels[4 * j], pDegree);
-        Darken((tU8*)&gScratch_pixels[4 * j + 1], pDegree);
-        Darken((tU8*)&gScratch_pixels[4 * j + 2], pDegree);
-        Darken((tU8*)&gScratch_pixels[4 * j + 3], pDegree);
+        Darken((tU8*)(&gScratch_pixels[4 * j]) + 1, pDegree);
+        Darken((tU8*)(&gScratch_pixels[4 * j]) + 2, pDegree);
+        Darken((tU8*)(&gScratch_pixels[4 * j]) + 3, pDegree);
     }
     DRSetPalette2(gScratch_palette, 0);
 }
