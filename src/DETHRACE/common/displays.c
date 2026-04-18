@@ -411,11 +411,13 @@ void DoPSPowerHeadup(int pY, int pLevel, char* pName, int pBar_colour) {
     DimRectangle(gBack_screen, gCurrent_graf_data->ps_dim_left, pY, gCurrent_graf_data->ps_dim_right, gCurrent_graf_data->ps_dim_height + pY, 1);
     TransDRPixelmapText(gBack_screen, gCurrent_graf_data->ps_name_left, gCurrent_graf_data->ps_name_top_border + pY, gFonts + 6, pName, gBack_screen->width);
 
-    for (i = (6 - gCurrent_graf_data->ps_bars_per_level) * gCurrent_graf_data->ps_bars_per_level + 1; i > (gCurrent_graf_data->ps_bars_per_level * pLevel + 1); i--) {
-        DubreyBar(i, pY + gCurrent_graf_data->ps_bar_top_border, 0);
+    pLevel = gCurrent_graf_data->ps_bars_per_level * pLevel;
+    pY += gCurrent_graf_data->ps_bar_top_border;
+    for (i = (6 - gCurrent_graf_data->ps_bars_per_level) * gCurrent_graf_data->ps_bars_per_level + 1; i > pLevel + 1; i--) {
+        DubreyBar(i, pY, 0);
     }
-    for (i = gCurrent_graf_data->ps_bars_per_level * pLevel + 1; i >= 0; i--) {
-        DubreyBar(i, pY + gCurrent_graf_data->ps_bar_top_border, pBar_colour);
+    for (i = pLevel + 1; i >= 0; i--) {
+        DubreyBar(i, pY, pBar_colour);
     }
 }
 
