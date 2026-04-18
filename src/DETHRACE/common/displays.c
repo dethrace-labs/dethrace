@@ -332,29 +332,29 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
 
     ptr = (tU8*)pPixelmap->pixels + pLeft + pPixelmap->row_bytes * pTop;
     line_skip = pPixelmap->row_bytes - pRight + pLeft;
-    depth_table_ptr = gDepth_shade_table->pixels;
-    x = gDepth_shade_table->row_bytes * gDim_amount;
+    depth_table_ptr = (tU8*)gDepth_shade_table->pixels + gDepth_shade_table->row_bytes * gDim_amount;
     width = pRight - pLeft;
 
     if (pKnock_out_corners) {
         ptr++;
         for (right_ptr = ptr + width - 2; ptr < right_ptr; ptr++) {
-            *ptr = depth_table_ptr[*ptr + x];
+            *ptr = depth_table_ptr[*ptr];
         }
         ptr += line_skip + 1;
-        for (y = pTop + 1; y < (pBottom - 1); y++, ptr += line_skip) {
+        for (y = pTop + 1; y < (pBottom - 1); y++) {
             for (right_ptr = ptr + width; ptr < right_ptr; ptr++) {
-                *ptr = depth_table_ptr[*ptr + x];
+                *ptr = depth_table_ptr[*ptr];
             }
+            ptr += line_skip;
         }
         ptr++;
         for (right_ptr = ptr + width - 2; ptr < right_ptr; ptr++) {
-            *ptr = depth_table_ptr[*ptr + x];
+            *ptr = depth_table_ptr[*ptr];
         }
     } else {
         for (y = pTop; y < pBottom; y++) {
             for (right_ptr = ptr + width; ptr < right_ptr; ptr++) {
-                *ptr = depth_table_ptr[*ptr + x];
+                *ptr = depth_table_ptr[*ptr];
             }
             ptr += line_skip;
         }
