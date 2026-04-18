@@ -934,20 +934,23 @@ void SortOutSmoke(tCar_spec* pCar) {
     int pass;
     int repeat;
 
+    pass = 0;
+    repeat = 0;
+
     if (!pCar || pCar->driver <= eDriver_non_car) {
         return;
     }
     for (i = 0; i < COUNT_OF(pCar->damage_units); i++) {
-        if (pCar->damage_units[i].damage_level != pCar->damage_units[i].smoke_last_level) {
-            step = gSmoke_damage_step[i];
-            if (step) {
-                if (pCar->damage_units[i].damage_level > pCar->damage_units[i].smoke_last_level) {
-                    old_colour = (99 - pCar->damage_units[i].smoke_last_level) / step;
-                    colour = (99 - pCar->damage_units[i].damage_level) / step;
-                    if (old_colour != colour && colour <= 2) {
-                        ConditionalSmokeColumn(pCar, i, colour);
-                    }
-                }
+        if (pCar->damage_units[i].damage_level == pCar->damage_units[i].smoke_last_level) {
+            continue;
+        }
+
+        step = gSmoke_damage_step[i];
+        if (step != 0 && pCar->damage_units[i].damage_level > pCar->damage_units[i].smoke_last_level) {
+            colour = (99 - pCar->damage_units[i].damage_level) / step;
+            old_colour = (99 - pCar->damage_units[i].smoke_last_level) / step;
+            if (step > 0 && old_colour != colour && colour <= 2) {
+                ConditionalSmokeColumn(pCar, i, colour);
             }
         }
     }
