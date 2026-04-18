@@ -3401,22 +3401,14 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
     int drop_distance;
 
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + 100 <= the_time) {
-            break;
-        }
-        DrawTellyImage(pImage, pLeft, pTop, 100 * (start_time + 100 - the_time) / 100);
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
+        DrawTellyImage(pImage, pLeft, pTop, (100 - the_time + start_time) * 100 / 100);
     }
     DrawTellyImage(pImage, pLeft, pTop, 1000);
 
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + 100 <= the_time) {
-            break;
-        }
-        DrawTellyLine(pImage, pLeft, pTop, 100 * (start_time + 100 - the_time) / 100);
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
+        DrawTellyLine(pImage, pLeft, pTop, (100 - the_time + start_time) * 100 / 100);
     }
     DrawTellyLine(pImage, pLeft, pTop, 0);
 }
