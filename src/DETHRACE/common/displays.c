@@ -723,13 +723,11 @@ int DRTextWidth(tDR_font* pFont, char* pText) {
     int result;
     char* c;
 
-    c = pText;
     result = 0;
     len = strlen(pText);
 
-    for (i = 0; i < len; i++) {
+    for (i = 0, c = pText; i < len; i++, c++) {
         result += pFont->width_table[*c - pFont->offset];
-        c++;
     }
     return result + pFont->spacing * (len - 1);
 }
