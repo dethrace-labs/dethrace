@@ -1642,23 +1642,21 @@ void EncodeFileWrapper(char* pThe_path) {
     if (STR_ENDS_WITH(pThe_path, len, ".TXT")) {
         return;
     }
-    if (STR_ENDS_WITH(pThe_path, len, "DKEYMAP0.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "DKEYMAP1.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "DKEYMAP2.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "DKEYMAP3.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_0.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_1.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_2.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_3.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "OPTIONS.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYNAMES.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYMAP.TXT")) {
-
-        if (!STR_ENDS_WITH(pThe_path, len, "PATHS.TXT")) {
-            return;
-        }
-        EncodeFile(pThe_path);
+    if (!STR_ENDS_WITH(pThe_path, len, "DKEYMAP0.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "DKEYMAP1.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "DKEYMAP2.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "DKEYMAP3.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYMAP_0.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYMAP_1.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYMAP_2.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYMAP_3.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "OPTIONS.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYNAMES.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYMAP.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "PATHS.TXT")) {
+        return;
     }
+    EncodeFile(pThe_path);
 }
 
 // IDA: void __usercall EncodeAllFilesInDirectory(char *pThe_path@<EAX>)
