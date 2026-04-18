@@ -1008,7 +1008,7 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
                     }
                 } else {
                     if (ratio1 >= 0.75) {
-                        ratio2 = 1.0 - (1.0 - ratio1) * (1.0 - pThree_quarter) * 4.0;
+                        ratio2 = 1.0 - (1.0 - ratio1) * (1.0f - pThree_quarter) * 4.0;
                     } else {
                         ratio2 = (ratio1 - .5) * (pThree_quarter - pHalf) * 4. + pHalf;
                     }
