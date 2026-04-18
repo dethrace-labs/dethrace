@@ -448,12 +448,12 @@ float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflecti
 // IDA: float __usercall RepairCar@<ST0>(tU16 pCar_ID@<EAX>, tU32 pFrame_period@<EDX>, br_scalar *pTotal_deflection@<EBX>)
 // FUNCTION: CARM95 0x004be159
 float RepairCar(tU16 pCar_ID, tU32 pFrame_period, br_scalar* pTotal_deflection) {
-
-    if (VEHICLE_TYPE_FROM_ID(pCar_ID) == eVehicle_self) {
-        return RepairCar2(&gProgram_state.current_car, pFrame_period, pTotal_deflection);
-    }
-
-    return RepairCar2(GetCarSpec(VEHICLE_TYPE_FROM_ID(pCar_ID), VEHICLE_INDEX_FROM_ID(pCar_ID)), pFrame_period, pTotal_deflection);
+    return RepairCar2(
+        VEHICLE_TYPE_FROM_ID(pCar_ID) == eVehicle_self
+            ? &gProgram_state.current_car
+            : GetCarSpec(VEHICLE_TYPE_FROM_ID(pCar_ID), VEHICLE_INDEX_FROM_ID(pCar_ID)),
+        pFrame_period,
+        pTotal_deflection);
 }
 
 // IDA: void __usercall TotallyRepairACar(tCar_spec *pCar@<EAX>)
