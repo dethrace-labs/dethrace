@@ -478,10 +478,34 @@ void TotallyRepairACar(tCar_spec* pCar) {
         pCar->damage_units[i].last_level = 0;
         pCar->damage_units[i].smoke_last_level = 0;
     }
+    #ifdef DETHRACE_FIX_BUGS
+    if ((char*)&storage_bounds < (char*)&pCar->bounds[1] + sizeof(br_bounds)
+        && (char*)&pCar->bounds[1] < (char*)&storage_bounds + sizeof(br_bounds)) {
+        memmove(&storage_bounds, &pCar->bounds[1], sizeof(br_bounds));
+    } else {
+        memcpy(&storage_bounds, &pCar->bounds[1], sizeof(br_bounds));
+    }
+    if ((char*)&pCar->bounds[1] < (char*)&pCar->max_bounds[1] + sizeof(br_bounds)
+        && (char*)&pCar->max_bounds[1] < (char*)&pCar->bounds[1] + sizeof(br_bounds)) {
+        memmove(&pCar->bounds[1], &pCar->max_bounds[1], sizeof(br_bounds));
+    } else {
+        memcpy(&pCar->bounds[1], &pCar->max_bounds[1], sizeof(br_bounds));
+    }
+    #else
     memcpy(&storage_bounds, &pCar->bounds[1], sizeof(br_bounds));
     memcpy(&pCar->bounds[1], &pCar->max_bounds[1], sizeof(br_bounds));
+    #endif
     if (!TestForCarInSensiblePlace(pCar)) {
+        #ifdef DETHRACE_FIX_BUGS
+        if ((char*)&pCar->bounds[1] < (char*)&storage_bounds + sizeof(br_bounds)
+            && (char*)&storage_bounds < (char*)&pCar->bounds[1] + sizeof(br_bounds)) {
+            memmove(&pCar->bounds[1], &storage_bounds, sizeof(br_bounds));
+        } else {
+            memcpy(&pCar->bounds[1], &storage_bounds, sizeof(br_bounds));
+        }
+        #else
         memcpy(&pCar->bounds[1], &storage_bounds, sizeof(br_bounds));
+        #endif
         return;
     }
     for (j = 0, the_car_actor = pCar->car_model_actors; j < pCar->car_actor_count; j++, the_car_actor++) {
@@ -497,9 +521,24 @@ void TotallyRepairACar(tCar_spec* pCar) {
                     }
                 }
             }
+            #ifdef DETHRACE_FIX_BUGS
+            if ((char*)the_car_actor->actor->model->vertices
+                < (char*)the_car_actor->undamaged_vertices + the_car_actor->actor->model->nvertices * sizeof(br_vertex)
+                && (char*)the_car_actor->undamaged_vertices
+                    < (char*)the_car_actor->actor->model->vertices + the_car_actor->actor->model->nvertices * sizeof(br_vertex)) {
+                memmove(the_car_actor->actor->model->vertices,
+                    the_car_actor->undamaged_vertices,
+                    the_car_actor->actor->model->nvertices * sizeof(br_vertex));
+            } else {
+                memcpy(the_car_actor->actor->model->vertices,
+                    the_car_actor->undamaged_vertices,
+                    the_car_actor->actor->model->nvertices * sizeof(br_vertex));
+            }
+            #else
             memcpy(the_car_actor->actor->model->vertices,
                 the_car_actor->undamaged_vertices,
                 the_car_actor->actor->model->nvertices * sizeof(br_vertex));
+            #endif
             BrModelUpdate(the_car_actor->actor->model, BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS);
             if (pipe_vertex_count != 0 && IsActionReplayAvailable()) {
                 PipeSingleModelGeometry(pCar->car_ID, j, pipe_vertex_count, pipe_array);
