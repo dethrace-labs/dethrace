@@ -582,7 +582,11 @@ void DamageUnit2(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
         last_level = the_damage->damage_level;
         the_damage->damage_level += pDamage_amount;
         if (the_damage->damage_level >= 99) {
-            the_damage->damage_level = (pDamage_amount < 10) ? last_level : 99;
+            if (pDamage_amount < 10) {
+                the_damage->damage_level = last_level;
+            } else {
+                the_damage->damage_level = 99;
+            }
         }
         if (pCar->driver == eDriver_oppo || gNet_mode != eNet_mode_none) {
             SetKnackeredFlag(pCar);
