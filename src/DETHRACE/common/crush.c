@@ -382,33 +382,32 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
     amount = 0.0f;
     *pTotal_deflection = 0.0f;
 
-    for (i = 0; i < pActor->model->nvertices; i++) {
-        model_vertex = &pActor->model->vertices[i];
+    i = 0;
+    model_vertex = pActor->model->vertices;
+    for (; i < pActor->model->nvertices; i++, model_vertex++, pUndamaged_vertices++) {
         old_point = model_vertex->p;
         for (j = 0; j < 3; ++j) {
-            *pTotal_deflection = fabs(pUndamaged_vertices->p.v[j] - old_point.v[j]) + *pTotal_deflection;
-            if (pUndamaged_vertices->p.v[j] >= old_point.v[j]) {
-                if (pUndamaged_vertices->p.v[j] > old_point.v[j]) {
-                    model_vertex->p.v[j] = model_vertex->p.v[j] + pAmount;
-                    if (pUndamaged_vertices->p.v[j] < model_vertex->p.v[j]) {
-                        model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
-                    }
-                    amount = model_vertex->p.v[j] - old_point.v[j] + amount;
-                }
-            } else {
+            deviation = fabs(pUndamaged_vertices->p.v[j] - old_point.v[j]);
+            *pTotal_deflection = deviation + *pTotal_deflection;
+            if (pUndamaged_vertices->p.v[j] < old_point.v[j]) {
                 model_vertex->p.v[j] = model_vertex->p.v[j] - pAmount;
-                if (pUndamaged_vertices->p.v[j] > model_vertex->p.v[j]) {
+                if (model_vertex->p.v[j] < pUndamaged_vertices->p.v[j]) {
                     model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
                 }
                 amount = old_point.v[j] - model_vertex->p.v[j] + amount;
+            } else if (pUndamaged_vertices->p.v[j] > old_point.v[j]) {
+                model_vertex->p.v[j] = model_vertex->p.v[j] + pAmount;
+                if (model_vertex->p.v[j] > pUndamaged_vertices->p.v[j]) {
+                    model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
+                }
+                amount = model_vertex->p.v[j] - old_point.v[j] + amount;
             }
         }
-        if (amount != 0.0 && IsActionReplayAvailable() && pipe_vertex_count < COUNT_OF(pipe_array)) {
+        if (amount != 0.0f && IsActionReplayAvailable() && pipe_vertex_count < COUNT_OF(pipe_array)) {
             pipe_array[pipe_vertex_count].vertex_index = i;
             BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates, &model_vertex->p, &old_point);
             pipe_vertex_count++;
         }
-        pUndamaged_vertices++;
     }
     SetModelForUpdate(pActor->model, pCar, 0);
     if (IsActionReplayAvailable() && pipe_vertex_count) {
