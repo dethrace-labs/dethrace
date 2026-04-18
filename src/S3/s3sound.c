@@ -297,13 +297,13 @@ int S3GetSampleLength(tS3_sound_tag tag) {
     tS3_descriptor* descriptor;
     tS3_sample* sound_data;
 
-    descriptor = S3GetDescriptorByID(tag);
-    if (descriptor) {
-        sound_data = (tS3_sample*)descriptor->sound_data;
-        return 1000 * sound_data->size / sound_data->rate;
-    } else {
+    sound_data = (tS3_sample*)S3GetDescriptorByID(tag);
+    if (!sound_data) {
         return 0;
     }
+
+    descriptor = (tS3_descriptor*)((tS3_descriptor*)sound_data)->sound_data;
+    return 1000 * ((tS3_sample*)descriptor)->size / ((tS3_sample*)descriptor)->rate;
 }
 
 // FUNCTION: CARM95 0x0049D71C
