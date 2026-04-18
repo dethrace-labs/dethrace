@@ -1052,12 +1052,9 @@ void DRMatrix34TApplyP(br_vector3* pA, br_vector3* pB, br_matrix34* pC) {
     t2 = BR_SUB(pB->v[1], pC->m[3][1]);
     t3 = BR_SUB(pB->v[2], pC->m[3][2]);
 
-    // this avoids the +fstp in the line above, but including the "add" breaks it again. Some combination of braces etc...
-    // pA->v[0] = BR_MUL(pC->m[0][2], t3);
-
-    pA->v[0] = pC->m[0][2] * t3 + pC->m[0][1] * t2 + pC->m[0][0] * t1;
-    pA->v[1] = pC->m[1][0] * t1 + pC->m[1][2] * t3 + pC->m[1][1] * t2;
-    pA->v[2] = pC->m[2][0] * t1 + pC->m[2][1] * t2 + pC->m[2][2] * t3;
+    pA->v[0] = BR_MAC3(t1, pC->m[0][0], t2, pC->m[0][1], t3, pC->m[0][2]);
+    pA->v[1] = BR_MAC3(t1, pC->m[1][0], t3, pC->m[1][2], t2, pC->m[1][1]);
+    pA->v[2] = BR_MAC3(t1, pC->m[2][0], t2, pC->m[2][1], t3, pC->m[2][2]);
 }
 
 // IDA: tU16 __usercall PaletteEntry16Bit@<AX>(br_pixelmap *pPal@<EAX>, int pEntry@<EDX>)
