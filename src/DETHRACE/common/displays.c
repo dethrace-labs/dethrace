@@ -1601,17 +1601,18 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
     int font_needed_loading;
     char line[256];
 
-    font = &gFonts[pFont_index];
     current_width = 0;
+    current_y = pTop;
+    font = &gFonts[pFont_index];
     font_needed_loading = font->images == NULL;
     if (font_needed_loading) {
         LoadFont(pFont_index);
     }
     centre = (pRight + pLeft) / 2;
-    current_y = pTop;
-    width = pRight - pLeft;
-    line_char_index = 0;
+    line[0] = 0;
     input_str_index = 0;
+    line_char_index = 0;
+    width = pRight - pLeft;
     start_line = 0;
 
     while (pText[input_str_index]) {
@@ -1619,7 +1620,7 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
         line[line_char_index + 1] = 0;
         current_width += font->spacing + font->width_table[pText[input_str_index] - font->offset];
         if (current_width > width) {
-            for (i = input_str_index; i >= start_line; i--) {
+            for (i = input_str_index; i > start_line; i--) {
                 if (pText[i] == ' ') {
                     break;
                 }
@@ -1627,8 +1628,9 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
             if (i == start_line) {
                 i = input_str_index;
             }
-            line_char_index += i - input_str_index;
+            line_char_index = i - start_line;
             input_str_index = i;
+            line[line_char_index + 1] = 0;
             if (pText[input_str_index] == ' ') {
                 input_str_index++;
             }
@@ -1638,10 +1640,10 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
             } else {
                 TransDRPixelmapText(gBack_screen, pLeft, current_y, font, line, pRight);
             }
-            current_width = 0;
             current_y += 3 * (font->height - (TranslationMode() ? 2 : 0)) / 2;
-            line_char_index = 0;
             start_line = input_str_index;
+            line_char_index = 0;
+            current_width = 0;
         } else {
             line_char_index++;
             input_str_index++;
@@ -1649,7 +1651,7 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
     }
     if (line_char_index != 0) {
         if (pCentred) {
-            TransDRPixelmapText(gBack_screen, centre - (DRTextWidth(font, line) / 2), current_y, font, line, (DRTextWidth(font, line) / 2) + centre);
+            DRPixelmapCentredText(gBack_screen, centre, current_y, font, line);
         } else {
             TransDRPixelmapText(gBack_screen, pLeft, current_y, font, line, pRight);
         }
