@@ -1688,11 +1688,15 @@ void TransDRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont
 // FUNCTION: CARM95 0x004c7fd5
 void TransDRPixelmapCleverText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, char* pText, int pRight_edge) {
 
-    if (gAusterity_mode && FlicsPlayedFromDisk() && gCached_font != pFont) {
-        if (gCached_font && gCached_font - gFonts > 13) {
-            DisposeFont(gCached_font - gFonts);
+    if (gAusterity_mode) {
+        if (FlicsPlayedFromDisk()) {
+            if (pFont != gCached_font) {
+                if (gCached_font && gFonts - gCached_font <= -13) {
+                    DisposeFont(gCached_font - gFonts);
+                }
+                gCached_font = pFont;
+            }
         }
-        gCached_font = pFont;
     }
     LoadFont(pFont - gFonts);
     DRPixelmapCleverText2(pPixelmap, pX, pY - (TranslationMode() == 0 ? 0 : 2), pFont, pText, pRight_edge);
