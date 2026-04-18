@@ -1044,18 +1044,19 @@ void ChangeHeadupText(int pHeadup_index, char* pNew_text) {
 void ChangeHeadupImage(int pHeadup_index, int pNew_image) {
     tHeadup* the_headup;
 
-    if (pHeadup_index >= 0) {
+    if (pHeadup_index < 0) {
+    } else {
         the_headup = &gHeadups[pHeadup_index];
         the_headup->data.image_info.image = gHeadup_images[pNew_image];
         switch (the_headup->justification) {
         case eJust_left:
             the_headup->x = the_headup->original_x;
             break;
-        case eJust_right:
-            the_headup->x = the_headup->original_x - the_headup->data.image_info.image->width;
-            break;
         case eJust_centre:
             the_headup->x = the_headup->original_x - the_headup->data.image_info.image->width / 2;
+            break;
+        case eJust_right:
+            the_headup->x = the_headup->original_x - the_headup->data.image_info.image->width;
             break;
         }
     }
