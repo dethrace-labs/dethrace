@@ -1662,10 +1662,9 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
 // IDA: void __usercall TransBrPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, br_uint_32 pColour@<ECX>, br_font *pFont, signed char *pText)
 // FUNCTION: CARM95 0x004c7ec5
 void TransBrPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, br_uint_32 pColour, br_font* pFont, char* pText) {
-    int len;
+    int len[2];
 
-    len = TranslationMode() ? 2 : 0;
-    BrPixelmapText(pPixelmap, pX, pY - len, pColour, pFont, (char*)pText);
+    BrPixelmapText(pPixelmap, pX, pY - (TranslationMode() ? 2 : 0), pColour, pFont, (char*)pText);
 }
 
 // IDA: void __usercall TransDRPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, char *pText, int pRight_edge)
