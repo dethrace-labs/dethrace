@@ -3359,12 +3359,14 @@ void DrawTellyLine(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
 void DrawTellyImage(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_height;
 
-    BrPixelmapRectangleFill(gBack_screen, pLeft, pTop, pImage->width, pImage->height, 0);
-    if (pPercentage != 1000) {
+    the_height = pImage->height;
+    BrPixelmapRectangleFill(gBack_screen, pLeft, pTop, pImage->width, the_height, 0);
+    if (pPercentage == 1000) {
+    } else {
         DRPixelmapRectangleVScaledCopy(
             gBack_screen,
             pLeft,
-            pTop + pImage->height * (100 - pPercentage) / 200,
+            pTop + the_height * (100 - pPercentage) / 200,
             pImage,
             0,
             0,
