@@ -677,27 +677,26 @@ void DoPratcamHit(br_vector3* pHit_vector) {
     int strength_modifier;
     br_scalar strength;
 
+    strength_modifier = 0;
     strength = BrVector3LengthSquared(pHit_vector);
     if (strength > 0.2f) {
         strength_modifier = 8;
     } else if (strength > 0.015f) {
         strength_modifier = 4;
-    } else if (strength >= 0.001f) {
-        strength_modifier = 0;
-    } else {
+    } else if (strength < 0.001f) {
         return;
     }
-    if (fabs(pHit_vector->v[2]) >= fabs(pHit_vector->v[0])) {
-        if (pHit_vector->v[2] >= 0.f) {
-            PratcamEvent(kPratcam_small_hit_front + strength_modifier);
+    if (fabs(pHit_vector->v[2]) < fabs(pHit_vector->v[0])) {
+        if (pHit_vector->v[0] < 0.f) {
+            PratcamEvent(kPratcam_small_hit_right + strength_modifier);
         } else {
-            PratcamEvent(kPratcam_small_hit_behind + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_left + strength_modifier);
         }
     } else {
-        if (pHit_vector->v[0] >= 0.f) {
-            PratcamEvent(kPratcam_small_hit_left + strength_modifier);
+        if (pHit_vector->v[2] < 0.f) {
+            PratcamEvent(kPratcam_small_hit_behind + strength_modifier);
         } else {
-            PratcamEvent(kPratcam_small_hit_right + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_front + strength_modifier);
         }
     }
 }
