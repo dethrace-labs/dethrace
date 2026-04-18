@@ -772,10 +772,9 @@ void DRPixelmapCentredText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
 int IsHeadupTextClever(signed char* pText) {
 
     while (*pText) {
-        if (*pText < 0) {
+        if (*pText++ < 0) {
             return 1;
         }
-        pText++;
     }
     return 0;
 }
