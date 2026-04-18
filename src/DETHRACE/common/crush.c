@@ -521,9 +521,14 @@ void TotallyRepairCar(void) {
 // FUNCTION: CARM95 0x004be5b5
 void CheckLastCar(void) {
 
-    if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -kFont_MEDIUMHD, GetMiscString(kMiscString_EveryOpponentWasted));
-        RaceCompleted(eRace_over_opponents);
+    if (gNet_mode != eNet_mode_none) {
+    } else {
+        if (GetCarCount(eVehicle_opponent) != 0) {
+            if (NumberOfOpponentsLeft() == 0) {
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -kFont_MEDIUMHD, GetMiscString(kMiscString_EveryOpponentWasted));
+                RaceCompleted(eRace_over_opponents);
+            }
+        }
     }
 }
 
