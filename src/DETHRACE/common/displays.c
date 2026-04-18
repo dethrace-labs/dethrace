@@ -1032,11 +1032,12 @@ void MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
 void ChangeHeadupText(int pHeadup_index, char* pNew_text) {
     tHeadup* the_headup;
 
-    if (pHeadup_index >= 0) {
-        the_headup = &gHeadups[pHeadup_index];
-        strcpy(the_headup->data.text_info.text, pNew_text);
-        MungeHeadupWidth(the_headup);
+    if (pHeadup_index < 0) {
+        return;
     }
+    the_headup = &gHeadups[pHeadup_index];
+    strcpy(the_headup->data.text_info.text, pNew_text);
+    MungeHeadupWidth(the_headup);
 }
 
 // IDA: void __usercall ChangeHeadupImage(int pHeadup_index@<EAX>, int pNew_image@<EDX>)
