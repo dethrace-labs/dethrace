@@ -897,20 +897,24 @@ tImpact_location GetDirection(br_vector3* pVelocity) {
     mag_x = fabs(pVelocity->v[0]);
     mag_y = fabs(pVelocity->v[1]);
     mag_z = fabs(pVelocity->v[2]);
-    if (mag_y >= mag_x || mag_z >= mag_x) {
-        if (mag_y <= mag_x || mag_z >= mag_y) {
-            if (pVelocity->v[2] >= 0.0f) {
-                return eImpact_back;
-            } else {
-                return eImpact_front;
-            }
+    if (mag_y < mag_x && mag_z < mag_x) {
+        if (pVelocity->v[0] < 0.0f) {
+            return eImpact_left;
         } else {
-            return pVelocity->v[1] < 0.0;
+            return eImpact_right;
         }
-    } else if (pVelocity->v[0] >= 0.0) {
-        return eImpact_right;
+    } else if (mag_y > mag_x && mag_z < mag_y) {
+        if (pVelocity->v[1] < 0.0f) {
+            return eImpact_bottom;
+        } else {
+            return eImpact_top;
+        }
     } else {
-        return eImpact_left;
+        if (pVelocity->v[2] < 0.0f) {
+            return eImpact_front;
+        } else {
+            return eImpact_back;
+        }
     }
 }
 
