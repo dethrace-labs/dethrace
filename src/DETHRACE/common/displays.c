@@ -187,14 +187,13 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
     int ch_width;
     unsigned char* ch;
 
+    x = pX;
     len = strlen(pText);
-    ch = (unsigned char*)pText;
-    if (pX >= 0 && pPixelmap->width >= pRight_edge && pY >= 0 && (pY + pFont->height) <= pPixelmap->height) {
-        x = pX;
-        for (i = 0; i < len; i++) {
-            chr = ch[i] - pFont->offset;
+    if (pX < 0 || pPixelmap->width < pRight_edge || pY < 0 || (pY + pFont->height) > pPixelmap->height) {
+        for (i = 0, ch = (unsigned char*)pText; i < len; i++, ch++) {
+            chr = *ch - pFont->offset;
             ch_width = pFont->width_table[chr];
-            DRPixelmapRectangleOnscreenCopy(
+            DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
                 x,
                 pY,
@@ -207,11 +206,10 @@ void DRPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFont, cha
             x += ch_width + pFont->spacing;
         }
     } else {
-        x = pX;
-        for (i = 0; i < len; i++) {
-            chr = ch[i] - pFont->offset;
+        for (i = 0, ch = (unsigned char*)pText; i < len; i++, ch++) {
+            chr = *ch - pFont->offset;
             ch_width = pFont->width_table[chr];
-            DRPixelmapRectangleMaskedCopy(
+            DRPixelmapRectangleOnscreenCopy(
                 gBack_screen,
                 x,
                 pY,
