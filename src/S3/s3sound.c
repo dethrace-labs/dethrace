@@ -441,6 +441,22 @@ int S3SyncSampleRate(tS3_channel* chan) {
 
 // FUNCTION: CARM95 0x004C946D
 int S3RegisterSampleFilters(tS3_sample_filter* filter1, tS3_sample_filter* filter2) {
-    STUB_ONCE();
+    if (filter1 != NULL) {
+        gS3_sample_filter_func = filter1;
+    }
+    if (filter2 != NULL) {
+        gS3_sample_filter_disable_func = filter2;
+    } else if (filter2 == NULL) {
+        gS3_sample_filter_disable_func = gS3_sample_filter_func;
+    }
+    if (filter1 == NULL) {
+        if (filter2 == NULL) {
+            gS3_sample_filter_funcs_registered = 0;
+        } else {
+            gS3_sample_filter_funcs_registered = 1;
+        }
+    } else {
+        gS3_sample_filter_funcs_registered = 1;
+    }
     return 0;
 }
