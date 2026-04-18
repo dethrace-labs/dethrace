@@ -743,16 +743,13 @@ int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
     unsigned char* c;
 
     result = 0;
-    len = strlen((char*)pText) + 1;
+    len = strlen((char*)pText);
 
     for (i = 0, c = (unsigned char*)pText; i < len; i++, c++) {
-        if (*c < 224) {
-            if (i < (len - 1)) {
-                result += pFont->spacing;
-            }
-            result += pFont->width_table[*c - pFont->offset];
+        if (*c >= 224) {
+            pFont = &gFonts[256] - *c;
         } else {
-            pFont = &gFonts[256 - *c];
+            result += pFont->width_table[*c - pFont->offset] + (i < (len - 1) ? pFont->spacing : 0);
         }
     }
     return result;
