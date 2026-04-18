@@ -703,12 +703,12 @@ int FindAHeadupHoleWoofBarkSoundsABitRude(int pSlot_index) {
     int empty_one;
     tHeadup* the_headup;
 
+    the_headup = gHeadups;
     empty_one = -1;
-    for (i = 0, the_headup = gHeadups; i < COUNT_OF(gHeadups); i++, the_headup++) {
+    for (i = 0; i < COUNT_OF(gHeadups); i++, the_headup++) {
         if (pSlot_index >= 0 && the_headup->slot_index == pSlot_index) {
             return i;
-        }
-        if (the_headup->type == eHeadup_unused) {
+        } else if (the_headup->type == eHeadup_unused) {
             empty_one = i;
         }
     }
