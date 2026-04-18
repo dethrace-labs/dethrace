@@ -657,6 +657,8 @@ void InitialiseApplication(int pArgc, char** pArgv) {
 // IDA: void __usercall InitialiseDeathRace(int pArgc@<EAX>, char **pArgv@<EDX>)
 // FUNCTION: CARM95 0x004bba24
 void InitialiseDeathRace(int pArgc, char** pArgv) {
+    tPath_name the_path;
+
     PDInitialiseSystem();
     InitialiseApplication(pArgc, pArgv);
     gInitialisation_finished = 1;
