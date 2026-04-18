@@ -288,19 +288,16 @@ void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3*
     br_vertex* the_vertex;
     br_matrix34 inverse_transform;
 
-    if (gArrow_mode) {
-        return;
-    }
-    if (pCrush_data->number_of_crush_points == 0) {
+    if (gArrow_mode || pCrush_data->number_of_crush_points == 0) {
         return;
     }
     BrVector3Sub(&impact_point_model, pImpact_point, (br_vector3*)pActor->t.t.mat.m[3]);
-    BrVector3Scale(&energy_vector_model, pEnergy_vector, pCrush_data->softness_factor * gCar_crush_softness);
-    total_energy = BrVector3Length(&energy_vector_model);
+    BrVector3Scale(&energy_vector_scaled, pEnergy_vector, pCrush_data->softness_factor * gCar_crush_softness);
+    total_energy = BrVector3Length(&energy_vector_scaled);
     if (total_energy < 0.06f) {
         return;
     }
-    BrVector3Scale(&energy_vector_scaled, &energy_vector_model, (total_energy - 0.06f) / total_energy);
+    BrVector3Scale(&energy_vector_scaled, &energy_vector_scaled, (total_energy - 0.06) / total_energy);
     nearest_so_far = BR_SCALAR_MAX;
     vertices = pActor->model->vertices;
     nearest_index = -1;
