@@ -791,41 +791,47 @@ int MungeHeadupWidth(tHeadup* pHeadup) {
     }
     if (pHeadup->type == eHeadup_coloured_text) {
         pHeadup->clever = IsHeadupTextClever((signed char*)(&pHeadup->data.text_info.text));
-        if (pHeadup->justification) {
-            if (pHeadup->justification == eJust_right) {
-                if (pHeadup->clever) {
-                    width = DRTextCleverWidth(
-                        pHeadup->data.coloured_text_info.coloured_font,
-                        (signed char*)(&pHeadup->data.text_info.text));
-                } else {
-                    width = DRTextWidth(pHeadup->data.coloured_text_info.coloured_font, pHeadup->data.text_info.text);
-                }
-                pHeadup->x = pHeadup->original_x - width;
-            } else if (pHeadup->justification == eJust_centre) {
-                if (pHeadup->clever) {
-                    width = DRTextCleverWidth(
-                        pHeadup->data.coloured_text_info.coloured_font,
-                        (signed char*)(&pHeadup->data.text_info.text));
-                } else {
-                    width = DRTextWidth(pHeadup->data.coloured_text_info.coloured_font, pHeadup->data.text_info.text);
-                }
+        switch (pHeadup->justification) {
+        case eJust_left:
+            pHeadup->x = pHeadup->original_x;
+            break;
+        case eJust_centre:
+            if (pHeadup->clever) {
+                width = DRTextCleverWidth(
+                    pHeadup->data.coloured_text_info.coloured_font,
+                    (signed char*)(&pHeadup->data.text_info.text));
+                pHeadup->x = pHeadup->original_x - width / 2;
+            } else {
+                width = DRTextWidth(pHeadup->data.coloured_text_info.coloured_font, pHeadup->data.text_info.text);
                 pHeadup->x = pHeadup->original_x - width / 2;
             }
-        } else {
-            pHeadup->x = pHeadup->original_x;
+            break;
+        case eJust_right:
+            if (pHeadup->clever) {
+                width = DRTextCleverWidth(
+                    pHeadup->data.coloured_text_info.coloured_font,
+                    (signed char*)(&pHeadup->data.text_info.text));
+                pHeadup->x = pHeadup->original_x - width;
+            } else {
+                width = DRTextWidth(pHeadup->data.coloured_text_info.coloured_font, pHeadup->data.text_info.text);
+                pHeadup->x = pHeadup->original_x - width;
+            }
+            break;
         }
     } else {
         pHeadup->clever = 0;
-        if (pHeadup->justification) {
-            if (pHeadup->justification == eJust_right) {
-                width = BrPixelmapTextWidth(gBack_screen, pHeadup->data.text_info.font, pHeadup->data.text_info.text);
-                pHeadup->x = pHeadup->original_x - width;
-            } else if (pHeadup->justification == eJust_centre) {
-                width = BrPixelmapTextWidth(gBack_screen, pHeadup->data.text_info.font, pHeadup->data.text_info.text);
-                pHeadup->x = pHeadup->original_x - width / 2;
-            }
-        } else {
+        switch (pHeadup->justification) {
+        case eJust_left:
             pHeadup->x = pHeadup->original_x;
+            break;
+        case eJust_centre:
+            width = BrPixelmapTextWidth(gBack_screen, pHeadup->data.text_info.font, pHeadup->data.text_info.text);
+            pHeadup->x = pHeadup->original_x - width / 2;
+            break;
+        case eJust_right:
+            width = BrPixelmapTextWidth(gBack_screen, pHeadup->data.text_info.font, pHeadup->data.text_info.text);
+            pHeadup->x = pHeadup->original_x - width;
+            break;
         }
     }
     return width;
