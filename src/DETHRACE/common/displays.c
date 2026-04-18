@@ -138,12 +138,11 @@ void ClearHeadupSlot(int pSlot_index) {
     tHeadup* the_headup;
 
     the_headup = gHeadups;
-    for (i = 0; i < COUNT_OF(gHeadups); i++) {
+    for (i = 0; i < COUNT_OF(gHeadups); i++, the_headup++) {
         if (the_headup->type != eHeadup_unused && the_headup->slot_index == pSlot_index) {
             ClearHeadup(i);
             return;
         }
-        the_headup++;
     }
 }
 
