@@ -3484,12 +3484,13 @@ br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
 
     if (gSaved_table_count == COUNT_OF(gSaved_shade_tables)) {
         return 1;
+    } else {
+        gSaved_shade_tables[gSaved_table_count].original = pTable;
+        gSaved_shade_tables[gSaved_table_count].copy = (br_pixelmap*)BrMemAllocate(sizeof(br_pixelmap), kMem_shade_table_copy);
+        memcpy(gSaved_shade_tables[gSaved_table_count].copy, pTable, sizeof(br_pixelmap));
+        gSaved_table_count++;
+        return 0;
     }
-    gSaved_shade_tables[gSaved_table_count].original = pTable;
-    gSaved_shade_tables[gSaved_table_count].copy = (br_pixelmap*)BrMemAllocate(sizeof(br_pixelmap), kMem_shade_table_copy);
-    memcpy(gSaved_shade_tables[gSaved_table_count].copy, pTable, sizeof(br_pixelmap));
-    gSaved_table_count++;
-    return 0;
 }
 
 // IDA: void __cdecl SaveShadeTables()
