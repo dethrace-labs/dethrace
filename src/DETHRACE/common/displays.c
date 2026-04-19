@@ -915,10 +915,10 @@ int NewImageHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pIma
         the_headup->type = eHeadup_image;
         the_headup->slot_index = pSlot_index;
         the_headup->justification = headup_slot->justification;
-        if (pSlot_index < 0) {
-            the_headup->cockpit_anchored = 0;
-        } else {
+        if (pSlot_index >= 0) {
             the_headup->cockpit_anchored = headup_slot->cockpit_anchored;
+        } else {
+            the_headup->cockpit_anchored = 0;
         }
         the_headup->dimmed_background = headup_slot->dimmed_background;
         the_headup->dim_left = headup_slot->dim_left;
@@ -927,14 +927,17 @@ int NewImageHeadupSlot(int pSlot_index, int pFlash_rate, int pLifetime, int pIma
         the_headup->dim_bottom = headup_slot->dim_bottom;
         the_headup->original_x = headup_slot->x;
 
-        if (headup_slot->justification) {
-            if (headup_slot->justification == eJust_right) {
-                the_headup->x = the_headup->original_x - gHeadup_images[pImage_index]->width;
-            } else if (headup_slot->justification == eJust_centre) {
-                the_headup->x = the_headup->original_x - gHeadup_images[pImage_index]->width / 2;
-            }
-        } else {
+        switch (headup_slot->justification) {
+        case 0:
             the_headup->x = the_headup->original_x;
+            break;
+        case eJust_centre:
+            the_headup->x = the_headup->original_x - gHeadup_images[pImage_index]->width / 2;
+            break;
+        case eJust_right:
+            the_headup->x = the_headup->original_x - gHeadup_images[pImage_index]->width;
+        default:
+            break;
         }
         the_headup->y = headup_slot->y;
         if (pFlash_rate) {
