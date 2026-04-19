@@ -218,7 +218,7 @@ void AllocateRearviewPixelmap(void) {
                 * gGraf_specs[gGraf_spec_index].depth_bytes,
             kMem_rear_screen_pixels);
         if (gScreen->row_bytes < 0) {
-            BrFatal("..\\..\\source\\common\\init.c", 260, "Bruce bug at line %d, file ..\\..\\source\\common\\init.c", 4);
+            BrFatal("C:\\Msdev\\Projects\\DethRace\\Init.c", 260, "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\Init.c", 260);
         }
         gRearview_screen = DRPixelmapAllocate(
             gScreen->type,
