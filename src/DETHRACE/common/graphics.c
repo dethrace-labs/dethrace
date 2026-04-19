@@ -3439,8 +3439,7 @@ tShadow_level GetShadowLevel(void) {
 // FUNCTION: CARM95 0x004ba15d
 void ToggleShadow(void) {
 
-    gShadow_level++;
-    if (gShadow_level == eShadow_everyone) {
+    if (gShadow_level++ == eShadow_everyone) {
         gShadow_level = eShadow_none;
     }
     switch (gShadow_level) {
@@ -3456,8 +3455,6 @@ void ToggleShadow(void) {
     case eShadow_everyone:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ShadowUnderAllCars));
         break;
-    default:
-        return;
     }
 }
 
