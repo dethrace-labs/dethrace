@@ -1740,47 +1740,39 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
     br_vector3 camera_to_car;
     br_scalar distance_factor;
 
-    if (gShadow_level == eShadow_none) {
-        return;
-    }
-    for (cat = eVehicle_self;; ++cat) {
-        if (gShadow_level == eShadow_everyone) {
-            if (cat > 4) {
-                break;
-            }
-        } else {
-            if (cat > (gShadow_level == eShadow_us_and_opponents ? 3 : 0)) {
-                break;
-            }
-        }
-
-        if (cat == eVehicle_self) {
-            car_count = 1;
-        } else {
-            car_count = GetCarCount(cat);
-        }
-        for (i = 0; i < car_count; i++) {
+    if (gShadow_level != eShadow_none) {
+        for (cat = eVehicle_self; cat <= (gShadow_level == eShadow_everyone ? 4 : gShadow_level == eShadow_us_and_opponents ? 3 : 0); ++cat) {
             if (cat == eVehicle_self) {
-                the_car = &gProgram_state.current_car;
+                car_count = 1;
             } else {
-                the_car = GetCarSpec(cat, i);
+                car_count = GetCarCount(cat);
             }
-            if (!the_car->active) {
-                continue;
-            }
+            for (i = 0; i < car_count; i++) {
+                if (cat == eVehicle_self) {
+                    the_car = &gProgram_state.current_car;
+                } else {
+                    the_car = GetCarSpec(cat, i);
+                }
+                if (!the_car->active) {
+                    continue;
+                }
 
-            BrVector3Sub(&camera_to_car, (br_vector3*)gCamera_to_world.m[3], &the_car->car_master_actor->t.t.translate.t);
-            distance_factor = BrVector3LengthSquared(&camera_to_car);
-            if (gAction_replay_mode || distance_factor <= SHADOW_MAX_RENDER_DISTANCE) {
+                if (!gAction_replay_mode) {
+                    BrVector3Sub(&camera_to_car, (br_vector3*)gCamera_to_world.m[3], &the_car->car_master_actor->t.t.translate.t);
+                    distance_factor = BrVector3LengthSquared(&camera_to_car);
+                    if (distance_factor > SHADOW_MAX_RENDER_DISTANCE) {
+                        continue;
+                    }
+                }
                 ProcessShadow(the_car, gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, distance_factor);
             }
         }
-    }
-    if (gFancy_shadow) {
-        for (i = 0; i < gSaved_table_count; i++) {
-            gSaved_shade_tables[i].original->height = gSaved_shade_tables[i].copy->height;
-            gSaved_shade_tables[i].original->pixels = gSaved_shade_tables[i].copy->pixels;
-            BrTableUpdate(gSaved_shade_tables[i].original, 0x7FFF);
+        if (gFancy_shadow) {
+            for (i = 0; i < gSaved_table_count; i++) {
+                gSaved_shade_tables[i].original->height = gSaved_shade_tables[i].copy->height;
+                gSaved_shade_tables[i].original->pixels = gSaved_shade_tables[i].copy->pixels;
+                BrTableUpdate(gSaved_shade_tables[i].original, 0x7FFF);
+            }
         }
     }
 }
