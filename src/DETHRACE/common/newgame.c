@@ -889,7 +889,7 @@ void GetNetOptions(tNet_game_options* pGame_options) {
     pGame_options->powerup_respawn = gRadio_bastards__newgame[4].current_value;
     pGame_options->open_game = !gRadio_bastards__newgame[5].current_value;
     pGame_options->grid_start = !gRadio_bastards__newgame[6].current_value;
-    pGame_options->race_sequence_type = gRadio_bastards__newgame[7].current_value ? eNet_sequence_sequential : eNet_sequence_random;
+    pGame_options->race_sequence_type = gRadio_bastards__newgame[7].current_value == 0;
     pGame_options->random_car_choice = gRadio_bastards__newgame[8].current_value;
     pGame_options->car_choice = gRadio_bastards__newgame[9].current_value;
     pGame_options->starting_money_index = gRadio_bastards__newgame[10].current_value;
