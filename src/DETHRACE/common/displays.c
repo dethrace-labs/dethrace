@@ -1060,7 +1060,8 @@ void ChangeHeadupImage(int pHeadup_index, int pNew_image) {
 // FUNCTION: CARM95 0x004c629e
 void ChangeHeadupColour(int pHeadup_index, int pNew_colour) {
 
-    if (pHeadup_index >= 0) {
+    if (pHeadup_index < 0) {
+    } else {
         gHeadups[pHeadup_index].data.text_info.colour = gColours[pNew_colour];
     }
 }
