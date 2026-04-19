@@ -1029,8 +1029,7 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
         if (gWobble_array[i].time_started == 0) {
             oldest_index = i;
             break;
-        }
-        if (gWobble_array[i].time_started < oldest_time) {
+        } else if (gWobble_array[i].time_started < oldest_time) {
             oldest_time = gWobble_array[i].time_started;
             oldest_index = i;
         }
