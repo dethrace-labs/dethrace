@@ -28,7 +28,7 @@ void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
     gProgram_state.cut_scene = 1;
     if (pSound_ID >= 0) {
         DRS3LoadSound(pSound_ID);
-        SetFlicSound(pSound_ID, PDGetTotalTime() + 1000.f * pDelay);
+        SetFlicSound(pSound_ID, PDGetTotalTime() + (int)(1000.f * pDelay));
     }
     SetNonFatalAllocationErrors();
     RunFlic(pIndex);
