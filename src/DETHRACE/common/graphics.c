@@ -3481,13 +3481,25 @@ void InitShadow(void) {
 // IDA: br_uint_32 __cdecl SaveShadeTable(br_pixelmap *pTable, void *pArg)
 // FUNCTION: CARM95 0x004ba427
 br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
+    br_pixelmap* copy;
+    size_t copy_size;
 
     if (gSaved_table_count == COUNT_OF(gSaved_shade_tables)) {
         return 1;
     } else {
         gSaved_shade_tables[gSaved_table_count].original = pTable;
-        gSaved_shade_tables[gSaved_table_count].copy = (br_pixelmap*)BrMemAllocate(sizeof(br_pixelmap), kMem_shade_table_copy);
-        memcpy(gSaved_shade_tables[gSaved_table_count].copy, pTable, sizeof(br_pixelmap));
+        copy_size = sizeof(br_pixelmap);
+        copy = (br_pixelmap*)BrMemAllocate(copy_size, kMem_shade_table_copy);
+        gSaved_shade_tables[gSaved_table_count].copy = copy;
+        if ((char*)copy < (char*)pTable + copy_size && (char*)pTable < (char*)copy + copy_size) {
+#ifdef DETHRACE_FIX_BUGS
+            memmove(copy, pTable, copy_size);
+#else
+            memcpy(copy, pTable, copy_size);
+#endif
+        } else {
+            memcpy(copy, pTable, copy_size);
+        }
         gSaved_table_count++;
         return 0;
     }
