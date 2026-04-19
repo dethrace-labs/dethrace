@@ -2910,52 +2910,50 @@ void ProcessCursorGiblets(int pPeriod) {
     tCursor_giblet* gib;
 
     time_now = PDGetTotalTime();
-    for (i = 0; i < COUNT_OF(gCursor_giblets); i++) {
-        gib = &gCursor_giblets[i];
+    for (gib = gCursor_giblets, i = 0; i < COUNT_OF(gCursor_giblets); i++, gib++) {
         kill_the_giblet = 0;
-        if (gib->current_giblet == -1) {
-            continue;
-        }
-        if (!gib->landed && gib->e_t_a <= time_now) {
-            gib->landed = 1;
-            gib->the_speed = 0.f;
-        }
-        if (gib->landed) {
-            gib->giblet_change_period -= pPeriod / 2;
-            if (gib->giblet_change_period < 50) {
-                gib->giblet_change_period = 50;
+        if (gib->current_giblet != -1) {
+            if (!gib->landed && gib->e_t_a <= time_now) {
+                gib->landed = 1;
+                gib->the_speed = 0.f;
             }
-            if (gib->giblet_change_period <= time_now - gib->last_giblet_change) {
-                if (gCursor_giblet_sequences[gib->sequence_index][0] == gib->current_giblet) {
-                    gib->current_giblet = 1;
-                } else {
-                    gib->current_giblet++;
+            if (gib->landed) {
+                gib->giblet_change_period -= pPeriod / 2;
+                if (gib->giblet_change_period < 50) {
+                    gib->giblet_change_period = 50;
                 }
-                gib->last_giblet_change = time_now;
-            }
-            gib->y_coord += pPeriod * gib->the_speed / 1000.f;
-            if (gib->y_coord <= gGraf_data[gGraf_data_index].height) {
-                if (gib->the_speed < gGraf_specs[gGraf_spec_index].total_height * 160 / 480) {
-                    gib->the_speed += pPeriod * gGraf_specs[gGraf_spec_index].total_height * 60 / 480 / 1000.f;
+                if (gib->giblet_change_period <= time_now - gib->last_giblet_change) {
+                    if (gCursor_giblet_sequences[gib->sequence_index][0] == gib->current_giblet) {
+                        gib->current_giblet = 1;
+                    } else {
+                        gib->current_giblet++;
+                    }
+                    gib->last_giblet_change = time_now;
+                }
+                gib->y_coord += pPeriod * gib->the_speed / 1000.0;
+                if (gib->y_coord > gGraf_data[gGraf_data_index].height) {
+                    kill_the_giblet = 1;
+                } else {
+                    if (gib->the_speed < gGraf_specs[gGraf_spec_index].total_height * 160u / 480u) {
+                        gib->the_speed += (gGraf_specs[gGraf_spec_index].total_height * 60u / 480u) * (float)pPeriod / 1000.f;
+                    }
                 }
             } else {
-                kill_the_giblet = 1;
+                if (gib->y_speed < gGraf_specs[gGraf_spec_index].total_height * 160u / 480u) {
+                    gib->y_speed += (gGraf_specs[gGraf_spec_index].total_height * 60u / 480u) * (float)pPeriod / 1000.f * 2.f;
+                }
+                gib->x_coord += pPeriod * gib->x_speed / 1000.f;
+                gib->y_coord += pPeriod * gib->y_speed / 1000.f;
+                if (gib->x_coord < 0.f || gib->y_coord < 0.f || gib->x_coord >= gGraf_data[gGraf_data_index].width || gib->y_coord >= gGraf_data[gGraf_data_index].height) {
+                    kill_the_giblet = 1;
+                }
             }
-        } else {
-            if (gib->y_speed < gGraf_specs[gGraf_spec_index].total_height * 160 / 480) {
-                gib->y_speed += pPeriod * gGraf_specs[gGraf_spec_index].total_height * 60 / 480 / 1000.f * 2.f;
+            if (kill_the_giblet) {
+                gib->current_giblet = -1;
+                DeallocateTransientBitmap(gib->transient_index);
+            } else {
+                DrawCursorGiblet(gib);
             }
-            gib->x_coord += pPeriod * gib->x_speed / 1000.f;
-            gib->y_coord += pPeriod * gib->y_speed / 1000.f;
-            if (gib->x_coord < 0.f || gib->x_coord >= gGraf_data[gGraf_spec_index].width || gib->y_coord < 0.f || gib->y_coord >= gGraf_data[gGraf_spec_index].height) {
-                kill_the_giblet = 1;
-            }
-        }
-        if (kill_the_giblet) {
-            gib->current_giblet = -1;
-            DeallocateTransientBitmap(gib->transient_index);
-        } else {
-            DrawCursorGiblet(gib);
         }
     }
 }
