@@ -767,6 +767,8 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
 // FUNCTION: CARM95 0x004b35fb
 void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pHeight) {
 
+    if (gBrZb_initialized) {
+    }
     PDAllocateScreenAndBack();
     if (!pWidth) {
         pWidth = gBack_screen->width;
@@ -775,10 +777,10 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
         pHeight = gBack_screen->height;
     }
     gRender_screen = DRPixelmapAllocateSub(gBack_screen, pX_offset, pY_offset, pWidth, pHeight);
+    gX_offset = pX_offset;
+    gY_offset = pY_offset;
     gWidth = pWidth;
     gHeight = pHeight;
-    gY_offset = pY_offset;
-    gX_offset = pX_offset;
     if (gGraf_specs[gGraf_spec_index].doubled) {
         gScreen->base_x = (gGraf_specs[gGraf_spec_index].phys_width - 2 * gGraf_specs[gGraf_spec_index].total_width) / 2;
         gScreen->base_y = (gGraf_specs[gGraf_spec_index].phys_height - 2 * gGraf_specs[gGraf_spec_index].total_height) / 2;
