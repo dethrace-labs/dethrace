@@ -2316,8 +2316,6 @@ void CycleCarTexturingLevel(void) {
     case eCTL_full:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_FullCarTextures));
         break;
-    case eCTL_count:
-        break;
     }
 }
 
