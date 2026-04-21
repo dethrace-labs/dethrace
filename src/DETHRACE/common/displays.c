@@ -436,6 +436,10 @@ void DoHeadups(tU32 pThe_time) {
     tHeadup* the_headup;
     int time_factor;
 
+    the_headup = &gHeadups[0];
+    x_offset = 0;
+    y_offset = 0;
+
     if (gNet_mode) {
         DoNetScores();
     }
@@ -447,8 +451,7 @@ void DoHeadups(tU32 pThe_time) {
         KillOldestQueuedHeadup();
     }
 
-    for (i = 0; i < COUNT_OF(gHeadups); i++) {
-        the_headup = &gHeadups[i];
+    for (i = 0; i < COUNT_OF(gHeadups); i++, the_headup++) {
         if (the_headup->type != eHeadup_unused
             && (gProgram_state.which_view == eView_forward || !the_headup->cockpit_anchored)
             && (the_headup->type == eHeadup_image
@@ -456,7 +459,9 @@ void DoHeadups(tU32 pThe_time) {
                 || (the_headup->type == eHeadup_text && the_headup->data.text_info.text[0] != '\0')
                 || ((the_headup->type == eHeadup_coloured_text || the_headup->type == eHeadup_box_text)
                     && the_headup->data.text_info.text[0] != '\0'))) {
-            if (the_headup->type == eHeadup_fancy || the_headup->end_time == 0 || pThe_time < the_headup->end_time) {
+            if (the_headup->type != eHeadup_fancy && the_headup->end_time != 0 && the_headup->end_time <= pThe_time) {
+                ClearHeadup(i);
+            } else {
                 if (the_headup->dimmed_background) {
                     DimRectangle(
                         gBack_screen,
@@ -527,6 +532,27 @@ void DoHeadups(tU32 pThe_time) {
                                 the_headup->right_edge);
                         }
                         break;
+                    case eHeadup_box_text:
+                        if (the_headup->cockpit_anchored) {
+                            y_offset = gScreen_wobble_y;
+                        } else {
+                            y_offset = 0;
+                        }
+                        if (the_headup->cockpit_anchored) {
+                            x_offset = gScreen_wobble_y;
+                        } else {
+                            x_offset = 0;
+                        }
+                        OoerrIveGotTextInMeBoxMissus(
+                            the_headup->data.coloured_text_info.coloured_font - gFonts,
+                            the_headup->data.coloured_text_info.text,
+                            gBack_screen,
+                            gBack_screen->width / 10,
+                            y_offset + x_offset + the_headup->y,
+                            9 * gBack_screen->width / 10,
+                            y_offset + y_offset + the_headup->y + 60,
+                            1);
+                        break;
                     case eHeadup_image:
                         if (the_headup->cockpit_anchored) {
                             y_offset = gScreen_wobble_y;
@@ -560,8 +586,8 @@ void DoHeadups(tU32 pThe_time) {
                             }
                             DRPixelmapRectangleShearedCopy(
                                 gBack_screen,
-                                the_headup->x + the_headup->data.fancy_info.offset,
-                                the_headup->y,
+                                the_headup->x + the_headup->data.fancy_info.offset + x_offset,
+                                the_headup->y + y_offset,
                                 the_headup->data.fancy_info.image,
                                 0,
                                 0,
@@ -571,7 +597,22 @@ void DoHeadups(tU32 pThe_time) {
                             break;
                         case eFancy_stage_halting:
                             time_factor = 1000 * (pThe_time - the_headup->data.fancy_info.start_time) / 100;
-                            if (time_factor > 1000) {
+                            if (!(time_factor > 1000)) {
+#if DETHRACE_FIX_BUGS
+                                time_factor = MAX(time_factor, 0);
+#endif
+                                DRPixelmapRectangleShearedCopy(
+                                    gBack_screen,
+                                    the_headup->x - the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500 + x_offset,
+                                    the_headup->y + y_offset,
+                                    the_headup->data.image_info.image,
+                                    0,
+                                    0,
+                                    the_headup->data.image_info.image->width,
+                                    the_headup->data.image_info.image->height,
+                                    BrIntToFixed(the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500)
+                                        / the_headup->data.image_info.image->height);
+                            } else {
                                 if (time_factor > 1500) {
                                     time_factor = 1500;
                                     the_headup->data.fancy_info.fancy_stage = eFancy_stage_waiting;
@@ -579,29 +620,14 @@ void DoHeadups(tU32 pThe_time) {
                                 }
                                 DRPixelmapRectangleShearedCopy(
                                     gBack_screen,
-                                    the_headup->x - (1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500,
-                                    the_headup->y,
+                                    the_headup->x - (1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500 + x_offset,
+                                    the_headup->y + y_offset,
                                     the_headup->data.image_info.image,
                                     0,
                                     0,
                                     the_headup->data.image_info.image->width,
                                     the_headup->data.image_info.image->height,
                                     BrIntToFixed((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500)
-                                        / the_headup->data.image_info.image->height);
-                            } else {
-#if DETHRACE_FIX_BUGS
-                                time_factor = MAX(time_factor, 0);
-#endif
-                                DRPixelmapRectangleShearedCopy(
-                                    gBack_screen,
-                                    the_headup->x - the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500,
-                                    the_headup->y,
-                                    the_headup->data.image_info.image,
-                                    0,
-                                    0,
-                                    the_headup->data.image_info.image->width,
-                                    the_headup->data.image_info.image->height,
-                                    BrIntToFixed(the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500)
                                         / the_headup->data.image_info.image->height);
                             }
                             break;
@@ -612,8 +638,8 @@ void DoHeadups(tU32 pThe_time) {
                             }
                             DRPixelmapRectangleMaskedCopy(
                                 gBack_screen,
-                                the_headup->x,
-                                the_headup->y,
+                                the_headup->x + x_offset,
+                                the_headup->y + y_offset,
                                 the_headup->data.image_info.image,
                                 0,
                                 0,
@@ -630,8 +656,8 @@ void DoHeadups(tU32 pThe_time) {
                             }
                             DRPixelmapRectangleShearedCopy(
                                 gBack_screen,
-                                the_headup->x,
-                                the_headup->y,
+                                the_headup->x + x_offset,
+                                the_headup->y + y_offset,
                                 the_headup->data.image_info.image,
                                 0,
                                 0,
@@ -647,8 +673,8 @@ void DoHeadups(tU32 pThe_time) {
                             } else {
                                 DRPixelmapRectangleShearedCopy(
                                     gBack_screen,
-                                    the_headup->data.fancy_info.offset + the_headup->x,
-                                    the_headup->y,
+                                    the_headup->data.fancy_info.offset + the_headup->x + x_offset,
+                                    the_headup->y + y_offset,
                                     the_headup->data.image_info.image,
                                     0,
                                     0,
@@ -657,38 +683,10 @@ void DoHeadups(tU32 pThe_time) {
                                     -BrIntToFixed(1));
                             }
                             break;
-                        default:
-                            break;
                         }
-                        break;
-
-                    case eHeadup_box_text:
-                        if (the_headup->cockpit_anchored) {
-                            y_offset = gScreen_wobble_y;
-                        } else {
-                            y_offset = 0;
-                        }
-                        if (the_headup->cockpit_anchored) {
-                            x_offset = gScreen_wobble_x;
-                        } else {
-                            x_offset = 0;
-                        }
-                        OoerrIveGotTextInMeBoxMissus(
-                            the_headup->data.coloured_text_info.coloured_font - gFonts,
-                            the_headup->data.coloured_text_info.text,
-                            gBack_screen,
-                            gBack_screen->width / 10,
-                            x_offset + the_headup->y,
-                            9 * gBack_screen->width / 10,
-                            y_offset + the_headup->y + 60,
-                            1);
-                        break;
-                    default:
                         break;
                     }
                 }
-            } else {
-                ClearHeadup(i);
             }
         }
     }
