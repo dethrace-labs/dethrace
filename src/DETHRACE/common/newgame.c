@@ -1003,18 +1003,18 @@ void DrawNOptInitialRadios(void) {
     DontLetFlicFuckWithPalettes();
     TurnFlicTransparencyOn();
     for (i = 0; i < COUNT_OF(gRadio_bastards__newgame); i++) {
-        if (gRadio_bastards__newgame[i].count < 2) {
-            if (gRadio_bastards__newgame[i].current_value) {
-                NetPlayCheckboxOn2(i);
-            } else {
-                NetPlayCheckboxOff2(i);
-            }
-        } else {
+        if (gRadio_bastards__newgame[i].count > 1) {
             NetPlayRadioOn2(i, gRadio_bastards__newgame[i].current_value);
             for (j = 0; j < gRadio_bastards__newgame[i].count; j++) {
                 if (j != gRadio_bastards__newgame[i].current_value) {
                     NetPlayRadioOff2(i, j);
                 }
+            }
+        } else {
+            if (gRadio_bastards__newgame[i].current_value) {
+                NetPlayCheckboxOn2(i);
+            } else {
+                NetPlayCheckboxOff2(i);
             }
         }
     }
