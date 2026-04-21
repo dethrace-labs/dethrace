@@ -588,57 +588,57 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
         gCurrent_graf_data->joinable_games_y + gFonts[kFont_GRYLIT].height + 1 - (TranslationMode() ? 2 : 0) - gCurrent_graf_data->joinable_games_y_pitch,
         6);
     for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
-        if (gGames_to_join[i].game == NULL) {
-            continue;
+        if (gGames_to_join[i].game != NULL) {
+            if (gGames_to_join[i].game->type >= 0 && gGames_to_join[i].game->type <= 6) {
+                if ((PDGetTotalTime() - gGames_to_join[i].time) >= 15000) {
+                    DisposeJoinableGame(i);
+                } else {
+                    if (gMouse_in_use
+                        && pCurrent_mode != 0
+                        && gGames_to_join[i].game != NULL
+                        && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet)
+                        && gGames_to_join[i].game->num_players < 6
+                        && x_coord >= gCurrent_graf_data->joinable_games_sel_left
+                        && x_coord <= gCurrent_graf_data->joinable_games_sel_right
+                        && y_coord >= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_top_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch)
+                        && y_coord <= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_bot_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch - 1)) {
+                        gLast_graph_sel__newgame = i;
+                    }
+                    if (i == gLast_graph_sel__newgame) {
+                        font_index = 10;
+                    } else {
+                        font_index = 9;
+                    }
+                    sprintf(s, "%s", gGames_to_join[i].game->host_name);
+                    DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_1, current_index, font_index, s);
+                    s2 = GetMiscString(kMiscString_NetworkGameTypeNames_START + gGames_to_join[i].game->type);
+                    sprintf(s, "%s", s2);
+                    DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_2, current_index, font_index, s);
+                    sprintf(s, "%d", gGames_to_join[i].game->num_players);
+                    DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_3, current_index, font_index, s);
+                    s2 = GetMiscString(kMiscString_NetworkGameStage_START + gGames_to_join[i].game->status.stage);
+                    s3 = GetMiscString(kMiscString_NetworkGameOpenGame_START + gGames_to_join[i].game->options.open_game);
+                    sprintf(s, "%s, %s", s2, s3);
+                    DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_4, current_index, font_index, s);
+                    if (i == gLast_graph_sel__newgame) {
+                        DrawRectangle(gBack_screen,
+                            gCurrent_graf_data->joinable_games_sel_left,
+                            gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_top_marg + gCurrent_graf_data->joinable_games_y_pitch * current_index,
+                            gCurrent_graf_data->joinable_games_sel_right - 1,
+                            gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_bot_marg + gCurrent_graf_data->joinable_games_y_pitch * current_index - 1,
+                            45);
+                    }
+                    current_index++;
+                }
+            }
         }
-        if (gGames_to_join[i].game->type < 0 || gGames_to_join[i].game->type >= eNet_game_type_count) {
-            continue;
-        }
-        if ((PDGetTotalTime() - gGames_to_join[i].time) >= 15000) {
-            DisposeJoinableGame(i);
-            continue;
-        }
-        if (gMouse_in_use
-            && pCurrent_mode != 0
-            && gGames_to_join[i].game != NULL
-            && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet)
-            && gGames_to_join[i].game->num_players <= 5
-            && x_coord >= gCurrent_graf_data->joinable_games_sel_left
-            && x_coord <= gCurrent_graf_data->joinable_games_sel_right
-            && y_coord >= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_top_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch)
-            && y_coord <= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_bot_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch - 1)) {
-            gLast_graph_sel__newgame = i;
-        }
-        if (i == gLast_graph_sel__newgame) {
-            font_index = 10;
-        } else {
-            font_index = 9;
-        }
-        sprintf(s, "%s", gGames_to_join[i].game->host_name);
-        DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_1, current_index, font_index, s);
-        sprintf(s, "%s", GetMiscString(kMiscString_NetworkGameTypeNames_START + gGames_to_join[i].game->type));
-        DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_2, current_index, font_index, s);
-        sprintf(s, "%d", gGames_to_join[i].game->num_players);
-        DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_3, current_index, font_index, s);
-        sprintf(s, "%s, %s",
-            GetMiscString(kMiscString_NetworkGameStage_START + gGames_to_join[i].game->status.stage),
-            GetMiscString(kMiscString_NetworkGameOpenGame_START + gGames_to_join[i].game->options.open_game));
-        DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_4, current_index, font_index, s);
-        if (i == gLast_graph_sel__newgame) {
-            DrawRectangle(gBack_screen,
-                gCurrent_graf_data->joinable_games_sel_left,
-                gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_top_marg + gCurrent_graf_data->joinable_games_y_pitch * current_index,
-                gCurrent_graf_data->joinable_games_sel_right - 1,
-                gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_bot_marg + gCurrent_graf_data->joinable_games_y_pitch * current_index - 1,
-                45);
-        }
-        current_index++;
     }
+    gCurrent_net_game_count = current_index;
 
-    if (current_index != 0 && (gShifted_default_yet == 0 || (gLast_graph_sel__newgame >= 0 && (gGames_to_join[gLast_graph_sel__newgame].game == NULL || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet) || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5)))) {
+    if (gCurrent_net_game_count != 0 && (gShifted_default_yet == 0 || (gLast_graph_sel__newgame >= 0 && (gGames_to_join[gLast_graph_sel__newgame].game == NULL || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet) || gGames_to_join[gLast_graph_sel__newgame].game->num_players >= 6)))) {
         gShifted_default_yet = 1;
         for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
-            if (gGames_to_join[i].game != NULL && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet) && gGames_to_join[i].game->num_players <= 5) {
+            if (gGames_to_join[i].game != NULL && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet) && gGames_to_join[i].game->num_players < 6) {
                 gLast_graph_sel__newgame = i;
                 ChangeSelectionTo(2, 1);
                 return;
@@ -649,10 +649,10 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
 #if defined(DETHRACE_FIX_BUGS)
         (gLast_graph_sel__newgame >= 0) &&
 #endif
-        (current_index == 0
+        (gCurrent_net_game_count == 0
             || gGames_to_join[gLast_graph_sel__newgame].game == NULL
             || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet)
-            || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5)) {
+            || gGames_to_join[gLast_graph_sel__newgame].game->num_players >= 6)) {
         gLast_graph_sel__newgame = -1;
         ChangeSelectionTo(0, 0);
     }
