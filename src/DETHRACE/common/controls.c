@@ -1270,28 +1270,32 @@ void CheckForBeingOutOfThisWorld(void) {
     static tU32 sLast_check;
     int time_step;
 
-    the_time = PDGetTotalTime();
+    time_step = PDGetTotalTime() - the_time;
+    the_time += time_step;
 
-    if (gRecover_timer == 0 || ((gProgram_state.current_car.frame_collision_flag || gProgram_state.current_car.number_of_wheels_on_ground) && !IsCarInTheSea())) {
-        gRecover_timer = 0;
-        if ((the_time - sLast_check) > 200) {
-            sLast_check = the_time;
-            if (HasCarFallenOffWorld(&gProgram_state.current_car)) {
-                gRecover_timer = 3000;
+    if (gRecover_timer != 0) {
+        if ((gProgram_state.current_car.frame_collision_flag || gProgram_state.current_car.number_of_wheels_on_ground) && !IsCarInTheSea()) {
+            gRecover_timer = 0;
+        } else {
+            gRecover_timer -= gFrame_period;
+            if (gRecover_timer <= 0 || IsCarInTheSea() == 2) {
+                gRecover_timer = 0;
+                RecoverCar();
+                gHad_auto_recover = 1;
             }
+            return;
         }
-        if (IsCarInTheSea()) {
-            if (!gRecover_timer) {
-                gRecover_timer = 3000;
-            }
-        }
-        return;
     }
-    gRecover_timer -= gFrame_period;
-    if (gRecover_timer <= 0 || IsCarInTheSea() == 2) {
-        gRecover_timer = 0;
-        RecoverCar();
-        gHad_auto_recover = 1;
+    if ((the_time - sLast_check) > 200) {
+        sLast_check = the_time;
+        if (HasCarFallenOffWorld(&gProgram_state.current_car)) {
+            gRecover_timer = 3000;
+        }
+    }
+    if (IsCarInTheSea()) {
+        if (!gRecover_timer) {
+            gRecover_timer = 3000;
+        }
     }
 }
 
