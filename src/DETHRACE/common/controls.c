@@ -873,10 +873,10 @@ void TDamageEngine(void) {
 // FUNCTION: CARM95 0x004a127f
 void TDamageDriver(void) {
 
-    if (gProgram_state.current_car.damage_units[eDamage_driver].damage_level >= 80) {
-        DamageUnit(&gProgram_state.current_car, eDamage_driver, 2);
-    } else {
+    if (gProgram_state.current_car.damage_units[eDamage_driver].damage_level < 80) {
         DamageUnit(&gProgram_state.current_car, eDamage_driver, 80 - gProgram_state.current_car.damage_units[2].damage_level);
+    } else {
+        DamageUnit(&gProgram_state.current_car, eDamage_driver, 2);
     }
 }
 
