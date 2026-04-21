@@ -756,39 +756,39 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
 
     x1 = pImpact_point->v[0] - crushed_car_bounds.min.v[0];
     x2 = crushed_car_bounds.max.v[0] - pImpact_point->v[0];
-    if (x1 >= x2) {
-        x = x2;
-    } else {
+    if (x1 < x2) {
         x = x1;
+    } else {
+        x = x2;
     }
     y1 = pImpact_point->v[1] - crushed_car_bounds.min.v[1];
     y2 = crushed_car_bounds.max.v[1] - pImpact_point->v[1];
-    if (y1 >= y2) {
-        y = y2;
-    } else {
+    if (y1 <= y2) {
         y = y1;
+    } else {
+        y = y2;
     }
     z1 = pImpact_point->v[2] - crushed_car_bounds.min.v[2];
     z2 = crushed_car_bounds.max.v[2] - pImpact_point->v[2];
-    if (z1 >= z2) {
-        z = z2;
-    } else {
+    if (z1 < z2) {
         z = z1;
-    }
-    if (z > x || z > y) {
-        if (x > y || x > z) {
-            impact_location = y1 < y2 ? eImpact_bottom : eImpact_top;
-            proportion_z = z1 / (crushed_car_bounds.max.v[2] - crushed_car_bounds.min.v[2]);
-            proportion_x = x1 / (crushed_car_bounds.max.v[0] - crushed_car_bounds.min.v[0]);
-        } else {
-            impact_location = x1 >= x2 ? eImpact_right : eImpact_left;
-            proportion_z = z1 / (crushed_car_bounds.max.v[2] - crushed_car_bounds.min.v[2]);
-            proportion_y = y1 / (crushed_car_bounds.max.v[1] - crushed_car_bounds.min.v[1]);
-        }
     } else {
-        impact_location = z1 >= z2 ? eImpact_back : eImpact_front;
+        z = z2;
+    }
+    if (z <= x && z <= y) {
+        impact_location = z2 <= z1 ? eImpact_back : eImpact_front;
         proportion_x = x1 / (crushed_car_bounds.max.v[0] - crushed_car_bounds.min.v[0]);
         proportion_y = y1 / (crushed_car_bounds.max.v[1] - crushed_car_bounds.min.v[1]);
+    } else {
+        if (x <= y && x <= z) {
+            impact_location = x2 <= x1 ? eImpact_right : eImpact_left;
+            proportion_y = y1 / (crushed_car_bounds.max.v[1] - crushed_car_bounds.min.v[1]);
+            proportion_z = z1 / (crushed_car_bounds.max.v[2] - crushed_car_bounds.min.v[2]);
+        } else {
+            impact_location = y2 > y1 ? eImpact_bottom : eImpact_top;
+            proportion_x = x1 / (crushed_car_bounds.max.v[0] - crushed_car_bounds.min.v[0]);
+            proportion_z = z1 / (crushed_car_bounds.max.v[2] - crushed_car_bounds.min.v[2]);
+        }
     }
     if (pWas_hitting_a_car && pCar->last_impact_location == eImpact_unknown) {
         pCar->last_impact_location = impact_location;
@@ -797,76 +797,82 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
         pCar->last_col_prop_z = proportion_z;
     }
 
-    if (energy_magnitude != 0.0f && !pCar->invulnerable) {
+    if (energy_magnitude != 0.0f) {
+        if (pCar->invulnerable) {
+            return;
+        }
         if (!pWas_hitting_a_car && impact_location == eImpact_bottom) {
             energy_magnitude = energy_magnitude / 2.0f;
         }
 
         the_program = &pCar->damage_programs[impact_location];
-        the_clause = the_program->clauses;
-        for (i = 0; i < the_program->clause_count; i++) {
+        for (i = 0, the_clause = the_program->clauses; i < the_program->clause_count; i++, the_clause++) {
             result = 1;
-            the_condition = the_clause->conditions;
-            for (j = 0; j < the_clause->condition_count; j++) {
+            for (j = 0, the_condition = the_clause->conditions; j < the_clause->condition_count && result; j++, the_condition++) {
                 switch (the_condition->axis_comp) {
                 case eAxis_x:
-                    if (the_condition->condition_operator == eCondition_greater_than) {
-                        if (the_condition->comparitor >= proportion_x) {
+                    if (the_condition->condition_operator == eCondition_less_than) {
+                        if (the_condition->comparitor > proportion_x) {
+                            result &= 1;
+                        } else {
                             result = 0;
                         }
-                    } else if (the_condition->comparitor <= proportion_x) {
-                        result = 0;
+                    } else {
+                        if (the_condition->comparitor < proportion_x) {
+                            result &= 1;
+                        } else {
+                            result = 0;
+                        }
                     }
                     break;
 
                 case eAxis_y:
-                    if (the_condition->condition_operator == eCondition_greater_than) {
-                        if (the_condition->comparitor >= proportion_y) {
+                    if (the_condition->condition_operator == eCondition_less_than) {
+                        if (the_condition->comparitor > proportion_y) {
+                            result &= 1;
+                        } else {
                             result = 0;
                         }
-                    } else if (the_condition->comparitor <= proportion_y) {
-                        result = 0;
+                    } else {
+                        if (the_condition->comparitor < proportion_y) {
+                            result &= 1;
+                        } else {
+                            result = 0;
+                        }
                     }
                     break;
 
                 case eAxis_z:
-                    if (the_condition->condition_operator == eCondition_greater_than) {
-                        if (the_condition->comparitor >= proportion_z) {
+                    if (the_condition->condition_operator == eCondition_less_than) {
+                        if (the_condition->comparitor > proportion_z) {
+                            result &= 1;
+                        } else {
                             result = 0;
                         }
-                    } else if (the_condition->comparitor <= proportion_z) {
-                        result = 0;
+                    } else {
+                        if (the_condition->comparitor < proportion_z) {
+                            result &= 1;
+                        } else {
+                            result = 0;
+                        }
                     }
                     break;
                 }
 
-                if (!result) {
-                    break;
-                }
-                the_condition++;
             }
             if (result) {
-                for (j = 0; j < the_clause->effect_count; j++) {
-                    the_effect = &the_clause->effects[j];
+                for (j = 0, the_effect = the_clause->effects; j < the_clause->effect_count; j++, the_effect++) {
                     DoDamage(pCar, the_effect->type, energy_magnitude, the_effect->weakness_factor);
                 }
             }
-            the_clause++;
         }
         if (pCar->driver == eDriver_local_human) {
             switch (impact_location) {
-            case eImpact_top:
-            case eImpact_bottom:
-                NewScreenWobble(
-                    FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
-                    FRandomBetween(energy_magnitude * 30.0f, energy_magnitude * 60.0f),
-                    FRandomBetween(1.0f / energy_magnitude, 5.0f / energy_magnitude));
-                break;
             case eImpact_left:
                 NewScreenWobble(
                     FRandomBetween(energy_magnitude * 50.0f, energy_magnitude * 100.0f),
                     FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
-                    FRandomBetween(4.0f / energy_magnitude, 7.0 / energy_magnitude));
+                    FRandomBetween(4.0f / energy_magnitude, 7.0f / energy_magnitude));
                 break;
             case eImpact_right:
                 NewScreenWobble(
@@ -874,6 +880,18 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
                     FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
                     FRandomBetween(4.0f / energy_magnitude, 7.0f / energy_magnitude));
 
+                break;
+            case eImpact_bottom:
+                NewScreenWobble(
+                    FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
+                    FRandomBetween(energy_magnitude * 30.0f, energy_magnitude * 60.0f),
+                    FRandomBetween(1.0f / energy_magnitude, 5.0f / energy_magnitude));
+                break;
+            case eImpact_top:
+                NewScreenWobble(
+                    FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
+                    FRandomBetween(energy_magnitude * 30.0f, energy_magnitude * 60.0f),
+                    FRandomBetween(1.0f / energy_magnitude, 5.0f / energy_magnitude));
                 break;
             case eImpact_front:
                 NewScreenWobble(
@@ -886,8 +904,6 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
                     FRandomBetween(energy_magnitude * 5.0f, energy_magnitude * 20.0f),
                     FRandomBetween(-energy_magnitude * 50.0f, energy_magnitude * 150.0f),
                     FRandomBetween(7.0f / energy_magnitude, 25.0f / energy_magnitude));
-                break;
-            default:
                 break;
             }
             CheckPiledriverBonus(pCar, pImpact_point, pEnergy_vector);
