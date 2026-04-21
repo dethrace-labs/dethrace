@@ -763,7 +763,7 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
     }
     y1 = pImpact_point->v[1] - crushed_car_bounds.min.v[1];
     y2 = crushed_car_bounds.max.v[1] - pImpact_point->v[1];
-    if (y1 <= y2) {
+    if (y1 < y2) {
         y = y1;
     } else {
         y = y2;
@@ -785,7 +785,7 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
             proportion_y = y1 / (crushed_car_bounds.max.v[1] - crushed_car_bounds.min.v[1]);
             proportion_z = z1 / (crushed_car_bounds.max.v[2] - crushed_car_bounds.min.v[2]);
         } else {
-            impact_location = y2 > y1 ? eImpact_bottom : eImpact_top;
+            impact_location = y1 <= y2 ? eImpact_top : eImpact_bottom;
             proportion_x = x1 / (crushed_car_bounds.max.v[0] - crushed_car_bounds.min.v[0]);
             proportion_z = z1 / (crushed_car_bounds.max.v[2] - crushed_car_bounds.min.v[2]);
         }
@@ -797,8 +797,7 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
         pCar->last_col_prop_z = proportion_z;
     }
 
-    if (energy_magnitude != 0.0f) {
-        if (pCar->invulnerable) {
+    if (energy_magnitude == 0.0f || pCar->invulnerable) {
             return;
         }
         if (!pWas_hitting_a_car && impact_location == eImpact_bottom) {
@@ -907,7 +906,7 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
                 break;
             }
             CheckPiledriverBonus(pCar, pImpact_point, pEnergy_vector);
-        }
+        // }
     }
 }
 
