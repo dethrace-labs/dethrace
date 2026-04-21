@@ -1167,8 +1167,10 @@ void DoInstruments(tU32 pThe_time) {
     double cos_angle;
     double speed_mph;
 
-    if (gProgram_state.current_car_index == gProgram_state.current_car.index) {
-        speed_mph = gCar_to_view->speedo_speed * WORLD_SCALE / 1600.0f * 3600000.0f;
+    if (gProgram_state.current_car_index != gProgram_state.current_car.index) {
+        return;
+    }
+    speed_mph = gCar_to_view->speedo_speed * WORLD_SCALE / 1600.0 * 3600000.0;
         if (speed_mph < 0.0f) {
             speed_mph = 0.0f;
         }
@@ -1177,60 +1179,74 @@ void DoInstruments(tU32 pThe_time) {
                 return;
             }
             the_wobble_x = gScreen_wobble_x;
-            the_wobble_y = gScreen_wobble_y;
-        } else {
+            gear = gScreen_wobble_y;
+    } else {
             the_wobble_x = 0;
-            the_wobble_y = 0;
+            gear = 0;
         }
         tacho_image = gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on];
-        if (gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] >= 0) {
+        if (gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] < 0) {
+            if (tacho_image != NULL) {
+#ifdef DETHRACE_3DFX_PATCH
+                DRPixelmapRectangleCopy(
+#else
+                BrPixelmapRectangleCopy(
+#endif
+                    gBack_screen,
+                    the_wobble_x + gProgram_state.current_car.tacho_x[gProgram_state.cockpit_on],
+                    gear + gProgram_state.current_car.tacho_y[gProgram_state.cockpit_on],
+                    gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on],
+                    0,
+                    0,
+                    (((float)(gCar_to_view->revs - 1.0f)) / (double)gCar_to_view->red_line * (double)gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on]->width + 1.0f),
+                    gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on]->height);
+            }
+        } else {
             if (gCar_to_view->red_line >= gCar_to_view->revs) {
                 the_angle = DEG_TO_RAD((double)(gProgram_state.current_car.tacho_end_angle[gProgram_state.cockpit_on] - gProgram_state.current_car.tacho_start_angle[gProgram_state.cockpit_on]) * gCar_to_view->revs / (double)gCar_to_view->red_line + (double)gProgram_state.current_car.tacho_start_angle[gProgram_state.cockpit_on]);
             } else {
                 the_angle = DEG_TO_RAD((double)gProgram_state.current_car.tacho_end_angle[gProgram_state.cockpit_on]);
             }
-            if (the_angle >= 0.0) {
-                if (the_angle >= TAU) {
-                    the_angle -= TAU;
-                }
-            } else {
+            if (the_angle < 0.0) {
                 the_angle += TAU;
+            } else if (the_angle >= TAU) {
+                the_angle -= TAU;
             }
             the_angle2 = DR_PI_OVER_2 - the_angle;
             if (the_angle2 < 0) {
                 the_angle2 += TAU;
             }
             if (the_angle2 > DR_3PI_OVER_2) {
-                cos_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
+                sin_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
             } else if (the_angle2 > DR_PI) {
-                cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
+                sin_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
 #if defined(DETHRACE_FIX_BUGS)
             } else if (the_angle2 >= DR_PI_OVER_2) {
 #else
             } else if (the_angle2 > DR_PI_OVER_2) {
 #endif
-                cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
+                sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
             } else {
-                cos_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
+                sin_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
             }
             if (the_angle > DR_3PI_OVER_2) {
-                sin_angle = gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)];
+                cos_angle = gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)];
             } else if (the_angle > DR_PI) {
-                sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
+                cos_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
 #if defined(DETHRACE_FIX_BUGS)
             } else if (the_angle >= DR_PI_OVER_2) {
 #else
             } else if (the_angle > DR_PI_OVER_2) {
 #endif
-                sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
+                cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
             } else {
-                sin_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
+                cos_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
             }
             if (tacho_image != NULL) {
                 DRPixelmapRectangleMaskedCopy(
                     gBack_screen,
                     the_wobble_x + gProgram_state.current_car.tacho_x[gProgram_state.cockpit_on],
-                    the_wobble_y + gProgram_state.current_car.tacho_y[gProgram_state.cockpit_on],
+                    gear + gProgram_state.current_car.tacho_y[gProgram_state.cockpit_on],
                     tacho_image,
                     0,
                     0,
@@ -1241,39 +1257,25 @@ void DoInstruments(tU32 pThe_time) {
             PoshDrawLine(
                 the_angle,
                 gBack_screen,
-                ((double)gProgram_state.current_car.tacho_radius_1[gProgram_state.cockpit_on] * sin_angle
+                ((double)gProgram_state.current_car.tacho_radius_1[gProgram_state.cockpit_on] * cos_angle
                     + (double)gProgram_state.current_car.tacho_centre_x[gProgram_state.cockpit_on]
                     + (double)the_wobble_x),
                 ((double)gProgram_state.current_car.tacho_centre_y[gProgram_state.cockpit_on]
-                    - (double)gProgram_state.current_car.tacho_radius_1[gProgram_state.cockpit_on] * cos_angle
-                    + (double)the_wobble_y),
-                ((double)gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] * sin_angle
+                    - (double)gProgram_state.current_car.tacho_radius_1[gProgram_state.cockpit_on] * sin_angle
+                    + (double)gear),
+                ((double)gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] * cos_angle
                     + (double)gProgram_state.current_car.tacho_centre_x[gProgram_state.cockpit_on]
                     + (double)the_wobble_x),
                 ((double)gProgram_state.current_car.tacho_centre_y[gProgram_state.cockpit_on]
-                    - (double)gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] * cos_angle
-                    + (double)the_wobble_y),
+                    - (double)gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] * sin_angle
+                    + (double)gear),
                 gProgram_state.current_car.tacho_needle_colour[gProgram_state.cockpit_on]);
-        } else if (tacho_image != NULL) {
-#ifdef DETHRACE_3DFX_PATCH
-            DRPixelmapRectangleCopy(
-#else
-            BrPixelmapRectangleCopy(
-#endif
-                gBack_screen,
-                the_wobble_x + gProgram_state.current_car.tacho_x[gProgram_state.cockpit_on],
-                the_wobble_y + gProgram_state.current_car.tacho_y[gProgram_state.cockpit_on],
-                gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on],
-                0,
-                0,
-                ((gCar_to_view->revs - 1.0) / (double)gCar_to_view->red_line * (double)gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on]->width + 1.0),
-                gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on]->height);
         }
         if (!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0 || gProgram_state.which_view == eView_forward) {
             if (gCar_to_view->gear < 0) {
-                gear = -1;
+                the_wobble_y = -1;
             } else {
-                gear = gCar_to_view->gear;
+                the_wobble_y = gCar_to_view->gear;
             }
 #if defined(DETHRACE_FIX_BUGS)
 /*
@@ -1292,20 +1294,32 @@ void DoInstruments(tU32 pThe_time) {
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
                 the_wobble_x + gProgram_state.current_car.gear_x[gProgram_state.cockpit_on],
-                the_wobble_y + gProgram_state.current_car.gear_y[gProgram_state.cockpit_on],
+                gear + gProgram_state.current_car.gear_y[gProgram_state.cockpit_on],
                 gProgram_state.current_car.gears_image,
                 0,
-                (gear + 1) * gear_height,
+                (the_wobble_y + 1) * gear_height,
                 gProgram_state.current_car.gears_image->width,
                 gear_height);
         }
         speedo_image = gProgram_state.current_car.speedo_image[gProgram_state.cockpit_on];
-        if (gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] >= 0) {
+        if (gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] < 0) {
+            if (speedo_image != NULL) {
+                DrawNumberAt(
+                    speedo_image,
+                    the_wobble_x + gProgram_state.current_car.speedo_x[gProgram_state.cockpit_on],
+                    gear + gProgram_state.current_car.speedo_y[gProgram_state.cockpit_on],
+                    gProgram_state.current_car.speedo_x_pitch[gProgram_state.cockpit_on],
+                    gProgram_state.current_car.speedo_y_pitch[gProgram_state.cockpit_on],
+                    speed_mph,
+                    3,
+                    1);
+            }
+        } else {
             if (speedo_image && (!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0)) {
                 DRPixelmapRectangleMaskedCopy(
                     gBack_screen,
                     the_wobble_x + gProgram_state.current_car.speedo_x[gProgram_state.cockpit_on],
-                    the_wobble_y + gProgram_state.current_car.speedo_y[gProgram_state.cockpit_on],
+                    gear + gProgram_state.current_car.speedo_y[gProgram_state.cockpit_on],
                     speedo_image,
                     0,
                     0,
@@ -1328,63 +1342,52 @@ void DoInstruments(tU32 pThe_time) {
                 the_angle2 += TAU;
             }
             if (the_angle2 > DR_3PI_OVER_2) {
-                cos_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
+                sin_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
             } else if (the_angle2 > DR_PI) {
-                cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
+                sin_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
             } else if (the_angle2 > DR_PI_OVER_2) {
-                cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
+                sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
             } else {
-                cos_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
+                sin_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
             }
 
             if (the_angle > DR_3PI_OVER_2) {
-                sin_angle = gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)];
+                cos_angle = gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)];
             } else if (the_angle > DR_PI) {
-                sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
+                cos_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
             } else if (the_angle > DR_PI_OVER_2) {
-                sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
+                cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
             } else {
-                sin_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
+                cos_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
             }
 
             PoshDrawLine(
                 the_angle,
                 gBack_screen,
-                ((double)gProgram_state.current_car.speedo_radius_1[gProgram_state.cockpit_on] * sin_angle
+                ((double)gProgram_state.current_car.speedo_radius_1[gProgram_state.cockpit_on] * cos_angle
                     + (double)gProgram_state.current_car.speedo_centre_x[gProgram_state.cockpit_on]
                     + (double)the_wobble_x),
                 ((double)gProgram_state.current_car.speedo_centre_y[gProgram_state.cockpit_on]
-                    - (double)gProgram_state.current_car.speedo_radius_1[gProgram_state.cockpit_on] * cos_angle
-                    + (double)the_wobble_y),
-                ((double)gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] * sin_angle
+                    - (double)gProgram_state.current_car.speedo_radius_1[gProgram_state.cockpit_on] * sin_angle
+                    + (double)gear),
+                ((double)gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] * cos_angle
                     + (double)gProgram_state.current_car.speedo_centre_x[gProgram_state.cockpit_on]
                     + (double)the_wobble_x),
                 ((double)gProgram_state.current_car.speedo_centre_y[gProgram_state.cockpit_on]
-                    - (double)gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] * cos_angle
-                    + (double)the_wobble_y),
+                    - (double)gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] * sin_angle
+                    + (double)gear),
                 gProgram_state.current_car.speedo_needle_colour[gProgram_state.cockpit_on]);
             if (speedo_image != NULL && gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
                 DRPixelmapRectangleMaskedCopy(
                     gBack_screen,
                     the_wobble_x + gProgram_state.current_car.speedo_x[gProgram_state.cockpit_on],
-                    the_wobble_y + gProgram_state.current_car.speedo_y[gProgram_state.cockpit_on],
+                    gear + gProgram_state.current_car.speedo_y[gProgram_state.cockpit_on],
                     speedo_image,
                     0,
                     0,
                     speedo_image->width,
                     speedo_image->height);
             }
-        } else if (speedo_image != NULL) {
-            DrawNumberAt(
-                speedo_image,
-                the_wobble_x + gProgram_state.current_car.speedo_x[gProgram_state.cockpit_on],
-                the_wobble_y + gProgram_state.current_car.speedo_y[gProgram_state.cockpit_on],
-                gProgram_state.current_car.speedo_x_pitch[gProgram_state.cockpit_on],
-                gProgram_state.current_car.speedo_y_pitch[gProgram_state.cockpit_on],
-                speed_mph,
-                3,
-                1);
-        }
     }
 }
 
