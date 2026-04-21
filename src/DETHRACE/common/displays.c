@@ -1015,11 +1015,13 @@ void MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
     int delta_x;
     tHeadup* the_headup;
 
-    if (pHeadup_index >= 0) {
-        delta_x = gHeadups[pHeadup_index].x - gHeadups[pHeadup_index].original_x;
-        gHeadups[pHeadup_index].original_x = pNew_x;
-        gHeadups[pHeadup_index].x = pNew_x + delta_x;
-        gHeadups[pHeadup_index].y = pNew_y;
+    if (pHeadup_index < 0) {
+    } else {
+        the_headup = &gHeadups[pHeadup_index];
+        delta_x = the_headup->x - the_headup->original_x;
+        the_headup->original_x = pNew_x;
+        the_headup->x = pNew_x + delta_x;
+        the_headup->y = pNew_y;
     }
 }
 
