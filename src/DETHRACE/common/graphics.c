@@ -1800,25 +1800,21 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
 
     if (pIndex >= 0 && pIndex < gCurrent_race.check_point_count && gRace_file_version > 0) {
         if (Flash(300, &last_flash, &flash_state)) {
-            switch (gGraf_data_index) {
-            case 0:
+            cp = &gCurrent_race.checkpoints[pIndex];
+            if (gGraf_data_index != 0) {
                 DimRectangle(gBack_screen,
-                    gCurrent_race.checkpoints[pIndex].map_left[0],
-                    gCurrent_race.checkpoints[pIndex].map_top[0],
-                    gCurrent_race.checkpoints[pIndex].map_right[0],
-                    gCurrent_race.checkpoints[pIndex].map_bottom[0],
+                    2 * cp->map_left[0],
+                    2 * cp->map_top[0] + HIRES_Y_OFFSET,
+                    2 * cp->map_right[0],
+                    2 * cp->map_bottom[0] + HIRES_Y_OFFSET,
                     0);
-                break;
-            case 1:
+            } else {
                 DimRectangle(gBack_screen,
-                    2 * gCurrent_race.checkpoints[pIndex].map_left[0],
-                    2 * gCurrent_race.checkpoints[pIndex].map_top[0] + HIRES_Y_OFFSET,
-                    2 * gCurrent_race.checkpoints[pIndex].map_right[0],
-                    2 * gCurrent_race.checkpoints[pIndex].map_bottom[0] + HIRES_Y_OFFSET,
+                    cp->map_left[0],
+                    cp->map_top[0],
+                    cp->map_right[0],
+                    cp->map_bottom[0],
                     0);
-                break;
-            default:
-                TELL_ME_IF_WE_PASS_THIS_WAY();
             }
         }
     }
