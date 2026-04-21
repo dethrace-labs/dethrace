@@ -3026,38 +3026,36 @@ int DoMouseCursor(void) {
     // GLOBAL: CARM95 0x520a18
     static int button_was_down;
 
-    period = 0;
-    this_call_time = PDGetTotalTime();
-    if (last_call_time == 0) {
-        period = 1000;
-    }
-    while (period <= 20) {
+    do {
         this_call_time = PDGetTotalTime();
-        period = this_call_time - last_call_time;
-        // added by dethrace to avoid 100% CPU usage
-        gHarness_platform.Sleep(1);
-    }
+        if (last_call_time != 0) {
+            period = this_call_time - last_call_time;
+        } else {
+            period = 1000;
+        }
+    } while (period <= 20);
     GetMousePosition(&x_coord, &y_coord);
-    mouse_moved = x_coord != gMouse_last_x_coord || y_coord != gMouse_last_y_coord;
+    mouse_moved = gMouse_last_x_coord != x_coord || gMouse_last_y_coord - y_coord != 0;
     button_is_down = EitherMouseButtonDown();
     cursor_offset = button_is_down ? 4 : 0;
     if (gMouse_in_use || mouse_moved) {
         gMouse_in_use = 1;
         if (gMouse_last_x_coord == x_coord) {
-            if (zero_count >= 5) {
+            if (zero_count++ >= 5) {
                 delta_x = 0;
             }
-            zero_count++;
         } else {
             zero_count = 0;
             delta_x = (x_coord - gMouse_last_x_coord) * 1000 / period;
         }
         if (delta_x < -10) {
             new_required = 0;
-        } else if (delta_x < 11) {
-            new_required = 2;
         } else {
-            new_required = 3;
+            if (delta_x > 10) {
+                new_required = 3;
+            } else {
+                new_required = 2;
+            }
         }
         if (new_required != required_cursor && this_call_time - last_required_change >= 200) {
             last_required_change = this_call_time;
@@ -3071,37 +3069,37 @@ int DoMouseCursor(void) {
             }
             last_cursor_change = PDGetTotalTime();
         }
-        giblet_chance = Chance(1.f + 20.f * (abs(x_coord - gMouse_last_x_coord) + abs(y_coord - gMouse_last_y_coord)) / (float)period, period);
+        giblet_chance = Chance(1.f + (abs(x_coord - gMouse_last_x_coord) + abs(y_coord - gMouse_last_y_coord)) / (float)period * 20.f, period);
         if (gProgram_state.sausage_eater_mode) {
             giblet_count = 0;
         } else {
             giblet_count = 6 * BooleanTo1Or0(button_is_down && !button_was_down) + BooleanTo1Or0(giblet_chance);
         }
-        for (; giblet_count != 0; giblet_count--) {
-            NewCursorGiblet(
-                x_coord + gCursor_gib_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
-                y_coord + gCursor_gib_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480,
-                ((float)(x_coord - gMouse_last_x_coord)) / period * 1000.f / 4.f,
-                ((float)(y_coord - gMouse_last_y_coord)) / period * 1000.f / 3.f,
+        while (giblet_count-- != 0) {
+            giblet_index = NewCursorGiblet(
+                x_coord + gCursor_gib_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640u,
+                y_coord + gCursor_gib_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480u,
+                ((float)(x_coord - gMouse_last_x_coord)) / period * 1000.0 / 4.0,
+                ((float)(y_coord - gMouse_last_y_coord)) / period * 1000.0 / 3.0,
                 (button_is_down && !button_was_down) ? 50 : 400);
         }
         ProcessCursorGiblets(period);
         SaveTransient(gCursor_transient_index,
-            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
-            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480);
+            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640u,
+            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480u);
         DRPixelmapRectangleMaskedCopy(gBack_screen,
-            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
-            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480,
+            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640u,
+            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480u,
             gCursors[gCurrent_cursor_index + cursor_offset],
             0,
             0,
             gCursors[gCurrent_cursor_index + cursor_offset]->width,
             gCursors[gCurrent_cursor_index + cursor_offset]->height);
     }
-    last_call_time = this_call_time;
-    button_was_down = button_is_down;
     gMouse_last_x_coord = x_coord;
     gMouse_last_y_coord = y_coord;
+    button_was_down = button_is_down;
+    last_call_time = this_call_time;
     return mouse_moved;
 }
 
