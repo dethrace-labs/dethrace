@@ -3470,8 +3470,18 @@ void InitShadow(void) {
     gFancy_shadow = 1;
     gShadow_material = BrMaterialFind("SHADOW.MAT");
     BrVector3Set(&gShadow_light_ray, 0.f, -1.f, 0.f);
-    BrVector3Set(&gShadow_light_z, -0.f, -0.f, -1.f);
-    BrVector3Set(&gShadow_light_x, 1.f, 0.f, 0.f);
+    temp_v.v[0] = -1.f;
+    temp_v.v[1] = 0.f;
+    temp_v.v[2] = 0.f;
+    gShadow_light_z.v[0] = gShadow_light_ray.v[1] * temp_v.v[2] - temp_v.v[1] * gShadow_light_ray.v[2];
+    gShadow_light_z.v[1] = gShadow_light_ray.v[2] * temp_v.v[0] - temp_v.v[2] * gShadow_light_ray.v[0];
+    gShadow_light_z.v[2] = gShadow_light_ray.v[0] * temp_v.v[1] - temp_v.v[0] * gShadow_light_ray.v[1];
+    temp_v.v[0] = 0.f;
+    temp_v.v[1] = 0.f;
+    temp_v.v[2] = -1.f;
+    gShadow_light_x.v[0] = gShadow_light_ray.v[1] * temp_v.v[2] - temp_v.v[1] * gShadow_light_ray.v[2];
+    gShadow_light_x.v[1] = gShadow_light_ray.v[2] * temp_v.v[0] - temp_v.v[2] * gShadow_light_ray.v[0];
+    gShadow_light_x.v[2] = gShadow_light_ray.v[0] * temp_v.v[1] - temp_v.v[0] * gShadow_light_ray.v[1];
 
     gShadow_model = BrModelAllocate("", 0, 0);
     gShadow_model->flags = BR_MODF_GENERATE_TAGS | BR_MODF_KEEP_ORIGINAL;
