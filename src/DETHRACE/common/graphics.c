@@ -3217,8 +3217,8 @@ void InitDRFonts(void) {
     int i;
 
     for (i = 0; i < 21; i++) {
-        gFonts[i].file_read_once = 0;
         gFonts[i].images = NULL;
+        gFonts[i].file_read_once = 0;
     }
 }
 
