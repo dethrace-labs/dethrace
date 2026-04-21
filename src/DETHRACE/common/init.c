@@ -74,6 +74,12 @@ int gNet_mode_of_last_game;
 // GLOBAL: CARM95 0x0054b29c
 br_material* gDefault_track_material;
 
+// GLOBAL: CARM95 0x005454c4
+int gINT_005454c4;
+
+// GLOBAL: CARM95 0x0055142c
+int gINT_0055142c;
+
 // IDA: void __cdecl AllocateSelf()
 // FUNCTION: CARM95 0x004bbebf
 void AllocateSelf(void) {
@@ -762,7 +768,7 @@ void CopyMaterialColourFromIndex(br_material* pMaterial) {
 void InitRace(void) {
 
     SwitchToRealResolution();
-    // TODO: dword_5454C4 = 0;
+    gINT_005454c4 = 0;
     ClearConcussion();
     ClearWobbles();
     ClearHeadups();
@@ -771,17 +777,15 @@ void InitRace(void) {
     PossibleService();
     BuildColourTable(gRender_palette);
     PossibleService();
-    // TODO: dword_55142C = 0;
+    gINT_0055142c = 0;
     gStart_race_sent = 0;
     gProgram_state.frame_rate_headup = NewTextHeadupSlot(eHeadupSlot_development, 0, 0, -kFont_ORANGHED, "");
-    if (TranslationMode()) {
-        if (gAusterity_mode) {
-            FlushInterfaceFonts();
-        }
-    } else {
+    if (!TranslationMode()) {
         LoadFont(kFont_ORANGHED);
         LoadFont(kFont_BLUEHEAD);
         LoadFont(kFont_GREENHED);
+    } else if (gAusterity_mode) {
+        FlushInterfaceFonts();
     }
     LoadFont(kFont_MEDIUMHD);
     LoadFont(kFont_TIMER);
@@ -828,7 +832,7 @@ void InitRace(void) {
     AdjustRenderScreenSize();
     PrintMemoryDump(0, "DIRECTLY BEFORE LOADING IN TRACK");
     LoadInTrack();
-    if (gYon_multiplier != 1.0) {
+    if (gYon_multiplier != 1.0f) {
         AdjustRenderScreenSize();
     }
     PrintMemoryDump(0, "DIRECTLY AFTER LOADING IN TRACK");
