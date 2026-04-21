@@ -1086,7 +1086,10 @@ void DoDamageScreen(tU32 pThe_time) {
     br_pixelmap* the_image;
     tDamage_unit* the_damage;
 
-    if (&gProgram_state.current_car != gCar_to_view || gProgram_state.current_car_index != gProgram_state.current_car.index) {
+    if (&gProgram_state.current_car != gCar_to_view) {
+        return;
+    }
+    if (gProgram_state.current_car_index != gProgram_state.current_car.index) {
         return;
     }
     if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
@@ -1111,15 +1114,15 @@ void DoDamageScreen(tU32 pThe_time) {
         }
     }
     for (i = 0; i < COUNT_OF(gProgram_state.current_car.damage_units); i++) {
-        the_damage = &gProgram_state.current_car.damage_units[i];
         if (i != eDamage_driver) {
+            the_damage = &gProgram_state.current_car.damage_units[i];
             the_image = the_damage->images;
             the_step = 5 * the_damage->damage_level / 100;
             y_pitch = (the_image->height / 2) / 5;
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
-                the_wobble_x + gProgram_state.current_car.damage_units[i].x_coord,
-                the_wobble_y + gProgram_state.current_car.damage_units[i].y_coord,
+                the_wobble_x + the_damage->x_coord,
+                the_wobble_y + the_damage->y_coord,
                 the_image,
                 0,
                 y_pitch * (2 * the_step + ((pThe_time / the_damage->periods[the_step]) & 1)),
