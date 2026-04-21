@@ -431,14 +431,15 @@ float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflecti
     *pTotal_deflection = 0.0;
     amount = 0.0;
 
-    for (i = 0; i < gProgram_state.current_car.car_actor_count; i++) {
-        the_car_actor = &pCar->car_model_actors[i];
-        if (the_car_actor->min_distance_squared == 0.0 || !the_car_actor->undamaged_vertices) {
+    for (i = 0, the_car_actor = pCar->car_model_actors; i < gProgram_state.current_car.car_actor_count; i++, the_car_actor++) {
+        if (the_car_actor->min_distance_squared != 0.0f) {
             if (the_car_actor->undamaged_vertices) {
-                amount = RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005f, pTotal_deflection);
+                RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005, &dummy);
             }
         } else {
-            RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005f, &dummy);
+            if (the_car_actor->undamaged_vertices) {
+                amount = RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005, pTotal_deflection);
+            }
         }
     }
     pCar->repair_time += pFrame_period;
