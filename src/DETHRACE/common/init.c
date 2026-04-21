@@ -146,33 +146,35 @@ void ReinitialiseForwardCamera(void) {
 
     camera_ptr = (br_camera*)gCamera->type_data;
     if (gProgram_state.cockpit_on) {
-        the_angle = gCamera_angle / 2.0;
-
-        d = atan(
-                tandeg(the_angle)
+        the_angle = atan(
+                tandeg(gCamera_angle / 2.0f)
                 * (double)gRender_screen->height
                 / (double)(gProgram_state.current_car.render_bottom[0] - gProgram_state.current_car.render_top[0]))
-            * 114.5915590261646;
-        camera_ptr->field_of_view = BrDegreeToAngle(d);
+            * 114.59155902616465;
+        camera_ptr->field_of_view = BrDegreeToAngle(the_angle);
         BrMatrix34Identity(&gCamera->t.t.mat);
         gCamera->t.t.mat.m[3][0] = gProgram_state.current_car.driver_x_offset;
         gCamera->t.t.mat.m[3][1] = gProgram_state.current_car.driver_y_offset;
         gCamera->t.t.mat.m[3][2] = gProgram_state.current_car.driver_z_offset;
-        w = (float)(gRender_screen->base_y
+        d = (float)(gRender_screen->base_y
             + (gRender_screen->height / 2)
             - (gProgram_state.current_car.render_bottom[0] + gProgram_state.current_car.render_top[0]) / 2);
+        w = (float)gRender_screen->height;
 
-        gCamera->t.t.mat.m[2][1] = tandeg(d / 2.0) * w * 2.0 / (float)gRender_screen->height;
-        camera_ptr->aspect = (float)gWidth / gHeight;
+        gCamera->t.t.mat.m[2][1] = tandeg(the_angle / 2.0f) * d * 2.0f / w;
+        camera_ptr->aspect = (float)gWidth / (float)gHeight;
         camera_ptr->yon_z = gYon_multiplier * gCamera_yon;
-        if (gProgram_state.which_view == eView_left) {
+        switch (gProgram_state.which_view) {
+        case eView_left:
             DRMatrix34PostRotateY(
                 &gCamera->t.t.mat,
                 BrDegreeToAngle(gProgram_state.current_car.head_left_angle));
-        } else if (gProgram_state.which_view == eView_right) {
+            break;
+        case eView_right:
             DRMatrix34PostRotateY(
                 &gCamera->t.t.mat,
                 BrDegreeToAngle(gProgram_state.current_car.head_right_angle));
+            break;
         }
         gCamera->t.t.mat.m[3][0] = gProgram_state.current_car.driver_x_offset;
         gCamera->t.t.mat.m[3][1] = gProgram_state.current_car.driver_y_offset;
