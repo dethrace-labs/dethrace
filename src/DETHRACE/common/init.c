@@ -280,6 +280,7 @@ void ReinitialiseRenderStuff(void) {
 }
 
 // IDA: void __cdecl InstallFindFailedHooks()
+// FUNCTION: CARM95 0x004bc121
 void InstallFindFailedHooks(void) {
     NOT_IMPLEMENTED();
 }
@@ -309,6 +310,7 @@ void InitializeBRenderEnvironment(void) {
 
     gBr_initialized = 1;
     PDInstallErrorHandlers();
+    InstallFindFailedHooks();
     InstallDRMemCalls();
     InstallDRFileCalls();
     SetBRenderScreenAndBuffers(0, 0, 0, 0);
