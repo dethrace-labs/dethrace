@@ -74,6 +74,12 @@ int gNet_mode_of_last_game;
 // GLOBAL: CARM95 0x0054b29c
 br_material* gDefault_track_material;
 
+// GLOBAL: CARM95 0x005454c4
+int gINT_005454c4;
+
+// GLOBAL: CARM95 0x0055142c
+int gINT_0055142c;
+
 // IDA: void __cdecl AllocateSelf()
 // FUNCTION: CARM95 0x004bbebf
 void AllocateSelf(void) {
@@ -124,10 +130,10 @@ void AllocateCamera(void) {
 
     gRearview_camera->t.t.mat.m[2][2] = -1.0f;
     camera_ptr = (br_camera*)gRearview_camera->type_data;
-    camera_ptr->hither_z = gCamera_hither;
     camera_ptr->type = BR_CAMERA_PERSPECTIVE_FOV;
-    camera_ptr->yon_z = gCamera_yon;
     camera_ptr->field_of_view = BrDegreeToAngle(gCamera_angle);
+    camera_ptr->hither_z = gCamera_hither;
+    camera_ptr->yon_z = gCamera_yon;
     camera_ptr->aspect = (double)gWidth / (double)gHeight;
     gRearview_camera = BrActorAdd(gSelf, gRearview_camera);
     if (gRearview_camera == NULL) {
@@ -146,33 +152,35 @@ void ReinitialiseForwardCamera(void) {
 
     camera_ptr = (br_camera*)gCamera->type_data;
     if (gProgram_state.cockpit_on) {
-        the_angle = gCamera_angle / 2.0;
-
-        d = atan(
-                tandeg(the_angle)
+        the_angle = atan(
+                tandeg(gCamera_angle / 2.0f)
                 * (double)gRender_screen->height
                 / (double)(gProgram_state.current_car.render_bottom[0] - gProgram_state.current_car.render_top[0]))
-            * 114.5915590261646;
-        camera_ptr->field_of_view = BrDegreeToAngle(d);
+            * 114.59155902616465;
+        camera_ptr->field_of_view = BrDegreeToAngle(the_angle);
         BrMatrix34Identity(&gCamera->t.t.mat);
         gCamera->t.t.mat.m[3][0] = gProgram_state.current_car.driver_x_offset;
         gCamera->t.t.mat.m[3][1] = gProgram_state.current_car.driver_y_offset;
         gCamera->t.t.mat.m[3][2] = gProgram_state.current_car.driver_z_offset;
-        w = (float)(gRender_screen->base_y
+        d = (float)(gRender_screen->base_y
             + (gRender_screen->height / 2)
             - (gProgram_state.current_car.render_bottom[0] + gProgram_state.current_car.render_top[0]) / 2);
+        w = (float)gRender_screen->height;
 
-        gCamera->t.t.mat.m[2][1] = tandeg(d / 2.0) * w * 2.0 / (float)gRender_screen->height;
-        camera_ptr->aspect = (float)gWidth / gHeight;
+        gCamera->t.t.mat.m[2][1] = tandeg(the_angle / 2.0f) * d * 2.0f / w;
+        camera_ptr->aspect = (float)gWidth / (float)gHeight;
         camera_ptr->yon_z = gYon_multiplier * gCamera_yon;
-        if (gProgram_state.which_view == eView_left) {
+        switch (gProgram_state.which_view) {
+        case eView_left:
             DRMatrix34PostRotateY(
                 &gCamera->t.t.mat,
                 BrDegreeToAngle(gProgram_state.current_car.head_left_angle));
-        } else if (gProgram_state.which_view == eView_right) {
+            break;
+        case eView_right:
             DRMatrix34PostRotateY(
                 &gCamera->t.t.mat,
                 BrDegreeToAngle(gProgram_state.current_car.head_right_angle));
+            break;
         }
         gCamera->t.t.mat.m[3][0] = gProgram_state.current_car.driver_x_offset;
         gCamera->t.t.mat.m[3][1] = gProgram_state.current_car.driver_y_offset;
@@ -270,16 +278,17 @@ void ReinitialiseRenderStuff(void) {
             return;
         }
 #endif
-        gProgram_state.current_render_top = (gGraf_specs[gGraf_spec_index].total_height / 18 & ~1) * gRender_indent;
-        gProgram_state.current_render_left = (gGraf_specs[gGraf_spec_index].total_width / 18 & ~3) * gRender_indent;
-        x_diff = gGraf_specs[gGraf_spec_index].total_width - gProgram_state.current_render_left;
-        y_diff = gGraf_specs[gGraf_spec_index].total_height - gProgram_state.current_render_top;
-        gProgram_state.current_render_right = x_diff;
-        gProgram_state.current_render_bottom = y_diff;
+        x_diff = gGraf_specs[gGraf_spec_index].total_width / 18 & ~3;
+        y_diff = gGraf_specs[gGraf_spec_index].total_height / 18 & ~1;
+        gProgram_state.current_render_left = gRender_indent * x_diff;
+        gProgram_state.current_render_top = gRender_indent * y_diff;
+        gProgram_state.current_render_right = gGraf_specs[gGraf_spec_index].total_width - gRender_indent * x_diff;
+        gProgram_state.current_render_bottom = gGraf_specs[gGraf_spec_index].total_height - gRender_indent * y_diff;
     }
 }
 
 // IDA: void __cdecl InstallFindFailedHooks()
+// FUNCTION: CARM95 0x004bc121
 void InstallFindFailedHooks(void) {
     NOT_IMPLEMENTED();
 }
@@ -309,6 +318,7 @@ void InitializeBRenderEnvironment(void) {
 
     gBr_initialized = 1;
     PDInstallErrorHandlers();
+    InstallFindFailedHooks();
     InstallDRMemCalls();
     InstallDRFileCalls();
     SetBRenderScreenAndBuffers(0, 0, 0, 0);
@@ -657,6 +667,8 @@ void InitialiseApplication(int pArgc, char** pArgv) {
 // IDA: void __usercall InitialiseDeathRace(int pArgc@<EAX>, char **pArgv@<EDX>)
 // FUNCTION: CARM95 0x004bba24
 void InitialiseDeathRace(int pArgc, char** pArgv) {
+    tPath_name the_path;
+
     PDInitialiseSystem();
     InitialiseApplication(pArgc, pArgv);
     gInitialisation_finished = 1;
@@ -760,7 +772,7 @@ void CopyMaterialColourFromIndex(br_material* pMaterial) {
 void InitRace(void) {
 
     SwitchToRealResolution();
-    // TODO: dword_5454C4 = 0;
+    gINT_005454c4 = 0;
     ClearConcussion();
     ClearWobbles();
     ClearHeadups();
@@ -769,17 +781,15 @@ void InitRace(void) {
     PossibleService();
     BuildColourTable(gRender_palette);
     PossibleService();
-    // TODO: dword_55142C = 0;
+    gINT_0055142c = 0;
     gStart_race_sent = 0;
     gProgram_state.frame_rate_headup = NewTextHeadupSlot(eHeadupSlot_development, 0, 0, -kFont_ORANGHED, "");
-    if (TranslationMode()) {
-        if (gAusterity_mode) {
-            FlushInterfaceFonts();
-        }
-    } else {
+    if (!TranslationMode()) {
         LoadFont(kFont_ORANGHED);
         LoadFont(kFont_BLUEHEAD);
         LoadFont(kFont_GREENHED);
+    } else if (gAusterity_mode) {
+        FlushInterfaceFonts();
     }
     LoadFont(kFont_MEDIUMHD);
     LoadFont(kFont_TIMER);
@@ -826,7 +836,7 @@ void InitRace(void) {
     AdjustRenderScreenSize();
     PrintMemoryDump(0, "DIRECTLY BEFORE LOADING IN TRACK");
     LoadInTrack();
-    if (gYon_multiplier != 1.0) {
+    if (gYon_multiplier != 1.0f) {
         AdjustRenderScreenSize();
     }
     PrintMemoryDump(0, "DIRECTLY AFTER LOADING IN TRACK");

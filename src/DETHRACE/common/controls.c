@@ -591,7 +591,7 @@ void F4Key(void) {
     tEdit_mode old_edit_mode;
 
     old_edit_mode = gWhich_edit_mode;
-    if (gI_am_cheating != 0xa11ee75d && (gI_am_cheating != 0x564e78b9 || gNet_mode != eNet_mode_none)) {
+    if (!(gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none))) {
         gWhich_edit_mode = eEdit_mode_options;
         return;
     }
@@ -657,11 +657,9 @@ void ShowSpecialVolumesIfRequ(void) {
 void DoEditModeKey(int pIndex) {
     int modifiers;
 
-    if (gI_am_cheating != 0xa11ee75d) {
-        if (gI_am_cheating != 0x564e78b9 || gNet_mode != eNet_mode_none) {
-            gWhich_edit_mode = eEdit_mode_options;
-            return;
-        }
+    if (!(gI_am_cheating == 0xa11ee75d || (gI_am_cheating == 0x564e78b9 && gNet_mode == eNet_mode_none))) {
+        gWhich_edit_mode = eEdit_mode_options;
+        return;
     }
 
     if (PDKeyDown(KEY_SHIFT_ANY)) {
@@ -1272,28 +1270,32 @@ void CheckForBeingOutOfThisWorld(void) {
     static tU32 sLast_check;
     int time_step;
 
-    the_time = PDGetTotalTime();
+    time_step = PDGetTotalTime() - the_time;
+    the_time += time_step;
 
-    if (gRecover_timer == 0 || ((gProgram_state.current_car.frame_collision_flag || gProgram_state.current_car.number_of_wheels_on_ground) && !IsCarInTheSea())) {
-        gRecover_timer = 0;
-        if ((the_time - sLast_check) > 200) {
-            sLast_check = the_time;
-            if (HasCarFallenOffWorld(&gProgram_state.current_car)) {
-                gRecover_timer = 3000;
+    if (gRecover_timer != 0) {
+        if ((gProgram_state.current_car.frame_collision_flag || gProgram_state.current_car.number_of_wheels_on_ground) && !IsCarInTheSea()) {
+            gRecover_timer = 0;
+        } else {
+            gRecover_timer -= gFrame_period;
+            if (gRecover_timer <= 0 || IsCarInTheSea() == 2) {
+                gRecover_timer = 0;
+                RecoverCar();
+                gHad_auto_recover = 1;
             }
+            return;
         }
-        if (IsCarInTheSea()) {
-            if (!gRecover_timer) {
-                gRecover_timer = 3000;
-            }
-        }
-        return;
     }
-    gRecover_timer -= gFrame_period;
-    if (gRecover_timer <= 0 || IsCarInTheSea() == 2) {
-        gRecover_timer = 0;
-        RecoverCar();
-        gHad_auto_recover = 1;
+    if ((the_time - sLast_check) > 200) {
+        sLast_check = the_time;
+        if (HasCarFallenOffWorld(&gProgram_state.current_car)) {
+            gRecover_timer = 3000;
+        }
+    }
+    if (IsCarInTheSea()) {
+        if (!gRecover_timer) {
+            gRecover_timer = 3000;
+        }
     }
 }
 
@@ -2219,27 +2221,25 @@ void ToggleMap(void) {
     // GLOBAL: CARM95 0x53d634
     static int was_in_cockpit;
 
-    if (gMap_mode == 0) {
-        if (!gAction_replay_mode) {
-            if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_THE_FOX_CANNOT_DO_THAT));
-            } else if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox) {
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ONLY_IT_CAN_DO_THAT));
-            } else {
-                old_indent = gRender_indent;
-                gRender_indent = 0;
-                was_in_cockpit = gProgram_state.cockpit_on;
-                if (gProgram_state.cockpit_on) {
-                    ToggleCockpit();
-                }
-                gMap_mode = PDGetTotalTime();
-            }
-        }
-    } else {
+    if (gMap_mode != 0) {
         gMap_mode = 0;
         gRender_indent = old_indent;
         if (was_in_cockpit) {
             ToggleCockpit();
+        }
+    } else if (!gAction_replay_mode) {
+        if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_THE_FOX_CANNOT_DO_THAT));
+        } else if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox) {
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ONLY_IT_CAN_DO_THAT));
+        } else {
+            old_indent = gRender_indent;
+            gRender_indent = 0;
+            was_in_cockpit = gProgram_state.cockpit_on;
+            if (was_in_cockpit) {
+                ToggleCockpit();
+            }
+            gMap_mode = PDGetTotalTime();
         }
     }
     AdjustRenderScreenSize();
@@ -2317,8 +2317,6 @@ void CycleCarTexturingLevel(void) {
         break;
     case eCTL_full:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_FullCarTextures));
-        break;
-    case eCTL_count:
         break;
     }
 }
@@ -2516,6 +2514,8 @@ void DrawSomeText2(tDR_font* pFont) {
 // IDA: void __cdecl DrawSomeText()
 // FUNCTION: CARM95 0x00485d80
 void DrawSomeText(void) {
+#ifdef DETHRACE_FIX_BUGS
+    // Font test present in DOS version, but disabled by default
     DrawSomeText2(&gFonts[kFont_ORANGHED]);
     DrawSomeText2(&gFonts[kFont_BLUEHEAD]);
     DrawSomeText2(&gFonts[kFont_GREENHED]);
@@ -2523,6 +2523,7 @@ void DrawSomeText(void) {
     DrawSomeText2(&gFonts[kFont_NEWHITE]);
     DrawSomeText2(&gFonts[kFont_NEWRED]);
     DrawSomeText2(&gFonts[kFont_NEWBIGGR]);
+#endif
 }
 
 // IDA: void __cdecl SaySorryYouLittleBastard()

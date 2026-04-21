@@ -1008,7 +1008,7 @@ br_pixelmap* GenerateDarkenedShadeTable(int pHeight, br_pixelmap* pPalette, int 
                     }
                 } else {
                     if (ratio1 >= 0.75) {
-                        ratio2 = 1.0 - (1.0 - ratio1) * (1.0 - pThree_quarter) * 4.0;
+                        ratio2 = 1.0 - (1.0 - ratio1) * (1.0f - pThree_quarter) * 4.0;
                     } else {
                         ratio2 = (ratio1 - .5) * (pThree_quarter - pHalf) * 4. + pHalf;
                     }
@@ -1052,12 +1052,9 @@ void DRMatrix34TApplyP(br_vector3* pA, br_vector3* pB, br_matrix34* pC) {
     t2 = BR_SUB(pB->v[1], pC->m[3][1]);
     t3 = BR_SUB(pB->v[2], pC->m[3][2]);
 
-    // this avoids the +fstp in the line above, but including the "add" breaks it again. Some combination of braces etc...
-    // pA->v[0] = BR_MUL(pC->m[0][2], t3);
-
-    pA->v[0] = pC->m[0][2] * t3 + pC->m[0][1] * t2 + pC->m[0][0] * t1;
-    pA->v[1] = pC->m[1][0] * t1 + pC->m[1][2] * t3 + pC->m[1][1] * t2;
-    pA->v[2] = pC->m[2][0] * t1 + pC->m[2][1] * t2 + pC->m[2][2] * t3;
+    pA->v[0] = BR_MAC3(t1, pC->m[0][0], t2, pC->m[0][1], t3, pC->m[0][2]);
+    pA->v[1] = BR_MAC3(t1, pC->m[1][0], t3, pC->m[1][2], t2, pC->m[1][1]);
+    pA->v[2] = BR_MAC3(t1, pC->m[2][0], t2, pC->m[2][1], t3, pC->m[2][2]);
 }
 
 // IDA: tU16 __usercall PaletteEntry16Bit@<AX>(br_pixelmap *pPal@<EAX>, int pEntry@<EDX>)
@@ -1642,23 +1639,21 @@ void EncodeFileWrapper(char* pThe_path) {
     if (STR_ENDS_WITH(pThe_path, len, ".TXT")) {
         return;
     }
-    if (STR_ENDS_WITH(pThe_path, len, "DKEYMAP0.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "DKEYMAP1.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "DKEYMAP2.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "DKEYMAP3.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_0.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_1.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_2.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYMAP_3.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "OPTIONS.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYNAMES.TXT")
-        && STR_ENDS_WITH(pThe_path, len, "KEYMAP.TXT")) {
-
-        if (!STR_ENDS_WITH(pThe_path, len, "PATHS.TXT")) {
-            return;
-        }
-        EncodeFile(pThe_path);
+    if (!STR_ENDS_WITH(pThe_path, len, "DKEYMAP0.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "DKEYMAP1.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "DKEYMAP2.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "DKEYMAP3.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYMAP_0.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYMAP_1.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYMAP_2.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYMAP_3.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "OPTIONS.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYNAMES.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "KEYMAP.TXT")
+        || !STR_ENDS_WITH(pThe_path, len, "PATHS.TXT")) {
+        return;
     }
+    EncodeFile(pThe_path);
 }
 
 // IDA: void __usercall EncodeAllFilesInDirectory(char *pThe_path@<EAX>)
@@ -1853,18 +1848,21 @@ void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
 // FUNCTION: CARM95 0x004c3fb5
 void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
 
+    // GLOBAL: CARM95 0x005214c0
     static br_token_value alpha25[3] = {
         { BRT_BLEND_B, { 1 } },          // .b = 1
         { BRT_OPACITY_X, { 0x400000 } }, // .x = 0x400000
         { 0, { 0 } },
     };
 
+    // GLOBAL: CARM95 0x005214d8
     static br_token_value alpha50[3] = {
         { BRT_BLEND_B, { 1 } },
         { BRT_OPACITY_X, { 0x800000 } },
         { 0, { 0 } },
     };
 
+    // GLOBAL: CARM95 0x005214f0
     static br_token_value alpha75[3] = {
         { BRT_BLEND_B, { 1 } },
         { BRT_OPACITY_X, { 0xc00000 } },

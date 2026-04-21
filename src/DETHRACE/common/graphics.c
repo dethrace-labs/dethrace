@@ -767,6 +767,8 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
 // FUNCTION: CARM95 0x004b35fb
 void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pHeight) {
 
+    if (gBrZb_initialized) {
+    }
     PDAllocateScreenAndBack();
     if (!pWidth) {
         pWidth = gBack_screen->width;
@@ -775,10 +777,10 @@ void SetBRenderScreenAndBuffers(int pX_offset, int pY_offset, int pWidth, int pH
         pHeight = gBack_screen->height;
     }
     gRender_screen = DRPixelmapAllocateSub(gBack_screen, pX_offset, pY_offset, pWidth, pHeight);
+    gX_offset = pX_offset;
+    gY_offset = pY_offset;
     gWidth = pWidth;
     gHeight = pHeight;
-    gY_offset = pY_offset;
-    gX_offset = pX_offset;
     if (gGraf_specs[gGraf_spec_index].doubled) {
         gScreen->base_x = (gGraf_specs[gGraf_spec_index].phys_width - 2 * gGraf_specs[gGraf_spec_index].total_width) / 2;
         gScreen->base_y = (gGraf_specs[gGraf_spec_index].phys_height - 2 * gGraf_specs[gGraf_spec_index].total_height) / 2;
@@ -1045,8 +1047,8 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
 // FUNCTION: CARM95 0x004b3f3a
 void SetScreenWobble(int pWobble_x, int pWobble_y) {
 
-    gScreen_wobble_y = pWobble_y;
     gScreen_wobble_x = pWobble_x;
+    gScreen_wobble_y = pWobble_y;
 }
 
 // IDA: void __cdecl ResetScreenWobble()
@@ -1175,19 +1177,21 @@ int OppositeColour(int pColour) {
     int brightness;
 
     if (pColour < 224) {
-        if ((pColour & 0x7) < 4) {
-            brightness = 255;
+        brightness = pColour & 0x7;
+        if (brightness < 4) {
+            pColour = 255;
         } else {
-            brightness = 0;
+            pColour = 0;
         }
     } else {
-        if ((pColour & 0xf) < 8) {
-            brightness = 255;
+        brightness = pColour & 0xf;
+        if (brightness < 8) {
+            pColour = 255;
         } else {
-            brightness = 0;
+            pColour = 0;
         }
     }
-    return brightness;
+    return pColour;
 }
 
 // IDA: void __usercall DrawMapBlip(tCar_spec *pCar@<EAX>, tU32 pTime@<EDX>, br_matrix34 *pTrans@<EBX>, br_vector3 *pPos@<ECX>, int pColour)
@@ -1796,25 +1800,21 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
 
     if (pIndex >= 0 && pIndex < gCurrent_race.check_point_count && gRace_file_version > 0) {
         if (Flash(300, &last_flash, &flash_state)) {
-            switch (gGraf_data_index) {
-            case 0:
+            cp = &gCurrent_race.checkpoints[pIndex];
+            if (gGraf_data_index != 0) {
                 DimRectangle(gBack_screen,
-                    gCurrent_race.checkpoints[pIndex].map_left[0],
-                    gCurrent_race.checkpoints[pIndex].map_top[0],
-                    gCurrent_race.checkpoints[pIndex].map_right[0],
-                    gCurrent_race.checkpoints[pIndex].map_bottom[0],
+                    2 * cp->map_left[0],
+                    2 * cp->map_top[0] + HIRES_Y_OFFSET,
+                    2 * cp->map_right[0],
+                    2 * cp->map_bottom[0] + HIRES_Y_OFFSET,
                     0);
-                break;
-            case 1:
+            } else {
                 DimRectangle(gBack_screen,
-                    2 * gCurrent_race.checkpoints[pIndex].map_left[0],
-                    2 * gCurrent_race.checkpoints[pIndex].map_top[0] + HIRES_Y_OFFSET,
-                    2 * gCurrent_race.checkpoints[pIndex].map_right[0],
-                    2 * gCurrent_race.checkpoints[pIndex].map_bottom[0] + HIRES_Y_OFFSET,
+                    cp->map_left[0],
+                    cp->map_top[0],
+                    cp->map_right[0],
+                    cp->map_bottom[0],
                     0);
-                break;
-            default:
-                TELL_ME_IF_WE_PASS_THIS_WAY();
             }
         }
     }
@@ -2310,6 +2310,10 @@ void MungePalette(void) {
     static float last_omega;
     static tU32 next_repair_time;
     static tU32 last_sound;
+
+    if (1) {
+        return;
+    }
 }
 
 // IDA: void __cdecl ResetPalette()
@@ -2325,7 +2329,8 @@ void ResetPalette(void) {
 void Darken(tU8* pPtr, unsigned int pDarken_amount) {
     unsigned int value;
 
-    *pPtr = (pDarken_amount * *pPtr) / 256;
+    value = *pPtr;
+    *pPtr = (value * pDarken_amount) / 256;
 }
 
 // IDA: void __usercall SetFadedPalette(int pDegree@<EAX>)
@@ -2490,7 +2495,7 @@ void ChangeAmbience(br_scalar pDelta) {
 void InitAmbience(void) {
 
     gCurrent_ambience = gAmbient_adjustment;
-    ChangeAmbience(gAmbient_adjustment);
+    ChangeAmbience(gCurrent_ambience);
 }
 
 // IDA: void __usercall DRPixelmapRectangleMaskedCopy(br_pixelmap *pDest@<EAX>, br_int_16 pDest_x@<EDX>, br_int_16 pDest_y@<EBX>, br_pixelmap *pSource@<ECX>, br_int_16 pSource_x, br_int_16 pSource_y, br_int_16 pWidth, br_int_16 pHeight)
@@ -3021,38 +3026,36 @@ int DoMouseCursor(void) {
     // GLOBAL: CARM95 0x520a18
     static int button_was_down;
 
-    period = 0;
-    this_call_time = PDGetTotalTime();
-    if (last_call_time == 0) {
-        period = 1000;
-    }
-    while (period <= 20) {
+    do {
         this_call_time = PDGetTotalTime();
-        period = this_call_time - last_call_time;
-        // added by dethrace to avoid 100% CPU usage
-        gHarness_platform.Sleep(1);
-    }
+        if (last_call_time != 0) {
+            period = this_call_time - last_call_time;
+        } else {
+            period = 1000;
+        }
+    } while (period <= 20);
     GetMousePosition(&x_coord, &y_coord);
-    mouse_moved = x_coord != gMouse_last_x_coord || y_coord != gMouse_last_y_coord;
+    mouse_moved = gMouse_last_x_coord != x_coord || gMouse_last_y_coord - y_coord != 0;
     button_is_down = EitherMouseButtonDown();
     cursor_offset = button_is_down ? 4 : 0;
     if (gMouse_in_use || mouse_moved) {
         gMouse_in_use = 1;
         if (gMouse_last_x_coord == x_coord) {
-            if (zero_count >= 5) {
+            if (zero_count++ >= 5) {
                 delta_x = 0;
             }
-            zero_count++;
         } else {
             zero_count = 0;
             delta_x = (x_coord - gMouse_last_x_coord) * 1000 / period;
         }
         if (delta_x < -10) {
             new_required = 0;
-        } else if (delta_x < 11) {
-            new_required = 2;
         } else {
-            new_required = 3;
+            if (delta_x > 10) {
+                new_required = 3;
+            } else {
+                new_required = 2;
+            }
         }
         if (new_required != required_cursor && this_call_time - last_required_change >= 200) {
             last_required_change = this_call_time;
@@ -3066,37 +3069,37 @@ int DoMouseCursor(void) {
             }
             last_cursor_change = PDGetTotalTime();
         }
-        giblet_chance = Chance(1.f + 20.f * (abs(x_coord - gMouse_last_x_coord) + abs(y_coord - gMouse_last_y_coord)) / (float)period, period);
+        giblet_chance = Chance(1.f + (abs(x_coord - gMouse_last_x_coord) + abs(y_coord - gMouse_last_y_coord)) / (float)period * 20.f, period);
         if (gProgram_state.sausage_eater_mode) {
             giblet_count = 0;
         } else {
             giblet_count = 6 * BooleanTo1Or0(button_is_down && !button_was_down) + BooleanTo1Or0(giblet_chance);
         }
-        for (; giblet_count != 0; giblet_count--) {
-            NewCursorGiblet(
-                x_coord + gCursor_gib_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
-                y_coord + gCursor_gib_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480,
-                ((float)(x_coord - gMouse_last_x_coord)) / period * 1000.f / 4.f,
-                ((float)(y_coord - gMouse_last_y_coord)) / period * 1000.f / 3.f,
+        while (giblet_count-- != 0) {
+            giblet_index = NewCursorGiblet(
+                x_coord + gCursor_gib_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640u,
+                y_coord + gCursor_gib_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480u,
+                ((float)(x_coord - gMouse_last_x_coord)) / period * 1000.0 / 4.0,
+                ((float)(y_coord - gMouse_last_y_coord)) / period * 1000.0 / 3.0,
                 (button_is_down && !button_was_down) ? 50 : 400);
         }
         ProcessCursorGiblets(period);
         SaveTransient(gCursor_transient_index,
-            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
-            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480);
+            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640u,
+            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480u);
         DRPixelmapRectangleMaskedCopy(gBack_screen,
-            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
-            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480,
+            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640u,
+            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480u,
             gCursors[gCurrent_cursor_index + cursor_offset],
             0,
             0,
             gCursors[gCurrent_cursor_index + cursor_offset]->width,
             gCursors[gCurrent_cursor_index + cursor_offset]->height);
     }
-    last_call_time = this_call_time;
-    button_was_down = button_is_down;
     gMouse_last_x_coord = x_coord;
     gMouse_last_y_coord = y_coord;
+    button_was_down = button_is_down;
+    last_call_time = this_call_time;
     return mouse_moved;
 }
 
@@ -3227,30 +3230,31 @@ void DrawDropImage(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip, int 
         pImage->width,
         pBottom_clip - pTop_clip,
         0);
-    if (pOffset != 1000) {
-        src_y = 0;
-        src_height = pImage->height;
-        y = pOffset + pTop;
-        y_diff = pTop_clip - y;
-        if (y_diff > 0) {
-            src_height -= y_diff;
-            y += y_diff;
-            src_y = y_diff;
-        }
-        y_diff = pBottom_clip - y - pImage->height;
-        if (y_diff < 0) {
-            src_height += y_diff;
-        }
-        BrPixelmapRectangleCopy(gBack_screen,
-            pLeft,
-            y,
-            pImage,
-            0,
-            src_y,
-            pImage->width,
-            src_height);
-        PDScreenBufferSwap(0);
+    if (pOffset == 1000) {
+        return;
     }
+    src_y = 0;
+    src_height = pImage->height;
+    y = pOffset + pTop;
+    y_diff = pTop_clip - y;
+    if (y_diff > 0) {
+        src_y += y_diff;
+        src_height -= y_diff;
+        y += y_diff;
+    }
+    y_diff = pBottom_clip - y - pImage->height;
+    if (y_diff < 0) {
+        src_height += y_diff;
+    }
+    BrPixelmapRectangleCopy(gBack_screen,
+        pLeft,
+        y,
+        pImage,
+        0,
+        src_y,
+        pImage->width,
+        src_height);
+    PDScreenBufferSwap(0);
 }
 
 // IDA: void __usercall DropInImageFromTop(br_pixelmap *pImage@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pTop_clip@<ECX>, int pBottom_clip)
@@ -3260,13 +3264,9 @@ void DropInImageFromTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip,
     tS32 the_time;
     int drop_distance;
 
-    start_time = PDGetTotalTime();
     drop_distance = pImage->height - pTop_clip + pTop;
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (the_time >= start_time + 100) {
-            break;
-        }
+    start_time = PDGetTotalTime();
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
         DrawDropImage(pImage,
             pLeft,
             pTop,
@@ -3284,13 +3284,9 @@ void DropOutImageThruBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_c
     tS32 the_time;
     int drop_distance;
 
-    start_time = PDGetTotalTime();
     drop_distance = pBottom_clip - pTop;
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (the_time >= start_time + 100) {
-            break;
-        }
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime()) < start_time + 100) {
         DrawDropImage(pImage,
             pLeft,
             pTop,
@@ -3308,13 +3304,9 @@ void DropInImageFromBottom(br_pixelmap* pImage, int pLeft, int pTop, int pTop_cl
     tS32 the_time;
     int drop_distance;
 
-    start_time = PDGetTotalTime();
     drop_distance = pBottom_clip - pTop;
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (the_time >= start_time + 100) {
-            break;
-        }
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime()) < start_time + 100) {
         DrawDropImage(pImage,
             pLeft,
             pTop,
@@ -3332,13 +3324,9 @@ void DropOutImageThruTop(br_pixelmap* pImage, int pLeft, int pTop, int pTop_clip
     tS32 the_time;
     int drop_distance;
 
-    start_time = PDGetTotalTime();
     drop_distance = pImage->height - pTop_clip + pTop;
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (the_time >= start_time + 100) {
-            break;
-        }
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime()) < start_time + 100) {
         DrawDropImage(pImage,
             pLeft,
             pTop,
@@ -3356,9 +3344,9 @@ void DrawTellyLine(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_height;
 
     the_width = pImage->width;
-    the_height = pImage->height / 2 + pTop;
-    BrPixelmapLine(gBack_screen, pLeft, the_height, pLeft + the_width, the_height, 0);
-    BrPixelmapLine(gBack_screen, the_width / 2 + pLeft - pPercentage * the_width / 200, the_height, the_width / 2 + pLeft + pPercentage * the_width / 200, the_height, 1);
+    the_height = pImage->height;
+    BrPixelmapLine(gBack_screen, pLeft, the_height / 2 + pTop, pLeft + the_width, the_height / 2 + pTop, 0);
+    BrPixelmapLine(gBack_screen, the_width / 2 + pLeft - pPercentage * the_width / 200, the_height / 2 + pTop, the_width / 2 + pLeft + pPercentage * the_width / 200, the_height / 2 + pTop, 1);
     PDScreenBufferSwap(0);
 }
 
@@ -3367,12 +3355,14 @@ void DrawTellyLine(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
 void DrawTellyImage(br_pixelmap* pImage, int pLeft, int pTop, int pPercentage) {
     int the_height;
 
-    BrPixelmapRectangleFill(gBack_screen, pLeft, pTop, pImage->width, pImage->height, 0);
-    if (pPercentage != 1000) {
+    the_height = pImage->height;
+    BrPixelmapRectangleFill(gBack_screen, pLeft, pTop, pImage->width, the_height, 0);
+    if (pPercentage == 1000) {
+    } else {
         DRPixelmapRectangleVScaledCopy(
             gBack_screen,
             pLeft,
-            pTop + pImage->height * (100 - pPercentage) / 200,
+            pTop + the_height * (100 - pPercentage) / 200,
             pImage,
             0,
             0,
@@ -3389,19 +3379,11 @@ void TellyInImage(br_pixelmap* pImage, int pLeft, int pTop) {
     tS32 the_time;
 
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + 100 <= the_time) {
-            break;
-        }
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
         DrawTellyLine(pImage, pLeft, pTop, 100 * (the_time - start_time) / 100);
     }
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + 100 <= the_time) {
-            break;
-        }
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
         DrawTellyImage(pImage, pLeft, pTop, 100 * (the_time - start_time) / 100);
     }
     DrawTellyImage(pImage, pLeft, pTop, 100);
@@ -3415,22 +3397,14 @@ void TellyOutImage(br_pixelmap* pImage, int pLeft, int pTop) {
     int drop_distance;
 
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + 100 <= the_time) {
-            break;
-        }
-        DrawTellyImage(pImage, pLeft, pTop, 100 * (start_time + 100 - the_time) / 100);
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
+        DrawTellyImage(pImage, pLeft, pTop, (100 - the_time + start_time) * 100 / 100);
     }
     DrawTellyImage(pImage, pLeft, pTop, 1000);
 
     start_time = PDGetTotalTime();
-    while (1) {
-        the_time = PDGetTotalTime();
-        if (start_time + 100 <= the_time) {
-            break;
-        }
-        DrawTellyLine(pImage, pLeft, pTop, 100 * (start_time + 100 - the_time) / 100);
+    while (start_time + 100 > (the_time = PDGetTotalTime())) {
+        DrawTellyLine(pImage, pLeft, pTop, (100 - the_time + start_time) * 100 / 100);
     }
     DrawTellyLine(pImage, pLeft, pTop, 0);
 }
