@@ -1351,10 +1351,10 @@ void CheckHorns(void) {
 
     if (gNet_mode == eNet_mode_none) {
         CheckHornLocal(&gProgram_state.current_car);
-        return;
-    }
-    for (i = 0; i < gNumber_of_net_players; i++) {
-        CheckHorn3D(gNet_players[i].car);
+    } else {
+        for (i = 0; i < gNumber_of_net_players; i++) {
+            CheckHorn3D(gNet_players[i].car);
+        }
     }
 }
 
