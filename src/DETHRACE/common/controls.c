@@ -1710,19 +1710,19 @@ void CheckOtherRacingKeys(void) {
 // FUNCTION: CARM95 0x004a2208
 int CheckRecoverCost(void) {
 
-    if (gProgram_state.current_car.knackered
-        || gNet_mode == eNet_mode_none
-        || (gProgram_state.credits_earned - gProgram_state.credits_lost) >= gNet_recovery_cost[gCurrent_net_game->type]
-        || gRecovery_voucher_count) {
-        return 1;
+    if (!(gProgram_state.current_car.knackered
+          || gNet_mode == eNet_mode_none
+          || (gProgram_state.credits_earned - gProgram_state.credits_lost) >= (gNet_mode != eNet_mode_none ? gNet_recovery_cost[gCurrent_net_game->type] : gRecovery_cost[gProgram_state.skill_level])
+          || gRecovery_voucher_count)) {
+        gProgram_state.credits_earned = 0;
+        gProgram_state.credits_lost = 0;
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_CANNOT_AFFORD_TO_RECOVER));
+        DoFancyHeadup(kFancyHeadupNetworkRaceNoMoreMoney);
+        KnackerThisCar(&gProgram_state.current_car);
+        SendGameplayToHost(eNet_gameplay_suicide, 0, 0, 0, 0);
+        return 0;
     }
-    gProgram_state.credits_earned = 0;
-    gProgram_state.credits_lost = 0;
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_CANNOT_AFFORD_TO_RECOVER));
-    DoFancyHeadup(kFancyHeadupNetworkRaceNoMoreMoney);
-    KnackerThisCar(&gProgram_state.current_car);
-    SendGameplayToHost(eNet_gameplay_suicide, 0, 0, 0, 0);
-    return 0;
+    return 1;
 }
 
 // IDA: void __usercall SortOutRecover(tCar_spec *pCar@<EAX>)
