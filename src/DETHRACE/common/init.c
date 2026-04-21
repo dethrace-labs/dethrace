@@ -270,12 +270,12 @@ void ReinitialiseRenderStuff(void) {
             return;
         }
 #endif
-        gProgram_state.current_render_top = (gGraf_specs[gGraf_spec_index].total_height / 18 & ~1) * gRender_indent;
-        gProgram_state.current_render_left = (gGraf_specs[gGraf_spec_index].total_width / 18 & ~3) * gRender_indent;
-        x_diff = gGraf_specs[gGraf_spec_index].total_width - gProgram_state.current_render_left;
-        y_diff = gGraf_specs[gGraf_spec_index].total_height - gProgram_state.current_render_top;
-        gProgram_state.current_render_right = x_diff;
-        gProgram_state.current_render_bottom = y_diff;
+        x_diff = gGraf_specs[gGraf_spec_index].total_width / 18 & ~3;
+        y_diff = gGraf_specs[gGraf_spec_index].total_height / 18 & ~1;
+        gProgram_state.current_render_left = gRender_indent * x_diff;
+        gProgram_state.current_render_top = gRender_indent * y_diff;
+        gProgram_state.current_render_right = gGraf_specs[gGraf_spec_index].total_width - gRender_indent * x_diff;
+        gProgram_state.current_render_bottom = gGraf_specs[gGraf_spec_index].total_height - gRender_indent * y_diff;
     }
 }
 
