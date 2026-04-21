@@ -1031,19 +1031,11 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
 #if defined(DETHRACE_FIX_BUGS)
     total_units_of_damage = 0;
 #endif
-    if (pCar1->driver <= eDriver_non_car) {
-        dam_acc_1 = 0;
-    } else {
-        dam_acc_1 = pCar1->damage_magnitude_accumulator;
-    }
+    dam_acc_1 = pCar1->driver > eDriver_non_car ? pCar1->damage_magnitude_accumulator : 0;
 
     dam_acc_2 = 0;
     if (pCar2 != NULL) {
-        if (pCar2->driver <= eDriver_non_car) {
-            dam_acc_2 = 0;
-        } else {
-            dam_acc_2 = pCar2->damage_magnitude_accumulator != 0;
-        }
+        dam_acc_2 = pCar2->driver > eDriver_non_car && pCar2->damage_magnitude_accumulator != 0;
     }
 
     if (pCar1->driver <= eDriver_non_car) {
@@ -1070,13 +1062,23 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
         impact_in_moving_direction_2 = car_direction_2 == modified_location_2;
     }
     if (pCar1->driver >= eDriver_net_human && pCar2) {
-        if (impact_in_moving_direction_1 && (pCar1->driver < eDriver_net_human || (pCar1->pre_car_col_velocity_car_space.v[2] != 0.0 && (pCar1->pre_car_col_velocity_car_space.v[2] > 0.0) != (pCar1->gear > 0) && (pCar1->keys.acc != 0 || pCar1->joystick.acc > 0x8000)))) {
+        if (impact_in_moving_direction_1 && (pCar1->driver < eDriver_net_human || (pCar1->pre_car_col_velocity_car_space.v[2] != 0.0f && (pCar1->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar1->gear > 0) && (pCar1->keys.acc != 0 || pCar1->joystick.acc > 0x8000)))) {
             pCar2->time_last_hit = the_time;
             pCar2->last_hit_by = pCar1;
         }
     } else if (pCar2 && pCar2->driver >= eDriver_net_human && impact_in_moving_direction_2 && (pCar2->driver < eDriver_net_human || (pCar2->pre_car_col_velocity_car_space.v[2] != 0.0f && (pCar2->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar2->gear > 0) && (pCar2->keys.acc != 0 || pCar2->joystick.acc > 0x8000)))) {
         pCar1->time_last_hit = the_time;
         pCar1->last_hit_by = pCar2;
+    }
+    if (!pCar2) {
+        if (the_time - pCar1->time_last_hit < 3000) {
+            culprit = pCar1->last_hit_by;
+            victim = pCar1;
+            bonus_level = 1;
+            inherited_damage = 1;
+        } else {
+            return 1;
+        }
     }
     if (pCar2) {
         if (impact_in_moving_direction_1
@@ -1106,7 +1108,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             if (car_1_culpable) {
                 culprit = pCar1;
                 victim = pCar2;
-                dp = BrVector3Dot(&pCar1->pre_car_col_direction, &pCar2->pre_car_col_direction);
+                dp = BrVector3Dot(&pCar2->pre_car_col_direction, &pCar1->pre_car_col_direction);
                 if (modified_location_1 == eImpact_front && modified_location_2 == eImpact_front && pCar1->pre_car_col_speed > 0.001f && pCar2->pre_car_col_speed > 0.001f && dp < -0.7f) {
                     head_on = 1;
                     bonus_level = 2;
@@ -1116,7 +1118,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             } else if (car_2_culpable) {
                 culprit = pCar2;
                 victim = pCar1;
-                dp = BrVector3Dot(&pCar1->pre_car_col_direction, &pCar2->pre_car_col_direction);
+                dp = BrVector3Dot(&pCar2->pre_car_col_direction, &pCar1->pre_car_col_direction);
                 if (modified_location_1 == eImpact_front && modified_location_2 == eImpact_front && pCar1->pre_car_col_speed > 0.001f && pCar2->pre_car_col_speed > 0.001f && dp < -0.7f) {
                     head_on = 1;
                     bonus_level = 2;
@@ -1125,14 +1127,6 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                 }
             }
         }
-    } else {
-        if (the_time - pCar1->time_last_hit >= 3000) {
-            return 1;
-        }
-        culprit = pCar1->last_hit_by;
-        victim = pCar1;
-        bonus_level = 1;
-        inherited_damage = 1;
     }
     if (!mutual_culpability && (!victim || culprit->driver < eDriver_net_human)) {
         if (pCar2 && pCar2->last_culprit == pCar1 && the_time - pCar2->time_last_victim < 750) {
@@ -1154,14 +1148,14 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
         total_units_of_damage = 0;
         for (i = 0; i < COUNT_OF(victim->damage_units); i++) {
             if (victim->damage_units[i].damage_level > victim->damage_units[i].last_level) {
-                victim->damage_units[i].damage_level = (victim->damage_units[i].damage_level - victim->damage_units[i].last_level) * 2.0f + victim->damage_units[i].last_level;
+                victim->damage_units[i].damage_level = (victim->damage_units[i].damage_level - victim->damage_units[i].last_level) * 2.0 + victim->damage_units[i].last_level;
                 if (victim->damage_units[i].damage_level >= 99) {
                     victim->damage_units[i].damage_level = 99;
                 }
                 total_units_of_damage += victim->damage_units[i].damage_level - victim->damage_units[i].last_level;
             }
             if (culprit->damage_units[i].damage_level > culprit->damage_units[i].last_level) {
-                culprit->damage_units[i].damage_level = (culprit->damage_units[i].damage_level - culprit->damage_units[i].last_level) * 0.1f + (double)culprit->damage_units[i].last_level;
+                culprit->damage_units[i].damage_level = (culprit->damage_units[i].damage_level - culprit->damage_units[i].last_level) * 0.1 + culprit->damage_units[i].last_level;
                 if (culprit->damage_units[i].damage_level < 0) {
                     culprit->damage_units[i].damage_level = 0;
                 }
@@ -1169,7 +1163,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
         }
     }
     // TODO: tidy this up
-    for (net_loop = 0; 2 - (mutual_culpability == 0) > net_loop; net_loop++) {
+    for (net_loop = 0; net_loop < 2 - (mutual_culpability == 0); net_loop++) {
         if (mutual_culpability) {
             if (net_loop) {
                 culprit = pCar1;
@@ -1189,8 +1183,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             SetKnackeredFlag(victim);
             if (victim->knackered && !victim->pre_car_col_knackered) {
                 victim->pre_car_col_knackered = 1;
-                credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
-                credits = 100 * (int)(credits_squared / 100.0f);
+                credits = 100 * (int)((sqr(0.7 / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f) / 100.0);
                 if (gNet_mode != eNet_mode_none) {
                     message = NetBuildMessage(NETMSGID_WASTED, 0);
                     message->contents.data.wasted.victim = NetPlayerFromCar(victim)->ID;
@@ -1204,8 +1197,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                 } else {
                     PratcamEvent(kPratcam_opponent_wasted);
                     DoFancyHeadup(kFancyHeadupYouWastedEm);
-                    credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
-                    credits = 100 * (int)(credits_squared / 100.0);
+                    credits = 100 * (int)((sqr(0.7 / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f) / 100.0);
                     AwardTime(gWasted_time[gProgram_state.skill_level]);
                     EarnCredits(credits);
                     if (victim->can_be_stolen && !gOpponents[victim->index].dead
@@ -1221,30 +1213,40 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                 victim->time_last_victim = the_time;
                 victim->last_culprit = culprit;
             }
-            if (victim && (fabs(victim->omega.v[0]) > 4.0f || fabs(victim->omega.v[1]) > 6.0f || fabs(victim->omega.v[2]) > 4.0f)) {
+            if (victim && ((float)fabs(victim->omega.v[0]) > 4.0f || (float)fabs(victim->omega.v[1]) > 6.0f || (float)fabs(victim->omega.v[2]) > 4.0f)) {
                 bonus_level *= 2;
             }
-            if (pCar1->number_of_wheels_on_ground) {
-                car_off_ground_1 = 0;
-            } else {
+            if (!pCar1->number_of_wheels_on_ground) {
                 BrVector3InvScale(&car_1_pos, &pCar1->car_master_actor->t.t.translate.t, WORLD_SCALE);
                 BrMatrix34ApplyV(&car_1_offset, &pCar1->car_model_actors[pCar1->principal_car_actor].actor->t.t.translate.t, &pCar1->car_master_actor->t.t.mat);
                 BrVector3Accumulate(&car_1_pos, &car_1_offset);
                 car_1_pos.v[1] += 0.15f;
                 car_1_height = FindYVerticallyBelow2(&car_1_pos);
-                car_off_ground_1 = car_1_height > -100.0f
-                    && pCar1->car_model_actors[pCar1->principal_car_actor].actor->t.t.translate.t.v[1] * 4.0f <= car_1_pos.v[1] - car_1_height - 0.15f;
-            }
-            if (!pCar2 || pCar2->number_of_wheels_on_ground) {
-                car_off_ground_2 = 0;
+                if (car_1_height > -100.0f
+                    && pCar1->car_model_actors[pCar1->principal_car_actor].actor->t.t.translate.t.v[1] * 4.0f <= car_1_pos.v[1] - car_1_height - 0.15f) {
+                    car_off_ground_1 = 1;
+                } else {
+                    car_off_ground_1 = 0;
+                }
             } else {
+                car_off_ground_1 = 0;
+            }
+            if (!pCar2) {
+                car_off_ground_2 = 0;
+            } else if (!pCar2->number_of_wheels_on_ground) {
                 BrVector3InvScale(&car_2_pos, &pCar2->car_master_actor->t.t.translate.t, WORLD_SCALE);
                 BrMatrix34ApplyV(&car_2_offset, &pCar2->car_model_actors[pCar2->principal_car_actor].actor->t.t.translate.t, &pCar2->car_master_actor->t.t.mat);
                 BrVector3Accumulate(&car_2_pos, &car_2_offset);
                 car_2_pos.v[1] += 0.15f;
                 car_2_height = FindYVerticallyBelow2(&car_2_pos);
-                car_off_ground_2 = car_2_height > -100.0f
-                    && pCar2->car_model_actors[pCar2->principal_car_actor].actor->t.t.translate.t.v[1] * 4.0f <= car_2_pos.v[1] - car_2_height - 0.15f;
+                if (car_2_height > -100.0f
+                    && pCar2->car_model_actors[pCar2->principal_car_actor].actor->t.t.translate.t.v[1] * 4.0f <= car_2_pos.v[1] - car_2_height - 0.15f) {
+                    car_off_ground_2 = 1;
+                } else {
+                    car_off_ground_2 = 0;
+                }
+            } else {
+                car_off_ground_2 = 0;
             }
             if (car_off_ground_1) {
                 bonus_level *= 2;
@@ -1252,7 +1254,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
             if (car_off_ground_2) {
                 bonus_level *= 2;
             }
-            total_units_of_damage = 0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor * total_units_of_damage;
+            total_units_of_damage = 0.7 / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor * total_units_of_damage;
             if (!victim->has_been_stolen) {
                 credits = 100 * (int)((gCar_cred_value[gProgram_state.skill_level] * MIN(bonus_level, 8) * total_units_of_damage + 50.0f) / 100.0f);
                 if (credits || victim->knackered) {
@@ -1264,17 +1266,15 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                         }
                         last_earn_time = the_time;
                         if (gNet_mode == eNet_mode_none) {
-                            time = 5 * (int)((total_units_of_damage * gCar_time_value[gProgram_state.skill_level] + 2.5f) / 5.0f);
+                            time = 5 * (int)((total_units_of_damage * gCar_time_value[gProgram_state.skill_level] + 2.5) / 5.0);
                             AwardTime(MIN(time, 90));
                             if (pCar2) {
                                 if (head_on) {
                                     DoFancyHeadup(kFancyHeadupHeadOnBonus);
-                                } else if (bonus_level <= 2) {
-                                    if (bonus_level > 1) {
-                                        DoFancyHeadup(kFancyHeadupExtraStyleBonus);
-                                    }
-                                } else {
+                                } else if (bonus_level > 2) {
                                     DoFancyHeadup(kFancyHeadupBonusForArtisticImpression);
+                                } else if (bonus_level > 1) {
+                                    DoFancyHeadup(kFancyHeadupExtraStyleBonus);
                                 }
                             }
                         }
