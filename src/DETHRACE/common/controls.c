@@ -2217,27 +2217,25 @@ void ToggleMap(void) {
     // GLOBAL: CARM95 0x53d634
     static int was_in_cockpit;
 
-    if (gMap_mode == 0) {
-        if (!gAction_replay_mode) {
-            if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_THE_FOX_CANNOT_DO_THAT));
-            } else if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox) {
-                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ONLY_IT_CAN_DO_THAT));
-            } else {
-                old_indent = gRender_indent;
-                gRender_indent = 0;
-                was_in_cockpit = gProgram_state.cockpit_on;
-                if (gProgram_state.cockpit_on) {
-                    ToggleCockpit();
-                }
-                gMap_mode = PDGetTotalTime();
-            }
-        }
-    } else {
+    if (gMap_mode != 0) {
         gMap_mode = 0;
         gRender_indent = old_indent;
         if (was_in_cockpit) {
             ToggleCockpit();
+        }
+    } else if (!gAction_replay_mode) {
+        if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gThis_net_player_index == gIt_or_fox) {
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_THE_FOX_CANNOT_DO_THAT));
+        } else if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_tag && gThis_net_player_index != gIt_or_fox) {
+            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ONLY_IT_CAN_DO_THAT));
+        } else {
+            old_indent = gRender_indent;
+            gRender_indent = 0;
+            was_in_cockpit = gProgram_state.cockpit_on;
+            if (was_in_cockpit) {
+                ToggleCockpit();
+            }
+            gMap_mode = PDGetTotalTime();
         }
     }
     AdjustRenderScreenSize();
