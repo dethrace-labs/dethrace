@@ -337,6 +337,9 @@
 // LIBRARY: CARM95 0x004dcfe0
 // BrV1dbBeginWrapper_Float
 
+// LIBRARY: CARM95 0x0004dd030
+// BrLightEnable
+
 // LIBRARY: CARM95 0x004dd130
 // BrClipPlaneEnable
 
