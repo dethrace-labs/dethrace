@@ -381,7 +381,11 @@ void DimAFewBits(void) {
 void KillOldestQueuedHeadup(void) {
 
     gQueued_headup_count--;
+#ifdef DETHRACE_FIX_BUGS
     memmove(&gQueued_headups[0], &gQueued_headups[1], gQueued_headup_count * sizeof(tQueued_headup));
+#else
+    memcpy(&gQueued_headups[0], &gQueued_headups[1], gQueued_headup_count * sizeof(tQueued_headup));
+#endif
 }
 
 // IDA: void __usercall DubreyBar(int pX_index@<EAX>, int pY@<EDX>, int pColour@<EBX>)
