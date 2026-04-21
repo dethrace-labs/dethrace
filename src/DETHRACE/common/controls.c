@@ -1355,57 +1355,44 @@ void CheckHorns(void) {
 // IDA: void __cdecl SetRecovery()
 // FUNCTION: CARM95 0x004a1d13
 void SetRecovery(void) {
-
-    if (gRace_finished
-        || gProgram_state.current_car.knackered
-        || gWait_for_it
-        || gHad_auto_recover
-        || gPalette_fade_time) {
-        return;
-    }
-
-    if (gNet_mode == eNet_mode_none) {
-        gRecover_car = 1;
-        gRecover_timer = 0;
-        return;
-    }
-    if (gProgram_state.current_car.time_to_recover) {
-        if (GetRaceTime() + 600 >= gProgram_state.current_car.time_to_recover) {
-            NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_TOO_LATE_TO_CANCEL), 1);
-            gToo_late = 1;
+    if (!gRace_finished
+        && !gProgram_state.current_car.knackered
+        && !gWait_for_it
+        && !gHad_auto_recover
+        && !gPalette_fade_time) {
+        if (gNet_mode != eNet_mode_none) {
+            if (gProgram_state.current_car.time_to_recover) {
+                if (GetRaceTime() + 600 < gProgram_state.current_car.time_to_recover) {
+                    gProgram_state.current_car.time_to_recover = 0;
+                    NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_RECOVERY_CANCELLED), 0);
+                } else {
+                    NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_TOO_LATE_TO_CANCEL), 1);
+                    gToo_late = 1;
+                }
+            } else if (CheckRecoverCost()) {
+                if (gCurrent_net_game->type == eNet_game_type_foxy) {
+                    if (gIt_or_fox == gThis_net_player_index) {
+                        gProgram_state.current_car.time_to_recover = GetRaceTime() + 5000;
+                    } else {
+                        gProgram_state.current_car.time_to_recover = GetRaceTime() + 1000;
+                    }
+                } else if (gCurrent_net_game->type == eNet_game_type_tag) {
+                    if (gIt_or_fox != gThis_net_player_index) {
+                        gProgram_state.current_car.time_to_recover = GetRaceTime() + 5000;
+                    } else {
+                        gProgram_state.current_car.time_to_recover = GetRaceTime() + 1000;
+                    }
+                } else {
+                    gProgram_state.current_car.time_to_recover = GetRaceTime() + 3000;
+                }
+                gRecover_timer = 0;
+                gToo_late = 0;
+            }
         } else {
-            gProgram_state.current_car.time_to_recover = 0;
-            NewTextHeadupSlot2(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_RECOVERY_CANCELLED), 0);
-        }
-        return;
-    }
-    if (!CheckRecoverCost()) {
-        return;
-    }
-    if (gCurrent_net_game->type == eNet_game_type_foxy) {
-        if (gThis_net_player_index == gIt_or_fox) {
-            gProgram_state.current_car.time_to_recover = GetRaceTime() + 5000;
+            gRecover_car = 1;
             gRecover_timer = 0;
-            gToo_late = 0;
-            return;
-        }
-    } else {
-        if (gCurrent_net_game->type != eNet_game_type_tag) {
-            gProgram_state.current_car.time_to_recover = GetRaceTime() + 3000;
-            gRecover_timer = 0;
-            gToo_late = 0;
-            return;
-        }
-        if (gThis_net_player_index != gIt_or_fox) {
-            gProgram_state.current_car.time_to_recover = GetRaceTime() + 5000;
-            gRecover_timer = 0;
-            gToo_late = 0;
-            return;
         }
     }
-    gProgram_state.current_car.time_to_recover = GetRaceTime() + 1000;
-    gRecover_timer = 0;
-    gToo_late = 0;
 }
 
 // IDA: void __cdecl RecoverCar()
