@@ -24,6 +24,12 @@
 // LIBRARY: CARM95 0x004eb3e0
 // rand
 
+// LIBRARY: CARM95 0x004eb430
+// _floor
+
+// LIBRARY: CARM95 0x004eb5a0
+// _ceil
+
 // LIBRARY: CARM95 0x004eb710
 // fread
 
