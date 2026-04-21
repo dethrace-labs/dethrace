@@ -2339,8 +2339,6 @@ void CycleWallTexturingLevel(void) {
     case eWTL_full:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_BestWallTextures));
         break;
-    case eWTL_count:
-        break;
     }
 }
 
