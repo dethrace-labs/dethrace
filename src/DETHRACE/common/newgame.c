@@ -1708,26 +1708,27 @@ void SetNetAvailability(tNet_game_options* pOptions) {
         case eNet_avail_never:
             gCar_details[i].ownership = eCar_owner_not_allowed;
             break;
-        case eNet_avail_eagle:
-            if (pOptions->car_choice == eNet_car_annie) {
-                gCar_details[i].ownership = eCar_owner_not_allowed;
-            } else {
-                gCar_details[i].ownership = eCar_owner_none;
-            }
-            break;
-        case eNet_avail_hawk:
-            if (pOptions->car_choice == eNet_car_frankie) {
-                gCar_details[i].ownership = eCar_owner_not_allowed;
-            } else {
-                gCar_details[i].ownership = eCar_owner_none;
-            }
-            break;
         case eNet_avail_all:
             if (pOptions->car_choice == eNet_car_all) {
                 gCar_details[i].ownership = eCar_owner_none;
             } else {
                 gCar_details[i].ownership = eCar_owner_not_allowed;
             }
+            break;
+        case eNet_avail_eagle:
+            if (pOptions->car_choice != eNet_car_annie) {
+                gCar_details[i].ownership = eCar_owner_none;
+            } else {
+                gCar_details[i].ownership = eCar_owner_not_allowed;
+            }
+            break;
+        case eNet_avail_hawk:
+            if (pOptions->car_choice != eNet_car_frankie) {
+                gCar_details[i].ownership = eCar_owner_none;
+            } else {
+                gCar_details[i].ownership = eCar_owner_not_allowed;
+            }
+            break;
         }
     }
 }
