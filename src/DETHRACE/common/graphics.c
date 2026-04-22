@@ -1771,7 +1771,7 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
             for (i = 0; i < gSaved_table_count; i++) {
                 gSaved_shade_tables[i].original->height = gSaved_shade_tables[i].copy->height;
                 gSaved_shade_tables[i].original->pixels = gSaved_shade_tables[i].copy->pixels;
-                BrTableUpdate(gSaved_shade_tables[i].original, 0x7FFF);
+                BrTableUpdate(gSaved_shade_tables[i].original, BR_TABU_ALL);
             }
         }
     }
