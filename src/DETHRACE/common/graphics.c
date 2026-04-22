@@ -1221,19 +1221,14 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
 
     time_diff = pTime - gMap_mode;
     BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
-    switch (gReal_graf_data_index) {
-    case 0:
-        break;
-    case 1:
+    if (gReal_graf_data_index != 0) {
         map_pos.v[0] = map_pos.v[0] * 2.f;
         map_pos.v[1] = map_pos.v[1] * 2.f + HIRES_Y_OFFSET;
-        break;
-    default:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
     }
     period = 256; // Must be power of 2
     colours[0] = pColour;
     colours[1] = OppositeColour(pColour);
+    offset = 0;
 
 #ifdef DETHRACE_3DFX_PATCH
     if (gBack_screen->type != BR_PMT_INDEX_8) {
@@ -1242,58 +1237,71 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
     }
 #endif
     BrMatrix34Mul(&car_in_map_space, pTrans, &gCurrent_race.map_transformation);
-    bearing = FastScalarArcTan2(car_in_map_space.m[2][0], car_in_map_space.m[2][1]);
-
     // Calculate in which of the 16 directions, the arrow is pointing to
-    bearing = (360.f - bearing + 12.25) / 22.5f;
-    arrow_index = ((int)bearing) % 16;
+    bearing = 360.f - FastScalarArcTan2(car_in_map_space.m[2][0], car_in_map_space.m[2][1]);
+    arrow_index = ((int)((int)(bearing + 12.25) / 22.5)) % 16;
 
     // The player's blip blinks, others are shown permanently
-    if (pCar->driver != eDriver_local_human || (period & pTime) != 0) {
-        for (i = 0; i < COUNT_OF(colours); i++) {
-            colour = colours[i];
-            point_count = gArrows[i][arrow_index & 0x3][0];
-            arrow_ptr = &gArrows[i][arrow_index & 0x3][1];
-            for (j = 0; j < point_count; j++, arrow_ptr += 2) {
+    if (pCar->driver != eDriver_local_human || (pTime & period)) {
+        for (j = 0; j < COUNT_OF(colours); j++) {
+            arrow_ptr = &gArrows[j][arrow_index & 0x3][0];
+            point_count = *arrow_ptr++;
+            for (i = 0; i < point_count; i++) {
                 if (arrow_index & 0x8) {
-                    x = -arrow_ptr[0];
-                    y = -arrow_ptr[1];
+                    x = -*arrow_ptr++;
+                    y = -*arrow_ptr++;
                 } else {
-                    x = arrow_ptr[0];
-                    y = arrow_ptr[1];
+                    x = *arrow_ptr++;
+                    y = *arrow_ptr++;
                 }
                 if (arrow_index & 0x4) {
-                    temp = x;
-                    x = -y;
-                    y = temp;
+                    temp = y;
+                    y = x;
+                    x = -temp;
                 }
-                BrPixelmapPixelSet(gBack_screen, map_pos.v[0] + x, map_pos.v[1] + y, colour);
+                BrPixelmapPixelSet(gBack_screen, map_pos.v[0] + x, map_pos.v[1] + y, colours[j]);
             }
         }
     }
     // Draw a rectangle around the fox
-    colour = colours[!!(pTime & period)];
+    colour = colours[pTime & period];
     if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gNet_players[gIt_or_fox].car == pCar) {
-        from_x = map_pos.v[0] - 8.f;
-        from_y = map_pos.v[1] - 8.f;
-        to_x = map_pos.v[0] + 8.f;
-        to_y = map_pos.v[1] + 8.f;
-        BrPixelmapLine(gBack_screen, from_x, from_y, to_x, from_y, colour);
-        BrPixelmapLine(gBack_screen, from_x, to_y, to_x, to_y, colour);
-        BrPixelmapLine(gBack_screen, from_x, from_y, from_x, to_y, colour);
-        BrPixelmapLine(gBack_screen, to_x, from_y, to_x, to_y, colour);
+        BrPixelmapLine(gBack_screen, map_pos.v[0] - 8.f, map_pos.v[1] - 8.f, map_pos.v[0] + 8.f, map_pos.v[1] - 8.f, colour);
+        BrPixelmapLine(gBack_screen, map_pos.v[0] - 8.f, map_pos.v[1] + 8.f, map_pos.v[0] + 8.f, map_pos.v[1] + 8.f, colour);
+        BrPixelmapLine(gBack_screen, map_pos.v[0] - 8.f, map_pos.v[1] - 8.f, map_pos.v[0] - 8.f, map_pos.v[1] + 8.f, colour);
+        BrPixelmapLine(gBack_screen, map_pos.v[0] + 8.f, map_pos.v[1] - 8.f, map_pos.v[0] + 8.f, map_pos.v[1] + 8.f, colour);
     }
     // To attract the player's attention, draw a rectangle around the player's position that decreases in size,
     if (time_diff <= 500 && pCar->driver == eDriver_local_human) {
         offset = ((500 - time_diff) * 70) / 500;
-        from_x = map_pos.v[0] - offset - .5f;
-        from_y = map_pos.v[1] - offset - .5f;
-        to_x = map_pos.v[0] + offset + .5f;
-        to_y = map_pos.v[1] + offset + .5f;
-        BrPixelmapLine(gBack_screen, from_x, from_y, to_x, from_y, colour);
-        BrPixelmapLine(gBack_screen, from_x, to_y, to_x, to_y, colour);
-        BrPixelmapLine(gBack_screen, from_x, from_y, from_x, to_y, colour);
-        BrPixelmapLine(gBack_screen, to_x, from_y, to_x, to_y, colour);
+        BrPixelmapLine(
+            gBack_screen,
+            (int)(map_pos.v[0] - .5) - offset,
+            (int)(map_pos.v[1] - .5) - offset,
+            (int)(map_pos.v[0] + .5) + offset,
+            (int)(map_pos.v[1] - .5) - offset,
+            colour);
+        BrPixelmapLine(
+            gBack_screen,
+            (int)(map_pos.v[0] - .5) - offset,
+            (int)(map_pos.v[1] + .5) + offset,
+            (int)(map_pos.v[0] + .5) + offset,
+            (int)(map_pos.v[1] + .5) + offset,
+            colour);
+        BrPixelmapLine(
+            gBack_screen,
+            (int)(map_pos.v[0] - .5) - offset,
+            (int)(map_pos.v[1] - .5) - offset,
+            (int)(map_pos.v[0] - .5) - offset,
+            (int)(map_pos.v[1] + .5) + offset,
+            colour);
+        BrPixelmapLine(
+            gBack_screen,
+            (int)(map_pos.v[0] + .5) + offset,
+            (int)(map_pos.v[1] - .5) - offset,
+            (int)(map_pos.v[0] + .5) + offset,
+            (int)(map_pos.v[1] + .5) + offset,
+            colour);
     }
 }
 
