@@ -2108,7 +2108,7 @@ void PollCameraControls(tU32 pTime_difference) {
                 }
             }
         }
-        if (swirl_mode && gProgram_state.current_car.speedo_speed < 0.0014492753623188406) {
+        if (swirl_mode && gProgram_state.current_car.speedo_speed < (1 / WORLD_SCALE_D / 100.0)) {
             left = 1;
             right = 0;
         } else {
