@@ -2538,28 +2538,23 @@ void EnterUserMessage(void) {
     int the_key;
     int abuse_num;
 
-    if (!gEntering_message) {
-        return;
-    }
-    if (gNet_mode == eNet_mode_none) {
-        return;
-    }
-    if (!gCurrent_net_game->options.enable_text_messages) {
+    the_message = &gString[20];
+    if (!gEntering_message || gNet_mode == eNet_mode_none || !gCurrent_net_game->options.enable_text_messages) {
         return;
     }
     the_key = PDAnyKeyDown();
     if (gEntering_message == 1) {
-        if (the_key != -1) {
+        if (the_key == -1) {
+            gEntering_message = 2;
+        } else {
             return;
         }
-        gEntering_message = 2;
     }
     if (about_to_die) {
-        if (the_key != -1) {
-            return;
+        if (the_key == -1) {
+            about_to_die = 0;
+            gEntering_message = 0;
         }
-        gEntering_message = 0;
-        about_to_die = 0;
         return;
     }
     if (the_key == last_key) {
@@ -2576,6 +2571,22 @@ void EnterUserMessage(void) {
     case -1:
     case KEY_SHIFT_ANY:
         break;
+    case KEY_RETURN:
+    case KEY_KP_ENTER:
+        len = strlen(gNet_players[gThis_net_player_index].player_name);
+        if (len > 18) {
+            break;
+        }
+        p = the_message - len - 2;
+        strcpy(p, gNet_players[gThis_net_player_index].player_name);
+        p[len + 0] = ':';
+        p[len + 1] = ' ';
+        gString[COUNT_OF(gString) - 1] = '\0';
+        NetSendHeadupToAllPlayers(p);
+        the_message[0] = '\0';
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_MESSAGE_SENT));
+        about_to_die = 1;
+        break;
     case KEY_CTRL_ANY:
     case KEY_CTRL_ANY_2:
     case KEY_TAB:
@@ -2585,50 +2596,41 @@ void EnterUserMessage(void) {
     case KEY_BACKSPACE:
     case KEY_DELETE:
     case KEY_LEFT:
-        len = strlen(&gString[20]);
+        len = strlen(the_message);
         if (len > 0) {
-            gString[20 + len - 1] = '\0';
-        }
-        break;
-    case KEY_RETURN:
-    case KEY_KP_ENTER:
-        len = strlen(gNet_players[gThis_net_player_index].player_name);
-        if (len <= 18) {
-            the_message = gString + 18 - len;
-            strcpy(the_message, gNet_players[gThis_net_player_index].player_name);
-            the_message[len + 0] = ':';
-            the_message[len + 1] = ' ';
-            gString[COUNT_OF(gString) - 1] = '\0';
-            NetSendHeadupToAllPlayers(the_message);
-            gString[20] = '\0';
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_MESSAGE_SENT));
-            about_to_die = 1;
+            the_message[len - 1] = '\0';
         }
         break;
     default:
         if (gKey_mapping[KEYMAP_SEND_MESSAGE] == the_key) {
             about_to_die = 1;
-        } else if (the_key <= KEY_KP_NUMLOCK || the_key >= KEY_SPACE) {
-            len = strlen(&gString[20]);
-            if (len < 64 - 1) {
-                gString[20 + len] = PDGetASCIIFromKey(the_key);
-                if (gString[20 + len] < gFonts[4].offset || gString[20 + len] >= gFonts[4].offset + gFonts[4].num_entries) {
-                    gString[20 + len] = '\0';
+            break;
+        }
+        if (the_key >= KEY_KP_NUMLOCK + 1 && the_key <= KEY_SPACE - 1) {
+            if (the_key >= KEY_KP_0 && the_key <= KEY_KP_9) {
+                if (the_key == KEY_KP_0) {
+                    abuse_num = 9;
+                } else {
+                    abuse_num = the_key - KEY_KP_1;
                 }
-                gString[20 + len + 1] = '\0';
-            }
-        } else if (the_key < KEY_KP_0 || the_key > KEY_KP_9) {
-            gEntering_message = 0;
-        } else {
-            if (the_key == KEY_KP_0) {
-                abuse_num = 9;
+                if (gAbuse_text[abuse_num] != NULL) {
+                    strcpy(the_message, gAbuse_text[abuse_num]);
+                }
+                break;
             } else {
-                abuse_num = the_key - KEY_KP_1;
-            }
-            if (gAbuse_text[abuse_num] != NULL) {
-                strcpy(&gString[20], gAbuse_text[abuse_num]);
+                gEntering_message = 0;
+                break;
             }
         }
+        len = strlen(the_message);
+        if (len < 64 - 1) {
+            the_message[len] = PDGetASCIIFromKey(the_key);
+            if (the_message[len] < gFonts[4].offset || the_message[len] >= gFonts[4].offset + gFonts[4].num_entries) {
+                the_message[len] = '\0';
+            }
+            the_message[len + 1] = '\0';
+        }
+        break;
     }
 }
 
