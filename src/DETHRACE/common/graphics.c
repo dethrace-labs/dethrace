@@ -3157,41 +3157,40 @@ void LoadFont(int pFont_ID) {
     FILE* f;
     tU32 the_size;
 
-    if (gFonts[pFont_ID].images != NULL) {
-        return;
-    }
-
-    PathCat(the_path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
-    PathCat(the_path, the_path, "FONTS");
-    PathCat(the_path, the_path, gFont_names[pFont_ID]);
-    number_of_chars = strlen(the_path);
-    strcat(the_path, ".PIX");
-    gFonts[pFont_ID].images = DRPixelmapLoad(the_path);
-
     if (gFonts[pFont_ID].images == NULL) {
-        FatalError(kFatalError_LoadFontImage_S, gFont_names[pFont_ID]);
-    }
-    if (!gFonts[pFont_ID].file_read_once) {
-        strcpy(&the_path[number_of_chars + 1], "TXT");
+        PathCat(the_path, gApplication_path, gGraf_specs[gGraf_spec_index].data_dir_name);
+        PathCat(the_path, the_path, "FONTS");
+        PathCat(the_path, the_path, gFont_names[pFont_ID]);
+        strcat(the_path, ".PIX");
+        gFonts[pFont_ID].images = DRPixelmapLoad(the_path);
 
-        f = DRfopen(the_path, "rt");
-        if (f == NULL) {
-            FatalError(kFatalError_LoadFontWidthTable_S, gFont_names[pFont_ID]);
+        if (gFonts[pFont_ID].images == NULL) {
+            FatalError(kFatalError_LoadFontImage_S, gFont_names[pFont_ID]);
         }
+        gFonts[pFont_ID].images->row_bytes = (gFonts[pFont_ID].images->row_bytes + 3) & ~3;
+        if (!gFonts[pFont_ID].file_read_once) {
+            the_path[strlen(the_path) - 3] = '\0';
+            strcat(the_path, "TXT");
 
-        gFonts[pFont_ID].height = GetAnInt(f);
-        gFonts[pFont_ID].width = GetAnInt(f);
-        gFonts[pFont_ID].spacing = GetAnInt(f);
-        gFonts[pFont_ID].offset = GetAnInt(f);
-        gFonts[pFont_ID].num_entries = GetAnInt(f);
-        if (gFonts[pFont_ID].width <= 0) {
-            for (i = 0; i < gFonts[pFont_ID].num_entries; i++) {
-                the_size = GetAnInt(f);
-                gFonts[pFont_ID].width_table[i] = the_size;
+            f = DRfopen(the_path, "rt");
+            if (f == NULL) {
+                FatalError(kFatalError_LoadFontWidthTable_S, gFont_names[pFont_ID]);
             }
+
+            gFonts[pFont_ID].height = GetAnInt(f);
+            gFonts[pFont_ID].width = GetAnInt(f);
+            gFonts[pFont_ID].spacing = GetAnInt(f);
+            gFonts[pFont_ID].offset = GetAnInt(f);
+            gFonts[pFont_ID].num_entries = GetAnInt(f);
+            if (gFonts[pFont_ID].width <= 0) {
+                the_size = pFont_ID;
+                for (i = 0; i < gFonts[pFont_ID].num_entries; i++) {
+                    gFonts[the_size].width_table[i] = GetAnInt(f);
+                }
+            }
+            fclose(f);
+            gFonts[pFont_ID].file_read_once = 1;
         }
-        fclose(f);
-        gFonts[pFont_ID].file_read_once = 1;
     }
 }
 
