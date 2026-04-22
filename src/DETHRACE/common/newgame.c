@@ -1067,14 +1067,14 @@ int NetOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
 
     DRS3StartSound(gEffects_outlet, 3000);
-    if (gRadio_bastards__newgame[*pCurrent_choice - 3].count < 2) {
-        NetCheckboxChanged(*pCurrent_choice - 3);
-    } else {
+    if (gRadio_bastards__newgame[*pCurrent_choice - 3].count > 1) {
         new_value = gRadio_bastards__newgame[*pCurrent_choice - 3].current_value + 1;
         if (new_value == gRadio_bastards__newgame[*pCurrent_choice - 3].count) {
             new_value = 0;
         }
         NetRadioChanged(*pCurrent_choice - 3, new_value);
+    } else {
+        NetCheckboxChanged(*pCurrent_choice - 3);
     }
     return 1;
 }
