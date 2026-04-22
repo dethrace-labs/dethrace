@@ -393,9 +393,10 @@ int SelectSkillLevel(void) {
     result = DoInterfaceScreen(&interface_spec, 0, gProgram_state.skill_level);
     if (result > 2) {
         return 0;
+    } else {
+        gProgram_state.skill_level = result;
+        return 1;
     }
-    gProgram_state.skill_level = result;
-    return 1;
 }
 
 // IDA: int __cdecl DoOnePlayerStart()
