@@ -871,9 +871,8 @@ tJoin_or_host_result JoinOrHostGame(tNet_game_details** pGame_to_join) {
     case 2:
         *pGame_to_join = gGames_to_join[gLast_graph_sel__newgame].game;
         return eJoin_or_host_join;
-    default:
-        return eJoin_or_host_cancel;
     }
+    return eJoin_or_host_cancel;
 }
 
 // IDA: void __usercall GetNetOptions(tNet_game_options *pGame_options@<EAX>)
