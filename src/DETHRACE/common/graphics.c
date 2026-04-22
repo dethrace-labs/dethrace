@@ -2825,7 +2825,7 @@ int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data) {
         }
     }
     FatalError(kFatalError_FindSpareTransientBitmap);
-    return 0;
+    return -1;
 }
 
 // IDA: void __usercall DeallocateTransientBitmap(int pIndex@<EAX>)
