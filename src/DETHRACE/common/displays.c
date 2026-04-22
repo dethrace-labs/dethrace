@@ -1557,25 +1557,27 @@ void AwardTime(tU32 pTime) {
     tU32 the_time;
     int i;
 
-    if (gRace_finished || gFreeze_timer || gNet_mode != eNet_mode_none || pTime == 0) {
+    if (gRace_finished || gFreeze_timer || gNet_mode != eNet_mode_none) {
         return;
     }
 
-    original_amount = pTime;
     the_time = GetTotalTime();
-    for (i = COUNT_OF(gOld_times) - 1; i > 0; i--) {
-        gOld_times[i] = gOld_times[i - 1];
+    if (pTime != 0) {
+        for (i = COUNT_OF(gOld_times) - 1; i > 0; i--) {
+            gOld_times[i] = gOld_times[i - 1];
+        }
+        gOld_times[0] = pTime;
+        original_amount = pTime;
+        if (gLast_time_credit_headup >= 0 && (the_time - gLast_time_earn_time) < 2000) {
+            pTime += gLast_time_credit_amount;
+        }
+        gLast_time_credit_amount = pTime;
+        gTimer += original_amount * 1000;
+        s[0] = '+';
+        TimerString(1000 * pTime, &s[1], 0, 0);
+        gLast_time_credit_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 2000, -kFont_BLUEHEAD, s);
+        gLast_time_earn_time = the_time;
     }
-    gOld_times[0] = pTime;
-    if (gLast_time_credit_headup >= 0 && (the_time - gLast_time_earn_time) < 2000) {
-        pTime += gLast_time_credit_amount;
-    }
-    gLast_time_credit_amount = pTime;
-    gTimer += original_amount * 1000;
-    s[0] = '+';
-    TimerString(1000 * pTime, &s[1], 0, 0);
-    gLast_time_credit_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 2000, -kFont_BLUEHEAD, s);
-    gLast_time_earn_time = the_time;
 }
 
 // IDA: void __usercall DrawRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour)
