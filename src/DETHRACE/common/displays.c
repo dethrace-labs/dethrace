@@ -855,23 +855,20 @@ int NewTextHeadupSlot2(int pSlot_index, int pFlash_rate, int pLifetime, int pFon
             }
             headup_slot = &gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on][pSlot_index];
             the_headup = &gHeadups[index];
-            the_headup->data.coloured_text_info.coloured_font = &gFonts[-pFont_index];
+            the_headup->data.coloured_text_info.coloured_font = gFonts - pFont_index;
             if (pSlot_index == 4) {
                 the_headup->type = eHeadup_box_text;
             } else {
                 the_headup->type = eHeadup_coloured_text;
             }
-            if (!pText) {
-                LOG_PANIC("panic");
-            }
             strcpy(the_headup->data.text_info.text, pText);
 
             the_headup->slot_index = pSlot_index;
             the_headup->justification = headup_slot->justification;
-            if (pSlot_index < 0) {
-                the_headup->cockpit_anchored = 0;
-            } else {
+            if (pSlot_index >= 0) {
                 the_headup->cockpit_anchored = headup_slot->cockpit_anchored;
+            } else {
+                the_headup->cockpit_anchored = 0;
             }
             the_headup->dimmed_background = headup_slot->dimmed_background;
             the_headup->dim_left = headup_slot->dim_left;
