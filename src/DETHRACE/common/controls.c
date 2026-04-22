@@ -2561,17 +2561,17 @@ void EnterUserMessage(void) {
     }
     the_key = PDAnyKeyDown();
     if (gEntering_message == 1) {
-        if (the_key != -1) {
+        if (the_key == -1) {
+            gEntering_message = 2;
+        } else {
             return;
         }
-        gEntering_message = 2;
     }
     if (about_to_die) {
-        if (the_key != -1) {
-            return;
+        if (the_key == -1) {
+            about_to_die = 0;
+            gEntering_message = 0;
         }
-        about_to_die = 0;
-        gEntering_message = 0;
         return;
     }
     if (the_key == last_key) {
@@ -2634,10 +2634,10 @@ void EnterUserMessage(void) {
                     strcpy(the_message, gAbuse_text[abuse_num]);
                 }
                 break;
+            } else {
+                gEntering_message = 0;
+                break;
             }
-        } else {
-            gEntering_message = 0;
-            break;
         }
         len = strlen(the_message);
         if (len < 64 - 1) {
