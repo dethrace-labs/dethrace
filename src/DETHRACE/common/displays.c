@@ -1543,11 +1543,12 @@ int SpendCredits(int pAmount) {
         return 0;
     }
     amount = gProgram_state.credits_earned - gProgram_state.credits_lost;
-    if (gProgram_state.credits_earned - gProgram_state.credits_lost >= 0) {
+    if (amount >= 0) {
         return 0;
+    } else {
+        gProgram_state.credits_lost = gProgram_state.credits_earned;
+        return amount;
     }
-    gProgram_state.credits_lost = gProgram_state.credits_earned;
-    return amount;
 }
 
 // IDA: void __usercall AwardTime(tU32 pTime@<EAX>)
