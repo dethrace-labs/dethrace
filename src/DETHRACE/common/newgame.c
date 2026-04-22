@@ -1741,48 +1741,45 @@ int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int*
     int car_index;
     int the_car_index;
 
-    if (!pOptions->random_car_choice || pIm_the_host_so_fuck_off) {
-        gNet_options = pOptions;
-        if (pIm_the_host_so_fuck_off) {
-            SetNetAvailability(pOptions);
-        } else {
-            RequestCarDetails(pNet_game);
-            start_time = PDGetTotalTime();
-            while (!gReceived_car_details && PDGetTotalTime() - start_time < 10000) {
-                NetService(0);
-            }
-            gNet_mode = eNet_mode_none;
-            if (!gReceived_car_details) {
-                gNet_mode = eNet_mode_none;
-                return 0;
-            }
+    if (pOptions->random_car_choice && !pIm_the_host_so_fuck_off) {
+        return 1;
+    }
+    gNet_options = pOptions;
+    if (!pIm_the_host_so_fuck_off) {
+        RequestCarDetails(pNet_game);
+        start_time = PDGetTotalTime();
+        while (!gReceived_car_details && PDGetTotalTime() - start_time < 10000) {
+            NetService(0);
         }
-        if (pOptions->random_car_choice) {
-            *pCar_index = PickARandomCar();
-            if (pIm_the_host_so_fuck_off && *pCar_index >= 0) {
-                gCar_details[*pCar_index].ownership = eCar_owner_someone;
-            }
-            result = 1;
-        } else {
-            if (*pCar_index < 0) {
-                *pCar_index = PickARandomCar();
-                car_index = 0;
-                for (i = 0; i < gNumber_of_racers; i++) {
-                    if (gCar_details[i].ownership < eCar_owner_not_allowed) {
-                        gProgram_state.cars_available[car_index] = i;
-                        car_index++;
-                    }
-                }
-                gProgram_state.number_of_cars = car_index;
-            }
-            result = ChangeCar(1, pCar_index, pNet_game);
-            gNet_mode = eNet_mode_none;
-            if (pIm_the_host_so_fuck_off) {
-                gCar_details[*pCar_index].ownership = eCar_owner_someone;
-            }
+        gNet_mode = eNet_mode_none;
+        if (!gReceived_car_details) {
+            return 0;
         }
     } else {
-        result = 1;
+        SetNetAvailability(pOptions);
+    }
+    if (pOptions->random_car_choice) {
+        *pCar_index = PickARandomCar();
+        if (pIm_the_host_so_fuck_off && *pCar_index >= 0) {
+            gCar_details[*pCar_index].ownership = eCar_owner_someone;
+        }
+        return 1;
+    }
+    if (*pCar_index < 0) {
+        *pCar_index = PickARandomCar();
+        car_index = 0;
+        for (i = 0; i < gNumber_of_racers; i++) {
+            if (gCar_details[i].ownership < eCar_owner_not_allowed) {
+                gProgram_state.cars_available[car_index] = i;
+                car_index++;
+            }
+        }
+        gProgram_state.number_of_cars = car_index;
+    }
+    result = ChangeCar(1, pCar_index, pNet_game);
+    gNet_mode = eNet_mode_none;
+    if (pIm_the_host_so_fuck_off) {
+        gCar_details[*pCar_index].ownership = eCar_owner_someone;
     }
     return result;
 }
