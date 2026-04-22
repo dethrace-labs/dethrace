@@ -1498,32 +1498,31 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
         return;
     }
     the_time = GetTotalTime();
-    if (pAmount == 0) {
-        return;
+    if (pAmount != 0) {
+        if (gNet_mode != eNet_mode_none && gProgram_state.credits_earned - gProgram_state.credits_lost + pAmount < 0) {
+            pAmount = gProgram_state.credits_lost - gProgram_state.credits_earned;
+        }
+        original_amount = pAmount;
+        if (gLast_credit_headup__displays >= 0 && the_time - gLast_earn_time < 2000) {
+            pAmount += gLast_credit_amount;
+        }
+        gLast_credit_amount = pAmount;
+        if (pAmount > 1) {
+            sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(kMiscString_Credits));
+            gProgram_state.credits_earned += original_amount;
+        } else if (pAmount > 0) {
+            sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(kMiscString_Credit));
+            gProgram_state.credits_earned += original_amount;
+        } else if (pAmount < -1) {
+            sprintf(s, "%s%s %d %s", GetMiscString(kMiscString_Lost), pPrefix_text, -pAmount, GetMiscString(kMiscString_Credits));
+            gProgram_state.credits_lost -= original_amount;
+        } else {
+            sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(kMiscString_Lost), GetMiscString(kMiscString_Credit));
+            gProgram_state.credits_lost -= original_amount;
+        }
+        gLast_credit_headup__displays = NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s);
+        gLast_earn_time = the_time;
     }
-    if (gNet_mode != eNet_mode_none && gProgram_state.credits_earned - gProgram_state.credits_lost + pAmount < 0) {
-        pAmount = gProgram_state.credits_lost - gProgram_state.credits_lost;
-    }
-    original_amount = pAmount;
-    if (gLast_credit_headup__displays >= 0 && the_time - gLast_earn_time < 2000) {
-        pAmount += gLast_credit_amount;
-    }
-    gLast_credit_amount = pAmount;
-    if (pAmount >= 2) {
-        sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(kMiscString_Credits));
-        gProgram_state.credits_earned += original_amount;
-    } else if (pAmount >= 1) {
-        sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(kMiscString_Credit));
-        gProgram_state.credits_earned += original_amount;
-    } else if (pAmount >= -1) {
-        sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(kMiscString_Lost), GetMiscString(kMiscString_Credit));
-        gProgram_state.credits_lost -= original_amount;
-    } else {
-        sprintf(s, "%s%s %d %s", GetMiscString(kMiscString_Lost), pPrefix_text, -pAmount, GetMiscString(kMiscString_Credits));
-        gProgram_state.credits_lost -= original_amount;
-    }
-    gLast_credit_headup__displays = NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s);
-    gLast_earn_time = the_time;
 }
 
 // IDA: void __usercall EarnCredits(int pAmount@<EAX>)
