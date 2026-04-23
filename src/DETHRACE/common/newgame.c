@@ -1622,7 +1622,7 @@ int NetGameChoices(tNet_game_type* pGame_type, tNet_game_options* pGame_options,
     } while (result > 1);
     gLast_game_type = *pGame_type;
     gNet_settings[0] = *pGame_options;
-    gNet_settings[gLast_game_type + 1] = *pGame_options;
+    memcpy(gNet_settings + 1 + gLast_game_type, pGame_options, sizeof(*pGame_options));
     SaveOptions();
     SetGameTarget(pGame_type, pGame_options);
     return result == 0;
