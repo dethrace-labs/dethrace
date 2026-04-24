@@ -2072,7 +2072,8 @@ void PollCameraControls(tU32 pTime_difference) {
         }
         last_swirl_mode = swirl_mode;
     }
-    if (!gMap_mode && !gProgram_state.cockpit_on && (!gAction_replay_mode || gAction_replay_camera_mode <= eAction_replay_standard)) {
+    if (gMap_mode) {
+    } else if (!gProgram_state.cockpit_on && (!gAction_replay_mode || gAction_replay_camera_mode <= eAction_replay_standard)) {
         if (KeyIsDown(31) || (up_and_down_mode && !going_up)) {
             gCamera_zoom = pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1) + gCamera_zoom;
             if (gCamera_zoom > 2.0f) {
@@ -2086,6 +2087,7 @@ void PollCameraControls(tU32 pTime_difference) {
             gCamera_zoom = gCamera_zoom - pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1);
             if (gCamera_zoom < 0.1f) {
                 gCamera_zoom = 0.1f;
+                going_up = 0;
                 if (up_and_down_mode) {
                     if (gCamera_zoom < 1.0f) {
                         gCamera_zoom = 1.0f;
@@ -2093,7 +2095,7 @@ void PollCameraControls(tU32 pTime_difference) {
                 }
             }
         }
-        if (swirl_mode && gProgram_state.current_car.speedo_speed < 0.001449275362318841) {
+        if (swirl_mode && gProgram_state.current_car.speedo_speed < (1 / WORLD_SCALE_D / 100.0)) {
             left = 1;
             right = 0;
         } else {
