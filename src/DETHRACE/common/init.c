@@ -153,9 +153,9 @@ void ReinitialiseForwardCamera(void) {
     camera_ptr = (br_camera*)gCamera->type_data;
     if (gProgram_state.cockpit_on) {
         the_angle = atan(
-                tandeg(gCamera_angle / 2.0f)
-                * (double)gRender_screen->height
-                / (double)(gProgram_state.current_car.render_bottom[0] - gProgram_state.current_car.render_top[0]))
+                        tandeg(gCamera_angle / 2.0f)
+                        * (double)gRender_screen->height
+                        / (double)(gProgram_state.current_car.render_bottom[0] - gProgram_state.current_car.render_top[0]))
             * 114.59155902616465;
         camera_ptr->field_of_view = BrDegreeToAngle(the_angle);
         BrMatrix34Identity(&gCamera->t.t.mat);
@@ -290,7 +290,6 @@ void ReinitialiseRenderStuff(void) {
 // IDA: void __cdecl InstallFindFailedHooks()
 // FUNCTION: CARM95 0x004bc121
 void InstallFindFailedHooks(void) {
-    NOT_IMPLEMENTED();
 }
 
 // IDA: void __cdecl AllocateStandardLamp()
