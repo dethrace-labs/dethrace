@@ -1333,15 +1333,16 @@ void GetTilingLimits(br_vector2* min, br_vector2* max) {
     BrVector2Set(min, 32000.f, 32000.f);
     BrVector2Set(max, -32000.f, -32000.f);
     for (f = 0; f < gSelected_model->nfaces; f++) {
-        if (faces[f].material == gSub_material) {
-            for (i = 0; i < 3; i++) {
-                for (j = 0; j < 2; j++) {
-                    if (verts[faces[f].vertices[i]].map.v[j] < min->v[j]) {
-                        min->v[j] = verts[faces[f].vertices[i]].map.v[j];
-                    }
-                    if (verts[faces[f].vertices[i]].map.v[j] > max->v[j]) {
-                        max->v[j] = verts[faces[f].vertices[i]].map.v[j];
-                    }
+        if (faces[f].material != gSub_material) {
+            continue;
+        }
+        for (i = 0; i < 3; i++) {
+            for (j = 0; j < 2; j++) {
+                if (verts[faces[f].vertices[0 + i]].map.v[j] < min->v[j]) {
+                    min->v[j] = verts[faces[f].vertices[0 + i]].map.v[j];
+                }
+                if (verts[faces[f].vertices[0 + i]].map.v[j] > max->v[j]) {
+                    max->v[j] = verts[faces[f].vertices[0 + i]].map.v[j];
                 }
             }
         }
