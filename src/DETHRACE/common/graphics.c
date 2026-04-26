@@ -923,7 +923,18 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     ((br_int_32*)pThe_palette->pixels)[0] = 0;
     if (pSet_current_palette) {
-        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+        size_t palette_size = 0x400u;
+        char* dst = gCurrent_palette_pixels;
+        char* src = pThe_palette->pixels;
+#ifdef DETHRACE_FIX_BUGS
+        if ((dst < src + palette_size) && (src < dst + palette_size)) {
+            memmove(dst, src, palette_size);
+        } else {
+            memcpy(dst, src, palette_size);
+        }
+#else
+        memcpy(dst, src, palette_size);
+#endif
 #ifdef DETHRACE_3DFX_PATCH
         g16bit_palette_valid = 0;
 #endif
@@ -931,8 +942,7 @@ void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     if (!gFaded_palette) {
         PDSetPalette(pThe_palette);
     }
-    if (pThe_palette != gRender_palette) {
-        gPalette_munged |= 1u;
+    if (gRender_palette == pThe_palette || (gPalette_munged |= 1, 0)) {
     }
 }
 
