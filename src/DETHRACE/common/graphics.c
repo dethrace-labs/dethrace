@@ -3524,14 +3524,15 @@ void ShadowMode(void) {
 // FUNCTION: CARM95 0x004ba581
 int SwitchToRealResolution(void) {
 
-    if (gGraf_data_index == gReal_graf_data_index) {
+    if (gGraf_data_index != gReal_graf_data_index) {
+        gGraf_data_index = gReal_graf_data_index;
+        gGraf_spec_index = gReal_graf_data_index;
+        gCurrent_graf_data = &gGraf_data[gGraf_data_index];
+        PDSwitchToRealResolution();
+        return 1;
+    } else {
         return 0;
     }
-    gGraf_data_index = gReal_graf_data_index;
-    gGraf_spec_index = gReal_graf_data_index;
-    gCurrent_graf_data = &gGraf_data[gReal_graf_data_index];
-    PDSwitchToRealResolution();
-    return 1;
 }
 
 // IDA: int __cdecl SwitchToLoresMode()
