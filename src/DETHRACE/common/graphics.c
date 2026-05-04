@@ -3570,8 +3570,8 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
 #endif
     dst_row_skip = 2 * pDestn->row_bytes - 2 * pSource_width;
     src_row_skip = (pSource->row_bytes - pSource_width) / 2;
-    sptr = (tU16*)((tU8*)pSource->pixels - 2 * src_row_skip + 2 * (pSource->row_bytes * pSource_height / 2));
-    dptr = (tU8*)pDestn->pixels + 2 * pSource_width + (2 * pSource_height + pY_offset) * pDestn->row_bytes - pDestn->row_bytes;
+    sptr = (tU16*)((tU8*)pSource->pixels + 2 * (pSource->row_bytes * pSource_height / 2) - 2 * src_row_skip);
+    dptr = (tU8*)pDestn->pixels + (2 * pSource_height + pY_offset) * pDestn->row_bytes - pDestn->row_bytes + 2 * pSource_width;
     dptr2 = dptr - pDestn->row_bytes;
     width_over_2 = pSource_width / 2;
     for (i = 0; i < pSource_height; i++) {
@@ -3585,16 +3585,22 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
             pixel_1 = pixels >> 8;
             pixel_2 = pixels >> 0;
 #endif
-            dptr[-1] = pixel_1;
-            dptr2[-1] = pixel_1;
-            dptr[-2] = pixel_1;
-            dptr2[-2] = pixel_1;
-            dptr[-3] = pixel_2;
-            dptr2[-3] = pixel_2;
-            dptr[-4] = pixel_2;
-            dptr2[-4] = pixel_2;
-            dptr -= 4;
-            dptr2 -= 4;
+            --dptr;
+            *dptr = pixel_1;
+            --dptr2;
+            *dptr2 = pixel_1;
+            --dptr;
+            *dptr = pixel_1;
+            --dptr2;
+            *dptr2 = pixel_1;
+            --dptr;
+            *dptr = pixel_2;
+            --dptr2;
+            *dptr2 = pixel_2;
+            --dptr;
+            *dptr = pixel_2;
+            --dptr2;
+            *dptr2 = pixel_2;
         }
         dptr -= dst_row_skip;
         dptr2 -= dst_row_skip;
