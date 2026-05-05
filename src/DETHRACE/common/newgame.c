@@ -393,9 +393,10 @@ int SelectSkillLevel(void) {
     result = DoInterfaceScreen(&interface_spec, 0, gProgram_state.skill_level);
     if (result > 2) {
         return 0;
+    } else {
+        gProgram_state.skill_level = result;
+        return 1;
     }
-    gProgram_state.skill_level = result;
-    return 1;
 }
 
 // IDA: int __cdecl DoOnePlayerStart()
@@ -588,57 +589,57 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
         gCurrent_graf_data->joinable_games_y + gFonts[kFont_GRYLIT].height + 1 - (TranslationMode() ? 2 : 0) - gCurrent_graf_data->joinable_games_y_pitch,
         6);
     for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
-        if (gGames_to_join[i].game == NULL) {
-            continue;
+        if (gGames_to_join[i].game != NULL) {
+            if (gGames_to_join[i].game->type >= 0 && gGames_to_join[i].game->type <= 6) {
+                if ((PDGetTotalTime() - gGames_to_join[i].time) >= 15000) {
+                    DisposeJoinableGame(i);
+                } else {
+                    if (gMouse_in_use
+                        && pCurrent_mode != 0
+                        && gGames_to_join[i].game != NULL
+                        && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet)
+                        && gGames_to_join[i].game->num_players < 6
+                        && x_coord >= gCurrent_graf_data->joinable_games_sel_left
+                        && x_coord <= gCurrent_graf_data->joinable_games_sel_right
+                        && y_coord >= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_top_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch)
+                        && y_coord <= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_bot_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch - 1)) {
+                        gLast_graph_sel__newgame = i;
+                    }
+                    if (i == gLast_graph_sel__newgame) {
+                        font_index = 10;
+                    } else {
+                        font_index = 9;
+                    }
+                    sprintf(s, "%s", gGames_to_join[i].game->host_name);
+                    DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_1, current_index, font_index, s);
+                    s2 = GetMiscString(kMiscString_NetworkGameTypeNames_START + gGames_to_join[i].game->type);
+                    sprintf(s, "%s", s2);
+                    DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_2, current_index, font_index, s);
+                    sprintf(s, "%d", gGames_to_join[i].game->num_players);
+                    DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_3, current_index, font_index, s);
+                    s2 = GetMiscString(kMiscString_NetworkGameStage_START + gGames_to_join[i].game->status.stage);
+                    s3 = GetMiscString(kMiscString_NetworkGameOpenGame_START + gGames_to_join[i].game->options.open_game);
+                    sprintf(s, "%s, %s", s2, s3);
+                    DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_4, current_index, font_index, s);
+                    if (i == gLast_graph_sel__newgame) {
+                        DrawRectangle(gBack_screen,
+                            gCurrent_graf_data->joinable_games_sel_left,
+                            gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_top_marg + gCurrent_graf_data->joinable_games_y_pitch * current_index,
+                            gCurrent_graf_data->joinable_games_sel_right - 1,
+                            gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_bot_marg + gCurrent_graf_data->joinable_games_y_pitch * current_index - 1,
+                            45);
+                    }
+                    current_index++;
+                }
+            }
         }
-        if (gGames_to_join[i].game->type < 0 || gGames_to_join[i].game->type >= eNet_game_type_count) {
-            continue;
-        }
-        if ((PDGetTotalTime() - gGames_to_join[i].time) >= 15000) {
-            DisposeJoinableGame(i);
-            continue;
-        }
-        if (gMouse_in_use
-            && pCurrent_mode != 0
-            && gGames_to_join[i].game != NULL
-            && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet)
-            && gGames_to_join[i].game->num_players <= 5
-            && x_coord >= gCurrent_graf_data->joinable_games_sel_left
-            && x_coord <= gCurrent_graf_data->joinable_games_sel_right
-            && y_coord >= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_top_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch)
-            && y_coord <= (gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_bot_marg + current_index * gCurrent_graf_data->joinable_games_y_pitch - 1)) {
-            gLast_graph_sel__newgame = i;
-        }
-        if (i == gLast_graph_sel__newgame) {
-            font_index = 10;
-        } else {
-            font_index = 9;
-        }
-        sprintf(s, "%s", gGames_to_join[i].game->host_name);
-        DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_1, current_index, font_index, s);
-        sprintf(s, "%s", GetMiscString(kMiscString_NetworkGameTypeNames_START + gGames_to_join[i].game->type));
-        DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_2, current_index, font_index, s);
-        sprintf(s, "%d", gGames_to_join[i].game->num_players);
-        DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_3, current_index, font_index, s);
-        sprintf(s, "%s, %s",
-            GetMiscString(kMiscString_NetworkGameStage_START + gGames_to_join[i].game->status.stage),
-            GetMiscString(kMiscString_NetworkGameOpenGame_START + gGames_to_join[i].game->options.open_game));
-        DrawAnItem__newgame(gCurrent_graf_data->joinable_games_x_4, current_index, font_index, s);
-        if (i == gLast_graph_sel__newgame) {
-            DrawRectangle(gBack_screen,
-                gCurrent_graf_data->joinable_games_sel_left,
-                gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_top_marg + gCurrent_graf_data->joinable_games_y_pitch * current_index,
-                gCurrent_graf_data->joinable_games_sel_right - 1,
-                gCurrent_graf_data->joinable_games_y + gCurrent_graf_data->joinable_games_sel_bot_marg + gCurrent_graf_data->joinable_games_y_pitch * current_index - 1,
-                45);
-        }
-        current_index++;
     }
+    gCurrent_net_game_count = current_index;
 
-    if (current_index != 0 && (gShifted_default_yet == 0 || (gLast_graph_sel__newgame >= 0 && (gGames_to_join[gLast_graph_sel__newgame].game == NULL || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet) || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5)))) {
+    if (gCurrent_net_game_count != 0 && (gShifted_default_yet == 0 || (gLast_graph_sel__newgame >= 0 && (gGames_to_join[gLast_graph_sel__newgame].game == NULL || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet) || gGames_to_join[gLast_graph_sel__newgame].game->num_players >= 6)))) {
         gShifted_default_yet = 1;
         for (i = 0; i < COUNT_OF(gGames_to_join); i++) {
-            if (gGames_to_join[i].game != NULL && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet) && gGames_to_join[i].game->num_players <= 5) {
+            if (gGames_to_join[i].game != NULL && (gGames_to_join[i].game->options.open_game || gGames_to_join[i].game->no_races_yet) && gGames_to_join[i].game->num_players < 6) {
                 gLast_graph_sel__newgame = i;
                 ChangeSelectionTo(2, 1);
                 return;
@@ -649,10 +650,10 @@ void DrawGames(int pCurrent_choice, int pCurrent_mode) {
 #if defined(DETHRACE_FIX_BUGS)
         (gLast_graph_sel__newgame >= 0) &&
 #endif
-        (current_index == 0
+        (gCurrent_net_game_count == 0
             || gGames_to_join[gLast_graph_sel__newgame].game == NULL
             || (!gGames_to_join[gLast_graph_sel__newgame].game->options.open_game && !gGames_to_join[gLast_graph_sel__newgame].game->no_races_yet)
-            || gGames_to_join[gLast_graph_sel__newgame].game->num_players > 5)) {
+            || gGames_to_join[gLast_graph_sel__newgame].game->num_players >= 6)) {
         gLast_graph_sel__newgame = -1;
         ChangeSelectionTo(0, 0);
     }
@@ -870,9 +871,8 @@ tJoin_or_host_result JoinOrHostGame(tNet_game_details** pGame_to_join) {
     case 2:
         *pGame_to_join = gGames_to_join[gLast_graph_sel__newgame].game;
         return eJoin_or_host_join;
-    default:
-        return eJoin_or_host_cancel;
     }
+    return eJoin_or_host_cancel;
 }
 
 // IDA: void __usercall GetNetOptions(tNet_game_options *pGame_options@<EAX>)
@@ -1003,18 +1003,18 @@ void DrawNOptInitialRadios(void) {
     DontLetFlicFuckWithPalettes();
     TurnFlicTransparencyOn();
     for (i = 0; i < COUNT_OF(gRadio_bastards__newgame); i++) {
-        if (gRadio_bastards__newgame[i].count < 2) {
-            if (gRadio_bastards__newgame[i].current_value) {
-                NetPlayCheckboxOn2(i);
-            } else {
-                NetPlayCheckboxOff2(i);
-            }
-        } else {
+        if (gRadio_bastards__newgame[i].count > 1) {
             NetPlayRadioOn2(i, gRadio_bastards__newgame[i].current_value);
             for (j = 0; j < gRadio_bastards__newgame[i].count; j++) {
                 if (j != gRadio_bastards__newgame[i].current_value) {
                     NetPlayRadioOff2(i, j);
                 }
+            }
+        } else {
+            if (gRadio_bastards__newgame[i].current_value) {
+                NetPlayCheckboxOn2(i);
+            } else {
+                NetPlayCheckboxOff2(i);
             }
         }
     }
@@ -1049,14 +1049,14 @@ int NetOptLeft(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
 
     DRS3StartSound(gEffects_outlet, 3000);
-    if (gRadio_bastards__newgame[*pCurrent_choice - 3].count < 2) {
-        NetCheckboxChanged(*pCurrent_choice - 3);
-    } else {
+    if (gRadio_bastards__newgame[*pCurrent_choice - 3].count > 1) {
         new_value = gRadio_bastards__newgame[*pCurrent_choice - 3].current_value - 1;
         if (new_value < 0) {
             new_value = gRadio_bastards__newgame[*pCurrent_choice - 3].count - 1;
         }
         NetRadioChanged(*pCurrent_choice - 3, new_value);
+    } else {
+        NetCheckboxChanged(*pCurrent_choice - 3);
     }
     return 1;
 }
@@ -1067,14 +1067,14 @@ int NetOptRight(int* pCurrent_choice, int* pCurrent_mode) {
     int new_value;
 
     DRS3StartSound(gEffects_outlet, 3000);
-    if (gRadio_bastards__newgame[*pCurrent_choice - 3].count < 2) {
-        NetCheckboxChanged(*pCurrent_choice - 3);
-    } else {
+    if (gRadio_bastards__newgame[*pCurrent_choice - 3].count > 1) {
         new_value = gRadio_bastards__newgame[*pCurrent_choice - 3].current_value + 1;
         if (new_value == gRadio_bastards__newgame[*pCurrent_choice - 3].count) {
             new_value = 0;
         }
         NetRadioChanged(*pCurrent_choice - 3, new_value);
+    } else {
+        NetCheckboxChanged(*pCurrent_choice - 3);
     }
     return 1;
 }
@@ -1708,26 +1708,27 @@ void SetNetAvailability(tNet_game_options* pOptions) {
         case eNet_avail_never:
             gCar_details[i].ownership = eCar_owner_not_allowed;
             break;
-        case eNet_avail_eagle:
-            if (pOptions->car_choice == eNet_car_annie) {
-                gCar_details[i].ownership = eCar_owner_not_allowed;
-            } else {
-                gCar_details[i].ownership = eCar_owner_none;
-            }
-            break;
-        case eNet_avail_hawk:
-            if (pOptions->car_choice == eNet_car_frankie) {
-                gCar_details[i].ownership = eCar_owner_not_allowed;
-            } else {
-                gCar_details[i].ownership = eCar_owner_none;
-            }
-            break;
         case eNet_avail_all:
             if (pOptions->car_choice == eNet_car_all) {
                 gCar_details[i].ownership = eCar_owner_none;
             } else {
                 gCar_details[i].ownership = eCar_owner_not_allowed;
             }
+            break;
+        case eNet_avail_eagle:
+            if (pOptions->car_choice != eNet_car_annie) {
+                gCar_details[i].ownership = eCar_owner_none;
+            } else {
+                gCar_details[i].ownership = eCar_owner_not_allowed;
+            }
+            break;
+        case eNet_avail_hawk:
+            if (pOptions->car_choice != eNet_car_frankie) {
+                gCar_details[i].ownership = eCar_owner_none;
+            } else {
+                gCar_details[i].ownership = eCar_owner_not_allowed;
+            }
+            break;
         }
     }
 }
@@ -1741,48 +1742,45 @@ int ChooseNetCar(tNet_game_details* pNet_game, tNet_game_options* pOptions, int*
     int car_index;
     int the_car_index;
 
-    if (!pOptions->random_car_choice || pIm_the_host_so_fuck_off) {
-        gNet_options = pOptions;
-        if (pIm_the_host_so_fuck_off) {
-            SetNetAvailability(pOptions);
-        } else {
-            RequestCarDetails(pNet_game);
-            start_time = PDGetTotalTime();
-            while (!gReceived_car_details && PDGetTotalTime() - start_time < 10000) {
-                NetService(0);
-            }
-            gNet_mode = eNet_mode_none;
-            if (!gReceived_car_details) {
-                gNet_mode = eNet_mode_none;
-                return 0;
-            }
+    if (pOptions->random_car_choice && !pIm_the_host_so_fuck_off) {
+        return 1;
+    }
+    gNet_options = pOptions;
+    if (!pIm_the_host_so_fuck_off) {
+        RequestCarDetails(pNet_game);
+        start_time = PDGetTotalTime();
+        while (!gReceived_car_details && PDGetTotalTime() - start_time < 10000) {
+            NetService(0);
         }
-        if (pOptions->random_car_choice) {
-            *pCar_index = PickARandomCar();
-            if (pIm_the_host_so_fuck_off && *pCar_index >= 0) {
-                gCar_details[*pCar_index].ownership = eCar_owner_someone;
-            }
-            result = 1;
-        } else {
-            if (*pCar_index < 0) {
-                *pCar_index = PickARandomCar();
-                car_index = 0;
-                for (i = 0; i < gNumber_of_racers; i++) {
-                    if (gCar_details[i].ownership < eCar_owner_not_allowed) {
-                        gProgram_state.cars_available[car_index] = i;
-                        car_index++;
-                    }
-                }
-                gProgram_state.number_of_cars = car_index;
-            }
-            result = ChangeCar(1, pCar_index, pNet_game);
-            gNet_mode = eNet_mode_none;
-            if (pIm_the_host_so_fuck_off) {
-                gCar_details[*pCar_index].ownership = eCar_owner_someone;
-            }
+        gNet_mode = eNet_mode_none;
+        if (!gReceived_car_details) {
+            return 0;
         }
     } else {
-        result = 1;
+        SetNetAvailability(pOptions);
+    }
+    if (pOptions->random_car_choice) {
+        *pCar_index = PickARandomCar();
+        if (pIm_the_host_so_fuck_off && *pCar_index >= 0) {
+            gCar_details[*pCar_index].ownership = eCar_owner_someone;
+        }
+        return 1;
+    }
+    if (*pCar_index < 0) {
+        *pCar_index = PickARandomCar();
+        car_index = 0;
+        for (i = 0; i < gNumber_of_racers; i++) {
+            if (gCar_details[i].ownership < eCar_owner_not_allowed) {
+                gProgram_state.cars_available[car_index] = i;
+                car_index++;
+            }
+        }
+        gProgram_state.number_of_cars = car_index;
+    }
+    result = ChangeCar(1, pCar_index, pNet_game);
+    gNet_mode = eNet_mode_none;
+    if (pIm_the_host_so_fuck_off) {
+        gCar_details[*pCar_index].ownership = eCar_owner_someone;
     }
     return result;
 }

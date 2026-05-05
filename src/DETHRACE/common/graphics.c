@@ -1031,8 +1031,7 @@ void NewScreenWobble(double pAmplitude_x, double pAmplitude_y, double pPeriod) {
         if (gWobble_array[i].time_started == 0) {
             oldest_index = i;
             break;
-        }
-        if (gWobble_array[i].time_started < oldest_time) {
+        } else if (gWobble_array[i].time_started < oldest_time) {
             oldest_time = gWobble_array[i].time_started;
             oldest_index = i;
         }
@@ -1222,19 +1221,14 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
 
     time_diff = pTime - gMap_mode;
     BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
-    switch (gReal_graf_data_index) {
-    case 0:
-        break;
-    case 1:
+    if (gReal_graf_data_index != 0) {
         map_pos.v[0] = map_pos.v[0] * 2.f;
         map_pos.v[1] = map_pos.v[1] * 2.f + HIRES_Y_OFFSET;
-        break;
-    default:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
     }
     period = 256; // Must be power of 2
     colours[0] = pColour;
     colours[1] = OppositeColour(pColour);
+    offset = 0;
 
 #ifdef DETHRACE_3DFX_PATCH
     if (gBack_screen->type != BR_PMT_INDEX_8) {
@@ -1243,58 +1237,71 @@ void DrawMapBlip(tCar_spec* pCar, tU32 pTime, br_matrix34* pTrans, br_vector3* p
     }
 #endif
     BrMatrix34Mul(&car_in_map_space, pTrans, &gCurrent_race.map_transformation);
-    bearing = FastScalarArcTan2(car_in_map_space.m[2][0], car_in_map_space.m[2][1]);
-
     // Calculate in which of the 16 directions, the arrow is pointing to
-    bearing = (360.f - bearing + 12.25) / 22.5f;
-    arrow_index = ((int)bearing) % 16;
+    bearing = 360.f - FastScalarArcTan2(car_in_map_space.m[2][0], car_in_map_space.m[2][1]);
+    arrow_index = ((int)((int)(bearing + 12.25) / 22.5)) % 16;
 
     // The player's blip blinks, others are shown permanently
-    if (pCar->driver != eDriver_local_human || (period & pTime) != 0) {
-        for (i = 0; i < COUNT_OF(colours); i++) {
-            colour = colours[i];
-            point_count = gArrows[i][arrow_index & 0x3][0];
-            arrow_ptr = &gArrows[i][arrow_index & 0x3][1];
-            for (j = 0; j < point_count; j++, arrow_ptr += 2) {
+    if (pCar->driver != eDriver_local_human || (pTime & period)) {
+        for (j = 0; j < COUNT_OF(colours); j++) {
+            arrow_ptr = &gArrows[j][arrow_index & 0x3][0];
+            point_count = *arrow_ptr++;
+            for (i = 0; i < point_count; i++) {
                 if (arrow_index & 0x8) {
-                    x = -arrow_ptr[0];
-                    y = -arrow_ptr[1];
+                    x = -*arrow_ptr++;
+                    y = -*arrow_ptr++;
                 } else {
-                    x = arrow_ptr[0];
-                    y = arrow_ptr[1];
+                    x = *arrow_ptr++;
+                    y = *arrow_ptr++;
                 }
                 if (arrow_index & 0x4) {
-                    temp = x;
-                    x = -y;
-                    y = temp;
+                    temp = y;
+                    y = x;
+                    x = -temp;
                 }
-                BrPixelmapPixelSet(gBack_screen, map_pos.v[0] + x, map_pos.v[1] + y, colour);
+                BrPixelmapPixelSet(gBack_screen, map_pos.v[0] + x, map_pos.v[1] + y, colours[j]);
             }
         }
     }
     // Draw a rectangle around the fox
-    colour = colours[!!(pTime & period)];
+    colour = colours[pTime & period];
     if (gNet_mode != eNet_mode_none && gCurrent_net_game->type == eNet_game_type_foxy && gNet_players[gIt_or_fox].car == pCar) {
-        from_x = map_pos.v[0] - 8.f;
-        from_y = map_pos.v[1] - 8.f;
-        to_x = map_pos.v[0] + 8.f;
-        to_y = map_pos.v[1] + 8.f;
-        BrPixelmapLine(gBack_screen, from_x, from_y, to_x, from_y, colour);
-        BrPixelmapLine(gBack_screen, from_x, to_y, to_x, to_y, colour);
-        BrPixelmapLine(gBack_screen, from_x, from_y, from_x, to_y, colour);
-        BrPixelmapLine(gBack_screen, to_x, from_y, to_x, to_y, colour);
+        BrPixelmapLine(gBack_screen, map_pos.v[0] - 8.f, map_pos.v[1] - 8.f, map_pos.v[0] + 8.f, map_pos.v[1] - 8.f, colour);
+        BrPixelmapLine(gBack_screen, map_pos.v[0] - 8.f, map_pos.v[1] + 8.f, map_pos.v[0] + 8.f, map_pos.v[1] + 8.f, colour);
+        BrPixelmapLine(gBack_screen, map_pos.v[0] - 8.f, map_pos.v[1] - 8.f, map_pos.v[0] - 8.f, map_pos.v[1] + 8.f, colour);
+        BrPixelmapLine(gBack_screen, map_pos.v[0] + 8.f, map_pos.v[1] - 8.f, map_pos.v[0] + 8.f, map_pos.v[1] + 8.f, colour);
     }
     // To attract the player's attention, draw a rectangle around the player's position that decreases in size,
     if (time_diff <= 500 && pCar->driver == eDriver_local_human) {
         offset = ((500 - time_diff) * 70) / 500;
-        from_x = map_pos.v[0] - offset - .5f;
-        from_y = map_pos.v[1] - offset - .5f;
-        to_x = map_pos.v[0] + offset + .5f;
-        to_y = map_pos.v[1] + offset + .5f;
-        BrPixelmapLine(gBack_screen, from_x, from_y, to_x, from_y, colour);
-        BrPixelmapLine(gBack_screen, from_x, to_y, to_x, to_y, colour);
-        BrPixelmapLine(gBack_screen, from_x, from_y, from_x, to_y, colour);
-        BrPixelmapLine(gBack_screen, to_x, from_y, to_x, to_y, colour);
+        BrPixelmapLine(
+            gBack_screen,
+            (int)(map_pos.v[0] - .5) - offset,
+            (int)(map_pos.v[1] - .5) - offset,
+            (int)(map_pos.v[0] + .5) + offset,
+            (int)(map_pos.v[1] - .5) - offset,
+            colour);
+        BrPixelmapLine(
+            gBack_screen,
+            (int)(map_pos.v[0] - .5) - offset,
+            (int)(map_pos.v[1] + .5) + offset,
+            (int)(map_pos.v[0] + .5) + offset,
+            (int)(map_pos.v[1] + .5) + offset,
+            colour);
+        BrPixelmapLine(
+            gBack_screen,
+            (int)(map_pos.v[0] - .5) - offset,
+            (int)(map_pos.v[1] - .5) - offset,
+            (int)(map_pos.v[0] - .5) - offset,
+            (int)(map_pos.v[1] + .5) + offset,
+            colour);
+        BrPixelmapLine(
+            gBack_screen,
+            (int)(map_pos.v[0] + .5) + offset,
+            (int)(map_pos.v[1] - .5) - offset,
+            (int)(map_pos.v[0] + .5) + offset,
+            (int)(map_pos.v[1] + .5) + offset,
+            colour);
     }
 }
 
@@ -1800,25 +1807,21 @@ void FlashyMapCheckpoint(int pIndex, tU32 pTime) {
 
     if (pIndex >= 0 && pIndex < gCurrent_race.check_point_count && gRace_file_version > 0) {
         if (Flash(300, &last_flash, &flash_state)) {
-            switch (gGraf_data_index) {
-            case 0:
+            cp = &gCurrent_race.checkpoints[pIndex];
+            if (gGraf_data_index != 0) {
                 DimRectangle(gBack_screen,
-                    gCurrent_race.checkpoints[pIndex].map_left[0],
-                    gCurrent_race.checkpoints[pIndex].map_top[0],
-                    gCurrent_race.checkpoints[pIndex].map_right[0],
-                    gCurrent_race.checkpoints[pIndex].map_bottom[0],
+                    2 * cp->map_left[0],
+                    2 * cp->map_top[0] + HIRES_Y_OFFSET,
+                    2 * cp->map_right[0],
+                    2 * cp->map_bottom[0] + HIRES_Y_OFFSET,
                     0);
-                break;
-            case 1:
+            } else {
                 DimRectangle(gBack_screen,
-                    2 * gCurrent_race.checkpoints[pIndex].map_left[0],
-                    2 * gCurrent_race.checkpoints[pIndex].map_top[0] + HIRES_Y_OFFSET,
-                    2 * gCurrent_race.checkpoints[pIndex].map_right[0],
-                    2 * gCurrent_race.checkpoints[pIndex].map_bottom[0] + HIRES_Y_OFFSET,
+                    cp->map_left[0],
+                    cp->map_top[0],
+                    cp->map_right[0],
+                    cp->map_bottom[0],
                     0);
-                break;
-            default:
-                TELL_ME_IF_WE_PASS_THIS_WAY();
             }
         }
     }
@@ -2822,7 +2825,7 @@ int AllocateTransientBitmap(int pWidth, int pHeight, int pUser_data) {
         }
     }
     FatalError(kFatalError_FindSpareTransientBitmap);
-    return 0;
+    return -1;
 }
 
 // IDA: void __usercall DeallocateTransientBitmap(int pIndex@<EAX>)
@@ -2919,52 +2922,50 @@ void ProcessCursorGiblets(int pPeriod) {
     tCursor_giblet* gib;
 
     time_now = PDGetTotalTime();
-    for (i = 0; i < COUNT_OF(gCursor_giblets); i++) {
-        gib = &gCursor_giblets[i];
+    for (gib = gCursor_giblets, i = 0; i < COUNT_OF(gCursor_giblets); i++, gib++) {
         kill_the_giblet = 0;
-        if (gib->current_giblet == -1) {
-            continue;
-        }
-        if (!gib->landed && gib->e_t_a <= time_now) {
-            gib->landed = 1;
-            gib->the_speed = 0.f;
-        }
-        if (gib->landed) {
-            gib->giblet_change_period -= pPeriod / 2;
-            if (gib->giblet_change_period < 50) {
-                gib->giblet_change_period = 50;
+        if (gib->current_giblet != -1) {
+            if (!gib->landed && gib->e_t_a <= time_now) {
+                gib->landed = 1;
+                gib->the_speed = 0.f;
             }
-            if (gib->giblet_change_period <= time_now - gib->last_giblet_change) {
-                if (gCursor_giblet_sequences[gib->sequence_index][0] == gib->current_giblet) {
-                    gib->current_giblet = 1;
-                } else {
-                    gib->current_giblet++;
+            if (gib->landed) {
+                gib->giblet_change_period -= pPeriod / 2;
+                if (gib->giblet_change_period < 50) {
+                    gib->giblet_change_period = 50;
                 }
-                gib->last_giblet_change = time_now;
-            }
-            gib->y_coord += pPeriod * gib->the_speed / 1000.f;
-            if (gib->y_coord <= gGraf_data[gGraf_data_index].height) {
-                if (gib->the_speed < gGraf_specs[gGraf_spec_index].total_height * 160 / 480) {
-                    gib->the_speed += pPeriod * gGraf_specs[gGraf_spec_index].total_height * 60 / 480 / 1000.f;
+                if (gib->giblet_change_period <= time_now - gib->last_giblet_change) {
+                    if (gCursor_giblet_sequences[gib->sequence_index][0] == gib->current_giblet) {
+                        gib->current_giblet = 1;
+                    } else {
+                        gib->current_giblet++;
+                    }
+                    gib->last_giblet_change = time_now;
+                }
+                gib->y_coord += pPeriod * gib->the_speed / 1000.0;
+                if (gib->y_coord > gGraf_data[gGraf_data_index].height) {
+                    kill_the_giblet = 1;
+                } else {
+                    if (gib->the_speed < gGraf_specs[gGraf_spec_index].total_height * 160u / 480u) {
+                        gib->the_speed += (gGraf_specs[gGraf_spec_index].total_height * 60u / 480u) * (float)pPeriod / 1000.f;
+                    }
                 }
             } else {
-                kill_the_giblet = 1;
+                if (gib->y_speed < gGraf_specs[gGraf_spec_index].total_height * 160u / 480u) {
+                    gib->y_speed += (gGraf_specs[gGraf_spec_index].total_height * 60u / 480u) * (float)pPeriod / 1000.f * 2.f;
+                }
+                gib->x_coord += pPeriod * gib->x_speed / 1000.f;
+                gib->y_coord += pPeriod * gib->y_speed / 1000.f;
+                if (gib->x_coord < 0.f || gib->y_coord < 0.f || gib->x_coord >= gGraf_data[gGraf_data_index].width || gib->y_coord >= gGraf_data[gGraf_data_index].height) {
+                    kill_the_giblet = 1;
+                }
             }
-        } else {
-            if (gib->y_speed < gGraf_specs[gGraf_spec_index].total_height * 160 / 480) {
-                gib->y_speed += pPeriod * gGraf_specs[gGraf_spec_index].total_height * 60 / 480 / 1000.f * 2.f;
+            if (kill_the_giblet) {
+                gib->current_giblet = -1;
+                DeallocateTransientBitmap(gib->transient_index);
+            } else {
+                DrawCursorGiblet(gib);
             }
-            gib->x_coord += pPeriod * gib->x_speed / 1000.f;
-            gib->y_coord += pPeriod * gib->y_speed / 1000.f;
-            if (gib->x_coord < 0.f || gib->x_coord >= gGraf_data[gGraf_spec_index].width || gib->y_coord < 0.f || gib->y_coord >= gGraf_data[gGraf_spec_index].height) {
-                kill_the_giblet = 1;
-            }
-        }
-        if (kill_the_giblet) {
-            gib->current_giblet = -1;
-            DeallocateTransientBitmap(gib->transient_index);
-        } else {
-            DrawCursorGiblet(gib);
         }
     }
 }
@@ -3030,38 +3031,36 @@ int DoMouseCursor(void) {
     // GLOBAL: CARM95 0x520a18
     static int button_was_down;
 
-    period = 0;
-    this_call_time = PDGetTotalTime();
-    if (last_call_time == 0) {
-        period = 1000;
-    }
-    while (period <= 20) {
+    do {
         this_call_time = PDGetTotalTime();
-        period = this_call_time - last_call_time;
-        // added by dethrace to avoid 100% CPU usage
-        gHarness_platform.Sleep(1);
-    }
+        if (last_call_time != 0) {
+            period = this_call_time - last_call_time;
+        } else {
+            period = 1000;
+        }
+    } while (period <= 20);
     GetMousePosition(&x_coord, &y_coord);
-    mouse_moved = x_coord != gMouse_last_x_coord || y_coord != gMouse_last_y_coord;
+    mouse_moved = gMouse_last_x_coord != x_coord || gMouse_last_y_coord - y_coord != 0;
     button_is_down = EitherMouseButtonDown();
     cursor_offset = button_is_down ? 4 : 0;
     if (gMouse_in_use || mouse_moved) {
         gMouse_in_use = 1;
         if (gMouse_last_x_coord == x_coord) {
-            if (zero_count >= 5) {
+            if (zero_count++ >= 5) {
                 delta_x = 0;
             }
-            zero_count++;
         } else {
             zero_count = 0;
             delta_x = (x_coord - gMouse_last_x_coord) * 1000 / period;
         }
         if (delta_x < -10) {
             new_required = 0;
-        } else if (delta_x < 11) {
-            new_required = 2;
         } else {
-            new_required = 3;
+            if (delta_x > 10) {
+                new_required = 3;
+            } else {
+                new_required = 2;
+            }
         }
         if (new_required != required_cursor && this_call_time - last_required_change >= 200) {
             last_required_change = this_call_time;
@@ -3075,37 +3074,37 @@ int DoMouseCursor(void) {
             }
             last_cursor_change = PDGetTotalTime();
         }
-        giblet_chance = Chance(1.f + 20.f * (abs(x_coord - gMouse_last_x_coord) + abs(y_coord - gMouse_last_y_coord)) / (float)period, period);
+        giblet_chance = Chance(1.f + (abs(x_coord - gMouse_last_x_coord) + abs(y_coord - gMouse_last_y_coord)) / (float)period * 20.f, period);
         if (gProgram_state.sausage_eater_mode) {
             giblet_count = 0;
         } else {
             giblet_count = 6 * BooleanTo1Or0(button_is_down && !button_was_down) + BooleanTo1Or0(giblet_chance);
         }
-        for (; giblet_count != 0; giblet_count--) {
-            NewCursorGiblet(
-                x_coord + gCursor_gib_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
-                y_coord + gCursor_gib_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480,
-                ((float)(x_coord - gMouse_last_x_coord)) / period * 1000.f / 4.f,
-                ((float)(y_coord - gMouse_last_y_coord)) / period * 1000.f / 3.f,
+        while (giblet_count-- != 0) {
+            giblet_index = NewCursorGiblet(
+                x_coord + gCursor_gib_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640u,
+                y_coord + gCursor_gib_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480u,
+                ((float)(x_coord - gMouse_last_x_coord)) / period * 1000.0 / 4.0,
+                ((float)(y_coord - gMouse_last_y_coord)) / period * 1000.0 / 3.0,
                 (button_is_down && !button_was_down) ? 50 : 400);
         }
         ProcessCursorGiblets(period);
         SaveTransient(gCursor_transient_index,
-            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
-            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480);
+            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640u,
+            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480u);
         DRPixelmapRectangleMaskedCopy(gBack_screen,
-            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640,
-            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480,
+            x_coord - gCursor_x_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_width / 640u,
+            y_coord - gCursor_y_offsets[gCurrent_cursor_index + cursor_offset] * gGraf_specs[gGraf_spec_index].total_height / 480u,
             gCursors[gCurrent_cursor_index + cursor_offset],
             0,
             0,
             gCursors[gCurrent_cursor_index + cursor_offset]->width,
             gCursors[gCurrent_cursor_index + cursor_offset]->height);
     }
-    last_call_time = this_call_time;
-    button_was_down = button_is_down;
     gMouse_last_x_coord = x_coord;
     gMouse_last_y_coord = y_coord;
+    button_was_down = button_is_down;
+    last_call_time = this_call_time;
     return mouse_moved;
 }
 
@@ -3216,8 +3215,8 @@ void InitDRFonts(void) {
     int i;
 
     for (i = 0; i < 21; i++) {
-        gFonts[i].file_read_once = 0;
         gFonts[i].images = NULL;
+        gFonts[i].file_read_once = 0;
     }
 }
 
@@ -3432,8 +3431,7 @@ tShadow_level GetShadowLevel(void) {
 // FUNCTION: CARM95 0x004ba15d
 void ToggleShadow(void) {
 
-    gShadow_level++;
-    if (gShadow_level == eShadow_everyone) {
+    if (gShadow_level++ == eShadow_everyone) {
         gShadow_level = eShadow_none;
     }
     switch (gShadow_level) {
@@ -3449,8 +3447,6 @@ void ToggleShadow(void) {
     case eShadow_everyone:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ShadowUnderAllCars));
         break;
-    default:
-        return;
     }
 }
 
