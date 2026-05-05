@@ -168,7 +168,7 @@ char* gFont_names[21] = {
 
 // GLOBAL: CARM95 0x005201a0
 br_colour gRGB_colours[9] = {
-    BR_COLOUR_RGB(0x00 ,0x00, 0x00),
+    BR_COLOUR_RGB(0x00, 0x00, 0x00),
     BR_COLOUR_RGB(0xff, 0xff, 0xff),
     BR_COLOUR_RGB(0xff, 0x00, 0x00),
     BR_COLOUR_RGB(0x00, 0xff, 0x00),
@@ -3188,9 +3188,8 @@ void LoadFont(int pFont_ID) {
             gFonts[pFont_ID].offset = GetAnInt(f);
             gFonts[pFont_ID].num_entries = GetAnInt(f);
             if (gFonts[pFont_ID].width <= 0) {
-                the_size = pFont_ID;
                 for (i = 0; i < gFonts[pFont_ID].num_entries; i++) {
-                    gFonts[the_size].width_table[i] = GetAnInt(f);
+                    gFonts[pFont_ID].width_table[i * 1] = GetAnInt(f);
                 }
             }
             fclose(f);
