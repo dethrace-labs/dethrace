@@ -73,21 +73,24 @@ void PlaySmackerFile(char* pSmack_name) {
         StopMusic();
         FadePaletteDown();
         ClearEntireScreen();
-        SmackSoundUseDirectSound(NULL);
+        ((int(__stdcall*)(void*))SmackSoundUseDirectSound)(NULL);
         br_colours_ptr = gCurrent_palette->pixels;
         PathCat(the_path, gApplication_path, "CUTSCENE");
         PathCat(the_path, the_path, pSmack_name);
         dr_dprintf("Trying to open smack file '%s'", the_path);
-        smk = SmackOpen(the_path, SMACKTRACKS, SMACKAUTOEXTRA);
+        smk = ((Smack*(__stdcall*)(const char*, unsigned int, unsigned int))SmackOpen)(the_path, SMACKTRACKS, SMACKAUTOEXTRA);
         if (smk == NULL) {
             dr_dprintf("Unable to open smack file - attempt to load smack from CD...");
             if (GetCDPathFromPathsTxtFile(the_path)) {
-                strcat(the_path, gDir_separator);
+                len = strlen(the_path);
+                if (len != 0 && the_path[len - 1] != gDir_separator[0]) {
+                    strcat(the_path, gDir_separator);
+                }
                 strcat(the_path, "DATA");
                 PathCat(the_path, the_path, "CUTSCENE");
                 PathCat(the_path, the_path, pSmack_name);
                 if (PDCheckDriveExists(the_path)) {
-                    smk = SmackOpen(the_path, SMACKTRACKS, SMACKAUTOEXTRA);
+                    smk = ((Smack*(__stdcall*)(const char*, unsigned int, unsigned int))SmackOpen)(the_path, SMACKTRACKS, SMACKAUTOEXTRA);
                 }
             } else {
                 dr_dprintf("Can't get CD directory name");
@@ -104,8 +107,7 @@ void PlaySmackerFile(char* pSmack_name) {
                         br_colours_ptr[j] = (smack_colours_ptr[j * 3] << 16) | smack_colours_ptr[j * 3 + 2] | (smack_colours_ptr[j * 3 + 1] << 8);
                     }
 
-                    // TOOD: remove the commented-out line below when smk->NewPalette is set correctly per-frame
-                    // memset(gBack_screen->pixels, 0, gBack_screen->row_bytes * gBack_screen->height);
+                    memset(gBack_screen->pixels, 0, gBack_screen->row_bytes * gBack_screen->height);
                     DRSetPalette(gCurrent_palette);
                     PDScreenBufferSwap(0);
                     EnsurePaletteUp();
