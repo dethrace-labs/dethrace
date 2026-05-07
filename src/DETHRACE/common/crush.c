@@ -669,17 +669,16 @@ void CheckPiledriverBonus(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3
 // FUNCTION: CARM95 0x004c13e0
 tImpact_location CalcModifiedLocation(tCar_spec* pCar) {
 
-    if (pCar->last_impact_location != eImpact_left && pCar->last_impact_location != eImpact_right && pCar->last_impact_location != eImpact_top && pCar->last_impact_location != eImpact_bottom) {
-        return pCar->last_impact_location;
+    if (pCar->last_impact_location == eImpact_left || pCar->last_impact_location == eImpact_right || pCar->last_impact_location == eImpact_top || pCar->last_impact_location == eImpact_bottom) {
+        if (pCar->last_col_prop_z < 0.25) {
+            return eImpact_front;
+        } else {
+            if (pCar->last_col_prop_z > 0.75) {
+                return eImpact_back;
+            }
+        }
     }
-    if (pCar->last_col_prop_z < 0.25) {
-        return eImpact_front;
-    }
-    if (pCar->last_col_prop_z > 0.75) {
-        return eImpact_back;
-    } else {
-        return pCar->last_impact_location;
-    }
+    return pCar->last_impact_location;
 }
 
 // IDA: void __usercall DoPratcamHit(br_vector3 *pHit_vector@<EAX>)
