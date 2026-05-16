@@ -966,18 +966,20 @@ void DoFancyHeadup(int pIndex) {
     int temp_ref;
 
     the_time = GetTotalTime();
-    if (!gMap_mode && (gLast_fancy_index < 0 || the_time - gLast_fancy_time > 2000 || gLast_fancy_index <= pIndex)) {
-        temp_ref = NewImageHeadupSlot(eHeadupSlot_fancies, 0, 2000, pIndex + 10);
-        if (temp_ref >= 0) {
-            gLast_fancy_headup = temp_ref;
-            gLast_fancy_index = pIndex;
-            gLast_fancy_time = the_time;
-            the_headup = &gHeadups[temp_ref];
-            the_headup->type = eHeadup_fancy;
-            the_headup->data.fancy_info.offset = (the_headup->data.image_info.image->width + gBack_screen->width) / 2;
-            the_headup->data.fancy_info.end_offset = -the_headup->data.fancy_info.offset;
-            the_headup->data.fancy_info.fancy_stage = eFancy_stage_incoming;
-            the_headup->data.fancy_info.shear_amount = the_headup->data.image_info.image->height;
+    if (!gMap_mode) {
+        if (!(gLast_fancy_index >= 0 && the_time - gLast_fancy_time <= 2000 && gLast_fancy_index > pIndex)) {
+            temp_ref = NewImageHeadupSlot(eHeadupSlot_fancies, 0, 2000, pIndex + 10);
+            if (temp_ref >= 0) {
+                gLast_fancy_headup = temp_ref;
+                gLast_fancy_index = pIndex;
+                gLast_fancy_time = the_time;
+                the_headup = &gHeadups[gLast_fancy_headup];
+                the_headup->type = eHeadup_fancy;
+                the_headup->data.fancy_info.offset = (the_headup->data.image_info.image->width + gBack_screen->width) / 2;
+                the_headup->data.fancy_info.end_offset = -the_headup->data.fancy_info.offset;
+                the_headup->data.fancy_info.fancy_stage = eFancy_stage_incoming;
+                the_headup->data.fancy_info.shear_amount = (the_headup->data.image_info.image->height << 16) >> 16;
+            }
         }
     }
 }
