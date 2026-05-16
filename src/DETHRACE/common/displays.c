@@ -363,15 +363,13 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
 void DimAFewBits(void) {
     int i;
 
-    int dim_index; // Added
-    dim_index = gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0;
-    for (i = 0; i < gProgram_state.current_car.dim_count[dim_index]; i++) {
+    for (i = 0; i < gProgram_state.current_car.dim_count[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0]; i++) {
         DimRectangle(
             gBack_screen,
-            gProgram_state.current_car.dim_left[dim_index][i],
-            gProgram_state.current_car.dim_top[dim_index][i],
-            gProgram_state.current_car.dim_right[dim_index][i],
-            gProgram_state.current_car.dim_bottom[dim_index][i],
+            gProgram_state.current_car.dim_left[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
+            gProgram_state.current_car.dim_top[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
+            gProgram_state.current_car.dim_right[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
+            gProgram_state.current_car.dim_bottom[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
             1);
     }
 }
