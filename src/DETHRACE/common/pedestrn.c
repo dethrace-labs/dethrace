@@ -1353,7 +1353,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
         && pPedestrian->current_action != pPedestrian->fatal_ground_impact_action
         && pPedestrian->current_action != pPedestrian->giblets_action) {
         the_action = &pPedestrian->action_list[pPedestrian->current_action];
-        if (0 == pPedestrian->done_initial) {
+        if (pPedestrian->done_initial) {
             terminal_speed = the_action->looping_speed;
         } else {
             terminal_speed = the_action->initial_speed;
@@ -1368,7 +1368,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
         if (!pPedestrian->irreversable
             && pDanger_level != 0.f
             && (pDanger_direction->v[Z] * pPedestrian->direction.v[Z]
-                    + pPedestrian->direction.v[X] * pDanger_direction->v[X])
+                   + pPedestrian->direction.v[X] * pDanger_direction->v[X])
                     + pPedestrian->direction.v[Y] * pDanger_direction->v[Y]
                 > 0.f) {
             pPedestrian->instruction_direction = -pPedestrian->instruction_direction;
@@ -1483,8 +1483,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                                 if (pPedestrian->mid_air) {
                                     BurstPedestrian(pPedestrian, pPedestrian->falling_speed * 3.f, 0);
                                 }
-                            }
-                            if (!pPedestrian->mid_air && pPedestrian->hit_points < damage) {
+                            } else if (pPedestrian->hit_points < damage) {
                                 ChangeActionTo(pPedestrian, pPedestrian->non_fatal_ground_impact_action, 1);
                             }
                         }
