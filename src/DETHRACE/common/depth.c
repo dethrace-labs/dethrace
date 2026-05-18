@@ -591,8 +591,8 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     hori_sky = 2 * BrRadianToAngle(atan2(tan_half_hori_sky, 1.0f));
     repetitions = (int)(1.f / BrFixedToFloat(hori_sky) + 0.5f);
     hori_sky = BR_ANGLE_DEG(360) / repetitions;
-    vert_sky = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
-    hshift = -BrFixedToFloat(vert_sky) / BrFixedToFloat(hori_sky);
+    yaw = BrRadianToAngle(atan2(pCamera_to_world->m[2][0], pCamera_to_world->m[2][2]));
+    hshift = -BrFixedToFloat(yaw) / BrFixedToFloat(hori_sky);
 
     src_x = col_map->width * hshift;
     while (src_x < 0) {
@@ -609,8 +609,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     top_y = -hori_y - hori_pixels;
 
     while (dst_x < pRender_buffer->width) {
-        dx = col_map->width - src_x;
-        dx = pRender_buffer->width - dst_x < dx ? pRender_buffer->width - dst_x : dx;
+        dx = pRender_buffer->width - dst_x < col_map->width - src_x ? pRender_buffer->width - dst_x : col_map->width - src_x;
         DRPixelmapRectangleCopy(pRender_buffer, dst_x - pRender_buffer->origin_x, top_y, col_map, src_x - col_map->origin_x, -col_map->origin_y, dx, col_map->height);
         src_x = 0;
         dst_x += dx;
