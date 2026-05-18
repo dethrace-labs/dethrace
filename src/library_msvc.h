@@ -7,7 +7,7 @@
 // sprintf
 
 // LIBRARY: CARM95 0x004eaa10
-// memcpy
+// memmove
 
 // LIBRARY: CARM95 0x004eabe0
 // fclose
@@ -216,8 +216,8 @@
 // LIBRARY: CARM95 0x004F7440
 // __loctotime_t
 
-// LIBRARY: CARM95 0x004EA9E0
-// $$$00001(1)
+// LIBRARY: CARM95 0x004EA9E0 SYMBOL
+// __chkstk
 
 // GLOBAL: CARM95 0x0052D39C
 // __mb_cur_max
