@@ -1334,11 +1334,11 @@ void SelectFace(br_vector3* pDir) {
 
     if (gSelected_model != NULL && gSelected_model->nfaces == gNfaces) {
         for (i = 0; i < gSelected_model->nfaces; i++) {
-            if (gSelected_model->faces[(unsigned short)i].material == gSub_material) {
-                gSelected_model->faces[(unsigned short)i].material = gReal_material;
+            if (gSelected_model->faces[i].material == gSub_material) {
+                gSelected_model->faces[i].material = gReal_material;
             }
         }
-        BrModelUpdate(gSelected_model, 0x7fff);
+        BrModelUpdate(gSelected_model, BR_MODU_ALL);
     }
 
     gSelected_model = NULL;
@@ -1357,10 +1357,10 @@ void SelectFace(br_vector3* pDir) {
     gSelected_model = gNearest_model;
     gNfaces = gSelected_model->nfaces;
     gSub_material->colour_map = gReal_material->colour_map;
-    gSub_material->flags = gReal_material->flags | 0x5;
-    BrMaterialUpdate(gSub_material, 0x7fff);
+    gSub_material->flags = gReal_material->flags | BR_MODF_GENERATE_TAGS | BR_MODF_DONT_WELD;
+    BrMaterialUpdate(gSub_material, BR_MATU_ALL);
     SetFacesGroup(gNearest_face);
-    BrModelUpdate(gSelected_model, 0x7fff);
+    BrModelUpdate(gSelected_model, BR_MODU_ALL);
 }
 
 // IDA: void __usercall GetTilingLimits(br_vector2 *min@<EAX>, br_vector2 *max@<EDX>)
