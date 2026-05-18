@@ -338,19 +338,11 @@ void MungeSkyModel(br_actor* pCamera, br_model* pModel) {
     }
     min_angle = -gSky_image_underground;
     angle_range = gSky_image_height;
-<<<<<<< HEAD
-    nbands = 18;
-    for (band = 0; (int)band < (int)nbands; band++) {
-        vertex = 4 * band + 8;
-        pModel->vertices[vertex].p.v[1] = sin(BrAngleToRadian(min_angle + angle_range * band / nbands)) * sky_distance;
-        pModel->vertices[vertex].p.v[2] = -cos(BrAngleToRadian(min_angle + angle_range * band / nbands)) * sky_distance;
-=======
     for (band = 0; band < 18; band++) {
         angle = min_angle + angle_range * band / 18;
         vertex = 4 * (band + 2);
         pModel->vertices[vertex].p.v[1] = sin(BrAngleToRadian(angle)) * sky_distance;
         pModel->vertices[vertex].p.v[2] = (-cos(BrAngleToRadian(angle))) * sky_distance;
->>>>>>> main
     }
     min_angle = gSky_image_height - gSky_image_underground;
     angle_range = half_diag_fov + BR_ANGLE_DEG(90) - min_angle;
