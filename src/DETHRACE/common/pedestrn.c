@@ -262,9 +262,7 @@ void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, 
 // IDA: int __usercall ActorIsPedestrian@<EAX>(br_actor *pActor@<EAX>)
 // FUNCTION: CARM95 0x00455870
 int ActorIsPedestrian(br_actor* pActor) {
-    return pActor->model != NULL && 
-           pActor->type_data != NULL && 
-           ActorToPedestrianData(pActor)->magic_number == PEDESTRIAN_MAGIC;
+    return pActor->model != NULL && pActor->type_data != NULL && ActorToPedestrianData(pActor)->magic_number == PEDESTRIAN_MAGIC;
 }
 
 // IDA: br_scalar __usercall PedHeightFromActor@<ST0>(br_actor *pActor@<EAX>)
@@ -959,14 +957,13 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
         if (heading_difference <= the_action->sequences[i].max_bearing) {
             the_sequence = the_action->sequences[i].sequence_index;
             if (pPedestrian->current_sequence != the_sequence) {
-                // equivalent but doesn't produce matching asm
                 sequence_ptr = &pPedestrian->sequences[the_sequence];
                 current_looping = pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start;
                 if (pAction_changed || current_looping > pPedestrian->current_frame) {
                     pPedestrian->current_frame = -1;
                     pPedestrian->done_initial = 0;
                 } else if (pPedestrian->fatal_car_impact_action != pPedestrian->current_action
-                    && (pPedestrian->fatal_ground_impact_action != pPedestrian->current_action)
+                    && pPedestrian->fatal_ground_impact_action != pPedestrian->current_action
                     && pPedestrian->giblets_action != pPedestrian->current_action) {
                     pPedestrian->current_frame = pPedestrian->current_frame + sequence_ptr->looping_frame_start - current_looping - 1;
                     pPedestrian->done_initial = 1;
