@@ -3679,10 +3679,10 @@ void ShowPedPaths(void) {
                 gPedestrian_array[i].first_instruction);
         }
     }
-    if (gPath_actor->render_style == BR_RSTYLE_FACES) {
-        gPath_actor->render_style = BR_RSTYLE_NONE;
-    } else {
+    if (gPath_actor->render_style != BR_RSTYLE_FACES) {
         gPath_actor->render_style = BR_RSTYLE_FACES;
+    } else {
+        gPath_actor->render_style = BR_RSTYLE_NONE;
     }
 }
 
