@@ -262,9 +262,7 @@ void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, 
 // IDA: int __usercall ActorIsPedestrian@<EAX>(br_actor *pActor@<EAX>)
 // FUNCTION: CARM95 0x00455870
 int ActorIsPedestrian(br_actor* pActor) {
-    return pActor->model != NULL && 
-           pActor->type_data != NULL && 
-           ActorToPedestrianData(pActor)->magic_number == PEDESTRIAN_MAGIC;
+    return pActor->model != NULL && pActor->type_data != NULL && ActorToPedestrianData(pActor)->magic_number == PEDESTRIAN_MAGIC;
 }
 
 // IDA: br_scalar __usercall PedHeightFromActor@<ST0>(br_actor *pActor@<EAX>)
