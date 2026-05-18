@@ -349,10 +349,11 @@ int DRS3LoadSound(tS3_sound_id pThe_sound) {
 // FUNCTION: CARM95 0x004648af
 int DRS3ReleaseSound(tS3_sound_id pThe_sound) {
 
-    if (gSound_enabled == 0) {
+    if (gSound_enabled) {
+        return S3ReleaseSound(pThe_sound);
+    } else {
         return 0;
     }
-    return S3ReleaseSound(pThe_sound);
 }
 
 // IDA: void __cdecl DRS3Service()
@@ -367,7 +368,11 @@ void DRS3Service(void) {
 // IDA: int __usercall DRS3OutletSoundsPlaying@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
 // FUNCTION: CARM95 0x0046493a
 int DRS3OutletSoundsPlaying(tS3_outlet_ptr pOutlet) {
-    NOT_IMPLEMENTED();
+    if (gSound_enabled) {
+        return S3OutletSoundsPlaying(pOutlet);
+    } else {
+        return 0;
+    }
 }
 
 // IDA: int __usercall DRS3SoundStillPlaying@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
@@ -445,12 +450,14 @@ void ToggleSoundEnable(void) {
 // IDA: void __cdecl SoundService()
 // FUNCTION: CARM95 0x00464adc
 void SoundService(void) {
+    tU32 this_service;
     br_matrix34 mat;
 
     if (gSound_enabled && !gServicing_sound) {
         gServicing_sound = 1;
-        gLast_sound_service = PDGetTotalTime();
-        if (gCDA_tag) {
+        this_service = PDGetTotalTime();
+        gLast_sound_service = this_service;
+        if (gCDA_is_playing) {
             if (!S3IsCDAPlaying()) {
                 StopMusic();
                 StartMusic();
@@ -733,15 +740,11 @@ int GetIndexFromOutlet(tS3_outlet_ptr pOutlet) {
 int DRS3StartCDA(tS3_sound_id pCDA_id) {
 
     if (!gCD_is_disabled && gMusic_available) {
-        if (!gCDA_is_playing && !gCDA_tag) {
+        if (!gCDA_tag && !gCDA_is_playing) {
             if (S3CDAEnabled()) {
                 S3StopOutletSound(gMusic_outlet);
                 if (gSound_enabled) {
-                    if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
-                        S3Service(1, 0);
-                    } else {
-                        S3Service(0, 0);
-                    }
+                    S3Service(gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0, 0);
 #if defined(DETHRACE_FIX_BUGS)
                     int random_track = pCDA_id == 9999;
                     int retries_remaining = 5;
@@ -768,8 +771,8 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
                     // Initial CD music volume was not set correctly
                     DRS3SetOutletVolume(gMusic_outlet, 42 * gProgram_state.music_volume);
 #endif
-                    gCDA_is_playing = gCDA_tag != 0;
-                    if (gCDA_tag == 0) {
+                    gCDA_is_playing = gCDA_tag;
+                    if (gCDA_is_playing == 0) {
                         gCD_is_disabled = 1;
                         S3DisableCDA();
                     }
@@ -785,10 +788,10 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
 // FUNCTION: CARM95 0x00465848
 int DRS3StopCDA(void) {
 
-    if (gMusic_available && gCDA_tag != 0) {
-        S3StopSound(gCDA_tag);
-        gCDA_is_playing = 0;
+    if (gMusic_available && gCDA_is_playing != 0) {
+        S3StopSound(gCDA_is_playing);
         gCDA_tag = 0;
+        gCDA_is_playing = 0;
     }
     return gCDA_is_playing;
 }
