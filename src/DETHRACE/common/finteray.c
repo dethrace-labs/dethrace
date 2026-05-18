@@ -753,7 +753,7 @@ int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
     BrMatrix34ApplyP(&bnds->real_bounds.min, &bnds->original_bounds.min, bnds->mat);
     BrVector3Copy(&bnds->real_bounds.max, &bnds->real_bounds.min);
     for (j = 0; j < 3; j++) {
-        BrVector3Scale(&c[j], (br_vector3*)&bnds->mat->m[j][0], a.v[j]);
+        BrVector3Scale(&c[j], (br_vector3*)bnds->mat->m[j], a.v[j]);
     }
     for (j = 0; j < 3; j++) {
         bnds->real_bounds.min.v[j] += ((float)(c[2].v[j] < 0.f) * c[2].v[j]
