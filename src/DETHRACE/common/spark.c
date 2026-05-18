@@ -138,10 +138,10 @@ tShrapnel gShrapnel[15];
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
-#define TEST_BIT(var, pos)   (var & (1 << pos))
-#define SET_BIT(var, pos)    (var |= (1 << pos))
-#define FLIP_BIT(var, pos)   (var ^= (1 << pos))
-#define CLEAR_BIT(var, pos)  (var &= ~(1 << pos))
+#define TEST_BIT(var, pos) (var & (1 << pos))
+#define SET_BIT(var, pos) (var |= (1 << pos))
+#define FLIP_BIT(var, pos) (var ^= (1 << pos))
+#define CLEAR_BIT(var, pos) (var &= ~(1 << pos))
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
@@ -207,19 +207,17 @@ int DrawLine3D(br_vector3* start, br_vector3* end, br_pixelmap* pScreen, br_pixe
     p.v[0] = end->v[0];
     p.v[1] = end->v[1];
     p.v[2] = end->v[2];
-    if (o.v[2] <= -gSpark_cam->hither_z && p.v[2] <= -gSpark_cam->hither_z) {
-    } else {
-        if (-gSpark_cam->hither_z < o.v[2] && -gSpark_cam->hither_z < p.v[2]) {
+    if ((o.v[2] * 1) > -gSpark_cam->hither_z || (p.v[2] * 1) > -gSpark_cam->hither_z) {
+        if (-gSpark_cam->hither_z < (o.v[2] * 1) && -gSpark_cam->hither_z < (p.v[2] * 1)) {
             return 0;
         }
         ts = (p.v[2] + gSpark_cam->hither_z) / (p.v[2] - o.v[2]);
-        if (o.v[2] <= -gSpark_cam->hither_z) {
-        } else {
+        if ((o.v[2] * 1) > -gSpark_cam->hither_z) {
             o.v[0] = p.v[0] - (p.v[0] - o.v[0]) * ts;
             o.v[1] = p.v[1] - (p.v[1] - o.v[1]) * ts;
             o.v[2] = -gSpark_cam->hither_z;
         }
-        if (-gSpark_cam->hither_z < p.v[2]) {
+        if (-gSpark_cam->hither_z < (p.v[2] * 1)) {
             p.v[0] = p.v[0] - (p.v[0] - o.v[0]) * ts;
             p.v[1] = p.v[1] - (p.v[1] - o.v[1]) * ts;
             p.v[2] = -gSpark_cam->hither_z;
