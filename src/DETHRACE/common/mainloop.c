@@ -182,8 +182,10 @@ void MungeHeadups(void) {
     int oppo_count;
     tU32 the_time;
     float bearing;
+#ifdef DETHRACE_3DFX_PATCH
     br_material* nearby;
     tPixelmap_user_data* user;
+#endif
     // GLOBAL: CARM95 0x53a1ac
     static tU32 last_rattle_time;
 
@@ -191,18 +193,17 @@ void MungeHeadups(void) {
     gMr_odo += gFrame_period * gProgram_state.current_car.speedo_speed * WORLD_SCALE / 1600.0;
     if (gInfo_on) {
         bearing = 360.0f - FastScalarArcTan2(gCamera_to_world.m[0][2], gCamera_to_world.m[2][2]);
-        if (gInfo_mode == 0) {
+        if (gInfo_mode != 0) {
             sprintf(
                 the_text,
-                "%d.%d (%.3f, %.3f, %.3f) %.0f, %.0f, MILES=%.2f",
-                gFrame_rate / 10,
-                gFrame_rate % 10,
-                gSelf->t.t.translate.t.v[0],
-                gSelf->t.t.translate.t.v[1],
-                gSelf->t.t.translate.t.v[2],
-                gCamera_to_horiz_angle,
-                bearing,
-                gMr_odo);
+                "P'cam: curr=%d, ambi=%d, pend=%d Car: c=%+.3f, a=%+.3f, b=%+.3f",
+                PratcamGetCurrent(),
+                PratcamGetAmbient(),
+                PratcamGetPending(),
+                gCar_to_view->curvature,
+                gCar_to_view->acc_force,
+                gCar_to_view->brake_force);
+
         } else {
 #ifdef DETHRACE_3DFX_PATCH
             if (gInfo_mode == 2) {
@@ -230,15 +231,17 @@ void MungeHeadups(void) {
             } else
 #endif
             {
-            sprintf(
-                the_text,
-                "P'cam: curr=%d, ambi=%d, pend=%d Car: c=%+.3f, a=%+.3f, b=%+.3f",
-                PratcamGetCurrent(),
-                PratcamGetAmbient(),
-                PratcamGetPending(),
-                gCar_to_view->curvature,
-                gCar_to_view->acc_force,
-                gCar_to_view->brake_force);
+                sprintf(
+                    the_text,
+                    "%d.%d (%.3f, %.3f, %.3f) %.0f, %.0f, MILES=%.2f",
+                    gFrame_rate / 10,
+                    gFrame_rate % 10,
+                    gSelf->t.t.translate.t.v[0],
+                    gSelf->t.t.translate.t.v[1],
+                    gSelf->t.t.translate.t.v[2],
+                    gCamera_to_horiz_angle,
+                    bearing,
+                    gMr_odo);
             }
         }
         ChangeHeadupText(gProgram_state.frame_rate_headup, the_text);
