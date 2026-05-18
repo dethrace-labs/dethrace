@@ -797,10 +797,8 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
         pCar->last_col_prop_z = proportion_z;
     }
 
-    if (energy_magnitude != 0.0f) {
-        if (pCar->invulnerable) {
-            return;
-        }
+    if (energy_magnitude == 0.0f || pCar->invulnerable) {
+    } else {
         if (!pWas_hitting_a_car && impact_location == eImpact_bottom) {
             energy_magnitude = energy_magnitude / 2.0f;
         }
@@ -858,7 +856,6 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
                     }
                     break;
                 }
-
             }
             if (result) {
                 for (j = 0, the_effect = the_clause->effects; j < the_clause->effect_count; j++, the_effect++) {
