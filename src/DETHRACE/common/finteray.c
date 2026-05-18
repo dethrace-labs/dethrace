@@ -683,9 +683,7 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
 
     i = 0;
     track_spec = &gProgram_state.track_spec;
-    b.v[0] = bnds->original_bounds.min.v[0] + bnds->original_bounds.max.v[0];
-    b.v[1] = bnds->original_bounds.min.v[1] + bnds->original_bounds.max.v[1];
-    b.v[2] = bnds->original_bounds.min.v[2] + bnds->original_bounds.max.v[2];
+    BrVector3Add(&b, &bnds->original_bounds.min, &bnds->original_bounds.max);
     BrVector3Scale(&a, &b, .5f);
     BrMatrix34ApplyP(&bnds->box_centre, &a, bnds->mat);
     BrVector3Sub(&a, &bnds->original_bounds.max, &bnds->original_bounds.min);
