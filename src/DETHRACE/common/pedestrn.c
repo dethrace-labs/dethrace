@@ -2566,14 +2566,16 @@ int GetPedPosition(int pIndex, br_vector3* pPos) {
             && pedestrian->current_action != pedestrian->giblets_action) {
             BrVector3Copy(pPos, &pedestrian->pos);
             return 1;
+        } else {
+            return 0;
         }
-        return 0;
     } else {
         if (pedestrian->hit_points != -100) {
             BrVector3Copy(pPos, &pedestrian->pos);
             return -1;
+        } else {
+            return 0;
         }
-        return 0;
     }
 }
 
