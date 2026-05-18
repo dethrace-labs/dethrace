@@ -138,10 +138,10 @@ tShrapnel gShrapnel[15];
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
-#define TEST_BIT(var, pos)   (var & (1 << pos))
-#define SET_BIT(var, pos)    (var |= (1 << pos))
-#define FLIP_BIT(var, pos)   (var ^= (1 << pos))
-#define CLEAR_BIT(var, pos)  (var &= ~(1 << pos))
+#define TEST_BIT(var, pos) (var & (1 << pos))
+#define SET_BIT(var, pos) (var |= (1 << pos))
+#define FLIP_BIT(var, pos) (var ^= (1 << pos))
+#define CLEAR_BIT(var, pos) (var &= ~(1 << pos))
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
@@ -2473,15 +2473,11 @@ void ConditionalSmokeColumn(tCar_spec* pCar, int pDamage_index, int pColour) {
     if (pCar->num_smoke_columns > 0) {
         for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
             if (gSmoke_column[i].car == pCar) {
-                if (TEST_BIT(gColumn_flags, i)) {
-                    if (gSmoke_column[i].colour <= pColour) {
-                        if (gSmoke_column[i].lifetime != 0) {
-                            return;
-                        } else {
-                        }
-                    }
+                if (TEST_BIT(gColumn_flags, i) && gSmoke_column[i].colour <= pColour && gSmoke_column[i].lifetime != 0) {
+                    return;
+                } else {
+                    gSmoke_column[i].lifetime = 2000;
                 }
-                gSmoke_column[i].lifetime = 2000;
             }
         }
     }
