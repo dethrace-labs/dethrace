@@ -168,7 +168,7 @@ char* gFont_names[21] = {
 
 // GLOBAL: CARM95 0x005201a0
 br_colour gRGB_colours[9] = {
-    BR_COLOUR_RGB(0x00 ,0x00, 0x00),
+    BR_COLOUR_RGB(0x00, 0x00, 0x00),
     BR_COLOUR_RGB(0xff, 0xff, 0xff),
     BR_COLOUR_RGB(0xff, 0x00, 0x00),
     BR_COLOUR_RGB(0x00, 0xff, 0x00),
@@ -1378,7 +1378,7 @@ void TryThisEdge(tCar_spec* pCar, br_vector3* pLight, int pIndex_1, br_scalar pS
 br_scalar DistanceFromPlane(br_vector3* pPos, br_scalar pA, br_scalar pB, br_scalar pC, br_scalar pD) {
     br_vector3 normal;
 
-    return fabs(((pPos->v[1] * pB + pPos->v[0] * pA) + pPos->v[2] * pC + pD) / ((pA * pA - -(pC * pC)) + pB * pB));
+    return fabs(((pPos->v[1] * pB + pPos->v[0] * pA) + pPos->v[2] * pC + pD) / ((pA * pA + (pC * pC)) + pB * pB));
 }
 
 // IDA: void __cdecl DisableLights()
