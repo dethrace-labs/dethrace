@@ -147,7 +147,7 @@ void CalculateFrameRate(void) {
 void LoseOldestWastedMassage(void) {
     int i;
 
-    for (i = 1; i <= gQueued_wasted_massages_count - 1; i++) {
+    for (i = 1; i < gQueued_wasted_massages_count; i++) {
         gQueued_wasted_massages[i - 1] = gQueued_wasted_massages[i];
     }
     gQueued_wasted_massages_count--;
