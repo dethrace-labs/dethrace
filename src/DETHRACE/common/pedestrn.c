@@ -1582,16 +1582,12 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
     tPed_hit_position result;
 
     result = ePed_hit_unknown;
-    if (fabs(pCar->speed) >= fabs(pPedestrian->current_speed)) {
-        car_plus_ped.v[X] = fabs(pCar->speed) * pCar->direction.v[X];
-        car_plus_ped.v[Y] = fabs(pCar->speed) * pCar->direction.v[Y];
-        car_plus_ped.v[Z] = fabs(pCar->speed) * pCar->direction.v[Z];
+    if ((fabs(pCar->speed)) > fabs(pPedestrian->current_speed)) {
+        BrVector3Scale(&car_plus_ped, &pCar->direction, fabs(pCar->speed));
     } else {
-        car_plus_ped.v[X] = (-fabs(pPedestrian->current_speed)) * pPedestrian->direction.v[X];
-        car_plus_ped.v[Y] = (-fabs(pPedestrian->current_speed)) * pPedestrian->direction.v[Y];
-        car_plus_ped.v[Z] = (-fabs(pPedestrian->current_speed)) * pPedestrian->direction.v[Z];
+        BrVector3Scale(&car_plus_ped, &pPedestrian->direction, (-fabs(pPedestrian->current_speed)));
     }
-    if (!(fabs(car_plus_ped.v[X]) >= 5e-5f || fabs(car_plus_ped.v[Z]) >= 5e-5f)) {
+    if ((fabs(car_plus_ped.v[X]) < 0.00005 || fabs(car_plus_ped.v[Z]) < 0.00005)) {
         return result;
     }
     BrActorToActorMatrix34(&global_to_car, gDont_render_actor, pCar_actor);
@@ -1629,9 +1625,9 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
         }
         x = x_to_use;
         if (delta_vector.v[X] < 0.f) {
-            result = ePed_hit_rside;
-        } else {
             result = ePed_hit_lside;
+        } else {
+            result = ePed_hit_rside;
         }
     }
 
@@ -1643,12 +1639,7 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
     ped_move_in_car.v[Z] *= 1.01f;
     BrMatrix34TApplyV(&ped_move_in_global, &ped_move_in_car, &global_to_car);
     ped_move_in_global.v[Y] = 0.f;
-    if (pCar->speed == 0.f || gFrame_period * fabs(pCar->speed)
-            > (br_scalar)sqrt(
-                ped_move_in_global.v[Y] * ped_move_in_global.v[Y]
-                + ped_move_in_global.v[X] * ped_move_in_global.v[X]
-                + ped_move_in_global.v[Z] * ped_move_in_global.v[Z])
-                / 10.f) {
+    if (pCar->speed == 0.f || gFrame_period * fabs(pCar->speed) > BrVector3Length(&ped_move_in_global) / 10.f) {
         pPedestrian->actor->t.t.translate.t.v[X] += ped_move_in_global.v[X];
         pPedestrian->actor->t.t.translate.t.v[Y] += ped_move_in_global.v[Y];
         pPedestrian->actor->t.t.translate.t.v[Z] += ped_move_in_global.v[Z];
