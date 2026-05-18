@@ -611,22 +611,6 @@ void* gPalette_pixels;
 // GLOBAL: CARM95 0x0053d0ac
 tFlic_descriptor* gFirst_flic;
 
-// Use this function to avoid unaligned memory access.
-// Added by DethRace
-tU16 mem_read_u16(void* memory) {
-    tU16 u16;
-
-    memcpy(&u16, memory, sizeof(tU16));
-    return u16;
-}
-
-// Use this function to avoid unaligned memory access
-// Added by DethRace
-void mem_write_u16(void* memory, tU16 u16) {
-
-    memcpy(memory, &u16, sizeof(tU16));
-}
-
 // IDA: void __cdecl EnableTranslationText()
 // FUNCTION: CARM95 0x00495990
 void EnableTranslationText(void) {
@@ -889,34 +873,32 @@ void DoColourMap(tFlic_descriptor_ptr pFlic_info, tU32 chunk_length) {
     tU8 green;
     tU8 blue;
 
-    palette_pixels = gPalette_pixels;
-
     packet_count = MemReadU16(&pFlic_info->data);
     for (i = 0; i < packet_count; i++) {
         skip_count = MemReadU8(&pFlic_info->data);
         change_count = MemReadU8(&pFlic_info->data);
-        if (!change_count) {
+        if (change_count) {
+        } else {
             change_count = 256;
         }
-        palette_pixels += skip_count * sizeof(br_int_32);
         current_colour += skip_count;
+        palette_pixels = (tU8*)gPalette_pixels + current_colour * sizeof(br_int_32);
         for (j = 0; j < change_count; j++) {
-            red = MemReadU8(&pFlic_info->data);
-            blue = MemReadU8(&pFlic_info->data);
-            green = MemReadU8(&pFlic_info->data);
+            red = MemReadU8(&pFlic_info->data) * 4;
+            green = MemReadU8(&pFlic_info->data) * 4;
+            blue = MemReadU8(&pFlic_info->data) * 4;
             // argb
 #if BR_ENDIAN_BIG
-            palette_pixels[3] = green * 4;
-            palette_pixels[2] = blue * 4;
-            palette_pixels[1] = red * 4;
-            palette_pixels[0] = 0;
+            *palette_pixels++ = 0;
+            *palette_pixels++ = red;
+            *palette_pixels++ = green;
+            *palette_pixels++ = blue;
 #else
-            palette_pixels[0] = green * 4;
-            palette_pixels[1] = blue * 4;
-            palette_pixels[2] = red * 4;
-            palette_pixels[3] = 0;
+            *palette_pixels++ = blue;
+            *palette_pixels++ = green;
+            *palette_pixels++ = red;
+            *palette_pixels++ = 0;
 #endif
-            palette_pixels += 4;
         }
         if (!gPalette_fuck_prevention) {
             DRSetPaletteEntries(gPalette, current_colour, change_count);
@@ -1045,7 +1027,7 @@ void DoColour256(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     for (i = 0; i < packet_count; i++) {
         skip_count = MemReadU8(&pFlic_info->data);
         change_count = MemReadU8(&pFlic_info->data);
-        if (change_count != 0) {
+        if (change_count == 0) {
             change_count = 256;
         }
         current_colour += skip_count;
@@ -1095,8 +1077,8 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
     pixel_ptr = pFlic_info->first_pixel;
 
     for (i = 0; i < line_count;) {
-        number_of_packets = MemReadS16(&pFlic_info->data);
         line_pixel_ptr = (tU16*)pixel_ptr;
+        number_of_packets = MemReadS16(&pFlic_info->data);
 
         if (number_of_packets < 0) {
             pixel_ptr = pixel_ptr + the_row_bytes * -number_of_packets;
@@ -1105,41 +1087,58 @@ void DoDeltaTrans(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
                 skip_count = MemReadU8(&pFlic_info->data);
                 size_count = MemReadS8(&pFlic_info->data);
                 line_pixel_ptr += skip_count / 2;
-                if (size_count < 0) {
+                if (size_count >= 0) {
+                    for (k = 0; k < size_count; k++) {
+                        the_byte = *pFlic_info->data++;
+                        if (the_byte) {
+                            *(tU8*)line_pixel_ptr = the_byte;
+                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                        } else {
+                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                        }
+                        the_byte = *pFlic_info->data++;
+                        if (the_byte) {
+                            *(tU8*)line_pixel_ptr = the_byte;
+                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                        } else {
+                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                        }
+                    }
+                } else {
                     the_byte = *pFlic_info->data++;
                     the_byte2 = *pFlic_info->data++;
 
                     if (the_byte && the_byte2) {
                         the_word = *((tU16*)pFlic_info->data - 1);
                         for (k = 0; k < -size_count; k++) {
-                            mem_write_u16(line_pixel_ptr, the_word);
+#ifdef DETHRACE_FIX_BUGS
+                            // Avoid unaligned memory access
+                            memcpy(line_pixel_ptr, &the_word, 2);
+#else
+                            *line_pixel_ptr = the_word;
+#endif
                             line_pixel_ptr++;
                         }
                     } else {
                         for (k = 0; k < -size_count; k++) {
                             if (the_byte) {
                                 *(tU8*)line_pixel_ptr = the_byte;
+                                line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                            } else {
+                                line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
                             }
-                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
                             if (the_byte2) {
                                 *(tU8*)line_pixel_ptr = the_byte2;
+                                line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
+                            } else {
+                                line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
                             }
-                            line_pixel_ptr = (tU16*)((tU8*)line_pixel_ptr + 1);
                         }
-                    }
-                } else {
-                    for (k = 0; k < size_count; k++) {
-                        the_word = *(tU16*)pFlic_info->data;
-                        pFlic_info->data += 2;
-                        if (the_word) {
-                            mem_write_u16(line_pixel_ptr, the_word);
-                        }
-                        line_pixel_ptr++;
                     }
                 }
             }
-            pixel_ptr = pixel_ptr + the_row_bytes;
             i++;
+            pixel_ptr = pixel_ptr + the_row_bytes;
         }
     }
 }
@@ -1315,10 +1314,10 @@ void DoUncompressed(tFlic_descriptor* pFlic_info, tU32 chunk_length) {
 
     pixel_ptr = pFlic_info->first_pixel;
     the_row_bytes = pFlic_info->the_pixelmap->row_bytes;
-    the_width = pFlic_info->width;
+    the_width = pFlic_info->width / 4;
     for (i = 0; i < pFlic_info->height; i++) {
         line_pixel_ptr = (tU32*)pixel_ptr;
-        for (j = 0; j < the_width / 4; j++) {
+        for (j = 0; j < the_width; j++) {
             *line_pixel_ptr = MemReadU32(&pFlic_info->data);
             line_pixel_ptr++;
         }
@@ -1476,7 +1475,6 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
             default:
                 LOG_WARN("unrecognized chunk type");
                 MemSkipBytes(&pFlic_info->data, chunk_length - 6);
-                break;
             }
             // Align on even byte
             pFlic_info->data = (char*)((uintptr_t)(pFlic_info->data + 1) & (~(uintptr_t)1));
@@ -1489,19 +1487,28 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
     }
     pFlic_info->current_frame++;
     pFlic_info->frames_left--;
+    if (pFlic_info->frames_left == 0) {
+        last_frame = 1;
+    } else {
+        last_frame = 0;
+    }
     if (gTrans_enabled && gTranslation_count != 0 && !pPanel_flic) {
-        DrawTranslations(pFlic_info, pFlic_info->frames_left == 0);
+        DrawTranslations(pFlic_info, last_frame);
     }
     if (pFlic_info->f != NULL && pFlic_info->bytes_still_to_be_read) {
         data_knocked_off = pFlic_info->data - pFlic_info->data_start;
+#ifdef DETHRACE_FIX_BUGS
         memmove(pFlic_info->data_start, pFlic_info->data, pFlic_info->bytes_in_buffer - data_knocked_off);
+#else
+        memcpy(pFlic_info->data_start, pFlic_info->data, pFlic_info->bytes_in_buffer - data_knocked_off);
+#endif
         pFlic_info->data = pFlic_info->data_start;
         pFlic_info->bytes_in_buffer -= data_knocked_off;
 
-        if (pFlic_info->bytes_still_to_be_read > data_knocked_off) {
-            read_amount = data_knocked_off;
-        } else {
+        if (pFlic_info->bytes_still_to_be_read <= data_knocked_off) {
             read_amount = pFlic_info->bytes_still_to_be_read;
+        } else {
+            read_amount = data_knocked_off;
         }
         if (read_amount != 0) {
             fread(&pFlic_info->data_start[pFlic_info->bytes_in_buffer], 1, read_amount, pFlic_info->f);
@@ -1509,7 +1516,7 @@ int PlayNextFlicFrame2(tFlic_descriptor* pFlic_info, int pPanel_flic) {
         pFlic_info->bytes_in_buffer += read_amount;
         pFlic_info->bytes_still_to_be_read -= read_amount;
     }
-    return pFlic_info->frames_left == 0;
+    return last_frame;
 }
 
 // IDA: int __usercall PlayNextFlicFrame@<EAX>(tFlic_descriptor *pFlic_info@<EAX>)

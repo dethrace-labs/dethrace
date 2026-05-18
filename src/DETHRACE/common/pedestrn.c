@@ -3861,14 +3861,15 @@ void DoPedReport(void) {
     time_t the_bloody_time;
     int i;
     int j;
-    int count;
-    int last_ref_num;
-    int ped_count;     // added by dethrace
-    int powerup_count; // added by dethrace
-    char s[256];       // added by dethrace
 
-    powerup_count = 0;
-    ped_count = 0;
+    int count;
+    int peds_count;     // added by dethrace
+    int powerups_count; // added by dethrace
+    int last_ref_num;
+    char s[256]; // added by dethrace
+
+    powerups_count = 0;
+    peds_count = 0;
     PathCat(the_path, gApplication_path, "PEDINFO.TXT");
     f = fopen(the_path, "at");
     time(&the_bloody_time);
@@ -3893,17 +3894,17 @@ void DoPedReport(void) {
         if (count != 0) {
             if (i < 100) {
                 s[0] = '\0';
-                ped_count += count;
+                peds_count += count;
             } else {
                 GetPowerupMessage(i - 100, s);
-                powerup_count += count;
+                powerups_count += count;
             }
             fprintf(f, "%6d    %5d      %s\n", i, count, s);
         }
     }
     fprintf(f, "\n\nSUMMARY:\n\n");
-    fprintf(f, "Peds:     %5d\n", ped_count);
-    fprintf(f, "Powerups: %5d\n", powerup_count);
+    fprintf(f, "Peds:     %5d\n", peds_count);
+    fprintf(f, "Powerups: %5d\n", powerups_count);
     fprintf(f, "\n\n\n\n");
     fclose(f);
 }
