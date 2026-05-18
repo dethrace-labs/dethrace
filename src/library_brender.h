@@ -420,3 +420,6 @@
 
 // LIBRARY: CARM95 0x004D2880
 // BrMatrix34PostTransform
+
+// LIBRARY: CARM95 0x004DD030
+// BrLightEnable
