@@ -4,16 +4,7 @@ set -euo pipefail
 
 WORKDIR="$(pwd)"
 
-<<<<<<< HEAD
-arg=()
-
-if [[ $# -gt 0 ]]; then
-  arg+=(--verbose "$1")
-  arg+=(--no-color)
-fi
-=======
 arg=("$@")
->>>>>>> main
 
 docker run --rm --platform linux/amd64 \
   -e "XDG_RUNTIME_DIR=/tmp" \
