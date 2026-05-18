@@ -2667,9 +2667,9 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
     the_pedestrian->magic_number = PEDESTRIAN_MAGIC;
     the_pedestrian->cloned = 0;
     if (!pForce_read) {
-        for (i = 0; i < gPed_count - 1; i++) {
-            if (gPedestrian_array[i].ref_number == the_pedestrian->ref_number) {
-                *the_pedestrian = gPedestrian_array[i];
+        for (j = 0; j < gPed_count - 1; j++) {
+            if (gPedestrian_array[j].ref_number == the_pedestrian->ref_number) {
+                *the_pedestrian = gPedestrian_array[j];
                 the_pedestrian->cloned = 1;
                 break;
             }
@@ -2680,26 +2680,24 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
     the_pedestrian->actor->type_data = the_pedestrian;
     BrActorAdd(gDont_render_actor, the_pedestrian->actor);
     the_pedestrian->actor->model = gPed_model;
-    if (the_pedestrian->cloned) {
-        the_pedestrian->actor->material = gPed_material;
-    } else {
+    if (!the_pedestrian->cloned) {
         rewind(pG);
         do {
-            GetALineAndDontArgue(pG, s);
-            str = strtok(s, "\t ,/");
-            sscanf(str, "%d", &the_ref);
+            GetALineAndDontArgue(pG, s2);
+            str2 = strtok(s2, "\t ,/");
+            sscanf(str2, "%d", &the_ref);
             if (the_pedestrian->ref_number != the_ref) {
                 while (1) {
                     PossibleService();
-                    GetALineAndDontArgue(pG, s);
-                    if (strcmp(s, "END OF PEDESTRIANS") == 0) {
+                    GetALineAndDontArgue(pG, s2);
+                    if (strcmp(s2, "END OF PEDESTRIANS") == 0) {
                         BrActorRemove(the_pedestrian->actor);
                         BrActorFree(the_pedestrian->actor);
                         gPed_count--;
                         DRS3StartSound(gEffects_outlet, 3100);
                         return;
                     }
-                    if (strcmp(s, "NEXT PEDESTRIAN") == 0) {
+                    if (strcmp(s2, "NEXT PEDESTRIAN") == 0) {
                         break;
                     }
                 }
@@ -2781,12 +2779,12 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
             GetPairOfFloats(pG, &the_action->danger_level, &the_action->percentage_chance);
             GetPairOfFloats(pG, &the_action->initial_speed, &the_action->looping_speed);
             the_action->reaction_time = (tU32)(GetAFloat(pG) * 1000.0f);
-            GetALineAndDontArgue(pG, s2);
-            str2 = strtok(s2, "\t ,/");
-            sscanf(str2, "%d", &the_action->number_of_sounds);
+            GetALineAndDontArgue(pG, s);
+            str = strtok(s, "\t ,/");
+            sscanf(str, "%d", &the_action->number_of_sounds);
             for (j = 0; j < the_action->number_of_sounds; j++) {
-                str2 = strtok(NULL, "\t ,/");
-                sscanf(str2, "%d", &the_action->sounds[j]);
+                str = strtok(NULL, "\t ,/");
+                sscanf(str, "%d", &the_action->sounds[j]);
             }
             the_action->number_of_bearings = GetAnInt(pG);
             if (the_action->number_of_bearings > COUNT_OF(the_action->sequences)) {
@@ -2808,7 +2806,9 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
             collide_frame = GetALineAndInterpretCommand(pG, gCollide_commands, COUNT_OF(gCollide_commands));
             the_sequence->frame_rate_type = GetALineAndInterpretCommand(pG, gRate_commands, COUNT_OF(gRate_commands));
 
-            if (the_sequence->frame_rate_type == ePed_frame_speed || the_sequence->frame_rate_type == ePed_frame_variable) {
+            if (the_sequence->frame_rate_type == ePed_frame_speed) {
+                GetPairOfFloats(pG, &the_sequence->frame_rate_factor1, &the_sequence->frame_rate_factor2);
+            } else if (the_sequence->frame_rate_type == ePed_frame_variable) {
                 GetPairOfFloats(pG, &the_sequence->frame_rate_factor1, &the_sequence->frame_rate_factor2);
             }
             the_sequence->number_of_frames = 0;
@@ -2819,24 +2819,24 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
                     FatalError(kFatalError_PedSeqTooManyFrames);
                 }
                 for (k = the_sequence->number_of_frames; k < new_frames + the_sequence->number_of_frames; k++) {
-                    GetAString(pG, s);
-                    the_sequence->frames[k].pixelmap = BrMapFind(s);
+                    GetAString(pG, s2);
+                    the_sequence->frames[k].pixelmap = BrMapFind(s2);
                     if (the_sequence->frames[k].pixelmap == NULL) {
-                        the_sequence->frames[k].pixelmap = LoadPixelmap(s);
+                        the_sequence->frames[k].pixelmap = LoadPixelmap(s2);
                         if (the_sequence->frames[k].pixelmap == NULL) {
-                            FatalError(kFatalError_FindPedestrianPixelmap_S, s);
+                            FatalError(kFatalError_FindPedestrianPixelmap_S, s2);
                         }
                         BrMapAdd(the_sequence->frames[k].pixelmap);
                     }
-                    GetALineAndDontArgue(pG, s);
-                    str = strtok(s, "\t ,/");
-                    sscanf(str, "%f", &temp_float1);
-                    str = strtok(NULL, "\t ,/");
-                    sscanf(str, "%f", &temp_float2);
-                    str = strtok(NULL, "\t ,/");
+                    GetALineAndDontArgue(pG, s2);
+                    str2 = strtok(s2, "\t ,/");
+                    sscanf(str2, "%f", &temp_float1);
+                    str2 = strtok(NULL, "\t ,/");
+                    sscanf(str2, "%f", &temp_float2);
+                    str2 = strtok(NULL, "\t ,/");
                     the_sequence->frames[k].offset.v[0] = temp_float1;
                     the_sequence->frames[k].offset.v[1] = temp_float2;
-                    the_sequence->frames[k].flipped = strcmp(str, "flipped") == 0;
+                    the_sequence->frames[k].flipped = strcmp(str2, "flipped") == 0;
                     if (collide_frame) {
                         CalcPedWidthNHeight(
                             the_pedestrian,
@@ -2866,6 +2866,8 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
         }
         the_pedestrian->min_x = maxest_min;
         the_pedestrian->max_x = minnest_max;
+    } else {
+        the_pedestrian->actor->material = gPed_material;
     }
     PossibleService();
     the_pedestrian->number_of_instructions = pInstruc_count;
