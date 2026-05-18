@@ -691,16 +691,16 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
     BrMatrix34ApplyP(&bnds->real_bounds.min, &bnds->original_bounds.min, bnds->mat);
     BrVector3Copy(&bnds->real_bounds.max, &bnds->real_bounds.min);
     for (j = 0; j < 3; j++) {
-        c[j].v[0] = a.v[j] * ((br_vector3*)bnds->mat->m)[j].v[0];
-        c[j].v[1] = a.v[j] * ((br_vector3*)bnds->mat->m)[j].v[1];
-        c[j].v[2] = a.v[j] * ((br_vector3*)bnds->mat->m)[j].v[2];
+        c[j].v[0] = a.v[j] * bnds->mat->m[j][0];
+        c[j].v[1] = a.v[j] * bnds->mat->m[j][1];
+        c[j].v[2] = a.v[j] * bnds->mat->m[j][2];
     }
     for (j = 0; j < 3; j++) {
         bnds->real_bounds.min.v[j] += ((float)(c[2].v[j] < 0.f) * c[2].v[j]
-            + (float)(c[1].v[j] < 0.f) * c[1].v[j])
+                                          + (float)(c[1].v[j] < 0.f) * c[1].v[j])
             + (float)(c[0].v[j] < 0.f) * c[0].v[j];
         bnds->real_bounds.max.v[j] += ((float)(c[2].v[j] > 0.f) * c[2].v[j]
-            + (float)(c[1].v[j] > 0.f) * c[1].v[j])
+                                          + (float)(c[1].v[j] > 0.f) * c[1].v[j])
             + (float)(c[0].v[j] > 0.f) * c[0].v[j];
     }
     XZToColumnXZ(&cx_min, &cz_min, bnds->real_bounds.min.v[0], bnds->real_bounds.min.v[2], track_spec);
