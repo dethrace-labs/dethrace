@@ -7,7 +7,7 @@
 // sprintf
 
 // LIBRARY: CARM95 0x004eaa10
-// memcpy
+// memmove
 
 // LIBRARY: CARM95 0x004eabe0
 // fclose
