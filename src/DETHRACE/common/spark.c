@@ -138,10 +138,10 @@ tShrapnel gShrapnel[15];
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
-#define TEST_BIT(var, pos)   (var & (1 << pos))
-#define SET_BIT(var, pos)    (var |= (1 << pos))
-#define FLIP_BIT(var, pos)   (var ^= (1 << pos))
-#define CLEAR_BIT(var, pos)  (var &= ~(1 << pos))
+#define TEST_BIT(var, pos) (var & (1 << pos))
+#define SET_BIT(var, pos) (var |= (1 << pos))
+#define FLIP_BIT(var, pos) (var ^= (1 << pos))
+#define CLEAR_BIT(var, pos) (var &= ~(1 << pos))
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
@@ -1815,14 +1815,14 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
             AddFlameToPipingSession(i + 16 * c, col->frame_count[i] + 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
             EndPipingSession();
             col->frame_count[i] = IRandomBetween(-5, -1);
-            col->scale_x[i] = (SRandomBetween(1.0f, 1.5f) * (2 * IRandomBetween(0, 1) - 1)) * 0.003f;
+            col->scale_x[i] = (2 * IRandomBetween(0, 1) - 1) * ((SRandomBetween(1.0f, 1.5f) * 0.003f) * 1);
             col->scale_y[i] = SRandomBetween(0.5f, 1.0f) * 0.003f;
             col->offset_x[i] = SRandomPosNeg(0.03f);
             col->offset_z[i] = SRandomBetween(-0.03f, 0.0);
             actor->type = BR_ACTOR_NONE;
         }
         if (col->frame_count[i] == 0) {
-            if (!(BrVector3LengthSquared(&col->car->v) >= 80.0f || col->lifetime <= 30 * pTime)) {
+            if ((BrVector3LengthSquared(&col->car->v) < 80.0f && (col->lifetime * 1) > 30 * pTime)) {
                 actor->type = BR_ACTOR_MODEL;
                 StartPipingSession(ePipe_chunk_flame);
                 AddFlameToPipingSession(i + 16 * c, col->frame_count[i] - 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
