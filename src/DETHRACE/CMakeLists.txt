@@ -187,7 +187,7 @@ endif()
 if(MSVC_42_FOR_RECCMP)
     add_executable(dethrace WIN32)
 
-    set(CMAKE_C_FLAGS_DEBUG "/Oi /Zi /MLd /G5")
+    set(CMAKE_C_FLAGS_DEBUG "/Oi /Zi /MLd /G5 /w")
 
     add_compile_definitions(_DEBUG)
     set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
@@ -195,7 +195,7 @@ if(MSVC_42_FOR_RECCMP)
     target_link_libraries(dethrace PRIVATE ws2_32)
 
     file(GLOB DETHRACE_COMMON_C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/common/*.c")
-    set_source_files_properties(${DETHRACE_COMMON_C_FILES} PROPERTIES COMPILE_FLAGS "/FA")
+    set_source_files_properties(${DETHRACE_COMMON_C_FILES} PROPERTIES COMPILE_FLAGS "/FAs")
 
     reccmp_add_target(dethrace ID CARM95)
     reccmp_configure()
