@@ -1522,45 +1522,42 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
             return car->keys.horn ? 100 : 0;
         }
         if ((distance_squared = (ped_pos->v[X] - car->pos.v[X]) * (ped_pos->v[X] - car->pos.v[X])
-                 + (10.f * (ped_pos->v[Y] - car->pos.v[Y])) * (10.f * (ped_pos->v[Y] - car->pos.v[Y]))
-                 + (ped_pos->v[Z] - car->pos.v[Z]) * (ped_pos->v[Z] - car->pos.v[Z]))
-            < gMax_distance_squared) {
-            car_movement_angle = FastScalarArcTan2(car->direction.v[X], car->direction.v[Z]);
-            car_to_pedestrian_angle = FastScalarArcTan2(ped_pos->v[X] - car->pos.v[X], ped_pos->v[Z] - car->pos.v[Z]);
-            if (car_to_pedestrian_angle > car_movement_angle) {
-                car_movement_angle += 360.f;
+                    + (10.f * (ped_pos->v[Y] - car->pos.v[Y])) * (10.f * (ped_pos->v[Y] - car->pos.v[Y]))
+                    + (ped_pos->v[Z] - car->pos.v[Z]) * (ped_pos->v[Z] - car->pos.v[Z]))
+            >= gMax_distance_squared) {
+            continue;
+        }
+        car_movement_angle = FastScalarArcTan2(car->direction.v[X], car->direction.v[Z]);
+        car_to_pedestrian_angle = FastScalarArcTan2(ped_pos->v[X] - car->pos.v[X], ped_pos->v[Z] - car->pos.v[Z]);
+        if (car_to_pedestrian_angle > car_movement_angle) {
+            car_movement_angle += 360.f;
+        }
+        heading_difference = car_movement_angle - car_to_pedestrian_angle;
+        if (heading_difference > 180.f) {
+            heading_difference = 360.f - heading_difference;
+        }
+        if (heading_difference < 30.f || car->speed == 0.f || car->keys.horn) {
+            if (car->keys.horn) {
+                this_danger = 10.f / distance_squared;
+            } else {
+                this_danger = (fabs(car->speed) + 0.00003) * (BR_ABS(car->speed) != 0.f ? 30.f - heading_difference + 5.f : 5.f) / distance_squared * 400.f;
             }
-            heading_difference = car_movement_angle - car_to_pedestrian_angle;
-            if (heading_difference > 180.f) {
-                heading_difference = 360.f - heading_difference;
-            }
-            if (heading_difference < 30.f || car->speed == 0.f || car->keys.horn) {
-                if (car->keys.horn) {
-                    this_danger = 10.f / distance_squared;
-                } else {
-                    if (fabs(car->speed) != 0.f) {
-                        this_danger = 30.f - heading_difference + 5.f;
-                    } else {
-                        this_danger = 5.f;
-                    }
-                    this_danger = (fabs(car->speed) + 3e-5f) * this_danger / distance_squared * 400.f;
-                }
-                if (this_danger > most_dangerous) {
-                    most_dangerous = this_danger;
-                    BrVector3Sub(pDanger_direction, &car->pos, ped_pos);
-                    if (car->driver == eDriver_local_human) {
-                        pPedestrian->frightened_of_us = 1;
-                    } else if (!pPedestrian->mid_air) {
-                        pPedestrian->frightened_of_us = 0;
-                    }
+            if (this_danger > most_dangerous) {
+                most_dangerous = this_danger;
+                BrVector3Sub(pDanger_direction, &car->pos, ped_pos);
+                if (car->driver == eDriver_local_human) {
+                    pPedestrian->frightened_of_us = 1;
+                } else if (!pPedestrian->mid_air) {
+                    pPedestrian->frightened_of_us = 0;
                 }
             }
         }
     }
-    if (most_dangerous > 999.f) {
-        most_dangerous = 999.f;
+    if ((most_dangerous <= 999.f)) {
+        return most_dangerous;
+    } else {
+        return 999.f;
     }
-    return most_dangerous;
 }
 
 // IDA: tPed_hit_position __usercall MoveToEdgeOfCar@<EAX>(tPedestrian_data *pPedestrian@<EAX>, tCollision_info *pCar@<EDX>, br_actor *pCar_actor@<EBX>, br_scalar pPed_x, br_scalar pPed_z, br_scalar pCar_bounds_min_x, br_scalar pCar_bounds_max_x, br_scalar pCar_bounds_min_z, br_scalar pCar_bounds_max_z, br_vector3 *pMin_ped_bounds_car, br_vector3 *pMax_ped_bounds_car)
