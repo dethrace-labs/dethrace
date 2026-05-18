@@ -138,10 +138,10 @@ tShrapnel gShrapnel[15];
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
-#define TEST_BIT(var, pos)   (var & (1 << pos))
-#define SET_BIT(var, pos)    (var |= (1 << pos))
-#define FLIP_BIT(var, pos)   (var ^= (1 << pos))
-#define CLEAR_BIT(var, pos)  (var &= ~(1 << pos))
+#define TEST_BIT(var, pos) (var & (1 << pos))
+#define SET_BIT(var, pos) (var |= (1 << pos))
+#define FLIP_BIT(var, pos) (var ^= (1 << pos))
+#define CLEAR_BIT(var, pos) (var &= ~(1 << pos))
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
@@ -1474,7 +1474,7 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
                 }
                 BrVector3Sub(&tv, &gSmoke[i].pos, &gSmoke[i].pos);
                 ts = BrVector3LengthSquared(&tv);
-                if ((gSmoke[i].radius + gSmoke[j].radius) * (gSmoke[i].radius + gSmoke[j].radius) > ts) {
+                if (BR_SQR(gSmoke[i].radius + gSmoke[j].radius) > ts) {
                     SET_BIT(not_lonely, i);
                     SET_BIT(not_lonely, j);
                     break;
