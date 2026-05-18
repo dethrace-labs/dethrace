@@ -855,23 +855,20 @@ int NewTextHeadupSlot2(int pSlot_index, int pFlash_rate, int pLifetime, int pFon
             }
             headup_slot = &gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on][pSlot_index];
             the_headup = &gHeadups[index];
-            the_headup->data.coloured_text_info.coloured_font = &gFonts[-pFont_index];
+            the_headup->data.coloured_text_info.coloured_font = gFonts - pFont_index;
             if (pSlot_index == 4) {
                 the_headup->type = eHeadup_box_text;
             } else {
                 the_headup->type = eHeadup_coloured_text;
             }
-            if (!pText) {
-                LOG_PANIC("panic");
-            }
             strcpy(the_headup->data.text_info.text, pText);
 
             the_headup->slot_index = pSlot_index;
             the_headup->justification = headup_slot->justification;
-            if (pSlot_index < 0) {
-                the_headup->cockpit_anchored = 0;
-            } else {
+            if (pSlot_index >= 0) {
                 the_headup->cockpit_anchored = headup_slot->cockpit_anchored;
+            } else {
+                the_headup->cockpit_anchored = 0;
             }
             the_headup->dimmed_background = headup_slot->dimmed_background;
             the_headup->dim_left = headup_slot->dim_left;
@@ -1501,32 +1498,31 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
         return;
     }
     the_time = GetTotalTime();
-    if (pAmount == 0) {
-        return;
+    if (pAmount != 0) {
+        if (gNet_mode != eNet_mode_none && gProgram_state.credits_earned - gProgram_state.credits_lost + pAmount < 0) {
+            pAmount = gProgram_state.credits_lost - gProgram_state.credits_earned;
+        }
+        original_amount = pAmount;
+        if (gLast_credit_headup__displays >= 0 && the_time - gLast_earn_time < 2000) {
+            pAmount += gLast_credit_amount;
+        }
+        gLast_credit_amount = pAmount;
+        if (pAmount > 1) {
+            sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(kMiscString_Credits));
+            gProgram_state.credits_earned += original_amount;
+        } else if (pAmount > 0) {
+            sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(kMiscString_Credit));
+            gProgram_state.credits_earned += original_amount;
+        } else if (pAmount < -1) {
+            sprintf(s, "%s%s %d %s", GetMiscString(kMiscString_Lost), pPrefix_text, -pAmount, GetMiscString(kMiscString_Credits));
+            gProgram_state.credits_lost -= original_amount;
+        } else {
+            sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(kMiscString_Lost), GetMiscString(kMiscString_Credit));
+            gProgram_state.credits_lost -= original_amount;
+        }
+        gLast_credit_headup__displays = NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s);
+        gLast_earn_time = the_time;
     }
-    if (gNet_mode != eNet_mode_none && gProgram_state.credits_earned - gProgram_state.credits_lost + pAmount < 0) {
-        pAmount = gProgram_state.credits_lost - gProgram_state.credits_lost;
-    }
-    original_amount = pAmount;
-    if (gLast_credit_headup__displays >= 0 && the_time - gLast_earn_time < 2000) {
-        pAmount += gLast_credit_amount;
-    }
-    gLast_credit_amount = pAmount;
-    if (pAmount >= 2) {
-        sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(kMiscString_Credits));
-        gProgram_state.credits_earned += original_amount;
-    } else if (pAmount >= 1) {
-        sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(kMiscString_Credit));
-        gProgram_state.credits_earned += original_amount;
-    } else if (pAmount >= -1) {
-        sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(kMiscString_Lost), GetMiscString(kMiscString_Credit));
-        gProgram_state.credits_lost -= original_amount;
-    } else {
-        sprintf(s, "%s%s %d %s", GetMiscString(kMiscString_Lost), pPrefix_text, -pAmount, GetMiscString(kMiscString_Credits));
-        gProgram_state.credits_lost -= original_amount;
-    }
-    gLast_credit_headup__displays = NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s);
-    gLast_earn_time = the_time;
 }
 
 // IDA: void __usercall EarnCredits(int pAmount@<EAX>)
@@ -1561,25 +1557,27 @@ void AwardTime(tU32 pTime) {
     tU32 the_time;
     int i;
 
-    if (gRace_finished || gFreeze_timer || gNet_mode != eNet_mode_none || pTime == 0) {
+    if (gRace_finished || gFreeze_timer || gNet_mode != eNet_mode_none) {
         return;
     }
 
-    original_amount = pTime;
     the_time = GetTotalTime();
-    for (i = COUNT_OF(gOld_times) - 1; i > 0; i--) {
-        gOld_times[i] = gOld_times[i - 1];
+    if (pTime != 0) {
+        for (i = COUNT_OF(gOld_times) - 1; i > 0; i--) {
+            gOld_times[i] = gOld_times[i - 1];
+        }
+        gOld_times[0] = pTime;
+        original_amount = pTime;
+        if (gLast_time_credit_headup >= 0 && (the_time - gLast_time_earn_time) < 2000) {
+            pTime += gLast_time_credit_amount;
+        }
+        gLast_time_credit_amount = pTime;
+        gTimer += original_amount * 1000;
+        s[0] = '+';
+        TimerString(1000 * pTime, &s[1], 0, 0);
+        gLast_time_credit_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 2000, -kFont_BLUEHEAD, s);
+        gLast_time_earn_time = the_time;
     }
-    gOld_times[0] = pTime;
-    if (gLast_time_credit_headup >= 0 && (the_time - gLast_time_earn_time) < 2000) {
-        pTime += gLast_time_credit_amount;
-    }
-    gLast_time_credit_amount = pTime;
-    gTimer += original_amount * 1000;
-    s[0] = '+';
-    TimerString(1000 * pTime, &s[1], 0, 0);
-    gLast_time_credit_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 2000, -kFont_BLUEHEAD, s);
-    gLast_time_earn_time = the_time;
 }
 
 // IDA: void __usercall DrawRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour)
