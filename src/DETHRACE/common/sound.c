@@ -607,7 +607,7 @@ void MungeEngineNoise(void) {
     int i;
     int stop_all;
     int type_of_engine_noise;
-    int frame_period;
+    tS3_sound_id engine_noise;
 
 #ifdef DETHRACE_FIX_BUGS
     // At framerates higher than 30, `gCamera_velocity` is not stable enough and causes the player car audio to stumble
@@ -622,7 +622,7 @@ void MungeEngineNoise(void) {
     dethrace_last_executed = now;
 #endif
 
-    vol = 0;
+    type_of_engine_noise = 0;
     if (gSound_available == 0 || gProgram_state.racing == 0) {
         return;
     }
@@ -645,50 +645,59 @@ void MungeEngineNoise(void) {
         } else {
             car_count = GetCarCount(cat);
         }
-        for (type_of_engine_noise = 0; type_of_engine_noise < car_count; type_of_engine_noise++) {
+        for (i = 0; i < car_count; i++) {
             if (cat == 0) {
                 the_car = &gProgram_state.current_car;
             } else {
-                the_car = GetCarSpec(cat, type_of_engine_noise);
+                the_car = GetCarSpec(cat, i);
             }
             if (the_car->driver == eDriver_local_human || gSound_detail_level == 2 || cat == eVehicle_rozzer) {
                 if (stop_all || !the_car->active || the_car->knackered || (cat == eVehicle_rozzer && BrVector3LengthSquared(&the_car->v) < 0.0001f)) {
-                    frame_period = 0;
+                    vol = 0;
                     pitch = 0x10000;
                 } else {
                     BrVector3InvScale(&the_car->velocity_bu_per_sec, &the_car->v, WORLD_SCALE_D);
                     if (cat == eVehicle_rozzer) {
-                        frame_period = 255;
+                        vol = 255;
                         pitch = 0x10000;
                     } else {
                         if (the_car->last_special_volume) {
-                            vol = the_car->last_special_volume->engine_noise_index;
+                            type_of_engine_noise = the_car->last_special_volume->engine_noise_index;
                         }
                         pitch = the_car->revs * 10.0 + 40960.0;
                         if (gAction_replay_mode) {
                             pitch = fabs(GetReplayRate()) * pitch;
+                        } else {
                         }
-                        if (vol == 1) {
+                        if (type_of_engine_noise == kEngineNoise_EnclosedSpace) {
                             pitch = pitch * 0.75;
-                        } else if (vol == 2) {
+                        } else if (type_of_engine_noise == kEngineNoise_Underwater) {
                             pitch = pitch * 0.55;
                         }
 
                         pitch = MAX(pitch, 4096);
                         pitch = MIN(pitch, 131072);
 
-                        frame_period = the_car->revs * 0.001 + 64.0;
-                        if (vol == 1) {
-                            frame_period = frame_period * 5.0;
-                        } else if (vol == 2) {
-                            frame_period = frame_period * 2.0;
+                        vol = the_car->revs * 0.001 + 64.0;
+                        if (type_of_engine_noise == kEngineNoise_EnclosedSpace) {
+                            vol = vol * 5.0;
+                        } else if (type_of_engine_noise == kEngineNoise_Underwater) {
+                            vol = vol * 2.0;
                         } else {
-                            frame_period = frame_period * 2.5;
+                            vol = vol * 2.5;
                         }
-                        frame_period = MIN(frame_period, 255);
+                        vol = MIN(vol, 255);
                     }
                 }
-                S3UpdateSoundSource(gEngine_outlet, -1, the_car->sound_source, (float)(300 + (-50 & -(gAction_replay_mode != 1))), 0, 0, frame_period, pitch, 0x10000);
+                S3UpdateSoundSource(
+                    gEngine_outlet,
+                    -1,
+                    the_car->sound_source,
+                    gAction_replay_mode == 0 ? 250 : 300,
+                    0,
+                    0,
+                    vol,
+                    pitch, 0x10000);
             }
         }
     }
