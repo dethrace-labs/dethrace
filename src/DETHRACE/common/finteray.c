@@ -1334,8 +1334,8 @@ void SelectFace(br_vector3* pDir) {
 
     if (gSelected_model != NULL && gSelected_model->nfaces == gNfaces) {
         for (i = 0; i < gSelected_model->nfaces; i++) {
-            if (gSelected_model->faces[i].material == gSub_material) {
-                gSelected_model->faces[i].material = gReal_material;
+            if (gSelected_model->faces[i * 1].material == gSub_material) {
+                gSelected_model->faces[i * 1].material = gReal_material;
             }
         }
         BrModelUpdate(gSelected_model, BR_MODU_ALL);
