@@ -138,10 +138,10 @@ tShrapnel gShrapnel[15];
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
-#define TEST_BIT(var, pos)   (var & (1 << pos))
-#define SET_BIT(var, pos)    (var |= (1 << pos))
-#define FLIP_BIT(var, pos)   (var ^= (1 << pos))
-#define CLEAR_BIT(var, pos)  (var &= ~(1 << pos))
+#define TEST_BIT(var, pos) (var & (1 << pos))
+#define SET_BIT(var, pos) (var |= (1 << pos))
+#define FLIP_BIT(var, pos) (var ^= (1 << pos))
+#define CLEAR_BIT(var, pos) (var &= ~(1 << pos))
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
@@ -626,18 +626,12 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
     if (sparkiness < 10.f) {
         return;
     }
-    tv.v[0] = pos->v[0];
-    tv.v[0] -= pCar->car_master_actor->t.t.translate.t.v[0] / WORLD_SCALE;
-    tv.v[1] = pos->v[1];
-    tv.v[1] -= pCar->car_master_actor->t.t.translate.t.v[1] / WORLD_SCALE;
-    tv.v[2] = pos->v[2];
-    tv.v[2] -= pCar->car_master_actor->t.t.translate.t.v[2] / WORLD_SCALE;
+    BrVector3InvScale(&tv, &pCar->car_master_actor->t.t.translate.t, WORLD_SCALE);
+    BrVector3Sub(&tv, pos, &tv);
     BrMatrix34TApplyV(&pos2, &tv, &pCar->car_master_actor->t.t.mat);
     BrMatrix34TApplyV(&norm, &normal, &pCar->car_master_actor->t.t.mat);
     BrVector3Scale(&tv, &norm, .01f);
-    pos2.v[0] += tv.v[0];
-    pos2.v[1] += tv.v[1];
-    pos2.v[2] = tv.v[2] + pos2.v[2];
+    BrVector3Accumulate(&pos2, &tv);
     num = (int)(sparkiness / 10.f) + 3;
     if (num > 10) {
         num = 10;
