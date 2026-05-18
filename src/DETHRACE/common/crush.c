@@ -765,7 +765,7 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
     }
     y1 = pImpact_point->v[1] - crushed_car_bounds.min.v[1];
     y2 = crushed_car_bounds.max.v[1] - pImpact_point->v[1];
-    if (y1 >= y2) {
+    if ((y1 * 1) < y2) {
         y = y1;
     } else {
         y = y2;
