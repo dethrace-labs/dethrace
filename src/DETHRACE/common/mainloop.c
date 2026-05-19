@@ -441,11 +441,10 @@ void UpdateFramePeriod(tU32* pCamera_period) {
             gLast_tick_count = new_tick_count;
             if (gNet_mode) {
                 switch (gNet_mode) {
-                case eNet_mode_host:
-                    break;
                 case eNet_mode_client:
                     gProgram_state.current_car.last_car_car_collision = 0;
-                default:
+                    break;
+                case eNet_mode_host:
                     break;
                 }
             }
