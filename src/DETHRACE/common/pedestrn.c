@@ -2609,24 +2609,21 @@ int GetPedPosition(int pIndex, br_vector3* pPos) {
 
     pedestrian = &gPedestrian_array[pIndex];
     if (pedestrian->ref_number < 100) {
-
-        // Item is a human
-        if (pedestrian->hit_points == -100
-            || pedestrian->current_action == pedestrian->fatal_car_impact_action
-            || pedestrian->current_action == pedestrian->fatal_ground_impact_action
-            || pedestrian->current_action == pedestrian->giblets_action) {
-            return 0;
-        } else {
+        if (pedestrian->hit_points != -100
+            && pedestrian->current_action != pedestrian->fatal_car_impact_action
+            && pedestrian->current_action != pedestrian->fatal_ground_impact_action
+            && pedestrian->current_action != pedestrian->giblets_action) {
             BrVector3Copy(pPos, &pedestrian->pos);
             return 1;
+        } else {
+            return 0;
         }
     } else {
-        // Item is a power-up/mine
-        if (pedestrian->hit_points == -100) {
-            return 0;
-        } else {
+        if (pedestrian->hit_points != -100) {
             BrVector3Copy(pPos, &pedestrian->pos);
             return -1;
+        } else {
+            return 0;
         }
     }
 }
