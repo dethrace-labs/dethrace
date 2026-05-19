@@ -1525,10 +1525,9 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
         if (gBlind_pedestrians) {
             return car->keys.horn ? 100 : 0;
         }
-        if ((distance_squared = (ped_pos->v[X] - car->pos.v[X]) * (ped_pos->v[X] - car->pos.v[X])
-                    + (10.f * (ped_pos->v[Y] - car->pos.v[Y])) * (10.f * (ped_pos->v[Y] - car->pos.v[Y]))
-                    + (ped_pos->v[Z] - car->pos.v[Z]) * (ped_pos->v[Z] - car->pos.v[Z]))
-            >= gMax_distance_squared) {
+        if ((distance_squared = BR_SQR(ped_pos->v[X] - car->pos.v[X])
+                    + BR_SQR(10.f * (ped_pos->v[Y] - car->pos.v[Y]))
+                    + BR_SQR(ped_pos->v[Z] - car->pos.v[Z])) >= gMax_distance_squared) {
             continue;
         }
         car_movement_angle = FastScalarArcTan2(car->direction.v[X], car->direction.v[Z]);
@@ -1557,7 +1556,7 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
             }
         }
     }
-    if ((most_dangerous <= 999.f)) {
+    if (most_dangerous <= 999.f) {
         return most_dangerous;
     } else {
         return 999.f;
