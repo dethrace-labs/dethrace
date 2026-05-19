@@ -781,20 +781,18 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
         impact_location = z2 <= z1 ? eImpact_back : eImpact_front;
         proportion_x = x1 / (crushed_car_bounds.max.v[0] - crushed_car_bounds.min.v[0]);
         proportion_y = y1 / (crushed_car_bounds.max.v[1] - crushed_car_bounds.min.v[1]);
+    } else if (x <= y && x <= z) {
+        impact_location = x2 <= x1 ? eImpact_right : eImpact_left;
+        proportion_y = y1 / (crushed_car_bounds.max.v[1] - crushed_car_bounds.min.v[1]);
+        proportion_z = z1 / (crushed_car_bounds.max.v[2] - crushed_car_bounds.min.v[2]);
     } else {
-        if (x <= y && x <= z) {
-            impact_location = x2 <= x1 ? eImpact_right : eImpact_left;
-            proportion_y = y1 / (crushed_car_bounds.max.v[1] - crushed_car_bounds.min.v[1]);
-            proportion_z = z1 / (crushed_car_bounds.max.v[2] - crushed_car_bounds.min.v[2]);
+        if ((y2 * 1) > y1) {
+            impact_location = eImpact_bottom;
         } else {
-            if ((y2 * 1) > y1) {
-                impact_location = eImpact_bottom;
-            } else {
-                impact_location = eImpact_top;
-            }
-            proportion_x = x1 / (crushed_car_bounds.max.v[0] - crushed_car_bounds.min.v[0]);
-            proportion_z = z1 / (crushed_car_bounds.max.v[2] - crushed_car_bounds.min.v[2]);
+            impact_location = eImpact_top;
         }
+        proportion_x = x1 / (crushed_car_bounds.max.v[0] - crushed_car_bounds.min.v[0]);
+        proportion_z = z1 / (crushed_car_bounds.max.v[2] - crushed_car_bounds.min.v[2]);
     }
     if (pWas_hitting_a_car && pCar->last_impact_location == eImpact_unknown) {
         pCar->last_impact_location = impact_location;
