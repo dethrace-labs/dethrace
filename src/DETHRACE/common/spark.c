@@ -699,12 +699,11 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
     }
     CreateShrapnelShower(pos, v, &normal, ts, pCar1, pCar2);
     ts2 = BR_MAC3(
-        pForce->v[2], v->v[2],
-        pForce->v[1], v->v[1],
-        pForce->v[0], v->v[0])
+              pForce->v[2], v->v[2],
+              pForce->v[1], v->v[1],
+              pForce->v[0], v->v[0])
         / (ts * ts);
     BrVector3Scale(v, pForce, ts2);
-<<<<<<< HEAD
     tv.v[0] = c->car_master_actor->t.t.translate.t.v[0] / WORLD_SCALE;
     tv.v[1] = c->car_master_actor->t.t.translate.t.v[1] / WORLD_SCALE;
     tv.v[2] = c->car_master_actor->t.t.translate.t.v[2] / WORLD_SCALE;
@@ -715,25 +714,17 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
     BrMatrix34TApplyV(&tv, pForce, &c->car_master_actor->t.t.mat);
     BrVector3Copy(pForce, &tv);
     num = (int)(ts / 10.f) + 3;
-=======
-    normal.v[0] = pos->v[0] - c->car_master_actor->t.t.translate.t.v[0] / WORLD_SCALE;
-    normal.v[1] = pos->v[1] - c->car_master_actor->t.t.translate.t.v[1] / WORLD_SCALE;
-    normal.v[2] = pos->v[2] - c->car_master_actor->t.t.translate.t.v[2] / WORLD_SCALE;
-    BrMatrix34TApplyV(pos, &normal, &c->car_master_actor->t.t.mat);
-    BrMatrix34TApplyV(&normal, pForce, &c->car_master_actor->t.t.mat);
-    num = (ts / 10.f) + 3;
 #ifdef DETHRACE_FIX_BUGS
     num = Harness_Hook_ScaleEmissionCountWithDt(num, gDt);
 #endif
->>>>>>> main
     for (i = 0; i < num; i++) {
         BrVector3Copy(&gSparks[gNext_spark].pos, pos);
         BrVector3SetFloat(&gSparks[gNext_spark].normal, 0.f, 0.f, 0.f);
         BrVector3SetFloat(&tv, FRandomBetween(-1.f, 1.f), FRandomBetween(-.2f, 1.f), FRandomBetween(-1.f, 1.f));
         ts2 = BR_MAC3(
-            pForce->v[2], tv.v[2],
-            pForce->v[1], tv.v[1],
-            pForce->v[0], tv.v[0])
+                  pForce->v[2], tv.v[2],
+                  pForce->v[1], tv.v[1],
+                  pForce->v[0], tv.v[0])
             / (ts * ts);
         BrVector3Scale(&tv2, pForce, ts2);
         BrVector3Sub(&gSparks[gNext_spark].v, &tv, &tv2);
