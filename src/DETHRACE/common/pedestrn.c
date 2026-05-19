@@ -1588,10 +1588,10 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
     tPed_hit_position result;
 
     result = ePed_hit_unknown;
-    if ((fabs(pCar->speed)) > fabs(pPedestrian->current_speed)) {
+    if (fabs(pCar->speed) > fabs(pPedestrian->current_speed)) {
         BrVector3Scale(&car_plus_ped, &pCar->direction, fabs(pCar->speed));
     } else {
-        BrVector3Scale(&car_plus_ped, &pPedestrian->direction, (-fabs(pPedestrian->current_speed)));
+        BrVector3Scale(&car_plus_ped, &pPedestrian->direction, -fabs(pPedestrian->current_speed));
     }
     if ((fabs(car_plus_ped.v[X]) < 0.00005 || fabs(car_plus_ped.v[Z]) < 0.00005)) {
         return result;
@@ -1637,21 +1637,13 @@ tPed_hit_position MoveToEdgeOfCar(tPedestrian_data* pPedestrian, tCollision_info
         }
     }
 
-    ped_move_in_car.v[X] = x;
-    ped_move_in_car.v[Y] = 0.f;
-    ped_move_in_car.v[Z] = z;
-    ped_move_in_car.v[X] *= 1.01f;
-    ped_move_in_car.v[Y] *= 1.01f;
-    ped_move_in_car.v[Z] *= 1.01f;
+    BrVector3Set(&ped_move_in_car, x, 0.0f, z);
+    BrVector3Scale(&ped_move_in_car, &ped_move_in_car, 1.01f);
     BrMatrix34TApplyV(&ped_move_in_global, &ped_move_in_car, &global_to_car);
     ped_move_in_global.v[Y] = 0.f;
     if (pCar->speed == 0.f || gFrame_period * fabs(pCar->speed) > BrVector3Length(&ped_move_in_global) / 10.f) {
-        pPedestrian->actor->t.t.translate.t.v[X] += ped_move_in_global.v[X];
-        pPedestrian->actor->t.t.translate.t.v[Y] += ped_move_in_global.v[Y];
-        pPedestrian->actor->t.t.translate.t.v[Z] += ped_move_in_global.v[Z];
-        pPedestrian->pos.v[X] += ped_move_in_global.v[X];
-        pPedestrian->pos.v[Y] += ped_move_in_global.v[Y];
-        pPedestrian->pos.v[Z] += ped_move_in_global.v[Z];
+        BrVector3Accumulate(&pPedestrian->actor->t.t.translate.t, &ped_move_in_global);
+        BrVector3Accumulate(&pPedestrian->pos, &ped_move_in_global);
     }
     return result;
 }
