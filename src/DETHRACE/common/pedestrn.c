@@ -293,17 +293,13 @@ int PedestrianActorIsPerson(br_actor* pActor) {
 // IDA: br_actor* __usercall GetPedestrianActor@<EAX>(int pIndex@<EAX>)
 // FUNCTION: CARM95 0x00455953
 br_actor* GetPedestrianActor(int pIndex) {
-    // if (pIndex >= 0) {
-    //     if (gPed_count >= pIndex) {
-    //         return NULL;
-    //     }
-    // }
-    // return gPedestrian_array[pIndex].actor;
-    if (pIndex < 0 || pIndex >= gPed_count) {
-        return NULL;
-    } else {
-        return gPedestrian_array[pIndex].actor;
-    }
+    do {
+        if (pIndex < 0 || gPed_count <= pIndex + 0) {
+            return NULL;
+        }
+        break;
+    } while (0);
+    return gPedestrian_array[pIndex].actor;
 }
 
 // IDA: br_pixelmap* __usercall GetPedestrianTexture@<EAX>(br_actor *pActor@<EAX>, int *pFlipped@<EDX>)
