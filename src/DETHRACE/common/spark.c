@@ -129,6 +129,13 @@ br_material* gBlack_material;
 // GLOBAL: CARM95 0x00538b50
 tShrapnel gShrapnel[15];
 
+#ifdef DETHRACE_FIX_BUGS
+// Smoke in mirror should use correct transform matrix
+br_matrix34 gSmoke_camera_to_world;
+#else
+#define gSmoke_camera_to_world gCamera_to_world
+#endif
+
 // gSmoke_column has 25 elements but all the code just checks the first 5 elements
 #define MAX_SMOKE_COLUMNS 5
 
@@ -138,17 +145,24 @@ tShrapnel gShrapnel[15];
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
-#define TEST_BIT(var, pos)   (var & (1 << pos))
-#define SET_BIT(var, pos)    (var |= (1 << pos))
-#define FLIP_BIT(var, pos)   (var ^= (1 << pos))
-#define CLEAR_BIT(var, pos)  (var &= ~(1 << pos))
+#ifdef DETHRACE_FIX_BUGS
+#define TEST_BIT(var, pos) (var & (1u << pos))
+#define SET_BIT(var, pos) (var |= (1u << pos))
+#define FLIP_BIT(var, pos) (var ^= (1u << pos))
+#define CLEAR_BIT(var, pos) (var &= ~(1u << pos))
+#else
+#define TEST_BIT(var, pos) (var & (1 << pos))
+#define SET_BIT(var, pos) (var |= (1 << pos))
+#define FLIP_BIT(var, pos) (var ^= (1 << pos))
+#define CLEAR_BIT(var, pos) (var &= ~(1 << pos))
+#endif
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
 void DrawDot(br_scalar z, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr) {
-
-    if (*depth_ptr > (1.0 - z) * 32768.0f) {
-        *depth_ptr = (1.0 - z) * 32768.0f;
+    z = (1.0f - z) * 32768.0f;
+    if (*depth_ptr > z) {
+        *depth_ptr = z;
         *scr_ptr = shade_ptr[*scr_ptr];
     }
 }
@@ -428,25 +442,22 @@ void ReplaySparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
     br_vector3 new_pos;
 
     for (i = 0; i < COUNT_OF(gSparks); i++) {
-        if (TEST_BIT(gSpark_flags, i)) {
-            if (gSparks[i].car == NULL) {
-                BrVector3Copy(&pos, &gSparks[i].pos);
-            } else {
-                BrMatrix34ApplyP(&tv, &o, &gSparks[i].car->car_master_actor->t.t.mat);
-                BrVector3Copy(&o, &tv);
-                BrMatrix34ApplyP(&pos, &gSparks[i].pos, &gSparks[i].car->car_master_actor->t.t.mat);
-            }
-            BrVector3Add(&o, &pos, &gSparks[i].length);
-            BrVector3Sub(&tv, &pos, (br_vector3*)gCamera_to_world.m[3]);
-            BrMatrix34TApplyV(&new_pos, &tv, &gCamera_to_world);
-            BrVector3Sub(&tv, &o, (br_vector3*)gCamera_to_world.m[3]);
-            BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
-            if (gSparks[i].colour) {
-                DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gFog_shade_table);
-            } else {
-                DrawLine3D(&p, &new_pos, pRender_screen, pDepth_buffer, gAcid_shade_table);
-            }
+        if (!TEST_BIT(gSpark_flags, i)) {
+            continue;
         }
+        if (gSparks[i].car != NULL) {
+            BrMatrix34ApplyP(&tv, &pos, &gSparks[i].car->car_master_actor->t.t.mat);
+            BrVector3Copy(&pos, &tv);
+            BrMatrix34ApplyP(&new_pos, &gSparks[i].pos, &gSparks[i].car->car_master_actor->t.t.mat);
+        } else {
+            BrVector3Copy(&new_pos, &gSparks[i].pos);
+        }
+        BrVector3Add(&pos, &new_pos, &gSparks[i].length);
+        BrVector3Sub(&tv, &new_pos, (br_vector3*)gCamera_to_world.m[3]);
+        BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
+        BrVector3Sub(&tv, &pos, (br_vector3*)gCamera_to_world.m[3]);
+        BrMatrix34TApplyV(&o, &tv, &gCamera_to_world);
+        DrawLine3D(&o, &p, pRender_screen, pDepth_buffer, gSparks[i].colour ? gFog_shade_table : gAcid_shade_table);
     }
 }
 
@@ -605,6 +616,9 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
     if (num > 10) {
         num = 10;
     }
+#ifdef DETHRACE_FIX_BUGS
+    num = Harness_Hook_ScaleEmissionCountWithDt(num, gDt);
+#endif
     for (i = 0; i < num; i++) {
         BrVector3Copy(&gSparks[gNext_spark].pos, pos);
         BrVector3Copy(&gSparks[gNext_spark].normal, &normal);
@@ -634,6 +648,9 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
         if (num > 10) {
             num = 10;
         }
+#ifdef DETHRACE_FIX_BUGS
+        num = Harness_Hook_ScaleEmissionCountWithDt(num, gDt);
+#endif
         for (i = 0; i < num; i++) {
             BrVector3Copy(&gSparks[gNext_spark].pos, &pos2);
             BrVector3Copy(&gSparks[gNext_spark].normal, &norm);
@@ -686,6 +703,9 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
     BrMatrix34TApplyV(pos, &normal, &c->car_master_actor->t.t.mat);
     BrMatrix34TApplyV(&normal, pForce, &c->car_master_actor->t.t.mat);
     num = (ts / 10.f) + 3;
+#ifdef DETHRACE_FIX_BUGS
+    num = Harness_Hook_ScaleEmissionCountWithDt(num, gDt);
+#endif
     for (i = 0; i < num; i++) {
         BrVector3Copy(&gSparks[gNext_spark].pos, pos);
         BrVector3SetFloat(&gSparks[gNext_spark].normal, 0.f, 0.f, 0.f);
@@ -881,10 +901,10 @@ void DisposeShrapnel(void) {
         BrActorFree(gShrapnel[i].actor);
     }
     gShrapnel_flags = 0;
-    for (i = 0; i < COUNT_OF(gShrapnel_model); i++) {
-        BrModelRemove(gShrapnel_model[i]);
-        BrModelFree(gShrapnel_model[i]);
-    }
+    BrModelRemove(gShrapnel_model[0]);
+    BrModelRemove(gShrapnel_model[1]);
+    BrModelFree(gShrapnel_model[0]);
+    BrModelFree(gShrapnel_model[1]);
 }
 
 // IDA: void __usercall ReplayShrapnel(tU32 pTime@<EAX>)
@@ -895,11 +915,12 @@ void ReplayShrapnel(tU32 pTime) {
 
     for (i = 0; i < COUNT_OF(gShrapnel); i++) {
         mat = &gShrapnel[i].actor->t.t.mat;
-        if (TEST_BIT(gShrapnel_flags, i)) {
-            gShrapnel[i].age += GetReplayRate() * pTime;
-            DrMatrix34Rotate(mat, gShrapnel[i].age * BrDegreeToAngle(1), &gShrapnel[i].axis);
-            BrMatrix34PreShearX(mat, gShrapnel[i].shear1, gShrapnel[i].shear2);
+        if (!TEST_BIT(gShrapnel_flags, i)) {
+            continue;
         }
+        gShrapnel[i].age += GetReplayRate() * pTime;
+        DrMatrix34Rotate(mat, gShrapnel[i].age * BrDegreeToAngle(1), &gShrapnel[i].axis);
+        BrMatrix34PreShearX(mat, gShrapnel[i].shear1, gShrapnel[i].shear2);
     }
 }
 
@@ -972,8 +993,9 @@ void DrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
     s = FastScalarSinAngle(r);
     c = FastScalarCosAngle(r);
     t = 1.0f - c;
-    txy = t * a->v[0] * a->v[1];
-    txz = t * a->v[0] * a->v[2];
+    txy = t * a->v[0];
+    txz = txy * a->v[2];
+    txy = a->v[1] * txy;
     tyz = t * a->v[1] * a->v[2];
     sx = a->v[0] * s;
     sy = a->v[1] * s;
@@ -993,33 +1015,37 @@ void DrMatrix34Rotate(br_matrix34* mat, br_angle r, br_vector3* a) {
 // FUNCTION: CARM95 0x00469fc0
 void SmokeLine(int l, int x, br_scalar zbuff, int r_squared, tU8* scr_ptr, tU16* depth_ptr, tU8* shade_ptr, br_scalar r_multiplier, br_scalar z_multiplier, br_scalar shade_offset) {
     int i;
+#if defined(DETHRACE_FIX_BUGS)
     int offset; /* Added by dethrace. */
+#endif
     int r_multiplier_int;
     int shade_offset_int;
     tU16 z;
 
+    z = (1.f - zbuff) * 32768.0f;
     scr_ptr += gOffset;
     if (gProgram_state.cockpit_on) {
         depth_ptr += gOffset;
     }
-    z = (1.f - zbuff) * 32768.0f;
     r_multiplier_int = r_multiplier * 65536.0f;
     shade_offset_int = shade_offset * 65536.0f;
 
     for (i = 0; i < l; i++) {
         if (*depth_ptr > z) {
-            offset = ((shade_offset_int - r_squared * r_multiplier_int) >> 8) & 0xffffff00;
 #if defined(DETHRACE_FIX_BUGS)
+            offset = ((shade_offset_int - r_squared * r_multiplier_int) >> 8) & 0xffffff00;
             /* Prevent buffer underflows by capping negative offsets. */
             offset = MAX(0, offset);
-#endif
             *scr_ptr = shade_ptr[*scr_ptr + offset];
+#else
+            *scr_ptr = shade_ptr[*scr_ptr + (((shade_offset_int - r_squared * r_multiplier_int) >> 8) & 0xffffff00)];
+#endif
         }
-        r_multiplier = x + r_squared;
+        r_squared += x;
         scr_ptr++;
         x++;
         depth_ptr++;
-        r_squared = x + r_multiplier;
+        r_squared += x;
     }
 }
 
@@ -1296,8 +1322,8 @@ void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAs
     }
 
     srand(o->v[2] * 16777216.0f + o->v[1] * 65536.0f + o->v[0] * 256.0f + r);
-    BrVector3Sub(&tv, o, (br_vector3*)gCamera_to_world.m[3]);
-    BrMatrix34TApplyV(&p, &tv, &gCamera_to_world);
+    BrVector3Sub(&tv, o, (br_vector3*)gSmoke_camera_to_world.m[3]);
+    BrMatrix34TApplyV(&p, &tv, &gSmoke_camera_to_world);
 
     if (-p.v[2] >= cam->hither_z && -p.v[2] <= cam->yon_z) {
         scaled_r = gCameraToScreen.m[0][0] * r / -p.v[2];
@@ -1313,6 +1339,15 @@ void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAs
 void ReplaySmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera) {
     br_scalar aspect;
     int i;
+
+#ifdef DETHRACE_FIX_BUGS
+    // Smoke in mirror should use correct transform matrix
+    if (gRendering_mirror) {
+        gSmoke_camera_to_world = gRearview_camera_to_world;
+    } else {
+        gSmoke_camera_to_world = gCamera_to_world;
+    }
+#endif
 
     for (i = 0; i < COUNT_OF(gSmoke_column); i++) {
         if (TEST_BIT(gSmoke_flags, i)) {
@@ -1352,11 +1387,11 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     BrVector3Cross(&tv, &pCar->omega, &pCar->wpos[wheel]);
     BrVector3Scale(&vcs, &pCar->velocity_car_space, WORLD_SCALE * 1000.0f);
     BrVector3Accumulate(&vcs, &tv);
-    ts = BrVector3LengthSquared(&vcs);
+    ts = vcs.v[1] * vcs.v[1] + vcs.v[2] * vcs.v[2] + vcs.v[0] * vcs.v[0];
     if (ts < 25.0f) {
         return;
     }
-    decay_factor = sqrt(ts) / 25.0f;
+    decay_factor = (br_scalar)sqrt(ts) / 25.0f;
     if (decay_factor > 1.0f) {
         decay_factor = 1.0f;
     }
@@ -1364,17 +1399,17 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     tv.v[1] -= pCar->oldd[wheel] / WORLD_SCALE_D;
 
     alpha = -1000.0f;
-    if (vcs.v[2] > 0.0f) {
-        alpha = (pCar->bounds[0].min.v[2] - tv.v[2]) / vcs.v[2];
-    } else if (vcs.v[2] < 0.0f) {
+    if (vcs.v[2] < 0.0f) {
         alpha = (pCar->bounds[0].max.v[2] - tv.v[2]) / vcs.v[2];
+    } else if (vcs.v[2] > 0.0f) {
+        alpha = (pCar->bounds[0].min.v[2] - tv.v[2]) / vcs.v[2];
     }
 
     beta = -1000.0f;
-    if (vcs.v[0] > 0.0f) {
-        beta = (pCar->bounds[0].min.v[0] - tv.v[0]) / vcs.v[0];
-    } else if (vcs.v[0] < 0.0f) {
+    if (vcs.v[0] < 0.0f) {
         beta = (pCar->bounds[0].max.v[0] - tv.v[0]) / vcs.v[0];
+    } else if (vcs.v[0] > 0.0f) {
+        beta = (pCar->bounds[0].min.v[0] - tv.v[0]) / vcs.v[0];
     }
 
     ts = MAX(alpha, beta);
@@ -1383,7 +1418,7 @@ void GenerateContinuousSmoke(tCar_spec* pCar, int wheel, tU32 pTime) {
     BrMatrix34ApplyP(&pos, &tv, &pCar->car_master_actor->t.t.mat);
     BrMatrix34ApplyV(&v, &vcs, &pCar->car_master_actor->t.t.mat);
 
-    colour = gDust_rotate + gCurrent_race.material_modifiers[pCar->material_index[wheel]].smoke_type - 2;
+    colour = gCurrent_race.material_modifiers[pCar->material_index[wheel]].smoke_type - 2 + gDust_rotate;
     while (colour >= gNum_dust_tables) {
         colour -= gNum_dust_tables;
     }
@@ -1411,6 +1446,16 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     br_scalar ts;
     tU32 seed;
     tU32 not_lonely;
+
+#ifdef DETHRACE_FIX_BUGS
+    // Fix opponent smoke rendering in cockpit view with rearview mirror enabled
+    // SetWorldToScreen sets gCameraToScreen matrix, which is used by SmokeCircle3D
+    gSpark_cam = pCamera->type_data;
+    SetWorldToScreen(pRender_screen);
+
+    // Smoke in mirror should use correct transform matrix
+    gSmoke_camera_to_world = *pCamera_to_world;
+#endif
 
     BrVector3Set(&tv, 0, 0, 0);
     not_lonely = 0;
@@ -1747,14 +1792,13 @@ void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pSc
     tSmoke_column* col;
     br_actor* actor;
 
-    i = pIndex >> 4;
-    j = pIndex & 0xf;
-    col = &gSmoke_column[i];
-    col->frame_count[j] = pFrame_count;
-    col->scale_x[j] = pScale_x;
-    col->scale_y[j] = pScale_y;
-    col->offset_x[j] = pOffset_x;
-    col->offset_z[j] = pOffset_z;
+    i = pIndex & 0xf;
+    col = &gSmoke_column[(pIndex & ~0xf) >> 4];
+    col->frame_count[i] = pFrame_count;
+    col->scale_x[i] = pScale_x;
+    col->scale_y[i] = pScale_y;
+    col->offset_x[i] = pOffset_x;
+    col->offset_z[i] = pOffset_z;
 }
 
 // IDA: void __usercall ReplayFlame(tSmoke_column *col@<EAX>, br_actor *actor@<EDX>)
@@ -1762,11 +1806,9 @@ void AdjustFlame(int pIndex, int pFrame_count, br_scalar pScale_x, br_scalar pSc
 void ReplayFlame(tSmoke_column* col, br_actor* actor) {
     int i;
 
-    for (i = 0; i < COUNT_OF(col->frame_count); i++, actor = actor->next) {
+    for (i = 0; i < COUNT_OF(col->frame_count); i++) {
         col->frame_count[i] += GetReplayRate();
-        if (col->frame_count[i] < 0 || col->frame_count[i] >= COUNT_OF(gFlame_map)) {
-            actor->type = BR_ACTOR_NONE;
-        } else {
+        if (col->frame_count[i] >= 0 && col->frame_count[i] < COUNT_OF(gFlame_map)) {
             actor->type = BR_ACTOR_MODEL;
             actor->material->colour_map = gFlame_map[col->frame_count[i]];
             BrMaterialUpdate(actor->material, BR_MATU_ALL);
@@ -1776,7 +1818,10 @@ void ReplayFlame(tSmoke_column* col, br_actor* actor) {
                 1.f);
             actor->t.t.translate.t.v[0] = col->offset_x[i];
             actor->t.t.translate.t.v[2] = col->offset_z[i];
+        } else {
+            actor->type = BR_ACTOR_NONE;
         }
+        actor = actor->next;
     }
 }
 
@@ -2086,22 +2131,23 @@ void InitSplash(FILE* pF) {
     br_actor* actor;
     char the_path[256];
     char s[256];
+    br_pixelmap* the_blend_table; // dethrace: name not defined in symbol dump
     br_pixelmap* splash_maps[20];
 
     gSplash_flags = 0;
     gSplash_model = BrModelAllocate("Splash", 4, 2);
     if (pF != NULL) {
-        num = GetAnInt(pF);
+        num_files = GetAnInt(pF);
         gNum_splash_types = 0;
-        for (i = 0; num > i; ++i) {
+        for (i = 0; i < num_files; i++) {
             GetAString(pF, s);
             PathCat(the_path, gApplication_path, "PIXELMAP");
             PathCat(the_path, the_path, s);
-            num_files = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], 20 - gNum_splash_types);
-            if (num_files == 0) {
+            num = DRPixelmapLoadMany(the_path, &splash_maps[gNum_splash_types], COUNT_OF(splash_maps) - gNum_splash_types);
+            if (num == 0) {
                 FatalError(kFatalError_LoadPixelmapFile_S, the_path);
             }
-            gNum_splash_types += num_files;
+            gNum_splash_types += num;
         }
     } else {
         PathCat(the_path, gApplication_path, "PIXELMAP");
@@ -2109,11 +2155,12 @@ void InitSplash(FILE* pF) {
         gNum_splash_types = DRPixelmapLoadMany(the_path, splash_maps, 0x14u);
     }
     BrMapAddMany(splash_maps, gNum_splash_types);
-    for (i = 0; i < gNum_splash_types; ++i) {
+    the_blend_table = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
+    for (i = 0; i < gNum_splash_types; i++) {
         gSplash_material[i] = BrMaterialAllocate(0);
         gSplash_material[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT);
         gSplash_material[i]->flags |= BR_MATF_ALWAYS_VISIBLE | BR_MATF_PERSPECTIVE;
-        gSplash_material[i]->index_blend = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
+        gSplash_material[i]->index_blend = the_blend_table;
         gSplash_material[i]->colour_map = splash_maps[i];
         BrMaterialAdd(gSplash_material[i]);
     }
@@ -2182,21 +2229,24 @@ void DrawTheGlow(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
     br_vector3 tv;
     tU32 seed;
 
-    if (gColumn_flags) {
-        seed = rand();
-        srand(GetTotalTime());
-        for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
-            if (TEST_BIT(gColumn_flags, i) && gSmoke_column[i].colour <= 1) {
-                strength = 0.5f;
-                if (gSmoke_column[i].lifetime < 4000) {
-                    strength = gSmoke_column[i].lifetime * 0.5f / 4000.f;
-                }
-                BrVector3Set(&tv, gSmoke_column[i].pos.v[0], gSmoke_column[i].pos.v[1] + 0.02f, gSmoke_column[i].pos.v[2]);
-                SmokeCircle3D(&tv, 0.07f, strength, SRandomBetween(0.5f, 0.99f), pRender_screen, pDepth_buffer, gAcid_shade_table, pCamera);
-            }
-        }
-        srand(seed);
+    if (!gColumn_flags) {
+        return;
     }
+
+    seed = rand();
+    srand(GetTotalTime());
+    for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
+        if (!TEST_BIT(gColumn_flags, i) || gSmoke_column[i].colour > 1) {
+            continue;
+        }
+        strength = 0.5f;
+        if (gSmoke_column[i].lifetime < 4000) {
+            strength = gSmoke_column[i].lifetime * strength / 4000.f;
+        }
+        BrVector3Set(&tv, gSmoke_column[i].pos.v[0], gSmoke_column[i].pos.v[1] + 0.02, gSmoke_column[i].pos.v[2]);
+        SmokeCircle3D(&tv, 0.07f, strength, SRandomBetween(0.5f, 0.99f), pRender_screen, pDepth_buffer, gAcid_shade_table, pCamera);
+    }
+    srand(seed);
 }
 
 // IDA: void __usercall PipeInstantUnSmudge(tCar_spec *pCar@<EAX>)
@@ -2317,7 +2367,12 @@ void SmudgeCar(tCar_spec* pCar, int fire_point) {
                     if (BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]) != (int)ts) {
                         data[n].vertex_index = real_vertex_number;
                         data[n].light_index = (int)ts - BR_ALPHA(V11MODEL(model)->groups[group].vertex_colours[j]);
+#ifdef DETHRACE_FIX_BUGS
+                        // Fixes ubsan runtime error: shifting number in sign bit of signed number is UB
+                        V11MODEL(model)->groups[group].vertex_colours[j] = (unsigned)ts << 24;
+#else
                         V11MODEL(model)->groups[group].vertex_colours[j] = (int)ts << 24;
+#endif
                         if ((model->flags & BR_MODF_UPDATEABLE) != 0) {
                             model->vertices[V11MODEL(model)->groups[group].vertex_user[j]].index = (int)ts;
                         }
@@ -2436,7 +2491,10 @@ void StopCarSmoking(tCar_spec* pCar) {
     int i;
 
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
-        if (gSmoke_column[i].car == pCar && gSmoke_column[i].lifetime > 2000) {
+        if (gSmoke_column[i].car != pCar) {
+            continue;
+        }
+        if (gSmoke_column[i].lifetime > 2000) {
             gSmoke_column[i].lifetime = 2000;
         }
     }
@@ -2794,11 +2852,12 @@ void RenderSplashes(void) {
     int i;
 
     for (i = 0; i < COUNT_OF(gSplash); i++) {
-        if (TEST_BIT(gSplash_flags, i)) {
-            BrActorRelink(gNon_track_actor, gSplash[i].actor);
-            BrZbSceneRenderAdd(gSplash[i].actor);
-            BrActorRelink(gDont_render_actor, gSplash[i].actor);
+        if (!TEST_BIT(gSplash_flags, i)) {
+            continue;
         }
+        BrActorRelink(gNon_track_actor, gSplash[i].actor);
+        BrZbSceneRenderAdd(gSplash[i].actor);
+        BrActorRelink(gDont_render_actor, gSplash[i].actor);
     }
 }
 
