@@ -493,9 +493,24 @@ void CheckTimer(void) {
     static tU32 last_time_in_seconds = 0;
     static tU32 last_demo_time_in_seconds = 0;
 
+#ifdef DETHRACE_FIX_BUGS
     if (harness_game_config.freeze_timer) {
         return;
     }
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
+        if (harness_game_config.demo_timeout != 0) {
+            time_left = harness_game_config.demo_timeout - GetRaceTime();
+            time_in_seconds = (time_left + 500) / 1000;
+            if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)
+                DRS3StartSound(gPedestrians_outlet, 1001);
+            last_demo_time_in_seconds = time_in_seconds;
+            if (time_left <= 0) {
+                gTimer = 0;
+                RaceCompleted(eRace_over_demo);
+            }
+        }
+    }
+#endif
 
     if (!gFreeze_timer && !gCountdown && !gRace_finished) {
         if (gFrame_period < gTimer) {
@@ -511,20 +526,6 @@ void CheckTimer(void) {
         } else {
             gTimer = 0;
             RaceCompleted(eRace_over_out_of_time);
-        }
-
-        if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
-            if (harness_game_config.demo_timeout != 0) {
-                time_left = harness_game_config.demo_timeout - GetRaceTime();
-                time_in_seconds = (time_left + 500) / 1000;
-                if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)
-                    DRS3StartSound(gPedestrians_outlet, 1001);
-                last_demo_time_in_seconds = time_in_seconds;
-                if (time_left <= 0) {
-                    gTimer = 0;
-                    RaceCompleted(eRace_over_demo);
-                }
-            }
         }
     }
 }
