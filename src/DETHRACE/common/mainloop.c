@@ -514,21 +514,21 @@ void CheckTimer(void) {
     }
 #endif
 
-    if (!gFreeze_timer && !gCountdown && !gRace_finished) {
-        if (gFrame_period < gTimer) {
-            if (gNet_mode == eNet_mode_none) {
-                gTimer -= gFrame_period;
-            }
-            time_left = gTimer + 500;
-            time_in_seconds = (time_left) / 1000;
-            if (time_in_seconds != last_time_in_seconds && time_in_seconds <= 10) {
-                DRS3StartSound(gPedestrians_outlet, 1001);
-            }
-            last_time_in_seconds = time_in_seconds;
-        } else {
-            gTimer = 0;
-            RaceCompleted(eRace_over_out_of_time);
+    if (gFreeze_timer || gCountdown || gRace_finished) {
+        return;
+    }
+    if (gFrame_period >= gTimer) {
+        gTimer = 0;
+        RaceCompleted(eRace_over_out_of_time);
+    } else {
+        if (gNet_mode == eNet_mode_none) {
+            gTimer -= gFrame_period;
         }
+        time_in_seconds = (gTimer + 500) / 1000;
+        if (time_in_seconds != last_time_in_seconds && time_in_seconds <= 10) {
+            DRS3StartSound(gPedestrians_outlet, 1001);
+        }
+        last_time_in_seconds = time_in_seconds;
     }
 }
 
