@@ -631,9 +631,7 @@ void MungeEngineNoise(void) {
     }
 
     BrVector3Copy(&gCamera_position, (br_vector3*)&gCamera_to_world.m[3][0]);
-    gCamera_left.v[0] = gCamera_to_world.m[0][0] * -1.0f;
-    gCamera_left.v[1] = gCamera_to_world.m[0][1] * -1.0f;
-    gCamera_left.v[2] = gCamera_to_world.m[0][2] * -1.0f;
+    BrVector3Scale(&gCamera_left, (br_vector3*)&gCamera_to_world.m[0], -1.0f);
     BrVector3Sub(&gCamera_velocity, &gCamera_position, &gOld_camera_position);
     if (gFrame_period) {
         BrVector3InvScale(&gCamera_velocity, &gCamera_velocity, ((float)gFrame_period / 1000.0));
