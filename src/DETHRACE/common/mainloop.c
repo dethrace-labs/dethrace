@@ -253,7 +253,7 @@ void MungeHeadups(void) {
     net_credits = gProgram_state.credits_earned - gProgram_state.credits_lost;
     if (fabs((double)net_credits - (double)gLast_credit_headup__mainloop) / (double)gFrame_period > 1.2) {
         if (net_credits - gLast_credit_headup__mainloop > 0) {
-            net_credits = (net_credits - gLast_credit_headup__mainloop) + 1000.0 * (double)gFrame_period * 1.2 / 1000.0 + (double)gLast_credit_headup__mainloop;
+            net_credits = (net_credits - gLast_credit_headup__mainloop + 1000.0) * (double)gFrame_period * 1.2 / 1000.0 + (double)gLast_credit_headup__mainloop;
         } else {
             net_credits = (double)gLast_credit_headup__mainloop - ((double)(gLast_credit_headup__mainloop - net_credits) + 1000.0) * (double)gFrame_period * 1.2 / 1000.0;
         }
@@ -266,7 +266,7 @@ void MungeHeadups(void) {
         }
         if (gCountdown != new_countdown && new_countdown <= 5) {
             gCountdown = new_countdown;
-            NewImageHeadupSlot(eHeadupSlot_countdown, 0, 800, new_countdown + 4);
+            NewImageHeadupSlot(eHeadupSlot_countdown, 0, 800, gCountdown + 4);
             DRS3StartSound(gPedestrians_outlet, gCountdown + 8000);
             if (!new_countdown) {
                 MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo();
@@ -288,10 +288,11 @@ void MungeHeadups(void) {
     } else {
         if (net_credits >= 0) {
             sprintf(the_text, "\xF8%d\xFA %s", net_credits, GetMiscString(net_credits < 100000 ? kMiscString_PROFIT : kMiscString_PRFT));
+            ChangeHeadupText(gCredits_won_headup, the_text);
         } else {
             sprintf(the_text, "\xF8%d\xFA %s", -net_credits, GetMiscString(kMiscString_LOSS));
+            ChangeHeadupText(gCredits_won_headup, the_text);
         }
-        ChangeHeadupText(gCredits_won_headup, the_text);
         if (gPedestrians_on) {
             sprintf(the_text, "\xF8%d\xFA/%d %s", gProgram_state.peds_killed, gTotal_peds, GetMiscString(kMiscString_KILLS));
             ChangeHeadupText(gPed_kill_count_headup, the_text);
@@ -374,12 +375,12 @@ void MungeHeadups(void) {
         case eTime_bonus_tb_down:
             if (gTime_bonus) {
                 if (the_time - last_rattle_time > 15) {
-                    bonus = gTime_bonus;
+                    previous_time_bonus = gTime_bonus;
                     gTime_bonus -= (the_time - last_rattle_time) * gPoints_per_second[gProgram_state.skill_level] / 15;
                     if (gTime_bonus < 0) {
                         gTime_bonus = 0;
                     }
-                    gProgram_state.credits_earned += bonus - gTime_bonus;
+                    gProgram_state.credits_earned += previous_time_bonus - gTime_bonus;
                     last_rattle_time += 15 * ((the_time - last_rattle_time) / 15);
                 }
                 sprintf(the_text, "%s %d", GetMiscString(kMiscString_TimeBonus), gTime_bonus);
@@ -391,10 +392,11 @@ void MungeHeadups(void) {
             gRace_finished = 10000;
             break;
         case eTime_bonus_end_pause:
-            if (the_time >= 2000 && gRace_finished > 1) {
-                gRace_finished = 1;
+            if (the_time >= 2000) {
+                if (gRace_finished > 1) {
+                    gRace_finished = 1;
+                }
             }
-            break;
         default:
             return;
         }
