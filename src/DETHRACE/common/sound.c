@@ -368,7 +368,11 @@ void DRS3Service(void) {
 // IDA: int __usercall DRS3OutletSoundsPlaying@<EAX>(tS3_outlet_ptr pOutlet@<EAX>)
 // FUNCTION: CARM95 0x0046493a
 int DRS3OutletSoundsPlaying(tS3_outlet_ptr pOutlet) {
-    NOT_IMPLEMENTED();
+    if (gSound_enabled) {
+        return S3OutletSoundsPlaying(pOutlet);
+    } else {
+        return 0;
+    }
 }
 
 // IDA: int __usercall DRS3SoundStillPlaying@<EAX>(tS3_sound_tag pSound_tag@<EAX>)
@@ -446,12 +450,14 @@ void ToggleSoundEnable(void) {
 // IDA: void __cdecl SoundService()
 // FUNCTION: CARM95 0x00464adc
 void SoundService(void) {
+    tU32 this_service;
     br_matrix34 mat;
 
     if (gSound_enabled && !gServicing_sound) {
         gServicing_sound = 1;
-        gLast_sound_service = PDGetTotalTime();
-        if (gCDA_tag) {
+        this_service = PDGetTotalTime();
+        gLast_sound_service = this_service;
+        if (gCDA_is_playing) {
             if (!S3IsCDAPlaying()) {
                 StopMusic();
                 StartMusic();

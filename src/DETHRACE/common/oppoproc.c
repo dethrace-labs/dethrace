@@ -72,10 +72,10 @@ br_scalar CornerFudge(tCar_spec* pCar_spec) {
 br_scalar MaxCurvatureForCarSpeed(tCar_spec* pCar, br_scalar pSpeed) {
     br_scalar curv;
 
-    if (pSpeed >= 12.5f) {
-        curv = pCar->maxcurve * 12.5f / pSpeed;
-    } else {
+    if (pSpeed < 12.5f) {
         curv = pCar->maxcurve;
+    } else {
+        curv = pCar->maxcurve * 12.5f / pSpeed;
     }
     return curv;
 }
