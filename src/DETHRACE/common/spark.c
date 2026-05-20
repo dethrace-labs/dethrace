@@ -1841,9 +1841,7 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
     col = &gSmoke_column[c];
     actor = col->flame_actor;
     DRMatrix34RotateY(&actor->t.t.mat, FastScalarArcTan2Angle(gCamera_to_world.m[2][0], gCamera_to_world.m[2][2]));
-    actor->t.t.translate.t.v[0] = pPos->v[0];
-    actor->t.t.translate.t.v[1] = pPos->v[1];
-    actor->t.t.translate.t.v[2] = pPos->v[2];
+    BrVector3Copy(&actor->t.t.translate.t, pPos);
     actor = actor->children;
 
     if (gAction_replay_mode) {
