@@ -818,26 +818,26 @@ void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
 void TypeKey(int pSlot_index, char pKey) {
 
     switch (pKey) {
-    case KEY_GRAVE:
-        break;
     case KEY_BACKSPACE:
         DoRLBackspace(pSlot_index);
-        break;
+        return;
     case KEY_DELETE:
         DoRLDelete(pSlot_index);
-        break;
+        return;
     case KEY_INSERT:
         DoRLInsert(pSlot_index);
-        break;
+        return;
     case KEY_LEFT:
         DoRLCursorLeft(pSlot_index);
-        break;
+        return;
     case KEY_RIGHT:
         DoRLCursorRight(pSlot_index);
-        break;
+        return;
+    case KEY_GRAVE:
+        return;
     default:
         DoRLTypeLetter(PDGetASCIIFromKey(pKey), pSlot_index);
-        break;
+        return;
     }
 }
 
