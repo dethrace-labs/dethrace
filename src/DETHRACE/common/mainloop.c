@@ -537,20 +537,23 @@ void CheckTimer(void) {
 int MungeRaceFinished(void) {
 
     if (gRace_finished && !gAction_replay_mode) {
-        if (gNet_mode != eNet_mode_none && gRace_over_reason == eRace_not_over_yet) {
-            return 0;
+        if (gNet_mode) {
+            if (gRace_over_reason == eRace_not_over_yet) {
+                return 0;
+            }
         }
-        if (gRace_finished <= gFrame_period) {
-            if (!gTimer || gNet_mode == eNet_mode_none) {
+        if (gFrame_period >= gRace_finished) {
+            if (gTimer && gNet_mode) {
+                gRace_finished = 15 * gTimer + 4500;
+                gRace_bonus_headup = NewTextHeadupSlot(eHeadupSlot_race_bonus, 0, 0, -kFont_MEDIUMHD, "");
+                gTime_bonus_headup = NewTextHeadupSlot(eHeadupSlot_time_bonus, 0, 0, -kFont_MEDIUMHD, "");
+                gTime_bonus = 0;
+                gTime_bonus_start = GetTotalTime();
+                gTime_bonus_state = eTime_bonus_initial_pause;
+            } else {
                 gRace_finished = 0;
                 return 1;
             }
-            gRace_finished = 15 * gTimer + 4500;
-            gRace_bonus_headup = NewTextHeadupSlot(eHeadupSlot_race_bonus, 0, 0, -kFont_MEDIUMHD, "");
-            gTime_bonus_headup = NewTextHeadupSlot(eHeadupSlot_time_bonus, 0, 0, -kFont_MEDIUMHD, "");
-            gTime_bonus = 0;
-            gTime_bonus_start = GetTotalTime();
-            gTime_bonus_state = eTime_bonus_initial_pause;
         } else {
             gRace_finished -= gFrame_period;
         }
