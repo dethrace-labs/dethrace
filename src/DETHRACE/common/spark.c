@@ -2552,7 +2552,7 @@ void SingleSplash(tCar_spec* pCar, br_vector3* sp, br_vector3* normal, tU32 pTim
     tv.v[2] = sp->v[1] * pCar->omega.v[0] - pCar->omega.v[1] * sp->v[0];
     BrMatrix34ApplyV(&vel, &tv, c_mat);
     BrVector3Accumulate(&vel, &pCar->v);
-    speed = BR_LENGTH3(vel.v[0], vel.v[2], vel.v[1]);
+    speed = BrVector3Length(&vel);
     size = ((br_scalar)fabs(BrVector3Dot(normal, &vel)) * 5.0f + speed) / 150.0f;
     size += 0.047826085f;
     if (size > 0.5f) {
