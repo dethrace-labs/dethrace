@@ -698,18 +698,10 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
         return;
     }
     CreateShrapnelShower(pos, v, &normal, ts, pCar1, pCar2);
-    ts2 = BR_MAC3(
-              pForce->v[2], v->v[2],
-              pForce->v[1], v->v[1],
-              pForce->v[0], v->v[0])
-        / (ts * ts);
+    ts2 = BrVector3Dot(pForce, v) / BR_SQR(ts);
     BrVector3Scale(v, pForce, ts2);
-    tv.v[0] = c->car_master_actor->t.t.translate.t.v[0] / WORLD_SCALE;
-    tv.v[1] = c->car_master_actor->t.t.translate.t.v[1] / WORLD_SCALE;
-    tv.v[2] = c->car_master_actor->t.t.translate.t.v[2] / WORLD_SCALE;
-    tv.v[0] = pos->v[0] - tv.v[0];
-    tv.v[1] = pos->v[1] - tv.v[1];
-    tv.v[2] = pos->v[2] - tv.v[2];
+    BrVector3InvScale(&tv, &c->car_master_actor->t.t.translate.t, WORLD_SCALE);
+    BrVector3Sub(&tv, pos, &tv);
     BrMatrix34TApplyV(pos, &tv, &c->car_master_actor->t.t.mat);
     BrMatrix34TApplyV(&tv, pForce, &c->car_master_actor->t.t.mat);
     BrVector3Copy(pForce, &tv);
@@ -721,11 +713,7 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
         BrVector3Copy(&gSparks[gNext_spark].pos, pos);
         BrVector3SetFloat(&gSparks[gNext_spark].normal, 0.f, 0.f, 0.f);
         BrVector3SetFloat(&tv, FRandomBetween(-1.f, 1.f), FRandomBetween(-.2f, 1.f), FRandomBetween(-1.f, 1.f));
-        ts2 = BR_MAC3(
-                  pForce->v[2], tv.v[2],
-                  pForce->v[1], tv.v[1],
-                  pForce->v[0], tv.v[0])
-            / (ts * ts);
+        ts2 = BrVector3Dot(pForce, &tv) / BR_SQR(ts);
         BrVector3Scale(&tv2, pForce, ts2);
         BrVector3Sub(&gSparks[gNext_spark].v, &tv, &tv2);
         BrVector3Accumulate(&gSparks[gNext_spark].v, v);
