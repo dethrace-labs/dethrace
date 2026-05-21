@@ -130,8 +130,8 @@ void RecopyAreas(tInterface_spec* pSpec, br_pixelmap** pCopy_areas) {
             pCopy_areas[i],
             0,
             0,
-            pSpec->recopy_areas[i].right[gGraf_data_index] + -pSpec->recopy_areas[i].left[gGraf_data_index],
-            pSpec->recopy_areas[i].bottom[gGraf_data_index] + -pSpec->recopy_areas[i].top[gGraf_data_index]);
+            pSpec->recopy_areas[i].right[gGraf_data_index] - pSpec->recopy_areas[i].left[gGraf_data_index],
+            pSpec->recopy_areas[i].bottom[gGraf_data_index] - pSpec->recopy_areas[i].top[gGraf_data_index]);
     }
 }
 
