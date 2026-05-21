@@ -267,18 +267,18 @@ tU32* KevKeyService(void) {
     return_val[0] = 0;
     return_val[1] = 0;
 
-    if (keys >= 0x6B) {
-        if (!(keys > 0x6b00)) {
+    if (keys >= 0x6b) {
+        if (keys <= 0x6b00) {
             if ((keys & 0xff) == last_single_key || keys >> 8 == last_single_key) {
                 if ((keys & 0xff) == last_single_key) {
                     keys >>= 8;
                 } else if (keys >> 8 == last_single_key) {
                     keys &= 0xff;
+                } else {
+                    sum = 0;
+                    code = 0;
+                    return return_val;
                 }
-            } else {
-                sum = 0;
-                code = 0;
-                return return_val;
             }
         } else {
             sum = 0;
