@@ -156,7 +156,12 @@ void EnableChoice(int pChoice) {
 
     for (i = 0; i < gDisabled_count; i++) {
         if (gDisabled_choices[i] == pChoice) {
+#ifdef DETHRACE_FIX_BUGS
+            // Use memmove because destination and source overlap
             memmove(&gDisabled_choices[i], &gDisabled_choices[i + 1], (gDisabled_count - i - 1) * sizeof(gDisabled_choices[0]));
+#else
+            memcpy(&gDisabled_choices[i], &gDisabled_choices[i + 1], (gDisabled_count - i - 1) * sizeof(gDisabled_choices[0]));
+#endif
             gDisabled_count--;
             break;
         }
@@ -169,7 +174,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     tProg_status entry_status; //
     int x_coord;               //
     int y_coord;               //
-    int mouse_in_somewhere = 0;
+    int mouse_in_somewhere;
     int i; //
     int key2;
     int mouse_was_started;
@@ -183,7 +188,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     int the_max;
     int mouse_down;     //
     int new_mouse_down; //
-    int last_mouse_down = 0;
+    int last_mouse_down;
     int defeat_mode_change; //
     int selection_changed;  //
     char the_str[256];
@@ -201,6 +206,11 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     mouse_down = 0;
 #endif
     entry_status = gProgram_state.prog_status;
+    last_press = 0;
+    last_left_press = 0;
+    last_right_press = 0;
+    last_up_press = 0;
+    last_down_press = 0;
     gTyping_slot = -1;
     EdgeTriggerModeOn();
     gSpec = pSpec;
@@ -242,7 +252,6 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         pSpec->start_proc2();
     }
 
-    copy_areas = NULL;
     if (pSpec->number_of_recopy_areas != 0) {
         copy_areas = BrMemAllocate(sizeof(void*) * pSpec->number_of_recopy_areas, kMem_intf_copy_areas);
         for (i = 0; i < pSpec->number_of_recopy_areas; i++) {
@@ -262,24 +271,25 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             pSpec->recopy_areas[i].bottom[gGraf_data_index] - pSpec->recopy_areas[i].top[gGraf_data_index]);
     }
 
-    timed_out = -1; /* Not sure this is right, timed_out looks like its used as a bool? */
     last_choice = gCurrent_choice;
-    last_press = -1;
+    last_mode = gCurrent_mode;
+    the_key = -1;
     do {
         if (last_choice != gCurrent_choice) {
             ChangeSelection(pSpec, &last_choice, &gCurrent_choice, gCurrent_mode, 1);
         }
         last_choice = gCurrent_choice;
+        last_mode = gCurrent_mode;
         PollKeys();
         EdgeTriggerModeOff();
-        the_key = PDAnyKeyDown();
-        if (the_key != -1 && the_key != KEY_CAPSLOCK) {
+        key2 = PDAnyKeyDown();
+        if (key2 != -1 && key2 != KEY_CAPSLOCK) {
             gMouse_in_use = 0;
             ResetInterfaceTimeout();
         }
         EdgeTriggerModeOn();
-        if ((gTyping_slot < 0 || gAlways_typing) && (PDKeyDown(KEY_LEFT) || PDKeyDown(KEY_KP_4) || last_press == KEY_LEFT)) {
-            last_press = -1;
+        if ((gTyping_slot < 0 || gAlways_typing) && (PDKeyDown(KEY_LEFT) || PDKeyDown(KEY_KP_4) || the_key == KEY_LEFT)) {
+            the_key = -1;
             if (pSpec->move_left_delta[gCurrent_mode] != 0) {
                 gCurrent_choice += pSpec->move_left_delta[gCurrent_mode];
                 if (gCurrent_choice < pSpec->move_left_min[gCurrent_mode]) {
@@ -299,8 +309,8 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 gCurrent_mode = pSpec->move_left_new_mode[gCurrent_mode];
             }
         }
-        if ((gTyping_slot < 0 || gAlways_typing) && (PDKeyDown(KEY_RIGHT) || PDKeyDown(KEY_KP_6) || last_press == KEY_RIGHT)) {
-            last_press = -1;
+        if ((gTyping_slot < 0 || gAlways_typing) && (PDKeyDown(KEY_RIGHT) || PDKeyDown(KEY_KP_6) || the_key == KEY_RIGHT)) {
+            the_key = -1;
             if (pSpec->move_right_delta[gCurrent_mode] != 0) {
                 gCurrent_choice += pSpec->move_right_delta[gCurrent_mode];
                 if (gCurrent_choice < pSpec->move_right_min[gCurrent_mode]) {
@@ -320,8 +330,8 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 gCurrent_mode = pSpec->move_right_new_mode[gCurrent_mode];
             }
         }
-        if (PDKeyDown(KEY_UP) || PDKeyDown(KEY_KP_8) || last_press == KEY_UP) {
-            last_press = -1;
+        if (PDKeyDown(KEY_UP) || PDKeyDown(KEY_KP_8) || the_key == KEY_UP) {
+            the_key = -1;
             if (pSpec->move_up_delta[gCurrent_mode] != 0) {
                 gCurrent_choice += pSpec->move_up_delta[gCurrent_mode];
                 if (gCurrent_choice < pSpec->move_up_min[gCurrent_mode]) {
@@ -341,8 +351,8 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 gCurrent_mode = pSpec->move_up_new_mode[gCurrent_mode];
             }
         }
-        if (PDKeyDown(KEY_DOWN) || PDKeyDown(KEY_KP_2) || last_press == KEY_DOWN) {
-            last_press = -1;
+        if (PDKeyDown(KEY_DOWN) || PDKeyDown(KEY_KP_2) || the_key == KEY_DOWN) {
+            the_key = -1;
             if (pSpec->move_down_delta[gCurrent_mode] != 0) {
                 gCurrent_choice += pSpec->move_down_delta[gCurrent_mode];
                 if (gCurrent_choice < pSpec->move_down_min[gCurrent_mode]) {
@@ -365,13 +375,17 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         if (gTyping_slot >= 0 && pSpec->typeable[gCurrent_mode] && gTyping_slot != gCurrent_choice && !gAlways_typing) {
             gCurrent_choice = gTyping_slot;
         }
-        if (last_choice == gCurrent_choice) {
-            selection_changed = 0;
-        } else {
+        if (last_choice != gCurrent_choice) {
             ChangeSelection(pSpec, &last_choice, &gCurrent_choice, gCurrent_mode, 1);
             selection_changed = 1;
+        } else {
+            selection_changed = 0;
         }
-        timed_out = pSpec->time_out && (PDGetTotalTime() >= pSpec->time_out + gStart_time);
+
+        // added the `*1` to force asm matching
+        timed_out = pSpec->time_out && (PDGetTotalTime() >= (gStart_time + pSpec->time_out) * 1);
+        if (!timed_out) {
+        }
         RemoveTransientBitmaps(1);
         RecopyAreas(pSpec, copy_areas);
         if (pSpec->font_needed) {
@@ -442,8 +456,8 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
             escaped = 0;
         }
         if (escaped && gTyping_slot >= 0 && !gAlways_typing) {
-            pSpec->get_original_string(0, gTyping_slot, the_str, &the_max);
             escaped = 0;
+            pSpec->get_original_string(0, gTyping_slot, the_str, &the_max);
             RevertTyping(gTyping_slot, the_str);
             gTyping = 0;
             gTyping_slot = -1;
@@ -455,32 +469,36 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
                 }
             }
             if (pSpec->typeable[gCurrent_mode]) {
-                if (gTyping_slot >= 0 || gAlways_typing) {
+                if (gTyping_slot < 0 && !gAlways_typing) {
+                    go_ahead = 0;
+                    gTyping_slot = gCurrent_choice;
+                    pSpec->get_original_string(1, gCurrent_choice, the_str, &the_max);
+                    StartTyping(gTyping_slot, the_str, the_max);
+                    gTyping = 1;
+                } else {
                     KillCursor(gCurrent_choice);
                     RecopyAreas(pSpec, copy_areas);
                     RollLettersIn();
                     PDScreenBufferSwap(0);
-                } else {
-                    gTyping_slot = gCurrent_choice;
-                    pSpec->get_original_string(1, gCurrent_choice, the_str, &the_max);
-                    StartTyping(gTyping_slot, the_str, the_max);
-                    go_ahead = 0;
-                    gTyping = 1;
                 }
             }
-        } else if (gTyping_slot >= 0 && !escaped) {
-            last_press = PDAnyKeyDown();
-            if (last_press != -1 && (!gAlways_typing || (last_press != KEY_LEFT && last_press != KEY_RIGHT && last_press != KEY_UP && last_press != KEY_DOWN))) {
-                if (gCurrent_choice != gTyping_slot && !gAlways_typing) {
-                    ChangeSelection(pSpec, &gCurrent_choice, &gTyping_slot, gCurrent_mode, gAlways_typing);
-                    for (i = 0; i < 2; i++) {
-                        if (pSpec->typeable[i]) {
-                            gCurrent_mode = i;
-                            break;
+        } else {
+            if (gTyping_slot >= 0 && !escaped) {
+                if (!go_ahead) {
+                    the_key = PDAnyKeyDown();
+                    if (the_key != -1 && (!gAlways_typing || (the_key != KEY_LEFT && the_key != KEY_RIGHT && the_key != KEY_UP && the_key != KEY_DOWN))) {
+                        if (gCurrent_choice != gTyping_slot && !gAlways_typing) {
+                            ChangeSelection(pSpec, &gCurrent_choice, &gTyping_slot, gCurrent_mode, 0);
+                            for (i = 0; i < 2; i++) {
+                                if (pSpec->typeable[i]) {
+                                    gCurrent_mode = i;
+                                    break;
+                                }
+                            }
                         }
+                        TypeKey(gAlways_typing ? 0 : gCurrent_choice, the_key);
                     }
                 }
-                TypeKey(gAlways_typing ? 0 : gCurrent_choice, last_press);
             }
         }
         ServiceGame();
@@ -497,7 +515,7 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
         EndRollingLetters();
         DisposeFont(FONT_TYPEABLE);
     }
-    if (pSpec->number_of_recopy_areas > 0) {
+    if (pSpec->number_of_recopy_areas != 0) {
         for (i = 0; i < pSpec->number_of_recopy_areas; i++) {
             BrPixelmapFree(copy_areas[i]);
         }
@@ -562,5 +580,5 @@ void ChangeSelectionTo(int pNew_choice, int pNew_mode) {
     last_choice = gCurrent_choice;
     gCurrent_choice = pNew_choice;
     gCurrent_mode = pNew_mode;
-    ChangeSelection(gSpec, &last_choice, &gCurrent_choice, pNew_mode, 1);
+    ChangeSelection(gSpec, &last_choice, &gCurrent_choice, gCurrent_mode, 1);
 }
