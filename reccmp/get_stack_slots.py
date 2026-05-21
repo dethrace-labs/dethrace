@@ -36,7 +36,7 @@ def find_function_file(function_name: str, build_dir: Path) -> Optional[Path]:
 
 def extract_stack_slots(asm_file: Path, function_name: str) -> list[str]:
     """Extract stack slot definitions for the given function."""
-    proc_pattern = f"_{function_name}"
+    proc_pattern = re.compile(rf'^\s*_{re.escape(function_name)}\b.*\bPROC\b')
     slot_pattern = re.compile(r'^(_[\w$]+) = (-?\d+)$')
 
     with open(asm_file, 'r') as f:
@@ -45,7 +45,7 @@ def extract_stack_slots(asm_file: Path, function_name: str) -> list[str]:
     # Find the PROC line
     proc_line_idx = None
     for idx, line in enumerate(lines):
-        if proc_pattern in line:
+        if proc_pattern.search(line):
             proc_line_idx = idx
             break
 
