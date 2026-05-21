@@ -904,7 +904,11 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 
     if (pSet_current_palette) {
-        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+#ifdef DETHRACE_FIX_BUGS
+        memmove(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
+#else
+        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
+#endif
 #ifdef DETHRACE_3DFX_PATCH
         g16bit_palette_valid = 0;
 #endif
@@ -913,7 +917,8 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
         PDSetPalette(pThe_palette);
     }
     if (pThe_palette != gRender_palette) {
-        gPalette_munged |= 1u;
+        gPalette_munged |= 1;
+    } else {
     }
 }
 
