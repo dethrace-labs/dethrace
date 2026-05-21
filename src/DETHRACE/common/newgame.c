@@ -1182,17 +1182,14 @@ void DefaultNetSettings(void) {
 // IDA: int __usercall NetOptGoAhead@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
 // FUNCTION: CARM95 0x004b1a34
 int NetOptGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
-
     if (*pCurrent_mode != 0) {
         NetOptRight(pCurrent_choice, pCurrent_mode);
         return 0;
+    } else if (*pCurrent_choice == 2) {
+        RevertToDefaults();
+        return 0;
     } else {
-        if (*pCurrent_choice == 2) {
-            RevertToDefaults();
-            return 0;
-        } else {
-            return 1;
-        }
+        return 1;
     }
 }
 
