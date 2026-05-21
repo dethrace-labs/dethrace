@@ -187,7 +187,7 @@ endif()
 if(MSVC_42_FOR_RECCMP)
     add_executable(dethrace WIN32)
 
-    set(CMAKE_C_FLAGS_DEBUG "/Oi /Zi /MLd /G5")
+    set(CMAKE_C_FLAGS_DEBUG "/Oi /Zi /MLd /G5 /w")
 
     add_compile_definitions(_DEBUG)
     set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
