@@ -551,10 +551,11 @@ void BuildColourTable(br_pixelmap* pPalette) {
         green = (gRGB_colours[i] >> 8) & 0xFF;
         blue = gRGB_colours[i] & 0xFF;
         for (j = 0; j < 256; j++) {
-            if ((distance = (sqr((double)(signed int)(((br_uint_8*)pPalette->pixels)[4 * j + 2] - red))
-                             + sqr((double)(signed int)(((br_uint_8*)pPalette->pixels)[4 * j] - blue)))
-                                + sqr((double)(signed int)(((br_uint_8*)pPalette->pixels)[4 * j + 1] - green)))
-                < nearest_distance) {
+            distance = sqr(((br_uint_8*)pPalette->pixels)[4 * j + 2] - red)
+                + sqr(((br_uint_8*)pPalette->pixels)[4 * j + 1] - green)
+                + sqr(((br_uint_8*)pPalette->pixels)[4 * j] - blue);
+
+            if (distance < nearest_distance) {
                 nearest_distance = distance;
                 nearest_index = j;
             }
