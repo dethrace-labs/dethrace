@@ -453,7 +453,7 @@ void ResetLollipopQueue(void) {
 int AddToLollipopQueue(br_actor* pActor, int pIndex) {
 
     if (pIndex < 0) {
-        if (gNumber_of_lollipops < 100) {
+        if (gNumber_of_lollipops < COUNT_OF(gLollipops)) {
             gLollipops[gNumber_of_lollipops] = pActor;
             gNumber_of_lollipops++;
             return gNumber_of_lollipops - 1;
