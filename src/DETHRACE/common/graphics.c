@@ -906,7 +906,7 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 #ifdef DETHRACE_FIX_BUGS
         memmove(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
 #else
-        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
 #endif
 #ifdef DETHRACE_3DFX_PATCH
         g16bit_palette_valid = 0;
