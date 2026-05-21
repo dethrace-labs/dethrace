@@ -74,7 +74,7 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
 
     if (ChoiceDisabled(*pNew_selection)) {
         if (pSkip_disabled) {
-            if (*pOld_selection > *pNew_selection) {
+            if (*pOld_selection < *pNew_selection) {
                 do {
                     *pNew_selection = *pNew_selection + 1;
                     if (*pNew_selection < pSpec->move_up_min[pMode]) {
