@@ -73,48 +73,51 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
     int i;
 
     if (ChoiceDisabled(*pNew_selection)) {
-        if (!pSkip_disabled) {
-            *pNew_selection = *pOld_selection;
-        } else if (*pOld_selection < *pNew_selection) {
-            do {
-                *pNew_selection = *pNew_selection + 1;
-                if (*pNew_selection < pSpec->move_up_min[pMode]) {
-                    *pNew_selection = pSpec->move_up_max[pMode];
-                }
-                if (*pNew_selection > pSpec->move_up_max[pMode]) {
-                    *pNew_selection = pSpec->move_up_min[pMode];
-                }
-            } while (*pNew_selection != *pOld_selection && ChoiceDisabled(*pNew_selection));
+        if (pSkip_disabled) {
+            if (*pOld_selection < *pNew_selection) {
+                do {
+                    *pNew_selection = *pNew_selection + 1;
+                    if (*pNew_selection < pSpec->move_up_min[pMode]) {
+                        *pNew_selection = pSpec->move_up_max[pMode];
+                    }
+                    if (*pNew_selection > pSpec->move_up_max[pMode]) {
+                        *pNew_selection = pSpec->move_up_min[pMode];
+                    }
+                } while (*pNew_selection != *pOld_selection && ChoiceDisabled(*pNew_selection));
+            } else {
+                do {
+                    *pNew_selection = *pNew_selection - 1;
+                    if (*pNew_selection < pSpec->move_up_min[pMode]) {
+                        *pNew_selection = pSpec->move_up_max[pMode];
+                    }
+                    if (*pNew_selection > pSpec->move_up_max[pMode]) {
+                        *pNew_selection = pSpec->move_up_min[pMode];
+                    }
+                } while (*pNew_selection != *pOld_selection && ChoiceDisabled(*pNew_selection));
+            }
         } else {
-            do {
-                *pNew_selection = *pNew_selection - 1;
-                if (*pNew_selection < pSpec->move_up_min[pMode]) {
-                    *pNew_selection = pSpec->move_up_max[pMode];
-                }
-                if (*pNew_selection > pSpec->move_up_max[pMode]) {
-                    *pNew_selection = pSpec->move_up_min[pMode];
-                }
-            } while (*pNew_selection != *pOld_selection && ChoiceDisabled(*pNew_selection));
+            *pNew_selection = *pOld_selection;
         }
     }
 
-    if (*pOld_selection != *pNew_selection) {
-        if (*pOld_selection >= 0 && *pOld_selection < pSpec->number_of_button_flics) {
-            if (pSpec->flicker_off_flics[*pOld_selection].flic_index >= 0) {
-                AddToFlicQueue(pSpec->flicker_off_flics[*pOld_selection].flic_index,
-                    pSpec->flicker_off_flics[*pOld_selection].x[gGraf_data_index],
-                    pSpec->flicker_off_flics[*pOld_selection].y[gGraf_data_index], 0);
-            }
-        }
-        if (*pNew_selection >= 0 && *pNew_selection < pSpec->number_of_button_flics) {
-            if (pSpec->flicker_on_flics[*pNew_selection].flic_index >= 0) {
-                AddToFlicQueue(pSpec->flicker_on_flics[*pNew_selection].flic_index,
-                    pSpec->flicker_on_flics[*pNew_selection].x[gGraf_data_index],
-                    pSpec->flicker_on_flics[*pNew_selection].y[gGraf_data_index], 0);
-            }
-        }
-        *pOld_selection = *pNew_selection;
+    if (*pOld_selection == *pNew_selection) {
+        return;
     }
+
+    if (*pOld_selection >= 0 && *pOld_selection < pSpec->number_of_button_flics
+        && pSpec->flicker_off_flics[*pOld_selection].flic_index >= 0) {
+        AddToFlicQueue(pSpec->flicker_off_flics[*pOld_selection].flic_index,
+            pSpec->flicker_off_flics[*pOld_selection].x[gGraf_data_index],
+            pSpec->flicker_off_flics[*pOld_selection].y[gGraf_data_index], 0);
+    }
+    if (*pNew_selection >= 0 && *pNew_selection < pSpec->number_of_button_flics) {
+        if (pSpec->flicker_on_flics[*pNew_selection].flic_index >= 0) {
+            AddToFlicQueue(pSpec->flicker_on_flics[*pNew_selection].flic_index,
+                pSpec->flicker_on_flics[*pNew_selection].x[gGraf_data_index],
+                pSpec->flicker_on_flics[*pNew_selection].y[gGraf_data_index], 0);
+        }
+    }
+    *pOld_selection = *pNew_selection;
 }
 
 // IDA: void __usercall RecopyAreas(tInterface_spec *pSpec@<EAX>, br_pixelmap **pCopy_areas@<EDX>)

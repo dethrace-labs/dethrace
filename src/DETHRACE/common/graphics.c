@@ -538,14 +538,12 @@ void DrawNumberAt(br_pixelmap* gImage, int pX, int pY, int pX_pitch, int pY_pitc
 void BuildColourTable(br_pixelmap* pPalette) {
     int i;
     int j;
-    int nearest_index = 0;
+    int nearest_index;
     int red;
     int green;
     int blue;
     float nearest_distance;
     float distance;
-
-#define SQR(i) i* i
 
     for (i = 0; i < COUNT_OF(gRGB_colours); i++) {
         nearest_distance = 196608.f;
@@ -553,12 +551,13 @@ void BuildColourTable(br_pixelmap* pPalette) {
         green = (gRGB_colours[i] >> 8) & 0xFF;
         blue = gRGB_colours[i] & 0xFF;
         for (j = 0; j < 256; j++) {
-            distance = SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j + 2) - red));
-            distance += SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j) - blue));
-            distance += SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j + 1) - green));
+            distance = sqr(((br_uint_8*)pPalette->pixels)[4 * j + 2] - red)
+                + sqr(((br_uint_8*)pPalette->pixels)[4 * j + 1] - green)
+                + sqr(((br_uint_8*)pPalette->pixels)[4 * j] - blue);
+
             if (distance < nearest_distance) {
-                nearest_index = j;
                 nearest_distance = distance;
+                nearest_index = j;
             }
         }
         gColours[i] = nearest_index;
@@ -905,7 +904,11 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 
     if (pSet_current_palette) {
-        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+#ifdef DETHRACE_FIX_BUGS
+        memmove(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
+#else
+        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
+#endif
 #ifdef DETHRACE_3DFX_PATCH
         g16bit_palette_valid = 0;
 #endif
@@ -914,7 +917,8 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
         PDSetPalette(pThe_palette);
     }
     if (pThe_palette != gRender_palette) {
-        gPalette_munged |= 1u;
+        gPalette_munged |= 1;
+    } else {
     }
 }
 
@@ -923,7 +927,11 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     ((br_int_32*)pThe_palette->pixels)[0] = 0;
     if (pSet_current_palette) {
-        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+#ifdef DETHRACE_FIX_BUGS
+        memmove(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
+#else
+        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
+#endif
 #ifdef DETHRACE_3DFX_PATCH
         g16bit_palette_valid = 0;
 #endif
@@ -931,8 +939,9 @@ void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     if (!gFaded_palette) {
         PDSetPalette(pThe_palette);
     }
-    if (pThe_palette != gRender_palette) {
-        gPalette_munged |= 1u;
+    if (gRender_palette != pThe_palette) {
+        gPalette_munged |= 1;
+    } else {
     }
 }
 
