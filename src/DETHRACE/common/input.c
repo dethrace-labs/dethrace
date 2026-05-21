@@ -382,16 +382,20 @@ void GetMousePosition(int* pX_coord, int* pY_coord) {
     int y_top_margin;
     int y_bottom_margin;
 
+    x_left_margin = 0;
+    x_right_margin = 0;
+    y_top_margin = 0;
+    y_bottom_margin = 0;
     PDGetMousePosition(pX_coord, pY_coord);
-    if (*pX_coord < 0) {
-        *pX_coord = 0;
-    } else if (gGraf_specs[gGraf_spec_index].total_width < *pX_coord) {
-        *pX_coord = gGraf_specs[gGraf_spec_index].total_width;
+    if (*pX_coord < x_left_margin) {
+        *pX_coord = x_left_margin;
+    } else if (gGraf_specs[gGraf_spec_index].total_width - x_right_margin < *pX_coord) {
+        *pX_coord = gGraf_specs[gGraf_spec_index].total_width - x_right_margin;
     }
-    if (*pY_coord < 0) {
+    if (y_top_margin > *pY_coord) {
         *pY_coord = 0;
-    } else if (gGraf_specs[gGraf_spec_index].total_height < *pY_coord) {
-        *pY_coord = gGraf_specs[gGraf_spec_index].total_height;
+    } else if (gGraf_specs[gGraf_spec_index].total_height - y_bottom_margin < *pY_coord) {
+        *pY_coord = gGraf_specs[gGraf_spec_index].total_height - y_bottom_margin;
     }
 }
 
