@@ -1664,7 +1664,7 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
 void TransBrPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, br_uint_32 pColour, br_font* pFont, char* pText) {
     int len[2];
 
-    BrPixelmapText(pPixelmap, pX, pY - (TranslationMode() ? 2 : 0), pColour, pFont, (char*)pText);
+    BrPixelmapText(pPixelmap, pX, pY - (TranslationMode() ? 2 : 0), pColour, pFont, pText);
 }
 
 // IDA: void __usercall TransDRPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, char *pText, int pRight_edge)
