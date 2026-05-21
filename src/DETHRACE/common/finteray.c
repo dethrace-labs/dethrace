@@ -1340,11 +1340,11 @@ void GetTilingLimits(br_vector2* min, br_vector2* max) {
         }
         for (i = 0; i < 3; i++) {
             for (j = 0; j < 2; j++) {
-                if (verts[faces[f].vertices[0 + i]].map.v[j] < min->v[j]) {
-                    min->v[j] = verts[faces[f].vertices[0 + i]].map.v[j];
+                if (verts[faces[f].vertices[DR_FF(i)]].map.v[j] < min->v[j]) {
+                    min->v[j] = verts[faces[f].vertices[DR_FF(i)]].map.v[j];
                 }
-                if (verts[faces[f].vertices[0 + i]].map.v[j] > max->v[j]) {
-                    max->v[j] = verts[faces[f].vertices[0 + i]].map.v[j];
+                if (verts[faces[f].vertices[DR_FF(i)]].map.v[j] > max->v[j]) {
+                    max->v[j] = verts[faces[f].vertices[DR_FF(i)]].map.v[j];
                 }
             }
         }
