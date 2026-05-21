@@ -91,6 +91,7 @@ void SetJoystickArrays(int* pKeys, int pMark) {
 // IDA: void __cdecl PollKeys()
 // FUNCTION: CARM95 0x00471bbf
 void PollKeys(void) {
+    int i;
 
     gKey_poll_counter++;
     PDSetKeyArray(gKey_array, gKey_poll_counter);
