@@ -904,12 +904,7 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 
     if (pSet_current_palette) {
 #ifdef DETHRACE_FIX_BUGS
-        if ((char*)gCurrent_palette_pixels < (char*)pThe_palette->pixels + 0x400u
-            && (char*)pThe_palette->pixels < (char*)gCurrent_palette_pixels + 0x400u) {
-            memmove(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
-        } else {
-            memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
-        }
+        memmove(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
 #else
         memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
 #endif
