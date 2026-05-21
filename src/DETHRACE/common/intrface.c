@@ -74,7 +74,7 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
 
     if (ChoiceDisabled(*pNew_selection)) {
         if (pSkip_disabled) {
-            if (*pNew_selection < *pOld_selection) {
+            if (*pOld_selection > *pNew_selection) {
                 do {
                     *pNew_selection = *pNew_selection + 1;
                     if (*pNew_selection < pSpec->move_up_min[pMode]) {
@@ -110,11 +110,12 @@ void ChangeSelection(tInterface_spec* pSpec, int* pOld_selection, int* pNew_sele
             pSpec->flicker_off_flics[*pOld_selection].x[gGraf_data_index],
             pSpec->flicker_off_flics[*pOld_selection].y[gGraf_data_index], 0);
     }
-    if (*pNew_selection >= 0 && *pNew_selection < pSpec->number_of_button_flics
-        && pSpec->flicker_on_flics[*pNew_selection].flic_index >= 0) {
-        AddToFlicQueue(pSpec->flicker_on_flics[*pNew_selection].flic_index,
-            pSpec->flicker_on_flics[*pNew_selection].x[gGraf_data_index],
-            pSpec->flicker_on_flics[*pNew_selection].y[gGraf_data_index], 0);
+    if (*pNew_selection >= 0 && *pNew_selection < pSpec->number_of_button_flics) {
+        if (pSpec->flicker_on_flics[*pNew_selection].flic_index >= 0) {
+            AddToFlicQueue(pSpec->flicker_on_flics[*pNew_selection].flic_index,
+                pSpec->flicker_on_flics[*pNew_selection].x[gGraf_data_index],
+                pSpec->flicker_on_flics[*pNew_selection].y[gGraf_data_index], 0);
+        }
     }
     *pOld_selection = *pNew_selection;
 }
