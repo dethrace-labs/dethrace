@@ -1347,12 +1347,12 @@ void CheckHorn3D(tCar_spec* pCar) {
 void CheckHorns(void) {
     int i;
 
-    if (gNet_mode != eNet_mode_none) {
+    if (gNet_mode == eNet_mode_none) {
+        CheckHornLocal(&gProgram_state.current_car);
+    } else {
         for (i = 0; i < gNumber_of_net_players; i++) {
             CheckHorn3D(gNet_players[i].car);
         }
-    } else {
-        CheckHornLocal(&gProgram_state.current_car);
     }
 }
 
