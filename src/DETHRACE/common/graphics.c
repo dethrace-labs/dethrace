@@ -925,11 +925,7 @@ void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
         char* dst = gCurrent_palette_pixels;
         char* src = pThe_palette->pixels;
 #ifdef DETHRACE_FIX_BUGS
-        if ((dst < src + palette_size) && (src < dst + palette_size)) {
-            memmove(dst, src, palette_size);
-        } else {
-            memcpy(dst, src, palette_size);
-        }
+        memmove(dst, src, palette_size);
 #else
         memcpy(dst, src, palette_size);
 #endif
