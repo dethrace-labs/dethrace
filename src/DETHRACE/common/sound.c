@@ -617,11 +617,14 @@ void MungeEngineNoise(void) {
     // as the pitch shifts up and down while applying doppler effect in `S3Calculate3D`.
     // We avoid the issue by only updating the engine sounds every MUNGE_ENGINE_INTERVAL ms
     static tU32 dethrace_last_executed = 0;
+    tU32 old_frame_period;
 
     tU32 now = GetTotalTime();
     if (now - dethrace_last_executed < MUNGE_ENGINE_INTERVAL) {
         return;
     }
+    old_frame_period = gFrame_period;
+    gFrame_period = now - dethrace_last_executed;
     dethrace_last_executed = now;
 #endif
 
@@ -705,6 +708,11 @@ void MungeEngineNoise(void) {
         }
     }
     SoundService();
+
+#ifdef DETHRACE_FIX_BUGS
+    // restore original value (see above)
+    gFrame_period = old_frame_period;
+#endif
 }
 
 // IDA: void __cdecl SetSoundVolumes()
