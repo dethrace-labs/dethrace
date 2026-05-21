@@ -334,17 +334,16 @@ int KeyIsDown(int pKey_index) {
     int i;
 
     CheckKeysForMouldiness();
-    switch (pKey_index) {
-    case -2:
+    if (pKey_index == -2) {
         return 1;
-    case -1:
+    } else if (pKey_index == -1) {
         for (i = 0; i < BR_ASIZE(gGo_ahead_keys); i++) {
             if (gKey_array[gGo_ahead_keys[i]]) {
                 return 1;
             }
         }
         return 0;
-    default:
+    } else {
         return gKey_array[gKey_mapping[pKey_index]];
     }
 }
@@ -362,16 +361,9 @@ void WaitForNoKeys(void) {
 // IDA: void __cdecl WaitForAKey()
 // FUNCTION: CARM95 0x0047235a
 void WaitForAKey(void) {
-
-    while (1) {
+    do {
         CheckQuit();
-        if (AnyKeyDown()) {
-            break;
-        }
-        if (EitherMouseButtonDown()) {
-            break;
-        }
-    }
+    } while (!AnyKeyDown() && !EitherMouseButtonDown());
     CheckQuit();
     WaitForNoKeys();
 }
@@ -588,7 +580,12 @@ int ChangeCharTo(int pSlot_index, int pChar_index, char pNew_char) {
         for (let = gRolling_letters, j = 0; j < NBR_ROLLING_LETTERS; j++, let++) {
             if (let->number_of_letters >= 0 && x_coord == let->x_coord && y_coord == let->y_coord) {
                 if (pNew_char != ROLLING_LETTER_LOOP_RANDOM) {
+#ifdef DETHRACE_FIX_BUGS
+                    /* Internationalization - the (tU8) cast makes sure extended ASCII is positive. */
+                    let->letters[0] = (tU8)pNew_char;
+#else
                     let->letters[0] = pNew_char;
+#endif
                 }
                 if (pNew_char == ' ') {
                     let->letters[0] = pNew_char;
@@ -821,26 +818,26 @@ void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
 void TypeKey(int pSlot_index, char pKey) {
 
     switch (pKey) {
-    case KEY_GRAVE:
-        break;
     case KEY_BACKSPACE:
         DoRLBackspace(pSlot_index);
-        break;
-    case KEY_INSERT:
-        DoRLInsert(pSlot_index);
-        break;
+        return;
     case KEY_DELETE:
         DoRLDelete(pSlot_index);
-        break;
+        return;
+    case KEY_INSERT:
+        DoRLInsert(pSlot_index);
+        return;
     case KEY_LEFT:
         DoRLCursorLeft(pSlot_index);
-        break;
+        return;
     case KEY_RIGHT:
         DoRLCursorRight(pSlot_index);
-        break;
+        return;
+    case KEY_GRAVE:
+        return;
     default:
         DoRLTypeLetter(PDGetASCIIFromKey(pKey), pSlot_index);
-        break;
+        return;
     }
 }
 
