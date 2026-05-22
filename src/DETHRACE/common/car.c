@@ -1491,12 +1491,12 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
     mat = &pCar->car_master_actor->t.t.mat;
     highest_p = 0.f;
     for (i = 0; i < 3; i++) {
-        highest_p += (mat->m[i][2] * pCar->water_normal.v[2] - -(mat->m[i][1] * pCar->water_normal.v[1]) + mat->m[i][0] * pCar->water_normal.v[0]) * pCar->bounds[0].min.v[i];
+        highest_p += (mat->m[i][2] * pCar->water_normal.v[2] + (mat->m[i][1] * pCar->water_normal.v[1]) + mat->m[i][0] * pCar->water_normal.v[0]) * pCar->bounds[0].min.v[i];
     }
-    highest_p += BrVector3Dot((br_vector3*)&pCar->water_normal, (br_vector3*)mat->m[3]) / 6.9;
+    highest_p += BrVector3Dot(&pCar->water_normal, (br_vector3*)mat->m[3]) / WORLD_SCALE_D;
     lowest_p = highest_p;
     for (i = 0; i < 3; i++) {
-        val = (pCar->bounds[0].max.v[i] - pCar->bounds[0].min.v[i]) * (mat->m[i][2] * pCar->water_normal.v[2] - -(mat->m[i][1] * pCar->water_normal.v[1]) + mat->m[i][0] * pCar->water_normal.v[0]);
+        val = (pCar->bounds[0].max.v[i] - pCar->bounds[0].min.v[i]) * (mat->m[i][2] * pCar->water_normal.v[2] + (mat->m[i][1] * pCar->water_normal.v[1]) + mat->m[i][0] * pCar->water_normal.v[0]);
         if (val < 0.f) {
             lowest_p += val;
         } else {
