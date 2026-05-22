@@ -475,8 +475,7 @@ void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
     int i;
 
     for (i = 0; i < strlen(pStr); i++) {
-        AddRollingLetter(pStr[i], pX, pY, rolling_type);
-        pX += gCurrent_graf_data->rolling_letter_x_pitch;
+        AddRollingLetter(pStr[i], pX + gCurrent_graf_data->rolling_letter_x_pitch * i, pY, rolling_type);
     }
 }
 
