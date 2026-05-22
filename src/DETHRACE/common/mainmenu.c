@@ -204,6 +204,7 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
         { { 58, 116 }, { 139, 334 }, { 265, 530 }, { 149, 358 }, 6, 0, 0, NULL },
         { { 64, 128 }, { 155, 372 }, { 265, 530 }, { 165, 396 }, 7, 0, 0, NULL }
     };
+    // GLOBAL: CARM95 0x0050D708
     static tInterface_spec interface_spec1 = {
         0,                      // initial_imode
         0,                      // first_opening_flic
@@ -285,6 +286,8 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
         { { 52, 104 }, { 119, 286 }, { 265, 530 }, { 129, 310 }, 3, 0, 0, NULL },
         { { 58, 116 }, { 142, 341 }, { 265, 530 }, { 152, 365 }, 4, 0, 0, NULL }
     };
+
+    // GLOBAL: CARM95 0x0050DA60
     static tInterface_spec interface_spec2 = {
         0,                      // initial_imode
         31,                     // first_opening_flic
@@ -343,7 +346,7 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
     if (pContinue_allowed) {
         gMain_menu_spec = &interface_spec1;
         result = DoInterfaceScreen(&interface_spec1, gFaded_palette | 2, 0);
-        if (result == 0 || result == 1 || result == 2 || result == 7) {
+        if (result == 7 || result == 0 || result == 1 || result == 2) {
             FadePaletteDown();
         } else {
             RunFlic(12);
@@ -365,40 +368,31 @@ int DoMainMenuInterface(tU32 pTime_out, int pContinue_allowed) {
             return 1;
         case 7:
             return 7;
-        default:
-            break;
         }
-        result = -1;
     } else {
         interface_spec2.time_out = pTime_out;
         result = DoInterfaceScreen(&interface_spec2, gFaded_palette, 0);
-        if (result == -1 || result == 4) {
+        if (result == 4 || result == -1) {
             FadePaletteDown();
         } else {
             RunFlic(32);
         }
         switch (result) {
+        case -1:
+            return -1;
         case 0:
-            result = 4;
-            break;
+            return 4;
         case 1:
-            result = 5;
-            break;
+            return 5;
         case 2:
-            result = 6;
-            break;
+            return 6;
         case 3:
-            result = 3;
-            break;
+            return 3;
         case 4:
-            result = 7;
-            break;
-        default:
-            result = -1;
-            break;
+            return 7;
         }
     }
-    return result;
+    return -1;
 }
 
 // IDA: tMM_result __usercall GetMainMenuOption@<EAX>(tU32 pTime_out@<EAX>, int pContinue_allowed@<EDX>)
@@ -409,31 +403,35 @@ tMM_result GetMainMenuOption(tU32 pTime_out, int pContinue_allowed) {
     result = DoMainMenuInterface(pTime_out, pContinue_allowed);
     if (result < 0) {
         return eMM_timeout;
-    }
-    if (gProgram_state.prog_status == eProg_game_starting) {
-        return eMM_continue;
-    }
-    switch (result) {
-    case 1:
-        return eMM_end_game;
-    case 2:
-        return eMM_save;
-    case 3:
-        return eMM_loaded;
-    case 4:
-        return eMM_1_start;
-    case 5:
-        return eMM_n_start;
-    case 6:
-        return eMM_options;
-    case 7:
-        return eMM_quit;
-    case 8:
-        return eMM_recover;
-    case 9:
-        return eMM_abort_race;
-    default:
-        return eMM_continue;
+    } else {
+        if (gProgram_state.prog_status == eProg_game_starting) {
+            return eMM_continue;
+        } else {
+            switch (result) {
+            case 0:
+                return eMM_continue;
+            case 1:
+                return eMM_end_game;
+            case 2:
+                return eMM_save;
+            case 3:
+                return eMM_loaded;
+            case 4:
+                return eMM_1_start;
+            case 5:
+                return eMM_n_start;
+            case 6:
+                return eMM_options;
+            case 7:
+                return eMM_quit;
+            case 8:
+                return eMM_recover;
+            case 9:
+                return eMM_abort_race;
+            default:
+                return eMM_continue;
+            }
+        }
     }
 }
 
@@ -663,10 +661,18 @@ void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
     NetPlayerStatusChanged(ePlayer_status_main_menu);
     PreloadBunchOfFlics(0);
     switch (DoMainMenu(pTime_out, pSave_allowed, pContinue_allowed)) {
+    case eMM_quit:
+        gProgram_state.prog_status = eProg_quit;
+        break;
     case eMM_end_game:
         gProgram_state.prog_status = eProg_idling;
         break;
+    case eMM_timeout:
+        gProgram_state.prog_status = eProg_demo;
+        break;
     case eMM_1_start:
+        gProgram_state.prog_status = eProg_game_starting;
+        break;
     case eMM_n_start:
         gProgram_state.prog_status = eProg_game_starting;
         break;
@@ -674,14 +680,6 @@ void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
         if (gGame_to_load < 0) {
             gProgram_state.prog_status = eProg_game_starting;
         }
-        break;
-    case eMM_quit:
-        gProgram_state.prog_status = eProg_quit;
-        break;
-    case eMM_timeout:
-        gProgram_state.prog_status = eProg_demo;
-        break;
-    default:
         break;
     }
     UnlockBunchOfFlics(0);
