@@ -427,42 +427,38 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
     int number_of_letters;
 
     let = &gRolling_letters[0];
-    for (i = 0; i < NBR_ROLLING_LETTERS && let->number_of_letters >= 0; i++, let++) {
-    }
-    if (i == NBR_ROLLING_LETTERS) {
-        return -1;
-    }
-    let->x_coord = pX;
-    let->y_coord = pY;
-    let->rolling_type = rolling_type;
-    switch (rolling_type) {
-    case eRT_looping_random:
-        let->number_of_letters = 9;
-        break;
-    case eRT_looping_single:
-        let->number_of_letters = 2;
-        break;
-    default:
-        let->number_of_letters = IRandomBetween(3, 9);
-        break;
-    }
 
-    let->current_offset = gCurrent_graf_data->save_slot_letter_height * let->number_of_letters;
-    i = let->number_of_letters - 1;
-    for (; ((rolling_type - 2 < 1) ? -1 : 0) < i; i--) {
-        if (rolling_type == eRT_numeric) {
-            let->letters[i] = IRandomBetween('A', 'Z' + 1);
-        } else if (rolling_type != eRT_looping_single) {
-            let->letters[i] = pChar;
-        } else {
-            let->letters[i] = IRandomBetween('0', '9' + 1);
+    for (i = 0; i < NBR_ROLLING_LETTERS; i++, let++) {
+        if (let->number_of_letters < 0) {
+            let->rolling_type = rolling_type;
+            let->x_coord = pX;
+            let->y_coord = pY;
+
+            if (rolling_type == eRT_looping_random) {
+                let->number_of_letters = 9;
+            } else if (rolling_type == eRT_looping_single) {
+                let->number_of_letters = 2;
+            } else {
+                let->number_of_letters = IRandomBetween(3, 9);
+            }
+
+            let->current_offset = gCurrent_graf_data->save_slot_letter_height * let->number_of_letters;
+            for (i = let->number_of_letters - 1; ((rolling_type - 2) < 1 ? -1 : 0) < i; i--) {
+                if (rolling_type == eRT_numeric) {
+                    let->letters[i] = IRandomBetween('A', 'Z' + 1);
+                } else if (rolling_type != eRT_looping_single) {
+                    let->letters[i] = pChar;
+                } else {
+                    let->letters[i] = IRandomBetween('0', '9' + 1);
+                }
+            }
+            if (rolling_type != eRT_looping_random) {
+                let->letters[0] = pChar;
+            }
+            return i;
         }
     }
-    if (rolling_type != eRT_looping_random) {
-        let->letters[0] = pChar;
-    }
-
-    return i;
+    return -1;
 }
 
 // IDA: void __usercall AddRollingString(char *pStr@<EAX>, int pX@<EDX>, int pY@<EBX>, tRolling_type rolling_type@<ECX>)
