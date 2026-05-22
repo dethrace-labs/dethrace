@@ -137,22 +137,21 @@ float FastFloatSin(int pAngle_in_degrees) {
 // FUNCTION: CARM95 0x004aa18c
 float FastFloatCos(int pAngle_in_degrees) {
 
-    if (pAngle_in_degrees >= 0) {
-        pAngle_in_degrees = pAngle_in_degrees % 360;
-    } else {
+    if (pAngle_in_degrees < 0) {
         pAngle_in_degrees = 360 - -pAngle_in_degrees % 360;
+    } else {
+        pAngle_in_degrees = pAngle_in_degrees % 360;
     }
 
     if (pAngle_in_degrees > 270) {
         return gFloat_sine_table[pAngle_in_degrees - 270];
-    }
-    if (pAngle_in_degrees > 180) {
+    } else if (pAngle_in_degrees > 180) {
         return -gFloat_sine_table[270 - pAngle_in_degrees];
-    }
-    if (pAngle_in_degrees <= 90) {
+    } else if (pAngle_in_degrees > 90) {
+        return -gFloat_sine_table[pAngle_in_degrees - 90];
+    } else {
         return gFloat_sine_table[90 - pAngle_in_degrees];
     }
-    return -gFloat_sine_table[pAngle_in_degrees - 90];
 }
 
 // IDA: float __usercall FastFloatTan@<ST0>(int pAngle_in_degrees@<EAX>)
@@ -313,9 +312,9 @@ br_angle FastFloatArcTan2Angle(float pY, float pX) {
     abs_y = fabs(pY);
     if (pX == 0.0f) {
         if (pY < 0.0f) {
-            return -16396;
+            return BR_ANGLE_DEG(270);
         } else if (pY > 0.0f) {
-            return 16380;
+            return BR_ANGLE_DEG(90);
         } else {
             return 0;
         }
