@@ -2398,14 +2398,15 @@ void FadePaletteUp(void) {
     int the_time;
 
     if (!gFaded_palette) {
-    } else {
-        gFaded_palette = 0;
-        start_time = PDGetTotalTime();
-        while ((the_time = PDGetTotalTime() - start_time) < 500) {
-            SetFadedPalette((the_time * 256) / 500);
-        }
-        DRSetPalette(gCurrent_palette);
+        return;
     }
+
+    gFaded_palette = 0;
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime() - start_time) < 500) {
+        SetFadedPalette((the_time * 256) / 500);
+    }
+    DRSetPalette(gCurrent_palette);
 }
 
 // IDA: void __cdecl KillSplashScreen()
