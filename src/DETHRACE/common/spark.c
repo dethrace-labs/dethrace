@@ -2518,15 +2518,18 @@ void ConditionalSmokeColumn(tCar_spec* pCar, int pDamage_index, int pColour) {
     int i;
 
     if (!pColour) {
-        pColour = pCar->driver < eDriver_net_human;
+        if (pCar->driver < eDriver_net_human) {
+            pColour = 1;
+        }
     }
-    if (pCar->num_smoke_columns != 0) {
+    if (pCar->num_smoke_columns > 0) {
         for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
             if (gSmoke_column[i].car == pCar) {
-                if (TEST_BIT(gColumn_flags, i) && gSmoke_column[i].colour <= pColour && gSmoke_column[i].lifetime) {
+                if (TEST_BIT(gColumn_flags, i) && gSmoke_column[i].colour <= pColour && gSmoke_column[i].lifetime != 0) {
                     return;
+                } else {
+                    gSmoke_column[i].lifetime = 2000;
                 }
-                gSmoke_column[i].lifetime = 2000;
             }
         }
     }
