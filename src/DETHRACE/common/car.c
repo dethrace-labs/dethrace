@@ -4538,7 +4538,8 @@ void MungeCarGraphics(tU32 pFrame_period) {
         }
         if (the_car->driver < eDriver_net_human && (!gAction_replay_mode || !ReplayIsPaused())) {
             if (gCountdown) {
-                sine_angle = FastScalarSin((frac(FRandomBetween(0.4f, 1.6f) * (GetTotalTime() / ((float)gCountdown * 100.0f))) * 360.0));
+                rev_angle = frac(FRandomBetween(0.4f, 1.6f) * (GetTotalTime() / ((float)gCountdown * 100.0f))) * 360.0;
+                sine_angle = FastScalarSin(rev_angle);
                 raw_revs = the_car->red_line * fabs(sine_angle);
                 rev_reducer = (11.0 - (double)gCountdown) / 10.0;
                 the_car->revs = rev_reducer * raw_revs;
@@ -4695,10 +4696,8 @@ void MungeCarGraphics(tU32 pFrame_period) {
             car_x = the_car->car_master_actor->t.t.translate.t.v[0];
             car_z = the_car->car_master_actor->t.t.translate.t.v[2];
             the_material = NULL;
-            if (the_car->last_special_volume != NULL && the_car->last_special_volume->screen_material != NULL) {
-                if (!gAction_replay_mode && the_car->last_special_volume != gDefault_water_spec_vol) {
-                    the_material = the_car->last_special_volume->screen_material;
-                } else if (gProgram_state.current_depth_effect.type == eDepth_effect_fog) {
+            if (the_car->last_special_volume == NULL || the_car->last_special_volume->screen_material == NULL) {
+                if (gProgram_state.current_depth_effect.type == eDepth_effect_fog) {
                     the_material = gProgram_state.standard_screen_fog;
                 } else if (gProgram_state.current_depth_effect.sky_texture != NULL) {
                     the_material = gProgram_state.standard_screen;
@@ -4706,7 +4705,9 @@ void MungeCarGraphics(tU32 pFrame_period) {
                     the_material = gProgram_state.standard_screen_dark;
                 }
             } else {
-                if (gProgram_state.current_depth_effect.type == eDepth_effect_fog) {
+                if (!gAction_replay_mode || the_car->last_special_volume != gDefault_water_spec_vol) {
+                    the_material = the_car->last_special_volume->screen_material;
+                } else if (gProgram_state.current_depth_effect.type == eDepth_effect_fog) {
                     the_material = gProgram_state.standard_screen_fog;
                 } else if (gProgram_state.current_depth_effect.sky_texture != NULL) {
                     the_material = gProgram_state.standard_screen;
