@@ -103,15 +103,18 @@
 #ifdef DETHRACE_FIX_BUGS
 // Fixes ubsan runtime errors related to memcpy arguments:
 // e.g. null pointer passed as argument 2, which is declared to never be null
-#define DR_SAFE_MEMCPY(DST, SRC, N) \
-    do { \
-        if ((N) != 0) { \
+#define DR_SAFE_MEMCPY(DST, SRC, N)    \
+    do {                               \
+        if ((N) != 0) {                \
             memcpy((DST), (SRC), (N)); \
-        } \
+        }                              \
     } while (0)
 #else
 #define DR_SAFE_MEMCPY(DST, SRC, N) memcpy((DST), (SRC), (N))
 #endif
+
+// "Force first" - for asm matching it can be helpful to try and force one branch/operation to be evaluated first
+#define DR_FF(x) (x * 1)
 
 // MACROS_H
 #endif
