@@ -2006,7 +2006,7 @@ void RotateCar(tCollision_info* c, br_scalar dt) {
     int steps;
     int i;
 
-    rad_squared = ((c->omega.v[1] * c->omega.v[1] - -(c->omega.v[2] * c->omega.v[2])) + c->omega.v[0] * c->omega.v[0]) * dt;
+    rad_squared = BrVector3LengthSquared(&c->omega) * dt;
     BrVector3Copy(&c->oldomega, &c->omega);
 
     if (rad_squared < .0000001) {
