@@ -1215,6 +1215,23 @@ int S3StopSound(tS3_sound_tag pTag) {
     return 0;
 }
 
+// FUNCTION: CARM95 0x0049C6E2
+int S3OutletSoundsPlaying(tS3_outlet* pOutlet) {
+    int sound_count;
+    tS3_channel* c;
+
+    sound_count = 0;
+    if (!gS3_enabled) {
+        return 0;
+    }
+    for (c = pOutlet->channel_list; c != NULL; c = c->next) {
+        if (c->active) {
+            sound_count++;
+        }
+    }
+    return sound_count;
+}
+
 // FUNCTION: CARM95 0x0049C748
 int S3StopOutletSound(tS3_outlet* pOutlet) {
     tS3_channel* c; // [esp+Ch] [ebp-4h]
