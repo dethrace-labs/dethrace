@@ -448,12 +448,12 @@ float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflecti
 // IDA: float __usercall RepairCar@<ST0>(tU16 pCar_ID@<EAX>, tU32 pFrame_period@<EDX>, br_scalar *pTotal_deflection@<EBX>)
 // FUNCTION: CARM95 0x004be159
 float RepairCar(tU16 pCar_ID, tU32 pFrame_period, br_scalar* pTotal_deflection) {
-
-    if (VEHICLE_TYPE_FROM_ID(pCar_ID) == eVehicle_self) {
-        return RepairCar2(&gProgram_state.current_car, pFrame_period, pTotal_deflection);
-    }
-
-    return RepairCar2(GetCarSpec(VEHICLE_TYPE_FROM_ID(pCar_ID), VEHICLE_INDEX_FROM_ID(pCar_ID)), pFrame_period, pTotal_deflection);
+    return RepairCar2(
+        VEHICLE_TYPE_FROM_ID(pCar_ID) == eVehicle_self
+            ? &gProgram_state.current_car
+            : GetCarSpec(VEHICLE_TYPE_FROM_ID(pCar_ID), VEHICLE_INDEX_FROM_ID(pCar_ID)),
+        pFrame_period,
+        pTotal_deflection);
 }
 
 // IDA: void __usercall TotallyRepairACar(tCar_spec *pCar@<EAX>)
@@ -521,9 +521,14 @@ void TotallyRepairCar(void) {
 // FUNCTION: CARM95 0x004be5b5
 void CheckLastCar(void) {
 
-    if (gNet_mode == eNet_mode_none && GetCarCount(eVehicle_opponent) != 0 && NumberOfOpponentsLeft() == 0) {
-        NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -kFont_MEDIUMHD, GetMiscString(kMiscString_EveryOpponentWasted));
-        RaceCompleted(eRace_over_opponents);
+    if (gNet_mode != eNet_mode_none) {
+    } else {
+        if (GetCarCount(eVehicle_opponent) != 0) {
+            if (NumberOfOpponentsLeft() == 0) {
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 5000, -kFont_MEDIUMHD, GetMiscString(kMiscString_EveryOpponentWasted));
+                RaceCompleted(eRace_over_opponents);
+            }
+        }
     }
 }
 
@@ -582,7 +587,11 @@ void DamageUnit2(tCar_spec* pCar, int pUnit_type, int pDamage_amount) {
         last_level = the_damage->damage_level;
         the_damage->damage_level += pDamage_amount;
         if (the_damage->damage_level >= 99) {
-            the_damage->damage_level = (pDamage_amount < 10) ? last_level : 99;
+            if (pDamage_amount < 10) {
+                the_damage->damage_level = last_level;
+            } else {
+                the_damage->damage_level = 99;
+            }
         }
         if (pCar->driver == eDriver_oppo || gNet_mode != eNet_mode_none) {
             SetKnackeredFlag(pCar);
@@ -615,12 +624,14 @@ void RecordLastDamage(tCar_spec* pCar) {
 // FUNCTION: CARM95 0x004bf3b9
 void DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, float pNastiness) {
 
-    if (pCar->driver < eDriver_net_human) {
-        DamageUnit2(pCar, pDamage_type, ((gCurrent_race.suggested_rank < 10 ? 0.5f : gCurrent_race.suggested_rank) / 20.0f + 1.0f) * (pNastiness * pMagnitude * 10.0f));
-    } else if (gNet_mode != eNet_mode_none) {
-        DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 15.0f);
-    } else if (PercentageChance(pNastiness * pMagnitude * 1500.0f)) {
-        DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 30.0f);
+    if (pCar->driver >= eDriver_net_human) {
+        if (gNet_mode != eNet_mode_none) {
+            DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 15.0f);
+        } else if (PercentageChance(pNastiness * pMagnitude * 1500.0f)) {
+            DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 30.0f);
+        }
+    } else {
+        DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 10.0f * ((gCurrent_race.suggested_rank < 10 ? 0.5 : gCurrent_race.suggested_rank) / 20.0 + 1.0));
     }
 }
 
@@ -677,27 +688,26 @@ void DoPratcamHit(br_vector3* pHit_vector) {
     int strength_modifier;
     br_scalar strength;
 
+    strength_modifier = 0;
     strength = BrVector3LengthSquared(pHit_vector);
     if (strength > 0.2f) {
         strength_modifier = 8;
     } else if (strength > 0.015f) {
         strength_modifier = 4;
-    } else if (strength >= 0.001f) {
-        strength_modifier = 0;
-    } else {
+    } else if (strength < 0.001f) {
         return;
     }
-    if (fabs(pHit_vector->v[2]) >= fabs(pHit_vector->v[0])) {
-        if (pHit_vector->v[2] >= 0.f) {
-            PratcamEvent(kPratcam_small_hit_front + strength_modifier);
+    if (fabs(pHit_vector->v[2]) < fabs(pHit_vector->v[0])) {
+        if (pHit_vector->v[0] < 0.f) {
+            PratcamEvent(kPratcam_small_hit_right + strength_modifier);
         } else {
-            PratcamEvent(kPratcam_small_hit_behind + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_left + strength_modifier);
         }
     } else {
-        if (pHit_vector->v[0] >= 0.f) {
-            PratcamEvent(kPratcam_small_hit_left + strength_modifier);
+        if (pHit_vector->v[2] < 0.f) {
+            PratcamEvent(kPratcam_small_hit_behind + strength_modifier);
         } else {
-            PratcamEvent(kPratcam_small_hit_right + strength_modifier);
+            PratcamEvent(kPratcam_small_hit_front + strength_modifier);
         }
     }
 }
@@ -897,20 +907,24 @@ tImpact_location GetDirection(br_vector3* pVelocity) {
     mag_x = fabs(pVelocity->v[0]);
     mag_y = fabs(pVelocity->v[1]);
     mag_z = fabs(pVelocity->v[2]);
-    if (mag_y >= mag_x || mag_z >= mag_x) {
-        if (mag_y <= mag_x || mag_z >= mag_y) {
-            if (pVelocity->v[2] >= 0.0f) {
-                return eImpact_back;
-            } else {
-                return eImpact_front;
-            }
+    if (mag_y < mag_x && mag_z < mag_x) {
+        if (pVelocity->v[0] < 0.0f) {
+            return eImpact_left;
         } else {
-            return pVelocity->v[1] < 0.0;
+            return eImpact_right;
         }
-    } else if (pVelocity->v[0] >= 0.0) {
-        return eImpact_right;
+    } else if (mag_y > mag_x && mag_z < mag_y) {
+        if (pVelocity->v[1] < 0.0f) {
+            return eImpact_bottom;
+        } else {
+            return eImpact_top;
+        }
     } else {
-        return eImpact_left;
+        if (pVelocity->v[2] < 0.0f) {
+            return eImpact_front;
+        } else {
+            return eImpact_back;
+        }
     }
 }
 
@@ -934,20 +948,23 @@ void SortOutSmoke(tCar_spec* pCar) {
     int pass;
     int repeat;
 
+    pass = 0;
+    repeat = 0;
+
     if (!pCar || pCar->driver <= eDriver_non_car) {
         return;
     }
     for (i = 0; i < COUNT_OF(pCar->damage_units); i++) {
-        if (pCar->damage_units[i].damage_level != pCar->damage_units[i].smoke_last_level) {
-            step = gSmoke_damage_step[i];
-            if (step) {
-                if (pCar->damage_units[i].damage_level > pCar->damage_units[i].smoke_last_level) {
-                    old_colour = (99 - pCar->damage_units[i].smoke_last_level) / step;
-                    colour = (99 - pCar->damage_units[i].damage_level) / step;
-                    if (old_colour != colour && colour <= 2) {
-                        ConditionalSmokeColumn(pCar, i, colour);
-                    }
-                }
+        if (pCar->damage_units[i].damage_level == pCar->damage_units[i].smoke_last_level) {
+            continue;
+        }
+
+        step = gSmoke_damage_step[i];
+        if (step != 0 && pCar->damage_units[i].damage_level > pCar->damage_units[i].smoke_last_level) {
+            colour = (99 - pCar->damage_units[i].damage_level) / step;
+            old_colour = (99 - pCar->damage_units[i].smoke_last_level) / step;
+            if (step > 0 && old_colour != colour && colour <= 2) {
+                ConditionalSmokeColumn(pCar, i, colour);
             }
         }
     }
