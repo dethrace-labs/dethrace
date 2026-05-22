@@ -1323,23 +1323,24 @@ void DrawMapSmallBlip(tU32 pTime, br_vector3* pPos, int pColour) {
     tU32 time_diff;
 
     if (pTime & 0x100) {
-    } else {
-        BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
-        if (gReal_graf_data_index != 0) {
-            map_pos.v[0] = 2.f * map_pos.v[0];
-            map_pos.v[1] = 2.f * map_pos.v[1] + HIRES_Y_OFFSET;
-        }
+        return;
+    }
+
+    BrMatrix34ApplyP(&map_pos, pPos, &gCurrent_race.map_transformation);
+    if (gReal_graf_data_index != 0) {
+        map_pos.v[0] = 2.f * map_pos.v[0];
+        map_pos.v[1] = 2.f * map_pos.v[1] + HIRES_Y_OFFSET;
+    }
 #ifdef DETHRACE_3DFX_PATCH
-        if (gBack_screen->type == BR_PMT_RGB_565) {
-            offset = ((int)map_pos.v[0] * 2) + gBack_screen->row_bytes * (int)map_pos.v[1];
-            pColour = PaletteEntry16Bit(gRender_palette, pColour);
-            tU8* p1 = &(((tU8*)gBack_screen->pixels)[offset]);
-            *((br_uint_16*)(p1)) = pColour;
-        } else
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        offset = ((int)map_pos.v[0] * 2) + gBack_screen->row_bytes * (int)map_pos.v[1];
+        pColour = PaletteEntry16Bit(gRender_palette, pColour);
+        tU8* p1 = &(((tU8*)gBack_screen->pixels)[offset]);
+        *((br_uint_16*)(p1)) = pColour;
+    } else
 #endif
-        {
-            ((br_uint_8*)gBack_screen->pixels)[(int)map_pos.v[0] + gBack_screen->row_bytes * (int)map_pos.v[1]] = pColour;
-        }
+    {
+        ((br_uint_8*)gBack_screen->pixels)[(int)map_pos.v[0] + gBack_screen->row_bytes * (int)map_pos.v[1]] = pColour;
     }
 }
 
