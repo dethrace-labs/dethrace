@@ -88,7 +88,7 @@ void InitRayCasting(void) {
 // FUNCTION: CARM95 0x004952ca
 int BadDiv__raycast(br_scalar a, br_scalar b) {
     //
-    return fabs(b) < 1.0 && fabs(a) > fabs(b) * BR_SCALAR_MAX;
+    return (float)fabs(b) < 1.0f && (float)fabs(a) > (float)fabs(b) * BR_SCALAR_MAX;
 }
 
 // IDA: void __usercall DRVector2AccumulateScale(br_vector2 *a@<EAX>, br_vector2 *b@<EDX>, br_scalar s)
@@ -109,27 +109,29 @@ int PickBoundsTestRay__raycast(br_bounds* b, br_vector3* rp, br_vector3* rd, br_
     float t;
 
     for (i = 0; i < 3; i++) {
-        if (rd->v[i] > 0.00000023841858) {
-            s = (1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-            if (s > BR_SCALAR_MAX) {
+        if (rd->v[i] > 0.00000023841858f) {
+            s = 1.0f / rd->v[i];
+            t = (rp->v[i] - b->max.v[i]) * s;
+            if (t > BR_SCALAR_MAX) {
                 t_near = BR_SCALAR_MAX;
-            } else if (s > t_near) {
-                t_near = s;
+            } else if (t > t_near) {
+                t_near = t;
             }
-            t = (1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
+            t = (rp->v[i] - b->min.v[i]) * s;
             if (t < BR_SCALAR_MIN) {
                 t_far = BR_SCALAR_MIN;
             } else if (t < t_far) {
                 t_far = t;
             }
-        } else if (rd->v[i] < -0.00000023841858) {
-            s = (1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-            if (s < BR_SCALAR_MIN) {
+        } else if (rd->v[i] < -0.00000023841858f) {
+            s = 1.0f / rd->v[i];
+            t = (rp->v[i] - b->max.v[i]) * s;
+            if (t < BR_SCALAR_MIN) {
                 t_far = BR_SCALAR_MIN;
-            } else if (s < t_far) {
-                t_far = s;
+            } else if (t < t_far) {
+                t_far = t;
             }
-            t = (1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
+            t = (rp->v[i] - b->min.v[i]) * s;
             if (t > BR_SCALAR_MAX) {
                 t_near = BR_SCALAR_MAX;
             } else if (t > t_near) {
@@ -139,12 +141,13 @@ int PickBoundsTestRay__raycast(br_bounds* b, br_vector3* rp, br_vector3* rd, br_
             return 0;
         }
     }
-    if (t_far < t_near) {
+    if (t_far >= t_near) {
+        *new_t_near = t_near;
+        *new_t_far = t_far;
+        return 1;
+    } else {
         return 0;
     }
-    *new_t_near = t_near;
-    *new_t_far = t_far;
-    return 1;
 }
 
 // IDA: int __usercall ActorPick2D@<EAX>(br_actor *ap@<EAX>, br_model *model@<EDX>, br_material *material@<EBX>, dr_pick2d_cbfn *callback@<ECX>, void *arg)
@@ -273,7 +276,7 @@ int DRScenePick2D(br_actor* world, br_actor* camera, dr_pick2d_cbfn* callback, v
     camera_data = (br_camera*)camera->type_data;
     DRActorToRoot(camera, world, &camera_tfm);
     BrMatrix34Inverse(&gPick_model_to_view__raycast, &camera_tfm);
-    scale = cos(BrAngleToRadian(camera_data->field_of_view / 2)) / sin(BrAngleToRadian(camera_data->field_of_view / 2));
+    scale = BR_COS((br_angle)(camera_data->field_of_view / 2)) / BR_SIN((br_angle)(camera_data->field_of_view / 2));
 
     BrMatrix34PostScale(&gPick_model_to_view__raycast, scale / camera_data->aspect, scale, 1.0f);
     return ActorPick2D(world, model_unk1, material_unk1, callback, arg);
@@ -424,16 +427,17 @@ int DRModelPick2D__raycast(br_model* model, br_material* material, br_vector3* r
 int FindHighestPolyCallBack__raycast(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     br_scalar the_y;
 
-    if (pPoint->v[1] > gCurrent_y) {
-        if (gLowest_y_above > pPoint->v[1]) {
-            gLowest_y_above = pPoint->v[1];
-            gAbove_face_index = pF;
-            gAbove_model = pModel;
+    the_y = pPoint->v[1];
+    if (the_y <= gCurrent_y) {
+        if (the_y > gHighest_y_below) {
+            gHighest_y_below = the_y;
+            gBelow_face_index = pF;
+            gBelow_model = pModel;
         }
-    } else if (pPoint->v[1] > gHighest_y_below) {
-        gHighest_y_below = pPoint->v[1];
-        gBelow_face_index = pF;
-        gBelow_model = pModel;
+    } else if (gLowest_y_above > the_y) {
+        gLowest_y_above = the_y;
+        gAbove_face_index = pF;
+        gAbove_model = pModel;
     }
     return 0;
 }
@@ -473,11 +477,12 @@ void FindBestY(br_vector3* pPosition, br_actor* gWorld, br_scalar pStarting_heig
 int FindYVerticallyBelowPolyCallBack(br_model* pModel, br_material* pMaterial, br_vector3* pRay_pos, br_vector3* pRay_dir, br_scalar pT, int pF, int pE, int pV, br_vector3* pPoint, br_vector2* pMap, void* pArg) {
     br_scalar the_y;
 
-    if (pMaterial->identifier == NULL || pMaterial->identifier[0] != '!') {
-        the_y = pPoint->v[Y];
-        if (the_y > gHighest_y_below) {
-            gHighest_y_below = the_y;
-        }
+    if (pMaterial->identifier != NULL && pMaterial->identifier[0] == '!') {
+        return 0;
+    }
+    the_y = pPoint->v[Y];
+    if (the_y > gHighest_y_below) {
+        gHighest_y_below = the_y;
     }
     return 0;
 }
@@ -529,13 +534,11 @@ br_scalar FindYVerticallyBelow2(br_vector3* pCast_point) {
     int number_of_attempts;
     br_vector3 cast_point;
 
-    BrVector3Copy(&cast_point, pCast_point);
-    for (number_of_attempts = 0; number_of_attempts <= 10; number_of_attempts++) {
+    number_of_attempts = 0;
+    cast_point = *pCast_point;
+    do {
         result = FindYVerticallyBelow(&cast_point);
         cast_point.v[Y] += .2f;
-        if (result >= -100.f) {
-            return result;
-        }
-    }
+    } while (result < -100.f && number_of_attempts++ < 10);
     return result;
 }
