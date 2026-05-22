@@ -856,6 +856,12 @@ enum ExceptionFlags {
     ExceptionFlag_Mipmap = 4,
 };
 
+enum kEngineNoiseTypes {
+    kEngineNoise_Normal = 0,
+    kEngineNoise_EnclosedSpace = 1,
+    kEngineNoise_Underwater = 2
+};
+
 #define FONT_TYPEABLE 0
 #define FONT_ORANGHED 1
 #define FONT_BLUEHEAD 2
