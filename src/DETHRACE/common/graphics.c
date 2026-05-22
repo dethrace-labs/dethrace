@@ -2375,22 +2375,19 @@ void FadePaletteDown(void) {
     int start_time;
     int the_time;
 
-    if (!gFaded_palette) {
-        gFaded_palette = 1;
-        MungeEngineNoise();
-        gFaded_palette = 0;
-        start_time = PDGetTotalTime();
-        while (1) {
-            the_time = PDGetTotalTime() - start_time;
-            if (the_time >= 500) {
-                break;
-            }
-            i = 256 - ((the_time * 256) / 500);
-            SetFadedPalette(i);
-        }
-        SetFadedPalette(0);
-        gFaded_palette = 1;
+    if (gFaded_palette) {
+        return;
     }
+
+    gFaded_palette = 1;
+    MungeEngineNoise();
+    gFaded_palette = 0;
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime() - start_time) < 500) {
+        SetFadedPalette(256 - ((the_time * 256) / 500));
+    }
+    SetFadedPalette(0);
+    gFaded_palette = 1;
 }
 
 // IDA: void __cdecl FadePaletteUp()
