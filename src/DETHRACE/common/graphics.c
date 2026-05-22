@@ -168,7 +168,7 @@ char* gFont_names[21] = {
 
 // GLOBAL: CARM95 0x005201a0
 br_colour gRGB_colours[9] = {
-    BR_COLOUR_RGB(0x00 ,0x00, 0x00),
+    BR_COLOUR_RGB(0x00, 0x00, 0x00),
     BR_COLOUR_RGB(0xff, 0xff, 0xff),
     BR_COLOUR_RGB(0xff, 0x00, 0x00),
     BR_COLOUR_RGB(0x00, 0xff, 0x00),
@@ -452,16 +452,17 @@ void ResetLollipopQueue(void) {
 // FUNCTION: CARM95 0x004b305f
 int AddToLollipopQueue(br_actor* pActor, int pIndex) {
 
-    if (pIndex >= 0) {
-        gLollipops[pIndex] = pActor;
-    } else if (gNumber_of_lollipops >= 100) {
-        pIndex = -1;
+    if (pIndex < 0) {
+        if (gNumber_of_lollipops < COUNT_OF(gLollipops)) {
+            gLollipops[gNumber_of_lollipops] = pActor;
+            gNumber_of_lollipops++;
+            return gNumber_of_lollipops - 1;
+        }
+        return -1;
     } else {
-        gLollipops[gNumber_of_lollipops] = pActor;
-        pIndex = gNumber_of_lollipops;
-        gNumber_of_lollipops++;
+        gLollipops[pIndex] = pActor;
+        return pIndex;
     }
-    return pIndex;
 }
 
 // IDA: void __cdecl RenderLollipops()
@@ -538,14 +539,12 @@ void DrawNumberAt(br_pixelmap* gImage, int pX, int pY, int pX_pitch, int pY_pitc
 void BuildColourTable(br_pixelmap* pPalette) {
     int i;
     int j;
-    int nearest_index = 0;
+    int nearest_index;
     int red;
     int green;
     int blue;
     float nearest_distance;
     float distance;
-
-#define SQR(i) i* i
 
     for (i = 0; i < COUNT_OF(gRGB_colours); i++) {
         nearest_distance = 196608.f;
@@ -553,12 +552,13 @@ void BuildColourTable(br_pixelmap* pPalette) {
         green = (gRGB_colours[i] >> 8) & 0xFF;
         blue = gRGB_colours[i] & 0xFF;
         for (j = 0; j < 256; j++) {
-            distance = SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j + 2) - red));
-            distance += SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j) - blue));
-            distance += SQR((double)(signed int)(*((br_uint_8*)pPalette->pixels + 4 * j + 1) - green));
+            distance = sqr(((br_uint_8*)pPalette->pixels)[4 * j + 2] - red)
+                + sqr(((br_uint_8*)pPalette->pixels)[4 * j + 1] - green)
+                + sqr(((br_uint_8*)pPalette->pixels)[4 * j] - blue);
+
             if (distance < nearest_distance) {
-                nearest_index = j;
                 nearest_distance = distance;
+                nearest_index = j;
             }
         }
         gColours[i] = nearest_index;
@@ -905,7 +905,11 @@ void DRSetPaletteEntries(br_pixelmap* pPalette, int pFirst_colour, int pCount) {
 void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 
     if (pSet_current_palette) {
-        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+#ifdef DETHRACE_FIX_BUGS
+        memmove(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
+#else
+        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
+#endif
 #ifdef DETHRACE_3DFX_PATCH
         g16bit_palette_valid = 0;
 #endif
@@ -914,7 +918,8 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
         PDSetPalette(pThe_palette);
     }
     if (pThe_palette != gRender_palette) {
-        gPalette_munged |= 1u;
+        gPalette_munged |= 1;
+    } else {
     }
 }
 
@@ -923,7 +928,11 @@ void DRSetPalette3(br_pixelmap* pThe_palette, int pSet_current_palette) {
 void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     ((br_int_32*)pThe_palette->pixels)[0] = 0;
     if (pSet_current_palette) {
-        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 0x400u);
+#ifdef DETHRACE_FIX_BUGS
+        memmove(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
+#else
+        memcpy(gCurrent_palette_pixels, pThe_palette->pixels, 4 * 256);
+#endif
 #ifdef DETHRACE_3DFX_PATCH
         g16bit_palette_valid = 0;
 #endif
@@ -931,8 +940,9 @@ void DRSetPalette2(br_pixelmap* pThe_palette, int pSet_current_palette) {
     if (!gFaded_palette) {
         PDSetPalette(pThe_palette);
     }
-    if (pThe_palette != gRender_palette) {
-        gPalette_munged |= 1u;
+    if (gRender_palette != pThe_palette) {
+        gPalette_munged |= 1;
+    } else {
     }
 }
 
@@ -3188,9 +3198,8 @@ void LoadFont(int pFont_ID) {
             gFonts[pFont_ID].offset = GetAnInt(f);
             gFonts[pFont_ID].num_entries = GetAnInt(f);
             if (gFonts[pFont_ID].width <= 0) {
-                the_size = pFont_ID;
                 for (i = 0; i < gFonts[pFont_ID].num_entries; i++) {
-                    gFonts[the_size].width_table[i] = GetAnInt(f);
+                    gFonts[pFont_ID].width_table[i * 1] = GetAnInt(f);
                 }
             }
             fclose(f);
@@ -3431,8 +3440,7 @@ tShadow_level GetShadowLevel(void) {
 // FUNCTION: CARM95 0x004ba15d
 void ToggleShadow(void) {
 
-    gShadow_level++;
-    if (gShadow_level == eShadow_everyone) {
+    if (gShadow_level++ == eShadow_everyone) {
         gShadow_level = eShadow_none;
     }
     switch (gShadow_level) {
@@ -3448,8 +3456,6 @@ void ToggleShadow(void) {
     case eShadow_everyone:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_ShadowUnderAllCars));
         break;
-    default:
-        return;
     }
 }
 
