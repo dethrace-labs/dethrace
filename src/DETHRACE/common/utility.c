@@ -1848,18 +1848,21 @@ void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
 // FUNCTION: CARM95 0x004c3fb5
 void BlendifyMaterialPrimitively(br_material* pMaterial, int pPercent) {
 
+    // GLOBAL: CARM95 0x005214c0
     static br_token_value alpha25[3] = {
         { BRT_BLEND_B, { 1 } },          // .b = 1
         { BRT_OPACITY_X, { 0x400000 } }, // .x = 0x400000
         { 0, { 0 } },
     };
 
+    // GLOBAL: CARM95 0x005214d8
     static br_token_value alpha50[3] = {
         { BRT_BLEND_B, { 1 } },
         { BRT_OPACITY_X, { 0x800000 } },
         { 0, { 0 } },
     };
 
+    // GLOBAL: CARM95 0x005214f0
     static br_token_value alpha75[3] = {
         { BRT_BLEND_B, { 1 } },
         { BRT_OPACITY_X, { 0xc00000 } },
