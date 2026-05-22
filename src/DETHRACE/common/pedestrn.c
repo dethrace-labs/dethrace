@@ -262,9 +262,7 @@ void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, 
 // IDA: int __usercall ActorIsPedestrian@<EAX>(br_actor *pActor@<EAX>)
 // FUNCTION: CARM95 0x00455870
 int ActorIsPedestrian(br_actor* pActor) {
-    return pActor->model != NULL && 
-           pActor->type_data != NULL && 
-           ActorToPedestrianData(pActor)->magic_number == PEDESTRIAN_MAGIC;
+    return pActor->model != NULL && pActor->type_data != NULL && ActorToPedestrianData(pActor)->magic_number == PEDESTRIAN_MAGIC;
 }
 
 // IDA: br_scalar __usercall PedHeightFromActor@<ST0>(br_actor *pActor@<EAX>)
@@ -944,6 +942,8 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
     float heading_difference;
     tPedestrian_sequence* sequence_ptr;
 
+    the_action = &pPedestrian->action_list[pPedestrian->current_action];
+
     if (pPedestrian->ref_number < 100) {
         ped_movement_angle = FastScalarArcTan2(pPedestrian->direction.v[X], pPedestrian->direction.v[Z]);
         if (ped_movement_angle < pPedestrian->car_to_ped) {
@@ -953,27 +953,26 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
     } else {
         heading_difference = gCamera_to_horiz_angle;
     }
-    for (i = 0; i < pPedestrian->action_list[pPedestrian->current_action].number_of_bearings; i++) {
-        if (heading_difference <= pPedestrian->action_list[pPedestrian->current_action].sequences[i].max_bearing) {
-            the_sequence = pPedestrian->action_list[pPedestrian->current_action].sequences[i].sequence_index;
-            if (pPedestrian->current_sequence == the_sequence) {
-                break;
+    for (i = 0; i < the_action->number_of_bearings; i++) {
+        if (heading_difference <= the_action->sequences[i].max_bearing) {
+            the_sequence = the_action->sequences[i].sequence_index;
+            if (pPedestrian->current_sequence != the_sequence) {
+                sequence_ptr = &pPedestrian->sequences[the_sequence];
+                current_looping = pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start;
+                if (pAction_changed || current_looping > pPedestrian->current_frame) {
+                    pPedestrian->current_frame = -1;
+                    pPedestrian->done_initial = 0;
+                } else if (pPedestrian->fatal_car_impact_action != pPedestrian->current_action
+                    && pPedestrian->fatal_ground_impact_action != pPedestrian->current_action
+                    && pPedestrian->giblets_action != pPedestrian->current_action) {
+                    pPedestrian->current_frame = pPedestrian->current_frame + sequence_ptr->looping_frame_start - current_looping - 1;
+                    pPedestrian->done_initial = 1;
+                } else if (pPedestrian->current_frame >= sequence_ptr->number_of_frames) {
+                    pPedestrian->current_frame = sequence_ptr->number_of_frames - 1;
+                }
+                pPedestrian->last_frame = 0;
+                pPedestrian->current_sequence = the_sequence;
             }
-            sequence_ptr = &pPedestrian->sequences[the_sequence];
-            current_looping = pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start;
-            if (pAction_changed || current_looping > pPedestrian->current_frame) {
-                pPedestrian->current_frame = -1;
-                pPedestrian->done_initial = 0;
-            } else if (pPedestrian->current_action != pPedestrian->fatal_car_impact_action
-                && pPedestrian->current_action != pPedestrian->fatal_ground_impact_action
-                && pPedestrian->current_action != pPedestrian->giblets_action) {
-                pPedestrian->current_frame += sequence_ptr->looping_frame_start - current_looping - 1;
-                pPedestrian->done_initial = 1;
-            } else if (pPedestrian->current_frame >= sequence_ptr->number_of_frames) {
-                pPedestrian->current_frame = sequence_ptr->number_of_frames - 1;
-            }
-            pPedestrian->last_frame = 0;
-            pPedestrian->current_sequence = the_sequence;
             break;
         }
     }
@@ -2609,24 +2608,21 @@ int GetPedPosition(int pIndex, br_vector3* pPos) {
 
     pedestrian = &gPedestrian_array[pIndex];
     if (pedestrian->ref_number < 100) {
-
-        // Item is a human
-        if (pedestrian->hit_points == -100
-            || pedestrian->current_action == pedestrian->fatal_car_impact_action
-            || pedestrian->current_action == pedestrian->fatal_ground_impact_action
-            || pedestrian->current_action == pedestrian->giblets_action) {
-            return 0;
-        } else {
+        if (pedestrian->hit_points != -100
+            && pedestrian->current_action != pedestrian->fatal_car_impact_action
+            && pedestrian->current_action != pedestrian->fatal_ground_impact_action
+            && pedestrian->current_action != pedestrian->giblets_action) {
             BrVector3Copy(pPos, &pedestrian->pos);
             return 1;
+        } else {
+            return 0;
         }
     } else {
-        // Item is a power-up/mine
-        if (pedestrian->hit_points == -100) {
-            return 0;
-        } else {
+        if (pedestrian->hit_points != -100) {
             BrVector3Copy(pPos, &pedestrian->pos);
             return -1;
+        } else {
+            return 0;
         }
     }
 }
@@ -3733,10 +3729,10 @@ void ShowPedPaths(void) {
                 gPedestrian_array[i].first_instruction);
         }
     }
-    if (gPath_actor->render_style == BR_RSTYLE_FACES) {
-        gPath_actor->render_style = BR_RSTYLE_NONE;
-    } else {
+    if (gPath_actor->render_style != BR_RSTYLE_FACES) {
         gPath_actor->render_style = BR_RSTYLE_FACES;
+    } else {
+        gPath_actor->render_style = BR_RSTYLE_NONE;
     }
 }
 
@@ -3861,14 +3857,15 @@ void DoPedReport(void) {
     time_t the_bloody_time;
     int i;
     int j;
-    int count;
-    int last_ref_num;
-    int ped_count;     // added by dethrace
-    int powerup_count; // added by dethrace
-    char s[256];       // added by dethrace
 
-    powerup_count = 0;
-    ped_count = 0;
+    int count;
+    int peds_count;     // added by dethrace
+    int powerups_count; // added by dethrace
+    int last_ref_num;
+    char s[256]; // added by dethrace
+
+    powerups_count = 0;
+    peds_count = 0;
     PathCat(the_path, gApplication_path, "PEDINFO.TXT");
     f = fopen(the_path, "at");
     time(&the_bloody_time);
@@ -3893,17 +3890,17 @@ void DoPedReport(void) {
         if (count != 0) {
             if (i < 100) {
                 s[0] = '\0';
-                ped_count += count;
+                peds_count += count;
             } else {
                 GetPowerupMessage(i - 100, s);
-                powerup_count += count;
+                powerups_count += count;
             }
             fprintf(f, "%6d    %5d      %s\n", i, count, s);
         }
     }
     fprintf(f, "\n\nSUMMARY:\n\n");
-    fprintf(f, "Peds:     %5d\n", ped_count);
-    fprintf(f, "Powerups: %5d\n", powerup_count);
+    fprintf(f, "Peds:     %5d\n", peds_count);
+    fprintf(f, "Powerups: %5d\n", powerups_count);
     fprintf(f, "\n\n\n\n");
     fclose(f);
 }
