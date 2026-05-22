@@ -4622,17 +4622,16 @@ void MungeCarGraphics(tU32 pFrame_period) {
                         if (!gQuite_wild_end) {
                             gQuite_wild_end = the_time;
                         }
-                        if (!gQuite_wild_start
-                            || the_time - gLast_cunning_stunt <= 10000
-                            || gQuite_wild_end - gQuite_wild_start < 2000
-                            || gQuite_wild_start > gWoz_upside_down_at_all
-                            || gQuite_wild_end < gWoz_upside_down_at_all
-                            || (!gOn_me_wheels_start && the_time - gQuite_wild_end < 300)) {
+                        if (gQuite_wild_start != 0
+                            && the_time - gLast_cunning_stunt > 10000
+                            && gQuite_wild_end - gQuite_wild_start >= 2000
+                            && gQuite_wild_start <= gWoz_upside_down_at_all
+                            && gQuite_wild_end >= gWoz_upside_down_at_all
+                            && (gOn_me_wheels_start || the_time - gQuite_wild_end < 300)) {
                             if (!gOn_me_wheels_start) {
                                 gOn_me_wheels_start = the_time;
                             } else if (the_time - gOn_me_wheels_start > 500
-                                && (the_car->last_special_volume == NULL
-                                    || the_car->last_special_volume->gravity_multiplier == 1.0)) {
+                                && (the_car->last_special_volume == NULL || the_car->last_special_volume->gravity_multiplier == 1.0)) {
                                 DoFancyHeadup(kFancyHeadupCunningStuntBonus);
                                 EarnCredits(gCunning_stunt_bonus[gProgram_state.skill_level]);
                                 gLast_cunning_stunt = PDGetTotalTime();
@@ -4640,12 +4639,12 @@ void MungeCarGraphics(tU32 pFrame_period) {
                                 gQuite_wild_start = 0;
                                 gOn_me_wheels_start = 0;
                                 gWoz_upside_down_at_all = 0;
-                            } else {
-                                gQuite_wild_end = 0;
-                                gQuite_wild_start = 0;
-                                gOn_me_wheels_start = 0;
-                                gWoz_upside_down_at_all = 0;
                             }
+                        } else {
+                            gQuite_wild_end = 0;
+                            gQuite_wild_start = 0;
+                            gOn_me_wheels_start = 0;
+                            gWoz_upside_down_at_all = 0;
                         }
                     } else {
                         gOn_me_wheels_start = 0;
