@@ -2376,17 +2376,18 @@ void FadePaletteDown(void) {
     int the_time;
 
     if (gFaded_palette) {
-    } else {
-        gFaded_palette = 1;
-        MungeEngineNoise();
-        gFaded_palette = 0;
-        start_time = PDGetTotalTime();
-        while ((the_time = PDGetTotalTime() - start_time) < 500) {
-            SetFadedPalette(256 - ((the_time * 256) / 500));
-        }
-        SetFadedPalette(0);
-        gFaded_palette = 1;
+        return;
     }
+
+    gFaded_palette = 1;
+    MungeEngineNoise();
+    gFaded_palette = 0;
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime() - start_time) < 500) {
+        SetFadedPalette(256 - ((the_time * 256) / 500));
+    }
+    SetFadedPalette(0);
+    gFaded_palette = 1;
 }
 
 // IDA: void __cdecl FadePaletteUp()
