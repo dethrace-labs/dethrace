@@ -612,21 +612,19 @@ void MungeEngineNoise(void) {
     int type_of_engine_noise;
     tS3_sound_id engine_noise;
 
-    // added by dethrace
-    tU32 frame_period;
-    frame_period = gFrame_period;
-
 #ifdef DETHRACE_FIX_BUGS
     // At framerates higher than 30, `gCamera_velocity` is not stable enough and causes the player car audio to stumble
     // as the pitch shifts up and down while applying doppler effect in `S3Calculate3D`.
     // We avoid the issue by only updating the engine sounds every MUNGE_ENGINE_INTERVAL ms
     static tU32 dethrace_last_executed = 0;
+    tU32 old_frame_period;
 
     tU32 now = GetTotalTime();
     if (now - dethrace_last_executed < MUNGE_ENGINE_INTERVAL) {
         return;
     }
-    frame_period = now - dethrace_last_executed;
+    old_frame_period = gFrame_period;
+    gFrame_period = now - dethrace_last_executed;
     dethrace_last_executed = now;
 #endif
 
@@ -636,33 +634,33 @@ void MungeEngineNoise(void) {
     }
 
     BrVector3Copy(&gCamera_position, (br_vector3*)&gCamera_to_world.m[3][0]);
-    BrVector3Negate(&gCamera_left, (br_vector3*)&gCamera_to_world.m[0][0]);
+    BrVector3Scale(&gCamera_left, (br_vector3*)&gCamera_to_world.m[0], -1.0f);
     BrVector3Sub(&gCamera_velocity, &gCamera_position, &gOld_camera_position);
-    if (frame_period) {
-        BrVector3InvScale(&gCamera_velocity, &gCamera_velocity, ((float)frame_period / 1000.0f));
+    if (gFrame_period) {
+        BrVector3InvScale(&gCamera_velocity, &gCamera_velocity, ((float)gFrame_period / 1000.0));
     } else {
         BrVector3Set(&gCamera_velocity, 0.0f, 0.0f, 0.0f);
     }
     BrVector3Copy(&gOld_camera_position, &gCamera_position);
     stop_all = (gAction_replay_mode && (fabs(GetReplayRate()) > 1.0f || GetReplayRate() == 0.0f)) || gFaded_palette || gPalette_fade_time;
     for (cat = eVehicle_self; cat <= eVehicle_rozzer; cat++) {
-        if (cat) {
-            car_count = GetCarCount(cat);
-        } else {
+        if (cat == 0) {
             car_count = 1;
+        } else {
+            car_count = GetCarCount(cat);
         }
         for (i = 0; i < car_count; i++) {
-            if (cat) {
-                the_car = GetCarSpec(cat, i);
-            } else {
+            if (cat == 0) {
                 the_car = &gProgram_state.current_car;
+            } else {
+                the_car = GetCarSpec(cat, i);
             }
             if (the_car->driver == eDriver_local_human || gSound_detail_level == 2 || cat == eVehicle_rozzer) {
                 if (stop_all || !the_car->active || the_car->knackered || (cat == eVehicle_rozzer && BrVector3LengthSquared(&the_car->v) < 0.0001f)) {
                     vol = 0;
                     pitch = 0x10000;
                 } else {
-                    BrVector3InvScale(&the_car->velocity_bu_per_sec, &the_car->v, WORLD_SCALE);
+                    BrVector3InvScale(&the_car->velocity_bu_per_sec, &the_car->v, WORLD_SCALE_D);
                     if (cat == eVehicle_rozzer) {
                         vol = 255;
                         pitch = 0x10000;
@@ -670,35 +668,49 @@ void MungeEngineNoise(void) {
                         if (the_car->last_special_volume) {
                             type_of_engine_noise = the_car->last_special_volume->engine_noise_index;
                         }
-                        pitch = the_car->revs * 10.0f + 40960.0f;
+                        pitch = the_car->revs * 10.0 + 40960.0;
                         if (gAction_replay_mode) {
                             pitch = fabs(GetReplayRate()) * pitch;
+                        } else {
                         }
-                        if (type_of_engine_noise == 1) {
-                            pitch = pitch * 0.75f;
-                        } else if (type_of_engine_noise == 2) {
-                            pitch = pitch * 0.55f;
+                        if (type_of_engine_noise == kEngineNoise_EnclosedSpace) {
+                            pitch = pitch * 0.75;
+                        } else if (type_of_engine_noise == kEngineNoise_Underwater) {
+                            pitch = pitch * 0.55;
                         }
 
                         pitch = MAX(pitch, 4096);
                         pitch = MIN(pitch, 131072);
 
-                        vol = the_car->revs * 0.001f + 64.0f;
-                        if (type_of_engine_noise == 1) {
-                            vol = vol * 5.0f;
-                        } else if (type_of_engine_noise == 2) {
-                            vol = vol * 2.0f;
+                        vol = the_car->revs * 0.001 + 64.0;
+                        if (type_of_engine_noise == kEngineNoise_EnclosedSpace) {
+                            vol = vol * 5.0;
+                        } else if (type_of_engine_noise == kEngineNoise_Underwater) {
+                            vol = vol * 2.0;
                         } else {
-                            vol = vol * 2.5f;
+                            vol = vol * 2.5;
                         }
                         vol = MIN(vol, 255);
                     }
                 }
-                S3UpdateSoundSource(gEngine_outlet, -1, the_car->sound_source, gAction_replay_mode == 0 ? 250.0f : 300.0f, 0, 0, vol, pitch, 0x10000);
+                S3UpdateSoundSource(
+                    gEngine_outlet,
+                    -1,
+                    the_car->sound_source,
+                    gAction_replay_mode == 0 ? 250 : 300,
+                    0,
+                    0,
+                    vol,
+                    pitch, 0x10000);
             }
         }
     }
     SoundService();
+
+#ifdef DETHRACE_FIX_BUGS
+    // restore original value (see above)
+    gFrame_period = old_frame_period;
+#endif
 }
 
 // IDA: void __cdecl SetSoundVolumes()
