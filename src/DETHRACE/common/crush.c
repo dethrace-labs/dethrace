@@ -624,12 +624,14 @@ void RecordLastDamage(tCar_spec* pCar) {
 // FUNCTION: CARM95 0x004bf3b9
 void DoDamage(tCar_spec* pCar, tDamage_type pDamage_type, float pMagnitude, float pNastiness) {
 
-    if (pCar->driver < eDriver_net_human) {
-        DamageUnit2(pCar, pDamage_type, ((gCurrent_race.suggested_rank < 10 ? 0.5f : gCurrent_race.suggested_rank) / 20.0f + 1.0f) * (pNastiness * pMagnitude * 10.0f));
-    } else if (gNet_mode != eNet_mode_none) {
-        DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 15.0f);
-    } else if (PercentageChance(pNastiness * pMagnitude * 1500.0f)) {
-        DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 30.0f);
+    if (pCar->driver >= eDriver_net_human) {
+        if (gNet_mode != eNet_mode_none) {
+            DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 15.0f);
+        } else if (PercentageChance(pNastiness * pMagnitude * 1500.0f)) {
+            DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 30.0f);
+        }
+    } else {
+        DamageUnit2(pCar, pDamage_type, pNastiness * pMagnitude * 10.0f * ((gCurrent_race.suggested_rank < 10 ? 0.5 : gCurrent_race.suggested_rank) / 20.0 + 1.0));
     }
 }
 
