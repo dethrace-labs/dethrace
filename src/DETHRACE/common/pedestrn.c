@@ -227,6 +227,7 @@ int gCurrent_lollipop_index;
 // GLOBAL: CARM95 0x00536aa8
 int gVesuvians_this_time;
 
+// GLOBAL: CARM95 0x00550a9c
 int gNumber_of_ped_gibs;
 
 // GLOBAL: CARM95 0x00536b14
@@ -261,9 +262,7 @@ void PedModelUpdate(br_model* pModel, br_scalar x0, br_scalar y0, br_scalar x1, 
 // IDA: int __usercall ActorIsPedestrian@<EAX>(br_actor *pActor@<EAX>)
 // FUNCTION: CARM95 0x00455870
 int ActorIsPedestrian(br_actor* pActor) {
-    return pActor->model != NULL && 
-           pActor->type_data != NULL && 
-           ActorToPedestrianData(pActor)->magic_number == PEDESTRIAN_MAGIC;
+    return pActor->model != NULL && pActor->type_data != NULL && ActorToPedestrianData(pActor)->magic_number == PEDESTRIAN_MAGIC;
 }
 
 // IDA: br_scalar __usercall PedHeightFromActor@<ST0>(br_actor *pActor@<EAX>)
@@ -943,6 +942,8 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
     float heading_difference;
     tPedestrian_sequence* sequence_ptr;
 
+    the_action = &pPedestrian->action_list[pPedestrian->current_action];
+
     if (pPedestrian->ref_number < 100) {
         ped_movement_angle = FastScalarArcTan2(pPedestrian->direction.v[X], pPedestrian->direction.v[Z]);
         if (ped_movement_angle < pPedestrian->car_to_ped) {
@@ -952,27 +953,26 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
     } else {
         heading_difference = gCamera_to_horiz_angle;
     }
-    for (i = 0; i < pPedestrian->action_list[pPedestrian->current_action].number_of_bearings; i++) {
-        if (heading_difference <= pPedestrian->action_list[pPedestrian->current_action].sequences[i].max_bearing) {
-            the_sequence = pPedestrian->action_list[pPedestrian->current_action].sequences[i].sequence_index;
-            if (pPedestrian->current_sequence == the_sequence) {
-                break;
+    for (i = 0; i < the_action->number_of_bearings; i++) {
+        if (heading_difference <= the_action->sequences[i].max_bearing) {
+            the_sequence = the_action->sequences[i].sequence_index;
+            if (pPedestrian->current_sequence != the_sequence) {
+                sequence_ptr = &pPedestrian->sequences[the_sequence];
+                current_looping = pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start;
+                if (pAction_changed || current_looping > pPedestrian->current_frame) {
+                    pPedestrian->current_frame = -1;
+                    pPedestrian->done_initial = 0;
+                } else if (pPedestrian->fatal_car_impact_action != pPedestrian->current_action
+                    && pPedestrian->fatal_ground_impact_action != pPedestrian->current_action
+                    && pPedestrian->giblets_action != pPedestrian->current_action) {
+                    pPedestrian->current_frame = pPedestrian->current_frame + sequence_ptr->looping_frame_start - current_looping - 1;
+                    pPedestrian->done_initial = 1;
+                } else if (pPedestrian->current_frame >= sequence_ptr->number_of_frames) {
+                    pPedestrian->current_frame = sequence_ptr->number_of_frames - 1;
+                }
+                pPedestrian->last_frame = 0;
+                pPedestrian->current_sequence = the_sequence;
             }
-            sequence_ptr = &pPedestrian->sequences[the_sequence];
-            current_looping = pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start;
-            if (pAction_changed || current_looping > pPedestrian->current_frame) {
-                pPedestrian->current_frame = -1;
-                pPedestrian->done_initial = 0;
-            } else if (pPedestrian->current_action != pPedestrian->fatal_car_impact_action
-                && pPedestrian->current_action != pPedestrian->fatal_ground_impact_action
-                && pPedestrian->current_action != pPedestrian->giblets_action) {
-                pPedestrian->current_frame += sequence_ptr->looping_frame_start - current_looping - 1;
-                pPedestrian->done_initial = 1;
-            } else if (pPedestrian->current_frame >= sequence_ptr->number_of_frames) {
-                pPedestrian->current_frame = sequence_ptr->number_of_frames - 1;
-            }
-            pPedestrian->last_frame = 0;
-            pPedestrian->current_sequence = the_sequence;
             break;
         }
     }
@@ -2476,7 +2476,9 @@ void MungePedestrians(tU32 pFrame_period) {
     tS32 diff;
 
     gVesuvians_this_time = 0;
-    // dword_550A9C = 32;
+    gNumber_of_ped_gibs = 32;
+    camera_ptr = gCamera->type_data;
+    max_distance = ACTIVE_PED_DXDZ;
     gMax_distance_squared = 121.f;
     if (!gAction_replay_mode) {
         MungePedGibs(pFrame_period);
@@ -2488,54 +2490,65 @@ void MungePedestrians(tU32 pFrame_period) {
     if (gSend_peds) {
         gLast_ped_message_send = PDGetTotalTime();
     }
-    // BrVector3(&br_vector3_00550ac0, 0.f, 0.f, 0.f);
+    BrVector3Set(&gCamera_direction, 0.f, 0.f, 0.f);
+    if (gProgram_state.mirror_on
+        && gProgram_state.cockpit_on
+        && gProgram_state.cockpit_image_index >= 0
+        && gProgram_state.which_view == eView_forward) {
+        mirror_on = 1;
+    } else {
+        mirror_on = 0;
+    }
     if (gAction_replay_mode) {
-        for (i = 0; i < gPed_count; i++) {
-            the_pedestrian = &gPedestrian_array[i];
-            x_delta = fabs(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
-            z_delta = fabs(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
-            if ((the_pedestrian->actor->parent != gDont_render_actor || (x_delta <= ACTIVE_PED_DXDZ && z_delta <= ACTIVE_PED_DXDZ))
-                && (gPedestrians_on || the_pedestrian->ref_number >= 100)
+        for (i = 0, the_pedestrian = gPedestrian_array; i < gPed_count; i++, the_pedestrian++) {
+            if (the_pedestrian->actor->parent == gDont_render_actor
+                && (fabs(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]) > max_distance
+                    || fabs(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]) > max_distance)) {
+                continue;
+            }
+            if ((gPedestrians_on || the_pedestrian->ref_number >= 100)
                 && the_pedestrian->hit_points != -100) {
                 gCurrent_lollipop_index = -1;
                 DoPedestrian(the_pedestrian, i);
             }
         }
     } else {
-        for (i = 0; i < gPed_count; i++) {
-            the_pedestrian = &gPedestrian_array[i];
-            x_delta = fabs(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]);
-            z_delta = fabs(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]);
+        for (i = 0, the_pedestrian = gPedestrian_array; i < gPed_count; i++, the_pedestrian++) {
             if (the_pedestrian->actor->parent == gDont_render_actor
-                && (x_delta > ACTIVE_PED_DXDZ || z_delta > ACTIVE_PED_DXDZ)) {
+                && (fabs(the_pedestrian->pos.v[X] - gCamera_to_world.m[3][X]) > max_distance
+                    || fabs(the_pedestrian->pos.v[Z] - gCamera_to_world.m[3][Z]) > max_distance)) {
                 the_pedestrian->active = 0;
-            } else if (the_pedestrian->hit_points == -100) {
-                if (the_pedestrian->respawn_time == 0) {
+                continue;
+            }
+            if (the_pedestrian->hit_points != -100) {
+                if (gPedestrians_on || the_pedestrian->ref_number >= 100) {
+                    if (the_pedestrian->mid_air && !the_pedestrian->active) {
+                        GroundPedestrian(the_pedestrian);
+                    } else {
+                        gCurrent_lollipop_index = -1;
+                        DoPedestrian(the_pedestrian, i);
+                    }
+                } else {
                     if (the_pedestrian->mid_air || the_pedestrian->actor->parent != gDont_render_actor) {
                         KillPedestrian(the_pedestrian);
                     }
                     the_pedestrian->active = 0;
-                } else {
-                    diff = GetRaceTime() - the_pedestrian->respawn_time;
-                    if (diff >= 0) {
-                        RevivePedestrian(the_pedestrian, diff < 1000);
-                    } else {
-                        if (the_pedestrian->mid_air || the_pedestrian->actor->parent != gDont_render_actor) {
-                            KillPedestrian(the_pedestrian);
-                        }
-                        the_pedestrian->active = 0;
-                    }
                 }
-            } else if (!gPedestrians_on && the_pedestrian->ref_number < 100) {
+            } else if (the_pedestrian->respawn_time != 0) {
+                diff = GetRaceTime() - the_pedestrian->respawn_time;
+                if (diff >= 0) {
+                    RevivePedestrian(the_pedestrian, diff < 1000);
+                } else {
+                    if (the_pedestrian->mid_air || the_pedestrian->actor->parent != gDont_render_actor) {
+                        KillPedestrian(the_pedestrian);
+                    }
+                    the_pedestrian->active = 0;
+                }
+            } else {
                 if (the_pedestrian->mid_air || the_pedestrian->actor->parent != gDont_render_actor) {
                     KillPedestrian(the_pedestrian);
                 }
                 the_pedestrian->active = 0;
-            } else if (!the_pedestrian->mid_air || the_pedestrian->active) {
-                gCurrent_lollipop_index = -1;
-                DoPedestrian(the_pedestrian, i);
-            } else {
-                GroundPedestrian(the_pedestrian);
             }
         }
     }
@@ -2544,8 +2557,7 @@ void MungePedestrians(tU32 pFrame_period) {
     }
     gVesuvians_last_time = gVesuvians_this_time;
     if (gCurrent_ped_path_actor != NULL) {
-        SquirtPathVertex(&gCurrent_ped_path_actor->model->vertices[gCurrent_ped_path_actor->model->nvertices - 4],
-            gOur_pos);
+        SquirtPathVertex(gCurrent_ped_path_actor->model->vertices + gCurrent_ped_path_actor->model->nvertices - 4, gOur_pos);
         BrModelUpdate(gCurrent_ped_path_actor->model, BR_MODU_ALL);
     }
 }
@@ -2596,24 +2608,21 @@ int GetPedPosition(int pIndex, br_vector3* pPos) {
 
     pedestrian = &gPedestrian_array[pIndex];
     if (pedestrian->ref_number < 100) {
-
-        // Item is a human
-        if (pedestrian->hit_points == -100
-            || pedestrian->current_action == pedestrian->fatal_car_impact_action
-            || pedestrian->current_action == pedestrian->fatal_ground_impact_action
-            || pedestrian->current_action == pedestrian->giblets_action) {
-            return 0;
-        } else {
+        if (pedestrian->hit_points != -100
+            && pedestrian->current_action != pedestrian->fatal_car_impact_action
+            && pedestrian->current_action != pedestrian->fatal_ground_impact_action
+            && pedestrian->current_action != pedestrian->giblets_action) {
             BrVector3Copy(pPos, &pedestrian->pos);
             return 1;
+        } else {
+            return 0;
         }
     } else {
-        // Item is a power-up/mine
-        if (pedestrian->hit_points == -100) {
-            return 0;
-        } else {
+        if (pedestrian->hit_points != -100) {
             BrVector3Copy(pPos, &pedestrian->pos);
             return -1;
+        } else {
+            return 0;
         }
     }
 }
@@ -3720,10 +3729,10 @@ void ShowPedPaths(void) {
                 gPedestrian_array[i].first_instruction);
         }
     }
-    if (gPath_actor->render_style == BR_RSTYLE_FACES) {
-        gPath_actor->render_style = BR_RSTYLE_NONE;
-    } else {
+    if (gPath_actor->render_style != BR_RSTYLE_FACES) {
         gPath_actor->render_style = BR_RSTYLE_FACES;
+    } else {
+        gPath_actor->render_style = BR_RSTYLE_NONE;
     }
 }
 
@@ -3848,14 +3857,15 @@ void DoPedReport(void) {
     time_t the_bloody_time;
     int i;
     int j;
-    int count;
-    int last_ref_num;
-    int ped_count;     // added by dethrace
-    int powerup_count; // added by dethrace
-    char s[256];       // added by dethrace
 
-    powerup_count = 0;
-    ped_count = 0;
+    int count;
+    int peds_count;     // added by dethrace
+    int powerups_count; // added by dethrace
+    int last_ref_num;
+    char s[256]; // added by dethrace
+
+    powerups_count = 0;
+    peds_count = 0;
     PathCat(the_path, gApplication_path, "PEDINFO.TXT");
     f = fopen(the_path, "at");
     time(&the_bloody_time);
@@ -3880,17 +3890,17 @@ void DoPedReport(void) {
         if (count != 0) {
             if (i < 100) {
                 s[0] = '\0';
-                ped_count += count;
+                peds_count += count;
             } else {
                 GetPowerupMessage(i - 100, s);
-                powerup_count += count;
+                powerups_count += count;
             }
             fprintf(f, "%6d    %5d      %s\n", i, count, s);
         }
     }
     fprintf(f, "\n\nSUMMARY:\n\n");
-    fprintf(f, "Peds:     %5d\n", ped_count);
-    fprintf(f, "Powerups: %5d\n", powerup_count);
+    fprintf(f, "Peds:     %5d\n", peds_count);
+    fprintf(f, "Powerups: %5d\n", powerups_count);
     fprintf(f, "\n\n\n\n");
     fclose(f);
 }
