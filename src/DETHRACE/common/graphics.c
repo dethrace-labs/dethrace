@@ -168,7 +168,7 @@ char* gFont_names[21] = {
 
 // GLOBAL: CARM95 0x005201a0
 br_colour gRGB_colours[9] = {
-    BR_COLOUR_RGB(0x00 ,0x00, 0x00),
+    BR_COLOUR_RGB(0x00, 0x00, 0x00),
     BR_COLOUR_RGB(0xff, 0xff, 0xff),
     BR_COLOUR_RGB(0xff, 0x00, 0x00),
     BR_COLOUR_RGB(0x00, 0xff, 0x00),
@@ -2626,8 +2626,7 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
         for (x_count = 0; x_count < pWidth; x_count++) {
             the_byte = *source_ptr++;
             if (the_byte) {
-                *dest_ptr = the_byte;
-                dest_ptr++;
+                *dest_ptr++ = the_byte;
             } else {
                 dest_ptr++;
             }
