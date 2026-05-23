@@ -2789,11 +2789,9 @@ void DRPixelmapRectangleVScaledCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
 
     for (y_count = 0; y_count < pHeight; y_count++) {
         for (x_count = 0; x_count < pWidth; x_count++) {
-            the_byte = *source_ptr;
-            source_ptr++;
+            the_byte = *source_ptr++;
             if (the_byte) {
-                *dest_ptr = the_byte;
-                dest_ptr++;
+                *dest_ptr++ = the_byte;
             } else {
                 dest_ptr++;
             }
