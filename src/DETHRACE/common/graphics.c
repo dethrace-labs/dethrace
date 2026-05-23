@@ -2575,11 +2575,9 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
         conv_table = gCurrent_conversion_table->pixels;
         for (y_count = 0; y_count < pHeight; y_count++) {
             for (x_count = 0; x_count < pWidth; x_count++) {
-                the_byte = *source_ptr;
-                source_ptr++;
+                the_byte = *source_ptr++;
                 if (the_byte != 0) {
-                    *dest_ptr = conv_table[the_byte];
-                    dest_ptr++;
+                    *dest_ptr++ = conv_table[the_byte];
                 } else {
                     dest_ptr++;
                 }
@@ -2590,11 +2588,9 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
     } else {
         for (y_count = 0; y_count < pHeight; y_count++) {
             for (x_count = 0; x_count < pWidth; x_count++) {
-                the_byte = *source_ptr;
-                source_ptr++;
+                the_byte = *source_ptr++;
                 if (the_byte != 0) {
-                    *dest_ptr = the_byte;
-                    dest_ptr++;
+                    *dest_ptr++ = the_byte;
                 } else {
                     dest_ptr++;
                 }
