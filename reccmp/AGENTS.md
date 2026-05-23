@@ -21,13 +21,11 @@ We want to generate assembly that matches the original retail binary. Each funct
 
 ## To see what assembly is different
 
-The `reccmp/asm-match.sh` script should be invoked with a single argument `asm-match.sh [function memory location]`. It will compile our code and then compare this function to the original. The output will show assembly-level diff.
+The `reccmp/asm-match.sh` script should be invoked as `reccmp/asm-match.sh --no-color --verbose [function memory location]`. It will compile our code and then compare this function to the original. The output will show assembly-level diff.
 
 - "+" lines show where we have code that the original doesnt have, so we should try and remove it
 - "-" lines show code that is in the retail binary but not in our recompiled binary, so we should try and add it
 - often, the code is just moved, so we would see the same line twice with a "-" in one and a "+" in another
-
-Continue making changes and running the command until it shows a 100% match or you run out of ideas.
 
 ## Reccmp Matching Heuristics (important)
 
@@ -46,29 +44,24 @@ Continue making changes and running the command until it shows a 100% match or y
 - For enum-based `switch` matching, `default:` can change jump-table targets even when behavior is equivalent.
 - A `default: break;` often creates a separate shared break block; retail may instead route missing/unhandled entries directly to function epilogue.
 - If diffs show extra or missing epilogue-adjacent blocks (`mov eax`, `pop`, `leave`, `ret`), prioritize matching return-site structure and `if/else` nesting before tuning jump targets.
-- For loops often init and increment an index and a pointer like for (i = 0, ptr=x; .. ; i++, ptr++)
+- For loops often init and increment an index and a pointer like for (i = 0, ptr=x; .. ; i++, ptr++). Do not resort to awkward for loop syntax like "for (j = 0; !(number_of_packets <= j); j++)".
 
 ## Aborting
 
 In some cases, a match is not possible due to compiler entropy. This is more common with floating point instructions. For example:
 
 ```
-0x404f73	fsub dword ptr [eax + ecx + 8]
-0x404f77	fstp dword ptr [ebp - 0x1118]
+...
 +fld dword ptr [ebp - 0x111c] (opponent.c:2383)
 +fmul dword ptr [ebp - 0x111c]
-0x404f7d	fld dword ptr [ebp - 0x1118]
+...
 0x404f83	fmul dword ptr [ebp - 0x1118]
 +faddp st(1)
-0x404f89	fld dword ptr [ebp - 0x1120]
-0x404f8f	fmul dword ptr [ebp - 0x1120]
+...
 0x404f95	-faddp st(1)
 0x404f97	-fld dword ptr [ebp - 0x111c]
 0x404f9d	-fmul dword ptr [ebp - 0x111c]
 0x404fa3	faddp st(1)
-0x404fa5	call __CIsqrt (FUNCTION)
 ```
 
 We are generally unable to resolve a diff like this, so resolve the other diffs in the function, then abort.
-
-If you see any references to `harness` in the asm diff, abort immediately.
