@@ -388,19 +388,19 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
         old_point = model_vertex->p;
         for (j = 0; j < 3; ++j) {
             deviation = fabs(pUndamaged_vertices->p.v[j] - old_point.v[j]);
-            *pTotal_deflection = deviation + *pTotal_deflection;
+            *pTotal_deflection += deviation;
             if (pUndamaged_vertices->p.v[j] < old_point.v[j]) {
-                model_vertex->p.v[j] = model_vertex->p.v[j] - pAmount;
-                if (model_vertex->p.v[j] < pUndamaged_vertices->p.v[j]) {
+                model_vertex->p.v[j] -= pAmount;
+                if (model_vertex->p.v[j] < DR_FF(pUndamaged_vertices->p.v[j])) {
                     model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
                 }
-                amount = old_point.v[j] - model_vertex->p.v[j] + amount;
+                amount += old_point.v[j] - model_vertex->p.v[j];
             } else if (pUndamaged_vertices->p.v[j] > old_point.v[j]) {
-                model_vertex->p.v[j] = model_vertex->p.v[j] + pAmount;
-                if (model_vertex->p.v[j] > pUndamaged_vertices->p.v[j]) {
+                model_vertex->p.v[j] += pAmount;
+                if (model_vertex->p.v[j] > DR_FF(pUndamaged_vertices->p.v[j])) {
                     model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
                 }
-                amount = model_vertex->p.v[j] - old_point.v[j] + amount;
+                amount += model_vertex->p.v[j] - old_point.v[j];
             }
         }
         if (amount != 0.0f && IsActionReplayAvailable() && pipe_vertex_count < COUNT_OF(pipe_array)) {
