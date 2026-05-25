@@ -179,17 +179,16 @@ jobs:
           reccmp_output_filename: ${{ github.workspace}}/reccmp-output.txt
           status_png_icon_filename: ${{ github.workspace}}/reccmp/carma_32x32_4.png
           status_svg_filename: ${{ github.workspace}}/new-reccmp-progress.svg
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: reccmp-output.txt
-          path: ${{ github.workspace}}/reccmp-output.txt
-          if-no-files-found: error
-      - name: Validate correctness
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if grep -q "Decreased" ${{ github.workspace}}/reccmp-output.txt; then
-            echo "::warning file=reccmp-output.txt::Decomp correctness decreased"
-          fi
+          gh pr comment ${{ github.event.number }} --body "## reccmp report
+
+          \`\`\`
+          $(cat ${{ github.workspace }}/reccmp-output.txt)
+          \`\`\`"
       - name: Checkout reccmp-report repo
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !github.event.repository.fork
         uses: actions/checkout@v4
