@@ -1,0 +1,35 @@
+name: Reccmp PR Comment
+
+on:
+  workflow_run:
+    workflows:
+      - Workflow
+    types:
+      - completed
+
+jobs:
+  comment-reccmp:
+    if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.pull_requests[0] != null }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Download reccmp output artifact
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          name: reccmp-output-pr-${{ github.event.workflow_run.pull_requests[0].number }}
+          path: ${{ github.workspace }}/reccmp-artifact
+
+      - name: Comment on PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment ${{ github.event.workflow_run.pull_requests[0].number }} --body "## reccmp report
+
+          \`\`\`
+          $(cat ${{ github.workspace }}/reccmp-artifact/reccmp-output.txt)
+          \`\`\`"
