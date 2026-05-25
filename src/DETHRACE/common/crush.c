@@ -465,6 +465,7 @@ void TotallyRepairACar(tCar_spec* pCar) {
     br_bounds storage_bounds;
 
     pipe_vertex_count = 0;
+    
     StopCarSmokingInstantly(pCar);
     if (IsActionReplayAvailable()) {
         PipeInstantUnSmudge(pCar);
