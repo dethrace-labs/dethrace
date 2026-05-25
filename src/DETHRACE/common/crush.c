@@ -382,9 +382,7 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
     amount = 0.0f;
     *pTotal_deflection = 0.0f;
 
-    i = 0;
-    model_vertex = pActor->model->vertices;
-    for (; i < pActor->model->nvertices; i++, model_vertex++, pUndamaged_vertices++) {
+    for (i = 0, model_vertex = pActor->model->vertices; i < pActor->model->nvertices; i++, model_vertex++, pUndamaged_vertices++) {
         old_point = model_vertex->p;
         for (j = 0; j < 3; ++j) {
             deviation = fabs(pUndamaged_vertices->p.v[j] - old_point.v[j]);
