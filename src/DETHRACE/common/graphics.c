@@ -2552,7 +2552,7 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
         return;
     }
     if (pDest_y + pHeight > pDest->height) {
-        pHeight = pDest->height - pDest_y;
+        pHeight -= pDest_y + pHeight - pDest->height;
     }
     if (pDest_x < 0) {
         pWidth += pDest_x;
@@ -2569,37 +2569,38 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
         return;
     }
     if (pDest_x + pWidth > pDest->width) {
-        source_row_wrap += pDest_x + pWidth - pDest->width;
-        dest_row_wrap += pDest_x + pWidth - pDest->width;
-        pWidth = pDest->width - pDest_x;
+        x_delta = pDest_x + pWidth - pDest->width;
+        pWidth -= x_delta;
+        source_row_wrap += x_delta;
+        dest_row_wrap += x_delta;
     }
 
     if (gCurrent_conversion_table != NULL) {
         conv_table = gCurrent_conversion_table->pixels;
         for (y_count = 0; y_count < pHeight; y_count++) {
             for (x_count = 0; x_count < pWidth; x_count++) {
-                the_byte = *source_ptr;
+                the_byte = *source_ptr++;
                 if (the_byte != 0) {
-                    *dest_ptr = conv_table[the_byte];
+                    *dest_ptr++ = conv_table[the_byte];
+                } else {
+                    dest_ptr++;
                 }
-                source_ptr++;
-                dest_ptr++;
             }
-            source_ptr += source_row_wrap;
             dest_ptr += dest_row_wrap;
+            source_ptr += source_row_wrap;
         }
     } else {
         for (y_count = 0; y_count < pHeight; y_count++) {
             for (x_count = 0; x_count < pWidth; x_count++) {
-                the_byte = *source_ptr;
+                the_byte = *source_ptr++;
                 if (the_byte != 0) {
-                    *dest_ptr = the_byte;
+                    *dest_ptr++ = the_byte;
+                } else {
+                    dest_ptr++;
                 }
-                source_ptr++;
-                dest_ptr++;
             }
-            source_ptr += source_row_wrap;
             dest_ptr += dest_row_wrap;
+            source_ptr += source_row_wrap;
         }
     }
 }
