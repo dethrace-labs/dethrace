@@ -2376,22 +2376,19 @@ void FadePaletteDown(void) {
     int start_time;
     int the_time;
 
-    if (!gFaded_palette) {
-        gFaded_palette = 1;
-        MungeEngineNoise();
-        gFaded_palette = 0;
-        start_time = PDGetTotalTime();
-        while (1) {
-            the_time = PDGetTotalTime() - start_time;
-            if (the_time >= 500) {
-                break;
-            }
-            i = 256 - ((the_time * 256) / 500);
-            SetFadedPalette(i);
-        }
-        SetFadedPalette(0);
-        gFaded_palette = 1;
+    if (gFaded_palette) {
+        return;
     }
+
+    gFaded_palette = 1;
+    MungeEngineNoise();
+    gFaded_palette = 0;
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime() - start_time) < 500) {
+        SetFadedPalette(256 - ((the_time * 256) / 500));
+    }
+    SetFadedPalette(0);
+    gFaded_palette = 1;
 }
 
 // IDA: void __cdecl FadePaletteUp()
@@ -2401,19 +2398,16 @@ void FadePaletteUp(void) {
     int start_time;
     int the_time;
 
-    if (gFaded_palette) {
-        gFaded_palette = 0;
-        start_time = PDGetTotalTime();
-        while (1) {
-            the_time = PDGetTotalTime() - start_time;
-            if (the_time >= 500) {
-                break;
-            }
-            i = (the_time * 256) / 500;
-            SetFadedPalette(i);
-        }
-        DRSetPalette(gCurrent_palette);
+    if (!gFaded_palette) {
+        return;
     }
+
+    gFaded_palette = 0;
+    start_time = PDGetTotalTime();
+    while ((the_time = PDGetTotalTime() - start_time) < 500) {
+        SetFadedPalette((the_time * 256) / 500);
+    }
+    DRSetPalette(gCurrent_palette);
 }
 
 // IDA: void __cdecl KillSplashScreen()
@@ -3535,14 +3529,15 @@ void ShadowMode(void) {
 // FUNCTION: CARM95 0x004ba581
 int SwitchToRealResolution(void) {
 
-    if (gGraf_data_index == gReal_graf_data_index) {
+    if (gGraf_data_index != gReal_graf_data_index) {
+        gGraf_data_index = gReal_graf_data_index;
+        gGraf_spec_index = gReal_graf_data_index;
+        gCurrent_graf_data = &gGraf_data[gGraf_data_index];
+        PDSwitchToRealResolution();
+        return 1;
+    } else {
         return 0;
     }
-    gGraf_data_index = gReal_graf_data_index;
-    gGraf_spec_index = gReal_graf_data_index;
-    gCurrent_graf_data = &gGraf_data[gReal_graf_data_index];
-    PDSwitchToRealResolution();
-    return 1;
 }
 
 // IDA: int __cdecl SwitchToLoresMode()
