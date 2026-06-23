@@ -4,3 +4,5 @@
 reccmp-user.yml
 reccmp-build.yml
 reccmp-report*
+/.cache
+CMakeUserPresets.json
