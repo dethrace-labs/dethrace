@@ -106,14 +106,17 @@ extern int gS3_last_error;
 // FUNCTION: CARM95 0x00463fb0
 void UsePathFileToDetermineIfFullInstallation(void) {
     // changed by dethrace for compatibility
-    // char line1[80];
-    // char line2[80];
-    // char line3[80];
-    // char path_file[80];
+#ifdef DETHRACE_FIX_BUGS
     char line1[MAX_PATH_LENGTH];
     char line2[MAX_PATH_LENGTH];
     char line3[MAX_PATH_LENGTH];
     char path_file[MAX_PATH_LENGTH];
+#else
+    char line1[80];
+    char line2[80];
+    char line3[80];
+    char path_file[80];
+#endif
     FILE* fp;
 
     strcpy(path_file, gApplication_path);
