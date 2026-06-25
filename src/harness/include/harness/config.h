@@ -58,6 +58,9 @@ typedef struct tHarness_game_config {
     int opengl_3dfx_mode;
     int game_completed;
 
+    int mouse_steering;
+    float mouse_steering_sensitivity;
+
     int install_signalhandler;
     int no_bind;
     char network_adapter_name[256];
