@@ -194,7 +194,7 @@ void DrawLine3DThroughBRender(br_vector3* pStart, br_vector3* pEnd) {
     gLine_model->vertices[2].blu = gLine_model->vertices[1].blu;
     // HACK end
 
-    BrModelUpdate(gLine_model, BR_MODU_VERTEX_POSITIONS);
+    BrModelUpdate(gLine_model, BR_MODU_VERTEX_POSITIONS | BR_MODU_VERTEX_COLOURS);
     BrZbSceneRenderAdd(gLine_actor);
 }
 
