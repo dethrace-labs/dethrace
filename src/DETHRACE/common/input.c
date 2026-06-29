@@ -268,17 +268,15 @@ tU32* KevKeyService(void) {
     return_val[1] = 0;
 
     if (keys >= 0x6b) {
-        if (keys <= 0x6b00) {
-            if ((keys & 0xff) == last_single_key || keys >> 8 == last_single_key) {
-                if ((keys & 0xff) == last_single_key) {
-                    keys >>= 8;
-                } else if (keys >> 8 == last_single_key) {
-                    keys &= 0xff;
-                } else {
-                    sum = 0;
-                    code = 0;
-                    return return_val;
-                }
+        if (keys <= 0x6b00 && ((keys & 0xff) == last_single_key || keys >> 8 == last_single_key)) {
+            if ((keys & 0xff) == last_single_key) {
+                keys >>= 8;
+            } else if (keys >> 8 == last_single_key) {
+                keys &= 0xff;
+            } else {
+                sum = 0;
+                code = 0;
+                return return_val;
             }
         } else {
             sum = 0;
@@ -292,7 +290,7 @@ tU32* KevKeyService(void) {
     if (last_key != keys && keys > 0) {
         sum += keys;
         code += keys << 11;
-        code = (code >> 17) + code * 16;
+        code = (code << 4) + (code >> 17);
         code2 = (code2 >> 29) + keys * keys + (code2 << 3);
         // printf("accumulate: keys=%lx, sum=%lx, code=%lx, code2=%lx\n", keys, sum, code, code2);
         last_time = PDGetTotalTime();
