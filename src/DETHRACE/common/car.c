@@ -2132,12 +2132,13 @@ void AddDrag(tCar_spec* c, br_scalar dt) {
         } else {
             drag_multiplier = vol->viscosity_multiplier * drag_multiplier;
         }
-        drag_multiplier = c->water_depth_factor * drag_multiplier;
+        drag_multiplier *= c->water_depth_factor;
     }
-    ts = BrVector3Length(&c->v) * drag_multiplier / c->M;
+    ts = drag_multiplier * BrVector3Length(&c->v);
+    ts /= c->M;
     BrVector3Scale(&b, &c->v, ts);
     BrVector3Accumulate(&c->v, &b);
-    ts = BrVector3Length(&c->omega) * drag_multiplier;
+    ts = drag_multiplier * BrVector3Length(&c->omega);
     BrVector3Scale(&b, &c->omega, ts);
     ApplyTorque(c, &b);
 }
