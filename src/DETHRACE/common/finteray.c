@@ -73,7 +73,7 @@ int PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br
     float t;
 
     for (i = 0; i < 3; i++) {
-        if (rd->v[i] < -0.00000023841858f) {
+        if (rd->v[i] < -2 * BR_SCALAR_EPSILON) {
             s = -1.0f / rd->v[i];
             t = (rp->v[i] - b->max.v[i]) * s;
             if (t > BR_SCALAR_MAX) {
@@ -87,7 +87,7 @@ int PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br
             } else if (t < t_far) {
                 t_far = t;
             }
-        } else if (rd->v[i] > 0.00000023841858f) {
+        } else if (rd->v[i] > 2 * BR_SCALAR_EPSILON) {
             s = -1.0f / rd->v[i];
             t = (rp->v[i] - b->max.v[i]) * s;
             if (t < BR_SCALAR_MIN) {
