@@ -2067,17 +2067,17 @@ void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
     br_vector3 v;
 
     c = &nc->collision_info;
-    vol = nc->collision_info.last_special_volume;
-    if (nc->collision_info.car_master_actor->identifier[3] != '!') {
+    vol = c->last_special_volume;
+    if (c->car_master_actor->identifier[3] != '!') {
         if (c->car_master_actor->t.t.mat.m[1][1] < nc->snap_off_cosine || c->min_torque_squared == 0.0f) {
             c->car_master_actor->identifier[3] = '!';
             c->M = nc->free_mass;
             c->min_torque_squared = 0.0f;
-            BrVector3Sub(&v, &nc->free_cmpos, &c->cmpos);
-            BrVector3Cross(&tv, &c->omega, &v);
-            BrMatrix34ApplyV(&v, &tv, &c->car_master_actor->t.t.mat);
-            BrVector3Accumulate(&c->v, &v);
-            c->cmpos = nc->free_cmpos;
+            BrVector3Sub(&tv, &nc->free_cmpos, &c->cmpos);
+            BrVector3Cross(&v, &c->omega, &tv);
+            BrMatrix34ApplyV(&tv, &v, &c->car_master_actor->t.t.mat);
+            BrVector3Accumulate(&c->v, &tv);
+            BrVector3Copy(&c->cmpos, &nc->free_cmpos);
         } else {
             BrVector3SetFloat(&c->v, 0.0f, 0.0f, 0.0f);
             ts = BrVector3LengthSquared(&c->omega);
@@ -2087,7 +2087,7 @@ void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
     }
     if (c->car_master_actor->identifier[3] == '!') {
         if (vol != NULL) {
-            c->v.v[1] = c->v.v[1] - dt * 10.0f * vol->gravity_multiplier;
+            c->v.v[1] = c->v.v[1] - BR_MUL(BR_MUL(dt, 10.0f), vol->gravity_multiplier);
         } else {
             c->v.v[1] = c->v.v[1] - dt * 10.0f;
         }
@@ -2095,16 +2095,17 @@ void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
         if (vol != NULL) {
             ts = vol->viscosity_multiplier * ts;
         }
-        ts = -(dt * 0.0005f * ts) / c->M;
-        BrVector3Scale(&v, &c->v, ts);
-        BrVector3Accumulate(&c->v, &v);
+        ts = -BR_MUL(BR_MUL(dt, 0.0005f), ts);
+        ts = ts / c->M;
+        BrVector3Scale(&tv, &c->v, ts);
+        BrVector3Accumulate(&c->v, &tv);
         ts = BrVector3Length(&c->omega);
         if (vol != NULL) {
             ts = vol->viscosity_multiplier * ts;
         }
-        ts = -(dt * 0.0005 * ts);
-        BrVector3Scale(&v, &c->omega, ts);
-        ApplyTorque(CAR(c), &v);
+        ts = -BR_MUL(BR_MUL(dt, 0.0005f), ts);
+        BrVector3Scale(&tv, &c->omega, ts);
+        ApplyTorque(CAR(c), &tv);
     }
 }
 
