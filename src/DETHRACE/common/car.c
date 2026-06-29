@@ -1516,9 +1516,9 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
         if (pCar->auto_special_volume == NULL) {
             vol = GetDefaultSpecialVolumeForWater();
             if (vol != NULL) {
-                BrVector3Scale(&tv, &pCar->bounds[0].min, 6.9);
+                BrVector3Scale(&tv, &pCar->bounds[0].min, WORLD_SCALE_D);
                 BrMatrix34ApplyP(&lp, &tv, mat);
-                BrVector3InvScale(&lp, &lp, 6.9);
+                BrVector3InvScale(&lp, &lp, WORLD_SCALE_D);
                 BrVector3Copy(&hp, &lp);
                 for (i = 0; i < 3; i++) {
                     val = pCar->bounds[0].max.v[i] - pCar->bounds[0].min.v[i];
