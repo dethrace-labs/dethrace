@@ -2559,7 +2559,7 @@ void EnterUserMessage(void) {
         }
         return;
     }
-    if (the_key == last_key) {
+    if (the_key + 0 == last_key) {
         if (next_time < PDGetTotalTime()) {
             next_time += 100;
         } else {
