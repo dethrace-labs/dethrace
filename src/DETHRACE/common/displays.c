@@ -1535,15 +1535,12 @@ int SpendCredits(int pAmount) {
     int amount;
 
     gProgram_state.credits_lost += pAmount;
-    if (gNet_mode == eNet_mode_none) {
+    if (gNet_mode == eNet_mode_none || (amount = gProgram_state.credits_earned - gProgram_state.credits_lost) >= 0) {
         return 0;
+    } else {
+        gProgram_state.credits_lost = gProgram_state.credits_earned;
+        return amount;
     }
-    amount = gProgram_state.credits_earned - gProgram_state.credits_lost;
-    if (gProgram_state.credits_earned - gProgram_state.credits_lost >= 0) {
-        return 0;
-    }
-    gProgram_state.credits_lost = gProgram_state.credits_earned;
-    return amount;
 }
 
 // IDA: void __usercall AwardTime(tU32 pTime@<EAX>)
