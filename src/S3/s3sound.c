@@ -11,9 +11,14 @@
 #define MAX_PATH_LENGTH 1024
 extern void dr_dprintf(char* fmt_string, ...);
 
+// GLOBAL: CARM95 0x00544e0c
 int gS3_sample_filter_funcs_registered;
 long gS3_last_file_length;
+
+// GLOBAL: CARM95 0x00544e14
 tS3_sample_filter* gS3_sample_filter_func;
+
+// GLOBAL: CARM95 0x00544e18
 tS3_sample_filter* gS3_sample_filter_disable_func;
 
 // FUNCTION: CARM95 0x004993A7
@@ -449,12 +454,8 @@ int S3RegisterSampleFilters(tS3_sample_filter* filter1, tS3_sample_filter* filte
     } else if (filter2 == NULL) {
         gS3_sample_filter_disable_func = gS3_sample_filter_func;
     }
-    if (filter1 == NULL) {
-        if (filter2 == NULL) {
-            gS3_sample_filter_funcs_registered = 0;
-        } else {
-            gS3_sample_filter_funcs_registered = 1;
-        }
+    if (filter1 == NULL || (filter1 == NULL && filter2 == NULL)) {
+        gS3_sample_filter_funcs_registered = 0;
     } else {
         gS3_sample_filter_funcs_registered = 1;
     }
