@@ -748,16 +748,13 @@ void GetFacesInBox(tCollision_info* c) {
     GetNewBoundingBox(&c->bounds_world_space, &bnds.original_bounds, &mat);
     c->bounds_ws_type = eBounds_ws;
 
-    if (c->box_face_ref != gFace_num__car && (c->box_face_ref != gFace_num__car - 1 || c->box_face_start <= gFace_count)) {
-        goto condition_met;
-    }
+    if (c->box_face_ref == gFace_num__car || (c->box_face_ref == gFace_num__car - 1 && c->box_face_start > gFace_count)) {
+        BrMatrix34Mul(&mat5, &mat, &c->last_box_inv_mat);
+        GetNewBoundingBox(&new_in_old, &bnds.original_bounds, &mat5);
 
-    /* Second group (was comma-expression) */
-    BrMatrix34Mul(&mat5, &mat, &c->last_box_inv_mat);
-    GetNewBoundingBox(&new_in_old, &bnds.original_bounds, &mat5);
-
-    if (c->last_box.max.v[0] > new_in_old.max.v[0] && c->last_box.max.v[1] > new_in_old.max.v[1] && c->last_box.max.v[2] > new_in_old.max.v[2] && c->last_box.min.v[0] < new_in_old.min.v[0] && c->last_box.min.v[1] < new_in_old.min.v[1] && c->last_box.min.v[2] < new_in_old.min.v[2]) {
-        return;
+        if (c->last_box.max.v[0] > new_in_old.max.v[0] && c->last_box.max.v[1] > new_in_old.max.v[1] && c->last_box.max.v[2] > new_in_old.max.v[2] && c->last_box.min.v[0] < new_in_old.min.v[0] && c->last_box.min.v[1] < new_in_old.min.v[1] && c->last_box.min.v[2] < new_in_old.min.v[2]) {
+            return;
+        }
     }
 
 condition_met:
@@ -788,7 +785,9 @@ condition_met:
     if (c->driver == eDriver_local_human
         && c->water_d != 10000.f
         && gDouble_pling_water
-        && BrVector3Dot(&c->bounds_world_space.max, &c->water_normal) - c->water_d <= 0.f) {
+        && (c->bounds_world_space.max.v[1] * c->water_normal.v[1]
+                   + c->bounds_world_space.max.v[2] * c->water_normal.v[2])
+                + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.max.v[0] - c->water_d <= 0.f) {
         gInTheSea = 1;
         FreezeCamera();
     }
@@ -797,12 +796,18 @@ condition_met:
         if (c->water_normal.v[1] < 0.f) {
             BrVector3Negate(&c->water_normal, &c->water_normal);
         }
-        c->water_d = BrVector3Dot(&gPling_face->v[0], &c->water_normal);
+        c->water_d = gPling_face->v[0].v[2] * c->water_normal.v[2]
+            + gPling_face->v[0].v[1] * c->water_normal.v[1]
+            + gPling_face->v[0].v[0] * c->water_normal.v[0];
         if (c->driver == eDriver_local_human) {
             if (gPling_face->material->identifier[1] == '!') {
-                if (BrVector3Dot(&c->bounds_world_space.min, &c->water_normal) - c->water_d < 0.0f) {
+                if ((c->water_normal.v[2] * c->bounds_world_space.min.v[2]
+                            + c->bounds_world_space.min.v[1] * c->water_normal.v[1])
+                        + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.min.v[0] - c->water_d < 0.0f) {
                     GetNewBoundingBox(&current_bounds, &c->bounds[1], &c->car_master_actor->t.t.mat);
-                    if (BrVector3Dot(&current_bounds.min, &c->water_normal) / WORLD_SCALE_D - c->water_d < 0.0) {
+                    if ((c->water_normal.v[2] * current_bounds.min.v[2]
+                            + c->water_normal.v[1] * current_bounds.min.v[1]
+                            + c->water_normal.v[0] * current_bounds.min.v[0]) / WORLD_SCALE_D - c->water_d < 0.0) {
                         gInTheSea = 1;
                         FreezeCamera();
                     }
@@ -1291,7 +1296,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     tU32 frame_end_time;
 
     step_number = 0;
-    frame_end_time = last_frame_time + pTime_difference;
+    frame_end_time = pTime_difference + last_frame_time;
     if (gFreeze_mechanics) {
         return;
     }
@@ -2009,16 +2014,19 @@ void RotateCar(tCollision_info* c, br_scalar dt) {
     rad_squared = BrVector3LengthSquared(&c->omega) * dt;
     BrVector3Copy(&c->oldomega, &c->omega);
 
-    if (rad_squared < .0000001f) {
+    if (rad_squared < .0000001) {
         return;
     }
 
     if (rad_squared > .008f) {
-        steps = sqrt(rad_squared / .032f) + 1;
+        steps = (int)sqrt(rad_squared / .032f) + 1;
         dt = dt / steps;
 
         for (i = 0; i < steps && i < 20; i++) {
             RotateCarSecondOrder(c, dt);
+        }
+        if (i == 20) {
+            i = 21;
         }
     } else {
         RotateCarFirstOrder(c, dt);
@@ -2037,18 +2045,22 @@ void SteeringSelfCentre(tCar_spec* c, br_scalar dt, br_vector3* n) {
     if (-c->maxcurve > c->curvature) {
         c->curvature = -c->maxcurve;
     }
-    if (!c->keys.left && c->joystick.left <= 0 && !c->keys.right && c->joystick.right <= 0 && !c->keys.holdw) {
-        if (c->susp_height[1] > c->oldd[2] || c->susp_height[1] > c->oldd[3]) {
-            ts = -((c->omega.v[2] * n->v[2] + c->omega.v[1] * n->v[1] + c->omega.v[0] * n->v[0]) * (dt / (c->wpos[0].v[2] - c->wpos[2].v[2])));
-            ts2 = -(c->curvature * dt);
-            if (fabs(ts) < fabs(ts2) || (ts * ts2 < 0.0f)) {
-                ts = ts2;
-            }
-            c->curvature = c->curvature + ts;
-            if (c->curvature * ts > 0.0f) {
-                c->curvature = 0.0;
-            }
+    if (c->keys.left || c->joystick.left > 0 || c->keys.right || c->joystick.right > 0 || c->keys.holdw) {
+        return;
+    }
+    if (c->susp_height[1] <= c->oldd[2]) {
+        if (c->susp_height[1] <= c->oldd[3]) {
+            return;
         }
+    }
+    ts = -((c->omega.v[1] * n->v[1] + c->omega.v[2] * n->v[2] + c->omega.v[0] * n->v[0]) * (dt / (c->wpos[0].v[2] - c->wpos[2].v[2])));
+    ts2 = -(c->curvature * dt);
+    if (fabs(ts) < fabs(ts2) || (ts2 * ts < 0.0f)) {
+        ts = ts2;
+    }
+    c->curvature = c->curvature + ts;
+    if (c->curvature * ts > 0.0f) {
+        c->curvature = 0.0;
     }
 }
 
@@ -2062,17 +2074,17 @@ void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
     br_vector3 v;
 
     c = &nc->collision_info;
-    vol = nc->collision_info.last_special_volume;
-    if (nc->collision_info.car_master_actor->identifier[3] != '!') {
+    vol = c->last_special_volume;
+    if (c->car_master_actor->identifier[3] != '!') {
         if (c->car_master_actor->t.t.mat.m[1][1] < nc->snap_off_cosine || c->min_torque_squared == 0.0f) {
             c->car_master_actor->identifier[3] = '!';
             c->M = nc->free_mass;
             c->min_torque_squared = 0.0f;
-            BrVector3Sub(&v, &nc->free_cmpos, &c->cmpos);
-            BrVector3Cross(&tv, &c->omega, &v);
-            BrMatrix34ApplyV(&v, &tv, &c->car_master_actor->t.t.mat);
-            BrVector3Accumulate(&c->v, &v);
-            c->cmpos = nc->free_cmpos;
+            BrVector3Sub(&tv, &nc->free_cmpos, &c->cmpos);
+            BrVector3Cross(&v, &c->omega, &tv);
+            BrMatrix34ApplyV(&tv, &v, &c->car_master_actor->t.t.mat);
+            BrVector3Accumulate(&c->v, &tv);
+            BrVector3Copy(&c->cmpos, &nc->free_cmpos);
         } else {
             BrVector3SetFloat(&c->v, 0.0f, 0.0f, 0.0f);
             ts = BrVector3LengthSquared(&c->omega);
@@ -2082,7 +2094,7 @@ void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
     }
     if (c->car_master_actor->identifier[3] == '!') {
         if (vol != NULL) {
-            c->v.v[1] = c->v.v[1] - dt * 10.0f * vol->gravity_multiplier;
+            c->v.v[1] = c->v.v[1] - BR_MUL(BR_MUL(dt, 10.0f), vol->gravity_multiplier);
         } else {
             c->v.v[1] = c->v.v[1] - dt * 10.0f;
         }
@@ -2090,16 +2102,17 @@ void NonCarCalcForce(tNon_car_spec* nc, br_scalar dt) {
         if (vol != NULL) {
             ts = vol->viscosity_multiplier * ts;
         }
-        ts = -(dt * 0.0005f * ts) / c->M;
-        BrVector3Scale(&v, &c->v, ts);
-        BrVector3Accumulate(&c->v, &v);
+        ts = -BR_MUL(BR_MUL(dt, 0.0005f), ts);
+        ts = ts / c->M;
+        BrVector3Scale(&tv, &c->v, ts);
+        BrVector3Accumulate(&c->v, &tv);
         ts = BrVector3Length(&c->omega);
         if (vol != NULL) {
             ts = vol->viscosity_multiplier * ts;
         }
-        ts = -(dt * 0.0005 * ts);
-        BrVector3Scale(&v, &c->omega, ts);
-        ApplyTorque(CAR(c), &v);
+        ts = -BR_MUL(BR_MUL(dt, 0.0005f), ts);
+        BrVector3Scale(&tv, &c->omega, ts);
+        ApplyTorque(CAR(c), &tv);
     }
 }
 
@@ -2119,12 +2132,13 @@ void AddDrag(tCar_spec* c, br_scalar dt) {
         } else {
             drag_multiplier = vol->viscosity_multiplier * drag_multiplier;
         }
-        drag_multiplier = c->water_depth_factor * drag_multiplier;
+        drag_multiplier *= c->water_depth_factor;
     }
-    ts = BrVector3Length(&c->v) * drag_multiplier / c->M;
+    ts = drag_multiplier * BrVector3Length(&c->v);
+    ts /= c->M;
     BrVector3Scale(&b, &c->v, ts);
     BrVector3Accumulate(&c->v, &b);
-    ts = BrVector3Length(&c->omega) * drag_multiplier;
+    ts = drag_multiplier * BrVector3Length(&c->omega);
     BrVector3Scale(&b, &c->omega, ts);
     ApplyTorque(c, &b);
 }
@@ -3283,38 +3297,37 @@ br_scalar AddFriction(tCollision_info* c, br_vector3* vel, br_vector3* normal_fo
     br_scalar point_vel;
 
     ts = BrVector3Dot(normal_force, vel) / BrVector3Dot(normal_force, normal_force);
-    BrVector3Scale(&tv, normal_force, ts);
-    BrVector3Sub(vel, vel, &tv);
-    point_vel = total_force * 0.35f * gCurrent_race.material_modifiers[gMaterial_index].car_wall_friction;
-    ts = BrVector3Length(vel);
-    if (ts < 0.0001f) {
+    BrVector3Scale(&norm, normal_force, ts);
+    BrVector3Sub(vel, vel, &norm);
+    total_force = (total_force * 0.35f) * gCurrent_race.material_modifiers[gMaterial_index].car_wall_friction;
+    point_vel = BrVector3Length(vel);
+    if (point_vel < 0.0001f) {
         BrVector3Set(max_friction, 0.f, 0.f, 0.f);
         return 0.0;
     }
-    BrVector3InvScale(max_friction, vel, -ts);
+    ts = 1.0f / (-point_vel);
+    BrVector3Scale(max_friction, vel, ts);
     BrVector3Cross(&ftau, pos, max_friction);
     BrVector3Scale(&ftau, &ftau, c->M);
     ftau.v[0] = ftau.v[0] / c->I.v[0];
     ftau.v[1] = ftau.v[1] / c->I.v[1];
     ftau.v[2] = ftau.v[2] / c->I.v[2];
-    ts = 1.0 / c->M;
-    norm.v[0] = pos->v[2] * ftau.v[1] - pos->v[1] * ftau.v[2];
-    norm.v[1] = pos->v[0] * ftau.v[2] - pos->v[2] * ftau.v[0];
-    norm.v[2] = pos->v[1] * ftau.v[0] - pos->v[0] * ftau.v[1];
-    ts = max_friction->v[0] * norm.v[0] + max_friction->v[1] * norm.v[1] + max_friction->v[2] * norm.v[2] + ts;
-    if (fabs(ts) <= 0.0001f) {
-        ts = 0.0f;
-    } else {
+    ts = 1.0f / c->M;
+    BrVector3Cross(&tv, &ftau, pos);
+    ts = BrVector3Dot(max_friction, &tv) + ts;
+    if ((float)fabs(ts) > 0.0001f) {
         ts = -BrVector3Dot(max_friction, vel) / ts;
+    } else {
+        ts = 0.0f;
     }
-    if (ts > point_vel) {
-        ts = point_vel;
+    if (ts > total_force) {
+        ts = total_force;
     }
     BrVector3Scale(max_friction, max_friction, ts);
-    BrVector3Cross(&tv, pos, max_friction);
-    BrVector3Scale(&tv, &tv, c->M);
-    ApplyTorque((tCar_spec*)c, &tv);
-    return point_vel;
+    BrVector3Cross(&norm, pos, max_friction);
+    BrVector3Scale(&norm, &norm, c->M);
+    ApplyTorque((tCar_spec*)c, &norm);
+    return total_force;
 }
 
 // IDA: void __usercall AddFrictionCarToCar(tCollision_info *car1@<EAX>, tCollision_info *car2@<EDX>, br_vector3 *vel1@<EBX>, br_vector3 *vel2@<ECX>, br_vector3 *normal_force1, br_vector3 *pos1, br_vector3 *pos2, br_scalar total_force, br_vector3 *max_friction)
