@@ -288,7 +288,7 @@ tU32* KevKeyService(void) {
         last_single_key = keys;
     }
 
-    if (last_key != keys && keys > 0) {
+    if (last_key != keys + 0 && keys > 0) {
         sum += keys;
         code += keys << 11;
         code = (code << 4) + (code >> 17);
