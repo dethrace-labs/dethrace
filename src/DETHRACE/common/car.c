@@ -4677,13 +4677,9 @@ void MungeCarGraphics(tU32 pFrame_period) {
         } else {
             MungeSpecialVolume((tCollision_info*)the_car);
         }
+
         if (the_car->driver != eDriver_local_human && the_car->car_model_variable) {
-            distance_from_camera = ((the_car->car_master_actor->t.t.translate.t.v[0] - gCamera_to_world.m[3][0])
-                    * (the_car->car_master_actor->t.t.translate.t.v[0] - gCamera_to_world.m[3][0])
-                + (the_car->car_master_actor->t.t.translate.t.v[2] - gCamera_to_world.m[3][2])
-                    * (the_car->car_master_actor->t.t.translate.t.v[2] - gCamera_to_world.m[3][2])
-                + (the_car->car_master_actor->t.t.translate.t.v[1] - gCamera_to_world.m[3][1])
-                    * (the_car->car_master_actor->t.t.translate.t.v[1] - gCamera_to_world.m[3][1]));
+            distance_from_camera = Vector3DistanceSquared(&the_car->car_master_actor->t.t.translate.t, (br_vector3*)gCamera_to_world.m[3]);
             distance_from_camera /= gCar_simplification_factor[gGraf_spec_index][gCar_simplification_level * 1];
 #ifdef DETHRACE_FIX_BUGS
 // This avoids out-of-bounds access when having lots of cars
