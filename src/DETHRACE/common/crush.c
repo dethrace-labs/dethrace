@@ -379,33 +379,30 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
     amount = 0.0f;
     *pTotal_deflection = 0.0f;
 
-    for (i = 0; i < pActor->model->nvertices; i++) {
-        model_vertex = &pActor->model->vertices[i];
+    for (i = 0, model_vertex = pActor->model->vertices; i < pActor->model->nvertices; i++, model_vertex++, pUndamaged_vertices++) {
         old_point = model_vertex->p;
         for (j = 0; j < 3; ++j) {
-            *pTotal_deflection = fabs(pUndamaged_vertices->p.v[j] - old_point.v[j]) + *pTotal_deflection;
-            if (pUndamaged_vertices->p.v[j] >= old_point.v[j]) {
-                if (pUndamaged_vertices->p.v[j] > old_point.v[j]) {
-                    model_vertex->p.v[j] = model_vertex->p.v[j] + pAmount;
-                    if (pUndamaged_vertices->p.v[j] < model_vertex->p.v[j]) {
-                        model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
-                    }
-                    amount = model_vertex->p.v[j] - old_point.v[j] + amount;
-                }
-            } else {
-                model_vertex->p.v[j] = model_vertex->p.v[j] - pAmount;
-                if (pUndamaged_vertices->p.v[j] > model_vertex->p.v[j]) {
+            deviation = fabs(pUndamaged_vertices->p.v[j] - old_point.v[j]);
+            *pTotal_deflection += deviation;
+            if (pUndamaged_vertices->p.v[j] < old_point.v[j]) {
+                model_vertex->p.v[j] -= pAmount;
+                if (model_vertex->p.v[j] < DR_FF(pUndamaged_vertices->p.v[j])) {
                     model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
                 }
-                amount = old_point.v[j] - model_vertex->p.v[j] + amount;
+                amount += old_point.v[j] - model_vertex->p.v[j];
+            } else if (pUndamaged_vertices->p.v[j] > old_point.v[j]) {
+                model_vertex->p.v[j] += pAmount;
+                if (model_vertex->p.v[j] > DR_FF(pUndamaged_vertices->p.v[j])) {
+                    model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
+                }
+                amount += model_vertex->p.v[j] - old_point.v[j];
             }
         }
-        if (amount != 0.0 && IsActionReplayAvailable() && pipe_vertex_count < COUNT_OF(pipe_array)) {
+        if (amount != 0.0f && IsActionReplayAvailable() && pipe_vertex_count < COUNT_OF(pipe_array)) {
             pipe_array[pipe_vertex_count].vertex_index = i;
             BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates, &model_vertex->p, &old_point);
             pipe_vertex_count++;
         }
-        pUndamaged_vertices++;
     }
     SetModelForUpdate(pActor->model, pCar, 0);
     if (IsActionReplayAvailable() && pipe_vertex_count) {
@@ -464,6 +461,7 @@ void TotallyRepairACar(tCar_spec* pCar) {
     tChanged_vertex pipe_array[600];
     br_bounds storage_bounds;
 
+    pipe_vertex_count = 0;
     StopCarSmokingInstantly(pCar);
     if (IsActionReplayAvailable()) {
         PipeInstantUnSmudge(pCar);
@@ -476,32 +474,33 @@ void TotallyRepairACar(tCar_spec* pCar) {
     }
     memcpy(&storage_bounds, &pCar->bounds[1], sizeof(br_bounds));
     memcpy(&pCar->bounds[1], &pCar->max_bounds[1], sizeof(br_bounds));
-    if (TestForCarInSensiblePlace(pCar)) {
-        for (j = 0; j < pCar->car_actor_count; j++) {
-            the_car_actor = &pCar->car_model_actors[j];
-            if (the_car_actor->undamaged_vertices != NULL) {
-                pipe_vertex_count = 0;
-                for (k = 0; k < the_car_actor->actor->model->nvertices; k++) {
-                    if (pipe_vertex_count < COUNT_OF(pipe_array)) {
-                        BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates,
-                            &the_car_actor->undamaged_vertices[k].p, &the_car_actor->actor->model->vertices[k].p);
-                        if (!Vector3IsZero(&pipe_array[pipe_vertex_count].delta_coordinates)) {
-                            pipe_array[pipe_vertex_count].vertex_index = k;
-                            pipe_vertex_count++;
-                        }
+
+    if (!TestForCarInSensiblePlace(pCar)) {
+        memcpy(&pCar->bounds[1], &storage_bounds, sizeof(br_bounds));
+        return;
+    }
+    for (j = 0, the_car_actor = pCar->car_model_actors; j < pCar->car_actor_count; j++, the_car_actor++) {
+        if (the_car_actor->undamaged_vertices != NULL) {
+            pipe_vertex_count = 0;
+            for (k = 0; k < the_car_actor->actor->model->nvertices; k++) {
+                if (pipe_vertex_count < COUNT_OF(pipe_array)) {
+                    BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates,
+                        &the_car_actor->undamaged_vertices[k].p, &the_car_actor->actor->model->vertices[k].p);
+                    if (!Vector3IsZero(&pipe_array[pipe_vertex_count].delta_coordinates)) {
+                        pipe_array[pipe_vertex_count].vertex_index = k;
+                        pipe_vertex_count++;
                     }
                 }
-                memcpy(the_car_actor->actor->model->vertices,
-                    the_car_actor->undamaged_vertices,
-                    the_car_actor->actor->model->nvertices * sizeof(br_vertex));
-                BrModelUpdate(the_car_actor->actor->model, BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS);
-                if (pipe_vertex_count != 0 && IsActionReplayAvailable()) {
-                    PipeSingleModelGeometry(pCar->car_ID, j, pipe_vertex_count, pipe_array);
-                }
+            }
+            memcpy(the_car_actor->actor->model->vertices,
+                the_car_actor->undamaged_vertices,
+                the_car_actor->actor->model->nvertices * sizeof(br_vertex));
+
+            BrModelUpdate(the_car_actor->actor->model, BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS);
+            if (pipe_vertex_count != 0 && IsActionReplayAvailable()) {
+                PipeSingleModelGeometry(pCar->car_ID, j, pipe_vertex_count, pipe_array);
             }
         }
-    } else {
-        memcpy(&pCar->bounds[1], &storage_bounds, sizeof(br_bounds));
     }
 }
 
