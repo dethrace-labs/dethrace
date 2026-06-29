@@ -2014,16 +2014,19 @@ void RotateCar(tCollision_info* c, br_scalar dt) {
     rad_squared = BrVector3LengthSquared(&c->omega) * dt;
     BrVector3Copy(&c->oldomega, &c->omega);
 
-    if (rad_squared < .0000001f) {
+    if (rad_squared < .0000001) {
         return;
     }
 
     if (rad_squared > .008f) {
-        steps = sqrt(rad_squared / .032f) + 1;
+        steps = (int)sqrt(rad_squared / .032f) + 1;
         dt = dt / steps;
 
         for (i = 0; i < steps && i < 20; i++) {
             RotateCarSecondOrder(c, dt);
+        }
+        if (i == 20) {
+            i = 21;
         }
     } else {
         RotateCarFirstOrder(c, dt);
