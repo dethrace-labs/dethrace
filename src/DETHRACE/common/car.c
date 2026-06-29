@@ -2045,18 +2045,22 @@ void SteeringSelfCentre(tCar_spec* c, br_scalar dt, br_vector3* n) {
     if (-c->maxcurve > c->curvature) {
         c->curvature = -c->maxcurve;
     }
-    if (!c->keys.left && c->joystick.left <= 0 && !c->keys.right && c->joystick.right <= 0 && !c->keys.holdw) {
-        if (c->susp_height[1] > c->oldd[2] || c->susp_height[1] > c->oldd[3]) {
-            ts = -((c->omega.v[2] * n->v[2] + c->omega.v[1] * n->v[1] + c->omega.v[0] * n->v[0]) * (dt / (c->wpos[0].v[2] - c->wpos[2].v[2])));
-            ts2 = -(c->curvature * dt);
-            if (fabs(ts) < fabs(ts2) || (ts * ts2 < 0.0f)) {
-                ts = ts2;
-            }
-            c->curvature = c->curvature + ts;
-            if (c->curvature * ts > 0.0f) {
-                c->curvature = 0.0;
-            }
+    if (c->keys.left || c->joystick.left > 0 || c->keys.right || c->joystick.right > 0 || c->keys.holdw) {
+        return;
+    }
+    if (c->susp_height[1] <= c->oldd[2]) {
+        if (c->susp_height[1] <= c->oldd[3]) {
+            return;
         }
+    }
+    ts = -((c->omega.v[1] * n->v[1] + c->omega.v[2] * n->v[2] + c->omega.v[0] * n->v[0]) * (dt / (c->wpos[0].v[2] - c->wpos[2].v[2])));
+    ts2 = -(c->curvature * dt);
+    if (fabs(ts) < fabs(ts2) || (ts2 * ts < 0.0f)) {
+        ts = ts2;
+    }
+    c->curvature = c->curvature + ts;
+    if (c->curvature * ts > 0.0f) {
+        c->curvature = 0.0;
     }
 }
 
