@@ -15,7 +15,6 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include <netinet/in.h>
 
 #ifdef _WIN32
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -28,6 +27,7 @@
 
 #include <arpa/inet.h>
 #include <errno.h>
+#include <netinet/in.h>
 #include <sys/socket.h>
 #endif
 
