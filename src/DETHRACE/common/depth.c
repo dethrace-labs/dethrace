@@ -374,7 +374,7 @@ br_model* CreateHorizonModel(br_actor* pCamera) {
     br_model* model;
 
     nbands = 21;
-    model = BrModelAllocate(NULL, 4 * nbands + 4, 6 * nbands);
+    model = BrModelAllocate(NULL, 4 * (nbands + 1), 6 * nbands);
     model->flags |= BR_MODF_KEEP_ORIGINAL;
     for (band = 0; band < nbands; band++) {
         for (stripe = 0; stripe < 3; stripe++) {
@@ -393,12 +393,12 @@ br_model* CreateHorizonModel(br_actor* pCamera) {
     for (vertex = 0; vertex < 12; vertex++) {
         model->vertices[vertex].map.v[1] = 0.9999999f;
     }
-    for (vertex = 80; vertex < 4 * nbands + 4; vertex++) {
-        model->vertices[vertex].map.v[1] = 0.f;
+    for (vertex = 80; vertex < 4 * (nbands + 1); vertex++) {
+        model->vertices[vertex].map.v[1] = 0.0f;
     }
     for (band = 1; band < 18; band++) {
-        vertex = 4 * band + 8;
-        model->vertices[vertex].map.v[1] = (float)(18 - band) / 18.f;
+        vertex = 4 * (band + 2);
+        model->vertices[vertex].map.v[1] = (float)(18 - band) / 18.0f;
         for (stripe = 1; stripe < 4; stripe++) {
             model->vertices[vertex + stripe].map.v[1] = model->vertices[vertex].map.v[1];
         }
