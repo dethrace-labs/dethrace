@@ -1535,11 +1535,7 @@ int SpendCredits(int pAmount) {
     int amount;
 
     gProgram_state.credits_lost += pAmount;
-    if (gNet_mode == eNet_mode_none) {
-        return 0;
-    }
-    amount = gProgram_state.credits_earned - gProgram_state.credits_lost;
-    if (amount >= 0) {
+    if (gNet_mode == eNet_mode_none || (amount = gProgram_state.credits_earned - gProgram_state.credits_lost) >= 0) {
         return 0;
     } else {
         gProgram_state.credits_lost = gProgram_state.credits_earned;
