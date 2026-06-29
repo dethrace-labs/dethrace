@@ -1291,7 +1291,7 @@ void ApplyPhysicsToCars(tU32 last_frame_time, tU32 pTime_difference) {
     tU32 frame_end_time;
 
     step_number = 0;
-    frame_end_time = last_frame_time + pTime_difference;
+    frame_end_time = pTime_difference + last_frame_time;
     if (gFreeze_mechanics) {
         return;
     }
