@@ -1071,7 +1071,7 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
     last_vertex = *nv - 1;
     j = 0;
     for (vertex = 0; *nv > vertex; ++vertex) {
-        if ((p[vertex].v[i] > limit) ^ (p[last_vertex].v[i] > limit)) {
+        if ((p[vertex].v[i] > limit) != (p[last_vertex].v[i] > limit)) {
             for (k = 0; k < 3; ++k) {
                 if (k == i) {
                     continue;
@@ -1090,7 +1090,7 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
         last_vertex = vertex;
     }
     *nv = j;
-    for (k = 0; !(k >= j); k++) {
+    for (k = 0; k < j; k++) {
         BrVector3Copy(&p[k], &p2[k]);
     }
 }
