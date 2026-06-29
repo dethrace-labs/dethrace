@@ -3312,9 +3312,7 @@ br_scalar AddFriction(tCollision_info* c, br_vector3* vel, br_vector3* normal_fo
     ftau.v[1] = ftau.v[1] / c->I.v[1];
     ftau.v[2] = ftau.v[2] / c->I.v[2];
     ts = 1.0f / c->M;
-    tv.v[0] = pos->v[2] * ftau.v[1] - pos->v[1] * ftau.v[2];
-    tv.v[1] = pos->v[0] * ftau.v[2] - pos->v[2] * ftau.v[0];
-    tv.v[2] = pos->v[1] * ftau.v[0] - pos->v[0] * ftau.v[1];
+    BrVector3Cross(&tv, &ftau, pos);
     ts = BrVector3Dot(max_friction, &tv) + ts;
     if ((float)fabs(ts) > 0.0001f) {
         ts = -BrVector3Dot(max_friction, vel) / ts;
