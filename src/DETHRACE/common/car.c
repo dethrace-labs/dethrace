@@ -215,9 +215,14 @@ int gInTheSea;
 
 // GLOBAL: CARM95 0x0053a524
 int gCamera_mode;
+
+// GLOBAL: CARM95 0x0053a514
 br_scalar gOur_yaw__car;            // suffix added to avoid duplicate symbol
 br_scalar gGravity__car;            // suffix added to avoid duplicate symbol
+
+// GLOBAL: CARM95 0x0053a530
 br_vector3 gNew_ground_normal__car; // suffix added to avoid duplicate symbol
+
 // GLOBAL: CARM95 0x00550750
 char gNon_car_spec_list[100];
 
@@ -4355,21 +4360,31 @@ int GetBoundsEdge(br_vector3* pos, br_vector3* edge, br_bounds* pB, int plane1, 
     return 1;
 }
 
-// IDA: void __usercall oldMoveOurCar(tU32 pTime_difference@<EAX>)
+// IDA: void __usercall oldMoveOurCar(br_scalar pNew_y@<EAX>, tU32 pTime_difference@<EDX>, br_model *pThe_model@<EBX>, int pFace_index@<ECX>)
 // FUNCTION: CARM95 0x00485bea
-void oldMoveOurCar(tU32 pTime_difference) {
+void oldMoveOurCar(br_scalar pNew_y, tU32 pTime_difference, br_model* pThe_model, int pFace_index) {
+    br_transform direction_transform;
     br_vector3 thrust_vector;
-    br_matrix34 direction_matrix;
-    br_matrix34 old_mat;
-    double rotate_amount;
-    br_scalar nearest_y_above;
-    br_scalar nearest_y_below;
     br_scalar speed;
-    int below_face_index;
-    int above_face_index;
-    br_model* below_model;
-    br_model* above_model;
-    NOT_IMPLEMENTED();
+
+    speed = (gSelf->t.t.translate.t.v[1] - pNew_y) * 100.0f;
+    if (pTime_difference == 0
+        || speed / (br_scalar)pTime_difference > 0.6f) {
+        gSelf->t.t.translate.t.v[1] -= (br_scalar)pTime_difference * 0.6f / 100.0f;
+    } else {
+        gSelf->t.t.translate.t.v[1] = pNew_y;
+        gGround_normal__car = gNew_ground_normal__car;
+    }
+
+    thrust_vector.v[0] = -cos(BrAngleToRadian(BrDegreeToAngle(gOur_yaw__car)));
+    thrust_vector.v[1] = 0.f;
+    thrust_vector.v[2] = sin(BrAngleToRadian(BrDegreeToAngle(gOur_yaw__car)));
+
+    direction_transform.type = BR_TRANSFORM_LOOK_UP;
+    BrVector3Cross(&direction_transform.t.look_up.look, &thrust_vector, &gGround_normal__car);
+    direction_transform.t.look_up.up = gGround_normal__car;
+    direction_transform.t.look_up.t = gSelf->t.t.translate.t;
+    BrTransformToTransform(&gSelf->t, &direction_transform);
 }
 
 // IDA: void __cdecl ToggleCollisionDetection()
