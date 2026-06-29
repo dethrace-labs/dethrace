@@ -1,0 +1,52 @@
+name: Post reccmp output as PR comment
+
+on:
+  workflow_run:
+    workflows:
+      - Workflow
+    types:
+      - completed
+
+jobs:
+  comment-reccmp:
+    if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Resolve PR number from head SHA
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER=$(gh pr list \
+            --repo "${{ github.repository }}" \
+            --state open \
+            --search "${{ github.event.workflow_run.head_sha }}" \
+            --json number,headRefOid \
+            --jq '.[] | select(.headRefOid == "${{ github.event.workflow_run.head_sha }}") | .number' \
+            | head -n 1)
+          test -n "$PR_NUMBER"
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Download reccmp output artifact
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          name: reccmp-output-pr-${{ steps.pr.outputs.number }}
+          path: ${{ github.workspace }}/reccmp-artifact
+
+      - name: Comment on PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment ${{ steps.pr.outputs.number }} \
+            --repo "${{ github.repository }}" \
+            --body "## reccmp report
+
+          \`\`\`
+          $(cat ${{ github.workspace }}/reccmp-artifact/reccmp-output.txt)
+          \`\`\`"
