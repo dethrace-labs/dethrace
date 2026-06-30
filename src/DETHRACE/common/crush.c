@@ -303,7 +303,7 @@ void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3*
     nearest_index = -1;
     for (i = 0; i < pCrush_data->number_of_crush_points; i++) {
         the_vertex = &vertices[pCrush_data->crush_points[i].vertex_index];
-        this_distance = (impact_point_model.v[2] - the_vertex->p.v[2]) * (impact_point_model.v[2] - the_vertex->p.v[2]) + (impact_point_model.v[1] - the_vertex->p.v[1]) * (impact_point_model.v[1] - the_vertex->p.v[1]) + (impact_point_model.v[0] - the_vertex->p.v[0]) * (impact_point_model.v[0] - the_vertex->p.v[0]);
+        this_distance = Vector3DistanceSquared(&impact_point_model, &the_vertex->p);
         if (this_distance < nearest_so_far) {
             nearest_so_far = this_distance;
             nearest_index = i;
