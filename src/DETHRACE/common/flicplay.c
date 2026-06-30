@@ -819,11 +819,12 @@ int StartFlic(char* pFile_name, int pIndex, tFlic_descriptor_ptr pFlic_info, tU3
     } else {
         if (claimed_speed == 0) {
             FatalError(kFatalError_FlicFileNoFrameRate_S, gLast_flic_name);
-        }
-        if (pFlic_info->new_format) {
-            pFlic_info->frame_period = claimed_speed;
         } else {
-            pFlic_info->frame_period = 14 * claimed_speed;
+            if (pFlic_info->new_format) {
+                pFlic_info->frame_period = claimed_speed;
+            } else {
+                pFlic_info->frame_period = 14 * claimed_speed;
+            }
         }
     }
     pFlic_info->the_index = pIndex;
