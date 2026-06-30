@@ -990,23 +990,20 @@ void AdjustHeadups(void) {
     int delta_y;
     tHeadup* the_headup;
 
-    the_headup = gHeadups;
-    for (i = 0; i < COUNT_OF(gHeadups); i++) {
-        the_headup = &gHeadups[i];
-        if (the_headup->type == eHeadup_unused) {
-            continue;
+    for (i = 0, the_headup = gHeadups; i < COUNT_OF(gHeadups); i++, the_headup++) {
+        if (the_headup->type != eHeadup_unused) {
+            delta_x = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][the_headup->slot_index].x
+                - gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on != 0 && gProgram_state.cockpit_image_index >= 0 ? 0 : 1][the_headup->slot_index].x;
+            delta_y = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][the_headup->slot_index].y
+                - gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on != 0 && gProgram_state.cockpit_image_index >= 0 ? 0 : 1][the_headup->slot_index].y;
+            the_headup->x += delta_x;
+            the_headup->original_x += delta_x;
+            the_headup->y += delta_y;
+            the_headup->dim_left += delta_x;
+            the_headup->dim_top += delta_y;
+            the_headup->dim_right += delta_x;
+            the_headup->dim_bottom += delta_y;
         }
-        delta_x = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0][the_headup->slot_index].x
-            - gProgram_state.current_car.headup_slots[!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0][the_headup->slot_index].x;
-        delta_y = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0][the_headup->slot_index].y
-            - gProgram_state.current_car.headup_slots[!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0][the_headup->slot_index].y;
-        the_headup->x += delta_x;
-        the_headup->original_x += delta_x;
-        the_headup->y += delta_y;
-        the_headup->dim_left += delta_x;
-        the_headup->dim_top += delta_y;
-        the_headup->dim_right += delta_x;
-        the_headup->dim_bottom += delta_y;
     }
 }
 
