@@ -1762,47 +1762,39 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
     br_vector3 camera_to_car;
     br_scalar distance_factor;
 
-    if (gShadow_level == eShadow_none) {
-        return;
-    }
-    for (cat = eVehicle_self;; ++cat) {
-        if (gShadow_level == eShadow_everyone) {
-            if (cat > 4) {
-                break;
-            }
-        } else {
-            if (cat > (gShadow_level == eShadow_us_and_opponents ? 3 : 0)) {
-                break;
-            }
-        }
-
-        if (cat == eVehicle_self) {
-            car_count = 1;
-        } else {
-            car_count = GetCarCount(cat);
-        }
-        for (i = 0; i < car_count; i++) {
+    if (gShadow_level != eShadow_none) {
+        for (cat = eVehicle_self; cat <= (gShadow_level == eShadow_everyone ? 4 : gShadow_level == eShadow_us_and_opponents ? 3 : 0); ++cat) {
             if (cat == eVehicle_self) {
-                the_car = &gProgram_state.current_car;
+                car_count = 1;
             } else {
-                the_car = GetCarSpec(cat, i);
+                car_count = GetCarCount(cat);
             }
-            if (!the_car->active) {
-                continue;
-            }
+            for (i = 0; i < car_count; i++) {
+                if (cat == eVehicle_self) {
+                    the_car = &gProgram_state.current_car;
+                } else {
+                    the_car = GetCarSpec(cat, i);
+                }
+                if (!the_car->active) {
+                    continue;
+                }
 
-            BrVector3Sub(&camera_to_car, (br_vector3*)gCamera_to_world.m[3], &the_car->car_master_actor->t.t.translate.t);
-            distance_factor = BrVector3LengthSquared(&camera_to_car);
-            if (gAction_replay_mode || distance_factor <= SHADOW_MAX_RENDER_DISTANCE) {
+                if (!gAction_replay_mode) {
+                    BrVector3Sub(&camera_to_car, (br_vector3*)gCamera_to_world.m[3], &the_car->car_master_actor->t.t.translate.t);
+                    distance_factor = BrVector3LengthSquared(&camera_to_car);
+                    if (distance_factor > SHADOW_MAX_RENDER_DISTANCE) {
+                        continue;
+                    }
+                }
                 ProcessShadow(the_car, gUniverse_actor, &gProgram_state.track_spec, gCamera, &gCamera_to_world, distance_factor);
             }
         }
-    }
-    if (gFancy_shadow) {
-        for (i = 0; i < gSaved_table_count; i++) {
-            gSaved_shade_tables[i].original->height = gSaved_shade_tables[i].copy->height;
-            gSaved_shade_tables[i].original->pixels = gSaved_shade_tables[i].copy->pixels;
-            BrTableUpdate(gSaved_shade_tables[i].original, 0x7FFF);
+        if (gFancy_shadow) {
+            for (i = 0; i < gSaved_table_count; i++) {
+                gSaved_shade_tables[i].original->height = gSaved_shade_tables[i].copy->height;
+                gSaved_shade_tables[i].original->pixels = gSaved_shade_tables[i].copy->pixels;
+                BrTableUpdate(gSaved_shade_tables[i].original, BR_TABU_ALL);
+            }
         }
     }
 }
@@ -2359,11 +2351,12 @@ void SetFadedPalette(int pDegree) {
     char* the_pixels;
 
     memcpy(gScratch_pixels, gCurrent_palette->pixels, 0x400u);
+
     for (j = 0; j < 256; j++) {
         Darken((tU8*)&gScratch_pixels[4 * j], pDegree);
-        Darken((tU8*)&gScratch_pixels[4 * j + 1], pDegree);
-        Darken((tU8*)&gScratch_pixels[4 * j + 2], pDegree);
-        Darken((tU8*)&gScratch_pixels[4 * j + 3], pDegree);
+        Darken((tU8*)&gScratch_pixels[4 * j] + 1, pDegree);
+        Darken((tU8*)&gScratch_pixels[4 * j] + 2, pDegree);
+        Darken((tU8*)&gScratch_pixels[4 * j] + 3, pDegree);
     }
     DRSetPalette2(gScratch_palette, 0);
 }
@@ -2438,36 +2431,39 @@ void SplashScreenWith(char* pPixmap_name) {
     br_pixelmap* the_map;
 
     the_map = BrMapFind(pPixmap_name);
-    if (gCurrent_splash == NULL || the_map != gCurrent_splash) {
-        FadePaletteDown();
-        EnsureRenderPalette();
+    if (gCurrent_splash != NULL && the_map == gCurrent_splash) {
+        return;
+    }
 
+    FadePaletteDown();
+    EnsureRenderPalette();
+
+    if (gCurrent_splash != NULL) {
+        KillSplashScreen();
+    }
+    gCurrent_splash = the_map;
+    if (gCurrent_splash == NULL) {
+        gCurrent_splash = LoadPixelmap(pPixmap_name);
         if (gCurrent_splash != NULL) {
-            KillSplashScreen();
+            BrMapAdd(gCurrent_splash);
         }
-        gCurrent_splash = the_map;
-        if (the_map == NULL) {
-            the_map = LoadPixelmap(pPixmap_name);
-            gCurrent_splash = the_map;
-            if (the_map != NULL) {
-                BrMapAdd(the_map);
-            }
-        }
-        if (gCurrent_splash != NULL) {
-            BrPixelmapRectangleCopy(
-                gBack_screen,
-                0,
-                0,
-                gCurrent_splash,
-                0,
-                0,
-                gCurrent_splash->width,
-                gCurrent_splash->height);
-            PDScreenBufferSwap(0);
-            if (gFaded_palette) {
-                FadePaletteUp();
-            }
-        }
+    }
+    if (gCurrent_splash != NULL) {
+        BrPixelmapRectangleCopy(
+            gBack_screen,
+            0,
+            0,
+            gCurrent_splash,
+            0,
+            0,
+            gCurrent_splash->width,
+            gCurrent_splash->height);
+    } else {
+        return;
+    }
+    PDScreenBufferSwap(0);
+    if (gFaded_palette) {
+        FadePaletteUp();
     }
 }
 
@@ -2550,7 +2546,7 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
         return;
     }
     if (pDest_y + pHeight > pDest->height) {
-        pHeight = pDest->height - pDest_y;
+        pHeight -= pDest_y + pHeight - pDest->height;
     }
     if (pDest_x < 0) {
         pWidth += pDest_x;
@@ -2567,37 +2563,38 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
         return;
     }
     if (pDest_x + pWidth > pDest->width) {
-        source_row_wrap += pDest_x + pWidth - pDest->width;
-        dest_row_wrap += pDest_x + pWidth - pDest->width;
-        pWidth = pDest->width - pDest_x;
+        x_delta = pDest_x + pWidth - pDest->width;
+        pWidth -= x_delta;
+        source_row_wrap += x_delta;
+        dest_row_wrap += x_delta;
     }
 
     if (gCurrent_conversion_table != NULL) {
         conv_table = gCurrent_conversion_table->pixels;
         for (y_count = 0; y_count < pHeight; y_count++) {
             for (x_count = 0; x_count < pWidth; x_count++) {
-                the_byte = *source_ptr;
+                the_byte = *source_ptr++;
                 if (the_byte != 0) {
-                    *dest_ptr = conv_table[the_byte];
+                    *dest_ptr++ = conv_table[the_byte];
+                } else {
+                    dest_ptr++;
                 }
-                source_ptr++;
-                dest_ptr++;
             }
-            source_ptr += source_row_wrap;
             dest_ptr += dest_row_wrap;
+            source_ptr += source_row_wrap;
         }
     } else {
         for (y_count = 0; y_count < pHeight; y_count++) {
             for (x_count = 0; x_count < pWidth; x_count++) {
-                the_byte = *source_ptr;
+                the_byte = *source_ptr++;
                 if (the_byte != 0) {
-                    *dest_ptr = the_byte;
+                    *dest_ptr++ = the_byte;
+                } else {
+                    dest_ptr++;
                 }
-                source_ptr++;
-                dest_ptr++;
             }
-            source_ptr += source_row_wrap;
             dest_ptr += dest_row_wrap;
+            source_ptr += source_row_wrap;
         }
     }
 }
@@ -2643,15 +2640,15 @@ void DRPixelmapRectangleOnscreenCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_i
 
     for (y_count = 0; y_count < pHeight; y_count++) {
         for (x_count = 0; x_count < pWidth; x_count++) {
-            the_byte = *source_ptr;
+            the_byte = *source_ptr++;
             if (the_byte) {
-                *dest_ptr = the_byte;
+                *dest_ptr++ = the_byte;
+            } else {
+                dest_ptr++;
             }
-            dest_ptr++;
-            source_ptr++;
         }
-        source_ptr += source_row_wrap;
         dest_ptr += dest_row_wrap;
+        source_ptr += source_row_wrap;
     }
 }
 
@@ -3472,8 +3469,10 @@ void InitShadow(void) {
     gFancy_shadow = 1;
     gShadow_material = BrMaterialFind("SHADOW.MAT");
     BrVector3Set(&gShadow_light_ray, 0.f, -1.f, 0.f);
-    BrVector3Set(&gShadow_light_z, -0.f, -0.f, -1.f);
-    BrVector3Set(&gShadow_light_x, 1.f, 0.f, 0.f);
+    BrVector3Set(&temp_v, -1.f, 0.f, 0.f);
+    BrVector3Cross(&gShadow_light_z, &gShadow_light_ray, &temp_v);
+    BrVector3Set(&temp_v, 0.f, 0.f, -1.f);
+    BrVector3Cross(&gShadow_light_x, &gShadow_light_ray, &temp_v);
 
     gShadow_model = BrModelAllocate("", 0, 0);
     gShadow_model->flags = BR_MODF_GENERATE_TAGS | BR_MODF_KEEP_ORIGINAL;
@@ -3488,12 +3487,13 @@ br_uint_32 SaveShadeTable(br_pixelmap* pTable, void* pArg) {
 
     if (gSaved_table_count == COUNT_OF(gSaved_shade_tables)) {
         return 1;
+    } else {
+        gSaved_shade_tables[gSaved_table_count].original = pTable;
+        gSaved_shade_tables[gSaved_table_count].copy = BrMemAllocate(sizeof(br_pixelmap), kMem_shade_table_copy);
+        memcpy(gSaved_shade_tables[gSaved_table_count].copy, pTable, sizeof(*pTable));
+        gSaved_table_count++;
+        return 0;
     }
-    gSaved_shade_tables[gSaved_table_count].original = pTable;
-    gSaved_shade_tables[gSaved_table_count].copy = (br_pixelmap*)BrMemAllocate(sizeof(br_pixelmap), kMem_shade_table_copy);
-    memcpy(gSaved_shade_tables[gSaved_table_count].copy, pTable, sizeof(br_pixelmap));
-    gSaved_table_count++;
-    return 0;
 }
 
 // IDA: void __cdecl SaveShadeTables()
