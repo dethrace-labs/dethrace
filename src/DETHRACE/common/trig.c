@@ -116,43 +116,41 @@ br_matrix34 mattmp2__trig; // suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004aa0d0
 float FastFloatSin(int pAngle_in_degrees) {
 
-    if (pAngle_in_degrees >= 0) {
-        pAngle_in_degrees = pAngle_in_degrees % 360;
-    } else {
+    if (pAngle_in_degrees < 0) {
         pAngle_in_degrees = 360 - -pAngle_in_degrees % 360;
+    } else {
+        pAngle_in_degrees = pAngle_in_degrees % 360;
     }
     if (pAngle_in_degrees > 270) {
         return -gFloat_sine_table[360 - pAngle_in_degrees];
-    }
-    if (pAngle_in_degrees > 180) {
+    } else if (pAngle_in_degrees > 180) {
         return -gFloat_sine_table[pAngle_in_degrees - 180];
-    }
-    if (pAngle_in_degrees <= 90) {
+    } else if (pAngle_in_degrees > 90) {
+        return gFloat_sine_table[180 - pAngle_in_degrees];
+    } else {
         return gFloat_sine_table[pAngle_in_degrees];
     }
-    return gFloat_sine_table[180 - pAngle_in_degrees];
 }
 
 // IDA: float __usercall FastFloatCos@<ST0>(int pAngle_in_degrees@<EAX>)
 // FUNCTION: CARM95 0x004aa18c
 float FastFloatCos(int pAngle_in_degrees) {
 
-    if (pAngle_in_degrees >= 0) {
-        pAngle_in_degrees = pAngle_in_degrees % 360;
-    } else {
+    if (pAngle_in_degrees < 0) {
         pAngle_in_degrees = 360 - -pAngle_in_degrees % 360;
+    } else {
+        pAngle_in_degrees = pAngle_in_degrees % 360;
     }
 
     if (pAngle_in_degrees > 270) {
         return gFloat_sine_table[pAngle_in_degrees - 270];
-    }
-    if (pAngle_in_degrees > 180) {
+    } else if (pAngle_in_degrees > 180) {
         return -gFloat_sine_table[270 - pAngle_in_degrees];
-    }
-    if (pAngle_in_degrees <= 90) {
+    } else if (pAngle_in_degrees > 90) {
+        return -gFloat_sine_table[pAngle_in_degrees - 90];
+    } else {
         return gFloat_sine_table[90 - pAngle_in_degrees];
     }
-    return -gFloat_sine_table[pAngle_in_degrees - 90];
 }
 
 // IDA: float __usercall FastFloatTan@<ST0>(int pAngle_in_degrees@<EAX>)
