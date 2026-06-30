@@ -2235,7 +2235,9 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
         } else {
             pPedestrian->current_frame = old_frame;
         }
-        pPedestrian->colour_map = pPedestrian->sequences[MAX(pPedestrian->current_sequence, 0)].frames[MAX(pPedestrian->current_frame, 0)].pixelmap;
+        pPedestrian->colour_map = pPedestrian->sequences[pPedestrian->current_sequence > 0 ? pPedestrian->current_sequence : 0]
+                                      .frames[pPedestrian->current_frame > 0 ? pPedestrian->current_frame : 0]
+                                      .pixelmap;
         gCurrent_lollipop_index = -1;
         MungePedModel(pPedestrian);
     } else {
@@ -2258,9 +2260,12 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
         MungePedestrianFrames(pPedestrian);
         if (pPedestrian->ref_number < 100) {
             MungePedestrianPath(pPedestrian, gDanger_level, &gDanger_direction);
-            if (Vector3AreEqual(&pPedestrian->pos, &old_pos)
-                && (gReally_stupid_ped_bug_enable || (pPedestrian->actor->parent == gDont_render_actor && pPedestrian->done_initial && pPedestrian->sequences[pPedestrian->current_sequence].frame_rate_type == ePed_frame_speed))) {
-                ChangeActionTo(pPedestrian, 0, 0);
+            if (old_pos.v[X] == pPedestrian->pos.v[X]
+                && old_pos.v[Y] == pPedestrian->pos.v[Y]
+                && old_pos.v[Z] + 0.0f == pPedestrian->pos.v[Z]) {
+                if (gReally_stupid_ped_bug_enable || (pPedestrian->actor->parent == gDont_render_actor && pPedestrian->done_initial && pPedestrian->sequences[pPedestrian->current_sequence].frame_rate_type == ePed_frame_speed)) {
+                    ChangeActionTo(pPedestrian, 0, 0);
+                }
             }
         }
         MungePedModel(pPedestrian);
@@ -2280,14 +2285,17 @@ void DoPedestrian(tPedestrian_data* pPedestrian, int pIndex) {
                 pPedestrian->jump_magnitude,
                 &pPedestrian->offset);
         }
-        if (gNet_mode != eNet_mode_none && !pPedestrian->reverse_frames
-            && !(Vector3AreEqual(&pPedestrian->pos, &old_pos)
-                && pPedestrian->current_speed == start_speed
-                && pPedestrian->current_instruction == start_ins
-                && pPedestrian->current_action == start_act
-                && pPedestrian->hit_points == start_hp
-                && pPedestrian->instruction_direction == start_ins_dir)) {
-            SendPedestrian(pPedestrian, pIndex);
+        if (gNet_mode != eNet_mode_none && !pPedestrian->reverse_frames) {
+            if (old_pos.v[X] != pPedestrian->pos.v[X]
+                || old_pos.v[Y] != pPedestrian->pos.v[Y]
+                || old_pos.v[Z] + 0.0f != pPedestrian->pos.v[Z]
+                || pPedestrian->current_speed != start_speed
+                || pPedestrian->current_instruction != start_ins
+                || pPedestrian->current_action != start_act
+                || pPedestrian->hit_points != start_hp
+                || pPedestrian->instruction_direction != start_ins_dir) {
+                SendPedestrian(pPedestrian, pIndex);
+            }
         }
     }
 }
