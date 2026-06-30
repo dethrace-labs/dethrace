@@ -978,7 +978,7 @@ void DoFancyHeadup(int pIndex) {
                 the_headup->data.fancy_info.offset = (the_headup->data.image_info.image->width + gBack_screen->width) / 2;
                 the_headup->data.fancy_info.end_offset = -the_headup->data.fancy_info.offset;
                 the_headup->data.fancy_info.fancy_stage = eFancy_stage_incoming;
-                the_headup->data.fancy_info.shear_amount = (the_headup->data.image_info.image->height << 16) >> 16;
+                the_headup->data.fancy_info.shear_amount = BrFixedToInt(BrIntToFixed(the_headup->data.image_info.image->height));
             }
         }
     }
