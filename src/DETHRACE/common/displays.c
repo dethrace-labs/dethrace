@@ -241,7 +241,12 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
         ch = (unsigned char*)pText;
         for (; i < len; i++, ch++) {
             if (*ch >= 224) {
+#ifdef DETHRACE_FIX_BUGS
+                // Fixes -Warray-bounds warning (array index 256 is past the end of the array 'tDR_font[21]')
+                new_font = &gFonts[256 - *ch];
+#else
                 new_font = &gFonts[256] - *ch;
+#endif
                 pY -= (new_font->height - pFont->height) / 2;
                 pFont = new_font;
             } else {
