@@ -293,8 +293,8 @@ tU32* KevKeyService(void) {
         code = (code << 4) + (code >> 17);
         code2 = (code2 >> 29) + keys * keys + (code2 << 3);
         last_time = PDGetTotalTime();
-    } else if (PDGetTotalTime() > (last_time + 1000)) {
-        return_val[0] = ((code >> 11) + (sum << 21));
+    } else if (PDGetTotalTime() > last_time + 1000) {
+        return_val[0] = (code >> 11) + (sum << 21);
         return_val[1] = code2;
         code = 0;
         code2 = 0;
