@@ -242,3 +242,9 @@
 
 // LIBRARY: CARM95 0x004EC160
 // _filbuf
+
+// LIBRARY: CARM95 0x004ED550
+// free
+
+// LIBRARY: CARM95 0x004EB430
+// _floor
