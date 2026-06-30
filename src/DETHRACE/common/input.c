@@ -264,7 +264,6 @@ tU32* KevKeyService(void) {
     tU32 keys;
 
     keys = gKeys_pressed;
-    // printf("key: %d, %lx, %lx\n", sizeof(long), keys, code2);
     return_val[0] = 0;
     return_val[1] = 0;
 
