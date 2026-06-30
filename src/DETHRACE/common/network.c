@@ -576,9 +576,12 @@ void NetPlayersChanged(int pNew_count, tNet_game_player_info* pNew_players) {
     int player_still_there;
     tPlayer_ID old_fox_it;
 
+#ifdef DETHRACE_FIX_BUGS
+    old_fox_it = -1;
+#endif
+
     if (gCurrent_net_game->type == eNet_game_type_tag || gCurrent_net_game->type == eNet_game_type_foxy) {
 #ifdef DETHRACE_FIX_BUGS
-        old_fox_it = -1;
         if (gIt_or_fox >= 0) {
 #endif
             old_fox_it = gNet_players[gIt_or_fox].ID;
