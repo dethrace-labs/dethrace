@@ -60,6 +60,7 @@ else()
     )
     add_compile_flags_if_supported(dethrace
         -Wformat
+        -Wno-format-overflow
         -Wno-unused-but-set-variable
         -Wno-unused-variable
         -Wno-unused-result
