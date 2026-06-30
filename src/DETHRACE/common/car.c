@@ -7116,6 +7116,10 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
         ts = FourPointCollB(f, &M, d, tau1, n);
         break;
     default:
+#ifdef DETHRACE_FIX_BUGS
+        // Fixes -Wsometimes-uninitialized warning
+        ts = 0.0f;
+#endif
         break;
     }
     if (k > 3) {
