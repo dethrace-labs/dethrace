@@ -363,15 +363,13 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
 void DimAFewBits(void) {
     int i;
 
-    int dim_index; // Added
-    dim_index = gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0;
-    for (i = 0; i < gProgram_state.current_car.dim_count[dim_index]; i++) {
+    for (i = 0; i < gProgram_state.current_car.dim_count[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0]; i++) {
         DimRectangle(
             gBack_screen,
-            gProgram_state.current_car.dim_left[dim_index][i],
-            gProgram_state.current_car.dim_top[dim_index][i],
-            gProgram_state.current_car.dim_right[dim_index][i],
-            gProgram_state.current_car.dim_bottom[dim_index][i],
+            gProgram_state.current_car.dim_left[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
+            gProgram_state.current_car.dim_top[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
+            gProgram_state.current_car.dim_right[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
+            gProgram_state.current_car.dim_bottom[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
             1);
     }
 }
@@ -381,7 +379,11 @@ void DimAFewBits(void) {
 void KillOldestQueuedHeadup(void) {
 
     gQueued_headup_count--;
+#ifdef DETHRACE_FIX_BUGS
     memmove(&gQueued_headups[0], &gQueued_headups[1], gQueued_headup_count * sizeof(tQueued_headup));
+#else
+    memcpy(&gQueued_headups[0], &gQueued_headups[1], gQueued_headup_count * sizeof(tQueued_headup));
+#endif
 }
 
 // IDA: void __usercall DubreyBar(int pX_index@<EAX>, int pY@<EDX>, int pColour@<EBX>)
@@ -851,23 +853,20 @@ int NewTextHeadupSlot2(int pSlot_index, int pFlash_rate, int pLifetime, int pFon
             }
             headup_slot = &gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on][pSlot_index];
             the_headup = &gHeadups[index];
-            the_headup->data.coloured_text_info.coloured_font = &gFonts[-pFont_index];
+            the_headup->data.coloured_text_info.coloured_font = gFonts - pFont_index;
             if (pSlot_index == 4) {
                 the_headup->type = eHeadup_box_text;
             } else {
                 the_headup->type = eHeadup_coloured_text;
             }
-            if (!pText) {
-                LOG_PANIC("panic");
-            }
             strcpy(the_headup->data.text_info.text, pText);
 
             the_headup->slot_index = pSlot_index;
             the_headup->justification = headup_slot->justification;
-            if (pSlot_index < 0) {
-                the_headup->cockpit_anchored = 0;
-            } else {
+            if (pSlot_index >= 0) {
                 the_headup->cockpit_anchored = headup_slot->cockpit_anchored;
+            } else {
+                the_headup->cockpit_anchored = 0;
             }
             the_headup->dimmed_background = headup_slot->dimmed_background;
             the_headup->dim_left = headup_slot->dim_left;
@@ -965,18 +964,20 @@ void DoFancyHeadup(int pIndex) {
     int temp_ref;
 
     the_time = GetTotalTime();
-    if (!gMap_mode && (gLast_fancy_index < 0 || the_time - gLast_fancy_time > 2000 || gLast_fancy_index <= pIndex)) {
-        temp_ref = NewImageHeadupSlot(eHeadupSlot_fancies, 0, 2000, pIndex + 10);
-        if (temp_ref >= 0) {
-            gLast_fancy_headup = temp_ref;
-            gLast_fancy_index = pIndex;
-            gLast_fancy_time = the_time;
-            the_headup = &gHeadups[temp_ref];
-            the_headup->type = eHeadup_fancy;
-            the_headup->data.fancy_info.offset = (the_headup->data.image_info.image->width + gBack_screen->width) / 2;
-            the_headup->data.fancy_info.end_offset = -the_headup->data.fancy_info.offset;
-            the_headup->data.fancy_info.fancy_stage = eFancy_stage_incoming;
-            the_headup->data.fancy_info.shear_amount = the_headup->data.image_info.image->height;
+    if (!gMap_mode) {
+        if (!(gLast_fancy_index >= 0 && the_time - gLast_fancy_time <= 2000 && gLast_fancy_index > pIndex)) {
+            temp_ref = NewImageHeadupSlot(eHeadupSlot_fancies, 0, 2000, pIndex + 10);
+            if (temp_ref >= 0) {
+                gLast_fancy_headup = temp_ref;
+                gLast_fancy_index = pIndex;
+                gLast_fancy_time = the_time;
+                the_headup = &gHeadups[gLast_fancy_headup];
+                the_headup->type = eHeadup_fancy;
+                the_headup->data.fancy_info.offset = (the_headup->data.image_info.image->width + gBack_screen->width) / 2;
+                the_headup->data.fancy_info.end_offset = -the_headup->data.fancy_info.offset;
+                the_headup->data.fancy_info.fancy_stage = eFancy_stage_incoming;
+                the_headup->data.fancy_info.shear_amount = BrFixedToInt(BrIntToFixed(the_headup->data.image_info.image->height));
+            }
         }
     }
 }
@@ -1015,11 +1016,13 @@ void MoveHeadupTo(int pHeadup_index, int pNew_x, int pNew_y) {
     int delta_x;
     tHeadup* the_headup;
 
-    if (pHeadup_index >= 0) {
-        delta_x = gHeadups[pHeadup_index].x - gHeadups[pHeadup_index].original_x;
-        gHeadups[pHeadup_index].original_x = pNew_x;
-        gHeadups[pHeadup_index].x = pNew_x + delta_x;
-        gHeadups[pHeadup_index].y = pNew_y;
+    if (pHeadup_index < 0) {
+    } else {
+        the_headup = &gHeadups[pHeadup_index];
+        delta_x = the_headup->x - the_headup->original_x;
+        the_headup->original_x = pNew_x;
+        the_headup->x = pNew_x + delta_x;
+        the_headup->y = pNew_y;
     }
 }
 
@@ -1080,7 +1083,10 @@ void DoDamageScreen(tU32 pThe_time) {
     br_pixelmap* the_image;
     tDamage_unit* the_damage;
 
-    if (&gProgram_state.current_car != gCar_to_view || gProgram_state.current_car_index != gProgram_state.current_car.index) {
+    if (&gProgram_state.current_car != gCar_to_view) {
+        return;
+    }
+    if (gProgram_state.current_car_index != gProgram_state.current_car.index) {
         return;
     }
     if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
@@ -1105,15 +1111,15 @@ void DoDamageScreen(tU32 pThe_time) {
         }
     }
     for (i = 0; i < COUNT_OF(gProgram_state.current_car.damage_units); i++) {
-        the_damage = &gProgram_state.current_car.damage_units[i];
         if (i != eDamage_driver) {
+            the_damage = &gProgram_state.current_car.damage_units[i];
             the_image = the_damage->images;
             the_step = 5 * the_damage->damage_level / 100;
             y_pitch = (the_image->height / 2) / 5;
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
-                the_wobble_x + gProgram_state.current_car.damage_units[i].x_coord,
-                the_wobble_y + gProgram_state.current_car.damage_units[i].y_coord,
+                the_wobble_x + the_damage->x_coord,
+                the_wobble_y + the_damage->y_coord,
                 the_image,
                 0,
                 y_pitch * (2 * the_step + ((pThe_time / the_damage->periods[the_step]) & 1)),
@@ -1388,8 +1394,11 @@ void DoSteeringWheel(tU32 pThe_time) {
     br_pixelmap* hands_image;
     int hands_index;
 
-    if (gProgram_state.current_car_index == gProgram_state.current_car.index && gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && gProgram_state.which_view == eView_forward) {
-        hands_index = (int)floor(gProgram_state.current_car.number_of_hands_images * ((1.f - gProgram_state.current_car.steering_angle / 10.f) / 2.f));
+    if (gProgram_state.current_car_index != gProgram_state.current_car.index) {
+        return;
+    }
+    if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && gProgram_state.which_view == eView_forward) {
+        hands_index = (int)floor(gProgram_state.current_car.number_of_hands_images * ((-gProgram_state.current_car.steering_angle / 10.f + 1.f) / 2.0));
         if (hands_index < 0) {
             hands_index = 0;
         } else if (hands_index >= gProgram_state.current_car.number_of_hands_images) {
@@ -1489,32 +1498,31 @@ void EarnCredits2(int pAmount, char* pPrefix_text) {
         return;
     }
     the_time = GetTotalTime();
-    if (pAmount == 0) {
-        return;
+    if (pAmount != 0) {
+        if (gNet_mode != eNet_mode_none && gProgram_state.credits_earned - gProgram_state.credits_lost + pAmount < 0) {
+            pAmount = gProgram_state.credits_lost - gProgram_state.credits_earned;
+        }
+        original_amount = pAmount;
+        if (gLast_credit_headup__displays >= 0 && the_time - gLast_earn_time < 2000) {
+            pAmount += gLast_credit_amount;
+        }
+        gLast_credit_amount = pAmount;
+        if (pAmount > 1) {
+            sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(kMiscString_Credits));
+            gProgram_state.credits_earned += original_amount;
+        } else if (pAmount > 0) {
+            sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(kMiscString_Credit));
+            gProgram_state.credits_earned += original_amount;
+        } else if (pAmount < -1) {
+            sprintf(s, "%s%s %d %s", GetMiscString(kMiscString_Lost), pPrefix_text, -pAmount, GetMiscString(kMiscString_Credits));
+            gProgram_state.credits_lost -= original_amount;
+        } else {
+            sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(kMiscString_Lost), GetMiscString(kMiscString_Credit));
+            gProgram_state.credits_lost -= original_amount;
+        }
+        gLast_credit_headup__displays = NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s);
+        gLast_earn_time = the_time;
     }
-    if (gNet_mode != eNet_mode_none && gProgram_state.credits_earned - gProgram_state.credits_lost + pAmount < 0) {
-        pAmount = gProgram_state.credits_lost - gProgram_state.credits_lost;
-    }
-    original_amount = pAmount;
-    if (gLast_credit_headup__displays >= 0 && the_time - gLast_earn_time < 2000) {
-        pAmount += gLast_credit_amount;
-    }
-    gLast_credit_amount = pAmount;
-    if (pAmount >= 2) {
-        sprintf(s, "%s%d %s", pPrefix_text, pAmount, GetMiscString(kMiscString_Credits));
-        gProgram_state.credits_earned += original_amount;
-    } else if (pAmount >= 1) {
-        sprintf(s, "%s1 %s", pPrefix_text, GetMiscString(kMiscString_Credit));
-        gProgram_state.credits_earned += original_amount;
-    } else if (pAmount >= -1) {
-        sprintf(s, "%s%s 1 %s", pPrefix_text, GetMiscString(kMiscString_Lost), GetMiscString(kMiscString_Credit));
-        gProgram_state.credits_lost -= original_amount;
-    } else {
-        sprintf(s, "%s%s %d %s", GetMiscString(kMiscString_Lost), pPrefix_text, -pAmount, GetMiscString(kMiscString_Credits));
-        gProgram_state.credits_lost -= original_amount;
-    }
-    gLast_credit_headup__displays = NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, s);
-    gLast_earn_time = the_time;
 }
 
 // IDA: void __usercall EarnCredits(int pAmount@<EAX>)
@@ -1530,15 +1538,12 @@ int SpendCredits(int pAmount) {
     int amount;
 
     gProgram_state.credits_lost += pAmount;
-    if (gNet_mode == eNet_mode_none) {
+    if (gNet_mode == eNet_mode_none || (amount = gProgram_state.credits_earned - gProgram_state.credits_lost) >= 0) {
         return 0;
+    } else {
+        gProgram_state.credits_lost = gProgram_state.credits_earned;
+        return amount;
     }
-    amount = gProgram_state.credits_earned - gProgram_state.credits_lost;
-    if (gProgram_state.credits_earned - gProgram_state.credits_lost >= 0) {
-        return 0;
-    }
-    gProgram_state.credits_lost = gProgram_state.credits_earned;
-    return amount;
 }
 
 // IDA: void __usercall AwardTime(tU32 pTime@<EAX>)
@@ -1549,25 +1554,27 @@ void AwardTime(tU32 pTime) {
     tU32 the_time;
     int i;
 
-    if (gRace_finished || gFreeze_timer || gNet_mode != eNet_mode_none || pTime == 0) {
+    if (gRace_finished || gFreeze_timer || gNet_mode != eNet_mode_none) {
         return;
     }
 
-    original_amount = pTime;
     the_time = GetTotalTime();
-    for (i = COUNT_OF(gOld_times) - 1; i > 0; i--) {
-        gOld_times[i] = gOld_times[i - 1];
+    if (pTime != 0) {
+        for (i = COUNT_OF(gOld_times) - 1; i > 0; i--) {
+            gOld_times[i] = gOld_times[i - 1];
+        }
+        gOld_times[0] = pTime;
+        original_amount = pTime;
+        if (gLast_time_credit_headup >= 0 && (the_time - gLast_time_earn_time) < 2000) {
+            pTime += gLast_time_credit_amount;
+        }
+        gLast_time_credit_amount = pTime;
+        gTimer += original_amount * 1000;
+        s[0] = '+';
+        TimerString(1000 * pTime, &s[1], 0, 0);
+        gLast_time_credit_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 2000, -kFont_BLUEHEAD, s);
+        gLast_time_earn_time = the_time;
     }
-    gOld_times[0] = pTime;
-    if (gLast_time_credit_headup >= 0 && (the_time - gLast_time_earn_time) < 2000) {
-        pTime += gLast_time_credit_amount;
-    }
-    gLast_time_credit_amount = pTime;
-    gTimer += original_amount * 1000;
-    s[0] = '+';
-    TimerString(1000 * pTime, &s[1], 0, 0);
-    gLast_time_credit_headup = NewTextHeadupSlot(eHeadupSlot_time_award, 0, 2000, -kFont_BLUEHEAD, s);
-    gLast_time_earn_time = the_time;
 }
 
 // IDA: void __usercall DrawRectangle(br_pixelmap *pPixelmap@<EAX>, int pLeft@<EDX>, int pTop@<EBX>, int pRight@<ECX>, int pBottom, int pColour)
@@ -1668,10 +1675,9 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
 // IDA: void __usercall TransBrPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, br_uint_32 pColour@<ECX>, br_font *pFont, signed char *pText)
 // FUNCTION: CARM95 0x004c7ec5
 void TransBrPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, br_uint_32 pColour, br_font* pFont, char* pText) {
-    int len;
+    int len[2];
 
-    len = TranslationMode() ? 2 : 0;
-    BrPixelmapText(pPixelmap, pX, pY - len, pColour, pFont, (char*)pText);
+    BrPixelmapText(pPixelmap, pX, pY - (TranslationMode() ? 2 : 0), pColour, pFont, pText);
 }
 
 // IDA: void __usercall TransDRPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, char *pText, int pRight_edge)
