@@ -1787,6 +1787,10 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
                     continue;
                 }
 
+#ifdef DETHRACE_FIX_BUGS
+                // Fix -Wmaybe-uninitialized warning
+                distance_factor = 0.0f;
+#endif
                 if (!gAction_replay_mode) {
                     BrVector3Sub(&camera_to_car, (br_vector3*)gCamera_to_world.m[3], &the_car->car_master_actor->t.t.translate.t);
                     distance_factor = BrVector3LengthSquared(&camera_to_car);
