@@ -65,4 +65,4 @@ extern void SMACK_CALL SmackNextFrame(Smack* smack);
 extern int SMACK_CALL SmackWait(Smack* smack);
 extern void SMACK_CALL SmackClose(Smack* smack);
 
-#endif SMACKW32_H
+#endif // SMACKW32_H
