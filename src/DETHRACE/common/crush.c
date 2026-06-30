@@ -1226,7 +1226,7 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
                 } else {
                     car_off_ground_1 = 0;
                 }
-                if (pCar2 != NULL && pCar2->number_of_wheels_on_ground) {
+                if (pCar2 != NULL && pCar2->number_of_wheels_on_ground == 0) {
                     BrVector3InvScale(&car_2_pos, &pCar2->car_master_actor->t.t.translate.t, WORLD_SCALE);
                     BrMatrix34ApplyV(&car_2_offset, &pCar2->car_model_actors[pCar2->principal_car_actor].actor->t.t.translate.t, &pCar2->car_master_actor->t.t.mat);
                     BrVector3Accumulate(&car_2_pos, &car_2_offset);
