@@ -215,19 +215,19 @@ int DrawLine3D(br_vector3* start, br_vector3* end, br_pixelmap* pScreen, br_pixe
     }
 #endif
 
-    o = *start;
-    p = *end;
-    if (-gSpark_cam->hither_z < o.v[2] || -gSpark_cam->hither_z < p.v[2]) {
-        if (-gSpark_cam->hither_z < o.v[2] && -gSpark_cam->hither_z < p.v[2]) {
+    BrVector3Copy(&o, start);
+    BrVector3Copy(&p, end);
+    if ((o.v[2] * 1) > -gSpark_cam->hither_z || (p.v[2] * 1) > -gSpark_cam->hither_z) {
+        if (-gSpark_cam->hither_z < (o.v[2] * 1) && -gSpark_cam->hither_z < (p.v[2] * 1)) {
             return 0;
         }
         ts = (p.v[2] + gSpark_cam->hither_z) / (p.v[2] - o.v[2]);
-        if (-gSpark_cam->hither_z < o.v[2]) {
+        if ((o.v[2] * 1) > -gSpark_cam->hither_z) {
             o.v[0] = p.v[0] - (p.v[0] - o.v[0]) * ts;
             o.v[1] = p.v[1] - (p.v[1] - o.v[1]) * ts;
             o.v[2] = -gSpark_cam->hither_z;
         }
-        if (-gSpark_cam->hither_z < p.v[2]) {
+        if (-gSpark_cam->hither_z < (p.v[2] * 1)) {
             p.v[0] = p.v[0] - (p.v[0] - o.v[0]) * ts;
             p.v[1] = p.v[1] - (p.v[1] - o.v[1]) * ts;
             p.v[2] = -gSpark_cam->hither_z;
@@ -235,12 +235,8 @@ int DrawLine3D(br_vector3* start, br_vector3* end, br_pixelmap* pScreen, br_pixe
     }
     BrMatrix4ApplyP(&o2, &o, &gCameraToScreen);
     BrMatrix4ApplyP(&p2, &p, &gCameraToScreen);
-    o.v[0] = o2.v[0] / o2.v[3];
-    o.v[1] = o2.v[1] / o2.v[3];
-    o.v[2] = o2.v[2] / o2.v[3];
-    p.v[0] = p2.v[0] / p2.v[3];
-    p.v[1] = p2.v[1] / p2.v[3];
-    p.v[2] = p2.v[2] / p2.v[3];
+    BrVector3InvScale(&o, &o2, o2.v[3]);
+    BrVector3InvScale(&p, &p2, p2.v[3]);
     return DrawLine2D(&o, &p, pScreen, pDepth_buffer, 1.0, shade_table);
 }
 
@@ -600,7 +596,10 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
     int num;
     int i;
 
-    ts = BrVector3Length(pForce);
+    ts = BR_SQRT(BR_MAC3(
+        pForce->v[2], pForce->v[2],
+        pForce->v[1], pForce->v[1],
+        pForce->v[0], pForce->v[0]));
     BrVector3InvScale(&normal, pForce, ts);
     ts2 = BrVector3Dot(pForce, v);
     if (ts2 >= 0) {
@@ -690,29 +689,29 @@ void CreateSparkShower(br_vector3* pos, br_vector3* v, br_vector3* pForce, tCar_
     } else {
         c = pCar2;
     }
-    BrVector3InvScale(&tv, pForce, ts);
+    BrVector3InvScale(&normal, pForce, ts);
     if (ts < 10.f) {
         return;
     }
-    CreateShrapnelShower(pos, v, &tv, ts, pCar1, pCar2);
-    ts2 = BrVector3Dot(pForce, v) / (ts * ts);
+    CreateShrapnelShower(pos, v, &normal, ts, pCar1, pCar2);
+    ts2 = BrVector3Dot(pForce, v) / BR_SQR(ts);
     BrVector3Scale(v, pForce, ts2);
-    normal.v[0] = pos->v[0] - c->car_master_actor->t.t.translate.t.v[0] / WORLD_SCALE;
-    normal.v[1] = pos->v[1] - c->car_master_actor->t.t.translate.t.v[1] / WORLD_SCALE;
-    normal.v[2] = pos->v[2] - c->car_master_actor->t.t.translate.t.v[2] / WORLD_SCALE;
-    BrMatrix34TApplyV(pos, &normal, &c->car_master_actor->t.t.mat);
-    BrMatrix34TApplyV(&normal, pForce, &c->car_master_actor->t.t.mat);
-    num = (ts / 10.f) + 3;
+    BrVector3InvScale(&tv, &c->car_master_actor->t.t.translate.t, WORLD_SCALE);
+    BrVector3Sub(&tv, pos, &tv);
+    BrMatrix34TApplyV(pos, &tv, &c->car_master_actor->t.t.mat);
+    BrMatrix34TApplyV(&tv, pForce, &c->car_master_actor->t.t.mat);
+    BrVector3Copy(pForce, &tv);
+    num = (int)(ts / 10.f) + 3;
 #ifdef DETHRACE_FIX_BUGS
     num = Harness_Hook_ScaleEmissionCountWithDt(num, gDt);
 #endif
     for (i = 0; i < num; i++) {
         BrVector3Copy(&gSparks[gNext_spark].pos, pos);
         BrVector3SetFloat(&gSparks[gNext_spark].normal, 0.f, 0.f, 0.f);
-        BrVector3SetFloat(&normal, FRandomBetween(-1.f, 1.f), FRandomBetween(-.2f, 1.f), FRandomBetween(-1.f, 1.f));
-        ts2 = BrVector3LengthSquared(&normal) / (ts * ts);
-        BrVector3Scale(&tv, &normal, ts2);
-        BrVector3Sub(&gSparks[gNext_spark].v, &normal, &tv);
+        BrVector3SetFloat(&tv, FRandomBetween(-1.f, 1.f), FRandomBetween(-.2f, 1.f), FRandomBetween(-1.f, 1.f));
+        ts2 = BrVector3Dot(pForce, &tv) / BR_SQR(ts);
+        BrVector3Scale(&tv2, pForce, ts2);
+        BrVector3Sub(&gSparks[gNext_spark].v, &tv, &tv2);
         BrVector3Accumulate(&gSparks[gNext_spark].v, v);
         gSparks[gNext_spark].count = 1000;
         gSparks[gNext_spark].car = c;
@@ -1835,7 +1834,7 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
     col = &gSmoke_column[c];
     actor = col->flame_actor;
     DRMatrix34RotateY(&actor->t.t.mat, FastScalarArcTan2Angle(gCamera_to_world.m[2][0], gCamera_to_world.m[2][2]));
-    actor->t.t.translate.t = *pPos;
+    BrVector3Copy(&actor->t.t.translate.t, pPos);
     actor = actor->children;
 
     if (gAction_replay_mode) {
@@ -1859,20 +1858,20 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
             AddFlameToPipingSession(i + 16 * c, col->frame_count[i] + 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
             EndPipingSession();
             col->frame_count[i] = IRandomBetween(-5, -1);
-            col->scale_x[i] = (2 * IRandomBetween(0, 1) - 1) * SRandomBetween(1.0f, 1.5f) * 0.003f;
+            col->scale_x[i] = (2 * IRandomBetween(0, 1) - 1) * DR_FF(SRandomBetween(1.0f, 1.5f) * 0.003f);
             col->scale_y[i] = SRandomBetween(0.5f, 1.0f) * 0.003f;
             col->offset_x[i] = SRandomPosNeg(0.03f);
             col->offset_z[i] = SRandomBetween(-0.03f, 0.0);
             actor->type = BR_ACTOR_NONE;
         }
         if (col->frame_count[i] == 0) {
-            if (BrVector3LengthSquared(&col->car->v) >= 80.0f || col->lifetime <= 30 * pTime) {
-                col->frame_count[i] = -5;
-            } else {
+            if ((BrVector3LengthSquared(&col->car->v) < 80.0f && DR_FF(col->lifetime) > 30 * pTime)) {
                 actor->type = BR_ACTOR_MODEL;
                 StartPipingSession(ePipe_chunk_flame);
                 AddFlameToPipingSession(i + 16 * c, col->frame_count[i] - 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
                 EndPipingSession();
+            } else {
+                col->frame_count[i] = -5;
             }
         }
         if (col->frame_count[i] >= 0) {

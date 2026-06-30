@@ -91,6 +91,7 @@ void SetJoystickArrays(int* pKeys, int pMark) {
 // IDA: void __cdecl PollKeys()
 // FUNCTION: CARM95 0x00471bbf
 void PollKeys(void) {
+    int i;
 
     gKey_poll_counter++;
     PDSetKeyArray(gKey_array, gKey_poll_counter);
@@ -475,8 +476,7 @@ void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
     int i;
 
     for (i = 0; i < strlen(pStr); i++) {
-        AddRollingLetter(pStr[i], pX, pY, rolling_type);
-        pX += gCurrent_graf_data->rolling_letter_x_pitch;
+        AddRollingLetter(pStr[i], pX + gCurrent_graf_data->rolling_letter_x_pitch * i, pY, rolling_type);
     }
 }
 
