@@ -73,54 +73,45 @@ int PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br
     float t;
 
     for (i = 0; i < 3; i++) {
-        if (rd->v[i] >= -0.00000023841858) {
-            if (rd->v[i] <= 0.00000023841858) {
-                if (b->max.v[i] < rp->v[i] || rp->v[i] < b->min.v[i]) {
-                    return 0;
-                }
-            } else {
-                s = (-1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-                if (s >= BR_SCALAR_MIN) {
-                    if (s < t_far) {
-                        t_far = (-1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-                    }
-                } else {
-                    t_far = BR_SCALAR_MIN;
-                }
-                t = (-1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
-                if (t <= BR_SCALAR_MAX) {
-                    if (t > t_near) {
-                        t_near = (-1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
-                    }
-                } else {
-                    t_near = BR_SCALAR_MAX;
-                }
-            }
-        } else {
-            s = (-1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-            if (s <= BR_SCALAR_MAX) {
-                if (s > t_near) {
-                    t_near = (-1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-                }
-            } else {
+        if (rd->v[i] < -2 * BR_SCALAR_EPSILON) {
+            s = -1.0f / rd->v[i];
+            t = (rp->v[i] - b->max.v[i]) * s;
+            if (t > BR_SCALAR_MAX) {
                 t_near = BR_SCALAR_MAX;
+            } else if (t > t_near) {
+                t_near = t;
             }
-            t = (-1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
-            if (t >= BR_SCALAR_MIN) {
-                if (t < t_far) {
-                    t_far = (-1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
-                }
-            } else {
+            t = (rp->v[i] - b->min.v[i]) * s;
+            if (t < BR_SCALAR_MIN) {
                 t_far = BR_SCALAR_MIN;
+            } else if (t < t_far) {
+                t_far = t;
             }
+        } else if (rd->v[i] > 2 * BR_SCALAR_EPSILON) {
+            s = -1.0f / rd->v[i];
+            t = (rp->v[i] - b->max.v[i]) * s;
+            if (t < BR_SCALAR_MIN) {
+                t_far = BR_SCALAR_MIN;
+            } else if (t < t_far) {
+                t_far = t;
+            }
+            t = (rp->v[i] - b->min.v[i]) * s;
+            if (t > BR_SCALAR_MAX) {
+                t_near = BR_SCALAR_MAX;
+            } else if (t > t_near) {
+                t_near = t;
+            }
+        } else if (rp->v[i] > b->max.v[i] || rp->v[i] < b->min.v[i]) {
+            return 0;
         }
     }
-    if (t_far < t_near) {
+    if (t_far >= t_near) {
+        *new_t_near = t_near;
+        *new_t_far = t_far;
+        return 1;
+    } else {
         return 0;
     }
-    *new_t_near = t_near;
-    *new_t_far = t_far;
-    return 1;
 }
 
 // IDA: int __usercall ActorRayPick2D@<EAX>(br_actor *ap@<EAX>, br_vector3 *pPosition@<EDX>, br_vector3 *pDir@<EBX>, br_model *model@<ECX>, br_material *material, dr_pick2d_cbfn *callback)
@@ -1082,16 +1073,17 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
     for (vertex = 0; *nv > vertex; ++vertex) {
         if ((p[vertex].v[i] > limit) != (p[last_vertex].v[i] > limit)) {
             for (k = 0; k < 3; ++k) {
-                if (k != i) {
-                    p2[j].v[k] = (p[vertex].v[k] - p[last_vertex].v[k])
-                            * (limit - p[last_vertex].v[i])
-                            / (p[vertex].v[i] - p[last_vertex].v[i])
-                        + p[last_vertex].v[k];
+                if (k == i) {
+                    continue;
                 }
+                p2[j].v[k] = (p[vertex].v[k] - p[last_vertex].v[k])
+                        * (limit - p[last_vertex].v[i])
+                        / (p[vertex].v[i] - p[last_vertex].v[i])
+                    + p[last_vertex].v[k];
             }
             p2[j++].v[i] = limit;
         }
-        if (p[vertex].v[i] <= (double)limit) {
+        if (p[vertex].v[i] <= limit) {
             BrVector3Copy(&p2[j], &p[vertex]);
             j++;
         }
@@ -1309,7 +1301,22 @@ void SetFacesGroup(int pFace) {
     int f;
     int v;
     int i;
-    NOT_IMPLEMENTED();
+
+    gSelected_model->faces[pFace].material = gSub_material;
+    for (f = 0; f < gSelected_model->nfaces; f++) {
+        if (gSelected_model->faces[f].material != gReal_material) {
+            continue;
+        }
+        for (i = 0; i < 3; i++) {
+            v = gSelected_model->faces[pFace].vertices[i];
+            if (CompVert(gSelected_model->faces[f].vertices[0], v)
+                || CompVert(gSelected_model->faces[f].vertices[1], v)
+                || CompVert(gSelected_model->faces[f].vertices[2], v)) {
+                SetFacesGroup(f);
+                break;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall SelectFace(br_vector3 *pDir@<EAX>)
@@ -1379,15 +1386,16 @@ void GetTilingLimits(br_vector2* min, br_vector2* max) {
     BrVector2Set(min, 32000.f, 32000.f);
     BrVector2Set(max, -32000.f, -32000.f);
     for (f = 0; f < gSelected_model->nfaces; f++) {
-        if (faces[f].material == gSub_material) {
-            for (i = 0; i < 3; i++) {
-                for (j = 0; j < 2; j++) {
-                    if (verts[faces[f].vertices[i]].map.v[j] < min->v[j]) {
-                        min->v[j] = verts[faces[f].vertices[i]].map.v[j];
-                    }
-                    if (verts[faces[f].vertices[i]].map.v[j] > max->v[j]) {
-                        max->v[j] = verts[faces[f].vertices[i]].map.v[j];
-                    }
+        if (faces[f].material != gSub_material) {
+            continue;
+        }
+        for (i = 0; i < 3; i++) {
+            for (j = 0; j < 2; j++) {
+                if (verts[faces[f].vertices[DR_FF(i)]].map.v[j] < min->v[j]) {
+                    min->v[j] = verts[faces[f].vertices[DR_FF(i)]].map.v[j];
+                }
+                if (verts[faces[f].vertices[DR_FF(i)]].map.v[j] > max->v[j]) {
+                    max->v[j] = verts[faces[f].vertices[DR_FF(i)]].map.v[j];
                 }
             }
         }
