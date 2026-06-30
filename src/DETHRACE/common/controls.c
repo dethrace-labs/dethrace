@@ -1347,12 +1347,12 @@ void CheckHorn3D(tCar_spec* pCar) {
 void CheckHorns(void) {
     int i;
 
-    if (gNet_mode != eNet_mode_none) {
+    if (gNet_mode == eNet_mode_none) {
+        CheckHornLocal(&gProgram_state.current_car);
+    } else {
         for (i = 0; i < gNumber_of_net_players; i++) {
             CheckHorn3D(gNet_players[i].car);
         }
-    } else {
-        CheckHornLocal(&gProgram_state.current_car);
     }
 }
 
@@ -1787,8 +1787,8 @@ void FlipUpCar(tCar_spec* car) {
     car->doing_nothing_flag = 0;
     EnableCar(car);
     new_pos = 1;
-    for (i = 0; i < 4; ++i) {
-        if (car->susp_height[i >> 1] <= car->oldd[i]) {
+    for (j = 0; j < 4; ++j) {
+        if (car->susp_height[j >> 1] <= car->oldd[j]) {
             new_pos = 0;
         }
     }
@@ -1830,13 +1830,15 @@ void FlipUpCar(tCar_spec* car) {
         car->direction.v[0] = -car->oldmat.m[2][0];
         car->direction.v[1] = -car->oldmat.m[2][1];
         car->direction.v[2] = -car->oldmat.m[2][2];
-        for (i = 0; i <= new_pos; i++) {
-            for (j = 0; j < 4; j++) {
-                BrMatrix34Copy(&car->last_safe_positions[j], &car->last_safe_positions[j + 1]);
+        for (j = 0; j <= new_pos; j++) {
+            for (i = 0; i < 4; i++) {
+                BrMatrix34Copy(&car->last_safe_positions[i], &car->last_safe_positions[i + 1]);
             }
         }
-        for (l = 0; l < 10; l++) {
-            BrVector3Scale(&car->old_norm, &car->old_norm, 0.072463766);
+        l = 0;
+        while (!TestForCarInSensiblePlace(car) && l < 10) {
+            dist = 0.072463766f;
+            BrVector3Scale(&car->old_norm, &car->old_norm, dist);
             BrMatrix34ApplyV(&tv, &car->old_norm, &car->car_master_actor->t.t.mat);
             car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] + tv.v[0];
             car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] + tv.v[1];
@@ -1847,9 +1849,7 @@ void FlipUpCar(tCar_spec* car) {
             car->old_frame_mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0];
             car->old_frame_mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1];
             car->old_frame_mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2];
-            if (TestForCarInSensiblePlace(car)) {
-                break;
-            }
+            l++;
         }
         count++;
     } while (l == 10 && count < 3);
@@ -1857,8 +1857,8 @@ void FlipUpCar(tCar_spec* car) {
     car->oldmat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * WORLD_SCALE;
     car->oldmat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * WORLD_SCALE;
     car->curvature = 0.0;
-    for (j = 0; j < 4; ++j) {
-        car->oldd[j] = car->ride_height;
+    for (i = 0; i < 4; ++i) {
+        car->oldd[i] = car->ride_height;
     }
     car->revs = 0.0;
     car->gear = 0;
@@ -2072,7 +2072,8 @@ void PollCameraControls(tU32 pTime_difference) {
         }
         last_swirl_mode = swirl_mode;
     }
-    if (!gMap_mode && !gProgram_state.cockpit_on && (!gAction_replay_mode || gAction_replay_camera_mode <= eAction_replay_standard)) {
+    if (gMap_mode) {
+    } else if (!gProgram_state.cockpit_on && (!gAction_replay_mode || gAction_replay_camera_mode <= eAction_replay_standard)) {
         if (KeyIsDown(31) || (up_and_down_mode && !going_up)) {
             gCamera_zoom = pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1) + gCamera_zoom;
             if (gCamera_zoom > 2.0f) {
@@ -2086,6 +2087,7 @@ void PollCameraControls(tU32 pTime_difference) {
             gCamera_zoom = gCamera_zoom - pTime_difference * TIME_CONV_THING / (double)(2 * swirl_mode + 1);
             if (gCamera_zoom < 0.1f) {
                 gCamera_zoom = 0.1f;
+                going_up = 0;
                 if (up_and_down_mode) {
                     if (gCamera_zoom < 1.0f) {
                         gCamera_zoom = 1.0f;
@@ -2093,7 +2095,7 @@ void PollCameraControls(tU32 pTime_difference) {
                 }
             }
         }
-        if (swirl_mode && gProgram_state.current_car.speedo_speed < 0.001449275362318841) {
+        if (swirl_mode && gProgram_state.current_car.speedo_speed < (1 / WORLD_SCALE_D / 100.0)) {
             left = 1;
             right = 0;
         } else {
