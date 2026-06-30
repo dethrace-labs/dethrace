@@ -2,6 +2,7 @@
 #include "brender.h"
 #include "brucetrk.h"
 #include "car.h"
+#include "depth.h"
 #include "formats.h"
 #include "globvars.h"
 #include "harness/trace.h"
@@ -72,54 +73,45 @@ int PickBoundsTestRay__finteray(br_bounds* b, br_vector3* rp, br_vector3* rd, br
     float t;
 
     for (i = 0; i < 3; i++) {
-        if (rd->v[i] >= -0.00000023841858) {
-            if (rd->v[i] <= 0.00000023841858) {
-                if (b->max.v[i] < rp->v[i] || rp->v[i] < b->min.v[i]) {
-                    return 0;
-                }
-            } else {
-                s = (-1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-                if (s >= BR_SCALAR_MIN) {
-                    if (s < t_far) {
-                        t_far = (-1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-                    }
-                } else {
-                    t_far = BR_SCALAR_MIN;
-                }
-                t = (-1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
-                if (t <= BR_SCALAR_MAX) {
-                    if (t > t_near) {
-                        t_near = (-1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
-                    }
-                } else {
-                    t_near = BR_SCALAR_MAX;
-                }
-            }
-        } else {
-            s = (-1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-            if (s <= BR_SCALAR_MAX) {
-                if (s > t_near) {
-                    t_near = (-1.0f / rd->v[i]) * (rp->v[i] - b->max.v[i]);
-                }
-            } else {
+        if (rd->v[i] < -2 * BR_SCALAR_EPSILON) {
+            s = -1.0f / rd->v[i];
+            t = (rp->v[i] - b->max.v[i]) * s;
+            if (t > BR_SCALAR_MAX) {
                 t_near = BR_SCALAR_MAX;
+            } else if (t > t_near) {
+                t_near = t;
             }
-            t = (-1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
-            if (t >= BR_SCALAR_MIN) {
-                if (t < t_far) {
-                    t_far = (-1.0f / rd->v[i]) * (rp->v[i] - b->min.v[i]);
-                }
-            } else {
+            t = (rp->v[i] - b->min.v[i]) * s;
+            if (t < BR_SCALAR_MIN) {
                 t_far = BR_SCALAR_MIN;
+            } else if (t < t_far) {
+                t_far = t;
             }
+        } else if (rd->v[i] > 2 * BR_SCALAR_EPSILON) {
+            s = -1.0f / rd->v[i];
+            t = (rp->v[i] - b->max.v[i]) * s;
+            if (t < BR_SCALAR_MIN) {
+                t_far = BR_SCALAR_MIN;
+            } else if (t < t_far) {
+                t_far = t;
+            }
+            t = (rp->v[i] - b->min.v[i]) * s;
+            if (t > BR_SCALAR_MAX) {
+                t_near = BR_SCALAR_MAX;
+            } else if (t > t_near) {
+                t_near = t;
+            }
+        } else if (rp->v[i] > b->max.v[i] || rp->v[i] < b->min.v[i]) {
+            return 0;
         }
     }
-    if (t_far < t_near) {
+    if (t_far >= t_near) {
+        *new_t_near = t_near;
+        *new_t_far = t_far;
+        return 1;
+    } else {
         return 0;
     }
-    *new_t_near = t_near;
-    *new_t_far = t_far;
-    return 1;
 }
 
 // IDA: int __usercall ActorRayPick2D@<EAX>(br_actor *ap@<EAX>, br_vector3 *pPosition@<EDX>, br_vector3 *pDir@<EBX>, br_model *model@<ECX>, br_material *material, dr_pick2d_cbfn *callback)
@@ -709,34 +701,34 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
     tU8 cz_max;
     tTrack_spec* track_spec;
 
-    j = 0;
+    i = 0;
     track_spec = &gProgram_state.track_spec;
-    BrVector3Add(&a, &bnds->original_bounds.min, &bnds->original_bounds.max);
-    BrVector3Scale(&a, &a, 0.5f);
+    BrVector3Add(&b, &bnds->original_bounds.min, &bnds->original_bounds.max);
+    BrVector3Scale(&a, &b, .5f);
     BrMatrix34ApplyP(&bnds->box_centre, &a, bnds->mat);
-    BrVector3Sub(&b, &bnds->original_bounds.max, &bnds->original_bounds.min);
-    bnds->radius = BrVector3Length(&b) / 2.f;
+    BrVector3Sub(&a, &bnds->original_bounds.max, &bnds->original_bounds.min);
+    bnds->radius = BrVector3Length(&a) / 2.f;
     BrMatrix34ApplyP(&bnds->real_bounds.min, &bnds->original_bounds.min, bnds->mat);
     BrVector3Copy(&bnds->real_bounds.max, &bnds->real_bounds.min);
-    for (i = 0; i < 3; ++i) {
-        c[i].v[0] = bnds->mat->m[i][0] * b.v[i];
-        c[i].v[1] = bnds->mat->m[i][1] * b.v[i];
-        c[i].v[2] = bnds->mat->m[i][2] * b.v[i];
+    for (j = 0; j < 3; j++) {
+        c[j].v[0] = a.v[j] * bnds->mat->m[j][0];
+        c[j].v[1] = a.v[j] * bnds->mat->m[j][1];
+        c[j].v[2] = a.v[j] * bnds->mat->m[j][2];
     }
-    for (i = 0; i < 3; ++i) {
-        bnds->real_bounds.min.v[i] += MIN(c[0].v[i], 0.f)
-            + MIN(c[1].v[i], 0.f)
-            + MIN(c[2].v[i], 0.f);
-        bnds->real_bounds.max.v[i] += MAX(c[0].v[i], 0.f)
-            + MAX(c[1].v[i], 0.f)
-            + MAX(c[2].v[i], 0.f);
+    for (j = 0; j < 3; j++) {
+        bnds->real_bounds.min.v[j] += ((float)(c[2].v[j] < 0.f) * c[2].v[j]
+                                          + (float)(c[1].v[j] < 0.f) * c[1].v[j])
+            + (float)(c[0].v[j] < 0.f) * c[0].v[j];
+        bnds->real_bounds.max.v[j] += ((float)(c[2].v[j] > 0.f) * c[2].v[j]
+                                          + (float)(c[1].v[j] > 0.f) * c[1].v[j])
+            + (float)(c[0].v[j] > 0.f) * c[0].v[j];
     }
     XZToColumnXZ(&cx_min, &cz_min, bnds->real_bounds.min.v[0], bnds->real_bounds.min.v[2], track_spec);
     XZToColumnXZ(&cx_max, &cz_max, bnds->real_bounds.max.v[0], bnds->real_bounds.max.v[2], track_spec);
-    if (cx_min != 0) {
+    if (cx_min > 0) {
         cx_min--;
     }
-    if (cz_min != 0) {
+    if (cz_min > 0) {
         cz_min--;
     }
     if (cx_max + 1 < track_spec->ncolumns_x) {
@@ -751,17 +743,17 @@ int FindFacesInBox(tBounds* bnds, tFace_ref* face_list, int max_face) {
                 if (track_spec->blends[z][x] != NULL) {
                     track_spec->blends[z][x]->render_style = BR_RSTYLE_FACES;
                 }
-                j = max_face - ActorBoxPick(bnds, track_spec->columns[z][x], model_unk1, material_unk1, &face_list[j], max_face - j, NULL);
+                i = max_face - ActorBoxPick(bnds, track_spec->columns[z][x], model_unk1, material_unk1, &face_list[i], max_face - i, NULL);
                 if (track_spec->blends[z][x] != NULL) {
                     track_spec->blends[z][x]->render_style = BR_RSTYLE_NONE;
                 }
             }
             if (track_spec->lollipops[z][x] != NULL) {
-                j = max_face - ActorBoxPick(bnds, track_spec->lollipops[z][x], model_unk1, material_unk1, &face_list[j], max_face - j, NULL);
+                i = max_face - ActorBoxPick(bnds, track_spec->lollipops[z][x], model_unk1, material_unk1, &face_list[i], max_face - i, NULL);
             }
         }
     }
-    return j;
+    return i;
 }
 
 // IDA: int __usercall FindFacesInBox2@<EAX>(tBounds *bnds@<EAX>, tFace_ref *face_list@<EDX>, int max_face@<EBX>)
@@ -773,22 +765,26 @@ int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
     int i;
     int j;
 
-    a.v[0] = (bnds->original_bounds.min.v[0] + bnds->original_bounds.max.v[0]) * .5f;
-    a.v[1] = (bnds->original_bounds.min.v[1] + bnds->original_bounds.max.v[1]) * .5f;
-    a.v[2] = (bnds->original_bounds.min.v[2] + bnds->original_bounds.max.v[2]) * .5f;
+    BrVector3Add(&b, &bnds->original_bounds.min, &bnds->original_bounds.max);
+    BrVector3Scale(&a, &b, 0.5f);
     BrMatrix34ApplyP(&bnds->box_centre, &a, bnds->mat);
-    BrVector3Sub(&b, &bnds->original_bounds.max, &bnds->original_bounds.min);
-    bnds->radius = BrVector3Length(&b) / 2.f;
+    BrVector3Sub(&a, &bnds->original_bounds.max, &bnds->original_bounds.min);
+    bnds->radius = BrVector3Length(&a) / 2.f;
     BrMatrix34ApplyP(&bnds->real_bounds.min, &bnds->original_bounds.min, bnds->mat);
     BrVector3Copy(&bnds->real_bounds.max, &bnds->real_bounds.min);
-    for (i = 0; i < 3; i++) {
-        BrVector3Scale(&c[i], (br_vector3*)bnds->mat->m[i], b.v[i]);
+    for (j = 0; j < 3; j++) {
+        BrVector3Scale(&c[j], (br_vector3*)bnds->mat->m[j], a.v[j]);
     }
-    for (i = 0; i < 3; i++) {
-        bnds->real_bounds.min.v[i] += MIN(0.f, c[0].v[i]) + MIN(0.f, c[1].v[i]) + MIN(0.f, c[2].v[i]);
-        bnds->real_bounds.max.v[i] += MAX(0.f, c[0].v[i]) + MAX(0.f, c[1].v[i]) + MAX(0.f, c[2].v[i]);
+    for (j = 0; j < 3; j++) {
+        bnds->real_bounds.min.v[j] += ((float)(c[2].v[j] < 0.f) * c[2].v[j]
+            + (float)(c[0].v[j] < 0.f) * c[0].v[j])
+            + (float)(c[1].v[j] < 0.f) * c[1].v[j];
+        bnds->real_bounds.max.v[j] += ((float)(c[2].v[j] > 0.f) * c[2].v[j]
+            + (float)(c[0].v[j] > 0.f) * c[0].v[j])
+            + (float)(c[1].v[j] > 0.f) * c[1].v[j];
     }
-    return max_face - ActorBoxPick(bnds, gTrack_actor, model_unk1, material_unk1, face_list, max_face, NULL);
+    i = ActorBoxPick(bnds, gTrack_actor, model_unk1, material_unk1, face_list, max_face, NULL);
+    return max_face - i;
 }
 
 // IDA: int __usercall ActorBoxPick@<EAX>(tBounds *bnds@<EAX>, br_actor *ap@<EDX>, br_model *model@<EBX>, br_material *material@<ECX>, tFace_ref *face_list, int max_face, br_matrix34 *pMat)
@@ -1077,16 +1073,17 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
     for (vertex = 0; *nv > vertex; ++vertex) {
         if ((p[vertex].v[i] > limit) != (p[last_vertex].v[i] > limit)) {
             for (k = 0; k < 3; ++k) {
-                if (k != i) {
-                    p2[j].v[k] = (p[vertex].v[k] - p[last_vertex].v[k])
-                            * (limit - p[last_vertex].v[i])
-                            / (p[vertex].v[i] - p[last_vertex].v[i])
-                        + p[last_vertex].v[k];
+                if (k == i) {
+                    continue;
                 }
+                p2[j].v[k] = (p[vertex].v[k] - p[last_vertex].v[k])
+                        * (limit - p[last_vertex].v[i])
+                        / (p[vertex].v[i] - p[last_vertex].v[i])
+                    + p[last_vertex].v[k];
             }
             p2[j++].v[i] = limit;
         }
-        if (p[vertex].v[i] <= (double)limit) {
+        if (p[vertex].v[i] <= limit) {
             BrVector3Copy(&p2[j], &p[vertex]);
             j++;
         }
@@ -1304,7 +1301,22 @@ void SetFacesGroup(int pFace) {
     int f;
     int v;
     int i;
-    NOT_IMPLEMENTED();
+
+    gSelected_model->faces[pFace].material = gSub_material;
+    for (f = 0; f < gSelected_model->nfaces; f++) {
+        if (gSelected_model->faces[f].material != gReal_material) {
+            continue;
+        }
+        for (i = 0; i < 3; i++) {
+            v = gSelected_model->faces[pFace].vertices[i];
+            if (CompVert(gSelected_model->faces[f].vertices[0], v)
+                || CompVert(gSelected_model->faces[f].vertices[1], v)
+                || CompVert(gSelected_model->faces[f].vertices[2], v)) {
+                SetFacesGroup(f);
+                break;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall SelectFace(br_vector3 *pDir@<EAX>)
@@ -1316,7 +1328,48 @@ void SelectFace(br_vector3* pDir) {
     br_scalar t;
     br_model* old_model;
     int i;
-    NOT_IMPLEMENTED();
+
+    c = &gProgram_state.current_car;
+    old_model = gSelected_model;
+
+    if (gSub_material == NULL) {
+        gSub_material = BrMaterialAllocate("");
+        if (gSub_material == NULL) {
+            return;
+        }
+        gSub_material->index_shade = gAcid_shade_table;
+        BrMaterialAdd(gSub_material);
+    }
+
+    if (gSelected_model != NULL && gSelected_model->nfaces == gNfaces) {
+        for (i = 0; i < gSelected_model->nfaces; i++) {
+            if (gSelected_model->faces[i * 1].material == gSub_material) {
+                gSelected_model->faces[i * 1].material = gReal_material;
+            }
+        }
+        BrModelUpdate(gSelected_model, BR_MODU_ALL);
+    }
+
+    gSelected_model = NULL;
+
+    BrVector3Copy(&dir, pDir);
+
+    FindFace(&c->pos, &dir, &normal, &t, &gReal_material);
+    if (t > 1.f) {
+        return;
+    }
+
+    if (gNearest_model == old_model) {
+        return;
+    }
+
+    gSelected_model = gNearest_model;
+    gNfaces = gSelected_model->nfaces;
+    gSub_material->colour_map = gReal_material->colour_map;
+    gSub_material->flags = gReal_material->flags | BR_MODF_GENERATE_TAGS | BR_MODF_DONT_WELD;
+    BrMaterialUpdate(gSub_material, BR_MATU_ALL);
+    SetFacesGroup(gNearest_face);
+    BrModelUpdate(gSelected_model, BR_MODU_ALL);
 }
 
 // IDA: void __usercall GetTilingLimits(br_vector2 *min@<EAX>, br_vector2 *max@<EDX>)
@@ -1333,15 +1386,16 @@ void GetTilingLimits(br_vector2* min, br_vector2* max) {
     BrVector2Set(min, 32000.f, 32000.f);
     BrVector2Set(max, -32000.f, -32000.f);
     for (f = 0; f < gSelected_model->nfaces; f++) {
-        if (faces[f].material == gSub_material) {
-            for (i = 0; i < 3; i++) {
-                for (j = 0; j < 2; j++) {
-                    if (verts[faces[f].vertices[i]].map.v[j] < min->v[j]) {
-                        min->v[j] = verts[faces[f].vertices[i]].map.v[j];
-                    }
-                    if (verts[faces[f].vertices[i]].map.v[j] > max->v[j]) {
-                        max->v[j] = verts[faces[f].vertices[i]].map.v[j];
-                    }
+        if (faces[f].material != gSub_material) {
+            continue;
+        }
+        for (i = 0; i < 3; i++) {
+            for (j = 0; j < 2; j++) {
+                if (verts[faces[f].vertices[DR_FF(i)]].map.v[j] < min->v[j]) {
+                    min->v[j] = verts[faces[f].vertices[DR_FF(i)]].map.v[j];
+                }
+                if (verts[faces[f].vertices[DR_FF(i)]].map.v[j] > max->v[j]) {
+                    max->v[j] = verts[faces[f].vertices[DR_FF(i)]].map.v[j];
                 }
             }
         }
