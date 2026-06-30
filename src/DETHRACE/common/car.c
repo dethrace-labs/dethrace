@@ -762,8 +762,6 @@ void GetFacesInBox(tCollision_info* c) {
         }
     }
 
-condition_met:
-
     BrMatrix34Mul(&mat5, &mat4, &mat4);
     BrMatrix34Mul(&mat6, &mat5, &mat4);
     BrMatrix34LPInverse(&mat5, &mat6);

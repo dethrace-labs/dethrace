@@ -181,6 +181,7 @@ void ReinitialiseForwardCamera(void) {
                 &gCamera->t.t.mat,
                 BrDegreeToAngle(gProgram_state.current_car.head_right_angle));
             break;
+        DETHRACE_DEFAULT_BREAK
         }
         gCamera->t.t.mat.m[3][0] = gProgram_state.current_car.driver_x_offset;
         gCamera->t.t.mat.m[3][1] = gProgram_state.current_car.driver_y_offset;
