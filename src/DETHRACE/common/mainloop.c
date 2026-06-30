@@ -184,30 +184,18 @@ void MungeHeadups(void) {
     int oppo_count;
     tU32 the_time;
     float bearing;
+#ifdef DETHRACE_3DFX_PATCH
     br_material* nearby;
     tPixelmap_user_data* user;
+#endif
     // GLOBAL: CARM95 0x53a1ac
     static tU32 last_rattle_time;
 
     ClearHeadupSlot(3);
-    gMr_odo = (double)gFrame_period * gProgram_state.current_car.speedo_speed * WORLD_SCALE / 1600.0 + gMr_odo;
+    gMr_odo += gFrame_period * gProgram_state.current_car.speedo_speed * WORLD_SCALE / 1600.0;
     if (gInfo_on) {
-        bearing = 360.0 - FastScalarArcTan2(gCamera_to_world.m[0][2], gCamera_to_world.m[2][2]);
-        switch (gInfo_mode) {
-        case 0:
-            sprintf(
-                the_text,
-                "%d.%d (%.3f, %.3f, %.3f) %.0f, %.0f, MILES=%.2f",
-                gFrame_rate / 10,
-                gFrame_rate % 10,
-                gSelf->t.t.translate.t.v[0],
-                gSelf->t.t.translate.t.v[1],
-                gSelf->t.t.translate.t.v[2],
-                gCamera_to_horiz_angle,
-                bearing,
-                gMr_odo);
-            break;
-        case 1:
+        bearing = 360.0f - FastScalarArcTan2(gCamera_to_world.m[0][2], gCamera_to_world.m[2][2]);
+        if (gInfo_mode != 0) {
             sprintf(
                 the_text,
                 "P'cam: curr=%d, ambi=%d, pend=%d Car: c=%+.3f, a=%+.3f, b=%+.3f",
@@ -217,50 +205,57 @@ void MungeHeadups(void) {
                 gCar_to_view->curvature,
                 gCar_to_view->acc_force,
                 gCar_to_view->brake_force);
-            break;
+
+        } else {
 #ifdef DETHRACE_3DFX_PATCH
-        case 2:
-            nearby = SomeNearbyMaterial();
-            strcpy(the_text, nearby->identifier);
-            if (nearby->colour_map != NULL) {
-                sprintf(&the_text[strlen(the_text)], " %s", nearby->colour_map->identifier);
-                user = (tPixelmap_user_data*)nearby->colour_map->user;
-                if (user != NULL) {
-                    sprintf(&the_text[strlen(the_text)], " %dx%d to", user->orig_width, user->orig_height);
-                } else {
-                    sprintf(&the_text[strlen(the_text)], " %dx%d", nearby->colour_map->width, nearby->colour_map->height);
+            if (gInfo_mode == 2) {
+                nearby = SomeNearbyMaterial();
+                strcpy(the_text, nearby->identifier);
+                if (nearby->colour_map != NULL) {
+                    sprintf(&the_text[strlen(the_text)], " %s", nearby->colour_map->identifier);
+                    user = (tPixelmap_user_data*)nearby->colour_map->user;
+                    if (user != NULL) {
+                        sprintf(&the_text[strlen(the_text)], " %dx%d to", user->orig_width, user->orig_height);
+                    } else {
+                        sprintf(&the_text[strlen(the_text)], " %dx%d", nearby->colour_map->width, nearby->colour_map->height);
+                    }
+                    if ((nearby->flags & BR_MATF_MAP_INTERPOLATION)) {
+                        strcat(the_text, " bilinear");
+                    } else {
+                        strcat(the_text, " nobilinear");
+                    }
+                    if ((nearby->flags & BR_MATF_MAP_ANTIALIASING) && nearby->colour_map != NULL && nearby->colour_map->mip_offset != 0) {
+                        strcat(the_text, " mipmap");
+                    } else {
+                        strcat(the_text, " nomipmap");
+                    }
                 }
-                if ((nearby->flags & BR_MATF_MAP_INTERPOLATION)) {
-                    strcat(the_text, " bilinear");
-                } else {
-                    strcat(the_text, " nobilinear");
-                }
-                if ((nearby->flags & BR_MATF_MAP_ANTIALIASING) && nearby->colour_map != NULL && nearby->colour_map->mip_offset != 0) {
-                    strcat(the_text, " mipmap");
-                } else {
-                    strcat(the_text, " nomipmap");
-                }
-                break;
-            }
+            } else
 #endif
-        default:
-            break;
+            {
+                sprintf(
+                    the_text,
+                    "%d.%d (%.3f, %.3f, %.3f) %.0f, %.0f, MILES=%.2f",
+                    gFrame_rate / 10,
+                    gFrame_rate % 10,
+                    gSelf->t.t.translate.t.v[0],
+                    gSelf->t.t.translate.t.v[1],
+                    gSelf->t.t.translate.t.v[2],
+                    gCamera_to_horiz_angle,
+                    bearing,
+                    gMr_odo);
+            }
         }
         ChangeHeadupText(gProgram_state.frame_rate_headup, the_text);
     } else {
         ChangeHeadupText(gProgram_state.frame_rate_headup, "");
     }
     net_credits = gProgram_state.credits_earned - gProgram_state.credits_lost;
-    if (fabs((double)(gProgram_state.credits_earned - gProgram_state.credits_lost) - (double)gLast_credit_headup__mainloop) / (double)gFrame_period > 1.2) {
-        if (net_credits - gLast_credit_headup__mainloop <= 0) {
-            net_credits = (double)gLast_credit_headup__mainloop
-                - ((double)(gLast_credit_headup__mainloop - net_credits) + 1000.0)
-                    * (double)gFrame_period
-                    * 1.2
-                    / 1000.0;
+    if (fabs((double)net_credits - (double)gLast_credit_headup__mainloop) / (double)gFrame_period > 1.2) {
+        if (net_credits - gLast_credit_headup__mainloop > 0) {
+            net_credits = (net_credits - gLast_credit_headup__mainloop + 1000.0) * (double)gFrame_period * 1.2 / 1000.0 + (double)gLast_credit_headup__mainloop;
         } else {
-            net_credits = (net_credits - gLast_credit_headup__mainloop) + 1000.0 * (double)gFrame_period * 1.2 / 1000.0
-                + (double)gLast_credit_headup__mainloop;
+            net_credits = (double)gLast_credit_headup__mainloop - ((double)(gLast_credit_headup__mainloop - net_credits) + 1000.0) * (double)gFrame_period * 1.2 / 1000.0;
         }
     }
     gLast_credit_headup__mainloop = net_credits;
@@ -271,30 +266,33 @@ void MungeHeadups(void) {
         }
         if (gCountdown != new_countdown && new_countdown <= 5) {
             gCountdown = new_countdown;
-            NewImageHeadupSlot(eHeadupSlot_countdown, 0, 800, new_countdown + 4);
+            NewImageHeadupSlot(eHeadupSlot_countdown, 0, 800, gCountdown + 4);
             DRS3StartSound(gPedestrians_outlet, gCountdown + 8000);
             if (!new_countdown) {
                 MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo();
             }
         }
     }
-    if (fabs((double)gTimer - (double)gLast_time_headup) / (double)gFrame_period <= 10.0) {
-        effective_timer = gTimer;
-    } else if (gTimer - gLast_time_headup <= 0) {
-        effective_timer = gTimer;
+    if (fabs((double)gTimer - (double)gLast_time_headup) / (double)gFrame_period > 10.0) {
+        if (gTimer - gLast_time_headup > 0) {
+            effective_timer = gFrame_period * 10.0 + gLast_time_headup;
+        } else {
+            effective_timer = gTimer;
+        }
     } else {
-        effective_timer = gFrame_period * 10.0 + gLast_time_headup;
+        effective_timer = gTimer;
     }
     gLast_time_headup = effective_timer;
     if (gNet_mode != eNet_mode_none) {
         DoNetworkHeadups(net_credits);
     } else {
-        if (net_credits < 0) {
-            sprintf(the_text, "\xF8%d\xFA %s", -net_credits, GetMiscString(kMiscString_LOSS));
-        } else {
+        if (net_credits >= 0) {
             sprintf(the_text, "\xF8%d\xFA %s", net_credits, GetMiscString(net_credits < 100000 ? kMiscString_PROFIT : kMiscString_PRFT));
+            ChangeHeadupText(gCredits_won_headup, the_text);
+        } else {
+            sprintf(the_text, "\xF8%d\xFA %s", -net_credits, GetMiscString(kMiscString_LOSS));
+            ChangeHeadupText(gCredits_won_headup, the_text);
         }
-        ChangeHeadupText(gCredits_won_headup, the_text);
         if (gPedestrians_on) {
             sprintf(the_text, "\xF8%d\xFA/%d %s", gProgram_state.peds_killed, gTotal_peds, GetMiscString(kMiscString_KILLS));
             ChangeHeadupText(gPed_kill_count_headup, the_text);
@@ -324,6 +322,8 @@ void MungeHeadups(void) {
         ChangeHeadupText(gLaps_headup, the_text);
         the_time = GetTotalTime() - gTime_bonus_start;
         switch (gTime_bonus_state) {
+        case 0:
+            return;
         case eTime_bonus_initial_pause:
             if (the_time >= 500) {
                 bonus = gCurrent_race.bonus_score[gRace_over_reason][gProgram_state.skill_level];
@@ -375,12 +375,12 @@ void MungeHeadups(void) {
         case eTime_bonus_tb_down:
             if (gTime_bonus) {
                 if (the_time - last_rattle_time > 15) {
-                    bonus = gTime_bonus;
+                    previous_time_bonus = gTime_bonus;
                     gTime_bonus -= (the_time - last_rattle_time) * gPoints_per_second[gProgram_state.skill_level] / 15;
                     if (gTime_bonus < 0) {
                         gTime_bonus = 0;
                     }
-                    gProgram_state.credits_earned += bonus - gTime_bonus;
+                    gProgram_state.credits_earned += previous_time_bonus - gTime_bonus;
                     last_rattle_time += 15 * ((the_time - last_rattle_time) / 15);
                 }
                 sprintf(the_text, "%s %d", GetMiscString(kMiscString_TimeBonus), gTime_bonus);
@@ -392,10 +392,11 @@ void MungeHeadups(void) {
             gRace_finished = 10000;
             break;
         case eTime_bonus_end_pause:
-            if (the_time >= 2000 && gRace_finished > 1) {
-                gRace_finished = 1;
+            if (the_time >= 2000) {
+                if (gRace_finished > 1) {
+                    gRace_finished = 1;
+                }
             }
-            break;
         default:
             return;
         }
@@ -438,12 +439,16 @@ void UpdateFramePeriod(tU32* pCamera_period) {
         gLast_tick_count += gFrame_period;
         error = new_tick_count - gLast_tick_count;
         gFrame_period = new_tick_count - gActual_last_tick_count;
-        if ((new_tick_count - gActual_last_tick_count) > 500 && new_tick_count - gRace_start > 2000) {
+        if (gFrame_period > 500 && new_tick_count - gRace_start > 2000) {
             gFrame_period = gAverage_frame_period / 10;
             gLast_tick_count = new_tick_count;
             if (gNet_mode) {
-                if (gNet_mode == eNet_mode_client) {
+                switch (gNet_mode) {
+                case eNet_mode_client:
                     gProgram_state.current_car.last_car_car_collision = 0;
+                    break;
+                case eNet_mode_host:
+                    break;
                 }
             }
         }
@@ -451,32 +456,28 @@ void UpdateFramePeriod(tU32* pCamera_period) {
         if ((new_tick_count - gRace_start) > 2000) {
             gFrame_period = gAverage_frame_period / 10;
         }
-        if ((int)(error + gFrame_period) > 0) {
-            gFrame_period += error;
-        } else {
+        if ((int)(error + gFrame_period) <= 0) {
             gLast_tick_count = new_tick_count;
+        } else {
+            gFrame_period += error;
         }
         *pCamera_period = gFrame_period;
         gActual_last_tick_count = new_tick_count;
     }
-    if (gFrame_period >= 10) {
-        if (gFrame_period > 1000) {
-            gFrame_period = 1000;
-            gLast_tick_count = new_tick_count;
-        }
-    } else {
+    if (gFrame_period < 10) {
         // The following makes the timer go too fast when the real frame rate is high (=low frame period)
 #ifndef DETHRACE_FIX_BUGS
         gFrame_period = 10;
 #endif
         gLast_tick_count = new_tick_count;
+    } else if (gFrame_period > 1000) {
+        gFrame_period = 1000;
+        gLast_tick_count = new_tick_count;
     }
-    if (*pCamera_period >= 10) {
-        if (*pCamera_period > 1000) {
-            *pCamera_period = 1000;
-        }
-    } else {
+    if (*pCamera_period < 10) {
         *pCamera_period = 10;
+    } else if (*pCamera_period > 1000) {
+        *pCamera_period = 1000;
     }
 }
 
