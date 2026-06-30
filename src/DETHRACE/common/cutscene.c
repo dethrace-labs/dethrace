@@ -69,7 +69,8 @@ void PlaySmackerFile(char* pSmack_name) {
     int len;
     int fuck_off;
 
-    if (!gSound_override && !gCut_scene_override) {
+    if (gSound_override || gCut_scene_override) {
+    } else {
         StopMusic();
         FadePaletteDown();
         ClearEntireScreen();
