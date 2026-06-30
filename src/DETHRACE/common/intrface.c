@@ -206,7 +206,11 @@ int DoInterfaceScreen(tInterface_spec* pSpec, int pOptions, int pCurrent_choice)
     void* palette_copy;
 
 #if defined(DETHRACE_FIX_BUGS)
+    // Fix -Wmaybe-uninitialized warnings
     mouse_down = 0;
+    last_mouse_down = 0;
+    mouse_in_somewhere = 0;
+    copy_areas = NULL;
 #endif
     entry_status = gProgram_state.prog_status;
     last_press = 0;
