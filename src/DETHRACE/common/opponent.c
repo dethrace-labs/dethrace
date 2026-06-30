@@ -3884,13 +3884,6 @@ int ConsistencyCheck(void) {
     tU8* sections_referenced_by_nodes_array;
 
     failed = 0;
-#ifdef DETHRACE_FIX_BUGS
-    if (gProgram_state.AI_vehicles.number_of_path_nodes == 0 || gProgram_state.AI_vehicles.number_of_path_sections == 0) {
-        // Fix -Wmaybe-uninitialized warning (nodes_referenced_by_sections_array and sections_referenced_by_nodes_array might be reference uninitialized)
-        failed = 1;
-        goto cleanup;
-    }
-#endif
 
     if (gProgram_state.AI_vehicles.number_of_path_nodes != 0) {
         nodes_referenced_by_sections_array = BrMemAllocate(gProgram_state.AI_vehicles.number_of_path_nodes, kMem_nodes_array);
@@ -3900,6 +3893,13 @@ int ConsistencyCheck(void) {
         sections_referenced_by_nodes_array = BrMemAllocate(gProgram_state.AI_vehicles.number_of_path_sections, kMem_sections_array);
         memset(sections_referenced_by_nodes_array, 0, gProgram_state.AI_vehicles.number_of_path_sections);
     }
+#ifdef DETHRACE_FIX_BUGS
+    if (gProgram_state.AI_vehicles.number_of_path_nodes == 0 || gProgram_state.AI_vehicles.number_of_path_sections == 0) {
+        // Fix -Wmaybe-uninitialized warning (nodes_referenced_by_sections_array and sections_referenced_by_nodes_array might be reference uninitialized)
+        failed = 1;
+        goto cleanup;
+    }
+#endif
     for (section_no = 0; section_no < gProgram_state.AI_vehicles.number_of_path_sections; section_no++) {
         start_node = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0];
         finish_node = gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1];
