@@ -2556,7 +2556,7 @@ void SingleSplash(tCar_spec* pCar, br_vector3* sp, br_vector3* normal, tU32 pTim
     BrVector3Accumulate(&vel, &pCar->v);
     speed = BrVector3Length(&vel);
     size = ((br_scalar)fabs(BrVector3Dot(normal, &vel)) * 5.0f + speed) / 150.0f;
-    size += 0.047826085f;
+    size += 99.0f / 300.0f / WORLD_SCALE;
     if (size > 0.5f) {
         size = 0.5f;
     }
