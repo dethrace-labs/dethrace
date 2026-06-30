@@ -755,14 +755,14 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
     }
     y1 = pImpact_point->v[1] - crushed_car_bounds.min.v[1];
     y2 = crushed_car_bounds.max.v[1] - pImpact_point->v[1];
-    if ((y1 * 1) < y2) {
+    if (y1 < y2) {
         y = y1;
     } else {
         y = y2;
     }
     z1 = pImpact_point->v[2] - crushed_car_bounds.min.v[2];
     z2 = crushed_car_bounds.max.v[2] - pImpact_point->v[2];
-    if ((z1 * 1) < z2) {
+    if (z1 < z2) {
         z = z1;
     } else {
         z = z2;
@@ -776,7 +776,7 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
         proportion_y = y1 / (crushed_car_bounds.max.v[1] - crushed_car_bounds.min.v[1]);
         proportion_z = z1 / (crushed_car_bounds.max.v[2] - crushed_car_bounds.min.v[2]);
     } else {
-        if ((y2 * 1) > y1) {
+        if (y2 > y1) {
             impact_location = eImpact_bottom;
         } else {
             impact_location = eImpact_top;
