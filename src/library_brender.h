@@ -421,6 +421,9 @@
 // LIBRARY: CARM95 0x004D2880
 // BrMatrix34PostTransform
 
+// LIBRARY: CARM95 0x004DD030
+// BrLightEnable
+
 // GLOBAL: CARM95 0x00521ab0
 // BrFontProp7x9
 
