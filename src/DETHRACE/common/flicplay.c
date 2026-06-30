@@ -1679,9 +1679,9 @@ int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
             fread(*pData, 1, *pData_length, f);
             fclose(f);
         }
-        return 1;
+    } else {
+        MAMSLock((void**)pData);
     }
-    MAMSLock((void**)pData);
     return 1;
 }
 
@@ -2060,7 +2060,7 @@ void LoadInterfaceStrings(void) {
     gTranslation_count = 0;
     PathCat(the_path, gApplication_path, "TRNSLATE.TXT");
     f = fopen(the_path, "rt");
-    if (f != NULL) {
+    if (f) {
 
         while (!feof(f)) {
             GetALineAndDontArgue(f, s);
@@ -2095,16 +2095,16 @@ void LoadInterfaceStrings(void) {
             str = strtok(NULL, "\t ,/");
             sscanf(str, "%c", &ch);
             switch (ch) {
-            case 'L':
             case 'l':
+            case 'L':
                 gTranslations[i].justification = eJust_left;
                 break;
-            case 'R':
             case 'r':
+            case 'R':
                 gTranslations[i].justification = eJust_right;
                 break;
-            case 'C':
             case 'c':
+            case 'C':
                 gTranslations[i].justification = eJust_centre;
                 break;
             }
@@ -2114,7 +2114,7 @@ void LoadInterfaceStrings(void) {
             gTranslations[i].every_frame = strlen(str) > 1 && (str[1] == 'e' || str[1] == 'E');
             str += strlen(str) + 1;
             comment = strstr(str, "//");
-            if (comment != NULL) {
+            if (comment) {
                 *comment = '\0';
             }
             len = strlen(str);
