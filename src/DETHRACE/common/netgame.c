@@ -693,7 +693,7 @@ void DoNetworkHeadups(int pCredits) {
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_THAT_HALVED_YOUR_TIME));
             break;
 
-            DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
         }
     }
 
@@ -1089,7 +1089,7 @@ void CarInContactWithItOrFox(tNet_game_player_info* pPlayer) {
         }
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -1176,7 +1176,7 @@ void CalcPlayerScores(void) {
         }
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
 
     lowest_score = 9999;
@@ -1255,7 +1255,7 @@ void CalcPlayerScores(void) {
                 }
                 break;
 
-                DETHRACE_DEFAULT_BREAK
+            DETHRACE_DEFAULT_BREAK
             }
         }
         switch (gCurrent_net_game->type) {
@@ -1337,7 +1337,7 @@ void CalcPlayerScores(void) {
             }
             break;
 
-            DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
         }
     }
     if ((gCurrent_net_game->type == eNet_game_type_sudden_death || gCurrent_net_game->type == eNet_game_type_tag)
@@ -1392,7 +1392,7 @@ void SendPlayerScores(void) {
         the_contents->data.scores.general_score = gNet_players[gIt_or_fox].ID;
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
     for (i = 0; i < gNumber_of_net_players; i++) {
         the_contents->data.scores.scores[i] = gNet_players[i].score;
@@ -1434,7 +1434,7 @@ void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
         pPlayer->score = 0;
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
     pPlayer->credits = gInitial_net_credits[gCurrent_net_game->options.starting_money_index];
     pPlayer->wasted = 0;
@@ -1535,7 +1535,7 @@ void UseGeneralScore(int pScore) {
         }
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -1633,11 +1633,11 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
                 gRace_finished = 1;
                 break;
 
-                DETHRACE_DEFAULT_BREAK
+            DETHRACE_DEFAULT_BREAK
             }
             break;
 
-            DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
         }
     }
 }
@@ -1691,7 +1691,7 @@ void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, in
 void InitNetGameplayStuff(void) {
 
     switch (gCurrent_net_game->type) {
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
 }
 

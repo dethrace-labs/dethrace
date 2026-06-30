@@ -646,7 +646,7 @@ tMM_result DoMainMenu(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
         SetRecovery();
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
 
     return the_result;
@@ -685,7 +685,7 @@ void DoMainMenuScreen(tU32 pTime_out, int pSave_allowed, int pContinue_allowed) 
         }
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
     UnlockBunchOfFlics(0);
     if (gNet_players[gThis_net_player_index].player_status == ePlayer_status_main_menu) {
