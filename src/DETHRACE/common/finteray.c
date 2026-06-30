@@ -1301,7 +1301,22 @@ void SetFacesGroup(int pFace) {
     int f;
     int v;
     int i;
-    NOT_IMPLEMENTED();
+
+    gSelected_model->faces[pFace].material = gSub_material;
+    for (f = 0; f < gSelected_model->nfaces; f++) {
+        if (gSelected_model->faces[f].material != gReal_material) {
+            continue;
+        }
+        for (i = 0; i < 3; i++) {
+            v = gSelected_model->faces[pFace].vertices[i];
+            if (CompVert(gSelected_model->faces[f].vertices[0], v)
+                || CompVert(gSelected_model->faces[f].vertices[1], v)
+                || CompVert(gSelected_model->faces[f].vertices[2], v)) {
+                SetFacesGroup(f);
+                break;
+            }
+        }
+    }
 }
 
 // IDA: void __usercall SelectFace(br_vector3 *pDir@<EAX>)

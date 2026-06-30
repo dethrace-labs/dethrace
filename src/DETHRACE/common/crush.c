@@ -288,25 +288,22 @@ void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3*
     br_vertex* the_vertex;
     br_matrix34 inverse_transform;
 
-    if (gArrow_mode) {
-        return;
-    }
-    if (pCrush_data->number_of_crush_points == 0) {
+    if (gArrow_mode || pCrush_data->number_of_crush_points == 0) {
         return;
     }
     BrVector3Sub(&impact_point_model, pImpact_point, (br_vector3*)pActor->t.t.mat.m[3]);
-    BrVector3Scale(&energy_vector_model, pEnergy_vector, pCrush_data->softness_factor * gCar_crush_softness);
-    total_energy = BrVector3Length(&energy_vector_model);
+    BrVector3Scale(&energy_vector_scaled, pEnergy_vector, pCrush_data->softness_factor * gCar_crush_softness);
+    total_energy = BrVector3Length(&energy_vector_scaled);
     if (total_energy < 0.06f) {
         return;
     }
-    BrVector3Scale(&energy_vector_scaled, &energy_vector_model, (total_energy - 0.06f) / total_energy);
+    BrVector3Scale(&energy_vector_scaled, &energy_vector_scaled, (total_energy - 0.06) / total_energy);
     nearest_so_far = BR_SCALAR_MAX;
     vertices = pActor->model->vertices;
     nearest_index = -1;
     for (i = 0; i < pCrush_data->number_of_crush_points; i++) {
         the_vertex = &vertices[pCrush_data->crush_points[i].vertex_index];
-        this_distance = (impact_point_model.v[2] - the_vertex->p.v[2]) * (impact_point_model.v[2] - the_vertex->p.v[2]) + (impact_point_model.v[1] - the_vertex->p.v[1]) * (impact_point_model.v[1] - the_vertex->p.v[1]) + (impact_point_model.v[0] - the_vertex->p.v[0]) * (impact_point_model.v[0] - the_vertex->p.v[0]);
+        this_distance = Vector3DistanceSquared(&impact_point_model, &the_vertex->p);
         if (this_distance < nearest_so_far) {
             nearest_so_far = this_distance;
             nearest_index = i;
@@ -428,14 +425,11 @@ float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflecti
     *pTotal_deflection = 0.0;
     amount = 0.0;
 
-    for (i = 0; i < gProgram_state.current_car.car_actor_count; i++) {
-        the_car_actor = &pCar->car_model_actors[i];
-        if (the_car_actor->min_distance_squared == 0.0 || !the_car_actor->undamaged_vertices) {
-            if (the_car_actor->undamaged_vertices) {
-                amount = RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005f, pTotal_deflection);
-            }
-        } else {
-            RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005f, &dummy);
+    for (i = 0, the_car_actor = pCar->car_model_actors; i < gProgram_state.current_car.car_actor_count; i++, the_car_actor++) {
+        if (the_car_actor->min_distance_squared != 0.0f && the_car_actor->undamaged_vertices != NULL) {
+            RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005, &dummy);
+        } else if (the_car_actor->undamaged_vertices != NULL) {
+            amount = RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005, pTotal_deflection);
         }
     }
     pCar->repair_time += pFrame_period;
