@@ -363,15 +363,13 @@ void DimRectangle(br_pixelmap* pPixelmap, int pLeft, int pTop, int pRight, int p
 void DimAFewBits(void) {
     int i;
 
-    int dim_index; // Added
-    dim_index = gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0;
-    for (i = 0; i < gProgram_state.current_car.dim_count[dim_index]; i++) {
+    for (i = 0; i < gProgram_state.current_car.dim_count[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0]; i++) {
         DimRectangle(
             gBack_screen,
-            gProgram_state.current_car.dim_left[dim_index][i],
-            gProgram_state.current_car.dim_top[dim_index][i],
-            gProgram_state.current_car.dim_right[dim_index][i],
-            gProgram_state.current_car.dim_bottom[dim_index][i],
+            gProgram_state.current_car.dim_left[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
+            gProgram_state.current_car.dim_top[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
+            gProgram_state.current_car.dim_right[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
+            gProgram_state.current_car.dim_bottom[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][i],
             1);
     }
 }
@@ -966,18 +964,20 @@ void DoFancyHeadup(int pIndex) {
     int temp_ref;
 
     the_time = GetTotalTime();
-    if (!gMap_mode && (gLast_fancy_index < 0 || the_time - gLast_fancy_time > 2000 || gLast_fancy_index <= pIndex)) {
-        temp_ref = NewImageHeadupSlot(eHeadupSlot_fancies, 0, 2000, pIndex + 10);
-        if (temp_ref >= 0) {
-            gLast_fancy_headup = temp_ref;
-            gLast_fancy_index = pIndex;
-            gLast_fancy_time = the_time;
-            the_headup = &gHeadups[temp_ref];
-            the_headup->type = eHeadup_fancy;
-            the_headup->data.fancy_info.offset = (the_headup->data.image_info.image->width + gBack_screen->width) / 2;
-            the_headup->data.fancy_info.end_offset = -the_headup->data.fancy_info.offset;
-            the_headup->data.fancy_info.fancy_stage = eFancy_stage_incoming;
-            the_headup->data.fancy_info.shear_amount = the_headup->data.image_info.image->height;
+    if (!gMap_mode) {
+        if (!(gLast_fancy_index >= 0 && the_time - gLast_fancy_time <= 2000 && gLast_fancy_index > pIndex)) {
+            temp_ref = NewImageHeadupSlot(eHeadupSlot_fancies, 0, 2000, pIndex + 10);
+            if (temp_ref >= 0) {
+                gLast_fancy_headup = temp_ref;
+                gLast_fancy_index = pIndex;
+                gLast_fancy_time = the_time;
+                the_headup = &gHeadups[gLast_fancy_headup];
+                the_headup->type = eHeadup_fancy;
+                the_headup->data.fancy_info.offset = (the_headup->data.image_info.image->width + gBack_screen->width) / 2;
+                the_headup->data.fancy_info.end_offset = -the_headup->data.fancy_info.offset;
+                the_headup->data.fancy_info.fancy_stage = eFancy_stage_incoming;
+                the_headup->data.fancy_info.shear_amount = BrFixedToInt(BrIntToFixed(the_headup->data.image_info.image->height));
+            }
         }
     }
 }
@@ -990,23 +990,20 @@ void AdjustHeadups(void) {
     int delta_y;
     tHeadup* the_headup;
 
-    the_headup = gHeadups;
-    for (i = 0; i < COUNT_OF(gHeadups); i++) {
-        the_headup = &gHeadups[i];
-        if (the_headup->type == eHeadup_unused) {
-            continue;
+    for (i = 0, the_headup = gHeadups; i < COUNT_OF(gHeadups); i++, the_headup++) {
+        if (the_headup->type != eHeadup_unused) {
+            delta_x = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][the_headup->slot_index].x
+                - gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on != 0 && gProgram_state.cockpit_image_index >= 0 ? 0 : 1][the_headup->slot_index].x;
+            delta_y = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 ? 1 : 0][the_headup->slot_index].y
+                - gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on != 0 && gProgram_state.cockpit_image_index >= 0 ? 0 : 1][the_headup->slot_index].y;
+            the_headup->x += delta_x;
+            the_headup->original_x += delta_x;
+            the_headup->y += delta_y;
+            the_headup->dim_left += delta_x;
+            the_headup->dim_top += delta_y;
+            the_headup->dim_right += delta_x;
+            the_headup->dim_bottom += delta_y;
         }
-        delta_x = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0][the_headup->slot_index].x
-            - gProgram_state.current_car.headup_slots[!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0][the_headup->slot_index].x;
-        delta_y = gProgram_state.current_car.headup_slots[gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0][the_headup->slot_index].y
-            - gProgram_state.current_car.headup_slots[!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0][the_headup->slot_index].y;
-        the_headup->x += delta_x;
-        the_headup->original_x += delta_x;
-        the_headup->y += delta_y;
-        the_headup->dim_left += delta_x;
-        the_headup->dim_top += delta_y;
-        the_headup->dim_right += delta_x;
-        the_headup->dim_bottom += delta_y;
     }
 }
 
@@ -1394,8 +1391,11 @@ void DoSteeringWheel(tU32 pThe_time) {
     br_pixelmap* hands_image;
     int hands_index;
 
-    if (gProgram_state.current_car_index == gProgram_state.current_car.index && gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && gProgram_state.which_view == eView_forward) {
-        hands_index = (int)floor(gProgram_state.current_car.number_of_hands_images * ((1.f - gProgram_state.current_car.steering_angle / 10.f) / 2.f));
+    if (gProgram_state.current_car_index != gProgram_state.current_car.index) {
+        return;
+    }
+    if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && gProgram_state.which_view == eView_forward) {
+        hands_index = (int)floor(gProgram_state.current_car.number_of_hands_images * ((-gProgram_state.current_car.steering_angle / 10.f + 1.f) / 2.0));
         if (hands_index < 0) {
             hands_index = 0;
         } else if (hands_index >= gProgram_state.current_car.number_of_hands_images) {
@@ -1535,15 +1535,12 @@ int SpendCredits(int pAmount) {
     int amount;
 
     gProgram_state.credits_lost += pAmount;
-    if (gNet_mode == eNet_mode_none) {
+    if (gNet_mode == eNet_mode_none || (amount = gProgram_state.credits_earned - gProgram_state.credits_lost) >= 0) {
         return 0;
+    } else {
+        gProgram_state.credits_lost = gProgram_state.credits_earned;
+        return amount;
     }
-    amount = gProgram_state.credits_earned - gProgram_state.credits_lost;
-    if (gProgram_state.credits_earned - gProgram_state.credits_lost >= 0) {
-        return 0;
-    }
-    gProgram_state.credits_lost = gProgram_state.credits_earned;
-    return amount;
 }
 
 // IDA: void __usercall AwardTime(tU32 pTime@<EAX>)
@@ -1675,10 +1672,9 @@ void OoerrIveGotTextInMeBoxMissus(int pFont_index, char* pText, br_pixelmap* pPi
 // IDA: void __usercall TransBrPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, br_uint_32 pColour@<ECX>, br_font *pFont, signed char *pText)
 // FUNCTION: CARM95 0x004c7ec5
 void TransBrPixelmapText(br_pixelmap* pPixelmap, int pX, int pY, br_uint_32 pColour, br_font* pFont, char* pText) {
-    int len;
+    int len[2];
 
-    len = TranslationMode() ? 2 : 0;
-    BrPixelmapText(pPixelmap, pX, pY - len, pColour, pFont, (char*)pText);
+    BrPixelmapText(pPixelmap, pX, pY - (TranslationMode() ? 2 : 0), pColour, pFont, pText);
 }
 
 // IDA: void __usercall TransDRPixelmapText(br_pixelmap *pPixelmap@<EAX>, int pX@<EDX>, int pY@<EBX>, tDR_font *pFont@<ECX>, char *pText, int pRight_edge)

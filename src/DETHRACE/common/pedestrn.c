@@ -292,10 +292,10 @@ int PedestrianActorIsPerson(br_actor* pActor) {
 // FUNCTION: CARM95 0x00455953
 br_actor* GetPedestrianActor(int pIndex) {
 
-    if (pIndex >= 0 && pIndex < gPed_count) {
-        return gPedestrian_array[pIndex].actor;
-    } else {
+    if (!(pIndex >= 0 && pIndex < gPed_count)) {
         return NULL;
+    } else{
+        return gPedestrian_array[pIndex].actor;
     }
 }
 
@@ -1278,49 +1278,54 @@ int MungePedestrianAction(tPedestrian_data* pPedestrian, float pDanger_level) {
     if (pPedestrian->current_action == pPedestrian->fatal_car_impact_action
         || pPedestrian->current_action == pPedestrian->non_fatal_car_impact_action
         || pPedestrian->current_action == pPedestrian->fatal_ground_impact_action
-        || pPedestrian->current_action == pPedestrian->non_fatal_car_impact_action
+        || pPedestrian->current_action == pPedestrian->non_fatal_ground_impact_action
         || pPedestrian->current_action == pPedestrian->giblets_action
         || pPedestrian->mid_air) {
         return 0;
     }
     time_diff = GetTotalTime() - pPedestrian->last_action_change;
-    if (pPedestrian->current_action_mode >= 0) {
+
+    if (pPedestrian->current_action_mode < 0) {
+        if (pPedestrian->current_action_mode < 0) {
+            most_dangerous = -1.f;
+#if defined(DETHRACE_FIX_BUGS)
+            start_index = 0;
+            end_index = 0;
+#endif
+            for (i = 0; i < pPedestrian->number_of_actions; i++) {
+                if (pPedestrian->action_list[i].danger_level < 999.f
+                    && pPedestrian->action_list[i].danger_level <= pDanger_level
+                    && pPedestrian->action_list[i].reaction_time <= time_diff
+                    && (gFlag_waving_bastard != pPedestrian || pPedestrian->current_action != 7 || pPedestrian->action_list[i].danger_level != 0.f)) {
+                    if (pPedestrian->action_list[i].danger_level > most_dangerous) {
+                        most_dangerous = pPedestrian->action_list[i].danger_level;
+                        start_index = i;
+                        end_index = i;
+                    } else if (pPedestrian->action_list[i].danger_level == most_dangerous) {
+                        end_index = i;
+                    }
+                }
+            }
+            if (most_dangerous > -1.f) {
+                chance_value = FRandomBetween(0.f, 99.f);
+                choice = start_index;
+                for (i = start_index; i <= end_index; i++) {
+                    chance_value -= pPedestrian->action_list[i].percentage_chance;
+                    if (chance_value < 0.f) {
+                        choice = i;
+                        break;
+                    }
+                }
+                ChangeActionTo(pPedestrian, choice, 1);
+                return 1;
+            }
+        }
+    } else {
         ChangeActionTo(pPedestrian, pPedestrian->current_action_mode, 0);
         return 1;
     }
-    most_dangerous = -1.f;
-#if defined(DETHRACE_FIX_BUGS)
-    start_index = 0;
-    end_index = 0;
-#endif
-    for (i = 0; i < pPedestrian->number_of_actions; i++) {
-        if (pPedestrian->action_list[i].danger_level < 999.f
-            && pPedestrian->action_list[i].danger_level <= pDanger_level
-            && pPedestrian->action_list[i].reaction_time <= time_diff
-            && (gFlag_waving_bastard != pPedestrian || pPedestrian->current_action != 7 || pPedestrian->action_list[i].danger_level != 0.f)) {
-            if (pPedestrian->action_list[i].danger_level > most_dangerous) {
-                most_dangerous = pPedestrian->action_list[i].danger_level;
-                start_index = i;
-                end_index = i;
-            } else if (pPedestrian->action_list[i].danger_level == most_dangerous) {
-                end_index = i;
-            }
-        }
-    }
-    if (most_dangerous <= -1.f) {
-        return 0;
-    }
-    chance_value = FRandomBetween(0.f, 99.f);
-    choice = start_index;
-    for (i = start_index; i <= end_index; i++) {
-        chance_value -= pPedestrian->action_list[i].percentage_chance;
-        if (chance_value < 0.f) {
-            choice = i;
-            break;
-        }
-    }
-    ChangeActionTo(pPedestrian, choice, 1);
-    return 1;
+
+    return 0;
 }
 
 // IDA: void __cdecl MakeFlagWavingBastardWaveHisFlagWhichIsTheProbablyTheLastThingHeWillEverDo()
@@ -1521,52 +1526,47 @@ float CalcPedestrianDangerLevel(tPedestrian_data* pPedestrian, br_vector3* pDang
     for (i = 0; i < gNum_active_cars; i++) {
         car = gActive_car_list[i];
         if (car->driver == eDriver_local_human) {
-            camera_view_angle = FastScalarArcTan2(ped_pos->v[X] - gCamera_to_world.m[3][X], ped_pos->v[Z] - gCamera_to_world.m[3][Z]);
-            pPedestrian->car_to_ped = camera_view_angle;
+            pPedestrian->car_to_ped = FastScalarArcTan2(ped_pos->v[X] - gCamera_to_world.m[3][X], ped_pos->v[Z] - gCamera_to_world.m[3][Z]);
         }
         if (gBlind_pedestrians) {
-            return car->keys.horn ? 100.f : 0.f;
+            return car->keys.horn ? 100 : 0;
         }
-        distance_squared = (ped_pos->v[X] - car->pos.v[X]) * (ped_pos->v[X] - car->pos.v[X])
-            + 10.f * (ped_pos->v[Y] - car->pos.v[Y]) * 10.f * (ped_pos->v[Y] - car->pos.v[Y])
-            + (ped_pos->v[Z] - car->pos.v[Z]) * (ped_pos->v[Z] - car->pos.v[Z]);
-        if (distance_squared < gMax_distance_squared) {
-            car_movement_angle = FastScalarArcTan2(car->direction.v[X], car->direction.v[Z]);
-            car_to_pedestrian_angle = FastScalarArcTan2(ped_pos->v[X] - car->pos.v[X], ped_pos->v[Z] - car->pos.v[Z]);
-            if (car_to_pedestrian_angle > car_movement_angle) {
-                car_movement_angle += 360.f;
+        if ((distance_squared = BR_SQR(ped_pos->v[X] - car->pos.v[X])
+                    + BR_SQR(10.f * (ped_pos->v[Y] - car->pos.v[Y]))
+                    + BR_SQR(ped_pos->v[Z] - car->pos.v[Z])) >= gMax_distance_squared) {
+            continue;
+        }
+        car_movement_angle = FastScalarArcTan2(car->direction.v[X], car->direction.v[Z]);
+        car_to_pedestrian_angle = FastScalarArcTan2(ped_pos->v[X] - car->pos.v[X], ped_pos->v[Z] - car->pos.v[Z]);
+        if (car_to_pedestrian_angle > car_movement_angle) {
+            car_movement_angle += 360.f;
+        }
+        heading_difference = car_movement_angle - car_to_pedestrian_angle;
+        if (heading_difference > 180.f) {
+            heading_difference = 360.f - heading_difference;
+        }
+        if (heading_difference < 30.f || car->speed == 0.f || car->keys.horn) {
+            if (car->keys.horn) {
+                this_danger = 10.f / distance_squared;
+            } else {
+                this_danger = (fabs(car->speed) + 0.00003) * (BR_ABS(car->speed) != 0.f ? 30.f - heading_difference + 5.f : 5.f) / distance_squared * 400.f;
             }
-            heading_difference = car_movement_angle - car_to_pedestrian_angle;
-            if (heading_difference > 180.f) {
-                heading_difference = 360.f - heading_difference;
-            }
-            if (heading_difference < 30.f || car->speed == 0.f || car->keys.horn) {
-                if (car->keys.horn) {
-                    this_danger = 10.f / distance_squared;
-                } else {
-                    if (car->speed != 0.f) {
-                        this_danger = 30.f - heading_difference + 5.f;
-                    } else {
-                        this_danger = 5.f;
-                    }
-                    this_danger = (fabs(car->speed) + 3e-5f) * this_danger / distance_squared * 400.f;
-                }
-                if (this_danger > most_dangerous) {
-                    most_dangerous = this_danger;
-                    BrVector3Sub(pDanger_direction, &car->pos, ped_pos);
-                    if (car->driver == eDriver_local_human) {
-                        pPedestrian->frightened_of_us = 1;
-                    } else if (!pPedestrian->mid_air) {
-                        pPedestrian->frightened_of_us = 0;
-                    }
+            if (this_danger > most_dangerous) {
+                most_dangerous = this_danger;
+                BrVector3Sub(pDanger_direction, &car->pos, ped_pos);
+                if (car->driver == eDriver_local_human) {
+                    pPedestrian->frightened_of_us = 1;
+                } else if (!pPedestrian->mid_air) {
+                    pPedestrian->frightened_of_us = 0;
                 }
             }
         }
     }
-    if (most_dangerous > 999.f) {
-        most_dangerous = 999.f;
+    if (most_dangerous <= 999.f) {
+        return most_dangerous;
+    } else {
+        return 999.f;
     }
-    return most_dangerous;
 }
 
 // IDA: tPed_hit_position __usercall MoveToEdgeOfCar@<EAX>(tPedestrian_data *pPedestrian@<EAX>, tCollision_info *pCar@<EDX>, br_actor *pCar_actor@<EBX>, br_scalar pPed_x, br_scalar pPed_z, br_scalar pCar_bounds_min_x, br_scalar pCar_bounds_max_x, br_scalar pCar_bounds_min_z, br_scalar pCar_bounds_max_z, br_vector3 *pMin_ped_bounds_car, br_vector3 *pMax_ped_bounds_car)
