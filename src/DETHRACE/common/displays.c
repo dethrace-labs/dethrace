@@ -241,7 +241,12 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
         ch = (unsigned char*)pText;
         for (; i < len; i++, ch++) {
             if (*ch >= 224) {
+#ifdef DETHRACE_FIX_BUGS
+                // Fixes -Warray-bounds warning (array index 256 is past the end of the array 'tDR_font[21]')
+                new_font = &gFonts[256 - *ch];
+#else
                 new_font = &gFonts[256] - *ch;
+#endif
                 pY -= (new_font->height - pFont->height) / 2;
                 pFont = new_font;
             } else {
@@ -264,7 +269,12 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
         ch = (unsigned char*)pText;
         for (; i < len; i++, ch++) {
             if (*ch >= 224) {
+#ifdef DETHRACE_FIX_BUGS
+                // Fixes -Warray-bounds warning (array index 256 is past the end of the array 'tDR_font[21]')
+                new_font = &gFonts[256 - *ch];
+#else
                 new_font = &gFonts[256] - *ch;
+#endif
                 pY -= (new_font->height - pFont->height) / 2;
                 pFont = new_font;
             } else {
@@ -747,7 +757,12 @@ int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
 
     for (i = 0, c = (unsigned char*)pText; i < len; i++, c++) {
         if (*c >= 224) {
+#ifdef DETHRACE_FIX_BUGS
+            // Fixes -Warray-bounds warning (array index 256 is past the end of the array 'tDR_font[21]')
+            pFont = &gFonts[256 - *c];
+#else
             pFont = &gFonts[256] - *c;
+#endif
         } else {
             result += pFont->width_table[*c - pFont->offset] + (i < (len - 1) ? pFont->spacing : 0);
         }

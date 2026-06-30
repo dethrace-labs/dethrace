@@ -1380,6 +1380,10 @@ void DrawTranslations(tFlic_descriptor* pFlic_info, int pLast_frame) {
                 width = DRTextWidth(gTrans_fonts[trans->font_index], trans->text);
                 switch (trans->justification) {
                 case eJust_left:
+#ifdef DETHRACE_FIX_BUGS
+                // Fix -Wmaybe-uninitialized warning
+                default:
+#endif
                     x = trans->x;
                     right_edge = x + width;
                     break;
@@ -1989,7 +1993,7 @@ void ServicePanelFlics(int pCopy_to_buffer) {
                         gPanel_flic[j].the_index,
                         &gPanel_flic[j],
                         gPanel_flic_data_length[j],
-                        gPanel_flic_data[j],
+                        (tS8*)gPanel_flic_data[j],
                         gPanel_buffer[j],
                         0,
                         0,
