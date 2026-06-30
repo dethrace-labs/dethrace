@@ -2526,12 +2526,10 @@ void DRPixelmapRectangleMaskedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_int
         return;
     }
 #endif
-    dest_ptr = (source_ptr = (tU8*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x),
-        (tU8*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x));
-    source_row_wrap = pSource->row_bytes;
-    source_row_wrap -= pWidth;
-    dest_row_wrap = pDest->row_bytes;
-    dest_row_wrap -= pWidth;
+    source_ptr = (tU8*)pSource->pixels + (pSource->row_bytes * pSource_y + pSource_x);
+    dest_ptr = (tU8*)pDest->pixels + (pDest->row_bytes * pDest_y + pDest_x);
+    source_row_wrap = pSource->row_bytes - pWidth;
+    dest_row_wrap = pDest->row_bytes - pWidth;
 
     if (pDest_y < 0) {
         pHeight += pDest_y;
