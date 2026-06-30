@@ -73,12 +73,12 @@ void PlaySmackerFile(char* pSmack_name) {
         StopMusic();
         FadePaletteDown();
         ClearEntireScreen();
-        ((int(__stdcall*)(void*))SmackSoundUseDirectSound)(NULL);
+        SmackSoundUseDirectSound(NULL);
         br_colours_ptr = gCurrent_palette->pixels;
         PathCat(the_path, gApplication_path, "CUTSCENE");
         PathCat(the_path, the_path, pSmack_name);
         dr_dprintf("Trying to open smack file '%s'", the_path);
-        smk = ((Smack*(__stdcall*)(const char*, unsigned int, unsigned int))SmackOpen)(the_path, SMACKTRACKS, SMACKAUTOEXTRA);
+        smk = SmackOpen(the_path, SMACKTRACKS, SMACKAUTOEXTRA);
         if (smk == NULL) {
             dr_dprintf("Unable to open smack file - attempt to load smack from CD...");
             if (GetCDPathFromPathsTxtFile(the_path)) {
@@ -90,7 +90,7 @@ void PlaySmackerFile(char* pSmack_name) {
                 PathCat(the_path, the_path, "CUTSCENE");
                 PathCat(the_path, the_path, pSmack_name);
                 if (PDCheckDriveExists(the_path)) {
-                    smk = ((Smack*(__stdcall*)(const char*, unsigned int, unsigned int))SmackOpen)(the_path, SMACKTRACKS, SMACKAUTOEXTRA);
+                    smk = SmackOpen(the_path, SMACKTRACKS, SMACKAUTOEXTRA);
                 }
             } else {
                 dr_dprintf("Can't get CD directory name");
