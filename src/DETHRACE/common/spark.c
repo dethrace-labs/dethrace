@@ -2554,37 +2554,38 @@ void SingleSplash(tCar_spec* pCar, br_vector3* sp, br_vector3* normal, tU32 pTim
     tv.v[2] = sp->v[1] * pCar->omega.v[0] - pCar->omega.v[1] * sp->v[0];
     BrMatrix34ApplyV(&vel, &tv, c_mat);
     BrVector3Accumulate(&vel, &pCar->v);
-    ts = BrVector3Length(&vel);
-    size = (fabs(BrVector3Dot(normal, &vel)) * 5.0 + ts) / 150.0 + 0.047826085;
-    if (size > 0.5) {
-        size = 0.5;
+    speed = BrVector3Length(&vel);
+    size = ((br_scalar)fabs(BrVector3Dot(normal, &vel)) * 5.0f + speed) / 150.0f;
+    size += 99.0f / 300.0f / WORLD_SCALE;
+    if (size > 0.5f) {
+        size = 0.5f;
     }
-    if (BrVector3Dot(&pCar->velocity_car_space, sp) < 0.0) {
-        size = size / 2.0;
+    if (0.0f > BrVector3Dot(sp, &pCar->velocity_car_space)) {
+        size = size / 2.0f;
     }
 
-    gSplash[gNext_splash].size = SRandomBetween(size / 2.0, size);
+    gSplash[gNext_splash].size = SRandomBetween(size / 2.0f, size);
     if (!TEST_BIT(gSplash_flags, gNext_splash)) {
         BrActorAdd(gDont_render_actor, gSplash[gNext_splash].actor);
     }
     SET_BIT(gSplash_flags, gNext_splash);
     gSplash[gNext_splash].just_done = 1;
-    if ((double)pTime * 0.003 > SRandomBetween(0.0, 1.0) && !gAction_replay_mode) {
+    if (pTime * 0.003f > SRandomBetween(0.0f, 1.0f) && !gAction_replay_mode) {
         BrVector3InvScale(&vel, &vel, WORLD_SCALE);
-        BrVector3Scale(&tv, &vel, 0.1f);
-        speed = sqrt(ts / 70.0) * 15.0;
-        if (speed > 15.0f) {
-            speed = 15.0f;
+        BrVector3Scale(&tv, &vel, -0.1f);
+        ts = (br_scalar)sqrt(speed / 70.0f) * 15.0f;
+        if (ts > 15.0f) {
+            ts = 15.0f;
         }
-        tv.v[1] += SRandomBetween(5.0, speed) / WORLD_SCALE;
+        tv.v[1] += SRandomBetween(5.0f, ts) / WORLD_SCALE_D;
         BrMatrix34TApplyV(&vel, &tv, &pCar->car_master_actor->t.t.mat);
 
         BrVector3Cross(&tv, &vel, &pCar->water_normal);
         BrVector3Scale(&tv, &tv, 0.5f);
-        if (BrVector3Dot(sp, &tv) <= 0.0) {
-            BrVector3Sub(&vel, &vel, &tv);
-        } else {
+        if (BrVector3Dot(sp, &tv) > 0.0f) {
             BrVector3Accumulate(&vel, &tv);
+        } else {
+            BrVector3Sub(&vel, &vel, &tv);
         }
         CreateSingleSpark(pCar, sp, &vel);
     }
