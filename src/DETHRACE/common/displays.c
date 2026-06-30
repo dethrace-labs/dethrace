@@ -747,7 +747,12 @@ int DRTextCleverWidth(tDR_font* pFont, signed char* pText) {
 
     for (i = 0, c = (unsigned char*)pText; i < len; i++, c++) {
         if (*c >= 224) {
+#ifdef DETHRACE_FIX_BUGS
+            // Fixes -Warray-bounds warning (array index 256 is past the end of the array 'tDR_font[21]')
+            pFont = &gFonts[256 - *c];
+#else
             pFont = &gFonts[256] - *c;
+#endif
         } else {
             result += pFont->width_table[*c - pFont->offset] + (i < (len - 1) ? pFont->spacing : 0);
         }
