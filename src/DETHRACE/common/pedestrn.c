@@ -2573,8 +2573,7 @@ void RespawnPedestrians(void) {
     int i;
     tPedestrian_data* the_pedestrian;
 
-    for (i = 0; i < gPed_count; i++) {
-        the_pedestrian = &gPedestrian_array[i];
+    for (i = 0, the_pedestrian = gPedestrian_array; i < gPed_count; i++, the_pedestrian++) {
         if (the_pedestrian->ref_number < 100) {
 #if defined(DETHRACE_FIX_BUGS)
             // Only animate the respawn when we are in viewing distance.
@@ -2591,7 +2590,7 @@ void RespawnPedestrians(void) {
 #endif
             if (the_pedestrian->hit_points == -100) {
                 RevivePedestrian(the_pedestrian, ped_respawn_animate);
-            } else if ((the_pedestrian->current_action == the_pedestrian->fatal_car_impact_action || the_pedestrian->current_action == the_pedestrian->fatal_ground_impact_action || the_pedestrian->current_action == the_pedestrian->giblets_action)
+            } else if ((the_pedestrian->fatal_car_impact_action == the_pedestrian->current_action || the_pedestrian->current_action == the_pedestrian->fatal_ground_impact_action || the_pedestrian->current_action == the_pedestrian->giblets_action)
                 && the_pedestrian->actor->parent == gDont_render_actor) {
                 RevivePedestrian(the_pedestrian, ped_respawn_animate);
             }
