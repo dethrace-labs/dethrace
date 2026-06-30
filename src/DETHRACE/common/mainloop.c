@@ -149,7 +149,7 @@ void CalculateFrameRate(void) {
 void LoseOldestWastedMassage(void) {
     int i;
 
-    for (i = 1; i < gQueued_wasted_massages_count; i++) {
+    for (i = 1; i + 0 < gQueued_wasted_massages_count; i++) {
         gQueued_wasted_massages[i - 1] = gQueued_wasted_massages[i];
     }
     gQueued_wasted_massages_count--;
@@ -439,12 +439,16 @@ void UpdateFramePeriod(tU32* pCamera_period) {
         gLast_tick_count += gFrame_period;
         error = new_tick_count - gLast_tick_count;
         gFrame_period = new_tick_count - gActual_last_tick_count;
-        if ((new_tick_count - gActual_last_tick_count) > 500 && new_tick_count - gRace_start > 2000) {
+        if (gFrame_period > 500 && new_tick_count - gRace_start > 2000) {
             gFrame_period = gAverage_frame_period / 10;
             gLast_tick_count = new_tick_count;
             if (gNet_mode) {
-                if (gNet_mode == eNet_mode_client) {
+                switch (gNet_mode) {
+                case eNet_mode_client:
                     gProgram_state.current_car.last_car_car_collision = 0;
+                    break;
+                case eNet_mode_host:
+                    break;
                 }
             }
         }
@@ -452,32 +456,28 @@ void UpdateFramePeriod(tU32* pCamera_period) {
         if ((new_tick_count - gRace_start) > 2000) {
             gFrame_period = gAverage_frame_period / 10;
         }
-        if ((int)(error + gFrame_period) > 0) {
-            gFrame_period += error;
-        } else {
+        if ((int)(error + gFrame_period) <= 0) {
             gLast_tick_count = new_tick_count;
+        } else {
+            gFrame_period += error;
         }
         *pCamera_period = gFrame_period;
         gActual_last_tick_count = new_tick_count;
     }
-    if (gFrame_period >= 10) {
-        if (gFrame_period > 1000) {
-            gFrame_period = 1000;
-            gLast_tick_count = new_tick_count;
-        }
-    } else {
+    if (gFrame_period < 10) {
         // The following makes the timer go too fast when the real frame rate is high (=low frame period)
 #ifndef DETHRACE_FIX_BUGS
         gFrame_period = 10;
 #endif
         gLast_tick_count = new_tick_count;
+    } else if (gFrame_period > 1000) {
+        gFrame_period = 1000;
+        gLast_tick_count = new_tick_count;
     }
-    if (*pCamera_period >= 10) {
-        if (*pCamera_period > 1000) {
-            *pCamera_period = 1000;
-        }
-    } else {
+    if (*pCamera_period < 10) {
         *pCamera_period = 10;
+    } else if (*pCamera_period > 1000) {
+        *pCamera_period = 1000;
     }
 }
 
@@ -496,39 +496,40 @@ void CheckTimer(void) {
     static tU32 last_time_in_seconds = 0;
     static tU32 last_demo_time_in_seconds = 0;
 
+#ifdef DETHRACE_FIX_BUGS
     if (harness_game_config.freeze_timer) {
         return;
     }
-
-    if (!gFreeze_timer && !gCountdown && !gRace_finished) {
-        if (gFrame_period < gTimer) {
-            if (gNet_mode == eNet_mode_none) {
-                gTimer -= gFrame_period;
-            }
-            time_left = gTimer + 500;
-            time_in_seconds = (time_left) / 1000;
-            if (time_in_seconds != last_time_in_seconds && time_in_seconds <= 10) {
+    if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
+        if (harness_game_config.demo_timeout != 0) {
+            time_left = harness_game_config.demo_timeout - GetRaceTime();
+            time_in_seconds = (time_left + 500) / 1000;
+            if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)
                 DRS3StartSound(gPedestrians_outlet, 1001);
+            last_demo_time_in_seconds = time_in_seconds;
+            if (time_left <= 0) {
+                gTimer = 0;
+                RaceCompleted(eRace_over_demo);
             }
-            last_time_in_seconds = time_in_seconds;
-        } else {
-            gTimer = 0;
-            RaceCompleted(eRace_over_out_of_time);
         }
+    }
+#endif
 
-        if (harness_game_info.mode == eGame_carmageddon_demo || harness_game_info.mode == eGame_splatpack_demo || harness_game_info.mode == eGame_splatpack_xmas_demo) {
-            if (harness_game_config.demo_timeout != 0) {
-                time_left = harness_game_config.demo_timeout - GetRaceTime();
-                time_in_seconds = (time_left + 500) / 1000;
-                if (time_in_seconds != last_demo_time_in_seconds && time_in_seconds <= 10)
-                    DRS3StartSound(gPedestrians_outlet, 1001);
-                last_demo_time_in_seconds = time_in_seconds;
-                if (time_left <= 0) {
-                    gTimer = 0;
-                    RaceCompleted(eRace_over_demo);
-                }
-            }
+    if (gFreeze_timer || gCountdown || gRace_finished) {
+        return;
+    }
+    if (gFrame_period >= gTimer) {
+        gTimer = 0;
+        RaceCompleted(eRace_over_out_of_time);
+    } else {
+        if (gNet_mode == eNet_mode_none) {
+            gTimer -= gFrame_period;
         }
+        time_in_seconds = (gTimer + 500) / 1000;
+        if (time_in_seconds != last_time_in_seconds && time_in_seconds <= 10) {
+            DRS3StartSound(gPedestrians_outlet, 1001);
+        }
+        last_time_in_seconds = time_in_seconds;
     }
 }
 
