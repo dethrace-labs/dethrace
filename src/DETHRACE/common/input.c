@@ -91,6 +91,7 @@ void SetJoystickArrays(int* pKeys, int pMark) {
 // IDA: void __cdecl PollKeys()
 // FUNCTION: CARM95 0x00471bbf
 void PollKeys(void) {
+    int i;
 
     gKey_poll_counter++;
     PDSetKeyArray(gKey_array, gKey_poll_counter);
@@ -382,16 +383,20 @@ void GetMousePosition(int* pX_coord, int* pY_coord) {
     int y_top_margin;
     int y_bottom_margin;
 
+    x_left_margin = 0;
+    x_right_margin = 0;
+    y_top_margin = 0;
+    y_bottom_margin = 0;
     PDGetMousePosition(pX_coord, pY_coord);
-    if (*pX_coord < 0) {
-        *pX_coord = 0;
-    } else if (gGraf_specs[gGraf_spec_index].total_width < *pX_coord) {
-        *pX_coord = gGraf_specs[gGraf_spec_index].total_width;
+    if (*pX_coord < x_left_margin) {
+        *pX_coord = x_left_margin;
+    } else if (gGraf_specs[gGraf_spec_index].total_width - x_right_margin < *pX_coord) {
+        *pX_coord = gGraf_specs[gGraf_spec_index].total_width - x_right_margin;
     }
-    if (*pY_coord < 0) {
+    if (y_top_margin > *pY_coord) {
         *pY_coord = 0;
-    } else if (gGraf_specs[gGraf_spec_index].total_height < *pY_coord) {
-        *pY_coord = gGraf_specs[gGraf_spec_index].total_height;
+    } else if (gGraf_specs[gGraf_spec_index].total_height - y_bottom_margin < *pY_coord) {
+        *pY_coord = gGraf_specs[gGraf_spec_index].total_height - y_bottom_margin;
     }
 }
 
@@ -471,8 +476,7 @@ void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
     int i;
 
     for (i = 0; i < strlen(pStr); i++) {
-        AddRollingLetter(pStr[i], pX, pY, rolling_type);
-        pX += gCurrent_graf_data->rolling_letter_x_pitch;
+        AddRollingLetter(pStr[i], pX + gCurrent_graf_data->rolling_letter_x_pitch * i, pY, rolling_type);
     }
 }
 
@@ -505,47 +509,46 @@ void RollLettersIn(void) {
     tU8* source_ptr;
     tU8 the_byte;
 
+    let = gRolling_letters;
     new_time = PDGetTotalTime();
     if (gLast_roll) {
         period = new_time - gLast_roll;
     } else {
         period = 0;
     }
-    font_height = gFonts[FONT_TYPEABLE].height;
     font_width = gFonts[FONT_TYPEABLE].width;
+    font_height = gFonts[FONT_TYPEABLE].height;
     the_row_bytes = gFonts[FONT_TYPEABLE].images->row_bytes;
 
-    for (i = 0; i < NBR_ROLLING_LETTERS; i++) {
-        let = &gRolling_letters[i];
+    for (i = 0; i < NBR_ROLLING_LETTERS; i++, let++) {
         if (let->number_of_letters >= 0) {
-            char_ptr = gBack_screen->pixels;
-            char_ptr += let->y_coord * gBack_screen->row_bytes + let->x_coord;
-            if (let->current_offset > 0.0f) {
-                let->current_offset -= period * 0.18f;
+            char_ptr = (tU8*)gBack_screen->pixels + let->y_coord * gBack_screen->row_bytes + let->x_coord;
+            if (let->current_offset != 0.0f) {
+                let->current_offset -= period * 0.18;
                 if (let->current_offset <= 0.0f) {
-                    if (let->rolling_type == eRT_looping_random || let->rolling_type == eRT_looping_single) {
-                        let->current_offset = (gCurrent_graf_data->save_slot_letter_height * let->number_of_letters) + let->current_offset;
-                    } else {
+                    if (let->rolling_type != eRT_looping_random && let->rolling_type != eRT_looping_single) {
                         let->current_offset = 0.0f;
+                    } else {
+                        let->current_offset = let->current_offset + (float)(gCurrent_graf_data->save_slot_letter_height * let->number_of_letters);
                     }
                 }
             }
             for (j = 0; j < gCurrent_graf_data->save_slot_height; j++) {
+                saved_char_ptr = char_ptr;
                 offset = gCurrent_graf_data->save_slot_table[j] + let->current_offset;
                 which_letter = offset / gCurrent_graf_data->save_slot_letter_height;
                 letter_offset = offset % gCurrent_graf_data->save_slot_letter_height - (gCurrent_graf_data->save_slot_letter_height - font_height) / 2;
-                saved_char_ptr = char_ptr;
                 if (which_letter < let->number_of_letters && which_letter >= 0 && letter_offset >= 0 && letter_offset < font_height) {
 
                     // LOG_DEBUG("chars %d, %d, %d, %d", let->letters[0], let->letters[1], let->letters[2], let->letters[3]);
                     source_ptr = (tU8*)gFonts[FONT_TYPEABLE].images->pixels + (font_height * (let->letters[which_letter] - ' ') + letter_offset) * the_row_bytes;
                     for (k = 0; k < font_width; k++) {
                         the_byte = *source_ptr;
+                        source_ptr++;
                         if (the_byte) {
                             *char_ptr = the_byte;
                         }
                         char_ptr++;
-                        source_ptr++;
                     }
                 }
                 char_ptr = saved_char_ptr + gBack_screen->row_bytes;
@@ -818,26 +821,26 @@ void StartTyping(int pSlot_index, char* pText, int pVisible_length) {
 void TypeKey(int pSlot_index, char pKey) {
 
     switch (pKey) {
-    case KEY_GRAVE:
-        break;
     case KEY_BACKSPACE:
         DoRLBackspace(pSlot_index);
-        break;
-    case KEY_INSERT:
-        DoRLInsert(pSlot_index);
-        break;
+        return;
     case KEY_DELETE:
         DoRLDelete(pSlot_index);
-        break;
+        return;
+    case KEY_INSERT:
+        DoRLInsert(pSlot_index);
+        return;
     case KEY_LEFT:
         DoRLCursorLeft(pSlot_index);
-        break;
+        return;
     case KEY_RIGHT:
         DoRLCursorRight(pSlot_index);
-        break;
+        return;
+    case KEY_GRAVE:
+        return;
     default:
         DoRLTypeLetter(PDGetASCIIFromKey(pKey), pSlot_index);
-        break;
+        return;
     }
 }
 
