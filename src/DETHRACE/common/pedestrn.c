@@ -1668,14 +1668,15 @@ int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vect
 
     ped_m_z = pPed_car->v[Z] * WORLD_SCALE;
     ped_m_x = pPed_car->v[X] * WORLD_SCALE;
-    pSize += .05f;
+    pSize += 0.05f;
     size_sqr = BR_SQR(pSize * WORLD_SCALE);
     squish = 0;
     for (wheel = 0; wheel < COUNT_OF(pCar->blood_remaining); wheel++) {
         if (pCar->blood_remaining[wheel] == 0.f) {
-            dist_sqr = BR_SQR(pCar->wpos[wheel].v[Z] - ped_m_z) + BR_SQR(pCar->wpos[wheel].v[X] - ped_m_x);
-            if (size_sqr > dist_sqr) {
-                pCar->blood_remaining[wheel] = SRandomBetween(2.f, 8.f) * pSize;
+            dist_sqr = BR_SQR(pCar->wpos[wheel].v[Z] - ped_m_z);
+            dist_sqr += BR_SQR(pCar->wpos[wheel].v[X] - ped_m_x);
+            if (dist_sqr < size_sqr) {
+                pCar->blood_remaining[wheel] = SRandomBetween(2.0f, 8.0f) * pSize;
                 pCar->special_start[wheel] = *pPed_glob;
                 squish = 1;
             }
