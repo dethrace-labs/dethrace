@@ -1055,7 +1055,7 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
         frame_period = 1000.f / FRandomBetween(the_sequence->frame_rate_factor1, the_sequence->frame_rate_factor2);
         break;
 
-        DETHRACE_DEFAULT_BREAK;
+        DETHRACE_DEFAULT_BREAK
     }
     if (frame_period == 0.f) {
         pPedestrian->current_frame = 0;

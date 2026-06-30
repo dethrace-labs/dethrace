@@ -1633,11 +1633,11 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
                 gRace_finished = 1;
                 break;
 
-                DETHRACE_DEFAULT_BREAK;
+                DETHRACE_DEFAULT_BREAK
             }
             break;
 
-            DETHRACE_DEFAULT_BREAK;
+            DETHRACE_DEFAULT_BREAK
         }
     }
 }
@@ -1691,7 +1691,7 @@ void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, in
 void InitNetGameplayStuff(void) {
 
     switch (gCurrent_net_game->type) {
-        DETHRACE_DEFAULT_BREAK;
+        DETHRACE_DEFAULT_BREAK
     }
 }
 

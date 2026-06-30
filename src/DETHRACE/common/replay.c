@@ -327,9 +327,8 @@ void MoveToEndOfReplay(void) {
 
     DisablePipedSounds();
     old_replay_rate = gReplay_rate;
-    gReplay_rate = 100.f;
-#define INT32_MAX 2147483647
-    MoveReplayBuffer(INT32_MAX);
+    gReplay_rate = 100.0f;
+    MoveReplayBuffer(DR_INT32_MAX);
     gReplay_rate = old_replay_rate;
     EnablePipedSounds();
 }
@@ -342,7 +341,7 @@ void MoveToStartOfReplay(void) {
     DisablePipedSounds();
     old_replay_rate = gReplay_rate;
     gReplay_rate = -100.f;
-    MoveReplayBuffer(-INT32_MAX);
+    MoveReplayBuffer(-DR_INT32_MAX);
     gReplay_rate = old_replay_rate;
     EnablePipedSounds();
 }

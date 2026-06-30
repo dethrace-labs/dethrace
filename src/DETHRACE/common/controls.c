@@ -2299,6 +2299,7 @@ void CycleCarTexturingLevel(void) {
     case eCTL_full:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_FullCarTextures));
         break;
+    DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -2320,6 +2321,7 @@ void CycleWallTexturingLevel(void) {
     case eWTL_full:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_BestWallTextures));
         break;
+    DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -2339,7 +2341,7 @@ void CycleRoadTexturingLevel(void) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_RoadTextures));
         break;
 
-        DETHRACE_DEFAULT_BREAK;
+    DETHRACE_DEFAULT_BREAK
     }
 }
 
