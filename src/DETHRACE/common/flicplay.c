@@ -1992,7 +1992,7 @@ void ServicePanelFlics(int pCopy_to_buffer) {
                         gPanel_flic[j].the_index,
                         &gPanel_flic[j],
                         gPanel_flic_data_length[j],
-                        gPanel_flic_data[j],
+                        (tS8*)gPanel_flic_data[j],
                         gPanel_buffer[j],
                         0,
                         0,
