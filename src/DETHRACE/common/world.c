@@ -2910,6 +2910,11 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 GetThreeScalars(f, &spec->bounds.max.v[0], &spec->bounds.max.v[1], &spec->bounds.max.v[2]);
                 BrMatrix34Identity(&spec->mat);
                 for (j = 0; j < 3; j++) {
+#ifdef DETHRACE_FIX_BUGS
+                    // Fix -Wmaybe-uninitialized warning
+                    temp_bounds.min.v[j] = spec->bounds.min.v[j];
+                    temp_bounds.max.v[j] = spec->bounds.max.v[j];
+#endif
                     spec->mat.m[3][j] = (temp_bounds.max.v[j] + temp_bounds.min.v[j]) / 2.0f;
                     MAT(&spec->mat.m, j, j) = temp_bounds.max.v[j] - spec->mat.m[3][j];
                 }
