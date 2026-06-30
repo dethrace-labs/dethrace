@@ -1679,9 +1679,9 @@ int LoadFlicData(char* pName, tU8** pData, tU32* pData_length) {
             fread(*pData, 1, *pData_length, f);
             fclose(f);
         }
-        return 1;
+    } else {
+        MAMSLock((void**)pData);
     }
-    MAMSLock((void**)pData);
     return 1;
 }
 
