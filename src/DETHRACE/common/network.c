@@ -969,6 +969,10 @@ tU32 NetGetContentsSize(tNet_message_type pType, tS32 pSize_decider) {
         case 1:
             the_size = offsetof(tNet_message_pedestrian, offset);
             break;
+#ifdef DETHRACE_FIX_BUGS
+        // Fix -Wmaybe-uninitialized warning (use bigest message size)
+        default:
+#endif
         case 2:
             the_size = sizeof(tNet_message_pedestrian);
             break;
