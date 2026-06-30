@@ -107,7 +107,9 @@ void PlaySmackerFile(char* pSmack_name) {
                         br_colours_ptr[j] = (smack_colours_ptr[j * 3] << 16) | smack_colours_ptr[j * 3 + 2] | (smack_colours_ptr[j * 3 + 1] << 8);
                     }
 
+#ifndef DETHRACE_FIX_BUGS
                     memset(gBack_screen->pixels, 0, gBack_screen->row_bytes * gBack_screen->height);
+#endif
                     DRSetPalette(gCurrent_palette);
                     PDScreenBufferSwap(0);
                     EnsurePaletteUp();
