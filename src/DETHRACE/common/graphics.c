@@ -3581,8 +3581,7 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
     width_over_2 = pSource_width / 2;
     for (i = 0; i < pSource_height; i++) {
         for (j = 0; j < width_over_2; j++) {
-            --sptr;
-            pixels = *sptr;
+            pixels = *--sptr;
 #if BR_ENDIAN_BIG
             pixel_1 = pixels >> 0;
             pixel_2 = pixels >> 8;
@@ -3590,22 +3589,14 @@ void DRPixelmapDoubledCopy(br_pixelmap* pDestn, br_pixelmap* pSource, int pSourc
             pixel_1 = pixels >> 8;
             pixel_2 = pixels >> 0;
 #endif
-            --dptr;
-            *dptr = pixel_1;
-            --dptr2;
-            *dptr2 = pixel_1;
-            --dptr;
-            *dptr = pixel_1;
-            --dptr2;
-            *dptr2 = pixel_1;
-            --dptr;
-            *dptr = pixel_2;
-            --dptr2;
-            *dptr2 = pixel_2;
-            --dptr;
-            *dptr = pixel_2;
-            --dptr2;
-            *dptr2 = pixel_2;
+            *--dptr = pixel_1;
+            *--dptr2 = pixel_1;
+            *--dptr = pixel_1;
+            *--dptr2 = pixel_1;
+            *--dptr = pixel_2;
+            *--dptr2 = pixel_2;
+            *--dptr = pixel_2;
+            *--dptr2 = pixel_2;
         }
         dptr -= dst_row_skip;
         dptr2 -= dst_row_skip;
