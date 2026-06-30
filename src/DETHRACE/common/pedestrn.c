@@ -963,7 +963,7 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
                     pPedestrian->current_frame = -1;
                     pPedestrian->done_initial = 0;
                 } else if (pPedestrian->fatal_car_impact_action != pPedestrian->current_action
-                    && pPedestrian->fatal_ground_impact_action != pPedestrian->current_action
+                    && DR_FF(pPedestrian->fatal_ground_impact_action) != pPedestrian->current_action
                     && pPedestrian->giblets_action != pPedestrian->current_action) {
                     pPedestrian->current_frame = pPedestrian->current_frame + sequence_ptr->looping_frame_start - current_looping - 1;
                     pPedestrian->done_initial = 1;
