@@ -292,10 +292,10 @@ int PedestrianActorIsPerson(br_actor* pActor) {
 // FUNCTION: CARM95 0x00455953
 br_actor* GetPedestrianActor(int pIndex) {
 
-    if (pIndex >= 0 && pIndex < gPed_count) {
-        return gPedestrian_array[pIndex].actor;
-    } else {
+    if (!(pIndex >= 0 && pIndex < gPed_count)) {
         return NULL;
+    } else{
+        return gPedestrian_array[pIndex].actor;
     }
 }
 
