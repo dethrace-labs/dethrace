@@ -215,19 +215,19 @@ int DrawLine3D(br_vector3* start, br_vector3* end, br_pixelmap* pScreen, br_pixe
     }
 #endif
 
-    o = *start;
-    p = *end;
-    if (-gSpark_cam->hither_z < o.v[2] || -gSpark_cam->hither_z < p.v[2]) {
-        if (-gSpark_cam->hither_z < o.v[2] && -gSpark_cam->hither_z < p.v[2]) {
+    BrVector3Copy(&o, start);
+    BrVector3Copy(&p, end);
+    if ((o.v[2] * 1) > -gSpark_cam->hither_z || (p.v[2] * 1) > -gSpark_cam->hither_z) {
+        if (-gSpark_cam->hither_z < (o.v[2] * 1) && -gSpark_cam->hither_z < (p.v[2] * 1)) {
             return 0;
         }
         ts = (p.v[2] + gSpark_cam->hither_z) / (p.v[2] - o.v[2]);
-        if (-gSpark_cam->hither_z < o.v[2]) {
+        if ((o.v[2] * 1) > -gSpark_cam->hither_z) {
             o.v[0] = p.v[0] - (p.v[0] - o.v[0]) * ts;
             o.v[1] = p.v[1] - (p.v[1] - o.v[1]) * ts;
             o.v[2] = -gSpark_cam->hither_z;
         }
-        if (-gSpark_cam->hither_z < p.v[2]) {
+        if (-gSpark_cam->hither_z < (p.v[2] * 1)) {
             p.v[0] = p.v[0] - (p.v[0] - o.v[0]) * ts;
             p.v[1] = p.v[1] - (p.v[1] - o.v[1]) * ts;
             p.v[2] = -gSpark_cam->hither_z;
@@ -235,12 +235,8 @@ int DrawLine3D(br_vector3* start, br_vector3* end, br_pixelmap* pScreen, br_pixe
     }
     BrMatrix4ApplyP(&o2, &o, &gCameraToScreen);
     BrMatrix4ApplyP(&p2, &p, &gCameraToScreen);
-    o.v[0] = o2.v[0] / o2.v[3];
-    o.v[1] = o2.v[1] / o2.v[3];
-    o.v[2] = o2.v[2] / o2.v[3];
-    p.v[0] = p2.v[0] / p2.v[3];
-    p.v[1] = p2.v[1] / p2.v[3];
-    p.v[2] = p2.v[2] / p2.v[3];
+    BrVector3InvScale(&o, &o2, o2.v[3]);
+    BrVector3InvScale(&p, &p2, p2.v[3]);
     return DrawLine2D(&o, &p, pScreen, pDepth_buffer, 1.0, shade_table);
 }
 

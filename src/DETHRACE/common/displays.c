@@ -966,18 +966,20 @@ void DoFancyHeadup(int pIndex) {
     int temp_ref;
 
     the_time = GetTotalTime();
-    if (!gMap_mode && (gLast_fancy_index < 0 || the_time - gLast_fancy_time > 2000 || gLast_fancy_index <= pIndex)) {
-        temp_ref = NewImageHeadupSlot(eHeadupSlot_fancies, 0, 2000, pIndex + 10);
-        if (temp_ref >= 0) {
-            gLast_fancy_headup = temp_ref;
-            gLast_fancy_index = pIndex;
-            gLast_fancy_time = the_time;
-            the_headup = &gHeadups[temp_ref];
-            the_headup->type = eHeadup_fancy;
-            the_headup->data.fancy_info.offset = (the_headup->data.image_info.image->width + gBack_screen->width) / 2;
-            the_headup->data.fancy_info.end_offset = -the_headup->data.fancy_info.offset;
-            the_headup->data.fancy_info.fancy_stage = eFancy_stage_incoming;
-            the_headup->data.fancy_info.shear_amount = the_headup->data.image_info.image->height;
+    if (!gMap_mode) {
+        if (!(gLast_fancy_index >= 0 && the_time - gLast_fancy_time <= 2000 && gLast_fancy_index > pIndex)) {
+            temp_ref = NewImageHeadupSlot(eHeadupSlot_fancies, 0, 2000, pIndex + 10);
+            if (temp_ref >= 0) {
+                gLast_fancy_headup = temp_ref;
+                gLast_fancy_index = pIndex;
+                gLast_fancy_time = the_time;
+                the_headup = &gHeadups[gLast_fancy_headup];
+                the_headup->type = eHeadup_fancy;
+                the_headup->data.fancy_info.offset = (the_headup->data.image_info.image->width + gBack_screen->width) / 2;
+                the_headup->data.fancy_info.end_offset = -the_headup->data.fancy_info.offset;
+                the_headup->data.fancy_info.fancy_stage = eFancy_stage_incoming;
+                the_headup->data.fancy_info.shear_amount = BrFixedToInt(BrIntToFixed(the_headup->data.image_info.image->height));
+            }
         }
     }
 }
@@ -1394,8 +1396,11 @@ void DoSteeringWheel(tU32 pThe_time) {
     br_pixelmap* hands_image;
     int hands_index;
 
-    if (gProgram_state.current_car_index == gProgram_state.current_car.index && gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && gProgram_state.which_view == eView_forward) {
-        hands_index = (int)floor(gProgram_state.current_car.number_of_hands_images * ((1.f - gProgram_state.current_car.steering_angle / 10.f) / 2.f));
+    if (gProgram_state.current_car_index != gProgram_state.current_car.index) {
+        return;
+    }
+    if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && gProgram_state.which_view == eView_forward) {
+        hands_index = (int)floor(gProgram_state.current_car.number_of_hands_images * ((-gProgram_state.current_car.steering_angle / 10.f + 1.f) / 2.0));
         if (hands_index < 0) {
             hands_index = 0;
         } else if (hands_index >= gProgram_state.current_car.number_of_hands_images) {
@@ -1535,15 +1540,12 @@ int SpendCredits(int pAmount) {
     int amount;
 
     gProgram_state.credits_lost += pAmount;
-    if (gNet_mode == eNet_mode_none) {
+    if (gNet_mode == eNet_mode_none || (amount = gProgram_state.credits_earned - gProgram_state.credits_lost) >= 0) {
         return 0;
+    } else {
+        gProgram_state.credits_lost = gProgram_state.credits_earned;
+        return amount;
     }
-    amount = gProgram_state.credits_earned - gProgram_state.credits_lost;
-    if (gProgram_state.credits_earned - gProgram_state.credits_lost >= 0) {
-        return 0;
-    }
-    gProgram_state.credits_lost = gProgram_state.credits_earned;
-    return amount;
 }
 
 // IDA: void __usercall AwardTime(tU32 pTime@<EAX>)
