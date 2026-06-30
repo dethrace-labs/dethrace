@@ -1855,14 +1855,14 @@ void FlameAnimate(int c, br_vector3* pPos, tU32 pTime) {
             AddFlameToPipingSession(i + 16 * c, col->frame_count[i] + 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
             EndPipingSession();
             col->frame_count[i] = IRandomBetween(-5, -1);
-            col->scale_x[i] = (2 * IRandomBetween(0, 1) - 1) * ((SRandomBetween(1.0f, 1.5f) * 0.003f) * 1);
+            col->scale_x[i] = (2 * IRandomBetween(0, 1) - 1) * DR_FF(SRandomBetween(1.0f, 1.5f) * 0.003f);
             col->scale_y[i] = SRandomBetween(0.5f, 1.0f) * 0.003f;
             col->offset_x[i] = SRandomPosNeg(0.03f);
             col->offset_z[i] = SRandomBetween(-0.03f, 0.0);
             actor->type = BR_ACTOR_NONE;
         }
         if (col->frame_count[i] == 0) {
-            if ((BrVector3LengthSquared(&col->car->v) < 80.0f && (col->lifetime * 1) > 30 * pTime)) {
+            if ((BrVector3LengthSquared(&col->car->v) < 80.0f && DR_FF(col->lifetime) > 30 * pTime)) {
                 actor->type = BR_ACTOR_MODEL;
                 StartPipingSession(ePipe_chunk_flame);
                 AddFlameToPipingSession(i + 16 * c, col->frame_count[i] - 1, col->scale_x[i], col->scale_y[i], col->offset_x[i], col->offset_z[i]);
