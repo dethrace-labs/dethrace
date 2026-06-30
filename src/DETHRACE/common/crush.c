@@ -288,25 +288,22 @@ void CrushModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_vector3*
     br_vertex* the_vertex;
     br_matrix34 inverse_transform;
 
-    if (gArrow_mode) {
-        return;
-    }
-    if (pCrush_data->number_of_crush_points == 0) {
+    if (gArrow_mode || pCrush_data->number_of_crush_points == 0) {
         return;
     }
     BrVector3Sub(&impact_point_model, pImpact_point, (br_vector3*)pActor->t.t.mat.m[3]);
-    BrVector3Scale(&energy_vector_model, pEnergy_vector, pCrush_data->softness_factor * gCar_crush_softness);
-    total_energy = BrVector3Length(&energy_vector_model);
+    BrVector3Scale(&energy_vector_scaled, pEnergy_vector, pCrush_data->softness_factor * gCar_crush_softness);
+    total_energy = BrVector3Length(&energy_vector_scaled);
     if (total_energy < 0.06f) {
         return;
     }
-    BrVector3Scale(&energy_vector_scaled, &energy_vector_model, (total_energy - 0.06f) / total_energy);
+    BrVector3Scale(&energy_vector_scaled, &energy_vector_scaled, (total_energy - 0.06) / total_energy);
     nearest_so_far = BR_SCALAR_MAX;
     vertices = pActor->model->vertices;
     nearest_index = -1;
     for (i = 0; i < pCrush_data->number_of_crush_points; i++) {
         the_vertex = &vertices[pCrush_data->crush_points[i].vertex_index];
-        this_distance = (impact_point_model.v[2] - the_vertex->p.v[2]) * (impact_point_model.v[2] - the_vertex->p.v[2]) + (impact_point_model.v[1] - the_vertex->p.v[1]) * (impact_point_model.v[1] - the_vertex->p.v[1]) + (impact_point_model.v[0] - the_vertex->p.v[0]) * (impact_point_model.v[0] - the_vertex->p.v[0]);
+        this_distance = Vector3DistanceSquared(&impact_point_model, &the_vertex->p);
         if (this_distance < nearest_so_far) {
             nearest_so_far = this_distance;
             nearest_index = i;
@@ -382,33 +379,30 @@ br_scalar RepairModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, br_ve
     amount = 0.0f;
     *pTotal_deflection = 0.0f;
 
-    for (i = 0; i < pActor->model->nvertices; i++) {
-        model_vertex = &pActor->model->vertices[i];
+    for (i = 0, model_vertex = pActor->model->vertices; i < pActor->model->nvertices; i++, model_vertex++, pUndamaged_vertices++) {
         old_point = model_vertex->p;
         for (j = 0; j < 3; ++j) {
-            *pTotal_deflection = fabs(pUndamaged_vertices->p.v[j] - old_point.v[j]) + *pTotal_deflection;
-            if (pUndamaged_vertices->p.v[j] >= old_point.v[j]) {
-                if (pUndamaged_vertices->p.v[j] > old_point.v[j]) {
-                    model_vertex->p.v[j] = model_vertex->p.v[j] + pAmount;
-                    if (pUndamaged_vertices->p.v[j] < model_vertex->p.v[j]) {
-                        model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
-                    }
-                    amount = model_vertex->p.v[j] - old_point.v[j] + amount;
-                }
-            } else {
-                model_vertex->p.v[j] = model_vertex->p.v[j] - pAmount;
-                if (pUndamaged_vertices->p.v[j] > model_vertex->p.v[j]) {
+            deviation = fabs(pUndamaged_vertices->p.v[j] - old_point.v[j]);
+            *pTotal_deflection += deviation;
+            if (pUndamaged_vertices->p.v[j] < old_point.v[j]) {
+                model_vertex->p.v[j] -= pAmount;
+                if (model_vertex->p.v[j] < DR_FF(pUndamaged_vertices->p.v[j])) {
                     model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
                 }
-                amount = old_point.v[j] - model_vertex->p.v[j] + amount;
+                amount += old_point.v[j] - model_vertex->p.v[j];
+            } else if (pUndamaged_vertices->p.v[j] > old_point.v[j]) {
+                model_vertex->p.v[j] += pAmount;
+                if (model_vertex->p.v[j] > DR_FF(pUndamaged_vertices->p.v[j])) {
+                    model_vertex->p.v[j] = pUndamaged_vertices->p.v[j];
+                }
+                amount += model_vertex->p.v[j] - old_point.v[j];
             }
         }
-        if (amount != 0.0 && IsActionReplayAvailable() && pipe_vertex_count < COUNT_OF(pipe_array)) {
+        if (amount != 0.0f && IsActionReplayAvailable() && pipe_vertex_count < COUNT_OF(pipe_array)) {
             pipe_array[pipe_vertex_count].vertex_index = i;
             BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates, &model_vertex->p, &old_point);
             pipe_vertex_count++;
         }
-        pUndamaged_vertices++;
     }
     SetModelForUpdate(pActor->model, pCar, 0);
     if (IsActionReplayAvailable() && pipe_vertex_count) {
@@ -431,14 +425,11 @@ float RepairCar2(tCar_spec* pCar, tU32 pFrame_period, br_scalar* pTotal_deflecti
     *pTotal_deflection = 0.0;
     amount = 0.0;
 
-    for (i = 0; i < gProgram_state.current_car.car_actor_count; i++) {
-        the_car_actor = &pCar->car_model_actors[i];
-        if (the_car_actor->min_distance_squared == 0.0 || !the_car_actor->undamaged_vertices) {
-            if (the_car_actor->undamaged_vertices) {
-                amount = RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005f, pTotal_deflection);
-            }
-        } else {
-            RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005f, &dummy);
+    for (i = 0, the_car_actor = pCar->car_model_actors; i < gProgram_state.current_car.car_actor_count; i++, the_car_actor++) {
+        if (the_car_actor->min_distance_squared != 0.0f && the_car_actor->undamaged_vertices != NULL) {
+            RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005, &dummy);
+        } else if (the_car_actor->undamaged_vertices != NULL) {
+            amount = RepairModel(pCar, i, the_car_actor->actor, the_car_actor->undamaged_vertices, pFrame_period * 0.00005, pTotal_deflection);
         }
     }
     pCar->repair_time += pFrame_period;
@@ -467,6 +458,7 @@ void TotallyRepairACar(tCar_spec* pCar) {
     tChanged_vertex pipe_array[600];
     br_bounds storage_bounds;
 
+    pipe_vertex_count = 0;
     StopCarSmokingInstantly(pCar);
     if (IsActionReplayAvailable()) {
         PipeInstantUnSmudge(pCar);
@@ -479,32 +471,33 @@ void TotallyRepairACar(tCar_spec* pCar) {
     }
     memcpy(&storage_bounds, &pCar->bounds[1], sizeof(br_bounds));
     memcpy(&pCar->bounds[1], &pCar->max_bounds[1], sizeof(br_bounds));
-    if (TestForCarInSensiblePlace(pCar)) {
-        for (j = 0; j < pCar->car_actor_count; j++) {
-            the_car_actor = &pCar->car_model_actors[j];
-            if (the_car_actor->undamaged_vertices != NULL) {
-                pipe_vertex_count = 0;
-                for (k = 0; k < the_car_actor->actor->model->nvertices; k++) {
-                    if (pipe_vertex_count < COUNT_OF(pipe_array)) {
-                        BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates,
-                            &the_car_actor->undamaged_vertices[k].p, &the_car_actor->actor->model->vertices[k].p);
-                        if (!Vector3IsZero(&pipe_array[pipe_vertex_count].delta_coordinates)) {
-                            pipe_array[pipe_vertex_count].vertex_index = k;
-                            pipe_vertex_count++;
-                        }
+
+    if (!TestForCarInSensiblePlace(pCar)) {
+        memcpy(&pCar->bounds[1], &storage_bounds, sizeof(br_bounds));
+        return;
+    }
+    for (j = 0, the_car_actor = pCar->car_model_actors; j < pCar->car_actor_count; j++, the_car_actor++) {
+        if (the_car_actor->undamaged_vertices != NULL) {
+            pipe_vertex_count = 0;
+            for (k = 0; k < the_car_actor->actor->model->nvertices; k++) {
+                if (pipe_vertex_count < COUNT_OF(pipe_array)) {
+                    BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates,
+                        &the_car_actor->undamaged_vertices[k].p, &the_car_actor->actor->model->vertices[k].p);
+                    if (!Vector3IsZero(&pipe_array[pipe_vertex_count].delta_coordinates)) {
+                        pipe_array[pipe_vertex_count].vertex_index = k;
+                        pipe_vertex_count++;
                     }
                 }
-                memcpy(the_car_actor->actor->model->vertices,
-                    the_car_actor->undamaged_vertices,
-                    the_car_actor->actor->model->nvertices * sizeof(br_vertex));
-                BrModelUpdate(the_car_actor->actor->model, BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS);
-                if (pipe_vertex_count != 0 && IsActionReplayAvailable()) {
-                    PipeSingleModelGeometry(pCar->car_ID, j, pipe_vertex_count, pipe_array);
-                }
+            }
+            memcpy(the_car_actor->actor->model->vertices,
+                the_car_actor->undamaged_vertices,
+                the_car_actor->actor->model->nvertices * sizeof(br_vertex));
+
+            BrModelUpdate(the_car_actor->actor->model, BR_MODU_VERTEX_COLOURS | BR_MODU_VERTEX_POSITIONS);
+            if (pipe_vertex_count != 0 && IsActionReplayAvailable()) {
+                PipeSingleModelGeometry(pCar->car_ID, j, pipe_vertex_count, pipe_array);
             }
         }
-    } else {
-        memcpy(&pCar->bounds[1], &storage_bounds, sizeof(br_bounds));
     }
 }
 
@@ -669,17 +662,14 @@ void CheckPiledriverBonus(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3
 // FUNCTION: CARM95 0x004c13e0
 tImpact_location CalcModifiedLocation(tCar_spec* pCar) {
 
-    if (pCar->last_impact_location != eImpact_left && pCar->last_impact_location != eImpact_right && pCar->last_impact_location != eImpact_top && pCar->last_impact_location != eImpact_bottom) {
-        return pCar->last_impact_location;
+    if (pCar->last_impact_location == eImpact_left || pCar->last_impact_location == eImpact_right || pCar->last_impact_location == eImpact_top || pCar->last_impact_location == eImpact_bottom) {
+        if (pCar->last_col_prop_z < 0.25) {
+            return eImpact_front;
+        } else if (pCar->last_col_prop_z > 0.75) {
+            return eImpact_back;
+        }
     }
-    if (pCar->last_col_prop_z < 0.25) {
-        return eImpact_front;
-    }
-    if (pCar->last_col_prop_z > 0.75) {
-        return eImpact_back;
-    } else {
-        return pCar->last_impact_location;
-    }
+    return pCar->last_impact_location;
 }
 
 // IDA: void __usercall DoPratcamHit(br_vector3 *pHit_vector@<EAX>)
@@ -1033,271 +1023,263 @@ int DoCrashEarnings(tCar_spec* pCar1, tCar_spec* pCar2) {
 #if defined(DETHRACE_FIX_BUGS)
     total_units_of_damage = 0;
 #endif
-    if (pCar1->driver <= eDriver_non_car) {
-        dam_acc_1 = 0;
-    } else {
-        dam_acc_1 = pCar1->damage_magnitude_accumulator;
-    }
+    dam_acc_1 = pCar1->driver > eDriver_non_car ? pCar1->damage_magnitude_accumulator : 0;
+    dam_acc_2 = pCar2 != NULL && (pCar2->driver > eDriver_non_car ? pCar2->damage_magnitude_accumulator : 0.0f) != 0;
 
-    dam_acc_2 = 0;
-    if (pCar2 != NULL) {
-        if (pCar2->driver <= eDriver_non_car) {
-            dam_acc_2 = 0;
+    if (pCar1->driver <= eDriver_non_car) {
+        if (pCar2 != NULL && pCar2->driver > eDriver_non_car) {
+            pCar1 = pCar2;
+            pCar2 = NULL;
         } else {
-            dam_acc_2 = pCar2->damage_magnitude_accumulator != 0;
-        }
-    }
-
-    if (pCar1->driver <= eDriver_non_car) {
-        if (pCar2 == NULL || pCar2->driver <= eDriver_non_car) {
             return 0;
         }
-        pCar1 = pCar2;
-        pCar2 = NULL;
     }
     if (pCar2 != NULL && pCar2->driver <= eDriver_non_car) {
         pCar2 = NULL;
     }
 
-    if (pCar1->pre_car_col_knackered || (pCar2 && pCar2->pre_car_col_knackered) || (pCar2 && pCar2->damage_magnitude_accumulator <= 0.00005f && pCar1->damage_magnitude_accumulator <= 0.00005f)) {
-        return dam_acc_1 || (pCar2 && dam_acc_2);
-    }
+    if (!pCar1->pre_car_col_knackered && !(pCar2 != NULL && pCar2->pre_car_col_knackered) && !(pCar2 != NULL && pCar2->damage_magnitude_accumulator <= 0.00005f && pCar1->damage_magnitude_accumulator <= 0.00005f)) {
 
-    modified_location_1 = CalcModifiedLocation(pCar1);
-    car_direction_1 = GetDirection(&pCar1->pre_car_col_velocity_car_space);
-    impact_in_moving_direction_1 = car_direction_1 == modified_location_1;
-    if (pCar2 != NULL) {
-        modified_location_2 = CalcModifiedLocation(pCar2);
-        car_direction_2 = GetDirection(&pCar2->pre_car_col_velocity_car_space);
-        impact_in_moving_direction_2 = car_direction_2 == modified_location_2;
-    }
-    if (pCar1->driver >= eDriver_net_human && pCar2) {
-        if (impact_in_moving_direction_1 && (pCar1->driver < eDriver_net_human || (pCar1->pre_car_col_velocity_car_space.v[2] != 0.0 && (pCar1->pre_car_col_velocity_car_space.v[2] > 0.0) != (pCar1->gear > 0) && (pCar1->keys.acc != 0 || pCar1->joystick.acc > 0x8000)))) {
-            pCar2->time_last_hit = the_time;
-            pCar2->last_hit_by = pCar1;
+        modified_location_1 = CalcModifiedLocation(pCar1);
+        car_direction_1 = GetDirection(&pCar1->pre_car_col_velocity_car_space);
+        impact_in_moving_direction_1 = car_direction_1 == modified_location_1;
+        if (pCar2 != NULL) {
+            modified_location_2 = CalcModifiedLocation(pCar2);
+            car_direction_2 = GetDirection(&pCar2->pre_car_col_velocity_car_space);
+            impact_in_moving_direction_2 = car_direction_2 == modified_location_2;
         }
-    } else if (pCar2 && pCar2->driver >= eDriver_net_human && impact_in_moving_direction_2 && (pCar2->driver < eDriver_net_human || (pCar2->pre_car_col_velocity_car_space.v[2] != 0.0f && (pCar2->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar2->gear > 0) && (pCar2->keys.acc != 0 || pCar2->joystick.acc > 0x8000)))) {
-        pCar1->time_last_hit = the_time;
-        pCar1->last_hit_by = pCar2;
-    }
-    if (pCar2) {
-        if (impact_in_moving_direction_1
-            && pCar1->pre_car_col_speed * 5.0f > pCar2->pre_car_col_speed
-            && pCar1->pre_car_col_speed > 0.0005f
-            && (pCar1->driver < eDriver_net_human
-                || (pCar1->pre_car_col_velocity_car_space.v[2] != 0.0f
-                    && (pCar1->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar1->gear > 0)
-                    && (pCar1->keys.acc != 0 || pCar1->joystick.acc > 0x8000)))) {
-            car_1_culpable = 1;
-        }
-        if (impact_in_moving_direction_2
-            && pCar2->pre_car_col_speed * 5.0f > pCar1->pre_car_col_speed
-            && pCar2->pre_car_col_speed > 0.0005f
-            && (pCar2->driver < eDriver_net_human
-                || (pCar2->pre_car_col_velocity_car_space.v[2] != 0.0f
-                    && (pCar2->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar2->gear > 0)
-                    && (pCar2->keys.acc != 0 || pCar2->joystick.acc > 0x8000)))) {
-            car_2_culpable = 1;
-        }
-        if (gNet_mode && car_1_culpable && car_2_culpable) {
-            mutual_culpability = 1;
-        } else {
-            if (car_2_culpable && pCar2->driver == eDriver_local_human) {
-                car_1_culpable = 0;
+        if (pCar1->driver >= eDriver_net_human && pCar2) {
+            if (impact_in_moving_direction_1 && (pCar1->driver < eDriver_net_human || (pCar1->pre_car_col_velocity_car_space.v[2] != 0.0f && (pCar1->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar1->gear > 0) && (pCar1->keys.acc != 0 || pCar1->joystick.acc > 0x8000)))) {
+                pCar2->time_last_hit = the_time;
+                pCar2->last_hit_by = pCar1;
             }
-            if (car_1_culpable) {
-                culprit = pCar1;
-                victim = pCar2;
-                dp = BrVector3Dot(&pCar1->pre_car_col_direction, &pCar2->pre_car_col_direction);
-                if (modified_location_1 == eImpact_front && modified_location_2 == eImpact_front && pCar1->pre_car_col_speed > 0.001f && pCar2->pre_car_col_speed > 0.001f && dp < -0.7f) {
-                    head_on = 1;
-                    bonus_level = 2;
-                } else {
-                    bonus_level = 1;
-                }
-            } else if (car_2_culpable) {
-                culprit = pCar2;
+        } else if (pCar2 != NULL && pCar2->driver >= eDriver_net_human && impact_in_moving_direction_2 && (pCar2->driver < eDriver_net_human || (pCar2->pre_car_col_velocity_car_space.v[2] != 0.0f && (pCar2->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar2->gear > 0) && (pCar2->keys.acc != 0 || pCar2->joystick.acc > 0x8000)))) {
+            pCar1->time_last_hit = the_time;
+            pCar1->last_hit_by = pCar2;
+        }
+        if (pCar2 == NULL) {
+            if (the_time - pCar1->time_last_hit < 3000) {
+                culprit = pCar1->last_hit_by;
                 victim = pCar1;
-                dp = BrVector3Dot(&pCar1->pre_car_col_direction, &pCar2->pre_car_col_direction);
-                if (modified_location_1 == eImpact_front && modified_location_2 == eImpact_front && pCar1->pre_car_col_speed > 0.001f && pCar2->pre_car_col_speed > 0.001f && dp < -0.7f) {
-                    head_on = 1;
-                    bonus_level = 2;
-                } else {
-                    bonus_level = 1;
-                }
-            }
-        }
-    } else {
-        if (the_time - pCar1->time_last_hit >= 3000) {
-            return 1;
-        }
-        culprit = pCar1->last_hit_by;
-        victim = pCar1;
-        bonus_level = 1;
-        inherited_damage = 1;
-    }
-    if (!mutual_culpability && (!victim || culprit->driver < eDriver_net_human)) {
-        if (pCar2 && pCar2->last_culprit == pCar1 && the_time - pCar2->time_last_victim < 750) {
-            inherited_damage = 1;
-            culprit = pCar1;
-            victim = pCar2;
-        } else if (pCar2 && pCar1->last_culprit == pCar2 && the_time - pCar1->time_last_victim < 750) {
-            inherited_damage = 1;
-            culprit = pCar2;
-            victim = pCar1;
-        } else if (!pCar2 && the_time - pCar1->time_last_victim < 750) {
-            inherited_damage = 1;
-            culprit = pCar1->last_culprit;
-            victim = pCar1;
-        }
-    }
-    if (culprit && victim) {
-        RecordOpponentTwattageOccurrence(culprit, victim);
-        total_units_of_damage = 0;
-        for (i = 0; i < COUNT_OF(victim->damage_units); i++) {
-            if (victim->damage_units[i].damage_level > victim->damage_units[i].last_level) {
-                victim->damage_units[i].damage_level = (victim->damage_units[i].damage_level - victim->damage_units[i].last_level) * 2.0f + victim->damage_units[i].last_level;
-                if (victim->damage_units[i].damage_level >= 99) {
-                    victim->damage_units[i].damage_level = 99;
-                }
-                total_units_of_damage += victim->damage_units[i].damage_level - victim->damage_units[i].last_level;
-            }
-            if (culprit->damage_units[i].damage_level > culprit->damage_units[i].last_level) {
-                culprit->damage_units[i].damage_level = (culprit->damage_units[i].damage_level - culprit->damage_units[i].last_level) * 0.1f + (double)culprit->damage_units[i].last_level;
-                if (culprit->damage_units[i].damage_level < 0) {
-                    culprit->damage_units[i].damage_level = 0;
-                }
-            }
-        }
-    }
-    // TODO: tidy this up
-    for (net_loop = 0; 2 - (mutual_culpability == 0) > net_loop; net_loop++) {
-        if (mutual_culpability) {
-            if (net_loop) {
-                culprit = pCar1;
-                victim = pCar2;
+                bonus_level = 1;
+                inherited_damage = 1;
             } else {
+                return 1;
+            }
+        } else {
+            if (impact_in_moving_direction_1
+                && pCar1->pre_car_col_speed * 5.0f > pCar2->pre_car_col_speed
+                && pCar1->pre_car_col_speed > 0.0005f
+                && (pCar1->driver < eDriver_net_human
+                    || (pCar1->pre_car_col_velocity_car_space.v[2] != 0.0f
+                        && (pCar1->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar1->gear > 0)
+                        && (pCar1->keys.acc != 0 || pCar1->joystick.acc > 0x8000)))) {
+                car_1_culpable = 1;
+            }
+            if (impact_in_moving_direction_2
+                && pCar2->pre_car_col_speed * 5.0f > pCar1->pre_car_col_speed
+                && pCar2->pre_car_col_speed > 0.0005f
+                && (pCar2->driver < eDriver_net_human
+                    || (pCar2->pre_car_col_velocity_car_space.v[2] != 0.0f
+                        && (pCar2->pre_car_col_velocity_car_space.v[2] > 0.0f) != (pCar2->gear > 0)
+                        && (pCar2->keys.acc != 0 || pCar2->joystick.acc > 0x8000)))) {
+                car_2_culpable = 1;
+            }
+            if (gNet_mode && car_1_culpable && car_2_culpable) {
+                mutual_culpability = 1;
+            } else {
+                if (car_2_culpable && pCar2->driver == eDriver_local_human) {
+                    car_1_culpable = 0;
+                }
+                if (car_1_culpable) {
+                    culprit = pCar1;
+                    victim = pCar2;
+                    dp = BrVector3Dot(&pCar2->pre_car_col_direction, &pCar1->pre_car_col_direction);
+                    if (modified_location_1 == eImpact_front && modified_location_2 == eImpact_front && pCar1->pre_car_col_speed > 0.001f && pCar2->pre_car_col_speed > 0.001f && dp < -0.7f) {
+                        head_on = 1;
+                        bonus_level = 2;
+                    } else {
+                        bonus_level = 1;
+                    }
+                } else if (car_2_culpable) {
+                    culprit = pCar2;
+                    victim = pCar1;
+                    dp = BrVector3Dot(&pCar2->pre_car_col_direction, &pCar1->pre_car_col_direction);
+                    if (modified_location_1 == eImpact_front && modified_location_2 == eImpact_front && pCar1->pre_car_col_speed > 0.001f && pCar2->pre_car_col_speed > 0.001f && dp < -0.7f) {
+                        head_on = 1;
+                        bonus_level = 2;
+                    } else {
+                        bonus_level = 1;
+                    }
+                }
+            }
+        }
+        if (!mutual_culpability && (!victim || culprit->driver < eDriver_net_human)) {
+            if (pCar2 != NULL && pCar2->last_culprit == pCar1 && the_time - pCar2->time_last_victim < 750) {
+                inherited_damage = 1;
+                culprit = pCar1;
+                victim = pCar2;
+            } else if (pCar2 != NULL && pCar1->last_culprit == pCar2 && the_time - pCar1->time_last_victim < 750) {
+                inherited_damage = 1;
                 culprit = pCar2;
                 victim = pCar1;
+            } else if (pCar2 == NULL && the_time - pCar1->time_last_victim < 750) {
+                inherited_damage = 1;
+                culprit = pCar1->last_culprit;
+                victim = pCar1;
             }
+        }
+        if (culprit && victim) {
+            RecordOpponentTwattageOccurrence(culprit, victim);
             total_units_of_damage = 0;
             for (i = 0; i < COUNT_OF(victim->damage_units); i++) {
                 if (victim->damage_units[i].damage_level > victim->damage_units[i].last_level) {
+                    victim->damage_units[i].damage_level = (victim->damage_units[i].damage_level - victim->damage_units[i].last_level) * 2.0 + victim->damage_units[i].last_level;
+                    if (victim->damage_units[i].damage_level >= 99) {
+                        victim->damage_units[i].damage_level = 99;
+                    }
                     total_units_of_damage += victim->damage_units[i].damage_level - victim->damage_units[i].last_level;
+                }
+                if (culprit->damage_units[i].damage_level > culprit->damage_units[i].last_level) {
+                    culprit->damage_units[i].damage_level = (culprit->damage_units[i].damage_level - culprit->damage_units[i].last_level) * 0.1 + culprit->damage_units[i].last_level;
+                    if (culprit->damage_units[i].damage_level < 0) {
+                        culprit->damage_units[i].damage_level = 0;
+                    }
                 }
             }
         }
-        if (culprit && (culprit->driver == eDriver_local_human || gNet_mode) && victim) {
-            SetKnackeredFlag(victim);
-            if (victim->knackered && !victim->pre_car_col_knackered) {
-                victim->pre_car_col_knackered = 1;
-                credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
-                credits = 100 * (int)(credits_squared / 100.0f);
-                if (gNet_mode != eNet_mode_none) {
-                    message = NetBuildMessage(NETMSGID_WASTED, 0);
-                    message->contents.data.wasted.victim = NetPlayerFromCar(victim)->ID;
-                    if (NetPlayerFromCar(culprit)) {
-                        message->contents.data.wasted.culprit = NetPlayerFromCar(culprit)->ID;
-                    } else {
-                        message->contents.data.wasted.culprit = -2;
-                    }
-                    NetGuaranteedSendMessageToEverybody(gCurrent_net_game, message, NULL);
-                    NetEarnCredits(NetPlayerFromCar(culprit), credits);
+        // TODO: tidy this up
+        for (net_loop = 0; net_loop < (mutual_culpability ? 2 : 1); net_loop++) {
+            if (mutual_culpability) {
+                if (net_loop) {
+                    culprit = pCar1;
+                    victim = pCar2;
                 } else {
-                    PratcamEvent(kPratcam_opponent_wasted);
-                    DoFancyHeadup(kFancyHeadupYouWastedEm);
-                    credits_squared = sqr(0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f;
-                    credits = 100 * (int)(credits_squared / 100.0);
-                    AwardTime(gWasted_time[gProgram_state.skill_level]);
-                    EarnCredits(credits);
-                    if (victim->can_be_stolen && !gOpponents[victim->index].dead
-                        // strength_rating is between 1 and 5
-                        && ((PercentageChance(50) && gProgram_state.rank <= gSteal_ranks[gOpponents[victim->index].strength_rating - 1]) || victim->index == BIGAPC_OPPONENT_INDEX)) {
-                        StealCar(victim);
+                    culprit = pCar2;
+                    victim = pCar1;
+                }
+                total_units_of_damage = 0;
+                for (i = 0; i < COUNT_OF(victim->damage_units); i++) {
+                    if (victim->damage_units[i].damage_level > victim->damage_units[i].last_level) {
+                        total_units_of_damage += victim->damage_units[i].damage_level - victim->damage_units[i].last_level;
                     }
                 }
             }
-            victim->time_last_hit = the_time;
-            victim->last_hit_by = culprit;
-            if (!inherited_damage) {
-                victim->time_last_victim = the_time;
-                victim->last_culprit = culprit;
-            }
-            if (victim && (fabs(victim->omega.v[0]) > 4.0f || fabs(victim->omega.v[1]) > 6.0f || fabs(victim->omega.v[2]) > 4.0f)) {
-                bonus_level *= 2;
-            }
-            if (pCar1->number_of_wheels_on_ground) {
-                car_off_ground_1 = 0;
-            } else {
-                BrVector3InvScale(&car_1_pos, &pCar1->car_master_actor->t.t.translate.t, WORLD_SCALE);
-                BrMatrix34ApplyV(&car_1_offset, &pCar1->car_model_actors[pCar1->principal_car_actor].actor->t.t.translate.t, &pCar1->car_master_actor->t.t.mat);
-                BrVector3Accumulate(&car_1_pos, &car_1_offset);
-                car_1_pos.v[1] += 0.15f;
-                car_1_height = FindYVerticallyBelow2(&car_1_pos);
-                car_off_ground_1 = car_1_height > -100.0f
-                    && pCar1->car_model_actors[pCar1->principal_car_actor].actor->t.t.translate.t.v[1] * 4.0f <= car_1_pos.v[1] - car_1_height - 0.15f;
-            }
-            if (!pCar2 || pCar2->number_of_wheels_on_ground) {
-                car_off_ground_2 = 0;
-            } else {
-                BrVector3InvScale(&car_2_pos, &pCar2->car_master_actor->t.t.translate.t, WORLD_SCALE);
-                BrMatrix34ApplyV(&car_2_offset, &pCar2->car_model_actors[pCar2->principal_car_actor].actor->t.t.translate.t, &pCar2->car_master_actor->t.t.mat);
-                BrVector3Accumulate(&car_2_pos, &car_2_offset);
-                car_2_pos.v[1] += 0.15f;
-                car_2_height = FindYVerticallyBelow2(&car_2_pos);
-                car_off_ground_2 = car_2_height > -100.0f
-                    && pCar2->car_model_actors[pCar2->principal_car_actor].actor->t.t.translate.t.v[1] * 4.0f <= car_2_pos.v[1] - car_2_height - 0.15f;
-            }
-            if (car_off_ground_1) {
-                bonus_level *= 2;
-            }
-            if (car_off_ground_2) {
-                bonus_level *= 2;
-            }
-            total_units_of_damage = 0.7f / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor * total_units_of_damage;
-            if (!victim->has_been_stolen) {
-                credits = 100 * (int)((gCar_cred_value[gProgram_state.skill_level] * MIN(bonus_level, 8) * total_units_of_damage + 50.0f) / 100.0f);
-                if (credits || victim->knackered) {
-                    if (!victim->knackered) {
-                        if (gNet_mode) {
-                            NetEarnCredits(NetPlayerFromCar(culprit), MIN(credits, 2000));
+            if (culprit && (culprit->driver == eDriver_local_human || gNet_mode) && victim) {
+                SetKnackeredFlag(victim);
+                if (victim->knackered && !victim->pre_car_col_knackered) {
+                    victim->pre_car_col_knackered = 1;
+                    credits = 100 * (int)((sqr(0.7 / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f) / 100.0);
+                    if (gNet_mode != eNet_mode_none) {
+                        message = NetBuildMessage(NETMSGID_WASTED, 0);
+                        message->contents.data.wasted.victim = NetPlayerFromCar(victim)->ID;
+                        if (NetPlayerFromCar(culprit)) {
+                            message->contents.data.wasted.culprit = NetPlayerFromCar(culprit)->ID;
                         } else {
-                            EarnCredits(MIN(credits, 2000));
+                            message->contents.data.wasted.culprit = -2;
                         }
-                        last_earn_time = the_time;
-                        if (gNet_mode == eNet_mode_none) {
-                            time = 5 * (int)((total_units_of_damage * gCar_time_value[gProgram_state.skill_level] + 2.5f) / 5.0f);
-                            AwardTime(MIN(time, 90));
-                            if (pCar2) {
-                                if (head_on) {
-                                    DoFancyHeadup(kFancyHeadupHeadOnBonus);
-                                } else if (bonus_level <= 2) {
-                                    if (bonus_level > 1) {
+                        NetGuaranteedSendMessageToEverybody(gCurrent_net_game, message, NULL);
+                        NetEarnCredits(NetPlayerFromCar(culprit), credits);
+                    } else {
+                        PratcamEvent(kPratcam_opponent_wasted);
+                        DoFancyHeadup(kFancyHeadupYouWastedEm);
+                        credits = 100 * (int)((sqr(0.7 / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor) * gWasted_creds[gProgram_state.skill_level] + 50.0f) / 100.0);
+                        AwardTime(gWasted_time[gProgram_state.skill_level]);
+                        EarnCredits(credits);
+                        if (victim->can_be_stolen && !gOpponents[victim->index].dead
+                            // strength_rating is between 1 and 5
+                            && ((PercentageChance(50) && gProgram_state.rank <= gSteal_ranks[gOpponents[victim->index].strength_rating - 1]) || victim->index == BIGAPC_OPPONENT_INDEX)) {
+                            StealCar(victim);
+                        }
+                    }
+                }
+                victim->time_last_hit = the_time;
+                victim->last_hit_by = culprit;
+                if (!inherited_damage) {
+                    victim->time_last_victim = the_time;
+                    victim->last_culprit = culprit;
+                }
+                if (victim && ((float)fabs(victim->omega.v[0]) > 4.0f || (float)fabs(victim->omega.v[1]) > 6.0f || (float)fabs(victim->omega.v[2]) > 4.0f)) {
+                    bonus_level *= 2;
+                }
+                if (!pCar1->number_of_wheels_on_ground) {
+                    BrVector3InvScale(&car_1_pos, &pCar1->car_master_actor->t.t.translate.t, WORLD_SCALE);
+                    BrMatrix34ApplyV(&car_1_offset, &pCar1->car_model_actors[pCar1->principal_car_actor].actor->t.t.translate.t, &pCar1->car_master_actor->t.t.mat);
+                    BrVector3Accumulate(&car_1_pos, &car_1_offset);
+                    car_1_pos.v[1] += 0.15f;
+                    car_1_height = FindYVerticallyBelow2(&car_1_pos);
+                    if (car_1_height > -100.0f
+                        && pCar1->car_model_actors[pCar1->principal_car_actor].actor->t.t.translate.t.v[1] * 4.0f <= car_1_pos.v[1] - car_1_height - 0.15f) {
+                        car_off_ground_1 = 1;
+                    } else {
+                        car_off_ground_1 = 0;
+                    }
+                } else {
+                    car_off_ground_1 = 0;
+                }
+                if (pCar2 != NULL && pCar2->number_of_wheels_on_ground == 0) {
+                    BrVector3InvScale(&car_2_pos, &pCar2->car_master_actor->t.t.translate.t, WORLD_SCALE);
+                    BrMatrix34ApplyV(&car_2_offset, &pCar2->car_model_actors[pCar2->principal_car_actor].actor->t.t.translate.t, &pCar2->car_master_actor->t.t.mat);
+                    BrVector3Accumulate(&car_2_pos, &car_2_offset);
+                    car_2_pos.v[1] += 0.15f;
+                    car_2_height = FindYVerticallyBelow2(&car_2_pos);
+                    if (car_2_height > -100.0f && pCar2->car_model_actors[pCar2->principal_car_actor].actor->t.t.translate.t.v[1] * 4.0f <= car_2_pos.v[1] - car_2_height - 0.15f) {
+                        car_off_ground_2 = 1;
+                    } else {
+                        car_off_ground_2 = 0;
+                    }
+                } else {
+                    car_off_ground_2 = 0;
+                }
+                if (car_off_ground_1) {
+                    bonus_level *= 2;
+                }
+                if (car_off_ground_2) {
+                    bonus_level *= 2;
+                }
+                total_units_of_damage = 0.7 / victim->car_model_actors[victim->principal_car_actor].crush_data.softness_factor * total_units_of_damage;
+                if (!victim->has_been_stolen) {
+                    credits = 100 * (int)((gCar_cred_value[gProgram_state.skill_level] * MIN(bonus_level, 8) * total_units_of_damage + 50.0f) / 100.0f);
+                    if (credits || victim->knackered) {
+                        if (!victim->knackered) {
+                            if (gNet_mode) {
+                                NetEarnCredits(NetPlayerFromCar(culprit), MIN(credits, 2000));
+                            } else {
+                                EarnCredits(MIN(credits, 2000));
+                            }
+                            last_earn_time = the_time;
+                            if (gNet_mode == eNet_mode_none) {
+                                time = 5 * (int)((total_units_of_damage * gCar_time_value[gProgram_state.skill_level] + 2.5) / 5.0);
+                                AwardTime(MIN(time, 90));
+                                if (pCar2 != NULL) {
+                                    if (head_on) {
+                                        DoFancyHeadup(kFancyHeadupHeadOnBonus);
+                                    } else if (bonus_level > 2) {
+                                        DoFancyHeadup(kFancyHeadupBonusForArtisticImpression);
+                                    } else if (bonus_level > 1) {
                                         DoFancyHeadup(kFancyHeadupExtraStyleBonus);
                                     }
-                                } else {
-                                    DoFancyHeadup(kFancyHeadupBonusForArtisticImpression);
                                 }
                             }
                         }
-                    }
-                    for (i = 0; i < COUNT_OF(victim->damage_units); i++) {
-                        victim->damage_units[i].last_level = victim->damage_units[i].damage_level;
+                        for (i = 0; i < COUNT_OF(victim->damage_units); i++) {
+                            victim->damage_units[i].last_level = victim->damage_units[i].damage_level;
+                        }
                     }
                 }
-            }
-        } else {
-            pCar1->time_last_hit = 0;
-            if (pCar2) {
-                pCar2->time_last_hit = 0;
+            } else {
+                pCar1->time_last_hit = 0;
+                if (pCar2 != NULL) {
+                    pCar2->time_last_hit = 0;
+                }
             }
         }
+        pCar1->damage_magnitude_accumulator = 0.0f;
+        if (pCar2 != NULL) {
+            pCar2->damage_magnitude_accumulator = 0.0f;
+        }
     }
-    pCar1->damage_magnitude_accumulator = 0.0f;
-    if (pCar2) {
-        pCar2->damage_magnitude_accumulator = 0.0f;
-    }
-    return 1;
+    return dam_acc_1 || (pCar2 != NULL && dam_acc_2);
 }
 
 // IDA: void __usercall DoWheelDamage(tU32 pFrame_period@<EAX>)
@@ -1316,7 +1298,7 @@ void DoWheelDamage(tU32 pFrame_period) {
     static int kev_index[4];
 
     if (!gAction_replay_mode || !ReplayIsPaused()) {
-        for (i = 0; i < gNum_active_cars; i++) {
+        for (i = 0; i < gNum_active_cars + 0; i++) {
             car = gActive_car_list[i];
             for (j = 0; j < COUNT_OF(car->wheel_dam_offset); j++) {
                 if (car->wheel_actors[j] != NULL) {
@@ -1349,7 +1331,7 @@ void DoWheelDamage(tU32 pFrame_period) {
                             break;
                         }
                         if (gNet_mode == eNet_mode_none || car->driver == eDriver_local_human) {
-                            BrVector3Set(&temp_vector, wheel_circum * gWheel_circ_to_width, 0.f, 0.f);
+                            BrVector3Set(&temp_vector, gWheel_circ_to_width * wheel_circum, 0.f, 0.f);
                             BrMatrix34ApplyV(&wonky_vector, &temp_vector, &car->wheel_actors[j]->t.t.mat);
                             car->wheel_dam_offset[j] = fabs(wonky_vector.v[1]);
                         }
