@@ -665,10 +665,8 @@ tImpact_location CalcModifiedLocation(tCar_spec* pCar) {
     if (pCar->last_impact_location == eImpact_left || pCar->last_impact_location == eImpact_right || pCar->last_impact_location == eImpact_top || pCar->last_impact_location == eImpact_bottom) {
         if (pCar->last_col_prop_z < 0.25) {
             return eImpact_front;
-        } else {
-            if (pCar->last_col_prop_z > 0.75) {
-                return eImpact_back;
-            }
+        } else if (pCar->last_col_prop_z > 0.75) {
+            return eImpact_back;
         }
     }
     return pCar->last_impact_location;
