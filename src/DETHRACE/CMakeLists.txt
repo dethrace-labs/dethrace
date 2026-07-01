@@ -234,11 +234,6 @@ if(DETHRACE_IDE_ARGUMENTS)
 endif()
 
 if(DETHRACE_INSTALL)
-    install(TARGETS dethrace
-        BUNDLE DESTINATION . COMPONENT Runtime
-        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT Runtime
-    )
-
     if(APPLE)
         set_target_properties(dethrace PROPERTIES
             BUNDLE True
@@ -255,7 +250,14 @@ if(DETHRACE_INSTALL)
         target_sources(dethrace_obj PRIVATE
             ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
         )
+    endif()
 
+    install(TARGETS dethrace
+        BUNDLE DESTINATION . COMPONENT Runtime
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT Runtime
+    )
+
+    if(APPLE)
         if(DETHRACE_PLATFORM_SDL_DYNAMIC)
             if(DETHRACE_PLATFORM_SDL2)
                 install(CODE "
