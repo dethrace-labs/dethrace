@@ -323,7 +323,7 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
             }
             LOG_PANIC2("Failed to create renderer texture (%s)", SDL3_GetError());
         }
-        if (!SDL3_SetTextureScaleMode(screen_texture, SDL_SCALEMODE_PIXELART)) {
+        if (!SDL3_SetTextureScaleMode(screen_texture, SDL_SCALEMODE_NEAREST)) {
             LOG_PANIC2("Failed to set texture scale mode: %s", SDL3_GetError());
         }
     }

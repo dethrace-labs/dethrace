@@ -259,8 +259,13 @@ if(DETHRACE_INSTALL)
         if(DETHRACE_PLATFORM_SDL_DYNAMIC)
             if(DETHRACE_PLATFORM_SDL2)
                 install(CODE "
+                    set(app_root \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}\")
+                    set(app \"\${app_root}/Deth Race.app\")
+                    if(NOT EXISTS \"\${app}\")
+                        set(app \"\${app_root}/${CMAKE_INSTALL_BINDIR}/Deth Race.app\")
+                    endif()
                     file(INSTALL
-                        DESTINATION \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/Deth Race.app/Contents/MacOS\"
+                        DESTINATION \"\${app}/Contents/MacOS\"
                         TYPE FILE
                         FOLLOW_SYMLINK_CHAIN
                         FILES \"$<TARGET_FILE:SDL2::SDL2>\"
@@ -272,15 +277,20 @@ if(DETHRACE_INSTALL)
 
             if(DETHRACE_PLATFORM_SDL3)
                 install(CODE "
+                    set(app_root \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}\")
+                    set(app \"\${app_root}/Deth Race.app\")
+                    if(NOT EXISTS \"\${app}\")
+                        set(app \"\${app_root}/${CMAKE_INSTALL_BINDIR}/Deth Race.app\")
+                    endif()
                     file(INSTALL
-                        DESTINATION \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/Deth Race.app/Contents/MacOS\"
+                        DESTINATION \"\${app}/Contents/MacOS\"
                         TYPE FILE
                         FOLLOW_SYMLINK_CHAIN
                         FILES \"$<TARGET_FILE:SDL3::SDL3>\"
                     )
                     file(CREATE_LINK
                         \"libSDL3.0.dylib\"
-                        \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/Deth Race.app/Contents/MacOS/libSDL3.dylib\"
+                        \"\${app}/Contents/MacOS/libSDL3.dylib\"
                         SYMBOLIC
                     )
                     "
@@ -291,13 +301,17 @@ if(DETHRACE_INSTALL)
 
         install(CODE "
             include(BundleUtilities)
-            set(app \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/Deth Race.app\")
+            set(app_root \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}\")
+            set(app \"\${app_root}/Deth Race.app\")
+            if(NOT EXISTS \"\${app}\")
+                set(app \"\${app_root}/${CMAKE_INSTALL_BINDIR}/Deth Race.app\")
+            endif()
             fixup_bundle(\"\${app}\" \"\" \"/Library/Frameworks\")
             execute_process(COMMAND
                 codesign -s - -f --deep \"\${app}\"
             )
             "
-            COMPONENT RUNTIME
+            COMPONENT Runtime
         )
     endif()
 
