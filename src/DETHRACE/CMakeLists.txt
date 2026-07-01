@@ -256,11 +256,45 @@ if(DETHRACE_INSTALL)
             ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
         )
 
+        if(DETHRACE_PLATFORM_SDL_DYNAMIC)
+            if(DETHRACE_PLATFORM_SDL2)
+                install(CODE "
+                    file(INSTALL
+                        DESTINATION \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/Deth Race.app/Contents/MacOS\"
+                        TYPE FILE
+                        FOLLOW_SYMLINK_CHAIN
+                        FILES \"$<TARGET_FILE:SDL2::SDL2>\"
+                    )
+                    "
+                    COMPONENT Runtime
+                )
+            endif()
+
+            if(DETHRACE_PLATFORM_SDL3)
+                install(CODE "
+                    file(INSTALL
+                        DESTINATION \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/Deth Race.app/Contents/MacOS\"
+                        TYPE FILE
+                        FOLLOW_SYMLINK_CHAIN
+                        FILES \"$<TARGET_FILE:SDL3::SDL3>\"
+                    )
+                    file(CREATE_LINK
+                        \"libSDL3.0.dylib\"
+                        \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/Deth Race.app/Contents/MacOS/libSDL3.dylib\"
+                        SYMBOLIC
+                    )
+                    "
+                    COMPONENT Runtime
+                )
+            endif()
+        endif()
+
         install(CODE "
             include(BundleUtilities)
-            fixup_bundle(\"${CMAKE_BINARY_DIR}/Deth Race.app\" \"\" \"/Library/Frameworks\")
+            set(app \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/Deth Race.app\")
+            fixup_bundle(\"\${app}\" \"\" \"/Library/Frameworks\")
             execute_process(COMMAND
-                codesign -s - -f \"${CMAKE_BINARY_DIR}/Deth Race.app/Contents/Frameworks/SDL2.framework\"
+                codesign -s - -f --deep \"\${app}\"
             )
             "
             COMPONENT RUNTIME

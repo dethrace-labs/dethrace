@@ -49,8 +49,7 @@ static const char* const possible_locations[] = {
     "@loader_path/../Frameworks/" SDL3_FRAMEWORK,     /* MyApp.app/Contents/Frameworks/SDL3_framework */
     "@executable_path/" SDL3_LIBNAME,                 /* MyApp.app/Contents/MacOS/libSDL3_dylib */
     "@executable_path/../Frameworks/" SDL3_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL3_framework */
-    NULL,                                             /* /Users/username/Library/Frameworks/SDL3_framework */
-    "/Library/Frameworks" SDL3_FRAMEWORK,             /* /Library/Frameworks/SDL3_framework */
+    "/Library/Frameworks/" SDL3_FRAMEWORK,            /* /Library/Frameworks/SDL3_framework */
     SDL3_LIBNAME                                      /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
@@ -323,6 +322,9 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
                 }
             }
             LOG_PANIC2("Failed to create renderer texture (%s)", SDL3_GetError());
+        }
+        if (!SDL3_SetTextureScaleMode(screen_texture, SDL_SCALEMODE_PIXELART)) {
+            LOG_PANIC2("Failed to set texture scale mode: %s", SDL3_GetError());
         }
     }
 
