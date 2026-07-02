@@ -3941,9 +3941,9 @@ static void DrawProxRaySegmentBR(br_vector3* pStart, br_vector3* pEnd) {
         BrVector3Set(&perp, 1.f, 0.f, 0.f);
         len = 1.f;
     }
-    thickness = -pEnd->v[2] * 0.003f;
-    if (thickness < 0.01f) {
-        thickness = 0.01f;
+    thickness = -pEnd->v[2] * 0.001f;
+    if (thickness < 0.003f) {
+        thickness = 0.003f;
     }
     BrVector3Scale(&perp, &perp, thickness / len);
 
