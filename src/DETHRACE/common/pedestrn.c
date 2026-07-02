@@ -5,6 +5,7 @@
 #include "displays.h"
 #include "errors.h"
 #include "globvars.h"
+#include "globvrbm.h"
 #include "globvrkm.h"
 #include "globvrpb.h"
 #include "graphics.h"
@@ -3917,6 +3918,44 @@ void DoPedReport(void) {
     fclose(f);
 }
 
+#ifdef DETHRACE_3DFX_PATCH
+static br_token_value gProxRayBlendTokens[3] = {
+    { BRT_BLEND_B,   { .u32 = 1u } },
+    { BRT_OPACITY_X, { .x = 0x800000 } },
+    { 0 }
+};
+
+static void DrawProxRaySegmentBR(br_vector3* pStart, br_vector3* pEnd) {
+    br_vector3 dir, perp;
+    br_scalar  len, thickness;
+
+    gLine_model->vertices[0].p = *pStart;
+    gLine_model->vertices[1].p = *pEnd;
+
+    BrVector3Sub(&dir, pEnd, pStart);
+    perp.v[0] = dir.v[1];
+    perp.v[1] = -dir.v[0];
+    perp.v[2] = 0.f;
+    len = BrVector3Length(&perp);
+    if (len < 1e-6f) {
+        BrVector3Set(&perp, 1.f, 0.f, 0.f);
+        len = 1.f;
+    }
+    thickness = -pEnd->v[2] * 0.001f;
+    if (thickness < 0.003f) {
+        thickness = 0.003f;
+    }
+    BrVector3Scale(&perp, &perp, thickness / len);
+
+    gLine_model->vertices[2].p.v[0] = pEnd->v[0] + perp.v[0];
+    gLine_model->vertices[2].p.v[1] = pEnd->v[1] + perp.v[1];
+    gLine_model->vertices[2].p.v[2] = pEnd->v[2];
+
+    BrModelUpdate(gLine_model, BR_MODU_VERTEX_POSITIONS);
+    BrZbSceneRenderAdd(gLine_actor);
+}
+#endif
+
 // IDA: void __usercall RenderProximityRays(br_pixelmap *pRender_screen@<EAX>, br_pixelmap *pDepth_buffer@<EDX>, br_actor *pCamera@<EBX>, br_matrix34 *pCamera_to_world@<ECX>, tU32 pTime)
 // FUNCTION: CARM95 0x00460696
 void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_actor* pCamera, br_matrix34* pCamera_to_world, tU32 pTime) {
@@ -3939,6 +3978,24 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
     br_scalar t;
 
     the_time = GetTotalTime();
+#ifdef DETHRACE_3DFX_PATCH
+    if (gNo_2d_effects) {
+        BrActorRemove(gLine_actor);
+        BrActorAdd(pCamera, gLine_actor);
+        gLine_material->extra_prim = gProxRayBlendTokens;
+        BrMaterialUpdate(gLine_material, BR_MATU_EXTRA_PRIM);
+        gLine_model->vertices[0].red = 215;
+        gLine_model->vertices[0].grn = 255;
+        gLine_model->vertices[0].blu = 233;
+        gLine_model->vertices[1].red = 215;
+        gLine_model->vertices[1].grn = 255;
+        gLine_model->vertices[1].blu = 233;
+        gLine_model->vertices[2].red = 215;
+        gLine_model->vertices[2].grn = 255;
+        gLine_model->vertices[2].blu = 233;
+        BrModelUpdate(gLine_model, BR_MODU_ALL);
+    }
+#endif
     StartPipingSession(ePipe_chunk_prox_ray);
     for (i = 0; i < COUNT_OF(gProximity_rays); i++) {
         if (gProximity_rays[i].start_time == 0) {
@@ -3976,16 +4033,38 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
                 to_pos.v[X] += SRandomPosNeg(0.1f);
                 to_pos.v[Y] += SRandomPosNeg(0.1f);
                 to_pos.v[Z] += SRandomPosNeg(0.1f);
-                DrawLine3D(&to_pos, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
+#ifdef DETHRACE_3DFX_PATCH
+                if (gNo_2d_effects) {
+                    DrawProxRaySegmentBR(&to_pos, &from_pos);
+                } else
+#endif
+                {
+                    DrawLine3D(&to_pos, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
+                }
                 from_pos = to_pos;
                 t += 0.05f;
             } while (t < distance);
-            DrawLine3D(&ped_pos_cam, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
+#ifdef DETHRACE_3DFX_PATCH
+            if (gNo_2d_effects) {
+                DrawProxRaySegmentBR(&ped_pos_cam, &from_pos);
+            } else
+#endif
+            {
+                DrawLine3D(&ped_pos_cam, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
+            }
         } else {
             gProximity_rays[i].start_time = 0;
         }
     }
     EndPipingSession();
+#ifdef DETHRACE_3DFX_PATCH
+    if (gNo_2d_effects) {
+        gLine_material->extra_prim = NULL;
+        BrMaterialUpdate(gLine_material, BR_MATU_EXTRA_PRIM);
+        BrActorRemove(gLine_actor);
+        BrActorAdd(gDont_render_actor, gLine_actor);
+    }
+#endif
 }
 
 // IDA: void __usercall AdjustProxRay(int pRay_index@<EAX>, tU16 pCar_ID@<EDX>, tU16 pPed_index@<EBX>, tU32 pTime@<ECX>)
