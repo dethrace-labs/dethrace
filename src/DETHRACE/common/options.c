@@ -846,6 +846,7 @@ void DoGraphicsOptions(void) {
 // IDA: void __cdecl CalibrateJoysticks()
 // FUNCTION: CARM95 0x0049bf81
 void CalibrateJoysticks(void) {
+#ifdef __DOS__
     tJoy_calib_stage stage;
     int escaped;
     int joy_value_x;
@@ -864,7 +865,6 @@ void CalibrateJoysticks(void) {
     int max;
     char s[256];
 
-#ifdef __DOS__
     NOT_IMPLEMENTED();
 #else
     NetFullScreenMessage(kMiscString_USE_SYSTEM_CONTROL_PANEL_FOR_JOYSTICKS, 0);
