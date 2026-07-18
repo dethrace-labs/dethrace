@@ -15,6 +15,10 @@ if(DETHRACE_ASAN)
     target_link_options(dethrace_obj PUBLIC -fsanitize=address)
 endif()
 
+if(DETHRACE_VULKAN)
+    target_compile_definitions(dethrace_obj PUBLIC DETHRACE_VULKAN)
+endif()
+
 target_link_libraries(dethrace_obj PUBLIC smackw32 harness BRender::Full BRender::DDI s3)
 
 if(MSVC_42_FOR_RECCMP)

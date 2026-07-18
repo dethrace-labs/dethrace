@@ -18,12 +18,18 @@ void BR_CALLBACK _BrBeginHook(void) {
     struct br_device* BR_EXPORT BrDrv1SoftRendBegin(char* arguments);
     struct br_device* BR_EXPORT BrDrv1VirtualFramebufferBegin(char* arguments);
     struct br_device* BR_EXPORT BrDrv1GLBegin(char* arguments);
+#ifdef DETHRACE_VULKAN
+    struct br_device* BR_EXPORT BrDrv1VKBegin(char* arguments);
+#endif
 
 #if _MSC_VER != 1020
     BrDevAddStatic(NULL, BrDrv1SoftPrimBegin, NULL);
     BrDevAddStatic(NULL, BrDrv1SoftRendBegin, NULL);
     BrDevAddStatic(NULL, BrDrv1VirtualFramebufferBegin, NULL);
     BrDevAddStatic(NULL, BrDrv1GLBegin, NULL);
+#ifdef DETHRACE_VULKAN
+    BrDevAddStatic(NULL, BrDrv1VKBegin, NULL);
+#endif
 #endif
 }
 

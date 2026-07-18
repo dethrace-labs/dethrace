@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <SDL_vulkan.h>
 
 #include "harness.h"
 #include "harness/config.h"
@@ -34,6 +35,8 @@ static struct {
 // Callbacks back into original game code
 extern void QuitGame(void);
 extern br_pixelmap* gBack_screen;
+extern int gHarness_window_width;
+extern int gHarness_window_height;
 
 #ifdef DETHRACE_SDL_DYNAMIC
 #ifdef _WIN32
@@ -166,6 +169,8 @@ static void SDL2_Harness_ProcessWindowMessages(void) {
 
         case SDL_WINDOWEVENT:
             if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                gHarness_window_width = event.window.data1;
+                gHarness_window_height = event.window.data2;
                 calculate_viewport(event.window.data1, event.window.data2);
             }
             break;
@@ -266,7 +271,19 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
         extra_window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
 
-    if (window_type == eWindow_type_opengl) {
+    if (window_type == eWindow_type_vulkan) {
+
+        window = SDL2_CreateWindow(title,
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            window_width, window_height,
+            extra_window_flags | SDL_WINDOW_VULKAN);
+
+        if (window == NULL) {
+            LOG_PANIC2("Failed to create Vulkan window: %s", SDL2_GetError());
+        }
+
+    } else if (window_type == eWindow_type_opengl) {
 
         window = SDL2_CreateWindow(title,
             SDL_WINDOWPOS_CENTERED,
@@ -341,6 +358,8 @@ static void SDL2_Harness_Swap(br_pixelmap* back_buffer) {
 
     if (gl_context != NULL) {
         SDL2_GL_SwapWindow(window);
+    } else if (SDL2_GetWindowFlags(window) & SDL_WINDOW_VULKAN) {
+        // VK handles its own presentation
     } else {
         src_pixels = back_buffer->pixels;
 
@@ -379,10 +398,50 @@ static void SDL2_Harness_GetViewport(int* x, int* y, float* width_multipler, flo
     *height_multiplier = viewport.scale_y;
 }
 
+static void* vkGetInstanceExtensions_fn;
+static void* vkCreateSurface_fn;
+
+static void LoadVulkanSymbols(void) {
+#ifdef DETHRACE_SDL_DYNAMIC
+    vkGetInstanceExtensions_fn = Harness_LoadFunction(sdl2_so, "SDL_Vulkan_GetInstanceExtensions");
+    vkCreateSurface_fn = Harness_LoadFunction(sdl2_so, "SDL_Vulkan_CreateSurface");
+#else
+    vkGetInstanceExtensions_fn = SDL_Vulkan_GetInstanceExtensions;
+    vkCreateSurface_fn = SDL_Vulkan_CreateSurface;
+#endif
+}
+
+static const char** SDL2_Harness_VK_GetInstanceExtensions(uint32_t* count) {
+    if (!vkGetInstanceExtensions_fn)
+        return NULL;
+    static const char* exts[16];
+    memset(exts, 0, sizeof(exts));
+    {
+        SDL_bool (*fn)(SDL_Window*, unsigned int*, const char**) = (void*)vkGetInstanceExtensions_fn;
+        if (!fn(window, count, NULL))
+            return NULL;
+        fn(window, count, exts);
+    }
+    return exts;
+}
+
+static void* SDL2_Harness_VK_CreateSurface(void* instance) {
+    if (!vkCreateSurface_fn)
+        return NULL;
+    void* surface = NULL;
+    {
+        SDL_bool (*fn)(SDL_Window*, void*, void**) = (void*)vkCreateSurface_fn;
+        if (fn(window, instance, &surface))
+            return surface;
+    }
+    return NULL;
+}
+
 static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
     if (SDL2_LoadSymbols() != 0) {
         return 1;
     }
+    LoadVulkanSymbols();
     platform->ProcessWindowMessages = SDL2_Harness_ProcessWindowMessages;
     platform->Sleep = SDL2_Delay;
     platform->GetTicks = SDL2_GetTicks;
@@ -400,12 +459,14 @@ static int SDL2_Harness_Platform_Init(tHarness_platform* platform) {
     platform->PaletteChanged = SDL2_Harness_PaletteChanged;
     platform->GL_GetProcAddress = SDL2_GL_GetProcAddress;
     platform->GetViewport = SDL2_Harness_GetViewport;
+    platform->VK_CreateSurface = SDL2_Harness_VK_CreateSurface;
+    platform->VK_GetInstanceExtensions = SDL2_Harness_VK_GetInstanceExtensions;
     return 0;
 };
 
 const tPlatform_bootstrap SDL2_bootstrap = {
     "sdl2",
     "SDL2 video backend (libsdl.org)",
-    ePlatform_cap_software | ePlatform_cap_opengl,
+    ePlatform_cap_software | ePlatform_cap_opengl | ePlatform_cap_vulkan,
     SDL2_Harness_Platform_Init,
 };
