@@ -9,6 +9,10 @@
 #include "harness/hooks.h"
 #include "harness/os.h"
 #include "harness/trace.h"
+
+#ifdef DETHRACE_VULKAN
+#include "brvkrend.h"
+#endif
 #include "init.h"
 #include "input.h"
 #include "loadsave.h"
@@ -74,6 +78,7 @@ int gForce_voodoo_rush_mode;
 int gForce_voodoo_mode;
 
 br_device_gl_callback_procs gl_callbacks;
+br_device_vk_callback_procs vk_callbacks;
 br_device_virtualfb_callback_procs virtualfb_callbacks;
 
 // from win95sys.c
@@ -398,9 +403,32 @@ void PDUnlockRealBackScreen(int lock) {
 void PDAllocateScreenAndBack(void) {
     gScreen = NULL;
 
-    // added by dethrace. We default to software mode unless we explicitly ask for 3dfx opengl mode
-    if (harness_game_config.opengl_3dfx_mode) {
-        if (gGraf_spec_index != 0 && !gNo_voodoo) {
+    // added by dethrace. We default to software mode unless we explicitly ask for 3dfx opengl or vulkan mode
+    if (harness_game_config.opengl_3dfx_mode == 2) {
+        if (!gNo_voodoo) {
+            BrBegin();
+            vk_callbacks.get_proc_address = NULL;
+            vk_callbacks.swap_buffers = gHarness_platform.Swap;
+            vk_callbacks.get_viewport = gHarness_platform.GetViewport;
+            vk_callbacks.free = NULL;
+            vk_callbacks.create_surface = (void*)gHarness_platform.VK_CreateSurface;
+            vk_callbacks.get_instance_extensions = gHarness_platform.VK_GetInstanceExtensions;
+            fprintf(stderr, "[VK] Creating Vulkan window...\n");
+            gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_vulkan);
+            fprintf(stderr, "[VK] Window created. Calling BrDevBeginVar(\"vkrend\")...\n");
+
+            br_error vk_err = BrDevBeginVar(&gScreen, "vkrend",
+                BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
+                BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
+                BRT_VULKAN_CALLBACKS_P, &vk_callbacks,
+                BRT_PIXEL_TYPE_U8, BR_PMT_RGB_565,
+                BR_NULL_TOKEN);
+            fprintf(stderr, "[VK] BrDevBeginVar returned %d, gScreen=%p\n", (int)vk_err, (void*)gScreen);
+
+
+        }
+    } else if (harness_game_config.opengl_3dfx_mode) {
+        if (!gNo_voodoo) {
             gl_callbacks.get_proc_address = gHarness_platform.GL_GetProcAddress;
             gl_callbacks.swap_buffers = gHarness_platform.Swap;
             gl_callbacks.get_viewport = gHarness_platform.GetViewport;
@@ -445,6 +473,11 @@ void PDAllocateScreenAndBack(void) {
         // Render framebuffer to memory and call hooks when swapping or palette changing
         virtualfb_callbacks.palette_changed = gHarness_platform.PaletteChanged;
         virtualfb_callbacks.swap_buffers = gHarness_platform.Swap;
+        fprintf(stderr, "[SW] Falling back to software renderer\n");
+        if (gHarness_platform.DestroyWindow) {
+            fprintf(stderr, "[SW] Destroying previous window before creating software window\n");
+            gHarness_platform.DestroyWindow();
+        }
         gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_software);
         BrDevBeginVar(&gScreen, "virtualframebuffer",
             BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,

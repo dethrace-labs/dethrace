@@ -476,19 +476,50 @@ tException_list FindExceptionInList(char* pName, tException_list pList) {
 
 // IDA: br_pixelmap* __usercall PurifiedPixelmap@<EAX>(br_pixelmap *pSrc@<EAX>)
 br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
-    br_pixelmap* intermediate;
     br_pixelmap* result;
-    int new_width;
-    int new_height;
-    tException_list e;
+    br_uint_8* src_pixels;
+    br_colour* dst_pixels;
+    br_colour* palette;
+    int x, y;
 
     // dethrace: added conditional to allow both software and 3dfx modes
     if (!harness_game_config.opengl_3dfx_mode) {
         return pSrc;
     }
 
-    LOG_INFO("PurifiedPixelmap not implemented");
-    return pSrc;
+    if (pSrc->type != BR_PMT_INDEX_8) {
+        return pSrc;
+    }
+
+    palette = NULL;
+    if (pSrc->map != NULL && pSrc->map->pixels != NULL) {
+        palette = (br_colour*)pSrc->map->pixels;
+    }
+
+    if (palette == NULL) {
+        return pSrc;
+    }
+
+    result = BrPixelmapAllocate(BR_PMT_RGBX_888, pSrc->width, pSrc->height, NULL, 0);
+    if (result == NULL) {
+        return pSrc;
+    }
+
+    if (pSrc->identifier != NULL) {
+        result->identifier = BrResStrDup(result, pSrc->identifier);
+    }
+
+    src_pixels = (br_uint_8*)pSrc->pixels;
+    dst_pixels = (br_colour*)result->pixels;
+
+    for (y = 0; y < pSrc->height; y++) {
+        for (x = 0; x < pSrc->width; x++) {
+            br_uint_8 idx = src_pixels[y * pSrc->row_bytes + x];
+            dst_pixels[y * result->row_bytes / sizeof(br_colour) + x] = palette[idx];
+        }
+    }
+
+    return result;
 }
 
 // IDA: br_pixelmap* __usercall DRPixelmapLoad@<EAX>(char *pFile_name@<EAX>)
