@@ -33,7 +33,43 @@ static const char *Harness_LoadError(void) {
 }
 #else
 #include <dlfcn.h>
+#ifdef __APPLE__
+#include <limits.h>
+#include <mach-o/dyld.h>
+#endif
 static void *Harness_LoadObject(const char *name) {
+#ifdef __APPLE__
+    static const char loader_prefix[] = "@loader_path/";
+    static const char executable_prefix[] = "@executable_path/";
+    char executable_path[PATH_MAX];
+    uint32_t executable_path_size;
+    const char* suffix;
+    char* last_slash;
+    char resolved_name[PATH_MAX];
+
+    if (name != NULL) {
+        if (strncmp(name, loader_prefix, sizeof(loader_prefix) - 1) == 0) {
+            suffix = name + sizeof(loader_prefix) - 1;
+        } else if (strncmp(name, executable_prefix, sizeof(executable_prefix) - 1) == 0) {
+            suffix = name + sizeof(executable_prefix) - 1;
+        } else {
+            suffix = NULL;
+        }
+
+        if (suffix != NULL) {
+            executable_path_size = sizeof(executable_path);
+            if (_NSGetExecutablePath(executable_path, &executable_path_size) == 0) {
+                last_slash = strrchr(executable_path, '/');
+                if (last_slash != NULL) {
+                    *last_slash = '\0';
+                    if (snprintf(resolved_name, sizeof(resolved_name), "%s/%s", executable_path, suffix) < (int)sizeof(resolved_name)) {
+                        return dlopen(resolved_name, RTLD_NOW | RTLD_LOCAL);
+                    }
+                }
+            }
+        }
+    }
+#endif
     return dlopen(name, RTLD_NOW | RTLD_LOCAL);
 }
 static void Harness_UnloadObject(void *obj) {
