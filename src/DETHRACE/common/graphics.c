@@ -3041,6 +3041,12 @@ int DoMouseCursor(void) {
         } else {
             period = 1000;
         }
+#ifdef DETHRACE_FIX_BUGS
+        // avoid 100% CPU usage
+        if (period <= 20) {
+            gHarness_platform.Sleep(1);
+        }
+#endif
     } while (period <= 20);
     GetMousePosition(&x_coord, &y_coord);
     mouse_moved = gMouse_last_x_coord != x_coord || gMouse_last_y_coord - y_coord != 0;
