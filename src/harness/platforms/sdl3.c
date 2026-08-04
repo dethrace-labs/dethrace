@@ -26,6 +26,13 @@ static void (*gKeyHandler_func)(void);
 // 32 bytes, 1 bit per key. Matches dos executable behavior
 static br_uint_32 key_state[8];
 
+// Mouse/trackpad steering (Doom-style). `key_state` only ever reflects the real
+// keyboard; the synthesized steering arrow is OR-ed in when the keyboard state is
+// read, so it never clobbers a real key press.
+static int mouse_steer_grabbed = 0;
+static float mouse_steer_charge = 0.0f;
+static int mouse_steer_dir = 0;
+
 static struct {
     int x, y;
     float scale_x, scale_y;
@@ -34,6 +41,8 @@ static struct {
 // Callbacks back into original game code
 extern void QuitGame(void);
 extern br_pixelmap* gBack_screen;
+// Resolves the scan code currently bound to a control action (steer left/right = 46/47)
+extern br_uint_8 GetBoundScanCode(int pControl_index);
 
 #ifdef DETHRACE_SDL_DYNAMIC
 #ifdef _WIN32
@@ -127,6 +136,32 @@ static int is_only_key_modifier(SDL_Keymod modifier_flags, SDL_Keymod flag_check
     return (modifier_flags & flag_check) && (modifier_flags & (SDL_KMOD_CTRL | SDL_KMOD_SHIFT | SDL_KMOD_ALT | SDL_KMOD_GUI)) == (modifier_flags & flag_check);
 }
 
+// How fast the steering charge bleeds back to centre each poll, the minimum charge
+// that counts as a turn, and the cap a single flick can build up.
+#define MOUSE_STEER_DECAY 0.55f
+#define MOUSE_STEER_DEADZONE 1.5f
+#define MOUSE_STEER_MAX 40.0f
+
+static void SDL3_SetMouseSteeringGrab(int grab) {
+    if (grab == mouse_steer_grabbed) {
+        return;
+    }
+    mouse_steer_grabbed = grab;
+    // Relative mode hides and locks the cursor so a trackpad never runs out of travel.
+    SDL3_SetWindowRelativeMouseMode(window, grab ? true : false);
+    if (grab) {
+        LOG_INFO("Mouse steering grabbed - move the mouse to steer (press ` or Cmd/Win to release)");
+    } else {
+        // Release any held steering so the car stops turning.
+        mouse_steer_charge = 0.0f;
+        mouse_steer_dir = 0;
+        if (gKeyHandler_func != NULL) {
+            gKeyHandler_func();
+        }
+        LOG_INFO("Mouse steering released");
+    }
+}
+
 static void SDL3_Harness_ProcessWindowMessages(void) {
     SDL_Event event;
 
@@ -136,6 +171,14 @@ static void SDL3_Harness_ProcessWindowMessages(void) {
         case SDL_EVENT_KEY_UP:
             if (event.key.windowID != SDL3_GetWindowID(window)) {
                 continue;
+            }
+            if (harness_game_config.mouse_steering && (event.key.scancode == SDL_SCANCODE_GRAVE || event.key.scancode == SDL_SCANCODE_LGUI || event.key.scancode == SDL_SCANCODE_RGUI)) {
+                // Toggle key for mouse steering, consumed so the game never sees it.
+                // The Cmd/Win keys are reliable alternatives where ` is a dead key (e.g. macOS FR).
+                if (event.type == SDL_EVENT_KEY_DOWN) {
+                    SDL3_SetMouseSteeringGrab(!mouse_steer_grabbed);
+                }
+                break;
             }
             if (event.key.key == SDLK_RETURN) {
                 if (event.key.type == SDL_EVENT_KEY_DOWN) {
@@ -165,12 +208,44 @@ static void SDL3_Harness_ProcessWindowMessages(void) {
             gKeyHandler_func();
             break;
 
+        case SDL_EVENT_MOUSE_MOTION:
+            if (mouse_steer_grabbed) {
+                float sensitivity = harness_game_config.mouse_steering_sensitivity;
+                if (sensitivity <= 0.0f) {
+                    sensitivity = 1.0f;
+                }
+                mouse_steer_charge += event.motion.xrel * sensitivity;
+                if (mouse_steer_charge > MOUSE_STEER_MAX) {
+                    mouse_steer_charge = MOUSE_STEER_MAX;
+                } else if (mouse_steer_charge < -MOUSE_STEER_MAX) {
+                    mouse_steer_charge = -MOUSE_STEER_MAX;
+                }
+            }
+            break;
+
         case SDL_EVENT_WINDOW_RESIZED:
             calculate_viewport(event.window.data1, event.window.data2);
             break;
 
         case SDL_EVENT_QUIT:
             QuitGame();
+        }
+    }
+
+    if (mouse_steer_grabbed) {
+        // Bleed the charge back towards centre so the wheel recentres once the mouse
+        // stops, then turn what is left into a held left/right arrow. This runs every
+        // poll (not just on motion events) so a stationary mouse releases the steering.
+        mouse_steer_charge *= MOUSE_STEER_DECAY;
+        if (mouse_steer_charge > MOUSE_STEER_DEADZONE) {
+            mouse_steer_dir = 1;
+        } else if (mouse_steer_charge < -MOUSE_STEER_DEADZONE) {
+            mouse_steer_dir = -1;
+        } else {
+            mouse_steer_dir = 0;
+        }
+        if (gKeyHandler_func != NULL) {
+            gKeyHandler_func();
         }
     }
 }
@@ -181,6 +256,15 @@ static void SDL3_Harness_SetKeyHandler(void (*handler_func)(void)) {
 
 static void SDL3_Harness_GetKeyboardState(br_uint_32* buffer) {
     memcpy(buffer, key_state, sizeof(key_state));
+    if (mouse_steer_grabbed && mouse_steer_dir != 0) {
+        // OR in the key the player has actually bound to steer left/right, so mouse
+        // steering follows the key mapping (arrows, WASD, ...). key_state is untouched,
+        // so real key presses keep working alongside it.
+        br_uint_8 scancode = GetBoundScanCode(mouse_steer_dir < 0 ? 46 : 47);
+        if (scancode != 0) {
+            buffer[scancode >> 5] |= (1u << (scancode & 0x1F));
+        }
+    }
 }
 
 static int SDL3_Harness_GetMouseButtons(int* pButton1, int* pButton2) {
