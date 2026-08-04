@@ -547,14 +547,18 @@ void BuildColourTable(br_pixelmap* pPalette) {
     float distance;
 
     for (i = 0; i < COUNT_OF(gRGB_colours); i++) {
-        nearest_distance = 196608.f;
+        nearest_distance = 3.0f * 256.0f * 256.0f;
+#ifdef DETHRACE_FIX_BUGS
+        // Fix -Wmaybe-uninitialized warning
+        nearest_index = 0;
+#endif
         red = (gRGB_colours[i] >> 16) & 0xFF;
         green = (gRGB_colours[i] >> 8) & 0xFF;
-        blue = gRGB_colours[i] & 0xFF;
+        blue = (gRGB_colours[i] >> 0) & 0xFF;
         for (j = 0; j < 256; j++) {
             distance = sqr(((br_uint_8*)pPalette->pixels)[4 * j + 2] - red)
                 + sqr(((br_uint_8*)pPalette->pixels)[4 * j + 1] - green)
-                + sqr(((br_uint_8*)pPalette->pixels)[4 * j] - blue);
+                + sqr(((br_uint_8*)pPalette->pixels)[4 * j + 0] - blue);
 
             if (distance < nearest_distance) {
                 nearest_distance = distance;
@@ -631,6 +635,10 @@ void Copy8BitStripImageTo16Bit(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 
     if (height + pDest_y + pOffset_y > pDest->height) {
         height = pDest->height - pDest_y - pOffset_y;
     }
+#ifdef DETHRACE_FIX_BUGS
+    // Fix -Wmaybe-uninitialized warning
+    destn_width = 2 * pDest->width;
+#endif
     if (gBack_screen->type == BR_PMT_RGB_565) {
         pDest_x *= 2;
         pOffset_x *= 2;
@@ -1779,6 +1787,10 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
                     continue;
                 }
 
+#ifdef DETHRACE_FIX_BUGS
+                // Fix -Wmaybe-uninitialized warning
+                distance_factor = 0.0f;
+#endif
                 if (!gAction_replay_mode) {
                     BrVector3Sub(&camera_to_car, (br_vector3*)gCamera_to_world.m[3], &the_car->car_master_actor->t.t.translate.t);
                     distance_factor = BrVector3LengthSquared(&camera_to_car);

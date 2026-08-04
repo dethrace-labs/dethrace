@@ -38,6 +38,8 @@ typedef tU32 tPlayer_ID;
 typedef void tPipe_reset_proc(void);
 typedef struct tPowerup tPowerup;
 
+#define DR_INT32_MAX 0x7fffffff
+
 #ifdef DETHRACE_FIX_BUGS
 typedef int tGot_proc(tPowerup*, tCar_spec*);
 typedef void tLose_proc(tPowerup*, tCar_spec*);
