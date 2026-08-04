@@ -234,10 +234,14 @@ if(DETHRACE_IDE_ARGUMENTS)
 endif()
 
 if(DETHRACE_INSTALL)
-    install(TARGETS dethrace
-        BUNDLE DESTINATION . COMPONENT Runtime
-        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT Runtime
-    )
+    if(CMAKE_SYSTEM_NAME MATCHES "Linux" AND DETHRACE_USE_LSB_GAMES)
+        install(TARGETS dethrace RUNTIME DESTINATION games)
+    else()
+        install(TARGETS dethrace
+            BUNDLE DESTINATION . COMPONENT Runtime
+            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT Runtime
+        )
+    endif()
 
     if(APPLE)
         set_target_properties(dethrace PROPERTIES
