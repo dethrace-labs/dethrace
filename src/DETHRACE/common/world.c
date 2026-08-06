@@ -835,7 +835,7 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "MODELS");
         PathCat(the_path, the_path, str);
-        new_ones = BrModelLoadMany(the_path, temp_array, 2000);
+        new_ones = BrModelLoadMany(the_path, temp_array, COUNT_OF(temp_array));
         if (new_ones == 0) {
             FatalError(kFatalError_LoadModelFile_S, str);
         }
@@ -2780,14 +2780,14 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         PossibleService();
         needs_updating = 0;
         if (gTrack_storage_space.models[i] && gTrack_storage_space.models[i]->flags & (BR_MODF_UPDATEABLE | BR_MODF_KEEP_ORIGINAL)) {
-            gTrack_storage_space.models[i]->flags &= 0xFFFFFF7Du;
+            gTrack_storage_space.models[i]->flags &= ~(BR_MODF_UPDATEABLE | BR_MODF_KEEP_ORIGINAL);
             // Minor asm differences here due to using open-sourced BRender 1.3.2
             for (group = 0; group < V11MODEL(gTrack_storage_space.models[i])->ngroups; group++) {
                 material = gTrack_storage_space.models[i]->faces[V11MODEL(gTrack_storage_space.models[i])->groups[group].face_user[0]].material;
                 V11MODEL(gTrack_storage_space.models[i])->groups[group].user = material;
                 if (material && !material->index_shade) {
                     material->index_shade = BrTableFind("DRRENDER.TAB");
-                    BrMaterialUpdate(material, 0x7FFFu);
+                    BrMaterialUpdate(material, BR_MATU_ALL);
                 }
             }
             DodgyModelUpdate(gTrack_storage_space.models[i]);
@@ -2830,7 +2830,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 break;
             }
         }
-        sky = 0;
+        sky = NULL;
         killed_sky = 1;
     }
     gProgram_state.default_depth_effect.sky_texture = sky;
