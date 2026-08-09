@@ -81,6 +81,15 @@ br_device_gl_callback_procs gl_callbacks;
 br_device_vk_callback_procs vk_callbacks;
 br_device_virtualfb_callback_procs virtualfb_callbacks;
 
+static int BR_CALLBACK vk_get_map_mode(void) {
+    return gMap_mode;
+}
+
+static void BR_CALLBACK vk_get_window_size(int* width, int* height) {
+    *width = gHarness_window_width;
+    *height = gHarness_window_height;
+}
+
 // from win95sys.c
 int gShow_fatal_error;
 char gFatal_error_string[512];
@@ -413,6 +422,8 @@ void PDAllocateScreenAndBack(void) {
             vk_callbacks.free = NULL;
             vk_callbacks.create_surface = (void*)gHarness_platform.VK_CreateSurface;
             vk_callbacks.get_instance_extensions = gHarness_platform.VK_GetInstanceExtensions;
+            vk_callbacks.get_map_mode = vk_get_map_mode;
+            vk_callbacks.get_window_size = vk_get_window_size;
             fprintf(stderr, "[VK] Creating Vulkan window...\n");
             gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_vulkan);
             fprintf(stderr, "[VK] Window created. Calling BrDevBeginVar(\"vkrend\")...\n");
