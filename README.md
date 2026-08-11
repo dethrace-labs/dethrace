@@ -37,13 +37,7 @@ apt-get install libsdl2-dev libsdl3-dev glslang-tools spirv-cross cmake
 Windows (MSYS2):
 
 ```sh
-pacman -S mingw-w64-x86_64-sdl2 mingw-w64-x86_64-sdl3 mingw-w64-x86_64-glslang mingw-w64-x86_64-spirv-cross cmake
-```
-
-Windows (vcpkg):
-
-```sh
-vcpkg install sdl2 sdl3 shaderc spirv-cross
+pacman -S mingw-w64-x86_64-sdl2 mingw-w64-x86_64-sdl3 mingw-w64-x86_64-glslang mingw-w64-x86_64-spirv-cross cmake make
 ```
 
 MSYS2 and vcpkg do not ship `dxc`; download `dxc_*.zip` from the [DirectXShaderCompiler releases](https://github.com/microsoft/DirectXShaderCompiler/releases) and ensure `dxc` is on `PATH` before configuring.
