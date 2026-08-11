@@ -15,18 +15,24 @@ Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](h
 ### Dependencies
 
 Dethrace using CMake to build, and SDL2/3 at runtime. The easiest way to install them is via your favorite package manager.
-For SDL3 GPU, requires vulkan-headers and shaderc.
+For SDL3 GPU, requires shaderc.
 
 OSX:
 
 ```sh
-brew install SDL2 cmake
+brew install SDL2 SDL3 shaderc cmake
 ```
 
 Linux:
 
 ```sh
-apt-get install libsdl2-dev libvulkan-dev shaderc cmake
+apt-get install libsdl2-dev libsdl3-dev shaderc cmake
+```
+
+Windows (vcpkg):
+
+```sh
+vcpkg install sdl2 sdl3 shaderc
 ```
 
 ### Clone
