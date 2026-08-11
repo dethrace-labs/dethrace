@@ -76,7 +76,7 @@ static int Harness_InitPlatform(void) {
         if (harness_game_config.opengl_3dfx_mode) {
             required_caps &= ~ePlatform_cap_video_mask;
             required_caps |= (harness_game_config.opengl_3dfx_mode == 2)
-                ? ePlatform_cap_vulkan
+                ? ePlatform_cap_sdl3
                 : ePlatform_cap_opengl;
         }
 

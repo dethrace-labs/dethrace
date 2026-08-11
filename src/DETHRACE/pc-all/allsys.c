@@ -10,9 +10,7 @@
 #include "harness/os.h"
 #include "harness/trace.h"
 
-#ifdef DETHRACE_VULKAN
-#include "brvkrend.h"
-#endif
+#include "brsdl3rend.h"
 #include "init.h"
 #include "input.h"
 #include "loadsave.h"
@@ -78,14 +76,14 @@ int gForce_voodoo_rush_mode;
 int gForce_voodoo_mode;
 
 br_device_gl_callback_procs gl_callbacks;
-br_device_vk_callback_procs vk_callbacks;
+br_device_sdl3_callback_procs sdl3_callbacks;
 br_device_virtualfb_callback_procs virtualfb_callbacks;
 
-static int BR_CALLBACK vk_get_map_mode(void) {
+static int BR_CALLBACK sdl3_get_map_mode(void) {
     return gMap_mode;
 }
 
-static void BR_CALLBACK vk_get_window_size(int* width, int* height) {
+static void BR_CALLBACK sdl3_get_window_size(int* width, int* height) {
     *width = gHarness_window_width;
     *height = gHarness_window_height;
 }
@@ -416,27 +414,30 @@ void PDAllocateScreenAndBack(void) {
     if (harness_game_config.opengl_3dfx_mode == 2) {
         if (!gNo_voodoo) {
             BrBegin();
-            vk_callbacks.get_proc_address = NULL;
-            vk_callbacks.swap_buffers = gHarness_platform.Swap;
-            vk_callbacks.get_viewport = gHarness_platform.GetViewport;
-            vk_callbacks.free = NULL;
-            vk_callbacks.create_surface = (void*)gHarness_platform.VK_CreateSurface;
-            vk_callbacks.get_instance_extensions = gHarness_platform.VK_GetInstanceExtensions;
-            vk_callbacks.get_map_mode = vk_get_map_mode;
-            vk_callbacks.get_window_size = vk_get_window_size;
-            fprintf(stderr, "[VK] Creating Vulkan window...\n");
-            gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_vulkan);
-            fprintf(stderr, "[VK] Window created. Calling BrDevBeginVar(\"vkrend\")...\n");
+            sdl3_callbacks.get_proc_address = NULL;
+            sdl3_callbacks.swap_buffers = gHarness_platform.Swap;
+            sdl3_callbacks.get_viewport = gHarness_platform.GetViewport;
+            sdl3_callbacks.free = NULL;
+            sdl3_callbacks.create_surface = (void*)gHarness_platform.SDL3_CreateSurface;
+            sdl3_callbacks.get_instance_extensions = gHarness_platform.SDL3_GetInstanceExtensions;
+            sdl3_callbacks.get_map_mode = sdl3_get_map_mode;
+            sdl3_callbacks.get_window_size = sdl3_get_window_size;
+            sdl3_callbacks.get_window = gHarness_platform.GetWindow;
+            fprintf(stderr, "[SDL3] Creating SDL3-GPU window...\n");
+            gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_sdl3);
+            fprintf(stderr, "[SDL3] Window created. Calling BrDevBeginVar(\"sdl3rend\")...\n");
 
-            br_error vk_err = BrDevBeginVar(&gScreen, "vkrend",
+            br_error sdl3_err = BrDevBeginVar(&gScreen, "sdl3rend",
                 BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
                 BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
-                BRT_VULKAN_CALLBACKS_P, &vk_callbacks,
+                BRT_SDL3_CALLBACKS_P, &sdl3_callbacks,
                 BRT_PIXEL_TYPE_U8, BR_PMT_RGB_565,
                 BR_NULL_TOKEN);
-            fprintf(stderr, "[VK] BrDevBeginVar returned %d, gScreen=%p\n", (int)vk_err, (void*)gScreen);
+            fprintf(stderr, "[SDL3] BrDevBeginVar returned %d, gScreen=%p\n", (int)sdl3_err, (void*)gScreen);
 
-
+            if (sdl3_err == BRE_OK && gScreen != NULL) {
+                fprintf(stderr, "[SDL3] SDL3-GPU window initialized\n");
+            }
         }
     } else if (harness_game_config.opengl_3dfx_mode) {
         if (!gNo_voodoo) {

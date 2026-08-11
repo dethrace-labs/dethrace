@@ -275,14 +275,13 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
         extra_window_flags |= SDL_WINDOW_FULLSCREEN;
     }
 
-    if (window_type == eWindow_type_vulkan) {
-
+    if (window_type == eWindow_type_sdl3) {
         window = SDL3_CreateWindow(title,
             window_width, window_height,
             extra_window_flags | SDL_WINDOW_VULKAN);
 
         if (window == NULL) {
-            LOG_PANIC2("Failed to create Vulkan window: %s", SDL3_GetError());
+            LOG_PANIC2("Failed to create SDL3-GPU window: %s", SDL3_GetError());
         }
 
     } else if (window_type == eWindow_type_opengl) {
@@ -349,6 +348,7 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
 
     SDL3_HideCursor();
 
+    SDL3_GetWindowSize(window, &gHarness_window_width, &gHarness_window_height);
     viewport.x = 0;
     viewport.y = 0;
     viewport.scale_x = 1;
@@ -435,7 +435,7 @@ static void LoadVulkanSymbols(void) {
 #endif
 }
 
-static const char** SDL3_Harness_VK_GetInstanceExtensions(uint32_t* count) {
+static const char** SDL3_Harness_SDL3_GetInstanceExtensions(uint32_t* count) {
     if (!vkGetInstanceExtensions_fn)
         return NULL;
     uint32_t sdlCount = 0;
@@ -445,7 +445,7 @@ static const char** SDL3_Harness_VK_GetInstanceExtensions(uint32_t* count) {
     return exts;
 }
 
-static void* SDL3_Harness_VK_CreateSurface(void* instance) {
+static void* SDL3_Harness_SDL3_CreateSurface(void* instance) {
     if (!vkCreateSurface_fn)
         return NULL;
     void* surface = NULL;
@@ -455,6 +455,10 @@ static void* SDL3_Harness_VK_CreateSurface(void* instance) {
             return surface;
     }
     return NULL;
+}
+
+static void* SDL3_Harness_GetWindow(void) {
+    return window;
 }
 
 static int SDL3_Harness_Platform_Init(tHarness_platform* platform) {
@@ -480,14 +484,15 @@ static int SDL3_Harness_Platform_Init(tHarness_platform* platform) {
     platform->GetViewport = SDL3_Harness_GetViewport;
 
     LoadVulkanSymbols();
-    platform->VK_CreateSurface = SDL3_Harness_VK_CreateSurface;
-    platform->VK_GetInstanceExtensions = SDL3_Harness_VK_GetInstanceExtensions;
+    platform->SDL3_CreateSurface = SDL3_Harness_SDL3_CreateSurface;
+    platform->SDL3_GetInstanceExtensions = SDL3_Harness_SDL3_GetInstanceExtensions;
+    platform->GetWindow = SDL3_Harness_GetWindow;
     return 0;
 };
 
 const tPlatform_bootstrap SDL3_bootstrap = {
     "sdl3",
     "SDL3 video backend (libsdl.org)",
-    ePlatform_cap_software | ePlatform_cap_opengl | ePlatform_cap_vulkan,
+    ePlatform_cap_software | ePlatform_cap_opengl | ePlatform_cap_sdl3,
     SDL3_Harness_Platform_Init,
 };
