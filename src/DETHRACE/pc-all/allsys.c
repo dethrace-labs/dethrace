@@ -418,8 +418,6 @@ void PDAllocateScreenAndBack(void) {
             sdl3_callbacks.swap_buffers = gHarness_platform.Swap;
             sdl3_callbacks.get_viewport = gHarness_platform.GetViewport;
             sdl3_callbacks.free = NULL;
-            sdl3_callbacks.create_surface = (void*)gHarness_platform.SDL3_CreateSurface;
-            sdl3_callbacks.get_instance_extensions = gHarness_platform.SDL3_GetInstanceExtensions;
             sdl3_callbacks.get_map_mode = sdl3_get_map_mode;
             sdl3_callbacks.get_window_size = sdl3_get_window_size;
             sdl3_callbacks.get_window = gHarness_platform.GetWindow;

@@ -48,9 +48,6 @@ typedef struct tHarness_platform {
     void* (*GL_GetProcAddress)(const char* name);
     void (*GetViewport)(int* x, int* y, float* width_multiplier, float* height_multiplier);
 
-    // If this platform supports Vulkan
-    void* (*SDL3_CreateSurface)(void* instance);
-    const char** (*SDL3_GetInstanceExtensions)(uint32_t* count);
     // Return the SDL_Window* the SDL3-GPU driver should claim
     void* (*GetWindow)(void);
 

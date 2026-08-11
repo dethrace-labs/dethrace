@@ -1,5 +1,4 @@
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_vulkan.h>
 #include <stdio.h>
 #ifndef DETHRACE_SDL_DYNAMIC
 #include <dlfcn.h>
@@ -419,44 +418,6 @@ static void* SDL3_Harness_GL_GetProcAddress(const char* name) {
     return SDL3_GL_GetProcAddress(name);
 }
 
-/*
- * Vulkan callbacks
- */
-static void* vkGetInstanceExtensions_fn;
-static void* vkCreateSurface_fn;
-
-static void LoadVulkanSymbols(void) {
-#ifdef DETHRACE_SDL_DYNAMIC
-    vkGetInstanceExtensions_fn = Harness_LoadFunction(sdl3_so, "SDL_Vulkan_GetInstanceExtensions");
-    vkCreateSurface_fn = Harness_LoadFunction(sdl3_so, "SDL_Vulkan_CreateSurface");
-#else
-    vkGetInstanceExtensions_fn = SDL_Vulkan_GetInstanceExtensions;
-    vkCreateSurface_fn = SDL_Vulkan_CreateSurface;
-#endif
-}
-
-static const char** SDL3_Harness_SDL3_GetInstanceExtensions(uint32_t* count) {
-    if (!vkGetInstanceExtensions_fn)
-        return NULL;
-    uint32_t sdlCount = 0;
-    char const * const * (*fn)(unsigned int*) = (void*)vkGetInstanceExtensions_fn;
-    const char** exts = (const char**)fn(&sdlCount);
-    *count = sdlCount;
-    return exts;
-}
-
-static void* SDL3_Harness_SDL3_CreateSurface(void* instance) {
-    if (!vkCreateSurface_fn)
-        return NULL;
-    void* surface = NULL;
-    {   int (*fn)(void*, void*, void*, void**) = (void*)vkCreateSurface_fn;
-        int ret = fn(window, instance, NULL, &surface);
-        if (ret)
-            return surface;
-    }
-    return NULL;
-}
-
 static void* SDL3_Harness_GetWindow(void) {
     return window;
 }
@@ -483,9 +444,6 @@ static int SDL3_Harness_Platform_Init(tHarness_platform* platform) {
     platform->GL_GetProcAddress = SDL3_Harness_GL_GetProcAddress;
     platform->GetViewport = SDL3_Harness_GetViewport;
 
-    LoadVulkanSymbols();
-    platform->SDL3_CreateSurface = SDL3_Harness_SDL3_CreateSurface;
-    platform->SDL3_GetInstanceExtensions = SDL3_Harness_SDL3_GetInstanceExtensions;
     platform->GetWindow = SDL3_Harness_GetWindow;
     return 0;
 };
