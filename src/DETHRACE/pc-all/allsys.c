@@ -421,6 +421,7 @@ void PDAllocateScreenAndBack(void) {
             sdl3_callbacks.get_map_mode = sdl3_get_map_mode;
             sdl3_callbacks.get_window_size = sdl3_get_window_size;
             sdl3_callbacks.get_window = gHarness_platform.GetWindow;
+            sdl3_callbacks.sdl3_handle = SDL3_GetHandle();
             fprintf(stderr, "[SDL3] Creating SDL3-GPU window...\n");
             gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_sdl3);
             fprintf(stderr, "[SDL3] Window created. Calling BrDevBeginVar(\"sdl3rend\")...\n");

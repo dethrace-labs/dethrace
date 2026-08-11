@@ -142,6 +142,14 @@ if(NOT DETHRACE_PLATFORMS AND NOT MSVC_42_FOR_RECCMP)
     message(FATAL_ERROR "No platform drivers enabled")
 endif()
 
+# Single-executable builds resolve SDL3 at runtime via the harness, so the
+# sdl3rend BRender driver must resolve its SDL3 symbols from the harness handle
+# (br_device_sdl3_callback_procs.sdl3_handle) rather than linking SDL3.
+if(DETHRACE_PLATFORM_SDL_DYNAMIC)
+    set(BRENDER_SDL3REND_DYNAMIC ON CACHE BOOL
+        "Resolve SDL3 at runtime (sdl3_dyn.c) instead of linking against SDL3" FORCE)
+endif()
+
 add_subdirectory(lib/BRender-v1.3.2)
 add_subdirectory(lib/libsmacker)
 add_subdirectory(lib/inih)

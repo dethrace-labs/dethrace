@@ -84,6 +84,18 @@ static void* sdl3_so;
 
 #include "sdl_dyn_common.h"
 
+// Returns the OS handle of the loaded SDL3 library (the dlopen/LoadLibrary
+// handle) so the sdl3rend BRender driver can resolve its own SDL3 function
+// pointers from it via br_device_sdl3_callback_procs.sdl3_handle. NULL when
+// SDL3 is linked directly into the binary.
+void* SDL3_GetHandle(void) {
+#ifdef DETHRACE_SDL_DYNAMIC
+    return sdl3_so;
+#else
+    return NULL;
+#endif
+}
+
 static void calculate_viewport(int window_width, int window_height) {
     int vp_width, vp_height;
     float target_aspect_ratio;
