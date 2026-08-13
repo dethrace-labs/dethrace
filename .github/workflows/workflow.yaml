@@ -56,11 +56,11 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl-dev libgl1-mesa-dev libglu1-mesa-dev libxext-dev glslang-tools spirv-cross
+          sudo apt-get install -y libgl-dev libgl1-mesa-dev libglu1-mesa-dev libxext-dev glslang-tools
       - name: Install macOS dependencies
         if: ${{ runner.os == 'macOS' }}
         run: |
-          brew install spirv-cross glslang
+          brew install glslang
       - name: Install glslang (Windows)
         if: ${{ runner.os == 'Windows' }}
         shell: pwsh
@@ -68,21 +68,6 @@ jobs:
           Invoke-WebRequest -Uri https://github.com/KhronosGroup/glslang/releases/download/main-tot/glslang-main-windows-x86_64-release.zip -OutFile glslang.zip
           Expand-Archive glslang.zip -DestinationPath glslang
           echo "$((Resolve-Path glslang/bin).Path)" >> $env:GITHUB_PATH
-      - name: Build spirv-cross (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        shell: pwsh
-        run: |
-          git clone --depth 1 --branch vulkan-sdk-1.4.357.0 https://github.com/KhronosGroup/SPIRV-Cross.git
-          cmake -S SPIRV-Cross -B SPIRV-Cross/build -GNinja -DCMAKE_BUILD_TYPE=Release -DSPIRV_CROSS_SHARED=OFF -DSPIRV_CROSS_CLI=ON
-          cmake --build SPIRV-Cross/build --target spirv-cross
-          echo "$((Resolve-Path SPIRV-Cross/build).Path)" >> $env:GITHUB_PATH
-      - name: Install dxc (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.9.2607/dxc_2026_07_29.zip -OutFile dxc.zip
-          Expand-Archive dxc.zip -DestinationPath dxc
-          echo "$((Resolve-Path dxc/bin/x64).Path)" >> $env:GITHUB_PATH
       - name: Set up SDL
         uses: libsdl-org/setup-sdl@main
         with:
@@ -96,6 +81,55 @@ jobs:
           version: 3-latest
           version-sdl2-compat: 2-head
           version-sdl12-compat: 1-head
+      - name: Build SDL_shadercross (Linux/macOS)
+        if: ${{ runner.os != 'Windows' }}
+        run: |
+          git clone --depth 1 https://github.com/libsdl-org/SDL_shadercross.git
+          git -C SDL_shadercross submodule update --init --depth 1 external/SPIRV-Cross external/SPIRV-Headers external/SPIRV-Tools
+          # DXC is only needed for the D3D12 (DXIL) backend, which is Windows-only.
+          # sdl_check_project_in_subfolder requires a CMakeLists.txt to exist.
+          mkdir -p SDL_shadercross/external/DirectXShaderCompiler
+          : > SDL_shadercross/external/DirectXShaderCompiler/CMakeLists.txt
+          cmake -S SDL_shadercross -B SDL_shadercross/build -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSDLSHADERCROSS_CLI=ON \
+            -DSDLSHADERCROSS_SHARED=ON \
+            -DSDLSHADERCROSS_STATIC=ON \
+            -DSDLSHADERCROSS_TESTS=OFF \
+            -DSDLSHADERCROSS_VENDORED=ON \
+            -DSDLSHADERCROSS_DXC=OFF
+          cmake --build SDL_shadercross/build --target shadercross
+          echo "$PWD/SDL_shadercross/build" >>$GITHUB_PATH
+      - name: Build SDL_shadercross (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/libsdl-org/SDL_shadercross.git
+          git -C SDL_shadercross submodule update --init --depth 1 external/SPIRV-Cross
+          # Build + install SPIRV-Cross (shared) for find_package(spirv_cross_c_shared).
+          cmake -S SDL_shadercross/external/SPIRV-Cross -B spirv-cross-build -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSPIRV_CROSS_SHARED=ON \
+            -DSPIRV_CROSS_CLI=OFF \
+            -DCMAKE_INSTALL_PREFIX="$PWD/spirv-cross-prefix"
+          cmake --build spirv-cross-build
+          cmake --install spirv-cross-build
+          # Download the prebuilt DXC binaries (dxcompiler.dll / dxil.dll).
+          cmake -P SDL_shadercross/build-scripts/download-prebuilt-DirectXShaderCompiler.cmake
+          echo "spirv_cross_c_shared_ROOT=$(cygpath -w "$PWD/spirv-cross-prefix");$(cygpath -w "$PWD/spirv-cross-prefix/share/spirv_cross_c_shared")" >>$GITHUB_ENV
+          echo "DirectXShaderCompiler_ROOT=$(cygpath -w "$PWD/SDL_shadercross/external/DirectXShaderCompiler-binaries")" >>$GITHUB_ENV
+          cmake -S SDL_shadercross -B SDL_shadercross/build -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSDLSHADERCROSS_CLI=ON \
+            -DSDLSHADERCROSS_SHARED=ON \
+            -DSDLSHADERCROSS_STATIC=ON \
+            -DSDLSHADERCROSS_TESTS=OFF \
+            -DSDLSHADERCROSS_VENDORED=OFF \
+            -DSDLSHADERCROSS_DXC=ON
+          cmake --build SDL_shadercross/build --target shadercross
+          echo "$(cygpath -w "$PWD/SDL_shadercross/build")" >>$GITHUB_PATH
+          echo "$(cygpath -w "$PWD/spirv-cross-prefix/bin")" >>$GITHUB_PATH
+          echo "$(cygpath -w "$PWD/SDL_shadercross/external/DirectXShaderCompiler-binaries/windows/bin/x64")" >>$GITHUB_PATH
       - name: "Prepare sources for release"
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: |
