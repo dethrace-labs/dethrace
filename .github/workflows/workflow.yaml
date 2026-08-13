@@ -115,8 +115,10 @@ jobs:
           cmake --install spirv-cross-build
           # Download the prebuilt DXC binaries (dxcompiler.dll / dxil.dll).
           cmake -P SDL_shadercross/build-scripts/download-prebuilt-DirectXShaderCompiler.cmake
-          echo "spirv_cross_c_shared_ROOT=$(cygpath -w "$PWD/spirv-cross-prefix");$(cygpath -w "$PWD/spirv-cross-prefix/share/spirv_cross_c_shared")" >>$GITHUB_ENV
-          echo "DirectXShaderCompiler_ROOT=$(cygpath -w "$PWD/SDL_shadercross/external/DirectXShaderCompiler-binaries")" >>$GITHUB_ENV
+          # find_package hints must be exported to THIS shell: GITHUB_ENV only
+          # applies to subsequent steps, but the shadercross configure runs here.
+          export spirv_cross_c_shared_ROOT="$(cygpath -w "$PWD/spirv-cross-prefix");$(cygpath -w "$PWD/spirv-cross-prefix/share/spirv_cross_c_shared")"
+          export DirectXShaderCompiler_ROOT="$(cygpath -w "$PWD/SDL_shadercross/external/DirectXShaderCompiler-binaries")"
           cmake -S SDL_shadercross -B SDL_shadercross/build -GNinja \
             -DCMAKE_BUILD_TYPE=Release \
             -DSDLSHADERCROSS_CLI=ON \
