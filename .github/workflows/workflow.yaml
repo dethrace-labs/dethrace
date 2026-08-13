@@ -85,11 +85,10 @@ jobs:
         if: ${{ runner.os != 'Windows' }}
         run: |
           git clone --depth 1 https://github.com/libsdl-org/SDL_shadercross.git
-          git -C SDL_shadercross submodule update --init --depth 1 external/SPIRV-Cross external/SPIRV-Headers external/SPIRV-Tools
-          # DXC is only needed for the D3D12 (DXIL) backend, which is Windows-only.
-          # sdl_check_project_in_subfolder requires a CMakeLists.txt to exist.
-          mkdir -p SDL_shadercross/external/DirectXShaderCompiler
-          : > SDL_shadercross/external/DirectXShaderCompiler/CMakeLists.txt
+          # The vendored build needs every external/ submodule checked out;
+          # DirectXShaderCompiler is required by sdl_check_project_in_subfolder
+          # even though DXC itself is only built for the D3D12 backend.
+          git -C SDL_shadercross submodule update --init --depth 1 external/SPIRV-Cross external/SPIRV-Headers external/SPIRV-Tools external/DirectXShaderCompiler
           cmake -S SDL_shadercross -B SDL_shadercross/build -GNinja \
             -DCMAKE_BUILD_TYPE=Release \
             -DSDLSHADERCROSS_CLI=ON \
