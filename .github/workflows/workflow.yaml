@@ -65,10 +65,10 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         shell: pwsh
         run: |
-          vcpkg install glslang spirv-cross dxc:x64-windows
+          vcpkg install glslang spirv-cross directx-dxc:x64-windows
           "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\glslang" >> $env:GITHUB_PATH
           "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\spirv-cross" >> $env:GITHUB_PATH
-          "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\dxc" >> $env:GITHUB_PATH
+          "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\directx-dxc" >> $env:GITHUB_PATH
       - name: Set up SDL
         uses: libsdl-org/setup-sdl@main
         with:
