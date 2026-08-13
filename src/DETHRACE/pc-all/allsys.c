@@ -10,9 +10,6 @@
 #include "harness/os.h"
 #include "harness/trace.h"
 
-#ifdef DETHRACE_SDL3GPU
-#include "brsdl3gpurend.h"
-#endif
 #include "init.h"
 #include "input.h"
 #include "loadsave.h"
@@ -90,12 +87,14 @@ static void BR_CALLBACK sdl3_get_window_size(int* width, int* height) {
 }
 
 /* SDL3 GPU renderer debug mode (Vulkan validation layers): enabled by the
- * --gpu-debug command line option or the SDL3GPU_DEBUG environment variable
+ * --sdl3gpu-debug command line option or the SDL3GPU_DEBUG environment variable
  * (any non-empty, non-"0" value). */
 static int sdl3_gpu_debug_mode(void) {
-    if (harness_game_config.gpu_debug)
+    const char* env;
+    if (harness_game_config.gpu_debug) {
         return 1;
-    const char* env = getenv("SDL3GPU_DEBUG");
+    }
+    env = getenv("SDL3GPU_DEBUG");
     return env != NULL && env[0] != '\0' && env[0] != '0';
 }
 #endif
@@ -426,6 +425,9 @@ void PDAllocateScreenAndBack(void) {
 #ifdef DETHRACE_SDL3GPU
     if (harness_game_config.opengl_3dfx_mode == 2) {
         if (!gNo_voodoo) {
+            int sdl3_debug_mode;
+            br_error sdl3_err;
+
             BrBegin();
             sdl3_callbacks.get_proc_address = NULL;
             sdl3_callbacks.swap_buffers = gHarness_platform.Swap;
@@ -433,16 +435,17 @@ void PDAllocateScreenAndBack(void) {
             sdl3_callbacks.free = NULL;
             sdl3_callbacks.get_window_size = sdl3_get_window_size;
             sdl3_callbacks.get_window = gHarness_platform.GetWindow;
-            sdl3_callbacks.sdl3_handle = SDL3_GetHandle();
+            sdl3_callbacks.sdl3_handle = gHarness_platform.GetSDL3Handle != NULL ? gHarness_platform.GetSDL3Handle() : NULL;
             fprintf(stderr, "[SDL3] Creating SDL3-GPU window...\n");
             gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_sdl3);
             fprintf(stderr, "[SDL3] Window created. Calling BrDevBeginVar(\"sdl3gpurend\")...\n");
 
-            int sdl3_debug_mode = sdl3_gpu_debug_mode();
-            if (sdl3_debug_mode)
+            sdl3_debug_mode = sdl3_gpu_debug_mode();
+            if (sdl3_debug_mode) {
                 fprintf(stderr, "[SDL3] Debug mode enabled (Vulkan validation layers)\n");
+            }
 
-            br_error sdl3_err = BrDevBeginVar(&gScreen, "sdl3gpurend",
+            sdl3_err = BrDevBeginVar(&gScreen, "sdl3gpurend",
                 BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
                 BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
                 BRT_SDL3GPU_CALLBACKS_P, &sdl3_callbacks,

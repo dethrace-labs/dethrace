@@ -445,7 +445,10 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--opengl") == 0) {
             harness_game_config.opengl_3dfx_mode = 1;
             consumed = 1;
-        } else if (strcasecmp(argv[i], "--gpu-debug") == 0) {
+        } else if (strcasecmp(argv[i], "--sdl3gpu") == 0) {
+            harness_game_config.opengl_3dfx_mode = 2;
+            consumed = 1;
+        } else if (strcasecmp(argv[i], "--sdl3gpu-debug") == 0) {
             // Enable the SDL3 GPU renderer's debug mode (Vulkan validation layers)
             harness_game_config.gpu_debug = 1;
             consumed = 1;

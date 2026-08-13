@@ -88,7 +88,7 @@ static void* sdl3_so;
 // handle) so the sdl3gpurend BRender driver can resolve its own SDL3 function
 // pointers from it via br_device_sdl3gpu_callback_procs.sdl3_handle. NULL when
 // SDL3 is linked directly into the binary.
-void* SDL3_GetHandle(void) {
+static void* SDL3_GetHandle(void) {
 #ifdef DETHRACE_SDL_DYNAMIC
     return sdl3_so;
 #else
@@ -457,6 +457,8 @@ static int SDL3_Harness_Platform_Init(tHarness_platform* platform) {
     platform->GetViewport = SDL3_Harness_GetViewport;
 
     platform->GetWindow = SDL3_Harness_GetWindow;
+
+    platform->GetSDL3Handle = SDL3_GetHandle;
     return 0;
 };
 
