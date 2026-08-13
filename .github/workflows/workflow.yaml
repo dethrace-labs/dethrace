@@ -56,19 +56,33 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl-dev libgl1-mesa-dev libglu1-mesa-dev libxext-dev glslang-tools
+          sudo apt-get install -y libgl-dev libgl1-mesa-dev libglu1-mesa-dev libxext-dev glslang-tools spirv-cross
       - name: Install macOS dependencies
         if: ${{ runner.os == 'macOS' }}
         run: |
           brew install spirv-cross glslang
-      - name: Install Windows shader tools
+      - name: Install glslang (Windows)
         if: ${{ runner.os == 'Windows' }}
         shell: pwsh
         run: |
-          vcpkg install glslang spirv-cross directx-dxc:x64-windows
-          "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\glslang" >> $env:GITHUB_PATH
-          "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\spirv-cross" >> $env:GITHUB_PATH
-          "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\directx-dxc" >> $env:GITHUB_PATH
+          Invoke-WebRequest -Uri https://github.com/KhronosGroup/glslang/releases/download/main-tot/glslang-main-windows-x86_64-release.zip -OutFile glslang.zip
+          Expand-Archive glslang.zip -DestinationPath glslang
+          echo "$((Resolve-Path glslang/bin).Path)" >> $env:GITHUB_PATH
+      - name: Build spirv-cross (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        shell: pwsh
+        run: |
+          git clone --depth 1 --branch vulkan-sdk-1.4.357.0 https://github.com/KhronosGroup/SPIRV-Cross.git
+          cmake -S SPIRV-Cross -B SPIRV-Cross/build -GNinja -DCMAKE_BUILD_TYPE=Release -DSPIRV_CROSS_SHARED=OFF -DSPIRV_CROSS_CLI=ON
+          cmake --build SPIRV-Cross/build --target spirv-cross
+          echo "$((Resolve-Path SPIRV-Cross/build).Path)" >> $env:GITHUB_PATH
+      - name: Install dxc (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.9.2607/dxc_2026_07_29.zip -OutFile dxc.zip
+          Expand-Archive dxc.zip -DestinationPath dxc
+          echo "$((Resolve-Path dxc/bin/x64).Path)" >> $env:GITHUB_PATH
       - name: Set up SDL
         uses: libsdl-org/setup-sdl@main
         with:
