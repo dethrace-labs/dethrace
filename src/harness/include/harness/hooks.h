@@ -70,7 +70,7 @@ typedef struct tPlatform_bootstrap {
 extern tHarness_platform gHarness_platform;
 
 // Returns the OS handle of the loaded SDL3 library (dlopen/LoadLibrary handle),
-// or NULL when SDL3 is linked directly. Used by the sdl3rend BRender driver to
+// or NULL when SDL3 is linked directly. Used by the sdl3gpurend BRender driver to
 // resolve its SDL3 function pointers at runtime.
 extern void* SDL3_GetHandle(void);
 

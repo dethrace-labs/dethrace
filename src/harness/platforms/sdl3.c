@@ -85,8 +85,8 @@ static void* sdl3_so;
 #include "sdl_dyn_common.h"
 
 // Returns the OS handle of the loaded SDL3 library (the dlopen/LoadLibrary
-// handle) so the sdl3rend BRender driver can resolve its own SDL3 function
-// pointers from it via br_device_sdl3_callback_procs.sdl3_handle. NULL when
+// handle) so the sdl3gpurend BRender driver can resolve its own SDL3 function
+// pointers from it via br_device_sdl3gpu_callback_procs.sdl3_handle. NULL when
 // SDL3 is linked directly into the binary.
 void* SDL3_GetHandle(void) {
 #ifdef DETHRACE_SDL_DYNAMIC
