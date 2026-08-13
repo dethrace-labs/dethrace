@@ -57,6 +57,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libgl-dev libgl1-mesa-dev libglu1-mesa-dev libxext-dev
+      - name: Install macOS dependencies
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          brew install spirv-cross
       - name: Set up SDL
         uses: libsdl-org/setup-sdl@main
         with:
