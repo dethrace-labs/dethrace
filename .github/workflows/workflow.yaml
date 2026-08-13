@@ -60,7 +60,7 @@ jobs:
       - name: Install macOS dependencies
         if: ${{ runner.os == 'macOS' }}
         run: |
-          brew install spirv-cross
+          brew install spirv-cross shaderc
       - name: Set up SDL
         uses: libsdl-org/setup-sdl@main
         with:
