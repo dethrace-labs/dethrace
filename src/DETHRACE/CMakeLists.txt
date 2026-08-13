@@ -41,6 +41,10 @@ endif()
 
 target_compile_definitions(dethrace_obj PRIVATE INSIDE_DETHRACE)
 
+if(NOT MSVC_42_FOR_RECCMP)
+    target_compile_definitions(dethrace_obj PRIVATE DETHRACE_SDL3GPU)
+endif()
+
 if(DETHRACE_FIX_BUGS)
     target_compile_definitions(dethrace_obj PRIVATE DETHRACE_FIX_BUGS)
 endif()

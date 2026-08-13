@@ -10,7 +10,9 @@
 #include "harness/os.h"
 #include "harness/trace.h"
 
+#ifdef DETHRACE_SDL3GPU
 #include "brsdl3gpurend.h"
+#endif
 #include "init.h"
 #include "input.h"
 #include "loadsave.h"
@@ -76,9 +78,12 @@ int gForce_voodoo_rush_mode;
 int gForce_voodoo_mode;
 
 br_device_gl_callback_procs gl_callbacks;
+#ifdef DETHRACE_SDL3GPU
 br_device_sdl3gpu_callback_procs sdl3_callbacks;
+#endif
 br_device_virtualfb_callback_procs virtualfb_callbacks;
 
+#ifdef DETHRACE_SDL3GPU
 static void BR_CALLBACK sdl3_get_window_size(int* width, int* height) {
     *width = gHarness_window_width;
     *height = gHarness_window_height;
@@ -93,6 +98,7 @@ static int sdl3_gpu_debug_mode(void) {
     const char* env = getenv("SDL3GPU_DEBUG");
     return env != NULL && env[0] != '\0' && env[0] != '0';
 }
+#endif
 
 // from win95sys.c
 int gShow_fatal_error;
@@ -417,6 +423,7 @@ void PDAllocateScreenAndBack(void) {
     gScreen = NULL;
 
     // added by dethrace. We default to software mode unless we explicitly ask for 3dfx opengl or vulkan mode
+#ifdef DETHRACE_SDL3GPU
     if (harness_game_config.opengl_3dfx_mode == 2) {
         if (!gNo_voodoo) {
             BrBegin();
@@ -448,7 +455,9 @@ void PDAllocateScreenAndBack(void) {
                 fprintf(stderr, "[SDL3] SDL3-GPU window initialized\n");
             }
         }
-    } else if (harness_game_config.opengl_3dfx_mode) {
+    } else
+#endif
+    if (harness_game_config.opengl_3dfx_mode) {
         if (!gNo_voodoo) {
             gl_callbacks.get_proc_address = gHarness_platform.GL_GetProcAddress;
             gl_callbacks.swap_buffers = gHarness_platform.Swap;
