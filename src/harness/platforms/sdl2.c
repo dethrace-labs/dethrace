@@ -49,8 +49,7 @@ static const char* const possible_locations[] = {
     "@loader_path/../Frameworks/" SDL2_FRAMEWORK,     /* MyApp.app/Contents/Frameworks/SDL2_framework */
     "@executable_path/" SDL2_LIBNAME,                 /* MyApp.app/Contents/MacOS/libSDL2_dylib */
     "@executable_path/../Frameworks/" SDL2_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL2_framework */
-    NULL,                                             /* /Users/username/Library/Frameworks/SDL2_framework */
-    "/Library/Frameworks" SDL2_FRAMEWORK,             /* /Library/Frameworks/SDL2_framework */
+    "/Library/Frameworks/" SDL2_FRAMEWORK,            /* /Library/Frameworks/SDL2_framework */
     SDL2_LIBNAME                                      /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
