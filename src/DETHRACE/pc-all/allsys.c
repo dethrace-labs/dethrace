@@ -461,6 +461,9 @@ void PDAllocateScreenAndBack(void) {
     } else
 #endif
     if (harness_game_config.opengl_3dfx_mode) {
+        if (harness_game_config.opengl_3dfx_mode != 1) {
+            fprintf(stderr, "Warning: unrecognized opengl_3dfx_mode %d; falling back to OpenGL renderer\n", harness_game_config.opengl_3dfx_mode);
+        }
         if (!gNo_voodoo) {
             gl_callbacks.get_proc_address = gHarness_platform.GL_GetProcAddress;
             gl_callbacks.swap_buffers = gHarness_platform.Swap;
