@@ -56,11 +56,19 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl-dev libgl1-mesa-dev libglu1-mesa-dev libxext-dev
+          sudo apt-get install -y libgl-dev libgl1-mesa-dev libglu1-mesa-dev libxext-dev glslang-tools
       - name: Install macOS dependencies
         if: ${{ runner.os == 'macOS' }}
         run: |
-          brew install spirv-cross shaderc
+          brew install spirv-cross glslang
+      - name: Install Windows shader tools
+        if: ${{ runner.os == 'Windows' }}
+        shell: pwsh
+        run: |
+          vcpkg install glslang spirv-cross dxc:x64-windows
+          "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\glslang" >> $env:GITHUB_PATH
+          "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\spirv-cross" >> $env:GITHUB_PATH
+          "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\dxc" >> $env:GITHUB_PATH
       - name: Set up SDL
         uses: libsdl-org/setup-sdl@main
         with:
