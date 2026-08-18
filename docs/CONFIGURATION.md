@@ -37,6 +37,13 @@ Cutscenes = 0
 ; "hires" mode is 640x480, otherwise default 320x200
 Hires = 1
 
+; Steer the car with the mouse/trackpad (Doom-style). Press ` (backtick) or the
+; Cmd/Win key in-game to grab/release the mouse. Set to 0 to disable entirely.
+MouseSteering = 1
+
+; Mouse steering sensitivity multiplier (default 1.0)
+MouseSteeringSensitivity = 1.0
+
 ; Only used in 'demo' mode. Default demo time out is 240s (4 mins)
 DemoTimeout = 240
 
