@@ -22,6 +22,8 @@
     X(HideCursor, bool, (void))                                                                         \
     X(SetWindowFullscreen, bool, (SDL_Window*, bool))                                                   \
     X(SetWindowSize, bool, (SDL_Window*, int, int))                                                     \
+    X(ShowWindow, bool, (SDL_Window*))                                                                  \
+    X(PumpEvents, void, (void))                                                                         \
     X(CreateRenderer, SDL_Renderer*, (SDL_Window*, const char*))                                        \
     X(RenderClear, bool, (SDL_Renderer*))                                                               \
     X(RenderTexture, bool, (SDL_Renderer*, SDL_Texture*, const SDL_FRect*, const SDL_FRect*))           \

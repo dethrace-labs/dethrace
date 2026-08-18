@@ -9,6 +9,7 @@
 #include "harness/hooks.h"
 #include "harness/os.h"
 #include "harness/trace.h"
+
 #include "init.h"
 #include "input.h"
 #include "loadsave.h"
@@ -74,7 +75,29 @@ int gForce_voodoo_rush_mode;
 int gForce_voodoo_mode;
 
 br_device_gl_callback_procs gl_callbacks;
+#ifdef DETHRACE_SDL3GPU
+br_device_sdl3gpu_callback_procs sdl3_callbacks;
+#endif
 br_device_virtualfb_callback_procs virtualfb_callbacks;
+
+#ifdef DETHRACE_SDL3GPU
+static void BR_CALLBACK sdl3_get_window_size(int* width, int* height) {
+    *width = gHarness_window_width;
+    *height = gHarness_window_height;
+}
+
+/* SDL3 GPU renderer debug mode (Vulkan validation layers): enabled by the
+ * --sdl3gpu-debug command line option or the SDL3GPU_DEBUG environment variable
+ * (any non-empty, non-"0" value). */
+static int sdl3_gpu_debug_mode(void) {
+    const char* env;
+    if (harness_game_config.gpu_debug) {
+        return 1;
+    }
+    env = getenv("SDL3GPU_DEBUG");
+    return env != NULL && env[0] != '\0' && env[0] != '0';
+}
+#endif
 
 // from win95sys.c
 int gShow_fatal_error;
@@ -398,9 +421,50 @@ void PDUnlockRealBackScreen(int lock) {
 void PDAllocateScreenAndBack(void) {
     gScreen = NULL;
 
-    // added by dethrace. We default to software mode unless we explicitly ask for 3dfx opengl mode
+    // added by dethrace. We default to software mode unless we explicitly ask for 3dfx opengl or vulkan mode
+#ifdef DETHRACE_SDL3GPU
+    if (harness_game_config.opengl_3dfx_mode == 2) {
+        if (!gNo_voodoo) {
+            int sdl3_debug_mode;
+            br_error sdl3_err;
+
+            BrBegin();
+            sdl3_callbacks.get_proc_address = NULL;
+            sdl3_callbacks.swap_buffers = gHarness_platform.Swap;
+            sdl3_callbacks.get_viewport = gHarness_platform.GetViewport;
+            sdl3_callbacks.free = NULL;
+            sdl3_callbacks.get_window_size = sdl3_get_window_size;
+            sdl3_callbacks.get_window = gHarness_platform.GetWindow;
+            sdl3_callbacks.sdl3_handle = gHarness_platform.GetSDL3Handle != NULL ? gHarness_platform.GetSDL3Handle() : NULL;
+            fprintf(stderr, "[SDL3] Creating SDL3-GPU window...\n");
+            gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_sdl3);
+            fprintf(stderr, "[SDL3] Window created. Calling BrDevBeginVar(\"sdl3gpurend\")...\n");
+
+            sdl3_debug_mode = sdl3_gpu_debug_mode();
+            if (sdl3_debug_mode) {
+                fprintf(stderr, "[SDL3] Debug mode enabled (Vulkan validation layers)\n");
+            }
+
+            sdl3_err = BrDevBeginVar(&gScreen, "sdl3gpurend",
+                BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,
+                BRT_HEIGHT_I32, gGraf_specs[gGraf_spec_index].phys_height,
+                BRT_SDL3GPU_CALLBACKS_P, &sdl3_callbacks,
+                BRT_SDL3GPU_DEBUG_MODE, sdl3_debug_mode,
+                BRT_PIXEL_TYPE_U8, BR_PMT_RGB_565,
+                BR_NULL_TOKEN);
+            fprintf(stderr, "[SDL3] BrDevBeginVar returned %d, gScreen=%p\n", (int)sdl3_err, (void*)gScreen);
+
+            if (sdl3_err == BRE_OK && gScreen != NULL) {
+                fprintf(stderr, "[SDL3] SDL3-GPU window initialized\n");
+            }
+        }
+    } else
+#endif
     if (harness_game_config.opengl_3dfx_mode) {
-        if (gGraf_spec_index != 0 && !gNo_voodoo) {
+        if (harness_game_config.opengl_3dfx_mode != 1) {
+            fprintf(stderr, "Warning: unrecognized opengl_3dfx_mode %d; falling back to OpenGL renderer\n", harness_game_config.opengl_3dfx_mode);
+        }
+        if (!gNo_voodoo) {
             gl_callbacks.get_proc_address = gHarness_platform.GL_GetProcAddress;
             gl_callbacks.swap_buffers = gHarness_platform.Swap;
             gl_callbacks.get_viewport = gHarness_platform.GetViewport;
@@ -445,6 +509,11 @@ void PDAllocateScreenAndBack(void) {
         // Render framebuffer to memory and call hooks when swapping or palette changing
         virtualfb_callbacks.palette_changed = gHarness_platform.PaletteChanged;
         virtualfb_callbacks.swap_buffers = gHarness_platform.Swap;
+        fprintf(stderr, "[SW] Falling back to software renderer\n");
+        if (gHarness_platform.DestroyWindow) {
+            fprintf(stderr, "[SW] Destroying previous window before creating software window\n");
+            gHarness_platform.DestroyWindow();
+        }
         gHarness_platform.CreateWindow_("Carmageddon", gGraf_specs[gGraf_spec_index].phys_width, gGraf_specs[gGraf_spec_index].phys_height, eWindow_type_software);
         BrDevBeginVar(&gScreen, "virtualframebuffer",
             BRT_WIDTH_I32, gGraf_specs[gGraf_spec_index].phys_width,

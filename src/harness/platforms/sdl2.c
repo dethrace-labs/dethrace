@@ -34,6 +34,8 @@ static struct {
 // Callbacks back into original game code
 extern void QuitGame(void);
 extern br_pixelmap* gBack_screen;
+extern int gHarness_window_width;
+extern int gHarness_window_height;
 
 #ifdef DETHRACE_SDL_DYNAMIC
 #ifdef _WIN32
@@ -166,6 +168,8 @@ static void SDL2_Harness_ProcessWindowMessages(void) {
 
         case SDL_WINDOWEVENT:
             if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                gHarness_window_width = event.window.data1;
+                gHarness_window_height = event.window.data2;
                 calculate_viewport(event.window.data1, event.window.data2);
             }
             break;
@@ -325,6 +329,7 @@ static void SDL2_Harness_CreateWindow(const char* title, int width, int height, 
 
     SDL2_ShowCursor(SDL_DISABLE);
 
+    SDL2_GetWindowSize(window, &gHarness_window_width, &gHarness_window_height);
     viewport.x = 0;
     viewport.y = 0;
     viewport.scale_x = 1;

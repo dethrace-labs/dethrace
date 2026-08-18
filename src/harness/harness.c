@@ -75,7 +75,9 @@ static int Harness_InitPlatform(void) {
 
         if (harness_game_config.opengl_3dfx_mode) {
             required_caps &= ~ePlatform_cap_video_mask;
-            required_caps |= ePlatform_cap_opengl;
+            required_caps |= (harness_game_config.opengl_3dfx_mode == 2)
+                ? ePlatform_cap_sdl3
+                : ePlatform_cap_opengl;
         }
 
         if (strlen(harness_game_config.platform_name) != 0) {
@@ -443,6 +445,13 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--opengl") == 0) {
             harness_game_config.opengl_3dfx_mode = 1;
             consumed = 1;
+        } else if (strcasecmp(argv[i], "--sdl3gpu") == 0) {
+            harness_game_config.opengl_3dfx_mode = 2;
+            consumed = 1;
+        } else if (strcasecmp(argv[i], "--sdl3gpu-debug") == 0) {
+            // Enable the SDL3 GPU renderer's debug mode (Vulkan validation layers)
+            harness_game_config.gpu_debug = 1;
+            consumed = 1;
         } else if (strcasecmp(argv[i], "--game-completed") == 0) {
             harness_game_config.game_completed = 1;
             consumed = 1;
@@ -501,7 +510,7 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
     } else if (MATCH("General", "Windowed")) {
         harness_game_config.start_full_screen = (value[0] == '0');
     } else if (MATCH("General", "Emulate3DFX")) {
-        harness_game_config.opengl_3dfx_mode = (value[0] == '1');
+        harness_game_config.opengl_3dfx_mode = atoi(value);
     } else if (MATCH("General", "DefaultGame")) {
         safe_strcpy(harness_game_config.default_game, value);
     } else if (MATCH("General", "BoringMode")) {
