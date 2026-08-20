@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <sys/param.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/sysctl.h>
@@ -35,7 +36,7 @@
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof(A[0]))
 
 static int stack_nbr = 0;
-static char _program_name[1024];
+static char _program_name[PATH_MAX];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
 static char name_buf[4096];
