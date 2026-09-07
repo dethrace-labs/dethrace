@@ -223,7 +223,7 @@ tEdit_func* gEdit_funcs[10][18][8] = {
         { DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7 },
         // 8
         { DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8 },
-        // 09
+        // 9
         { DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9 },
         { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL } },
 
