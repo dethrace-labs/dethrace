@@ -6,3 +6,4 @@ Exec=dethrace
 Icon=icon_source
 Terminal=false
 Categories=Game;Action;Simulator
+StartupWMClass=dethrace
