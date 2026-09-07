@@ -1,4 +1,8 @@
 #include <SDL3/SDL.h>
+#include <stdio.h>
+#ifndef DETHRACE_SDL_DYNAMIC
+#include <dlfcn.h>
+#endif
 
 #include "harness.h"
 #include "harness/config.h"
@@ -34,6 +38,8 @@ static struct {
 // Callbacks back into original game code
 extern void QuitGame(void);
 extern br_pixelmap* gBack_screen;
+extern int gHarness_window_width;
+extern int gHarness_window_height;
 
 #ifdef DETHRACE_SDL_DYNAMIC
 #ifdef _WIN32
@@ -77,6 +83,18 @@ static void* sdl3_so;
 #define FOREACH_SDLX_SYM FOREACH_SDL3_SYM
 
 #include "sdl_dyn_common.h"
+
+// Returns the OS handle of the loaded SDL3 library (the dlopen/LoadLibrary
+// handle) so the sdl3gpurend BRender driver can resolve its own SDL3 function
+// pointers from it via br_device_sdl3gpu_callback_procs.sdl3_handle. NULL when
+// SDL3 is linked directly into the binary.
+static void* SDL3_GetHandle(void) {
+#ifdef DETHRACE_SDL_DYNAMIC
+    return sdl3_so;
+#else
+    return NULL;
+#endif
+}
 
 static void calculate_viewport(int window_width, int window_height) {
     int vp_width, vp_height;
@@ -165,6 +183,8 @@ static void SDL3_Harness_ProcessWindowMessages(void) {
             break;
 
         case SDL_EVENT_WINDOW_RESIZED:
+            gHarness_window_width = event.window.data1;
+            gHarness_window_height = event.window.data2;
             calculate_viewport(event.window.data1, event.window.data2);
             break;
 
@@ -266,7 +286,16 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
         extra_window_flags |= SDL_WINDOW_FULLSCREEN;
     }
 
-    if (window_type == eWindow_type_opengl) {
+    if (window_type == eWindow_type_sdl3) {
+        window = SDL3_CreateWindow(title,
+            window_width, window_height,
+            extra_window_flags | SDL_WINDOW_VULKAN);
+
+        if (window == NULL) {
+            LOG_PANIC2("Failed to create SDL3-GPU window: %s", SDL3_GetError());
+        }
+
+    } else if (window_type == eWindow_type_opengl) {
         SDL3_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL3_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -330,6 +359,7 @@ static void SDL3_Harness_CreateWindow(const char* title, int width, int height, 
 
     SDL3_HideCursor();
 
+    SDL3_GetWindowSize(window, &gHarness_window_width, &gHarness_window_height);
     viewport.x = 0;
     viewport.y = 0;
     viewport.scale_x = 1;
@@ -342,6 +372,8 @@ static void SDL3_Harness_Swap(br_pixelmap* back_buffer) {
 
     if (gl_context != NULL) {
         SDL3_GL_SwapWindow(window);
+    } else if (SDL3_GetWindowFlags(window) & SDL_WINDOW_VULKAN) {
+        // VK handles its own presentation
     } else {
         uint8_t* src_pixels = back_buffer->pixels;
         uint32_t* dest_pixels;
@@ -398,6 +430,10 @@ static void* SDL3_Harness_GL_GetProcAddress(const char* name) {
     return SDL3_GL_GetProcAddress(name);
 }
 
+static void* SDL3_Harness_GetWindow(void) {
+    return window;
+}
+
 static int SDL3_Harness_Platform_Init(tHarness_platform* platform) {
     if (SDL3_LoadSymbols() != 0) {
         return 1;
@@ -419,12 +455,16 @@ static int SDL3_Harness_Platform_Init(tHarness_platform* platform) {
     platform->PaletteChanged = SDL3_Harness_PaletteChanged;
     platform->GL_GetProcAddress = SDL3_Harness_GL_GetProcAddress;
     platform->GetViewport = SDL3_Harness_GetViewport;
+
+    platform->GetWindow = SDL3_Harness_GetWindow;
+
+    platform->GetSDL3Handle = SDL3_GetHandle;
     return 0;
 };
 
 const tPlatform_bootstrap SDL3_bootstrap = {
     "sdl3",
     "SDL3 video backend (libsdl.org)",
-    ePlatform_cap_software | ePlatform_cap_opengl,
+    ePlatform_cap_software | ePlatform_cap_opengl | ePlatform_cap_sdl3,
     SDL3_Harness_Platform_Init,
 };

@@ -7,6 +7,7 @@
 typedef enum tHarness_window_type {
     eWindow_type_software = 0,
     eWindow_type_opengl = 1,
+    eWindow_type_sdl3 = 2,
 } tHarness_window_type;
 
 // Platform implementation functions
@@ -47,12 +48,19 @@ typedef struct tHarness_platform {
     void* (*GL_GetProcAddress)(const char* name);
     void (*GetViewport)(int* x, int* y, float* width_multiplier, float* height_multiplier);
 
+    // Return the SDL_Window* the SDL3-GPU driver should claim
+    void* (*GetWindow)(void);
+
+    // Return the handle of the SDL3 library
+    void* (*GetSDL3Handle)(void);
+
 } tHarness_platform;
 
 enum {
     ePlatform_cap_software = 0x1,
     ePlatform_cap_opengl = 0x2,
-    ePlatform_cap_video_mask = ePlatform_cap_software | ePlatform_cap_opengl,
+    ePlatform_cap_sdl3 = 0x4,
+    ePlatform_cap_video_mask = ePlatform_cap_software | ePlatform_cap_opengl | ePlatform_cap_sdl3,
 };
 
 typedef struct tPlatform_bootstrap {

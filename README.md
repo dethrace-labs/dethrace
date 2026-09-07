@@ -14,19 +14,33 @@ Dethrace is an attempt to learn how the 1997 driving/mayhem game [Carmageddon](h
 
 ### Dependencies
 
-Dethrace using CMake to build, and SDL2 at runtime. The easiest way to install them is via your favorite package manager.
+Dethrace using CMake to build, and SDL2/3 at runtime. The easiest way to install them is via your favorite package manager.
+
+The SDL3 GPU renderer (`Emulate3DFX = 2`) additionally needs the shader toolchain at build time. It compiles one set of GLSL sources into the shader formats SDL3 GPU expects per backend:
+
+- **glslang** (`glslangValidator`, `glslang`, or `glslc`) — GLSL to SPIR-V (Vulkan).
+- **SDL_shadercross** (`shadercross`) — SPIR-V to MSL (Metal) and DXIL (D3D12). This is the tool [SDL3 uses itself](https://github.com/libsdl-org/SDL_shadercross); its output follows the SDL3-GPU slot conventions by construction. Required on macOS; the build fails at configure time without it.
+- **spirv-cross** and **dxc** — fallback translator for setups without SDL_shadercross. Windows only; without either SDL_shadercross or dxc the build silently drops the D3D12 backend and falls back to Vulkan.
 
 OSX:
 
 ```sh
-brew install SDL2 cmake
+brew install SDL2 SDL3 glslang cmake
 ```
 
 Linux:
 
 ```sh
-apt-get install libsdl2-dev cmake
+apt-get install libsdl2-dev libsdl3-dev glslang-tools cmake
 ```
+
+Windows (MSYS2):
+
+```sh
+pacman -S mingw-w64-x86_64-sdl2 mingw-w64-x86_64-sdl3 mingw-w64-x86_64-glslang cmake make
+```
+
+MSYS2 and vcpkg do not ship `shadercross`; build it from [SDL_shadercross](https://github.com/libsdl-org/SDL_shadercross) (or install `spirv-cross` and `dxc` instead; `dxc` is downloaded from the [DirectXShaderCompiler releases](https://github.com/microsoft/DirectXShaderCompiler/releases) and must be on `PATH` before configuring).
 
 ### Clone
 

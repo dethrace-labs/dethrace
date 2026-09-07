@@ -140,6 +140,9 @@ extern int gSound_available;
 extern int gNumber_of_races;
 extern char gDir_separator[3];
 
+extern int gHarness_window_width;
+extern int gHarness_window_height;
+
 // FIXME!
 #define TAU 6.283185307179586
 
