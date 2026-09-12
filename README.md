@@ -72,6 +72,12 @@ Dethrace generally expects to be placed into the top level Carmageddon folder. Y
 
 Alternatively, you may configure a different Carmageddon directory and settings by providing a [dethrace.ini file](docs/CONFIGURATION.md).
 
+### Mouse steering
+
+Dethrace can steer the car with the mouse or trackpad, Doom-style. Press the `` ` `` (backtick) or `Cmd`/`Win` key in-game to grab the mouse: the cursor is hidden and locked, and moving left/right steers the car. Press the same key again to release the mouse for the menus. Steering by keyboard keeps working at the same time, and mouse steering follows your key mapping (it drives whatever you've bound steer-left/right to, arrows or WASD).
+
+It is enabled by default; disable it with `--no-mouse-steering` (or `MouseSteering = 0` in the INI). Tune the responsiveness with `--mouse-steering-sensitivity=1.5` (or `MouseSteeringSensitivity` in the INI).
+
 ### CD audio
 
 Dethrace supports the GOG cd audio convention. If there is a `MUSIC` folder in the Carmageddon folder containing files `Track02.ogg`, `Track03.ogg` etc, then Dethrace will use those files in place of the original CD audio functions.

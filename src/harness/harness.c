@@ -293,6 +293,9 @@ int Harness_Init(int* argc, char* argv[]) {
     harness_game_config.volume_multiplier = 1.0f;
     // start window in windowed mode
     harness_game_config.start_full_screen = 1;
+    // allow steering the car with the mouse/trackpad (Doom-style). Inert until grabbed with the toggle key
+    harness_game_config.mouse_steering = 1;
+    harness_game_config.mouse_steering_sensitivity = 1.0f;
     // Disable gore check emulation
     harness_game_config.gore_check = 0;
     // Disable "Sound Options" menu
@@ -434,6 +437,17 @@ int Harness_ProcessCommandLine(int* argc, char* argv[]) {
         } else if (strcasecmp(argv[i], "--window") == 0) {
             harness_game_config.start_full_screen = 0;
             consumed = 1;
+        } else if (strcasecmp(argv[i], "--mouse-steering") == 0) {
+            harness_game_config.mouse_steering = 1;
+            consumed = 1;
+        } else if (strcasecmp(argv[i], "--no-mouse-steering") == 0) {
+            harness_game_config.mouse_steering = 0;
+            consumed = 1;
+        } else if (strstr(argv[i], "--mouse-steering-sensitivity=") != NULL) {
+            char* s = strstr(argv[i], "=");
+            harness_game_config.mouse_steering_sensitivity = atof(s + 1);
+            LOG_INFO2("Mouse steering sensitivity set to %f", harness_game_config.mouse_steering_sensitivity);
+            consumed = 1;
         } else if (strcasecmp(argv[i], "--gore-check") == 0) {
             harness_game_config.gore_check = 1;
             consumed = 1;
@@ -510,6 +524,10 @@ static int Harness_Ini_Callback(void* user, const char* section, const char* nam
         gGraf_spec_index = (value[0] == '1');
     } else if (MATCH("General", "PhysicsPerFrame")) {
         harness_game_config.physics_per_frame = (value[0] == '1');
+    } else if (MATCH("General", "MouseSteering")) {
+        harness_game_config.mouse_steering = (value[0] == '1');
+    } else if (MATCH("General", "MouseSteeringSensitivity")) {
+        harness_game_config.mouse_steering_sensitivity = atof(value);
     }
 
     else if (MATCH("Cheats", "EditMode")) {

@@ -99,6 +99,23 @@ int KeyDown(tU8 pScan_code) {
     return (gKeyboard_bits[pScan_code >> 5] >> (pScan_code & 0x1F)) & 1;
 }
 
+// Resolve the keyboard scan code currently bound to a control action (steer left is
+// index 46, steer right is 47 - see PollCarControls). Returns 0 when the action is
+// unbound or mapped to a joystick axis. Lets the harness inject mouse/trackpad
+// steering as the correct key regardless of the player's key mapping.
+tU8 GetBoundScanCode(int pControl_index) {
+    int key;
+
+    if (pControl_index < 0 || pControl_index >= COUNT_OF(gKey_mapping)) {
+        return 0;
+    }
+    key = gKey_mapping[pControl_index];
+    if (key < 0 || key >= COUNT_OF(gScan_code)) {
+        return 0;
+    }
+    return gScan_code[key][0];
+}
+
 // IDA: void __usercall KeyTranslation(tU8 pKey_index@<EAX>, tU8 pScan_code_1@<EDX>, tU8 pScan_code_2@<EBX>)
 void KeyTranslation(tU8 pKey_index, tU8 pScan_code_1, tU8 pScan_code_2) {
     NOT_IMPLEMENTED();
