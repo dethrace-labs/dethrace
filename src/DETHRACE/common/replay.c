@@ -398,7 +398,9 @@ void ToggleReplay(void) {
 // IDA: void __usercall ReverseSound(tS3_effect_tag pEffect_index@<EAX>, tS3_sound_tag pSound_tag@<EDX>)
 // FUNCTION: CARM95 0x0041b7fe
 void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
-    NOT_IMPLEMENTED();
+    // Reverse playback is not implemented yet, but it must not abort replay.
+    (void)pEffect_index;
+    (void)pSound_tag;
 }
 
 // IDA: int __cdecl FindUniqueFile()
