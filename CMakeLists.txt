@@ -165,52 +165,5 @@ if(DETHRACE_WERROR)
 endif()
 
 if(DETHRACE_INSTALL)
-    if(APPLE)
-        install(FILES LICENSE
-            DESTINATION "."
-        )
-    else()
-        install(FILES LICENSE
-            DESTINATION "${CMAKE_INSTALL_DOCDIR}"
-        )
-    endif()
-
-    set(DETHRACE_PACKAGE_PLATFORM "" CACHE STRING "Dethrace binary package platform")
-    set(DETHRACE_PACKAGE_ARCH "" CACHE STRING "Dethrace binary package architecture")
-
-    if(NOT DETHRACE_PACKAGE_PLATFORM)
-        set(DETHRACE_PACKAGE_PLATFORM "${CMAKE_SYSTEM_NAME}")
-    endif()
-
-    string(TOLOWER "${DETHRACE_PACKAGE_PLATFORM}" DETHRACE_PACKAGE_PLATFORM)
-    string(TOLOWER "${DETHRACE_PACKAGE_ARCH}" DETHRACE_PACKAGE_ARCH)
-
-    set(CPACK_PACKAGE_NAME "dethrace")
-    set(CPACK_SYSTEM_NAME "${DETHRACE_PACKAGE_PLATFORM}")
-
-    set(CPACK_PACKAGE_FILE_NAME "dethrace-${DETHRACE_VERSION}-${DETHRACE_PACKAGE_PLATFORM}")
-
-    if(DETHRACE_PACKAGE_ARCH)
-        string(APPEND CPACK_PACKAGE_FILE_NAME "-${DETHRACE_PACKAGE_ARCH}")
-    endif()
-
-    set(CPACK_PACKAGE_DIRECTORY dist)
-
-    if(APPLE)
-        set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK "ON")
-        set(CPACK_GENERATOR "DragNDrop")
-        set(ext ".dmg")
-    elseif(MSVC)
-        set(CPACK_GENERATOR ZIP)
-        set(ext ".zip")
-    else()
-        set(CPACK_GENERATOR TGZ)
-        set(ext ".tar.gz")
-    endif()
-
-    if(EXISTS "$ENV{GITHUB_OUTPUT}")
-        file(APPEND "$ENV{GITHUB_OUTPUT}" "filename=${CPACK_PACKAGE_FILE_NAME}${ext}")
-    endif()
-
-    include(CPack)
+    include(InstallConfig)
 endif()
