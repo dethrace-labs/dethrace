@@ -56,7 +56,7 @@ elseif(MSVC)
     )
 else()
     target_compile_options(dethrace PRIVATE
-        -Wall
+        $<$<COMPILE_LANGUAGE:C,CXX>:-Wall>
     )
     add_compile_flags_if_supported(dethrace
         -Wformat
