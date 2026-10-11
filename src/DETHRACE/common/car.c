@@ -1499,7 +1499,7 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
     mat = &pCar->car_master_actor->t.t.mat;
     highest_p = 0.0f;
     for (i = 0; i < 3; i++) {
-        highest_p += BrVector3Dot((br_vector3*)mat->m[i], &pCar->water_normal);
+        highest_p += BrVector3Dot((br_vector3*)mat->m[i], &pCar->water_normal) * pCar->bounds[0].min.v[i];
     }
     highest_p += BrVector3Dot((br_vector3*)mat->m[3], &pCar->water_normal) / WORLD_SCALE_D;
     lowest_p = highest_p;
