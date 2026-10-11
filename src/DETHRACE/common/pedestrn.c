@@ -1042,6 +1042,9 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
 
     switch (the_sequence->frame_rate_type) {
     case ePed_frame_fixed:
+#ifdef DETHRACE_FIX_BUGS
+    default:
+#endif
         frame_period = 0.f;
         break;
     case ePed_frame_speed:
@@ -1054,10 +1057,8 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
     case ePed_frame_variable:
         frame_period = 1000.f / FRandomBetween(the_sequence->frame_rate_factor1, the_sequence->frame_rate_factor2);
         break;
-
-        DETHRACE_DEFAULT_BREAK;
     }
-    if (frame_period == 0.f) {
+    if (frame_period == 0.0f) {
         pPedestrian->current_frame = 0;
     } else if (pPedestrian->done_initial) {
         if (number_of_frames != 0) {

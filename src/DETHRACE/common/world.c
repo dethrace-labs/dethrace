@@ -1359,7 +1359,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
 #endif
             break;
 
-            DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
         }
         the_funk->lighting_animation_type = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
         if (the_funk->lighting_animation_type != eMove_none) {
@@ -1455,7 +1455,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
             }
             break;
 
-            DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
         }
 
         the_funk->proximity_count = 0;
@@ -1625,7 +1625,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
             the_groove->path_data.circular_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
             break;
 
-            DETHRACE_DEFAULT_BREAK;
+        DETHRACE_DEFAULT_BREAK
         }
 
         the_groove->object_type = GetALineAndInterpretCommand(pF, gGroove_object_names, COUNT_OF(gGroove_object_names));
@@ -1724,7 +1724,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                 &the_groove->object_data.shear_info.z_magnitude);
             break;
 
-            DETHRACE_DEFAULT_BREAK;
+        DETHRACE_DEFAULT_BREAK
         }
     }
 }
@@ -2123,10 +2123,10 @@ void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_leve
         case eCTL_none:
             RevealStoredTransparentTextures(pStorage);
 
-            DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
         }
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -2910,6 +2910,11 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 GetThreeScalars(f, &spec->bounds.max.v[0], &spec->bounds.max.v[1], &spec->bounds.max.v[2]);
                 BrMatrix34Identity(&spec->mat);
                 for (j = 0; j < 3; j++) {
+#ifdef DETHRACE_FIX_BUGS
+                    // Fix -Wmaybe-uninitialized warning
+                    temp_bounds.min.v[j] = spec->bounds.min.v[j];
+                    temp_bounds.max.v[j] = spec->bounds.max.v[j];
+#endif
                     spec->mat.m[3][j] = (temp_bounds.max.v[j] + temp_bounds.min.v[j]) / 2.0f;
                     MAT(&spec->mat.m, j, j) = temp_bounds.max.v[j] - spec->mat.m[3][j];
                 }
@@ -3448,7 +3453,7 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
         BrVector3SetFloat(&fixed_axis, 0.f, 0.f, 1.f);
         break;
 
-        DETHRACE_DEFAULT_BREAK;
+    DETHRACE_DEFAULT_BREAK
     }
     BrVector3Cross(&vector_a, &ref_to_subject, &fixed_axis);
     BrVector3Normalise(&vector_a, &vector_a);
@@ -3499,7 +3504,7 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
         mat.m[3][2] = 0.f;
         break;
 
-        DETHRACE_DEFAULT_BREAK;
+    DETHRACE_DEFAULT_BREAK
     }
     BrMatrix34Pre(&pSubject_actor->t.t.mat, &mat);
 }
