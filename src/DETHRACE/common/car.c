@@ -762,8 +762,6 @@ void GetFacesInBox(tCollision_info* c) {
         }
     }
 
-condition_met:
-
     BrMatrix34Mul(&mat5, &mat4, &mat4);
     BrMatrix34Mul(&mat6, &mat5, &mat4);
     BrMatrix34LPInverse(&mat5, &mat6);
@@ -1501,7 +1499,7 @@ void TestAutoSpecialVolume(tCollision_info* pCar) {
     mat = &pCar->car_master_actor->t.t.mat;
     highest_p = 0.0f;
     for (i = 0; i < 3; i++) {
-        highest_p += BrVector3Dot((br_vector3*)mat->m[i], &pCar->water_normal);
+        highest_p += BrVector3Dot((br_vector3*)mat->m[i], &pCar->water_normal) * pCar->bounds[0].min.v[i];
     }
     highest_p += BrVector3Dot((br_vector3*)mat->m[3], &pCar->water_normal) / WORLD_SCALE_D;
     lowest_p = highest_p;
@@ -7118,6 +7116,10 @@ int DoCollide(tCollision_info* car1, tCollision_info* car2, br_vector3* r, br_ve
         ts = FourPointCollB(f, &M, d, tau1, n);
         break;
     default:
+#ifdef DETHRACE_FIX_BUGS
+        // Fixes -Wsometimes-uninitialized warning
+        ts = 0.0f;
+#endif
         break;
     }
     if (k > 3) {

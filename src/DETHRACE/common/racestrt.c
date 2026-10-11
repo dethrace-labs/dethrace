@@ -2930,6 +2930,11 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     case eNet_synch_client:
         result = DoInterfaceScreen(&interface_spec_c, 0, -1);
         break;
+#ifdef DETHRACE_FIX_BUGS
+    default:
+        result = 1;
+        break;
+#endif
     }
     TurnOffPaletteConversion();
     FadePaletteDown();

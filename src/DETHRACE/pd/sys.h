@@ -51,8 +51,6 @@ extern tS32 gJoystick_min1x;
 // extern tU32 gScan_code[123];
 // #endif
 
-extern char* _unittest_last_fatal_error;
-
 // void KeyboardHandler(void);
 
 // int KeyDown(tU8 pScan_code);

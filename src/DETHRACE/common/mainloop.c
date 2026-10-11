@@ -449,6 +449,8 @@ void UpdateFramePeriod(tU32* pCamera_period) {
                     break;
                 case eNet_mode_host:
                     break;
+
+                DETHRACE_DEFAULT_BREAK
                 }
             }
         }

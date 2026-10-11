@@ -896,6 +896,8 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
                     FRandomBetween(-energy_magnitude * 50.0f, energy_magnitude * 150.0f),
                     FRandomBetween(7.0f / energy_magnitude, 25.0f / energy_magnitude));
                 break;
+
+            DETHRACE_DEFAULT_BREAK
             }
             CheckPiledriverBonus(pCar, pImpact_point, pEnergy_vector);
         }

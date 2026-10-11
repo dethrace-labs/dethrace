@@ -2121,6 +2121,10 @@ int UndoPipedSession(tU8** pPtr) {
     chunk_type = ((tPipe_session*)*pPtr)->chunk_type;
     for (i = 0; i < ((tPipe_session*)*pPtr)->number_of_chunks; i++) {
         pushed_end_of_session = gEnd_of_session;
+#ifdef DETHRACE_FIX_BUGS
+        // Fix -Wmaybe-uninitialized warning
+        prev_chunk = NULL;
+#endif
         if (!(chunk_type == ePipe_chunk_model_geometry || chunk_type == ePipe_chunk_sound || chunk_type == ePipe_chunk_damage || chunk_type == ePipe_chunk_special || chunk_type == ePipe_chunk_incident || chunk_type == ePipe_chunk_prox_ray || chunk_type == ePipe_chunk_smudge)) {
             prev_chunk = FindPreviousChunk(*pPtr, ((tPipe_session*)*pPtr)->chunk_type, chunk_ptr->subject_index);
         }
