@@ -1,6 +1,12 @@
-install(FILES LICENSE
-    DESTINATION "${CMAKE_INSTALL_DOCDIR}"
-)
+if(APPLE)
+    install(FILES LICENSE
+        DESTINATION "."
+    )
+else()
+    install(FILES LICENSE
+        DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+    )
+endif()
 
 set(DETHRACE_PACKAGE_PLATFORM "" CACHE STRING "Dethrace binary package platform")
 set(DETHRACE_PACKAGE_ARCH "" CACHE STRING "Dethrace binary package architecture")
