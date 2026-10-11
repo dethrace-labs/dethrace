@@ -399,6 +399,7 @@ void ToggleReplay(void) {
 // FUNCTION: CARM95 0x0041b7fe
 void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
     // Reverse playback is not implemented yet, but it must not abort replay.
+    STUB_ONCE();
     (void)pEffect_index;
     (void)pSound_tag;
 }
