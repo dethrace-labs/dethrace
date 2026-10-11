@@ -259,49 +259,43 @@ tU32* KevKeyService(void) {
     static int last_single_key = -1;
     // GLOBAL: CARM95 0x53a1fc
     static tU32 last_time = 0;
+    // GLOBAL: CARM95 0x00514CA0
     static tU32 return_val[2];
     tU32 keys;
 
     keys = gKeys_pressed;
-    // printf("key: %d, %lx, %lx\n", sizeof(long), keys, code2);
     return_val[0] = 0;
     return_val[1] = 0;
 
-    if (keys < 0x6B) {
-        last_single_key = gKeys_pressed;
+    if (keys >= 0x6b) {
+        if (keys <= 0x6b00 && ((keys & 0xff) == last_single_key || keys >> 8 == last_single_key)) {
+            if ((keys & 0xff) == last_single_key) {
+                keys >>= 8;
+            } else if (keys >> 8 == last_single_key) {
+                keys &= 0xff;
+            } else {
+                sum = 0;
+                code = 0;
+                return return_val;
+            }
+        } else {
+            sum = 0;
+            code = 0;
+            return return_val;
+        }
     } else {
-        if (keys > 0x6b00) {
-            sum = 0;
-            code = 0;
-            return return_val;
-        }
-        if ((keys & 0xff) != last_single_key && keys >> 8 != last_single_key) {
-            sum = 0;
-            code = 0;
-            return return_val;
-        }
-        if (keys >> 8 != last_single_key) {
-            sum = 0;
-            code = 0;
-            return return_val;
-        }
-        if ((keys & 0xff) == last_single_key) {
-            keys = keys >> 8;
-        }
-        keys = keys & 0xff;
+        last_single_key = keys;
     }
 
-    if (keys && keys != last_key) {
+    if (last_key != keys + 0 && keys > 0) {
         sum += keys;
         code += keys << 11;
-        code = (code >> 17) + (code << 4);
+        code = (code << 4) + (code >> 17);
         code2 = (code2 >> 29) + keys * keys + (code2 << 3);
-        // printf("accumulate: keys=%lx, sum=%lx, code=%lx, code2=%lx\n", keys, sum, code, code2);
         last_time = PDGetTotalTime();
-    } else if (PDGetTotalTime() > (last_time + 1000)) {
-        return_val[0] = ((code >> 11) + (sum << 21));
+    } else if (PDGetTotalTime() > last_time + 1000) {
+        return_val[0] = (code >> 11) + (sum << 21);
         return_val[1] = code2;
-        // printf("final value: code=%lx, code2=%lx\n", return_val[0], return_val[1]);
         code = 0;
         code2 = 0;
         sum = 0;

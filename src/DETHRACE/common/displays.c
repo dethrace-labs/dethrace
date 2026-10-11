@@ -236,32 +236,15 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
 
     x = pX;
     len = strlen(pText);
-    ch = (unsigned char*)pText;
-    if (pX >= 0 && pPixelmap->width >= pRight_edge && pY >= 0 && pY + pFont->height <= pPixelmap->height) {
-        for (i = 0; i < len; i++) {
-            if (*ch < 224) {
-                chr = *ch - pFont->offset;
-                ch_width = pFont->width_table[chr];
-                DRPixelmapRectangleOnscreenCopy(
-                    gBack_screen,
-                    x,
-                    pY,
-                    pFont->images,
-                    0,
-                    chr * pFont->height,
-                    ch_width,
-                    pFont->height);
-                x += ch_width + pFont->spacing;
-            } else {
-                new_font = &gFonts[-*ch + 256];
+    if (pX < 0 || pPixelmap->width < pRight_edge || pY < 0 || pY + pFont->height > pPixelmap->height) {
+        i = 0;
+        ch = (unsigned char*)pText;
+        for (; i < len; i++, ch++) {
+            if (*ch >= 224) {
+                new_font = &gFonts[256] - *ch;
                 pY -= (new_font->height - pFont->height) / 2;
                 pFont = new_font;
-            }
-            ch++;
-        }
-    } else {
-        for (i = 0; i < len; i++) {
-            if (*ch < 224) {
+            } else {
                 chr = *ch - pFont->offset;
                 ch_width = pFont->width_table[chr];
                 DRPixelmapRectangleMaskedCopy(
@@ -274,12 +257,30 @@ void DRPixelmapCleverText2(br_pixelmap* pPixelmap, int pX, int pY, tDR_font* pFo
                     ch_width,
                     pFont->height);
                 x += ch_width + pFont->spacing;
-            } else {
-                new_font = &gFonts[-*ch + 256];
+            }
+        }
+    } else {
+        i = 0;
+        ch = (unsigned char*)pText;
+        for (; i < len; i++, ch++) {
+            if (*ch >= 224) {
+                new_font = &gFonts[256] - *ch;
                 pY -= (new_font->height - pFont->height) / 2;
                 pFont = new_font;
+            } else {
+                chr = *ch - pFont->offset;
+                ch_width = pFont->width_table[chr];
+                DRPixelmapRectangleOnscreenCopy(
+                    gBack_screen,
+                    x,
+                    pY,
+                    pFont->images,
+                    0,
+                    chr * pFont->height,
+                    ch_width,
+                    pFont->height);
+                x += ch_width + pFont->spacing;
             }
-            ch++;
         }
     }
 }
@@ -786,41 +787,47 @@ int MungeHeadupWidth(tHeadup* pHeadup) {
     }
     if (pHeadup->type == eHeadup_coloured_text) {
         pHeadup->clever = IsHeadupTextClever((signed char*)(&pHeadup->data.text_info.text));
-        if (pHeadup->justification) {
-            if (pHeadup->justification == eJust_right) {
-                if (pHeadup->clever) {
-                    width = DRTextCleverWidth(
-                        pHeadup->data.coloured_text_info.coloured_font,
-                        (signed char*)(&pHeadup->data.text_info.text));
-                } else {
-                    width = DRTextWidth(pHeadup->data.coloured_text_info.coloured_font, pHeadup->data.text_info.text);
-                }
-                pHeadup->x = pHeadup->original_x - width;
-            } else if (pHeadup->justification == eJust_centre) {
-                if (pHeadup->clever) {
-                    width = DRTextCleverWidth(
-                        pHeadup->data.coloured_text_info.coloured_font,
-                        (signed char*)(&pHeadup->data.text_info.text));
-                } else {
-                    width = DRTextWidth(pHeadup->data.coloured_text_info.coloured_font, pHeadup->data.text_info.text);
-                }
+        switch (pHeadup->justification) {
+        case eJust_left:
+            pHeadup->x = pHeadup->original_x;
+            break;
+        case eJust_centre:
+            if (pHeadup->clever) {
+                width = DRTextCleverWidth(
+                    pHeadup->data.coloured_text_info.coloured_font,
+                    (signed char*)(&pHeadup->data.text_info.text));
+                pHeadup->x = pHeadup->original_x - width / 2;
+            } else {
+                width = DRTextWidth(pHeadup->data.coloured_text_info.coloured_font, pHeadup->data.text_info.text);
                 pHeadup->x = pHeadup->original_x - width / 2;
             }
-        } else {
-            pHeadup->x = pHeadup->original_x;
+            break;
+        case eJust_right:
+            if (pHeadup->clever) {
+                width = DRTextCleverWidth(
+                    pHeadup->data.coloured_text_info.coloured_font,
+                    (signed char*)(&pHeadup->data.text_info.text));
+                pHeadup->x = pHeadup->original_x - width;
+            } else {
+                width = DRTextWidth(pHeadup->data.coloured_text_info.coloured_font, pHeadup->data.text_info.text);
+                pHeadup->x = pHeadup->original_x - width;
+            }
+            break;
         }
     } else {
         pHeadup->clever = 0;
-        if (pHeadup->justification) {
-            if (pHeadup->justification == eJust_right) {
-                width = BrPixelmapTextWidth(gBack_screen, pHeadup->data.text_info.font, pHeadup->data.text_info.text);
-                pHeadup->x = pHeadup->original_x - width;
-            } else if (pHeadup->justification == eJust_centre) {
-                width = BrPixelmapTextWidth(gBack_screen, pHeadup->data.text_info.font, pHeadup->data.text_info.text);
-                pHeadup->x = pHeadup->original_x - width / 2;
-            }
-        } else {
+        switch (pHeadup->justification) {
+        case eJust_left:
             pHeadup->x = pHeadup->original_x;
+            break;
+        case eJust_centre:
+            width = BrPixelmapTextWidth(gBack_screen, pHeadup->data.text_info.font, pHeadup->data.text_info.text);
+            pHeadup->x = pHeadup->original_x - width / 2;
+            break;
+        case eJust_right:
+            width = BrPixelmapTextWidth(gBack_screen, pHeadup->data.text_info.font, pHeadup->data.text_info.text);
+            pHeadup->x = pHeadup->original_x - width;
+            break;
         }
     }
     return width;
