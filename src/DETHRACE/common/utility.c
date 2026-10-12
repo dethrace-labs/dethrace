@@ -1341,148 +1341,17 @@ void DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pi
 }
 
 // IDA: void __usercall DRPixelmapCopy(br_pixelmap *dst@<EAX>, br_pixelmap *src@<EDX>)
-// FUNCTION: CARM95 0x004ca180
 void DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
-#if defined(_MSC_VER) && defined(_M_IX86)
-    extern void _CheckDispatch(struct br_device_pixelmap * pm);
-    extern br_error GeneralCopy(struct br_device_pixelmap * dst, struct br_device_pixelmap * src);
-    __asm {
-        sub esp, 20h
-        push ebx
-        push esi
-        mov esi, dword ptr [esp + 2Ch]
-        push edi
-        push esi
-        call _CheckDispatch
-        mov edi, dword ptr [esp + 34h]
-        push edi
-        call _CheckDispatch
-        mov dx, word ptr [edi + 34h]
-        mov cx, word ptr [esi + 34h]
-        cmp dx, cx
-        jne stretch_copy
-        mov ax, word ptr [esi + 36h]
-        cmp word ptr [edi + 36h], ax
-        jne stretch_copy
-        push esi
-        call _CheckDispatch
-        push edi
-        call _CheckDispatch
-        push edi
-        mov eax, dword ptr [edi]
-        call dword ptr [eax + 20h]
-        add esp, 4
-        mov ebx, eax
-        mov eax, dword ptr [esi]
-        push esi
-        call dword ptr [eax + 20h]
-        add esp, 4
-        cmp ebx, eax
-        jne check_copy_to
-        push edi
-        mov eax, dword ptr [esi]
-        push esi
-        call dword ptr [eax + 54h]
-        add esp, 8
-        pop edi
-        pop esi
-        pop ebx
-        add esp, 20h
-        ret
-
-    check_copy_to:
-        mov al, byte ptr [edi + 2Dh]
-        test al, 1
-        jne check_copy_from
-        push edi
-        mov eax, dword ptr [esi]
-        push esi
-        call dword ptr [eax + 58h]
-        add esp, 8
-        pop edi
-        pop esi
-        pop ebx
-        add esp, 20h
-        ret
-
-    check_copy_from:
-        mov al, byte ptr [esi + 2Dh]
-        test al, 1
-        jne do_general_copy
-        push esi
-        mov eax, dword ptr [edi]
-        push edi
-        call dword ptr [eax + 5Ch]
-        add esp, 8
-        pop edi
-        pop esi
-        pop ebx
-        add esp, 20h
-        ret
-
-    do_general_copy:
-        push edi
-        push esi
-        call GeneralCopy
-        pop edi
-        pop esi
-        pop ebx
-        add esp, 20h
-        ret
-
-    stretch_copy:
-        movsx eax, word ptr [edi + 38h]
-        neg eax
-        and edx, 0FFFFh
-        mov dword ptr [esp + 0Ch], eax
-        movsx eax, word ptr [edi + 3Ah]
-        neg eax
-        mov dword ptr [esp + 10h], eax
-        mov dword ptr [esp + 14h], edx
-        xor eax, eax
-        mov ax, word ptr [edi + 36h]
-        mov dword ptr [esp + 18h], eax
-        and ecx, 0FFFFh
-        movsx eax, word ptr [esi + 38h]
-        neg eax
-        mov dword ptr [esp + 1Ch], eax
-        mov dword ptr [esp + 24h], ecx
-        movsx eax, word ptr [esi + 3Ah]
-        neg eax
-        lea ecx, [esp + 0Ch]
-        mov dword ptr [esp + 20h], eax
-        xor eax, eax
-        push ecx
-        mov ax, word ptr [esi + 36h]
-        push edi
-        lea edx, [esp + 24h]
-        mov dword ptr [esp + 30h], eax
-        push edx
-        push esi
-        call BrPixelmapRectangleStretchCopy
-        pop edi
-        pop esi
-        pop ebx
-        add esp, 20h
-        ret
-    }
-#else
-#ifdef DETHRACE_3DFX_PATCH
     if (dst->type == src->type) {
         BrPixelmapCopy(dst, src);
     } else if (dst->type == BR_PMT_RGB_565 && src->type == BR_PMT_INDEX_8) {
         Copy8BitTo16Bit(dst, src, gCurrent_palette);
     }
-#else
-    BrPixelmapCopy(dst, src);
-#endif
-#endif
 }
 
 // IDA: void __usercall DRPixelmapRectangleFill(br_pixelmap *dst@<EAX>, br_int_16 x@<EDX>, br_int_16 y@<EBX>, br_uint_16 w@<ECX>, br_uint_16 h, br_uint_32 colour)
 // FUNCTION: CARM95 0x004c3112
 void DRPixelmapRectangleFill(br_pixelmap* dst, br_int_16 x, br_int_16 y, br_uint_16 w, br_uint_16 h, br_uint_32 colour) {
-
     BrPixelmapRectangleFill(dst, x, y, w, h, colour);
 }
 

@@ -426,3 +426,6 @@
 
 // GLOBAL: CARM95 0x00521ab4
 // BrFontFixed3x5
+
+// GLOBAL: CARM95 0x004CA180
+// BrPixelmapCopy
