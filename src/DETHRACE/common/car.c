@@ -6934,9 +6934,7 @@ int FacePointCarCarCollide(tCollision_info* car1, tCollision_info* car2, br_matr
             a1.v[1] = ((i & 1) == 0) * pMove_box->min.v[1] + (i & 1) * pMove_box->max.v[1];
             a1.v[2] = ((i & 4) == 0) * pMove_box->max.v[2] + ((i & 4) >> 2) * pMove_box->min.v[2];
         } else {
-            a1.v[0] = car2->extra_points[i - 8].v[0];
-            a1.v[1] = car2->extra_points[i - 8].v[1];
-            a1.v[2] = car2->extra_points[i - 8].v[2];
+            BrVector3Copy(&a1, &car2->extra_points[i - 8]);
         }
         BrMatrix34ApplyP(&bb, &a1, pMms);
         BrMatrix34ApplyP(&aa, &a1, pMoms);
@@ -6959,12 +6957,8 @@ int FacePointCarCarCollide(tCollision_info* car1, tCollision_info* car2, br_matr
                 && TestOldMats(car1, car2, 0)) {
                 continue;
             }
-            pPoint_list[2 * k + (order == 0)].v[0] = a1.v[0];
-            pPoint_list[2 * k + (order == 0)].v[1] = a1.v[1];
-            pPoint_list[2 * k + (order == 0)].v[2] = a1.v[2];
-            pPoint_list[2 * k + order].v[0] = hp.v[0];
-            pPoint_list[2 * k + order].v[1] = hp.v[1];
-            pPoint_list[2 * k + order].v[2] = hp.v[2];
+            BrVector3Copy(&pPoint_list[2 * k + (order == 0)], &a1);
+            BrVector3Copy(&pPoint_list[2 * k + order], &hp);
             k++;
             if (k == pMax) {
                 return k;
