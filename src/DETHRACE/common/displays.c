@@ -1461,6 +1461,8 @@ void ChangingView(void) {
                 case eView_right:
                     LookRight();
                     break;
+
+                    DETHRACE_DEFAULT_BREAK;
                 }
                 return;
             } else if (gProgram_state.which_view == gProgram_state.new_view) {
@@ -1480,6 +1482,8 @@ void ChangingView(void) {
             case eView_right:
                 gProgram_state.cockpit_image_index = 2;
                 break;
+
+                DETHRACE_DEFAULT_BREAK;
             }
             AdjustRenderScreenSize();
             if (gProgram_state.old_view < gProgram_state.new_view) {
