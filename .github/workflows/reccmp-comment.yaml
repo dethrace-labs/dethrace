@@ -44,6 +44,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh pr comment ${{ steps.pr.outputs.number }} \
+            --create-if-none \
             --edit-last \
             --repo "${{ github.repository }}" \
             --body "## reccmp report
