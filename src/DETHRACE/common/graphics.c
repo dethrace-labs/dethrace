@@ -1935,7 +1935,11 @@ void RenderAFrame(int pDepth_mask_on) {
                     0,
                     40);
             } else {
+#ifdef DETHRACE_3DFX_PATCH
                 DRPixelmapCopy(gBack_screen, gCurrent_race.map_image);
+#else
+                BrPixelmapCopy(gBack_screen, gCurrent_race.map_image);
+#endif
             }
         }
 

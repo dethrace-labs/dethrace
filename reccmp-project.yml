@@ -147,6 +147,8 @@ targets:
           "BrSimpleRemove",
           "BrQsort",
           "BrFileRead",
+          "BrPixelmapCopy",
+
           "S3DisableMIDI",
           "S3MIDILoadSong",
           "S3PlayMIDI",
