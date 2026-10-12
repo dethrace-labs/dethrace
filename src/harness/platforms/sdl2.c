@@ -49,8 +49,7 @@ static const char* const possible_locations[] = {
     "@loader_path/../Frameworks/" SDL2_FRAMEWORK,     /* MyApp.app/Contents/Frameworks/SDL2_framework */
     "@executable_path/" SDL2_LIBNAME,                 /* MyApp.app/Contents/MacOS/libSDL2_dylib */
     "@executable_path/../Frameworks/" SDL2_FRAMEWORK, /* MyApp.app/Contents/Frameworks/SDL2_framework */
-    NULL,                                             /* /Users/username/Library/Frameworks/SDL2_framework */
-    "/Library/Frameworks" SDL2_FRAMEWORK,             /* /Library/Frameworks/SDL2_framework */
+    "/Library/Frameworks/" SDL2_FRAMEWORK,            /* /Library/Frameworks/SDL2_framework */
     SDL2_LIBNAME                                      /* oh well, anywhere the system can see the .dylib (/usr/local/lib or whatever) */
 };
 #else
@@ -366,7 +365,7 @@ static void SDL2_Harness_Swap(br_pixelmap* back_buffer) {
 static void SDL2_Harness_PaletteChanged(br_colour entries[256]) {
     int i;
     for (i = 0; i < 256; i++) {
-        converted_palette[i] = (0xff << 24 | BR_RED(entries[i]) << 16 | BR_GRN(entries[i]) << 8 | BR_BLU(entries[i]));
+        converted_palette[i] = (0xffu << 24 | BR_RED(entries[i]) << 16 | BR_GRN(entries[i]) << 8 | BR_BLU(entries[i]));
     }
     if (last_screen_src != NULL) {
         SDL2_Harness_Swap(last_screen_src);

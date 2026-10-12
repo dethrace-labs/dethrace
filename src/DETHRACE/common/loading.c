@@ -909,6 +909,11 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
     tU8 byte;
     tU16* palette_entry;
 
+#ifdef DETHRACE_FIX_BUGS
+    // Fix -Wmaybe-uninitialized warning
+    byte = 0;
+#endif
+
     palette_entry = PaletteOf16Bits(gRender_palette)->pixels;
     max_line_bytes = 125 * ((pBr_map->width + 61) / 62) + 2;
     new_line = BrMemAllocate(max_line_bytes, kMem_strip_image);
@@ -934,7 +939,12 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
                 if (counting_blanks != (*next_byte == 0))
                     break;
                 if (!counting_blanks) {
+#ifdef DETHRACE_FIX_BUGS
+                    // Avoid an unaligned write
+                    memcpy(&new_line[new_line_length], &palette_entry[byte], sizeof(tU16));
+#else
                     *(tU16*)&new_line[new_line_length] = palette_entry[byte];
+#endif
                     new_line_length += 2;
                 }
                 next_byte++;
@@ -989,6 +999,11 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     tU8* temp_strip_image;
     tU8 new_line[800];
     tU8 the_byte;
+
+#ifdef DETHRACE_FIX_BUGS
+    // Fix -Wmaybe-uninitialized warning
+    the_byte = 0;
+#endif
 
     the_strip_image = BrMemAllocate(pThe_br_map->row_bytes * pThe_br_map->height, kMem_strip_image);
     current_strip_pointer = the_strip_image;
@@ -1788,7 +1803,7 @@ int RemoveDoubleSided(br_model* pModel) {
 
         for (i = 0, face = pModel->faces; i < pModel->nfaces; i++, face++) {
             if (face->material) {
-                if (face->material->user == DOUBLESIDED_USER_FLAG) {
+                if (face->material->colour_map_1 == DOUBLESIDED_USER_FLAG) {
                     num_double_sided_faces++;
                 }
             }
@@ -1799,7 +1814,7 @@ int RemoveDoubleSided(br_model* pModel) {
             orig_nfaces = pModel->nfaces;
 
             for (i = 0, face = pModel->faces; i < orig_nfaces; i++, face++) {
-                if (face->material && face->material->user == DOUBLESIDED_USER_FLAG) {
+                if (face->material && face->material->colour_map_1 == DOUBLESIDED_USER_FLAG) {
                     faces[pModel->nfaces].vertices[0] = face->vertices[1];
                     faces[pModel->nfaces].vertices[1] = face->vertices[0];
                     faces[pModel->nfaces].vertices[2] = face->vertices[2];
@@ -2264,7 +2279,7 @@ void LoadCar(char* pCar_name, tDriver pDriver, tCar_spec* pCar_spec, int pOwner,
                 if (its_a_floorpan) {
                     pStorage_space->materials[i]->flags &= ~BR_MATF_TWO_SIDED;
                 } else {
-                    pStorage_space->materials[i]->user = DOUBLESIDED_USER_FLAG;
+                    pStorage_space->materials[i]->colour_map_1 = DOUBLESIDED_USER_FLAG;
                     pStorage_space->materials[i]->flags &= ~BR_MATF_TWO_SIDED;
                 }
             }

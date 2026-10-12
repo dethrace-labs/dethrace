@@ -139,22 +139,23 @@ void LoadSavedGames(void) {
     for (i = 0; i < COUNT_OF(gSaved_games); i++) {
         the_path[strlen(the_path) - 1] = '0' + i;
         f = DRfopen(the_path, "rb");
-        if (f == NULL) {
-            continue;
-        }
-        the_size = GetFileLength(f);
-        if (the_size == sizeof(tSave_game)) {
-            gSaved_games[i] = BrMemCalloc(1, sizeof(tSave_game), kMem_saved_game);
-            fread(gSaved_games[i], 1, the_size, f);
-            CorrectLoadByteOrdering(i);
-            if (CalcLSChecksum(gSaved_games[i]) != gSaved_games[i]->checksum || gSaved_games[i]->version != SAVEGAME_VERSION) {
-                BrMemFree(gSaved_games[i]);
+        if (f != NULL) {
+            the_size = GetFileLength(f);
+            if (the_size != sizeof(tSave_game)) {
                 gSaved_games[i] = NULL;
+            } else {
+                gSaved_games[i] = BrMemCalloc(1, sizeof(tSave_game), kMem_saved_game);
+                fread(gSaved_games[i], 1, the_size, f);
+                CorrectLoadByteOrdering(i);
+                if (CalcLSChecksum(gSaved_games[i]) != gSaved_games[i]->checksum || gSaved_games[i]->version != SAVEGAME_VERSION) {
+                    BrMemFree(gSaved_games[i]);
+                    gSaved_games[i] = NULL;
+                }
             }
+            fclose(f);
         } else {
             gSaved_games[i] = NULL;
         }
-        fclose(f);
     }
 }
 
@@ -667,10 +668,10 @@ void MakeSavedGame(tSave_game** pSave_record) {
     (*pSave_record)->frank_or_annitude = gProgram_state.frank_or_anniness;
     (*pSave_record)->game_completed = gProgram_state.game_completed;
     (*pSave_record)->current_race_index = gProgram_state.current_race_index;
-    for (i = 0; i < gNumber_of_races; i++) {
+    for (i = 0; gNumber_of_races > i; i++) {
         (*pSave_record)->race_info[i].been_there_done_that = gRace_list[i].been_there_done_that;
     }
-    for (i = 0; i < gNumber_of_racers; i++) {
+    for (i = 0; gNumber_of_racers > i; i++) {
         (*pSave_record)->opponent_info[i].dead = gOpponents[i].dead;
     }
     (*pSave_record)->credits = gProgram_state.credits;
@@ -682,9 +683,7 @@ void MakeSavedGame(tSave_game** pSave_record) {
     (*pSave_record)->number_of_cars = gProgram_state.number_of_cars;
     (*pSave_record)->current_car_index = gProgram_state.current_car_index;
     (*pSave_record)->redo_race_index = gProgram_state.redo_race_index;
-    for (i = 0; i < COUNT_OF(gProgram_state.cars_available); i++) {
-        (*pSave_record)->cars_available[i] = gProgram_state.cars_available[i];
-    }
+    memcpy((*pSave_record)->cars_available, gProgram_state.cars_available, sizeof((*pSave_record)->cars_available));
     for (i = 0; i < COUNT_OF(gProgram_state.current_car.power_up_levels); i++) {
         (*pSave_record)->power_up_levels[i] = gProgram_state.current_car.power_up_levels[i];
     }
@@ -739,19 +738,19 @@ int SaveGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 
     if (gTyping_slot != 0) {
         sprintf(s1, VARLZEROINT, 2, gProgram_state.rank);
-        if (gSaved_games[*pCurrent_choice] == NULL) {
-            s2[0] = '\0';
-        } else {
+        if (gSaved_games[*pCurrent_choice] != NULL) {
             sprintf(s2, VARLZEROINT, 2, gSaved_games[*pCurrent_choice]->rank);
+        } else {
+            s2[0] = '\0';
         }
         ChangeTextTo(gCurrent_graf_data->save_slot_rank_x_offset,
             gCurrent_graf_data->save_slot_y_offset + *pCurrent_choice * gCurrent_graf_data->rolling_letter_y_pitch,
             s1, s2);
         sprintf(s1, VARLZEROINT, 6, gProgram_state.credits);
-        if (gSaved_games[*pCurrent_choice] == NULL) {
-            s2[0] = '\0';
-        } else {
+        if (gSaved_games[*pCurrent_choice] != NULL) {
             sprintf(s2, VARLZEROINT, 6, gSaved_games[*pCurrent_choice]->credits);
+        } else {
+            s2[0] = '\0';
         }
         ChangeTextTo(gCurrent_graf_data->save_slot_credits_x_offset,
             gCurrent_graf_data->save_slot_y_offset + *pCurrent_choice * gCurrent_graf_data->rolling_letter_y_pitch,
@@ -768,24 +767,24 @@ int SaveEscape(int* pCurrent_choice, int* pCurrent_mode) {
     char s2[256];
 
     if (gStarted_typing != 0) {
-        sprintf(s1, VARLZEROINT, 2, gProgram_state.rank);
-        if (gSaved_games[*pCurrent_choice] == NULL) {
-            s2[0] = '\0';
+        sprintf(s2, VARLZEROINT, 2, gProgram_state.rank);
+        if (gSaved_games[*pCurrent_choice] != NULL) {
+            sprintf(s1, VARLZEROINT, 2, gSaved_games[*pCurrent_choice]->rank);
         } else {
-            sprintf(s2, VARLZEROINT, 2, gSaved_games[*pCurrent_choice]->rank);
+            s1[0] = '\0';
         }
         ChangeTextTo(gCurrent_graf_data->save_slot_rank_x_offset,
             gCurrent_graf_data->save_slot_y_offset + *pCurrent_choice * gCurrent_graf_data->rolling_letter_y_pitch,
-            s2, s1);
-        sprintf(s1, VARLZEROINT, 6, gProgram_state.credits);
-        if (gSaved_games[*pCurrent_choice] == NULL) {
-            s2[0] = '\0';
+            s1, s2);
+        sprintf(s2, VARLZEROINT, 6, gProgram_state.credits);
+        if (gSaved_games[*pCurrent_choice] != NULL) {
+            sprintf(s1, VARLZEROINT, 6, gSaved_games[*pCurrent_choice]->credits);
         } else {
-            sprintf(s2, VARLZEROINT, 6, gSaved_games[*pCurrent_choice]->credits);
+            s1[0] = '\0';
         }
         ChangeTextTo(gCurrent_graf_data->save_slot_credits_x_offset,
             gCurrent_graf_data->save_slot_y_offset + *pCurrent_choice * gCurrent_graf_data->rolling_letter_y_pitch,
-            s2, s1);
+            s1, s2);
         gStarted_typing = 0;
     }
     return 1;
@@ -1020,7 +1019,10 @@ void DoSaveGame(int pSave_allowed) {
     }
 #endif
 
-    if (gNet_mode == eNet_mode_none) {
+    if (gNet_mode != eNet_mode_none) {
+        SuspendPendingFlic();
+        DoErrorInterface(kMiscString_CannotSaveGameInNetworkPlay);
+    } else {
         DRS3StopOutletSound(gEffects_outlet);
         gProgram_state.saving = 1;
         gSave_allowed = pSave_allowed;
@@ -1038,8 +1040,5 @@ void DoSaveGame(int pSave_allowed) {
         }
         DisposeSavedGames();
         gProgram_state.saving = 0;
-    } else {
-        SuspendPendingFlic();
-        DoErrorInterface(kMiscString_CannotSaveGameInNetworkPlay);
     }
 }

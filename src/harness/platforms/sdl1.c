@@ -270,7 +270,7 @@ static void SDL1_Harness_Swap(br_pixelmap* back_buffer) {
 static void SDL1_Harness_PaletteChanged(br_colour entries[256]) {
     int i;
     for (i = 0; i < 256; i++) {
-        converted_palette[i] = (0xff << 24 | BR_RED(entries[i]) << 16 | BR_GRN(entries[i]) << 8 | BR_BLU(entries[i]));
+        converted_palette[i] = (0xffu << 24 | BR_RED(entries[i]) << 16 | BR_GRN(entries[i]) << 8 | BR_BLU(entries[i]));
     }
     if (last_screen_src != NULL) {
         SDL1_Harness_Swap(last_screen_src);

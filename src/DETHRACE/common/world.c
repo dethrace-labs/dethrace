@@ -835,7 +835,7 @@ int LoadNTrackModels(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         str = strtok(s, "\t ,/");
         PathCat(the_path, gApplication_path, "MODELS");
         PathCat(the_path, the_path, str);
-        new_ones = BrModelLoadMany(the_path, temp_array, 2000);
+        new_ones = BrModelLoadMany(the_path, temp_array, COUNT_OF(temp_array));
         if (new_ones == 0) {
             FatalError(kFatalError_LoadModelFile_S, str);
         }
@@ -1359,7 +1359,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
 #endif
             break;
 
-            DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
         }
         the_funk->lighting_animation_type = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
         if (the_funk->lighting_animation_type != eMove_none) {
@@ -1455,7 +1455,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
             }
             break;
 
-            DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
         }
 
         the_funk->proximity_count = 0;
@@ -1625,7 +1625,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
             the_groove->path_data.circular_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
             break;
 
-            DETHRACE_DEFAULT_BREAK;
+        DETHRACE_DEFAULT_BREAK
         }
 
         the_groove->object_type = GetALineAndInterpretCommand(pF, gGroove_object_names, COUNT_OF(gGroove_object_names));
@@ -1724,7 +1724,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                 &the_groove->object_data.shear_info.z_magnitude);
             break;
 
-            DETHRACE_DEFAULT_BREAK;
+        DETHRACE_DEFAULT_BREAK
         }
     }
 }
@@ -2123,10 +2123,10 @@ void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_leve
         case eCTL_none:
             RevealStoredTransparentTextures(pStorage);
 
-            DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
         }
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -2725,7 +2725,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
             if (gTrack_storage_space.materials[i]->flags & (BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH)) {
                 gTrack_storage_space.materials[i]->flags &= ~(BR_MATF_LIGHT | BR_MATF_PRELIT | BR_MATF_SMOOTH);
                 if (gTrack_storage_space.materials[i]->flags & BR_MATF_TWO_SIDED) {
-                    gTrack_storage_space.materials[i]->user = DOUBLESIDED_USER_FLAG;
+                    gTrack_storage_space.materials[i]->colour_map_1 = DOUBLESIDED_USER_FLAG;
                     gTrack_storage_space.materials[i]->flags &= ~BR_MATF_TWO_SIDED;
                 }
                 BrMaterialUpdate(gTrack_storage_space.materials[i], BR_MATU_RENDERING);
@@ -2780,14 +2780,14 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         PossibleService();
         needs_updating = 0;
         if (gTrack_storage_space.models[i] && gTrack_storage_space.models[i]->flags & (BR_MODF_UPDATEABLE | BR_MODF_KEEP_ORIGINAL)) {
-            gTrack_storage_space.models[i]->flags &= 0xFFFFFF7Du;
+            gTrack_storage_space.models[i]->flags &= ~(BR_MODF_UPDATEABLE | BR_MODF_KEEP_ORIGINAL);
             // Minor asm differences here due to using open-sourced BRender 1.3.2
             for (group = 0; group < V11MODEL(gTrack_storage_space.models[i])->ngroups; group++) {
                 material = gTrack_storage_space.models[i]->faces[V11MODEL(gTrack_storage_space.models[i])->groups[group].face_user[0]].material;
                 V11MODEL(gTrack_storage_space.models[i])->groups[group].user = material;
                 if (material && !material->index_shade) {
                     material->index_shade = BrTableFind("DRRENDER.TAB");
-                    BrMaterialUpdate(material, 0x7FFFu);
+                    BrMaterialUpdate(material, BR_MATU_ALL);
                 }
             }
             DodgyModelUpdate(gTrack_storage_space.models[i]);
@@ -2830,7 +2830,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 break;
             }
         }
-        sky = 0;
+        sky = NULL;
         killed_sky = 1;
     }
     gProgram_state.default_depth_effect.sky_texture = sky;
@@ -2910,6 +2910,11 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
                 GetThreeScalars(f, &spec->bounds.max.v[0], &spec->bounds.max.v[1], &spec->bounds.max.v[2]);
                 BrMatrix34Identity(&spec->mat);
                 for (j = 0; j < 3; j++) {
+#ifdef DETHRACE_FIX_BUGS
+                    // Fix -Wmaybe-uninitialized warning
+                    temp_bounds.min.v[j] = spec->bounds.min.v[j];
+                    temp_bounds.max.v[j] = spec->bounds.max.v[j];
+#endif
                     spec->mat.m[3][j] = (temp_bounds.max.v[j] + temp_bounds.min.v[j]) / 2.0f;
                     MAT(&spec->mat.m, j, j) = temp_bounds.max.v[j] - spec->mat.m[3][j];
                 }
@@ -3448,7 +3453,7 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
         BrVector3SetFloat(&fixed_axis, 0.f, 0.f, 1.f);
         break;
 
-        DETHRACE_DEFAULT_BREAK;
+    DETHRACE_DEFAULT_BREAK
     }
     BrVector3Cross(&vector_a, &ref_to_subject, &fixed_axis);
     BrVector3Normalise(&vector_a, &vector_a);
@@ -3499,7 +3504,7 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
         mat.m[3][2] = 0.f;
         break;
 
-        DETHRACE_DEFAULT_BREAK;
+    DETHRACE_DEFAULT_BREAK
     }
     BrMatrix34Pre(&pSubject_actor->t.t.mat, &mat);
 }
