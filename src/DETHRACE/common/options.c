@@ -357,8 +357,6 @@ void GetGraphicsOptions(void) {
     default:
         gRadio_bastards__options[2].current_value = 0;
         break;
-
-        DETHRACE_DEFAULT_BREAK;
     }
 
     switch (GetWallTexturingLevel()) {
