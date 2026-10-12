@@ -1461,15 +1461,14 @@ void ChangingView(void) {
                 case eView_right:
                     LookRight();
                     break;
-                default:
-                    break;
                 }
                 return;
-            }
-            if (gProgram_state.which_view == gProgram_state.new_view) {
+            } else if (gProgram_state.which_view == gProgram_state.new_view) {
                 gProgram_state.new_view = eView_undefined;
+                return;
             }
-        } else if (the_time > 87) {
+        }
+        if (the_time > 87) {
             gProgram_state.which_view = gProgram_state.new_view;
             switch (gProgram_state.which_view) {
             case eView_forward:
