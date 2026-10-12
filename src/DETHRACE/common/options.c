@@ -343,6 +343,8 @@ void GetGraphicsOptions(void) {
     case eCTL_full:
         gRadio_bastards__options[1].current_value = 0;
         break;
+
+        DETHRACE_DEFAULT_BREAK;
     }
 
     switch (GetShadowLevel()) {
@@ -355,6 +357,8 @@ void GetGraphicsOptions(void) {
     default:
         gRadio_bastards__options[2].current_value = 0;
         break;
+
+        DETHRACE_DEFAULT_BREAK;
     }
 
     switch (GetWallTexturingLevel()) {
@@ -367,6 +371,8 @@ void GetGraphicsOptions(void) {
     case eWTL_full:
         gRadio_bastards__options[3].current_value = 0;
         break;
+
+        DETHRACE_DEFAULT_BREAK;
     }
 
     switch (GetRoadTexturingLevel()) {
@@ -376,6 +382,8 @@ void GetGraphicsOptions(void) {
     case eRTL_full:
         gRadio_bastards__options[4].current_value = 0;
         break;
+
+        DETHRACE_DEFAULT_BREAK;
     }
 
     br_value = GetYon();
@@ -1110,8 +1118,7 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
         RadioChanged(12, new_index);
         DRS3StartSound(gEffects_outlet, 3000);
         return 1;
-    }
-    else {
+    } else {
         if (gCurrent_key >= (gKey_count + 1) / 2) {
             gCurrent_key -= (gKey_count + 1) / 2;
         } else {
