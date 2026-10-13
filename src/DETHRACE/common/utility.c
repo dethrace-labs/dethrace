@@ -1341,24 +1341,17 @@ void DRPixelmapRectangleCopy(br_pixelmap* dst, br_int_16 dx, br_int_16 dy, br_pi
 }
 
 // IDA: void __usercall DRPixelmapCopy(br_pixelmap *dst@<EAX>, br_pixelmap *src@<EDX>)
-// FUNCTION: CARM95 0x004ca180
 void DRPixelmapCopy(br_pixelmap* dst, br_pixelmap* src) {
-
-#ifdef DETHRACE_3DFX_PATCH
     if (dst->type == src->type) {
         BrPixelmapCopy(dst, src);
     } else if (dst->type == BR_PMT_RGB_565 && src->type == BR_PMT_INDEX_8) {
         Copy8BitTo16Bit(dst, src, gCurrent_palette);
     }
-#else
-    BrPixelmapCopy(dst, src);
-#endif
 }
 
 // IDA: void __usercall DRPixelmapRectangleFill(br_pixelmap *dst@<EAX>, br_int_16 x@<EDX>, br_int_16 y@<EBX>, br_uint_16 w@<ECX>, br_uint_16 h, br_uint_32 colour)
 // FUNCTION: CARM95 0x004c3112
 void DRPixelmapRectangleFill(br_pixelmap* dst, br_int_16 x, br_int_16 y, br_uint_16 w, br_uint_16 h, br_uint_32 colour) {
-
     BrPixelmapRectangleFill(dst, x, y, w, h, colour);
 }
 
@@ -1824,6 +1817,11 @@ int AlreadyBlended(br_material* pMaterial) {
 // FUNCTION: CARM95 0x004c3f0d
 void BlendifyMaterialTablishly(br_material* pMaterial, int pPercent) {
     char* s;
+
+#ifdef DETHRACE_FIX_BUGS
+    // avoid uninitialized variable error
+    s = NULL;
+#endif
 
     switch (pPercent) {
     case 25:

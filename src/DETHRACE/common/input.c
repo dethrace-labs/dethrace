@@ -91,6 +91,7 @@ void SetJoystickArrays(int* pKeys, int pMark) {
 // IDA: void __cdecl PollKeys()
 // FUNCTION: CARM95 0x00471bbf
 void PollKeys(void) {
+    int i;
 
     gKey_poll_counter++;
     PDSetKeyArray(gKey_array, gKey_poll_counter);
@@ -258,49 +259,43 @@ tU32* KevKeyService(void) {
     static int last_single_key = -1;
     // GLOBAL: CARM95 0x53a1fc
     static tU32 last_time = 0;
+    // GLOBAL: CARM95 0x00514CA0
     static tU32 return_val[2];
     tU32 keys;
 
     keys = gKeys_pressed;
-    // printf("key: %d, %lx, %lx\n", sizeof(long), keys, code2);
     return_val[0] = 0;
     return_val[1] = 0;
 
-    if (keys < 0x6B) {
-        last_single_key = gKeys_pressed;
+    if (keys >= 0x6b) {
+        if (keys <= 0x6b00 && ((keys & 0xff) == last_single_key || keys >> 8 == last_single_key)) {
+            if ((keys & 0xff) == last_single_key) {
+                keys >>= 8;
+            } else if (keys >> 8 == last_single_key) {
+                keys &= 0xff;
+            } else {
+                sum = 0;
+                code = 0;
+                return return_val;
+            }
+        } else {
+            sum = 0;
+            code = 0;
+            return return_val;
+        }
     } else {
-        if (keys > 0x6b00) {
-            sum = 0;
-            code = 0;
-            return return_val;
-        }
-        if ((keys & 0xff) != last_single_key && keys >> 8 != last_single_key) {
-            sum = 0;
-            code = 0;
-            return return_val;
-        }
-        if (keys >> 8 != last_single_key) {
-            sum = 0;
-            code = 0;
-            return return_val;
-        }
-        if ((keys & 0xff) == last_single_key) {
-            keys = keys >> 8;
-        }
-        keys = keys & 0xff;
+        last_single_key = keys;
     }
 
-    if (keys && keys != last_key) {
+    if (last_key != keys + 0 && keys > 0) {
         sum += keys;
         code += keys << 11;
-        code = (code >> 17) + (code << 4);
+        code = (code << 4) + (code >> 17);
         code2 = (code2 >> 29) + keys * keys + (code2 << 3);
-        // printf("accumulate: keys=%lx, sum=%lx, code=%lx, code2=%lx\n", keys, sum, code, code2);
         last_time = PDGetTotalTime();
-    } else if (PDGetTotalTime() > (last_time + 1000)) {
-        return_val[0] = ((code >> 11) + (sum << 21));
+    } else if (PDGetTotalTime() > last_time + 1000) {
+        return_val[0] = (code >> 11) + (sum << 21);
         return_val[1] = code2;
-        // printf("final value: code=%lx, code2=%lx\n", return_val[0], return_val[1]);
         code = 0;
         code2 = 0;
         sum = 0;
@@ -475,8 +470,7 @@ void AddRollingString(char* pStr, int pX, int pY, tRolling_type rolling_type) {
     int i;
 
     for (i = 0; i < strlen(pStr); i++) {
-        AddRollingLetter(pStr[i], pX, pY, rolling_type);
-        pX += gCurrent_graf_data->rolling_letter_x_pitch;
+        AddRollingLetter(pStr[i], pX + gCurrent_graf_data->rolling_letter_x_pitch * i, pY, rolling_type);
     }
 }
 
@@ -509,47 +503,46 @@ void RollLettersIn(void) {
     tU8* source_ptr;
     tU8 the_byte;
 
+    let = gRolling_letters;
     new_time = PDGetTotalTime();
     if (gLast_roll) {
         period = new_time - gLast_roll;
     } else {
         period = 0;
     }
-    font_height = gFonts[FONT_TYPEABLE].height;
     font_width = gFonts[FONT_TYPEABLE].width;
+    font_height = gFonts[FONT_TYPEABLE].height;
     the_row_bytes = gFonts[FONT_TYPEABLE].images->row_bytes;
 
-    for (i = 0; i < NBR_ROLLING_LETTERS; i++) {
-        let = &gRolling_letters[i];
+    for (i = 0; i < NBR_ROLLING_LETTERS; i++, let++) {
         if (let->number_of_letters >= 0) {
-            char_ptr = gBack_screen->pixels;
-            char_ptr += let->y_coord * gBack_screen->row_bytes + let->x_coord;
-            if (let->current_offset > 0.0f) {
-                let->current_offset -= period * 0.18f;
+            char_ptr = (tU8*)gBack_screen->pixels + let->y_coord * gBack_screen->row_bytes + let->x_coord;
+            if (let->current_offset != 0.0f) {
+                let->current_offset -= period * 0.18;
                 if (let->current_offset <= 0.0f) {
-                    if (let->rolling_type == eRT_looping_random || let->rolling_type == eRT_looping_single) {
-                        let->current_offset = (gCurrent_graf_data->save_slot_letter_height * let->number_of_letters) + let->current_offset;
-                    } else {
+                    if (let->rolling_type != eRT_looping_random && let->rolling_type != eRT_looping_single) {
                         let->current_offset = 0.0f;
+                    } else {
+                        let->current_offset = let->current_offset + (float)(gCurrent_graf_data->save_slot_letter_height * let->number_of_letters);
                     }
                 }
             }
             for (j = 0; j < gCurrent_graf_data->save_slot_height; j++) {
+                saved_char_ptr = char_ptr;
                 offset = gCurrent_graf_data->save_slot_table[j] + let->current_offset;
                 which_letter = offset / gCurrent_graf_data->save_slot_letter_height;
                 letter_offset = offset % gCurrent_graf_data->save_slot_letter_height - (gCurrent_graf_data->save_slot_letter_height - font_height) / 2;
-                saved_char_ptr = char_ptr;
                 if (which_letter < let->number_of_letters && which_letter >= 0 && letter_offset >= 0 && letter_offset < font_height) {
 
                     // LOG_DEBUG("chars %d, %d, %d, %d", let->letters[0], let->letters[1], let->letters[2], let->letters[3]);
                     source_ptr = (tU8*)gFonts[FONT_TYPEABLE].images->pixels + (font_height * (let->letters[which_letter] - ' ') + letter_offset) * the_row_bytes;
                     for (k = 0; k < font_width; k++) {
                         the_byte = *source_ptr;
+                        source_ptr++;
                         if (the_byte) {
                             *char_ptr = the_byte;
                         }
                         char_ptr++;
-                        source_ptr++;
                     }
                 }
                 char_ptr = saved_char_ptr + gBack_screen->row_bytes;
