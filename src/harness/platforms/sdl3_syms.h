@@ -38,6 +38,7 @@
     X(UnlockTexture, void, (SDL_Texture*))                                                              \
     X(GetMouseFocus, SDL_Window*, (void))                                                               \
     X(GetMouseState, SDL_MouseButtonFlags, (float*, float*))                                            \
+    X(SetWindowRelativeMouseMode, bool, (SDL_Window*, bool))                                            \
     X(ShowCursor, bool, (void))                                                                         \
     X(GetPixelFormatName, const char*, (SDL_PixelFormat))                                               \
     X(GetScancodeName, const char *, (SDL_Scancode))                                                    \
