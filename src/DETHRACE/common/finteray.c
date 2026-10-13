@@ -1099,11 +1099,11 @@ void ClipToPlaneLE(br_vector3* p, int* nv, int i, br_scalar limit) {
 // Suffix added to avoid duplicate symbol
 // FUNCTION: CARM95 0x004aeb89
 int BoundsOverlapTest__finteray(br_bounds* b1, br_bounds* b2) {
-    if (b1->min.v[0] > b2->max.v[0]
+    if (b1[0].min.v[0] > b2->max.v[0]
         || b1->max.v[0] < b2->min.v[0]
-        || b1->min.v[1] > b2->max.v[1]
-        || b2->min.v[1] > b1->max.v[1]
-        || b1->min.v[2] > b2->max.v[2]
+        || b1[0].min.v[1] > b2->max.v[1]
+        || b2[0].min.v[1] > b1->max.v[1]
+        || b1[0].min.v[2] > b2->max.v[2]
         || b1->max.v[2] < b2->min.v[2]) {
         return 0;
     } else {
