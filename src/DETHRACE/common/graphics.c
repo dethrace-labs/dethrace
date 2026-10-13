@@ -715,50 +715,55 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     if (height + pDest_y + pOffset_y > pDest->height) {
         height = pDest->height - pDest_y - pOffset_y;
     }
-    off_the_left = pDest_x;
-    off_the_left += pOffset_x;
-    if (off_the_left > 0) {
-        destn_ptr += off_the_left;
+    if (pDest_x + pOffset_x > 0) {
+        destn_ptr += pDest_x + pOffset_x;
     }
+    destn_width = pDest->width;
     for (i = 0; i < height; i++) {
         destn_ptr2 = destn_ptr;
         number_of_chunks = *pSource;
         pSource++;
-        x_byte = off_the_left;
+        x_byte = pOffset_x + pDest_x;
+        if (x_byte < 0) {
+            off_the_left = 1;
+        } else {
+            off_the_left = 0;
+        }
         for (j = 0; j < number_of_chunks; j++) {
             chunk_length = *pSource;
             pSource++;
             if (chunk_length < 0) {
-                destn_width = chunk_length;
-                destn_width = -destn_width;
+                chunk_length = -chunk_length;
                 old_x_byte = x_byte;
-                x_byte += destn_width;
+                x_byte += chunk_length;
                 if (old_x_byte < 0) {
                     if (x_byte > 0) {
 #ifdef DETHRACE_FIX_BUGS
                         memmove(destn_ptr2, &pSource[-old_x_byte], destn_width + old_x_byte);
 #else
-                        memcpy(destn_ptr2, &pSource[-old_x_byte], destn_width + old_x_byte);
+                        memcpy(destn_ptr2, pSource - old_x_byte, chunk_length + old_x_byte);
 #endif
-                        destn_ptr2 += destn_width + old_x_byte;
+                        destn_ptr2 += chunk_length + old_x_byte;
                     }
                 } else {
-                    if (pDest->width >= x_byte) {
+                    if (destn_width < x_byte) {
+                        if (old_x_byte < destn_width) {
 #ifdef DETHRACE_FIX_BUGS
                         memmove(destn_ptr2, pSource, destn_width);
 #else
-                        memcpy(destn_ptr2, pSource, destn_width);
+                            memcpy(destn_ptr2, pSource, destn_width - old_x_byte);
 #endif
-                        destn_ptr2 += destn_width;
-                    } else if (old_x_byte < pDest->width) {
+                        }
+                    } else {
 #ifdef DETHRACE_FIX_BUGS
                         memmove(destn_ptr2, pSource, pDest->width - old_x_byte);
 #else
-                        memcpy(destn_ptr2, pSource, pDest->width - old_x_byte);
+                        memcpy(destn_ptr2, pSource, chunk_length);
 #endif
+                        destn_ptr2 += chunk_length;
                     }
                 }
-                pSource += destn_width;
+                pSource += chunk_length;
             } else {
                 old_x_byte = x_byte;
                 x_byte += chunk_length;
