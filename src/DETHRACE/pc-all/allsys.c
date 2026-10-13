@@ -77,9 +77,13 @@ br_device_gl_callback_procs gl_callbacks;
 br_device_virtualfb_callback_procs virtualfb_callbacks;
 
 // from win95sys.c
+// GLOBAL: CARM95 0x0051D5BC
 int gShow_fatal_error;
+// GLOBAL: CARM95 0x0053DD20
 char gFatal_error_string[512];
+// GLOBAL: CARM95 0x0051D5B8
 int gExit_code;
+
 br_diaghandler gBr_diaghandler;
 
 // forward declare for `PDInitialiseSystem`
@@ -914,7 +918,7 @@ int OurGetChar(void) {
 void PDEnterDebugger(char* pStr) {
     static unsigned char* save_it;
 
-    save_it = (unsigned char*)pStr;
+    abort();
 }
 
 // IDA: void __cdecl PDEndItAllAndReRunTheBastard()
