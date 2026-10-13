@@ -3015,9 +3015,7 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             a1.v[1] = ((i & 1) == 0) * c->bounds[1].min.v[1] + ((i & 1) >> 0) * c->bounds[1].max.v[1];
             a1.v[2] = ((i & 4) == 0) * c->bounds[1].max.v[2] + ((i & 4) >> 2) * c->bounds[1].min.v[2];
         } else {
-            a1.v[0] = c->extra_points[i - 8].v[0];
-            a1.v[1] = c->extra_points[i - 8].v[1];
-            a1.v[2] = c->extra_points[i - 8].v[2];
+            BrVector3Copy(&a1, &c->extra_points[i - 8]);
         }
         BrMatrix34ApplyP(&bb, &a1, mat);
         if (dt < 0.0f) {
@@ -3058,12 +3056,8 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
         if ((float)(fabs(r[i].v[1]) + fabs(r[i].v[2]) + fabs(r[i].v[0])) > 500.0f) {
             for (j = i + 1; j < k; j++) {
                 if ((float)(fabs(r[j].v[1]) + fabs(r[j].v[2]) + fabs(r[j].v[0])) < 500.0f) {
-                    r[i].v[0] = r[j].v[0];
-                    r[i].v[1] = r[j].v[1];
-                    r[i].v[2] = r[j].v[2];
-                    n[i].v[0] = n[j].v[0];
-                    n[i].v[1] = n[j].v[1];
-                    n[i].v[2] = n[j].v[2];
+                    BrVector3Copy(&r[i], &r[j]);
+                    BrVector3Copy(&n[i], &n[j]);
                     i++;
                 }
             }
@@ -3073,12 +3067,8 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     }
     if (dt < 0.0f) {
         if (k != 0) {
-            c->old_point.v[0] = r[0].v[0];
-            c->old_point.v[1] = r[0].v[1];
-            c->old_point.v[2] = r[0].v[2];
-            c->old_norm.v[0] = n[0].v[0];
-            c->old_norm.v[1] = n[0].v[1];
-            c->old_norm.v[2] = n[0].v[2];
+            BrVector3Copy(&c->old_point, &r[0]);
+            BrVector3Copy(&c->old_norm, &n[0]);
         }
         return k;
     }
@@ -3086,25 +3076,15 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
         && (fabs(r[0].v[0] - c->old_point.v[0]) > 0.05
             || fabs(r[0].v[1] - c->old_point.v[1]) > 0.05
             || fabs(r[0].v[2] - c->old_point.v[2]) > 0.05)) {
-        r[k].v[0] = c->old_point.v[0];
-        r[k].v[1] = c->old_point.v[1];
-        r[k].v[2] = c->old_point.v[2];
-        n[k].v[0] = c->old_norm.v[0];
-        n[k].v[1] = c->old_norm.v[1];
-        n[k].v[2] = c->old_norm.v[2];
+        BrVector3Copy(&r[k], &c->old_point);
+        BrVector3Copy(&n[k], &c->old_norm);
         k++;
     }
     if (k > 0) {
-        c->old_point.v[0] = r[0].v[0];
-        c->old_point.v[1] = r[0].v[1];
-        c->old_point.v[2] = r[0].v[2];
-        c->old_norm.v[0] = n[0].v[0];
-        c->old_norm.v[1] = n[0].v[1];
-        c->old_norm.v[2] = n[0].v[2];
+        BrVector3Copy(&c->old_point, &r[0]);
+        BrVector3Copy(&c->old_norm, &n[0]);
         BrMatrix34Copy(mat, oldmat);
-        c->omega.v[0] = c->oldomega.v[0];
-        c->omega.v[1] = c->oldomega.v[1];
-        c->omega.v[2] = c->oldomega.v[2];
+        BrVector3Copy(&c->omega, &c->oldomega);
         BrMatrix34TApplyV(&c->velocity_car_space, &c->v, mat);
         norm.v[0] = 0.f;
         norm.v[1] = 0.f;
