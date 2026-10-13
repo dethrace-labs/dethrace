@@ -438,8 +438,8 @@ int AddRollingLetter(char pChar, int pX, int pY, tRolling_type rolling_type) {
             }
 
             let->current_offset = gCurrent_graf_data->save_slot_letter_height * let->number_of_letters;
-            for (i = let->number_of_letters - 1; ((rolling_type - 2) < 1 ? -1 : 0) < i; i--) {
-                if (rolling_type == eRT_numeric) {
+            for (i = let->number_of_letters - 1; ((tU32)(rolling_type - eRT_looping_random) < 1 ? -1 : 0) < i; i--) {
+                if (rolling_type != eRT_numeric) {
                     let->letters[i] = IRandomBetween('A', 'Z' + 1);
                 } else if (rolling_type != eRT_looping_single) {
                     let->letters[i] = pChar;
