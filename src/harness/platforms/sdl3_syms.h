@@ -33,6 +33,7 @@
     X(SetRenderDrawBlendMode, bool, (SDL_Renderer*, SDL_BlendMode))                                     \
     X(SetRenderVSync, bool, (SDL_Renderer*, int))                                                       \
     X(CreateTexture, SDL_Texture*, (SDL_Renderer*, SDL_PixelFormat, SDL_TextureAccess, int, int))       \
+    X(SetTextureScaleMode, bool, (SDL_Texture*, SDL_ScaleMode))                                         \
     X(LockTexture, bool, (SDL_Texture*, const SDL_Rect*, void**, int*))                                 \
     X(UnlockTexture, void, (SDL_Texture*))                                                              \
     X(GetMouseFocus, SDL_Window*, (void))                                                               \

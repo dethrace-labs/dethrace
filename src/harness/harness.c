@@ -5,7 +5,6 @@
 #include "include/harness/hooks.h"
 #include "include/harness/os.h"
 #include "ini.h"
-#include "platforms/null.h"
 #include "version.h"
 
 #include <ctype.h>
@@ -60,69 +59,59 @@ tHarness_game_config harness_game_config;
 // Platform hooks
 tHarness_platform gHarness_platform;
 
-static int force_null_platform = 0;
-
 static int Harness_ProcessCommandLine(int* argc, char* argv[]);
 static int Harness_ProcessIniFile(void);
 
 static int Harness_InitPlatform(void) {
     int required_caps = 0;
 
-    if (force_null_platform) {
-        Null_Platform_Init(&gHarness_platform);
-    } else {
-        const tPlatform_bootstrap* selected_bootstrap = NULL;
+    const tPlatform_bootstrap* selected_bootstrap = NULL;
 
-        if (harness_game_config.opengl_3dfx_mode) {
-            required_caps &= ~ePlatform_cap_video_mask;
-            required_caps |= ePlatform_cap_opengl;
-        }
+    if (harness_game_config.opengl_3dfx_mode) {
+        required_caps &= ~ePlatform_cap_video_mask;
+        required_caps |= ePlatform_cap_opengl;
+    }
 
-        if (strlen(harness_game_config.platform_name) != 0) {
-            size_t i;
-            for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
-                if (strcasecmp(platform_bootstraps[i]->name, harness_game_config.platform_name) == 0) {
-                    if ((platform_bootstraps[i]->capabilities & required_caps) != required_caps) {
-                        fprintf(stderr, "Platform \"%s\" does not support required capabilities. Try another video driver and/or add/remove --opengl\n", platform_bootstraps[i]->name);
-                        return 1;
-                    }
-                    selected_bootstrap = platform_bootstraps[i];
-                    break;
-                }
-            }
-            if (selected_bootstrap == NULL) {
-                fprintf(stderr, "Could not find a platform named \"%s\"\n", harness_game_config.platform_name);
-                return 1;
-            }
-            if (selected_bootstrap->init(&gHarness_platform) != 0) {
-                fprintf(stderr, "%s initialization failed\n", selected_bootstrap->name);
-                return 1;
-            }
-        } else {
-            size_t i;
-            for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
-                LOG_DEBUG2("Attempting video driver \"%s\"", platform_bootstraps[i]->name);
+    if (strlen(harness_game_config.platform_name) != 0) {
+        size_t i;
+        for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
+            if (strcasecmp(platform_bootstraps[i]->name, harness_game_config.platform_name) == 0) {
                 if ((platform_bootstraps[i]->capabilities & required_caps) != required_caps) {
-                    fprintf(stderr, "Skipping platform \"%s\". Does not support required capabilities.\n", platform_bootstraps[i]->name);
-                    continue;
+                    fprintf(stderr, "Platform \"%s\" does not support required capabilities. Try another video driver and/or add/remove --opengl\n", platform_bootstraps[i]->name);
+                    return 1;
                 }
-                LOG_DEBUG2("Try platform \"%s\"...", platform_bootstraps[i]->name);
-                if (platform_bootstraps[i]->init(&gHarness_platform) == 0) {
-                    selected_bootstrap = platform_bootstraps[i];
-                    break;
-                }
+                selected_bootstrap = platform_bootstraps[i];
+                break;
             }
-            if (selected_bootstrap == NULL) {
-                fprintf(stderr, "Could not find a supported platform\n");
-                return 1;
+        }
+        if (selected_bootstrap == NULL) {
+            fprintf(stderr, "Could not find a platform named \"%s\"\n", harness_game_config.platform_name);
+            return 1;
+        }
+        if (selected_bootstrap->init(&gHarness_platform) != 0) {
+            fprintf(stderr, "%s initialization failed\n", selected_bootstrap->name);
+            return 1;
+        }
+    } else {
+        size_t i;
+        for (i = 0; i < BR_ASIZE(platform_bootstraps); i++) {
+            LOG_DEBUG2("Attempting video driver \"%s\"", platform_bootstraps[i]->name);
+            if ((platform_bootstraps[i]->capabilities & required_caps) != required_caps) {
+                fprintf(stderr, "Skipping platform \"%s\". Does not support required capabilities.\n", platform_bootstraps[i]->name);
+                continue;
+            }
+            LOG_DEBUG2("Try platform \"%s\"...", platform_bootstraps[i]->name);
+            if (platform_bootstraps[i]->init(&gHarness_platform) == 0) {
+                selected_bootstrap = platform_bootstraps[i];
+                break;
             }
         }
         if (selected_bootstrap == NULL) {
             fprintf(stderr, "Could not find a supported platform\n");
             return 1;
         }
-        LOG_INFO3("Platform: %s (%s)", selected_bootstrap->name, selected_bootstrap->description);
     }
+    LOG_INFO3("Platform: %s (%s)", selected_bootstrap->name, selected_bootstrap->description);
 
     return 0;
 }
@@ -342,11 +331,6 @@ void Harness_Quit(void) {
     if (harness_game_config.install_signalhandler) {
         OS_RemoveSignalHandler();
     }
-}
-
-// used by unit tests
-void Harness_ForceNullPlatform(void) {
-    force_null_platform = 1;
 }
 
 int Harness_ProcessCommandLine(int* argc, char* argv[]) {
