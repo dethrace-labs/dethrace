@@ -327,102 +327,106 @@ void GetGraphicsOptions(void) {
     br_scalar br_value;
 
     value = GetCarSimplificationLevel();
-    if (value > 1) {
-        value--;
+    if (value < 2) {
+        gRadio_bastards__options[0].current_value = value;
+    } else {
+        gRadio_bastards__options[0].current_value = value - 1;
     }
-    gRadio_bastards__options[0].current_value = value;
 
     switch (GetCarTexturingLevel()) {
     case eCTL_none:
-        value = 2;
+        gRadio_bastards__options[1].current_value = 2;
         break;
     case eCTL_transparent:
-        value = 1;
+        gRadio_bastards__options[1].current_value = 1;
         break;
     case eCTL_full:
-        value = 0;
+        gRadio_bastards__options[1].current_value = 0;
         break;
-    case eCTL_count:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
-        break;
+
+        DETHRACE_DEFAULT_BREAK;
     }
-    gRadio_bastards__options[1].current_value = value;
 
     switch (GetShadowLevel()) {
     case eShadow_none:
-        value = 2;
+        gRadio_bastards__options[2].current_value = 2;
         break;
     case eShadow_us_only:
-        value = 1;
+        gRadio_bastards__options[2].current_value = 1;
         break;
     default:
-        value = 0;
+        gRadio_bastards__options[2].current_value = 0;
         break;
     }
-    gRadio_bastards__options[2].current_value = value;
 
     switch (GetWallTexturingLevel()) {
     case eWTL_none:
-        value = 2;
+        gRadio_bastards__options[3].current_value = 2;
         break;
     case eWTL_linear:
-        value = 1;
+        gRadio_bastards__options[3].current_value = 1;
         break;
     case eWTL_full:
-        value = 0;
+        gRadio_bastards__options[3].current_value = 0;
         break;
-    case eWTL_count:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
-        break;
+
+        DETHRACE_DEFAULT_BREAK;
     }
-    gRadio_bastards__options[3].current_value = value;
 
     switch (GetRoadTexturingLevel()) {
     case eRTL_none:
-        value = 2;
+        gRadio_bastards__options[4].current_value = 2;
         break;
     case eRTL_full:
-        value = 0;
+        gRadio_bastards__options[4].current_value = 0;
         break;
-    case eRTL_count:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
-        break;
-    }
-    gRadio_bastards__options[4].current_value = value;
 
-    value = (int)((35.f - GetYon()) / 5.f);
-    gRadio_bastards__options[5].current_value = value;
+        DETHRACE_DEFAULT_BREAK;
+    }
+
+    br_value = GetYon();
+    gRadio_bastards__options[5].current_value = (int)((35.f - br_value) / 5.f);
+    if (gRadio_bastards__options[5].current_value > 3) {
+        gRadio_bastards__options[5].current_value = 3;
+    }
 
     br_value = GetYonFactor();
-    if (br_value < .5f) {
-        if (br_value < .25f) {
-            value = 3;
-        } else {
-            value = 2;
-        }
+    if (br_value >= 1.f) {
+        gRadio_bastards__options[6].current_value = 0;
+    } else if (br_value >= .5f) {
+        gRadio_bastards__options[6].current_value = 1;
+    } else if (br_value >= .25f) {
+        gRadio_bastards__options[6].current_value = 2;
     } else {
-        if (br_value < 1.f) {
-            value = 1;
-        } else {
-            value = 0;
-        }
+        gRadio_bastards__options[6].current_value = 3;
     }
-    gRadio_bastards__options[6].current_value = value;
 
-    value = !GetSkyTextureOn();
-    gRadio_bastards__options[7].current_value = value;
+    if (GetSkyTextureOn()) {
+        gRadio_bastards__options[7].current_value = 0;
+    } else {
+        gRadio_bastards__options[7].current_value = 1;
+    }
 
-    value = !GetDepthCueingOn();
-    gRadio_bastards__options[8].current_value = value;
+    if (GetDepthCueingOn()) {
+        gRadio_bastards__options[8].current_value = 0;
+    } else {
+        gRadio_bastards__options[8].current_value = 1;
+    }
 
-    value = !GetAccessoryRendering();
-    gRadio_bastards__options[9].current_value = value;
+    if (GetAccessoryRendering()) {
+        gRadio_bastards__options[9].current_value = 0;
+    } else {
+        gRadio_bastards__options[9].current_value = 1;
+    }
 
-    value = !GetSmokeOn();
-    gRadio_bastards__options[10].current_value = value;
+    if (GetSmokeOn()) {
+        gRadio_bastards__options[10].current_value = 0;
+    } else {
+        gRadio_bastards__options[10].current_value = 1;
+    }
 
-    value = 2 - GetSoundDetailLevel();
-    gRadio_bastards__options[11].current_value = value;
+    value = GetSoundDetailLevel();
+    gRadio_bastards__options[11].current_value = 2 - value;
 }
 
 // IDA: void __cdecl SetGraphicsOptions()
@@ -846,6 +850,7 @@ void DoGraphicsOptions(void) {
 // IDA: void __cdecl CalibrateJoysticks()
 // FUNCTION: CARM95 0x0049bf81
 void CalibrateJoysticks(void) {
+#ifdef __DOS__
     tJoy_calib_stage stage;
     int escaped;
     int joy_value_x;
@@ -864,7 +869,6 @@ void CalibrateJoysticks(void) {
     int max;
     char s[256];
 
-#ifdef __DOS__
     NOT_IMPLEMENTED();
 #else
     NetFullScreenMessage(kMiscString_USE_SYSTEM_CONTROL_PANEL_FOR_JOYSTICKS, 0);
@@ -1112,8 +1116,7 @@ int KeyAssignLeft(int* pCurrent_choice, int* pCurrent_mode) {
         RadioChanged(12, new_index);
         DRS3StartSound(gEffects_outlet, 3000);
         return 1;
-    }
-    else {
+    } else {
         if (gCurrent_key >= (gKey_count + 1) / 2) {
             gCurrent_key -= (gKey_count + 1) / 2;
         } else {
