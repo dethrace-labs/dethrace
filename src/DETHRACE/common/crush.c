@@ -180,9 +180,6 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
     tChanged_vertex pipe_array[600];
     tCar_spec* car;
 
-    float v12;
-    int axis_tmp;
-
     pipe_vertex_count = 0;
     if (gNet_mode == eNet_mode_host && pCar->car_model_actors[pModel_index].min_distance_squared == 0.0f) {
         NetSendPointCrush(pCar, pCrush_point_index, pEnergy_vector);
@@ -193,8 +190,9 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
     working_limit_deviant = pCrush_data->limit_deviant * gCar_crush_limit_deviant;
     working_split_chance = pCrush_data->split_chance * gCar_crush_split_chance;
     min_y_fold_down = pCrush_data->min_y_fold_down;
-    the_crush_point = &pCrush_data->crush_points[pCrush_point_index];
-    if (pModel->nvertices <= the_crush_point->vertex_index) {
+    the_crush_point = pCrush_data->crush_points;
+    the_crush_point += pCrush_point_index;
+    if (the_crush_point->vertex_index < 0 || pModel->nvertices <= the_crush_point->vertex_index) {
         return;
     }
     target_point = &pModel->vertices[the_crush_point->vertex_index].p;
@@ -227,13 +225,12 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
         pipe_vertex_count++;
     }
     neighbour_index = -1;
-    for (j = 0; j < 3; j++) {
-        default_bend_axis[j] = (j + IRandomBetween(1, 2)) % 3;
-        default_bend_factor[j] = FRandomBetween(working_min_fold, working_max_fold);
+    for (k = 0; k < 3; k++) {
+        default_bend_axis[k] = (k + IRandomBetween(1, 2)) % 3;
+        default_bend_factor[k] = FRandomBetween(working_min_fold, working_max_fold);
     }
 
-    the_neighbour = the_crush_point->neighbours;
-    for (k = 0; k < the_crush_point->number_of_neighbours; k++, the_neighbour++) {
+    for (j = 0, the_neighbour = the_crush_point->neighbours; j < the_crush_point->number_of_neighbours; j++, the_neighbour++) {
         if (!the_neighbour->vertex_index) {
             neighbour_index += the_neighbour->factor;
             continue;
@@ -244,20 +241,15 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
         }
         target_point = &pModel->vertices[neighbour_index].p;
         old_vector = *target_point;
-        for (j = 0; j < 3; j++) {
-            target_point->v[j] += (1.0 - (unsigned int)the_neighbour->factor / 256.0) * movement.v[j];
+        for (k = 0; k < 3; k++) {
+            target_point->v[k] += (1.0 - (unsigned int)the_neighbour->factor / 256.0) * movement.v[k];
 
-            if (the_neighbour->factor > 128) {
-                bend_amount = 2.0 - (unsigned int)the_neighbour->factor / 128.0;
-            } else {
-                bend_amount = (unsigned int)the_neighbour->factor / 128.0;
-            }
-            if (((int)((target_point->v[2] + (target_point->v[1] + target_point->v[0])) * 63.0f) & 1) * bend_amount != 0.0) {
-                bend_amount = default_bend_factor[j];
-            } else {
-                bend_amount = -default_bend_factor[j];
-            }
-            target_point->v[((((int)((target_point->v[2] + (target_point->v[1] + target_point->v[0])) * 100.0f) + j) - 1) & 1) % 3] += fabs(movement.v[j]) * bend_amount;
+            target_point->v[(((int)((target_point->v[2] + target_point->v[1] + target_point->v[0]) * 100.0f) + k + -1) & 1) % 3] += fabs(movement.v[k])
+                * ((((int)((target_point->v[2] + target_point->v[1] + target_point->v[0]) * 63.0f) & 1)
+                           * (the_neighbour->factor > 128 ? 2.0 - (unsigned int)the_neighbour->factor / 128.0 : (unsigned int)the_neighbour->factor / 128.0)
+                       != 0.0)
+                        ? default_bend_factor[k]
+                        : -default_bend_factor[k]);
         }
         if (IsActionReplayAvailable() && pipe_vertex_count < 600) {
             pipe_array[pipe_vertex_count].vertex_index = neighbour_index;
@@ -894,7 +886,7 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
                     FRandomBetween(7.0f / energy_magnitude, 25.0f / energy_magnitude));
                 break;
 
-            DETHRACE_DEFAULT_BREAK
+                DETHRACE_DEFAULT_BREAK
             }
             CheckPiledriverBonus(pCar, pImpact_point, pEnergy_vector);
         }
