@@ -303,12 +303,8 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
             BrVector3Sub(&wank, &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t, GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no));
 
             dist_along = BrVector3Dot(&section_dir, &wank); // v62.v[2] * wank.v[2] + v62.v[1] * wank.v[1] + v62.v[0] * wank.v[0];
-            wank2.v[0] = section_dir.v[0] * dist_along;
-            wank2.v[1] = section_dir.v[1] * dist_along;
-            wank2.v[2] = section_dir.v[2] * dist_along;
-            goal_dir.v[0] = wank2.v[0] - wank.v[0];
-            goal_dir.v[1] = wank2.v[1] - wank.v[1];
-            goal_dir.v[2] = wank2.v[2] - wank.v[2];
+            BrVector3Scale(&wank2, &section_dir, dist_along);
+            BrVector3Sub(&goal_dir, &wank2, &wank);
             goal_dir.v[1] = 0.0f;
             dist_to_goal = BrVector3Length(&goal_dir) * 6.9;
             if (dist_to_goal < 15.0f) {
