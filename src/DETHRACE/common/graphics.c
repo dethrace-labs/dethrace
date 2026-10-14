@@ -700,6 +700,23 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     char* destn_ptr;
     char* destn_ptr2;
 
+#ifdef DETHRACE_3DFX_PATCH
+    if (gBack_screen->type == BR_PMT_RGB_565) {
+        Copy8BitStripImageTo16Bit(
+            pDest,
+            pDest_x,
+            pOffset_x,
+            pDest_y,
+            pOffset_y,
+            pSource,
+            pSource_x,
+            pSource_y,
+            pWidth,
+            pHeight);
+        return;
+    }
+#endif
+
     height = *(tU16*)pSource;
     pSource = pSource + 2;
     if (pDest_y + pOffset_y < 0) {
@@ -738,28 +755,16 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
                 x_byte += chunk_length;
                 if (old_x_byte < 0) {
                     if (x_byte > 0) {
-#ifdef DETHRACE_FIX_BUGS
-                        memmove(destn_ptr2, pSource - old_x_byte, chunk_length + old_x_byte);
-#else
                         memcpy(destn_ptr2, pSource - old_x_byte, chunk_length + old_x_byte);
-#endif
                         destn_ptr2 += chunk_length + old_x_byte;
                     }
                 } else {
                     if (destn_width < x_byte) {
                         if (old_x_byte < destn_width) {
-#ifdef DETHRACE_FIX_BUGS
-                            memmove(destn_ptr2, pSource, destn_width - old_x_byte);
-#else
                             memcpy(destn_ptr2, pSource, destn_width - old_x_byte);
-#endif
                         }
                     } else {
-#ifdef DETHRACE_FIX_BUGS
-                        memmove(destn_ptr2, pSource, chunk_length);
-#else
                         memcpy(destn_ptr2, pSource, chunk_length);
-#endif
                         destn_ptr2 += chunk_length;
                     }
                 }
