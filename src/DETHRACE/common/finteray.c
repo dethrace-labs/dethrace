@@ -580,10 +580,8 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
         return;
     }
     for (i = 0; i < pNum_rays; ++i) {
-        tv.v[0] = ray_pos[i].v[0] - pFace->v[0].v[0];
-        tv.v[1] = ray_pos[i].v[1] - pFace->v[0].v[1];
-        tv.v[2] = ray_pos[i].v[2] - pFace->v[0].v[2];
-        numerator = pFace->normal.v[1] * tv.v[1] + pFace->normal.v[2] * tv.v[2] + pFace->normal.v[0] * tv.v[0];
+        BrVector3Sub(&tv, &ray_pos[i], &pFace->v[0]);
+        numerator = BrVector3Dot(&pFace->normal, &tv);
         if (BadDiv__finteray(numerator, d)) {
             return;
         }
@@ -602,12 +600,8 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
         if (t[i] > 1.0f) {
             t[i] = 1.0f;
         }
-        p[i].v[0] = t[i] * ray_dir->v[0];
-        p[i].v[1] = t[i] * ray_dir->v[1];
-        p[i].v[2] = t[i] * ray_dir->v[2];
-        p[i].v[0] = ray_pos[i].v[0] + p[i].v[0];
-        p[i].v[1] = ray_pos[i].v[1] + p[i].v[1];
-        p[i].v[2] = ray_pos[i].v[2] + p[i].v[2];
+        BrVector3Scale(&p[i], ray_dir, t[i]);
+        BrVector3Accumulate(&p[i], &ray_pos[i]);
     }
 
     axis_m = 0;
@@ -663,9 +657,7 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
         rt[i] = t[i];
         BrVector3Copy(normal, &pFace->normal);
         if (d > 0.0f) {
-            normal->v[0] = -pFace->normal.v[0];
-            normal->v[1] = -pFace->normal.v[1];
-            normal->v[2] = -pFace->normal.v[2];
+            BrVector3Negate(normal, &pFace->normal);
         }
     }
 }
@@ -787,10 +779,10 @@ int FindFacesInBox2(tBounds* bnds, tFace_ref* face_list, int max_face) {
     }
     for (j = 0; j < 3; j++) {
         bnds->real_bounds.min.v[j] += ((float)(c[2].v[j] < 0.f) * c[2].v[j]
-            + (float)(c[0].v[j] < 0.f) * c[0].v[j])
+                                          + (float)(c[0].v[j] < 0.f) * c[0].v[j])
             + (float)(c[1].v[j] < 0.f) * c[1].v[j];
         bnds->real_bounds.max.v[j] += ((float)(c[2].v[j] > 0.f) * c[2].v[j]
-            + (float)(c[0].v[j] > 0.f) * c[0].v[j])
+                                          + (float)(c[0].v[j] > 0.f) * c[0].v[j])
             + (float)(c[1].v[j] > 0.f) * c[1].v[j];
     }
     i = ActorBoxPick(bnds, gTrack_actor, model_unk1, material_unk1, face_list, max_face, NULL);
