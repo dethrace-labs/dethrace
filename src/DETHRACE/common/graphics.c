@@ -1585,9 +1585,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
         ray.v[0] = 0.0f;
         ray.v[1] = -ray_length;
         ray.v[2] = 0.0f;
-        ray_pos.v[0] = pCar->car_master_actor->t.t.translate.t.v[0];
-        ray_pos.v[1] = pCar->car_master_actor->t.t.translate.t.v[1];
-        ray_pos.v[2] = pCar->car_master_actor->t.t.translate.t.v[2];
+        BrVector3Copy(&ray_pos, &pCar->car_master_actor->t.t.translate.t);
         ray_pos.v[1] = kev_bounds.original_bounds.max.v[1];
     } else {
         height = 0.0f;
@@ -1652,15 +1650,9 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
                 }
             }
 
-            verts[3 * f_num].p.v[0] = face_ref->v[0].v[0];
-            verts[3 * f_num].p.v[1] = face_ref->v[0].v[1];
-            verts[3 * f_num].p.v[2] = face_ref->v[0].v[2];
-            verts[3 * f_num + 1].p.v[0] = face_ref->v[1].v[0];
-            verts[3 * f_num + 1].p.v[1] = face_ref->v[1].v[1];
-            verts[3 * f_num + 1].p.v[2] = face_ref->v[1].v[2];
-            verts[3 * f_num + 2].p.v[0] = face_ref->v[2].v[0];
-            verts[3 * f_num + 2].p.v[1] = face_ref->v[2].v[1];
-            verts[3 * f_num + 2].p.v[2] = face_ref->v[2].v[2];
+            BrVector3Copy(&verts[3 * f_num].p, &face_ref->v[0]);
+            BrVector3Copy(&verts[3 * f_num + 1].p, &face_ref->v[1]);
+            BrVector3Copy(&verts[3 * f_num + 2].p, &face_ref->v[2]);
             verts[3 * f_num].map.v[0] = face_ref->map[0]->v[0];
             verts[3 * f_num].map.v[1] = face_ref->map[0]->v[1];
             verts[3 * f_num + 1].map.v[0] = face_ref->map[1]->v[0];
