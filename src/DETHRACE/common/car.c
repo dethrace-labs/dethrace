@@ -5139,114 +5139,118 @@ int IncidentCam(tCar_spec* c, tU32 pTime) {
     br_vector3 old_cam_pos;
     int removed;
 
-    gPed_actor = NULL;
     m2 = &gCamera->t.t.mat;
+    gPed_actor = NULL;
     if (type == eNo_incident) {
         MoveCamToIncident(c, &type, &severity, &info, &next_incident_time);
     }
     if (type == eNo_incident) {
         return 0;
     }
-    if (type == eIncident_ped) {
-        BrVector3Copy(&old_cam_pos, &gCamera->t.t.translate.t);
+    switch (type) {
+    case eIncident_ped:
+        BrVector3Copy(&old_cam_pos, (br_vector3*)m2->m[3]);
         gPed_actor = info.ped_info.ped_actor;
         removed = PossibleRemoveNonCarFromWorld(info.ped_info.murderer_actor);
-        BrMatrix34Mul(&mat, &gPed_actor->t.t.mat, &gPed_actor->parent->t.t.mat);
+        BrMatrix34Mul(&mat, &info.ped_info.ped_actor->t.t.mat, &info.ped_info.ped_actor->parent->t.t.mat);
         info.ped_info.murderer_actor = c->car_master_actor;
         if (info.ped_info.murderer_actor != NULL) {
             BrVector3Copy(&murderer_pos, &c->pos);
         } else if (info.ped_info.murderer_actor->model != NULL) {
-            BrVector3Add(&murderer_pos, &info.ped_info.murderer_actor->model->bounds.max, &info.ped_info.murderer_actor->model->bounds.min);
-            BrVector3Scale(&murderer_pos, &murderer_pos, 0.5f);
-            BrMatrix34ApplyP(&murderer_pos, &murderer_pos, &info.ped_info.murderer_actor->t.t.mat);
+            BrVector3Sub(&tv, &info.ped_info.murderer_actor->model->bounds.max, &info.ped_info.murderer_actor->model->bounds.min);
+            BrVector3Scale(&tv, &tv, 0.5f);
+            BrMatrix34ApplyP(&murderer_pos, &tv, &info.ped_info.murderer_actor->t.t.mat);
         } else {
             BrVector3Copy(&murderer_pos, &info.ped_info.murderer_actor->t.t.translate.t);
         }
-        BrVector3Normalise(&vertical, (br_vector3*)mat.m[1]);
-        BrVector3Scale(&vertical, &vertical, PedHeightFromActor(info.ped_info.ped_actor) / 2.f);
-        BrVector3Accumulate((br_vector3*)mat.m[3], &vertical);
+        BrVector3Normalise(&tv, (br_vector3*)mat.m[1]);
+        BrVector3Scale(&tv, &tv, PedHeightFromActor(info.ped_info.ped_actor) / 2.f);
+        BrVector3Accumulate((br_vector3*)mat.m[3], &tv);
         if (next_incident_time > GetTotalTime() || !PipeSearchForwards()) {
             BrVector3Sub(&tv, (br_vector3*)mat.m[3], &murderer_pos);
             tv.v[1] = 0.f;
             BrVector3Normalise(&tv, &tv);
             BrVector3Set(&vertical, .0f, .4f, .0f);
-            BrVector3Cross(&perp, &tv, &vertical);
+            BrVector3Cross(&tv2, &tv, &vertical);
             if (random) {
-                BrVector3Negate(&perp, &perp);
+                BrVector3Negate(&tv2, &tv2);
             }
             if (PipeSearchForwards()) {
-                BrVector3Accumulate(&perp, &tv);
+                BrVector3Accumulate(&tv2, &tv);
             }
-            BrVector3Add(&gCamera->t.t.translate.t, (br_vector3*)mat.m[3], &perp);
-            CollideCamera2(&murderer_pos, &gCamera->t.t.translate.t, NULL, 1);
+            BrVector3Add((br_vector3*)m2->m[3], (br_vector3*)mat.m[3], &tv2);
+            m2->m[3][1] += 0.25f;
+            CollideCamera2(&murderer_pos, (br_vector3*)m2->m[3], NULL, 1);
         }
         PointCamera((br_vector3*)mat.m[3], m2);
-        BrVector3Sub(&tv, &gCamera->t.t.translate.t, &info.ped_info.murderer_actor->t.t.translate.t);
+        BrVector3Sub(&tv, (br_vector3*)m2->m[3], &info.ped_info.murderer_actor->t.t.translate.t);
         ts = BrVector3LengthSquared(&tv);
         if (abs(GetTotalTime() - next_incident_time) > 2500) {
             type = eNo_incident;
         }
         if ((PipeSearchForwards() ? (next_incident_time < GetTotalTime()) : (next_incident_time > GetTotalTime()))
-            && (ts > 25.f || CheckForWall(&info.ped_info.murderer_actor->t.t.translate.t, &gCamera->t.t.translate.t))) {
+            && (ts > 25.f || CheckForWall(&info.ped_info.murderer_actor->t.t.translate.t, (br_vector3*)m2->m[3]))) {
             type = eNo_incident;
         }
         if (removed) {
             PutNonCarBackInWorld(info.ped_info.murderer_actor);
         }
-        if (Vector3DistanceSquared((br_vector3*)mat.m[3], &gCamera->t.t.translate.t) < .15f * .15f) {
-            BrVector3Copy(&gCamera->t.t.translate.t, &old_cam_pos);
+        if (((mat.m[3][0] - m2->m[3][0]) * (mat.m[3][0] - m2->m[3][0])
+                + (mat.m[3][2] - m2->m[3][2]) * (mat.m[3][2] - m2->m[3][2])) < .15 * .15) {
+            BrVector3Copy((br_vector3*)m2->m[3], &old_cam_pos);
             gPed_actor = NULL;
             return 0;
         }
-    } else if (type == eIncident_car) {
-        BrVector3Sub(&tv, &info.car_info.car->pos, &c->pos);
+        break;
+    case eIncident_wall:
+        PointCamera(&c->pos, m2);
+        BrVector3Sub(&tv, (br_vector3*)m2->m[3], &c->pos);
+        ts = BrVector3LengthSquared(&tv);
+        if ((float)fabs((int)(GetTotalTime() - next_incident_time)) > 2500.f) {
+            type = eNo_incident;
+        }
+        if ((PipeSearchForwards() ? (next_incident_time < GetTotalTime()) : (next_incident_time > GetTotalTime()))
+            && (ts > 25.f || CheckForWall(&c->pos, (br_vector3*)m2->m[3]))) {
+            type = eNo_incident;
+        }
+        break;
+    case eIncident_car:
+        car2 = info.car_info.car;
+        BrVector3Sub(&tv, &car2->pos, &c->pos);
         tv.v[1] = 0.f;
         BrVector3Normalise(&tv, &tv);
         BrVector3Scale(&tv, &tv, 2.f);
-        BrVector3Add(&gCamera->t.t.translate.t, &info.car_info.car->pos, &tv);
-        gCamera->t.t.translate.t.v[1] += 1.f;
-        CollideCamera2(&info.car_info.car->pos, &gCamera->t.t.translate.t, NULL, 1);
-        PointCamera(&info.car_info.car->pos, m2);
-        BrVector3Sub(&tv, &gCamera->t.t.translate.t, &c->pos);
+        BrVector3Add((br_vector3*)m2->m[3], &car2->pos, &tv);
+        m2->m[3][1] += 1.f;
+        CollideCamera2(&car2->pos, (br_vector3*)m2->m[3], NULL, 1);
+        PointCamera(&car2->pos, m2);
+        BrVector3Sub(&tv, (br_vector3*)m2->m[3], &c->pos);
         ts = BrVector3LengthSquared(&tv);
-        if (abs(GetTotalTime() - next_incident_time) > 2500) {
+        if ((float)fabs((int)(GetTotalTime() - next_incident_time)) > 2500.f) {
             type = eNo_incident;
         }
         if ((PipeSearchForwards() ? (next_incident_time < GetTotalTime()) : (next_incident_time > GetTotalTime()))
-            && (ts > 25.f || CheckForWall(&c->pos, &gCamera->t.t.translate.t))) {
+            && (ts > 25.f || CheckForWall(&c->pos, (br_vector3*)m2->m[3]))) {
             type = eNo_incident;
         }
-    } else if (type == eIncident_wall) {
-        PointCamera(&c->pos, m2);
-        BrVector3Sub(&tv, &gCamera->t.t.translate.t, &c->pos);
-        ts = BrVector3LengthSquared(&tv);
-        if (abs(GetTotalTime() - next_incident_time) > 2500) {
-            type = eNo_incident;
-        }
-        if ((PipeSearchForwards() ? (next_incident_time < GetTotalTime()) : (next_incident_time > GetTotalTime()))
-            && (ts > 25.f || CheckForWall(&c->pos, &gCamera->t.t.translate.t))) {
-            type = eNo_incident;
-        }
-    } else {
+        break;
+    default:
         type = eNo_incident;
     }
-    if (type == eNo_incident) {
-        if (count > 1) {
-            SetUpPanningCamera(c);
-            return 0;
-        } else {
-            count++;
-            if (IncidentCam(c, pTime)) {
-                count--;
-                return 1;
-            } else {
-                count--;
-                return 0;
-            }
-        }
-    } else {
+    if (type != eNo_incident) {
         return 1;
     }
+    if (count > 1) {
+        SetUpPanningCamera(c);
+        return 0;
+    }
+    count++;
+    if (IncidentCam(c, pTime)) {
+        count--;
+        return 1;
+    }
+    count--;
+    return 0;
 }
 
 // IDA: int __usercall MoveCamToIncident@<EAX>(tCar_spec *c@<EAX>, tIncident_type *type@<EDX>, float *severity@<EBX>, tIncident_info *info@<ECX>, tU32 *next_incident_time)
