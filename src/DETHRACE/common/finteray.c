@@ -11,6 +11,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#define RAY_FACE_TOLERANCE (1.0 / 0x400000)
+
 // GLOBAL: CARM95 0x0051e8fc
 int gPling_materials = 1;
 
@@ -574,7 +576,7 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
     if (this_material && this_material->identifier && *this_material->identifier == '!' && gPling_materials) {
         return;
     }
-    if ((br_scalar)fabs(d) < 0.00000023841858f) {
+    if ((br_scalar)fabs(d) < (br_scalar)RAY_FACE_TOLERANCE) {
         return;
     }
     for (i = 0; i < pNum_rays; ++i) {
@@ -641,7 +643,7 @@ void MultiRayCheckSingleFace(int pNum_rays, tFace_ref* pFace, br_vector3* ray_po
         }
         u0[i] = p[i].v[axis_0] - v0i1;
         v0[i] = p[i].v[axis_1] - v0i2;
-        if (fabs(u1) <= 0.0000002384185791015625) {
+        if (fabs(u1) <= RAY_FACE_TOLERANCE) {
             beta = u0[i] / u2;
             f_numerator = v0[i] - beta * v2;
             alpha = f_numerator / v1;
