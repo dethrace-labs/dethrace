@@ -194,7 +194,6 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
     int later_straight;
     int next_left_not_right;
 
-    // float v104;
 
     car_spec = pOpponent_spec->car_spec;
     engine_damage = car_spec->damage_units[0].damage_level;
