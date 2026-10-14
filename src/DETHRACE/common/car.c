@@ -5777,22 +5777,22 @@ void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
     br_camera* camera_ptr;
     br_angle off_centre_angle;
     int swoop;
-    br_scalar scale;
 
     camera_ptr = gCamera->type_data;
-    theta = camera_ptr->field_of_view / 5;
+    off_centre_angle = camera_ptr->field_of_view / 5;
     swoop = gCountdown && c->pos.v[1] + 0.01f < gCamera_height;
-    if (0) {
+    if (swoop) {
         BrVector3Sub(&tv, &gAverage_grid_position, &c->pos);
         frac = (gCamera_height - c->pos.v[1]) / 10.0f;
         BrVector3Scale(&tv, &tv, frac);
         BrVector3Accumulate(&tv, &c->pos);
         pos = &tv;
-        theta = (1.0f - frac) * (float)theta;
+        off_centre_angle = (1.0f - frac) * (float)off_centre_angle;
     } else {
         pos = &c->pos;
     }
-    BrVector3Set(&vn, c->pos.v[0] - m2->m[3][0], 0.f, c->pos.v[2] - m2->m[3][2]);
+    BrVector3Sub(&vn, &c->pos, (br_vector3*)m2->m[3]);
+    vn.v[1] = 0.f;
     BrVector3Normalise(&vn, &vn);
     m2->m[0][0] = -vn.v[2];
     m2->m[0][1] = 0.0f;
@@ -5805,7 +5805,8 @@ void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
     m2->m[2][2] = -vn.v[2];
     BrVector3Sub(&tv2, pos, (br_vector3*)m2->m[3]);
     dist = BrVector3Dot(&tv2, &vn);
-    BrMatrix34PreRotateX(m2, theta - BrRadianToAngle(atan2(m2->m[3][1] - pos->v[1], dist)));
+    theta = -BrRadianToAngle(atan2(m2->m[3][1] - pos->v[1], dist)) + off_centre_angle;
+    BrMatrix34PreRotateX(m2, theta);
 }
 
 // IDA: void __usercall PointCamera(br_vector3 *pos@<EAX>, br_matrix34 *m2@<EDX>)
