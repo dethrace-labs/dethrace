@@ -5914,12 +5914,8 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
         bnds.mat = &mat;
         BrMatrix34Identity(bnds.mat);
         BrVector3Set(&tv, hither, hither, hither);
-        bnds.original_bounds.min.v[0] = cam_pos->v[0] - tv.v[0];
-        bnds.original_bounds.min.v[1] = cam_pos->v[1] - tv.v[1];
-        bnds.original_bounds.min.v[2] = cam_pos->v[2] - tv.v[2];
-        bnds.original_bounds.max.v[0] = cam_pos->v[0] + tv.v[0];
-        bnds.original_bounds.max.v[1] = cam_pos->v[1] + tv.v[1];
-        bnds.original_bounds.max.v[2] = cam_pos->v[2] + tv.v[2];
+        BrVector3Sub(&bnds.original_bounds.min, cam_pos, &tv);
+        BrVector3Add(&bnds.original_bounds.max, cam_pos, &tv);
         k = FindFacesInBox(&bnds, face_list, 3);
         if (k > 0) {
             BrVector3Sub(&tv, cam_pos, &face_list[0].v[0]);
