@@ -217,8 +217,8 @@ int gInTheSea;
 int gCamera_mode;
 
 // GLOBAL: CARM95 0x0053a514
-br_scalar gOur_yaw__car;            // suffix added to avoid duplicate symbol
-br_scalar gGravity__car;            // suffix added to avoid duplicate symbol
+br_scalar gOur_yaw__car; // suffix added to avoid duplicate symbol
+br_scalar gGravity__car; // suffix added to avoid duplicate symbol
 
 // GLOBAL: CARM95 0x0053a530
 br_vector3 gNew_ground_normal__car; // suffix added to avoid duplicate symbol
@@ -789,8 +789,9 @@ void GetFacesInBox(tCollision_info* c) {
         && c->water_d != 10000.f
         && gDouble_pling_water
         && (c->bounds_world_space.max.v[1] * c->water_normal.v[1]
-                   + c->bounds_world_space.max.v[2] * c->water_normal.v[2])
-                + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.max.v[0] - c->water_d <= 0.f) {
+               + c->bounds_world_space.max.v[2] * c->water_normal.v[2])
+                + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.max.v[0] - c->water_d
+            <= 0.f) {
         gInTheSea = 1;
         FreezeCamera();
     }
@@ -805,12 +806,16 @@ void GetFacesInBox(tCollision_info* c) {
         if (c->driver == eDriver_local_human) {
             if (gPling_face->material->identifier[1] == '!') {
                 if ((c->water_normal.v[2] * c->bounds_world_space.min.v[2]
-                            + c->bounds_world_space.min.v[1] * c->water_normal.v[1])
-                        + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.min.v[0] - c->water_d < 0.0f) {
+                        + c->bounds_world_space.min.v[1] * c->water_normal.v[1])
+                        + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.min.v[0] - c->water_d
+                    < 0.0f) {
                     GetNewBoundingBox(&current_bounds, &c->bounds[1], &c->car_master_actor->t.t.mat);
                     if ((c->water_normal.v[2] * current_bounds.min.v[2]
                             + c->water_normal.v[1] * current_bounds.min.v[1]
-                            + c->water_normal.v[0] * current_bounds.min.v[0]) / WORLD_SCALE_D - c->water_d < 0.0) {
+                            + c->water_normal.v[0] * current_bounds.min.v[0])
+                                / WORLD_SCALE_D
+                            - c->water_d
+                        < 0.0) {
                         gInTheSea = 1;
                         FreezeCamera();
                     }
@@ -6791,53 +6796,49 @@ int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_
     }
     for (i = 0; i < 4; i++) {
         if (i == 3) {
-            tp1 = pB2->min;
+            BrVector3Copy(&p1, &pB2->min);
         } else {
-            tp1 = pB2->max;
-            tp1.v[i] = pB2->min.v[i];
+            BrVector3Copy(&p1, &pB2->max);
+            p1.v[i] = pB2->min.v[i];
         }
         for (j = 0; j < 3; j++) {
-            tp2 = tp1;
-            if (pB2->max.v[j] == tp2.v[j]) {
-                tp2.v[j] = pB2->min.v[j];
+            BrVector3Copy(&p2, &p1);
+            if (pB2->max.v[j] == p2.v[j]) {
+                p2.v[j] = pB2->min.v[j];
             } else {
-                tp2.v[j] = pB2->max.v[j];
+                p2.v[j] = pB2->max.v[j];
             }
 
-            BrMatrix34ApplyP(&p1, &tp1, pM21);
-            BrMatrix34ApplyP(&p2, &tp2, pM21);
-            plane1 = LineBoxColl(&p1, &p2, pB1, &hp1);
+            BrMatrix34ApplyP(&tp1, &p1, pM21);
+            BrMatrix34ApplyP(&tp2, &p2, pM21);
+            plane1 = LineBoxColl(&tp1, &tp2, pB1, &hp1);
             if (plane1 == 0) {
                 continue;
             }
-            plane2 = LineBoxColl(&p2, &p1, pB1, &hp2);
+            plane2 = LineBoxColl(&tp2, &tp1, pB1, &hp2);
             if (plane1 == 8 || plane2 == 8 || plane2 == 0) {
                 continue;
             }
-            BrVector3Add(&p1, &hp1, &hp2);
-            BrVector3Scale(&p1, &p1, 0.5f);
-            BrMatrix34ApplyP(&tp3, &p1, pM12);
-            BrMatrix34ApplyP(&p2, &tp3, pMo21);
-            plane3 = LineBoxColl(&p2, &p1, pB1, &hp3);
+            BrVector3Add(&tp1, &hp1, &hp2);
+            BrVector3Scale(&tp1, &tp1, 0.5f);
+            BrMatrix34ApplyP(&tp3, &tp1, pM12);
+            BrMatrix34ApplyP(&tp2, &tp3, pMo21);
+            plane3 = LineBoxColl(&tp2, &tp1, pB1, &hp3);
             // if (plane3 != 8 && plane3 != 0) {
             //     goto LABEL_25;
             // }
             if (plane3 == 8 || plane3 == 0) {
-                BrVector3Sub(&tp3, &p2, &p1);
-                ts = BrVector3Length(&tp3);
-                ts = ts / 0.01f;
+                BrVector3Sub(&tp3, &tp2, &tp1);
+                ts = BrVector3Length(&tp3) / 0.01f;
                 if (ts == 0.0f) {
                     continue;
                 }
                 BrVector3InvScale(&tp3, &tp3, ts);
-                BrVector3Accumulate(&p2, &tp3);
-                plane3 = LineBoxColl(&p2, &p1, pB1, &hp3);
-                if (plane3 == 8) {
+                BrVector3Accumulate(&tp2, &tp3);
+                plane3 = LineBoxColl(&tp2, &tp1, pB1, &hp3);
+                if (plane3 == 8 || plane3 == 0) {
                     continue;
                 }
-            }
-            if (plane3 == 0) {
-                continue;
             }
 
             BrMatrix34ApplyP(&shp1, &hp1, pM12);
@@ -6846,36 +6847,51 @@ int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_
                 if (n >= pMax) {
                     return n;
                 }
-                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane2, &p2, &hp1, &hp2, 0);
+                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane2, &tp2, &hp1, &hp2, 0);
                 BrVector3Accumulate(&shp1, &shp2);
                 BrVector3Scale(&pPoint_list[2 * n + 1], &shp1, 0.5f);
-                BrVector3Sub(&p1, &hp1, &hp2);
-                BrVector3Cross(&p2, &edge, &p1);
-                BrVector3Normalise(&p2, &p2);
-                BrVector3Add(&p1, &pB1->max, &pB1->min);
-                BrVector3Scale(&p1, &p1, 0.5f);
-                BrVector3Sub(&p1, &pPoint_list[2 * n], &p1);
-                if (BrVector3Dot(&p1, &p2) > 0.0) {
-                    BrVector3Negate(&p2, &p2);
+                BrVector3Sub(&tp1, &hp1, &hp2);
+                BrVector3Cross(&tp2, &edge, &tp1);
+                BrVector3Normalise(&tp2, &tp2);
+                BrVector3Add(&tp1, &pB1->max, &pB1->min);
+                BrVector3Scale(&tp1, &tp1, 0.5f);
+                BrVector3Sub(&tp1, &pPoint_list[2 * n], &tp1);
+                if (BrVector3Dot(&tp1, &tp2) > 0.0f) {
+                    BrVector3Negate(&tp2, &tp2);
                 }
-                BrMatrix34ApplyV(&p1, &p2, pM12);
-                BrMatrix34TApplyV(&pNorm_list[2 * n], &p1, pMo12);
-                BrMatrix34TApplyV(&pNorm_list[2 * n + 1], &p2, pMo21);
+                BrMatrix34ApplyV(&tp1, &tp2, pM12);
+                BrMatrix34TApplyV(&pNorm_list[2 * n], &tp1, pMo12);
+                BrMatrix34TApplyV(&pNorm_list[2 * n + 1], &tp2, pMo21);
                 BrVector3Negate(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 1]);
                 n++;
-            } else if ((plane1 ^ plane2) == 4) {
+            } else if ((plane1 ^ plane2) != 4) {
                 if (pMax - 1 <= n) {
                     return n;
                 }
-                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &p2, &hp1, &hp2, 0);
-                GetBoundsEdge(&pPoint_list[2 * n + 2], &edge, pB1, plane2, plane3, &p2, &hp1, &hp2, 0);
-                pPoint_list[2 * n + 1] = shp1;
-                pPoint_list[2 * n + 3] = shp2;
-                BrVector3Sub(&p1, &hp1, &hp2);
-                BrMatrix34ApplyV(&p2, &p1, pM12);
-                BrMatrix34ApplyV(&p1, &p2, pMo21);
-                BrVector3Cross(&p2, &edge, &p1);
-                BrVector3Normalise(&pNorm_list[2 * n], &p2);
+                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &tp2, &hp1, &hp2, 0);
+                GetBoundsEdge(&pPoint_list[2 * n + 2], &edge, pB1, plane2, plane3, &tp2, &hp1, &hp2, 0);
+                BrMatrix34ApplyP(&pPoint_list[2 * n + 1], &hp1, pM12);
+                BrMatrix34ApplyP(&pPoint_list[2 * n + 3], &hp2, pM12);
+                GetPlaneNormal(&pNorm_list[2 * n], plane3);
+                BrMatrix34ApplyV(&pNorm_list[2 * n + 2], &pNorm_list[2 * n], pM1o1);
+                BrMatrix34ApplyV(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 2], pMo12);
+                BrVector3Copy(&pNorm_list[2 * n], &pNorm_list[2 * n + 2]);
+                BrVector3Negate(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 1]);
+                BrVector3Copy(&pNorm_list[2 * n + 3], &pNorm_list[2 * n + 1]);
+                n += 2;
+            } else {
+                if (pMax - 1 <= n) {
+                    return n;
+                }
+                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &tp2, &hp1, &hp2, 0);
+                GetBoundsEdge(&pPoint_list[2 * n + 2], &edge, pB1, plane2, plane3, &tp2, &hp1, &hp2, 0);
+                BrVector3Copy(&pPoint_list[2 * n + 1], &shp1);
+                BrVector3Copy(&pPoint_list[2 * n + 3], &shp2);
+                BrVector3Sub(&tp1, &hp1, &hp2);
+                BrMatrix34ApplyV(&tp2, &tp1, pM12);
+                BrMatrix34ApplyV(&tp1, &tp2, pMo21);
+                BrVector3Cross(&tp2, &edge, &tp1);
+                BrVector3Normalise(&pNorm_list[2 * n], &tp2);
                 GetPlaneNormal(&edge, plane3);
                 if (BrVector3Dot(&pNorm_list[2 * n], &edge) < 0.0f) {
                     BrVector3Negate(&pNorm_list[2 * n], &pNorm_list[2 * n]);
@@ -6884,23 +6900,8 @@ int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_
                 BrVector3Negate(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 1]);
                 BrMatrix34ApplyV(&tp3, &pNorm_list[2 * n], pM12);
                 BrMatrix34ApplyV(&pNorm_list[2 * n], &tp3, pMo21);
-                pNorm_list[2 * n + 2] = pNorm_list[2 * n];
-                pNorm_list[2 * n + 3] = pNorm_list[2 * n + 1];
-                n += 2;
-            } else {
-                if (pMax - 1 <= n) {
-                    return n;
-                }
-                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &p2, &hp1, &hp2, 0);
-                GetBoundsEdge(&pPoint_list[2 * n + 2], &edge, pB1, plane2, plane3, &p2, &hp1, &hp2, 0);
-                BrMatrix34ApplyP(&pPoint_list[2 * n + 1], &hp1, pM12);
-                BrMatrix34ApplyP(&pPoint_list[2 * n + 3], &hp2, pM12);
-                GetPlaneNormal(&pNorm_list[2 * n], plane3);
-                BrMatrix34ApplyV(&pNorm_list[2 * n + 2], &pNorm_list[2 * n], pM1o1);
-                BrMatrix34ApplyV(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 2], pMo12);
-                pNorm_list[2 * n] = pNorm_list[2 * n + 2];
-                BrVector3Negate(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 1]);
-                pNorm_list[2 * n + 3] = pNorm_list[2 * n + 1];
+                BrVector3Copy(&pNorm_list[2 * n + 2], &pNorm_list[2 * n]);
+                BrVector3Copy(&pNorm_list[2 * n + 3], &pNorm_list[2 * n + 1]);
                 n += 2;
             }
         }
