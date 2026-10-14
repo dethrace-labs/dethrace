@@ -3942,48 +3942,47 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
     the_time = GetTotalTime();
     StartPipingSession(ePipe_chunk_prox_ray);
     for (i = 0; i < COUNT_OF(gProximity_rays); i++) {
-        if (gProximity_rays[i].start_time == 0) {
-            continue;
-        }
-        if (the_time - gProximity_rays[i].start_time < 500) {
+        if (gProximity_rays[i].start_time != 0) {
+            if (the_time - gProximity_rays[i].start_time >= 500) {
+                gProximity_rays[i].start_time = 0;
+            } else {
             AddProxRayToPipingSession(i,
                 gProximity_rays[i].car,
                 GET_PEDESTRIAN_INDEX(gProximity_rays[i].ped),
                 gProximity_rays[i].start_time);
             car_model = gProximity_rays[i].car->car_model_actors[gProximity_rays[i].car->principal_car_actor].actor->model;
 
-            BrVector3Set(&car_add_c, 0.f, (car_model->bounds.max.v[Y] - car_model->bounds.min.v[Y]) / -5.f, 0.f);
-            BrMatrix34ApplyV(&car_add, &car_add_c, &gProximity_rays[i].car->car_master_actor->t.t.mat);
-            BrVector3Add(&car_pos, &gProximity_rays[i].car->pos, &car_add);
-            DRMatrix34TApplyP(&car_pos_cam, &car_pos, &gCamera_to_world);
-
+            BrVector3Set(&car_add, 0.f, (car_model->bounds.max.v[Y] - car_model->bounds.min.v[Y]) / -5.f, 0.f);
             BrVector3Set(&ped_add, 0.f, gProximity_rays[i].ped->actor->t.t.mat.m[1][1] / 2.f, 0.f);
+            BrMatrix34ApplyV(&car_add_c, &car_add, &gProximity_rays[i].car->car_master_actor->t.t.mat);
+            BrVector3Add(&car_pos, &gProximity_rays[i].car->pos, &car_add_c);
+
             BrVector3Add(&ped_pos, &gProximity_rays[i].ped->pos, &ped_add);
+            DRMatrix34TApplyP(&car_pos_cam, &car_pos, &gCamera_to_world);
             DRMatrix34TApplyP(&ped_pos_cam, &ped_pos, &gCamera_to_world);
 
-            BrVector3Sub(&r1, &ped_pos_cam, &car_pos_cam);
-            distance = BrVector3Length(&r1);
-            BrVector3Normalise(&r1, &r1);
+            BrVector3Sub(&ray, &ped_pos_cam, &car_pos_cam);
+            distance = BrVector3Length(&ray);
+            BrVector3Normalise(&ray, &ray);
 
-            from_pos = car_pos_cam;
+            BrVector3Copy(&from_pos, &car_pos_cam);
 
-            seed = the_time + ped_pos.v[X] + ped_pos.v[Y] + ped_pos.v[Z] + car_pos.v[X] + car_pos.v[Y] + car_pos.v[Z];
-            srand(seed);
+            seed = (float)(ped_pos.v[Y] + ped_pos.v[Z] + car_pos.v[Z] + ped_pos.v[X] + car_pos.v[X]) + car_pos.v[Y];
+            srand(the_time + *(int*)&seed);
 
             t = 0.f;
             do {
-                BrVector3Scale(&ray, &r1, t);
-                BrVector3Add(&to_pos, &ray, &car_pos_cam);
+                BrVector3Scale(&r1, &ray, t);
+                BrVector3Add(&to_pos, &r1, &car_pos_cam);
                 to_pos.v[X] += SRandomPosNeg(0.1f);
                 to_pos.v[Y] += SRandomPosNeg(0.1f);
                 to_pos.v[Z] += SRandomPosNeg(0.1f);
                 DrawLine3D(&to_pos, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
-                from_pos = to_pos;
+                BrVector3Copy(&from_pos, &to_pos);
                 t += 0.05f;
             } while (t < distance);
             DrawLine3D(&ped_pos_cam, &from_pos, pRender_screen, pDepth_buffer, gProx_ray_shade_table);
-        } else {
-            gProximity_rays[i].start_time = 0;
+            }
         }
     }
     EndPipingSession();
