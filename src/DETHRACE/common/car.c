@@ -5777,7 +5777,6 @@ void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
     br_camera* camera_ptr;
     br_angle off_centre_angle;
     int swoop;
-    static br_scalar scale;
 
     camera_ptr = gCamera->type_data;
     off_centre_angle = camera_ptr->field_of_view / 5;
