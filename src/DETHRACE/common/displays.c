@@ -1179,7 +1179,9 @@ void DoInstruments(tU32 pThe_time) {
     int the_wobble_x;
     int the_wobble_y;
     int gear;
-    extern int gear_height; /* Added by dethrace. */
+#ifdef DETHRACE_FIX_BUGS
+    int gear_height; /* Added by dethrace. */
+#endif
     double the_angle;
     double the_angle2;
     double sin_angle;
@@ -1326,15 +1328,26 @@ void DoInstruments(tU32 pThe_time) {
 #define GEAR_HEIGHT ((int)gProgram_state.current_car.gears_image->height / 8)
 #define GEAR_HEIGHT_HIRES GEAR_HEIGHT
 #endif
+#ifdef DETHRACE_FIX_BUGS
+            gear_height = gGraf_spec_index ? GEAR_HEIGHT_HIRES : GEAR_HEIGHT;
+#endif
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
                 the_wobble_x + gProgram_state.current_car.gear_x[gProgram_state.cockpit_on],
                 the_wobble_y + gProgram_state.current_car.gear_y[gProgram_state.cockpit_on],
                 gProgram_state.current_car.gears_image,
                 0,
+#ifdef DETHRACE_FIX_BUGS
+                (gear + 1) * gear_height,
+#else
                 (gear + 1) * GEAR_HEIGHT,
+#endif
                 gProgram_state.current_car.gears_image->width,
+#ifdef DETHRACE_FIX_BUGS
+                gear_height);
+#else
                 GEAR_HEIGHT);
+#endif
         }
         speedo_image = gProgram_state.current_car.speedo_image[gProgram_state.cockpit_on];
         if (gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] < 0) {
