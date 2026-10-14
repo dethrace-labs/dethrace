@@ -5862,98 +5862,94 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
     hither = ((br_camera*)gCamera->type_data)->hither_z * 3.0f;
     gCamera_has_collided = 0;
     for (i = 0; i < 1; i++) {
-        BrVector3Sub(&tv, cam_pos, car_pos);
-        dist = BrVector3Length(&tv);
-        BrVector3Scale(&tv, &tv, 1.2f);
-        FindFace(car_pos, &tv, &a, &ts, &material);
-        if (ts <= 1.0) {
+        BrVector3Sub(&b, cam_pos, car_pos);
+        l = BrVector3Length(&b);
+        BrVector3Scale(&b, &b, 1.2f);
+        FindFace(car_pos, &b, &vn, &d, &material);
+        if (d <= 1.0f) {
             gCamera_has_collided = 1;
-            if (BrVector3Dot(&a, &tv) > 0.0f) {
-                BrVector3Negate(&a, &a);
+            if (BrVector3Dot(&vn, &b) > 0.0f) {
+                BrVector3Negate(&vn, &vn);
             }
             if (gCamera_mode == 1 && !manual_move) {
-                BrVector3Sub(&tv2, car_pos, old_camera_pos);
-                FindFace(old_camera_pos, &tv2, &b, &ts2, &material);
-                if (ts2 > 1.0f) {
+                BrVector3Sub(&tv, car_pos, old_camera_pos);
+                FindFace(old_camera_pos, &tv, &tv2, &ts, &material);
+                if (ts > 1.0f) {
                     BrVector3Copy(cam_pos, old_camera_pos);
-                    return i;
+                    break;
                 }
             }
-            BrVector3Scale(&tv, &tv, ts);
-            BrVector3Scale(&tv2, &a, hither);
-            BrVector3Accumulate(&tv, &tv2);
-            dist = BrVector3Length(&tv);
-            BrVector3Add(cam_pos, car_pos, &tv);
-            if (gMin_camera_car_distance > dist && i == 0 && a.v[1] > -0.7) {
-                BrVector3Scale(&tv2, &a, -a.v[1]);
-                tv2.v[1] += 1.f;
+            BrVector3Scale(&b, &b, d);
+            BrVector3Scale(&tv, &vn, hither);
+            BrVector3Accumulate(&b, &tv);
+            l = BrVector3Length(&b);
+            BrVector3Add(cam_pos, car_pos, &b);
+            if (gMin_camera_car_distance > l && i == 0 && vn.v[1] > -0.7) {
+                BrVector3Scale(&tv, &vn, -vn.v[1]);
+                tv.v[1] += 1.f;
                 if (gProgram_state.current_car.car_master_actor->t.t.mat.m[1][1] < 0.f) {
-                    BrVector3Negate(&tv2, &tv2);
+                    BrVector3Negate(&tv, &tv);
                 }
-                d = BrVector3LengthSquared(&tv2);
-                l = BrVector3Dot(&tv2, &tv);
-                alpha = BrVector3LengthSquared(&tv) - gMin_camera_car_distance * gMin_camera_car_distance;
-                ts2 = l * l - alpha * d * 4.0;
-                if (ts2 >= 0.f && d != 0.f) {
-                    sa = (sqrt(ts2) - l) / (d * 2.0f);
-                    BrVector3Scale(&tv2, &tv2, sa);
-                    FindFace(cam_pos, &tv2, &a, &ts, &material);
-                    if (ts < 1.0f) {
-                        BrVector3Scale(&tv2, &tv2, ts);
+                sa = BrVector3LengthSquared(&tv);
+                sb = BrVector3Dot(&tv, &b);
+                sc = BrVector3LengthSquared(&b) - gMin_camera_car_distance * gMin_camera_car_distance;
+                ts = sb * sb - sc * sa * 4.0f;
+                if (ts >= 0.f && sa != 0.f) {
+                    alpha = (sqrt(ts) + -sb) / (sa * 2.0f);
+                    BrVector3Scale(&tv, &tv, alpha);
+                    FindFace(cam_pos, &tv, &vn, &d, &material);
+                    if (d < 1.0f) {
+                        BrVector3Scale(&tv, &tv, d);
                     }
-                    BrVector3Set(&b, tv.v[0], 0.f, tv.v[2]);
-                    BrVector3Normalise(&b, &b);
-                    BrVector3Accumulate(&tv, &tv2);
-                    ts2 = BrVector3Dot(&tv, &b);
-                    if (ts2 < 0.03f && !gAction_replay_mode) {
-                        BrVector3Normalise(&tv2, &tv2);
-                        alpha = BrVector3Dot(&tv2, &b);
-                        if (alpha < -0.03f) {
-                            alpha = (0.03f - ts2) / alpha;
-                            BrVector3Scale(&tv2, &tv2, alpha);
-                            BrVector3Add(&tv, &tv2, &tv);
+                    BrVector3Set(&tv2, b.v[0], 0.f, b.v[2]);
+                    BrVector3Normalise(&tv2, &tv2);
+                    BrVector3Accumulate(&b, &tv);
+                    ts = BrVector3Dot(&b, &tv2);
+                    if (ts < 0.03f && !gAction_replay_mode) {
+                        BrVector3Normalise(&tv, &tv);
+                        ts2 = BrVector3Dot(&tv, &tv2);
+                        if (ts2 < -0.03f) {
+                            ts2 = (0.03f - ts) / ts2;
+                            BrVector3Scale(&tv, &tv, ts2);
+                            BrVector3Add(&b, &tv, &b);
                         }
                     }
                 }
-                BrVector3Add(cam_pos, car_pos, &tv);
+                BrVector3Add(cam_pos, car_pos, &b);
             }
         }
 
         bnds.mat = &mat;
-        BrMatrix34Identity(&mat);
-        BrVector3Set(&tv2, hither, hither, hither);
-        bnds.original_bounds.min.v[0] = cam_pos->v[0] - hither;
-        bnds.original_bounds.min.v[1] = cam_pos->v[1] - hither;
-        bnds.original_bounds.min.v[2] = cam_pos->v[2] - hither;
-        bnds.original_bounds.max.v[0] = cam_pos->v[0] + hither;
-        bnds.original_bounds.max.v[1] = cam_pos->v[1] + hither;
-        bnds.original_bounds.max.v[2] = cam_pos->v[2] + hither;
+        BrMatrix34Identity(bnds.mat);
+        BrVector3Set(&tv, hither, hither, hither);
+        BrVector3Sub(&bnds.original_bounds.min, cam_pos, &tv);
+        BrVector3Add(&bnds.original_bounds.max, cam_pos, &tv);
         k = FindFacesInBox(&bnds, face_list, 3);
         if (k > 0) {
-            BrVector3Sub(&tv2, cam_pos, &face_list[0].v[0]);
-            sa = BrVector3Dot(&face_list[0].normal, &tv2);
+            BrVector3Sub(&tv, cam_pos, &face_list[0].v[0]);
+            ts = BrVector3Dot(&face_list[0].normal, &tv);
             // ts2 = sa;
-            if (sa < hither && sa >= 0.0) {
-                BrVector3Scale(&tv2, &face_list[0].normal, hither - sa);
-                BrVector3Accumulate(cam_pos, &tv2);
+            if (ts < hither && ts >= 0.0f) {
+                BrVector3Scale(&tv, &face_list[0].normal, hither - ts);
+                BrVector3Accumulate(cam_pos, &tv);
             }
             if (k > 1) {
-                sb = BrVector3Dot(&face_list[0].normal, &face_list[1].normal);
-                if (sb > 0.95f && k > 2) {
+                ts2 = BrVector3Dot(&face_list[0].normal, &face_list[1].normal);
+                if (ts2 > 0.95f && k > 2) {
                     BrVector3Copy(&face_list[1].normal, &face_list[2].normal);
                     BrVector3Copy(&face_list[1].v[0], &face_list[2].v[0]);
-                    sb = BrVector3Dot(&face_list[0].normal, &face_list[2].normal);
+                    ts2 = BrVector3Dot(&face_list[1].normal, &face_list[0].normal);
                     k = 2;
                 }
-                if (sb <= 0.95f) {
-                    BrVector3Sub(&tv2, cam_pos, &face_list[1].v[0]);
-                    sc = BrVector3Dot(&face_list[1].normal, &tv2);
-                    if (sc < hither && sc >= 0.0) {
-                        sc = BrVector3Dot(&face_list[0].normal, &face_list[1].normal);
-                        BrVector3Scale(&b, &face_list[0].normal, sc);
-                        BrVector3Sub(&face_list[1].normal, &face_list[1].normal, &b);
-                        BrVector3Scale(&tv2, &face_list[1].normal, hither - ts2);
-                        BrVector3Accumulate(cam_pos, &tv2);
+                if (ts2 <= 0.95f) {
+                    BrVector3Sub(&tv, cam_pos, &face_list[1].v[0]);
+                    ts = BrVector3Dot(&face_list[1].normal, &tv);
+                    if (ts < hither && ts >= 0.0f) {
+                        ts2 = BrVector3Dot(&face_list[0].normal, &face_list[1].normal);
+                        BrVector3Scale(&tv2, &face_list[0].normal, ts2);
+                        BrVector3Sub(&face_list[1].normal, &face_list[1].normal, &tv2);
+                        BrVector3Scale(&tv, &face_list[1].normal, hither - ts);
+                        BrVector3Accumulate(cam_pos, &tv);
                     }
                 }
             }
