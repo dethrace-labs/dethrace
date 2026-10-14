@@ -294,7 +294,7 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
         }
         BrVector3Sub(&goal_dir, GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no), &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
         goal_dir.v[1] = 0.0f;
-        dist_to_goal = BrVector3Length(&goal_dir) * 6.9;
+        dist_to_goal = BrVector3Length(&goal_dir) * WORLD_SCALE_D;
         dist_to_end = dist_to_goal;
         if (dist_to_goal > 15.0f) {
             BrVector3Sub(&wank, GetOpponentsSectionFinishNodePoint(pOpponent_spec, data->section_no), GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no));
@@ -305,12 +305,12 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
             BrVector3Scale(&wank2, &section_dir, dist_along);
             BrVector3Sub(&goal_dir, &wank2, &wank);
             goal_dir.v[1] = 0.0f;
-            dist_to_goal = BrVector3Length(&goal_dir) * 6.9;
+            dist_to_goal = BrVector3Length(&goal_dir) * WORLD_SCALE_D;
             if (dist_to_goal < 15.0f) {
-                further_along = sqrt(225.0f - dist_to_goal * dist_to_goal) / 6.9;
+                further_along = sqrt(225.0f - dist_to_goal * dist_to_goal) / WORLD_SCALE_D;
                 if (further_along + dist_along < 0.0f) {
                     BrVector3Sub(&goal_dir, GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no), &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
-                    dist_to_goal = BrVector3Length(&goal_dir) * 6.9;
+                    dist_to_goal = BrVector3Length(&goal_dir) * WORLD_SCALE_D;
                     BrVector3Scale(&goal_dir, &goal_dir, 15.0f / dist_to_goal);
                 } else {
                     wank.v[0] = section_dir.v[0] * further_along;
@@ -322,13 +322,13 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
                 dist_to_goal = 15.0f;
             } else if (dist_along < 0.0f) {
                 BrVector3Sub(&goal_dir, GetOpponentsSectionStartNodePoint(pOpponent_spec, data->section_no), &pOpponent_spec->car_spec->car_master_actor->t.t.translate.t);
-                dist_to_goal = BrVector3Length(&goal_dir) * 6.9;
+                dist_to_goal = BrVector3Length(&goal_dir) * WORLD_SCALE_D;
                 BrVector3Scale(&goal_dir, &goal_dir, 15.0f / dist_to_goal);
             }
         }
         speed_to_goal = BrVector3Dot(&car_spec->v, &goal_dir) / BrVector3Length(&goal_dir);
         section_width = GetOpponentsSectionWidth(pOpponent_spec, data->section_no);
-        section_width *= 6.9;
+        section_width *= WORLD_SCALE_D;
         if (!pIgnore_end && speed * 1.5f > dist_to_end) {
             dr_dprintf("%s: ProcessFollowPath() - *** CHANGING SECTIONS ***", pOpponent_spec->car_spec->driver_name);
             dr_dprintf("%s: ProcessFollowPath() - current section %d(#%d)", pOpponent_spec->car_spec->driver_name, data->section_no, GetOpponentsRealSection(pOpponent_spec, data->section_no));
@@ -396,13 +396,13 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
                         StraightestArcForCorner(&radius, &entry_len, &dist_along, &start, &corner, &next, &start, &corner,
                             GetOpponentsSectionWidth(pOpponent_spec, data->section_no),
                             GetOpponentsSectionWidth(pOpponent_spec, GetOpponentsNextSection(pOpponent_spec, data->section_no)));
-                        dist_along *= 6.9;
+                        dist_along *= WORLD_SCALE_D;
                         distance += dist_along;
                         if (distance > stopping_distance) {
                             break;
                         }
-                        radius *= 6.9;
-                        entry_len *= 6.9;
+                        radius *= WORLD_SCALE_D;
+                        entry_len *= WORLD_SCALE_D;
                         corner_speed2 = CornerFudge(car_spec) * CornerFudge(car_spec) * (radius * 10.0f);
                         corner_speed = sqrt(corner_speed2);
                         if (GetOpponentsSectionMaxSpeed(pOpponent_spec, data->section_no, 1) < corner_speed) {
