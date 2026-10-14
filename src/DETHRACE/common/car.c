@@ -5493,7 +5493,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
     int manual_swing;
     int manual_zoom;
     br_vector3 old_camera_pos;
-    static br_scalar scale;
+    br_scalar scale;
 
     m2 = &gCamera->t.t.mat;
     m1 = &c->car_master_actor->t.t.mat;
