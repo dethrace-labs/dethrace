@@ -4194,8 +4194,6 @@ int AddEdgeCollPoints(br_vector3* p1, br_vector3* p2, br_bounds* pB, br_matrix34
     int plane3;
     int d;
 
-    static float scale;
-
     plane1 = LineBoxColl(p1, p2, pB, &hp1);
     if (plane1 == 0) {
         return 0;
