@@ -6290,7 +6290,7 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
                         } else {
                             car_in_middle = car_2;
                         }
-                        if (car_3->infinite_mass > 1 || car_3->infinite_mass == -1 || ((struct { unsigned int value : 8; }*)&car_in_middle->infinite_mass)->value > 1 || car_in_middle->infinite_mass == -1) {
+                        if (car_3->infinite_mass > 1 || car_3->infinite_mass == -1 || (tU8)(car_in_middle->infinite_mass) > 1 || car_in_middle->infinite_mass == -1) {
                             BringCarToAGrindingHalt(car_1);
                             BringCarToAGrindingHalt(car_2);
                             collide_list[i].ref = gNum_cars_and_non_cars - 2;
