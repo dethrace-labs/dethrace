@@ -700,6 +700,7 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     char* destn_ptr;
     char* destn_ptr2;
 
+#ifdef DETHRACE_3DFX_PATCH
     if (gBack_screen->type == BR_PMT_RGB_565) {
         Copy8BitStripImageTo16Bit(
             pDest,
@@ -714,57 +715,70 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
             pHeight);
         return;
     }
+#endif
 
     height = *(tU16*)pSource;
     pSource = pSource + 2;
-    if (pDest_y + pOffset_y >= 0) {
-        destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
-    } else {
+    if (pDest_y + pOffset_y < 0) {
         pSource = SkipLines(pSource, -pDest_y - pOffset_y);
         destn_ptr = (char*)pDest->pixels;
         height += pDest_y + pOffset_y;
         pOffset_y = 0;
         pDest_y = 0;
+    } else {
+        destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
     }
 
     if (height + pDest_y + pOffset_y > pDest->height) {
         height = pDest->height - pDest_y - pOffset_y;
     }
-    off_the_left = pDest_x + pOffset_x;
-    if (off_the_left > 0) {
-        destn_ptr += off_the_left;
+    if (pDest_x + pOffset_x > 0) {
+        destn_ptr += pDest_x + pOffset_x;
     }
+    destn_width = pDest->width;
     for (i = 0; i < height; i++) {
         destn_ptr2 = destn_ptr;
         number_of_chunks = *pSource;
         pSource++;
-        x_byte = off_the_left;
+        x_byte = pOffset_x + pDest_x;
+        if (x_byte < 0) {
+            off_the_left = 1;
+        } else {
+            off_the_left = 0;
+        }
         for (j = 0; j < number_of_chunks; j++) {
             chunk_length = *pSource;
             pSource++;
-            if (chunk_length >= 0) {
+            if (chunk_length < 0) {
+                chunk_length = -chunk_length;
                 old_x_byte = x_byte;
                 x_byte += chunk_length;
-                if (old_x_byte >= 0) {
-                    destn_ptr2 += chunk_length;
-                } else if (x_byte > 0) {
-                    destn_ptr2 += chunk_length + old_x_byte;
+                if (old_x_byte < 0) {
+                    if (x_byte > 0) {
+                        memcpy(destn_ptr2, pSource - old_x_byte, chunk_length + old_x_byte);
+                        destn_ptr2 += chunk_length + old_x_byte;
+                    }
+                } else {
+                    if (destn_width < x_byte) {
+                        if (old_x_byte < destn_width) {
+                            memcpy(destn_ptr2, pSource, destn_width - old_x_byte);
+                        }
+                    } else {
+                        memcpy(destn_ptr2, pSource, chunk_length);
+                        destn_ptr2 += chunk_length;
+                    }
                 }
+                pSource += chunk_length;
             } else {
                 old_x_byte = x_byte;
-                x_byte += -chunk_length;
-                if (old_x_byte >= 0) {
-                    if (pDest->width >= x_byte) {
-                        memcpy(destn_ptr2, pSource, -chunk_length);
-                        destn_ptr2 += -chunk_length;
-                    } else if (old_x_byte < pDest->width) {
-                        memcpy(destn_ptr2, pSource, pDest->width - old_x_byte);
+                x_byte += chunk_length;
+                if (old_x_byte < 0) {
+                    if (x_byte > 0) {
+                        destn_ptr2 += chunk_length + old_x_byte;
                     }
-                } else if (x_byte > 0) {
-                    memcpy(destn_ptr2, &pSource[-old_x_byte], -chunk_length + old_x_byte);
-                    destn_ptr2 += -chunk_length + old_x_byte;
+                } else {
+                    destn_ptr2 += chunk_length;
                 }
-                pSource += -chunk_length;
             }
         }
         destn_ptr += pDest->row_bytes;
