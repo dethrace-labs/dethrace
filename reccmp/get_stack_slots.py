@@ -45,11 +45,7 @@ def extract_stack_slots(asm_file: Path, function_name: str) -> list[str]:
     # Find the PROC line
     proc_line_idx = None
     for idx, line in enumerate(lines):
-<<<<<<< HEAD
-        if proc_pattern in line and "PROC" in line:
-=======
-        if proc_pattern.search(line):
->>>>>>> main
+        if proc_pattern.search(line) and "PROC" in line:
             proc_line_idx = idx
             break
 
