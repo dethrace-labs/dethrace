@@ -217,8 +217,8 @@ int gInTheSea;
 int gCamera_mode;
 
 // GLOBAL: CARM95 0x0053a514
-br_scalar gOur_yaw__car; // suffix added to avoid duplicate symbol
-br_scalar gGravity__car; // suffix added to avoid duplicate symbol
+br_scalar gOur_yaw__car;            // suffix added to avoid duplicate symbol
+br_scalar gGravity__car;            // suffix added to avoid duplicate symbol
 
 // GLOBAL: CARM95 0x0053a530
 br_vector3 gNew_ground_normal__car; // suffix added to avoid duplicate symbol
@@ -789,9 +789,8 @@ void GetFacesInBox(tCollision_info* c) {
         && c->water_d != 10000.f
         && gDouble_pling_water
         && (c->bounds_world_space.max.v[1] * c->water_normal.v[1]
-               + c->bounds_world_space.max.v[2] * c->water_normal.v[2])
-                + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.max.v[0] - c->water_d
-            <= 0.f) {
+                   + c->bounds_world_space.max.v[2] * c->water_normal.v[2])
+                + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.max.v[0] - c->water_d <= 0.f) {
         gInTheSea = 1;
         FreezeCamera();
     }
@@ -806,16 +805,12 @@ void GetFacesInBox(tCollision_info* c) {
         if (c->driver == eDriver_local_human) {
             if (gPling_face->material->identifier[1] == '!') {
                 if ((c->water_normal.v[2] * c->bounds_world_space.min.v[2]
-                        + c->bounds_world_space.min.v[1] * c->water_normal.v[1])
-                        + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.min.v[0] - c->water_d
-                    < 0.0f) {
+                            + c->bounds_world_space.min.v[1] * c->water_normal.v[1])
+                        + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.min.v[0] - c->water_d < 0.0f) {
                     GetNewBoundingBox(&current_bounds, &c->bounds[1], &c->car_master_actor->t.t.mat);
                     if ((c->water_normal.v[2] * current_bounds.min.v[2]
                             + c->water_normal.v[1] * current_bounds.min.v[1]
-                            + c->water_normal.v[0] * current_bounds.min.v[0])
-                                / WORLD_SCALE_D
-                            - c->water_d
-                        < 0.0) {
+                            + c->water_normal.v[0] * current_bounds.min.v[0]) / WORLD_SCALE_D - c->water_d < 0.0) {
                         gInTheSea = 1;
                         FreezeCamera();
                     }
