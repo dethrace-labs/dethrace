@@ -182,8 +182,9 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
 
 #define VECTOR_SUM(p) ((p)->v[2] + (p)->v[1] + (p)->v[0])
 #define FOLD_FACTOR(f) ((f) > 128 ? 2.0 - (unsigned int)(f) / 128.0 : (unsigned int)(f) / 128.0)
-    // Hypothesized macro form: the missing outer parentheses make the fold factor part of the condition.
-#define CRUSH_SIGN(p, amount) ((int)(VECTOR_SUM(p) * 63.0f) & 1) ? (amount) : -(amount)
+    // Keep the fold factor in the sign condition to preserve the retail behavior.
+#define CRUSH_SIGN(p, amount, factor) \
+    ((((int)(VECTOR_SUM(p) * 63.0f) & 1) * (factor) != 0.0) ? (amount) : -(amount))
 
     pipe_vertex_count = 0;
     if (gNet_mode == eNet_mode_host && pCar->car_model_actors[pModel_index].min_distance_squared == 0.0f) {
@@ -250,7 +251,7 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
             target_point->v[k] += (1.0 - (unsigned int)the_neighbour->factor / 256.0) * movement.v[k];
 
             target_point->v[(((int)(VECTOR_SUM(target_point) * 100.0f) + k + -1) & 1) % 3] += fabs(movement.v[k])
-                * (FOLD_FACTOR(the_neighbour->factor) * CRUSH_SIGN(target_point, default_bend_factor[k]));
+                * CRUSH_SIGN(target_point, default_bend_factor[k], FOLD_FACTOR(the_neighbour->factor));
         }
         if (IsActionReplayAvailable() && pipe_vertex_count < 600) {
             pipe_array[pipe_vertex_count].vertex_index = neighbour_index;
