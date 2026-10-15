@@ -180,6 +180,11 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
     tChanged_vertex pipe_array[600];
     tCar_spec* car;
 
+#define VECTOR_SUM(p) ((p)->v[2] + (p)->v[1] + (p)->v[0])
+#define FOLD_FACTOR(f) ((f) > 128 ? 2.0 - (unsigned int)(f) / 128.0 : (unsigned int)(f) / 128.0)
+    // Hypothesized macro form: the missing outer parentheses make the fold factor part of the condition.
+#define CRUSH_SIGN(p, amount) ((int)(VECTOR_SUM(p) * 63.0f) & 1) ? (amount) : -(amount)
+
     pipe_vertex_count = 0;
     if (gNet_mode == eNet_mode_host && pCar->car_model_actors[pModel_index].min_distance_squared == 0.0f) {
         NetSendPointCrush(pCar, pCrush_point_index, pEnergy_vector);
@@ -244,12 +249,8 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
         for (k = 0; k < 3; k++) {
             target_point->v[k] += (1.0 - (unsigned int)the_neighbour->factor / 256.0) * movement.v[k];
 
-            target_point->v[(((int)((target_point->v[2] + target_point->v[1] + target_point->v[0]) * 100.0f) + k + -1) & 1) % 3] += fabs(movement.v[k])
-                * ((((int)((target_point->v[2] + target_point->v[1] + target_point->v[0]) * 63.0f) & 1)
-                           * (the_neighbour->factor > 128 ? 2.0 - (unsigned int)the_neighbour->factor / 128.0 : (unsigned int)the_neighbour->factor / 128.0)
-                       != 0.0)
-                        ? default_bend_factor[k]
-                        : -default_bend_factor[k]);
+            target_point->v[(((int)(VECTOR_SUM(target_point) * 100.0f) + k + -1) & 1) % 3] += fabs(movement.v[k])
+                * (FOLD_FACTOR(the_neighbour->factor) * CRUSH_SIGN(target_point, default_bend_factor[k]));
         }
         if (IsActionReplayAvailable() && pipe_vertex_count < 600) {
             pipe_array[pipe_vertex_count].vertex_index = neighbour_index;
@@ -260,6 +261,10 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
     if (IsActionReplayAvailable() && pipe_vertex_count) {
         PipeSingleModelGeometry(pCar->car_ID, pModel_index, pipe_vertex_count, pipe_array);
     }
+
+#undef CRUSH_SIGN
+#undef FOLD_FACTOR
+#undef VECTOR_SUM
 }
 
 // IDA: void __usercall CrushModel(tCar_spec *pCar@<EAX>, int pModel_index@<EDX>, br_actor *pActor@<EBX>, br_vector3 *pImpact_point@<ECX>, br_vector3 *pEnergy_vector, tCrush_data *pCrush_data)
