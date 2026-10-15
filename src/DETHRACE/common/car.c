@@ -5671,18 +5671,16 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
 
     BrVector3Copy(&old_vn, vn);
     if ((ts < 0.0f) != gCamera_sign) {
-        if (sign > 0.0f) {
-            if (elapsed_time < 0) {
-                gCamera_sign = gCamera_sign == 0;
-                if (gCamera_yaw > 32760) {
-                    yaw = gCamera_yaw - 32760;
-                } else {
+        if (sign > 0.0f && elapsed_time < 0) {
+            gCamera_sign = gCamera_sign == 0;
+            if (gCamera_yaw > 32760) {
+                yaw = gCamera_yaw - 32760;
+            } else {
                     yaw = gCamera_yaw;
                 }
                 if (yaw > 8190 && yaw < 24570) {
                     gCamera_yaw = -gCamera_yaw;
                 }
-            }
         } else {
             if (elapsed_time < 0) {
                 elapsed_time = 0;
@@ -5723,11 +5721,12 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     }
     ts = 0.0;
     sin_dtheta = gView_direction.v[2] * vn->v[0] - gView_direction.v[0] * vn->v[2];
-    cos_dtheta = vn->v[2] * gView_direction.v[2] + vn->v[0] * gView_direction.v[0];
+    cos_dtheta = (double)(vn->v[0] * gView_direction.v[0]) + vn->v[2] * gView_direction.v[2];
 
     if (omega || gCamera_reset || (c->speed < 0.0001f && !manual_swing) || gCamera_mode == -1
         || (cos_dtheta > 0.0f && !manual_swing
-            && fabs(sin_dtheta) > (ts = (br_scalar)sin(BrAngleToRadian(BrRadianToAngle((br_scalar)sqrt(c->omega.v[1] * c->omega.v[1] + (c->omega.v[0] * c->omega.v[0] + c->omega.v[2] * c->omega.v[2])) * pTime / 1000.0f))) + 0.1f))) {
+            && (ts = (br_scalar)sin(BrAngleToRadian(BrRadianToAngle((br_scalar)sqrt(c->omega.v[1] * c->omega.v[1] + (c->omega.v[0] * c->omega.v[0] + c->omega.v[2] * c->omega.v[2])) * pTime / 1000.0f))) + 0.1f, 1)
+            && fabs(sin_dtheta) > ts)) {
         if (!gCar_flying) {
             alpha = BrRadianToAngle(asin(ts));
             if (omega < alpha) {
@@ -5742,7 +5741,7 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
                     vn->v[2] = cos(BrAngleToRadian(omega)) * gView_direction.v[2] - sin(BrAngleToRadian(omega)) * gView_direction.v[0];
                 } else {
                     vn->v[0] = cos(BrAngleToRadian(omega)) * gView_direction.v[0] - sin(BrAngleToRadian(omega)) * gView_direction.v[2];
-                    vn->v[2] = sin(BrAngleToRadian(omega)) * gView_direction.v[0] + cos(BrAngleToRadian(omega)) * gView_direction.v[2];
+                    vn->v[2] = (br_scalar)(sin(BrAngleToRadian(omega)) * gView_direction.v[0]) + cos(BrAngleToRadian(omega)) * gView_direction.v[2];
                 }
                 omega += BrDegreeToAngle((int)pTime * 0.03);
                 if (BrDegreeToAngle((int)pTime * 0.1) < omega) {
@@ -5753,9 +5752,9 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
                 }
                 return;
             }
+            omega = 0;
+            gCamera_mode = 0;
         }
-        omega = 0;
-        gCamera_mode = 0;
     }
 }
 
