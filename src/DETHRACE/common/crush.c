@@ -180,8 +180,11 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
     tChanged_vertex pipe_array[600];
     tCar_spec* car;
 
-    float v12;
-    int axis_tmp;
+#define VECTOR_SUM(p) ((p)->v[2] + (p)->v[1] + (p)->v[0])
+#define FOLD_FACTOR(f) ((f) > 128 ? 2.0 - (unsigned int)(f) / 128.0 : (unsigned int)(f) / 128.0)
+    // Keep the fold factor in the sign condition to preserve the retail behavior.
+#define CRUSH_SIGN(p, amount, factor) \
+    ((((int)(VECTOR_SUM(p) * 63.0f) & 1) * (factor) != 0.0) ? (amount) : -(amount))
 
     pipe_vertex_count = 0;
     if (gNet_mode == eNet_mode_host && pCar->car_model_actors[pModel_index].min_distance_squared == 0.0f) {
@@ -193,33 +196,32 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
     working_limit_deviant = pCrush_data->limit_deviant * gCar_crush_limit_deviant;
     working_split_chance = pCrush_data->split_chance * gCar_crush_split_chance;
     min_y_fold_down = pCrush_data->min_y_fold_down;
-    the_crush_point = &pCrush_data->crush_points[pCrush_point_index];
-    if (pModel->nvertices <= the_crush_point->vertex_index) {
+    the_crush_point = pCrush_data->crush_points;
+    the_crush_point += pCrush_point_index;
+    if (the_crush_point->vertex_index < 0 || pModel->nvertices <= the_crush_point->vertex_index) {
         return;
     }
     target_point = &pModel->vertices[the_crush_point->vertex_index].p;
     old_vector = *target_point;
-    for (i = 0; i < 3; i++) {
-        pEnergy_vector->v[i] = SRandomPosNeg(working_wibble * total_energy) + pEnergy_vector->v[i];
-        random_range = (the_crush_point->limits_pos.v[i] - the_crush_point->limits_neg.v[i]) * working_limit_deviant;
-        if (pEnergy_vector->v[i] >= 0.0f) {
-            softnesss.v[i] = the_crush_point->softness_pos.v[i];
+    for (j = 0; j < 3; j++) {
+        pEnergy_vector->v[j] = SRandomPosNeg(working_wibble * total_energy) + pEnergy_vector->v[j];
+        random_range = (the_crush_point->limits_pos.v[j] - the_crush_point->limits_neg.v[j]) * working_limit_deviant;
+        if (pEnergy_vector->v[j] < 0.0f) {
+            softnesss.v[j] = the_crush_point->softness_neg.v[j];
         } else {
-            softnesss.v[i] = the_crush_point->softness_neg.v[i];
+            softnesss.v[j] = the_crush_point->softness_pos.v[j];
         }
-        movement.v[i] = target_point->v[i];
-        target_point->v[i] += pEnergy_vector->v[i] * softnesss.v[i];
-        if (the_crush_point->limits_neg.v[i] <= target_point->v[i]) {
-            if (target_point->v[i] > the_crush_point->limits_pos.v[i]) {
-                target_point->v[i] = SRandomPosNeg(random_range) + the_crush_point->limits_pos.v[i];
-            }
-        } else {
-            target_point->v[i] = SRandomPosNeg(random_range) + the_crush_point->limits_neg.v[i];
+        movement.v[j] = target_point->v[j];
+        target_point->v[j] += pEnergy_vector->v[j] * softnesss.v[j];
+        if (target_point->v[j] < the_crush_point->limits_neg.v[j]) {
+            target_point->v[j] = SRandomPosNeg(random_range) + the_crush_point->limits_neg.v[j];
+        } else if (target_point->v[j] > the_crush_point->limits_pos.v[j]) {
+            target_point->v[j] = SRandomPosNeg(random_range) + the_crush_point->limits_pos.v[j];
         }
-        movement.v[i] = target_point->v[i] - movement.v[i];
-        if (pEnergy_vector->v[i] * movement.v[i] < 0.0f) {
-            movement.v[i] = 0.0f;
-            target_point->v[i] = old_vector.v[i];
+        movement.v[j] = target_point->v[j] - movement.v[j];
+        if (pEnergy_vector->v[j] * movement.v[j] < 0.0f) {
+            movement.v[j] = 0.0f;
+            target_point->v[j] = old_vector.v[j];
         }
     }
 
@@ -229,48 +231,41 @@ void CrushModelPoint(tCar_spec* pCar, int pModel_index, br_model* pModel, int pC
         pipe_vertex_count++;
     }
     neighbour_index = -1;
-    for (bend_axis = 0; bend_axis < 3; bend_axis++) {
-        default_bend_axis[bend_axis] = (bend_axis + IRandomBetween(1, 2)) % 3;
-        default_bend_factor[bend_axis] = FRandomBetween(working_min_fold, working_max_fold);
+    for (k = 0; k < 3; k++) {
+        default_bend_axis[k] = (k + IRandomBetween(1, 2)) % 3;
+        default_bend_factor[k] = FRandomBetween(working_min_fold, working_max_fold);
     }
 
-    the_neighbour = the_crush_point->neighbours;
-    for (j = 0; j < the_crush_point->number_of_neighbours; j++, the_neighbour++) {
-        if (the_neighbour->vertex_index) {
-            neighbour_index += the_neighbour->vertex_index;
-            if (neighbour_index < 0 || pModel->nvertices <= neighbour_index) {
-                return;
-            }
-            target_point = &pModel->vertices[neighbour_index].p;
-            old_vector = *target_point;
-            for (bend_axis = 0; bend_axis < 3; bend_axis++) {
-                target_point->v[bend_axis] += (1.0f - the_neighbour->factor / 256.0f) * movement.v[bend_axis];
-
-                if (the_neighbour->factor <= 128) {
-                    v12 = the_neighbour->factor / 128.0f;
-                } else {
-                    v12 = 2.0 - the_neighbour->factor / 128.0f;
-                }
-                if (((int)((target_point->v[2] + target_point->v[1] + target_point->v[0]) * 63.0f) & 1) * v12 == 0.0) {
-                    bend_amount = -default_bend_factor[bend_axis];
-                } else {
-                    bend_amount = default_bend_factor[bend_axis];
-                }
-                axis_tmp = (((int)((target_point->v[2] + target_point->v[1] + target_point->v[0]) * 100.0f) + bend_axis - 1) & 1) % 3;
-                target_point->v[axis_tmp] += fabs(movement.v[bend_axis]) * bend_amount;
-            }
-            if (IsActionReplayAvailable() && pipe_vertex_count < 600) {
-                pipe_array[pipe_vertex_count].vertex_index = neighbour_index;
-                BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates, target_point, &old_vector);
-                pipe_vertex_count++;
-            }
-        } else {
+    for (j = 0, the_neighbour = the_crush_point->neighbours; j < the_crush_point->number_of_neighbours; j++, the_neighbour++) {
+        if (!the_neighbour->vertex_index) {
             neighbour_index += the_neighbour->factor;
+            continue;
+        }
+        neighbour_index += the_neighbour->vertex_index;
+        if (neighbour_index < 0 || pModel->nvertices <= neighbour_index) {
+            return;
+        }
+        target_point = &pModel->vertices[neighbour_index].p;
+        old_vector = *target_point;
+        for (k = 0; k < 3; k++) {
+            target_point->v[k] += (1.0 - (unsigned int)the_neighbour->factor / 256.0) * movement.v[k];
+
+            target_point->v[(((int)(VECTOR_SUM(target_point) * 100.0f) + k + -1) & 1) % 3] += fabs(movement.v[k])
+                * CRUSH_SIGN(target_point, default_bend_factor[k], FOLD_FACTOR(the_neighbour->factor));
+        }
+        if (IsActionReplayAvailable() && pipe_vertex_count < 600) {
+            pipe_array[pipe_vertex_count].vertex_index = neighbour_index;
+            BrVector3Sub(&pipe_array[pipe_vertex_count].delta_coordinates, target_point, &old_vector);
+            pipe_vertex_count++;
         }
     }
     if (IsActionReplayAvailable() && pipe_vertex_count) {
         PipeSingleModelGeometry(pCar->car_ID, pModel_index, pipe_vertex_count, pipe_array);
     }
+
+#undef CRUSH_SIGN
+#undef FOLD_FACTOR
+#undef VECTOR_SUM
 }
 
 // IDA: void __usercall CrushModel(tCar_spec *pCar@<EAX>, int pModel_index@<EDX>, br_actor *pActor@<EBX>, br_vector3 *pImpact_point@<ECX>, br_vector3 *pEnergy_vector, tCrush_data *pCrush_data)
@@ -897,7 +892,7 @@ void DamageSystems(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3* pEner
                     FRandomBetween(7.0f / energy_magnitude, 25.0f / energy_magnitude));
                 break;
 
-            DETHRACE_DEFAULT_BREAK
+                DETHRACE_DEFAULT_BREAK
             }
             CheckPiledriverBonus(pCar, pImpact_point, pEnergy_vector);
         }
