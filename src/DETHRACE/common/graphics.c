@@ -700,6 +700,7 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
     char* destn_ptr;
     char* destn_ptr2;
 
+#ifdef DETHRACE_3DFX_PATCH
     if (gBack_screen->type == BR_PMT_RGB_565) {
         Copy8BitStripImageTo16Bit(
             pDest,
@@ -714,57 +715,70 @@ void CopyStripImage(br_pixelmap* pDest, br_int_16 pDest_x, br_int_16 pOffset_x, 
             pHeight);
         return;
     }
+#endif
 
     height = *(tU16*)pSource;
     pSource = pSource + 2;
-    if (pDest_y + pOffset_y >= 0) {
-        destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
-    } else {
+    if (pDest_y + pOffset_y < 0) {
         pSource = SkipLines(pSource, -pDest_y - pOffset_y);
         destn_ptr = (char*)pDest->pixels;
         height += pDest_y + pOffset_y;
         pOffset_y = 0;
         pDest_y = 0;
+    } else {
+        destn_ptr = (char*)pDest->pixels + pDest->row_bytes * (pDest_y + pOffset_y);
     }
 
     if (height + pDest_y + pOffset_y > pDest->height) {
         height = pDest->height - pDest_y - pOffset_y;
     }
-    off_the_left = pDest_x + pOffset_x;
-    if (off_the_left > 0) {
-        destn_ptr += off_the_left;
+    if (pDest_x + pOffset_x > 0) {
+        destn_ptr += pDest_x + pOffset_x;
     }
+    destn_width = pDest->width;
     for (i = 0; i < height; i++) {
         destn_ptr2 = destn_ptr;
         number_of_chunks = *pSource;
         pSource++;
-        x_byte = off_the_left;
+        x_byte = pOffset_x + pDest_x;
+        if (x_byte < 0) {
+            off_the_left = 1;
+        } else {
+            off_the_left = 0;
+        }
         for (j = 0; j < number_of_chunks; j++) {
             chunk_length = *pSource;
             pSource++;
-            if (chunk_length >= 0) {
+            if (chunk_length < 0) {
+                chunk_length = -chunk_length;
                 old_x_byte = x_byte;
                 x_byte += chunk_length;
-                if (old_x_byte >= 0) {
-                    destn_ptr2 += chunk_length;
-                } else if (x_byte > 0) {
-                    destn_ptr2 += chunk_length + old_x_byte;
+                if (old_x_byte < 0) {
+                    if (x_byte > 0) {
+                        memcpy(destn_ptr2, pSource - old_x_byte, chunk_length + old_x_byte);
+                        destn_ptr2 += chunk_length + old_x_byte;
+                    }
+                } else {
+                    if (destn_width < x_byte) {
+                        if (old_x_byte < destn_width) {
+                            memcpy(destn_ptr2, pSource, destn_width - old_x_byte);
+                        }
+                    } else {
+                        memcpy(destn_ptr2, pSource, chunk_length);
+                        destn_ptr2 += chunk_length;
+                    }
                 }
+                pSource += chunk_length;
             } else {
                 old_x_byte = x_byte;
-                x_byte += -chunk_length;
-                if (old_x_byte >= 0) {
-                    if (pDest->width >= x_byte) {
-                        memcpy(destn_ptr2, pSource, -chunk_length);
-                        destn_ptr2 += -chunk_length;
-                    } else if (old_x_byte < pDest->width) {
-                        memcpy(destn_ptr2, pSource, pDest->width - old_x_byte);
+                x_byte += chunk_length;
+                if (old_x_byte < 0) {
+                    if (x_byte > 0) {
+                        destn_ptr2 += chunk_length + old_x_byte;
                     }
-                } else if (x_byte > 0) {
-                    memcpy(destn_ptr2, &pSource[-old_x_byte], -chunk_length + old_x_byte);
-                    destn_ptr2 += -chunk_length + old_x_byte;
+                } else {
+                    destn_ptr2 += chunk_length;
                 }
-                pSource += -chunk_length;
             }
         }
         destn_ptr += pDest->row_bytes;
@@ -1521,7 +1535,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
     gShadow_points[7].v[2] = bounds_z_max;
     gShadow_clip_plane_count = 0;
     BrMatrix34TApplyV(&light_ray_car, &gShadow_light_ray, &pCar->car_master_actor->t.t.mat);
-    y_offset = (bounds_y_max + bounds_y_min) / 2.0;
+    y_offset = (bounds_y_max + bounds_y_min) / 2.0f;
     TryThisEdge(pCar, &light_ray_car, 2, 1.0, 1, 1.0, 0, 3, y_offset);
     TryThisEdge(pCar, &light_ray_car, 2, -1.0, 1, 1.0, 1, 2, y_offset);
     TryThisEdge(pCar, &light_ray_car, 2, -1.0, 1, -1.0, 6, 5, y_offset);
@@ -1537,145 +1551,137 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
     for (i = 0; i < gShadow_clip_plane_count; i++) {
         BrClipPlaneEnable(gShadow_clip_planes[i].clip);
     }
-    face_count = GetPrecalculatedFacesUnderCar(pCar, &face_ref);
-
-    if (!gAction_replay_mode && pCar->number_of_wheels_on_ground >= 3 && face_count != 0) {
-        highest_underneath = 0.0;
-    } else {
-        kev_bounds.original_bounds.min.v[0] = 1000.0;
-        kev_bounds.original_bounds.min.v[1] = 1000.0;
-        kev_bounds.original_bounds.min.v[2] = 1000.0;
-        kev_bounds.original_bounds.max.v[0] = -1000.0;
-        kev_bounds.original_bounds.max.v[1] = -1000.0;
-        kev_bounds.original_bounds.max.v[2] = -1000.0;
+    if (gAction_replay_mode || pCar->number_of_wheels_on_ground < 3 || (face_count = GetPrecalculatedFacesUnderCar(pCar, &list_ptr)) == 0) {
+        kev_bounds.original_bounds.min.v[0] = 1000.0f;
+        kev_bounds.original_bounds.min.v[1] = 1000.0f;
+        kev_bounds.original_bounds.min.v[2] = 1000.0f;
+        kev_bounds.original_bounds.max.v[0] = -1000.0f;
+        kev_bounds.original_bounds.max.v[1] = -1000.0f;
+        kev_bounds.original_bounds.max.v[2] = -1000.0f;
         for (i = 0; i < COUNT_OF(shadow_points_world); i++) {
             BrMatrix34ApplyP(&shadow_points_world[i], &gShadow_points[i], &pCar->car_master_actor->t.t.mat);
-            if (shadow_points_world[i].v[0] >= kev_bounds.original_bounds.min.v[0]) {
-                if (shadow_points_world[i].v[0] > kev_bounds.original_bounds.max.v[0]) {
-                    kev_bounds.original_bounds.max.v[0] = shadow_points_world[i].v[0];
-                }
-            } else {
+            if (shadow_points_world[i].v[0] < kev_bounds.original_bounds.min.v[0]) {
                 kev_bounds.original_bounds.min.v[0] = shadow_points_world[i].v[0];
+            } else if (shadow_points_world[i].v[0] > kev_bounds.original_bounds.max.v[0]) {
+                kev_bounds.original_bounds.max.v[0] = shadow_points_world[i].v[0];
             }
-            if (shadow_points_world[i].v[1] >= kev_bounds.original_bounds.min.v[1]) {
-                if (shadow_points_world[i].v[1] > kev_bounds.original_bounds.max.v[1]) {
-                    kev_bounds.original_bounds.max.v[1] = shadow_points_world[i].v[1];
-                }
-            } else {
+            if (shadow_points_world[i].v[1] < kev_bounds.original_bounds.min.v[1]) {
                 kev_bounds.original_bounds.min.v[1] = shadow_points_world[i].v[1];
+            } else if (shadow_points_world[i].v[1] > kev_bounds.original_bounds.max.v[1]) {
+                kev_bounds.original_bounds.max.v[1] = shadow_points_world[i].v[1];
             }
-            if (shadow_points_world[i].v[2] >= kev_bounds.original_bounds.min.v[2]) {
-                if (shadow_points_world[i].v[2] > kev_bounds.original_bounds.max.v[2]) {
-                    kev_bounds.original_bounds.max.v[2] = shadow_points_world[i].v[2];
-                }
-            } else {
+            if (shadow_points_world[i].v[2] < kev_bounds.original_bounds.min.v[2]) {
                 kev_bounds.original_bounds.min.v[2] = shadow_points_world[i].v[2];
+            } else if (shadow_points_world[i].v[2] > kev_bounds.original_bounds.max.v[2]) {
+                kev_bounds.original_bounds.max.v[2] = shadow_points_world[i].v[2];
             }
         }
-        kev_bounds.original_bounds.min.v[1] = kev_bounds.original_bounds.min.v[1] - 4.4000001;
+        kev_bounds.original_bounds.min.v[1] = kev_bounds.original_bounds.min.v[1] - 4.4000001f;
         kev_bounds.mat = &gIdentity34;
         face_count = FindFacesInBox(&kev_bounds, the_list, 100);
-        face_ref = the_list;
-        highest_underneath = 1000.0;
+        list_ptr = the_list;
+        height = 1000.0f;
         ray_length = kev_bounds.original_bounds.max.v[1] - kev_bounds.original_bounds.min.v[1];
-        ray.v[0] = 0.0;
+        ray.v[0] = 0.0f;
         ray.v[1] = -ray_length;
-        ray.v[2] = 0.0;
-        ray_pos = pCar->car_master_actor->t.t.translate.t;
+        ray.v[2] = 0.0f;
+        BrVector3Copy(&ray_pos, &pCar->car_master_actor->t.t.translate.t);
         ray_pos.v[1] = kev_bounds.original_bounds.max.v[1];
+    } else {
+        height = 0.0f;
     }
     if (face_count) {
-        first_poly_below = -1000.0;
-        i = 0;
-        list_ptr = face_ref;
-        for (i = 0; i < face_count; i++) {
-            v1 = &list_ptr->v[1];
-            v2 = &list_ptr->v[2];
-            if (list_ptr->normal.v[1] >= -0.1 || (list_ptr->material && (list_ptr->material->flags & BR_MATF_TWO_SIDED) != 0)) {
-                if (list_ptr->normal.v[1] < 0.0 || (list_ptr->material && ((list_ptr->material->identifier && list_ptr->material->identifier[0] == '!') || list_ptr->material->index_blend))) {
-                    list_ptr->d = SHADOW_D_IGNORE_FLAG;
-                } else if ((list_ptr->v[0].v[1] > pCar->pos.v[1] || v1->v[1] > pCar->pos.v[1] || v2->v[1] > pCar->pos.v[1]) && list_ptr->normal.v[1] < 0.1) {
-                    list_ptr->d = SHADOW_D_IGNORE_FLAG;
-                }
-            } else {
-                poly_centre.v[0] = v1->v[0] + list_ptr->v[0].v[0];
-                poly_centre.v[1] = v1->v[1] + list_ptr->v[0].v[1];
-                poly_centre.v[2] = v1->v[2] + list_ptr->v[0].v[2];
+        models_used = 0;
+        highest_underneath = -1000.0f;
+        for (i = 0, face_ref = list_ptr; i < face_count; i++, face_ref++) {
+            v0 = &face_ref->v[0];
+            v1 = &face_ref->v[1];
+            v2 = &face_ref->v[2];
+            if (face_ref->normal.v[1] < -0.1 && (!face_ref->material || (face_ref->material->flags & BR_MATF_TWO_SIDED) == 0)) {
+                poly_centre.v[0] = v1->v[0] + v0->v[0];
+                poly_centre.v[1] = v1->v[1] + v0->v[1];
+                poly_centre.v[2] = v1->v[2] + v0->v[2];
                 poly_centre.v[0] = v2->v[0] + poly_centre.v[0];
                 poly_centre.v[1] = v2->v[1] + poly_centre.v[1];
                 poly_centre.v[2] = v2->v[2] + poly_centre.v[2];
-                poly_centre.v[0] = poly_centre.v[0] / 3.0;
-                poly_centre.v[1] = poly_centre.v[1] / 3.0;
-                poly_centre.v[2] = poly_centre.v[2] / 3.0;
-                poly_centre.v[1] = (v2->v[1] + v1->v[1] + list_ptr->v[0].v[1]) / 3.0;
-                if (poly_centre.v[1] > first_poly_below) {
+                poly_centre.v[0] = poly_centre.v[0] / 3.0f;
+                poly_centre.v[1] = poly_centre.v[1] / 3.0f;
+                poly_centre.v[2] = poly_centre.v[2] / 3.0f;
+                poly_centre.v[1] = (v2->v[1] + v1->v[1] + v0->v[1]) / 3.0f;
+                if (poly_centre.v[1] > highest_underneath) {
                     car_to_poly.v[0] = poly_centre.v[0] - pCar->car_master_actor->t.t.mat.m[3][0];
                     car_to_poly.v[1] = poly_centre.v[1] - pCar->car_master_actor->t.t.mat.m[3][1];
                     car_to_poly.v[2] = poly_centre.v[2] - pCar->car_master_actor->t.t.mat.m[3][2];
 
-                    if (BrVector3Dot(&list_ptr->normal, &car_to_poly) > 0.0) {
-                        first_poly_below = poly_centre.v[1];
+                    if (BrVector3Dot(&face_ref->normal, &car_to_poly) > 0.0f) {
+                        highest_underneath = poly_centre.v[1];
                     }
                 }
-                list_ptr->d = SHADOW_D_IGNORE_FLAG;
+                face_ref->d = SHADOW_D_IGNORE_FLAG;
+            } else if (face_ref->normal.v[1] < 0.0f || (face_ref->material && ((face_ref->material->identifier && face_ref->material->identifier[0] == '!') || face_ref->material->index_blend))) {
+                face_ref->d = SHADOW_D_IGNORE_FLAG;
+            } else if ((v0[0].v[1] > pCar->pos.v[1] || v1[0].v[1] > pCar->pos.v[1] || v2[0].v[1] > pCar->pos.v[1]) && face_ref->normal.v[1] < 0.1) {
+                face_ref->d = SHADOW_D_IGNORE_FLAG;
             }
-            list_ptr++;
         }
-        list_ptr = face_ref;
-        for (i = 0; i < face_count; i++) {
-            if (list_ptr->d != 10000.0) {
-                if (list_ptr->v[0].v[1] >= first_poly_below || list_ptr->v[1].v[1] >= first_poly_below || list_ptr->v[2].v[1] >= first_poly_below) {
-                    if (gFancy_shadow) {
-                        faces[f_num].material = list_ptr->material;
+        for (i = 0, face_ref = list_ptr; i < face_count; i++, face_ref++) {
+            if (face_ref->d == 10000.0f) {
+                continue;
+            }
+            force_shadow = 0;
+            if (!force_shadow && face_ref->v[0].v[1] < highest_underneath && face_ref->v[1].v[1] < highest_underneath && face_ref->v[2].v[1] < highest_underneath) {
+                continue;
+            }
+            if (!gFancy_shadow) {
+                faces[f_num].material = gShadow_material;
+            } else {
+                faces[f_num].material = face_ref->material;
 #ifdef DETHRACE_3DFX_PATCH
-                        if (gShade_tables_do_not_work) {
-                            list_ptr->material->ka = 0.75f;
-                            BrMaterialUpdate(list_ptr->material, BR_MATU_LIGHTING);
-                        } else
+                if (gShade_tables_do_not_work) {
+                    face_ref->material->ka = 0.75f;
+                    BrMaterialUpdate(face_ref->material, BR_MATU_LIGHTING);
+                } else
 #endif
-                        {
-                            if (list_ptr->material && list_ptr->material->colour_map && (list_ptr->material->flags & BR_MATF_LIGHT) == 0) {
-                                list_ptr->material->flags |= BR_MATF_SMOOTH | BR_MATF_LIGHT;
-                                BrMaterialUpdate(list_ptr->material, BR_MATU_RENDERING);
-                            }
-                        }
-                    } else {
-                        faces[f_num].material = gShadow_material;
-                    }
-
-                    verts[3 * f_num].p = list_ptr->v[0];
-                    verts[3 * f_num].map = *list_ptr->map[0];
-                    verts[3 * f_num + 1].p = list_ptr->v[1];
-                    verts[3 * f_num + 1].map = *list_ptr->map[1];
-                    verts[3 * f_num + 2].p = list_ptr->v[2];
-                    verts[3 * f_num + 2].map = *list_ptr->map[2];
-                    faces[f_num].vertices[0] = 3 * f_num;
-                    faces[f_num].vertices[1] = 3 * f_num + 1;
-                    faces[f_num].vertices[2] = 3 * f_num + 2;
-                    f_num++;
-                    if (highest_underneath > 0.0) {
-                        CheckSingleFace(list_ptr, &ray_pos, &ray, &normal, &distance);
-                        if (distance < 1.0 && ray_length * distance < highest_underneath) {
-                            highest_underneath = ray_length * distance;
-                        }
-                    }
-                    if (f_num >= LEN(faces)) {
-                        break;
+                {
+                    if (face_ref->material && face_ref->material->colour_map && (face_ref->material->flags & BR_MATF_LIGHT) == 0) {
+                        face_ref->material->flags |= BR_MATF_SMOOTH | BR_MATF_LIGHT;
+                        BrMaterialUpdate(face_ref->material, BR_MATU_RENDERING);
                     }
                 }
             }
-            list_ptr++;
-        }
-        highest_underneath = highest_underneath - (bounds_y_max - bounds_y_min);
-        if (highest_underneath < 2.2) {
-            if (highest_underneath < 0.0) {
-                highest_underneath = 0.0;
+
+            BrVector3Copy(&verts[3 * f_num].p, &face_ref->v[0]);
+            BrVector3Copy(&verts[3 * f_num + 1].p, &face_ref->v[1]);
+            BrVector3Copy(&verts[3 * f_num + 2].p, &face_ref->v[2]);
+            verts[3 * f_num].map.v[0] = face_ref->map[0]->v[0];
+            verts[3 * f_num].map.v[1] = face_ref->map[0]->v[1];
+            verts[3 * f_num + 1].map.v[0] = face_ref->map[1]->v[0];
+            verts[3 * f_num + 1].map.v[1] = face_ref->map[1]->v[1];
+            verts[3 * f_num + 2].map.v[0] = face_ref->map[2]->v[0];
+            verts[3 * f_num + 2].map.v[1] = face_ref->map[2]->v[1];
+            faces[f_num].vertices[0] = 3 * f_num;
+            faces[f_num].vertices[1] = 3 * f_num + 1;
+            faces[f_num].vertices[2] = 3 * f_num + 2;
+            f_num++;
+            if (height > 0.0f) {
+                CheckSingleFace(face_ref, &ray_pos, &ray, &normal, &distance);
+                if (distance < 1.0f && ray_length * distance < height) {
+                    height = ray_length * distance;
+                    BrVector3Copy(&the_normal, &normal);
+                }
             }
-        } else {
-            highest_underneath = 2.2;
+            if (f_num >= (int)LEN(faces)) {
+                break;
+            }
+        }
+        height = height - (bounds_y_max - bounds_y_min);
+        if (height > 2.2) {
+            height = 2.2;
+        } else if (height < 0.0f) {
+            height = 0.0f;
         }
         if (gFancy_shadow) {
-            gShadow_dim_amount = ((2.2 - highest_underneath) * 5.0 / 2.2 + 2.5);
+            gShadow_dim_amount = ((2.2 - height) * 5.0 / 2.2 + 2.5);
             for (i = 0; i < gSaved_table_count; i++) {
                 gSaved_shade_tables[i].original->height = 1;
                 gSaved_shade_tables[i].original->pixels = (tU8*)gDepth_shade_table->pixels + gShadow_dim_amount * gDepth_shade_table->row_bytes;
@@ -1683,26 +1689,30 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
                 BrTableUpdate(gSaved_shade_tables[i].original, BR_TABU_ALL);
             }
         }
-        shadow_scaling_factor = (2.2 - highest_underneath) * 0.52 / 2.2 + 0.4;
+        shadow_scaling_factor = (2.2 - height) * 0.52 / 2.2 + 0.4;
         for (i = 0; i < gShadow_clip_plane_count; i++) {
             clip_normal = (br_vector4*)gShadow_clip_planes[i].clip->type_data;
-            distance = DistanceFromPlane(&pCar->car_master_actor->t.t.euler.t, clip_normal->v[0], clip_normal->v[1], clip_normal->v[2], clip_normal->v[3]);
-            gShadow_clip_planes[i].clip->t.t.mat.m[3][0] = (1.0 - shadow_scaling_factor) * distance * clip_normal->v[0];
-            gShadow_clip_planes[i].clip->t.t.mat.m[3][1] = (1.0 - shadow_scaling_factor) * distance * clip_normal->v[1];
-            gShadow_clip_planes[i].clip->t.t.mat.m[3][2] = (1.0 - shadow_scaling_factor) * distance * clip_normal->v[2];
+            distance = DistanceFromPlane(&pCar->car_master_actor->t.t.euler.t,
+                ((br_vector4*)gShadow_clip_planes[i].clip->type_data)->v[0],
+                ((br_vector4*)gShadow_clip_planes[i].clip->type_data)->v[1],
+                ((br_vector4*)gShadow_clip_planes[i].clip->type_data)->v[2],
+                ((br_vector4*)gShadow_clip_planes[i].clip->type_data)->v[3]);
+            gShadow_clip_planes[i].clip->t.t.mat.m[3][0] = clip_normal->v[0] * ((1.0 - shadow_scaling_factor) * distance);
+            gShadow_clip_planes[i].clip->t.t.mat.m[3][1] = clip_normal->v[1] * ((1.0 - shadow_scaling_factor) * distance);
+            gShadow_clip_planes[i].clip->t.t.mat.m[3][2] = clip_normal->v[2] * ((1.0 - shadow_scaling_factor) * distance);
         }
 
         camera_ptr = (br_camera*)gCamera->type_data;
         DRMatrix34TApplyP(&pos_cam_space, &pCar->car_master_actor->t.t.euler.t, &gCamera_to_world);
-        if (pos_cam_space.v[2] >= 36.0 || pos_cam_space.v[2] >= camera_ptr->yon_z) {
-            camera_hither_fudge = 0.0;
-        } else {
-            camera_angle_additional_fudge = sqr(camera_ptr->yon_z - camera_ptr->hither_z);
-            camera_hither_fudge = camera_angle_additional_fudge * (pos_cam_space.v[2] * 1.0) / ((pos_cam_space.v[2] - camera_ptr->yon_z) * camera_ptr->yon_z * 65536.0);
-            if (camera_hither_fudge < 0.0002) {
-                camera_hither_fudge = 0.0002;
+        if (pos_cam_space.v[2] < 36.0f && pos_cam_space.v[2] < camera_ptr->yon_z) {
+            camera_hither_fudge = pos_cam_space.v[2] * gShadow_hither_z_move * sqr(camera_ptr->yon_z - camera_ptr->hither_z)
+                / ((pos_cam_space.v[2] - camera_ptr->yon_z) * camera_ptr->yon_z * 65536.0f);
+            if ((&camera_hither_fudge)[0] < gShadow_hither_min_move) {
+                camera_hither_fudge = gShadow_hither_min_move;
             }
             camera_ptr->hither_z += camera_hither_fudge;
+        } else {
+            camera_hither_fudge = 0.0f;
         }
         if (f_num) {
 #ifdef DETHRACE_3DFX_PATCH
@@ -1722,7 +1732,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
             BrModelRemove(gShadow_model);
             if (pCar->shadow_intersection_flags) {
                 oily_count = GetOilSpillCount();
-                for (i = 0; i < oily_count; ++i) {
+                for (i = 0; i < oily_count; i++) {
                     if (((1 << i) & pCar->shadow_intersection_flags) != 0) {
                         GetOilSpillDetails(i, &oily_actor, &oily_size);
                         if (oily_actor) {
@@ -1737,7 +1747,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
         camera_ptr->hither_z -= camera_hither_fudge;
         for (i = 0; i < f_num; i++) {
             if (gFancy_shadow) {
-                material = gShadow_model->faces[i].material;
+                material = gShadow_model[0].faces[i].material;
                 if (material) {
 #ifdef DETHRACE_3DFX_PATCH
                     if (gShade_tables_do_not_work) {

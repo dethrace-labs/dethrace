@@ -217,8 +217,8 @@ int gInTheSea;
 int gCamera_mode;
 
 // GLOBAL: CARM95 0x0053a514
-br_scalar gOur_yaw__car;            // suffix added to avoid duplicate symbol
-br_scalar gGravity__car;            // suffix added to avoid duplicate symbol
+br_scalar gOur_yaw__car; // suffix added to avoid duplicate symbol
+br_scalar gGravity__car; // suffix added to avoid duplicate symbol
 
 // GLOBAL: CARM95 0x0053a530
 br_vector3 gNew_ground_normal__car; // suffix added to avoid duplicate symbol
@@ -789,8 +789,9 @@ void GetFacesInBox(tCollision_info* c) {
         && c->water_d != 10000.f
         && gDouble_pling_water
         && (c->bounds_world_space.max.v[1] * c->water_normal.v[1]
-                   + c->bounds_world_space.max.v[2] * c->water_normal.v[2])
-                + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.max.v[0] - c->water_d <= 0.f) {
+               + c->bounds_world_space.max.v[2] * c->water_normal.v[2])
+                + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.max.v[0] - c->water_d
+            <= 0.f) {
         gInTheSea = 1;
         FreezeCamera();
     }
@@ -805,12 +806,16 @@ void GetFacesInBox(tCollision_info* c) {
         if (c->driver == eDriver_local_human) {
             if (gPling_face->material->identifier[1] == '!') {
                 if ((c->water_normal.v[2] * c->bounds_world_space.min.v[2]
-                            + c->bounds_world_space.min.v[1] * c->water_normal.v[1])
-                        + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.min.v[0] - c->water_d < 0.0f) {
+                        + c->bounds_world_space.min.v[1] * c->water_normal.v[1])
+                        + (c->water_normal.v[0] + 0.0f) * c->bounds_world_space.min.v[0] - c->water_d
+                    < 0.0f) {
                     GetNewBoundingBox(&current_bounds, &c->bounds[1], &c->car_master_actor->t.t.mat);
                     if ((c->water_normal.v[2] * current_bounds.min.v[2]
                             + c->water_normal.v[1] * current_bounds.min.v[1]
-                            + c->water_normal.v[0] * current_bounds.min.v[0]) / WORLD_SCALE_D - c->water_d < 0.0) {
+                            + c->water_normal.v[0] * current_bounds.min.v[0])
+                                / WORLD_SCALE_D
+                            - c->water_d
+                        < 0.0) {
                         gInTheSea = 1;
                         FreezeCamera();
                     }
@@ -2943,17 +2948,17 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     br_scalar max_acc;
     br_matrix34 message_mat;
 
-    // v34 = 0;
-    // v35 = 0;
-    // v36 = 0x3F800000;
-    // v48 = 0x3F800347;
+    dir.v[0] = 0.f;
+    dir.v[1] = 0.f;
+    dir.v[2] = 1.f;
+    min_d = 1.0001f;
     mat = &c->car_master_actor->t.t.mat;
     oldmat = &c->oldmat;
     k = 0;
     gMaterial_index = 0;
     if (c->dt >= 0.0f && gNet_mode == eNet_mode_host) {
         oldmat = &message_mat;
-        GetExpandedMatrix(&message_mat, &c->message.mat);
+        GetExpandedMatrix(oldmat, &c->message.mat);
     }
     if (dt < 0.0f) {
         mat = oldmat;
@@ -2973,34 +2978,33 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             bnds.max.v[i] = c->bounds[2].max.v[i];
         }
     }
-    a1.v[0] = mat->m[3][0] / WORLD_SCALE;
-    a1.v[1] = mat->m[3][1] / WORLD_SCALE;
-    a1.v[2] = mat->m[3][2] / WORLD_SCALE;
-    BrMatrix34ApplyV(&aa, &bnds.min, mat);
-    BrVector3Accumulate(&aa, &a1);
+    pos.v[0] = mat->m[3][0] / WORLD_SCALE;
+    pos.v[1] = mat->m[3][1] / WORLD_SCALE;
+    pos.v[2] = mat->m[3][2] / WORLD_SCALE;
+    BrMatrix34ApplyV(&corner, &bnds.min, mat);
+    BrVector3Accumulate(&corner, &pos);
     for (j = 0; j < 3; ++j) {
         edges[j].v[0] = (bnds.max.v[j] - bnds.min.v[j]) * mat->m[j][0];
         edges[j].v[1] = (bnds.max.v[j] - bnds.min.v[j]) * mat->m[j][1];
         edges[j].v[2] = (bnds.max.v[j] - bnds.min.v[j]) * mat->m[j][2];
     }
-    for (i = 0; i < 50 && i < c->box_face_end - c->box_face_start; i++) {
-        f_ref = &gFace_list__car[c->box_face_start + i];
-        BrVector3Sub(&bb, &aa, &f_ref->v[0]);
-        max = BrVector3Dot(&bb, &f_ref->normal);
+    for (i = 0, f_ref = &gFace_list__car[c->box_face_start]; i < c->box_face_end - c->box_face_start && i < 50; i++, f_ref++) {
+        BrVector3Sub(&tv, &corner, &f_ref->v[0]);
+        max = BrVector3Dot(&tv, &f_ref->normal);
         min = max;
         for (j = 0; j < 3; ++j) {
             ts = BrVector3Dot(&edges[j], &f_ref->normal);
-            if (ts >= 0) {
-                max = max + ts;
-            } else {
+            if (ts < 0) {
                 min = min + ts;
+            } else {
+                max = max + ts;
             }
         }
-        if ((max <= 0.001f || min <= 0.001f) && (max >= -0.001f || min >= -0.001f)) {
-            f_ref->flags &= ~0x80u;
-            k++;
+        if ((max > 0.001f && min > 0.001f) || (max < -0.001f && min < -0.001f)) {
+            f_ref->flags |= 0x80;
         } else {
-            f_ref->flags |= 0x80u;
+            f_ref->flags &= ~0x80;
+            k++;
         }
     }
     if (k == 0) {
@@ -3011,35 +3015,38 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
     BrMatrix34Mul(&mat_to_oldmat, mat, &tm);
     gEliminate_faces = 1;
     for (i = 0; i < 8 + c->extra_point_num; i++) {
-        if (i >= 8) {
-            tv = c->extra_points[i - 8];
+        if (i < 8) {
+            a1.v[0] = ((i & 2) == 0) * c->bounds[1].min.v[0] + ((i & 2) >> 1) * c->bounds[1].max.v[0];
+            a1.v[1] = ((i & 1) == 0) * c->bounds[1].min.v[1] + ((i & 1) >> 0) * c->bounds[1].max.v[1];
+            a1.v[2] = ((i & 4) == 0) * c->bounds[1].max.v[2] + ((i & 4) >> 2) * c->bounds[1].min.v[2];
         } else {
-            tv.v[0] = ((i & 2) == 0) * c->bounds[1].min.v[0] + ((i & 2) >> 1) * c->bounds[1].max.v[0];
-            tv.v[1] = ((i & 1) == 0) * c->bounds[1].min.v[1] + ((i & 1) >> 0) * c->bounds[1].max.v[1];
-            tv.v[2] = ((i & 4) == 0) * c->bounds[1].max.v[2] + ((i & 4) >> 2) * c->bounds[1].min.v[2];
+            BrVector3Copy(&a1, &c->extra_points[i - 8]);
         }
-        BrMatrix34ApplyP(&dir, &tv, mat);
-        if (dt >= 0.0f) {
-            BrMatrix34ApplyP(&a, &tv, oldmat);
+        BrMatrix34ApplyP(&bb, &a1, mat);
+        if (dt < 0.0f) {
+            BrVector3Scale(&aa, &c->pos, WORLD_SCALE);
         } else {
-            BrVector3Scale(&a, &c->pos, WORLD_SCALE);
+            BrMatrix34ApplyP(&aa, &a1, oldmat);
         }
-        BrVector3Sub(&dir, &dir, &a);
-        BrVector3Normalise(&normal_force, &dir);
-        BrVector3Scale(&normal_force, &normal_force, 0.0072463769f);
-        BrVector3Accumulate(&dir, &normal_force);
-        material = FindFloorInBoxM2(&a, &dir, &norm, &dist, c);
+        BrVector3Sub(&bb, &bb, &aa);
+        BrVector3Normalise(&a, &bb);
+        BrVector3Scale(&a, &a, 0.0072463769f);
+        BrVector3Accumulate(&bb, &a);
+        material = FindFloorInBoxM2(&aa, &bb, &norm, &dist, c);
         if (dist >= 0.0f && dist < 1.0001f) {
-            BrVector3Scale(&cc, &c->pos, WORLD_SCALE);
-            BrVector3Sub(&cc, &cc, &a);
-            FindFloorInBoxM(&a, &cc, &bb, &ts, c);
-            if (i < 8 || ts > 1.0f) {
-                BrMatrix34TApplyV(&a, &norm, oldmat);
-                AddCollPoint(dist, &tv, &a, r, n, &dir, k, c);
-                k++;
-                if (gMaterial_index == 0) {
-                    gMaterial_index = material;
+            if (i >= 8) {
+                BrVector3Scale(&test_dir, &c->pos, WORLD_SCALE);
+                BrVector3Sub(&test_dir, &test_dir, &aa);
+                FindFloorInBoxM(&aa, &test_dir, &tv, &ts, c);
+                if (ts <= 1.0f) {
+                    continue;
                 }
+            }
+            BrMatrix34TApplyV(&aa, &norm, oldmat);
+            AddCollPoint(dist, &a1, &aa, r, n, &bb, k, c);
+            k++;
+            if (gMaterial_index == 0) {
+                gMaterial_index = material;
             }
         }
     }
@@ -3051,11 +3058,11 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
         k = 4;
     }
     for (i = 0; i < k; i++) {
-        if (fabs(r[i].v[1]) + fabs(r[i].v[2]) + fabs(r[i].v[0]) > 500.0f) {
+        if ((float)(fabs(r[i].v[1]) + fabs(r[i].v[2]) + fabs(r[i].v[0])) > 500.0f) {
             for (j = i + 1; j < k; j++) {
-                if (fabs(r[j].v[1]) + fabs(r[j].v[2]) + fabs(r[j].v[0]) < 500.0f) {
-                    r[i] = r[j];
-                    n[i] = n[j];
+                if ((float)(fabs(r[j].v[1]) + fabs(r[j].v[2]) + fabs(r[j].v[0])) < 500.0f) {
+                    BrVector3Copy(&r[i], &r[j]);
+                    BrVector3Copy(&n[i], &n[j]);
                     i++;
                 }
             }
@@ -3063,88 +3070,92 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             break;
         }
     }
-    if (dt >= 0.0f) {
-        if (k > 0 && c->collision_flag && k < 4
-            && (fabs(r[0].v[0] - c->old_point.v[0]) > 0.05f
-                || fabs(r[0].v[1] - c->old_point.v[1]) > 0.05f
-                || fabs(r[0].v[2] - c->old_point.v[2]) > 0.05f)) {
-            r[k] = c->old_point;
-            n[k] = c->old_norm;
-            k++;
+    if (dt < 0.0f) {
+        if (k != 0) {
+            BrVector3Copy(&c->old_point, &r[0]);
+            BrVector3Copy(&c->old_norm, &n[0]);
         }
-        if (k > 0) {
-            c->old_point = r[0];
-            c->old_norm = n[0];
-            BrMatrix34Copy(mat, oldmat);
-            c->omega = c->oldomega;
-            BrMatrix34TApplyV(&c->velocity_car_space, &c->v, mat);
-            memset(&norm, 0, sizeof(norm));
-            collision = 0;
-            for (i = 0; i < k; i++) {
-                BrVector3Cross(&tau[i], &r[i], &n[i]);
-                tau[i].v[0] = tau[i].v[0] / c->I.v[0];
-                tau[i].v[1] = tau[i].v[1] / c->I.v[1];
-                tau[i].v[2] = tau[i].v[2] / c->I.v[2];
-                BrVector3Cross(&normal_force, &c->omega, &r[i]);
-                BrVector3Accumulate(&normal_force, &c->velocity_car_space);
-                d[i] = -(BrVector3Dot(&n[i], &normal_force));
-                BrVector3Add(&normal_force, &r[i], &c->cmpos);
-                BrMatrix34ApplyP(&dir, &normal_force, &mat_to_oldmat);
-                BrVector3Sub(&dir, &dir, &normal_force);
-                ts = -(BrVector3Dot(&n[i], &dir) / dt);
-                if (ts > d[i]) {
-                    d[i] = ts;
-                }
-                if (d[i] > 0.0f) {
-                    collision = 1;
-                }
+        return k;
+    }
+    if (k > 0 && c->collision_flag && k < 4
+        && (fabs(r[0].v[0] - c->old_point.v[0]) > 0.05
+            || fabs(r[0].v[1] - c->old_point.v[1]) > 0.05
+            || fabs(r[0].v[2] - c->old_point.v[2]) > 0.05)) {
+        BrVector3Copy(&r[k], &c->old_point);
+        BrVector3Copy(&n[k], &c->old_norm);
+        k++;
+    }
+    if (k > 0) {
+        BrVector3Copy(&c->old_point, &r[0]);
+        BrVector3Copy(&c->old_norm, &n[0]);
+        BrMatrix34Copy(mat, oldmat);
+        BrVector3Copy(&c->omega, &c->oldomega);
+        BrMatrix34TApplyV(&c->velocity_car_space, &c->v, mat);
+        norm.v[0] = 0.f;
+        norm.v[1] = 0.f;
+        norm.v[2] = 0.f;
+        collision = 0;
+        for (i = 0; i < k; i++) {
+            BrVector3Cross(&tau[i], &r[i], &n[i]);
+            tau[i].v[0] = tau[i].v[0] / c->I.v[0];
+            tau[i].v[1] = tau[i].v[1] / c->I.v[1];
+            tau[i].v[2] = tau[i].v[2] / c->I.v[2];
+            BrVector3Cross(&a, &c->omega, &r[i]);
+            BrVector3Accumulate(&a, &c->velocity_car_space);
+            d[i] = -(BrVector3Dot(&n[i], &a));
+            BrVector3Add(&a, &r[i], &c->cmpos);
+            BrMatrix34ApplyP(&bb, &a, &mat_to_oldmat);
+            BrVector3Sub(&bb, &bb, &a);
+            ts = -(BrVector3Dot(&n[i], &bb) / dt);
+            if (ts > d[i]) {
+                d[i] = ts;
             }
-            if (!collision) {
-                d[0] = 0.5f;
+            if (d[i] > 0.0f) {
+                collision = 1;
             }
-            for (i = 0; i < k; i++) {
-                for (j = 0; j < k; j++) {
-                    BrVector3Cross(&normal_force, &tau[j], &r[i]);
-                    BrVector3InvScale(&norm, &n[j], c->M);
-                    BrVector3Accumulate(&normal_force, &norm);
-                    M.m[i][j] = BrVector3Dot(&n[i], &normal_force);
-                }
+        }
+        if (!collision) {
+            d[0] = 0.5f;
+        }
+        for (i = 0; i < k; i++) {
+            for (j = 0; j < k; j++) {
+                BrVector3Cross(&a, &tau[j], &r[i]);
+                BrVector3InvScale(&norm, &n[j], c->M);
+                BrVector3Accumulate(&a, &norm);
+                M.m[i][j] = BrVector3Dot(&n[i], &a);
             }
-            switch (k) {
-            case 1:
-                ts = SinglePointColl(f, &M, d);
-                break;
-            case 2:
-                ts = TwoPointColl(f, &M, d, tau, n);
-                break;
-            case 3:
-                d[3] = 0.0f;
-                ts = ThreePointCollRec(f, &M, d, tau, n, c);
-                break;
-            case 4:
-                ts = FourPointColl(f, &M, d, tau, n, c);
-                break;
-            default:
-                break;
-            }
-            if (k > 3) {
-                k = 3;
-            }
-            // if (f[0] > 10.0f || f[1] > 10.0f || f[2] > 10.0f) {
-            //     v31 = 0;
-            // }
-            if (fabs(ts) <= 0.000001f) {
-                BrVector3Set(&c->v, 0.f, 0.f, 0.f);
-                BrVector3Set(&c->omega, 0.f, 0.f, 0.f);
-                BrVector3Set(&c->oldomega, 0.f, 0.f, 0.f);
-                return k;
-            }
-            BrVector3Set(&p_vel, 0.f, 0.f, 0.f);
-            BrVector3Set(&dir, 0.f, 0.f, 0.f);
+        }
+        switch (k) {
+        case 1:
+            ts = SinglePointColl(f, &M, d);
+            break;
+        case 2:
+            ts = TwoPointColl(f, &M, d, tau, n);
+            break;
+        case 3:
+            d[3] = 0.0f;
+            ts = ThreePointCollRec(f, &M, d, tau, n, c);
+            break;
+        case 4:
+            ts = FourPointColl(f, &M, d, tau, n, c);
+            break;
+        default:
+            break;
+        }
+        if (k > 3) {
+            k = 3;
+        }
+        if (f[0] > 10.0f || f[1] > 10.0f || f[2] > 10.0f) {
+            ts2 = 0.f;
+        }
+        if (fabs(ts) > 0.000001) {
+            BrVector3Set(&normal_force, 0.f, 0.f, 0.f);
+            BrVector3Set(&friction_force, 0.f, 0.f, 0.f);
+            BrVector3Set(&bb, 0.f, 0.f, 0.f);
             BrVector3Set(&friction_force, 0.f, 0.f, 0.f);
             total_force = 0.f;
             for (i = 0; i < k; i++) {
-                if (f[i] < 0.001f) {
+                if (f[i] < 0.001) {
                     f[i] = 0.001f;
                 }
                 f[i] = f[i] * 1.001f;
@@ -3152,33 +3163,33 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                 BrVector3Accumulate(&c->omega, &tau[i]);
                 f[i] = f[i] / c->M;
                 BrVector3Scale(&n[i], &n[i], f[i]);
-                BrVector3Accumulate(&p_vel, &n[i]);
-                BrVector3Add(&bb, &r[i], &c->cmpos);
-                BrVector3Scale(&bb, &bb, f[i]);
-                BrVector3Accumulate(&dir, &bb);
+                BrVector3Accumulate(&normal_force, &n[i]);
+                BrVector3Add(&tv, &r[i], &c->cmpos);
+                BrVector3Scale(&tv, &tv, f[i]);
+                BrVector3Accumulate(&bb, &tv);
                 total_force = f[i] + total_force;
             }
             if (gPinball_factor != 0.0f) {
-                BrVector3Scale(&p_vel, &p_vel, gPinball_factor);
-                point_vel = BrVector3LengthSquared(&p_vel);
-                if (point_vel > 10.0f) {
+                BrVector3Scale(&normal_force, &normal_force, gPinball_factor);
+                batwick_length = BrVector3LengthSquared(&normal_force);
+                if (batwick_length > 10.0f) {
                     noise_defeat = 1;
                     if (c->driver == eDriver_local_human) {
                         DRS3StartSound(gCar_outlet, 9011);
                     } else {
                         DRS3StartSound3D(gCar_outlet, 9011, &c->pos, &gZero_v__car, 1, 255, 0x10000, 0x10000);
                     }
-                    if (point_vel > 10000.0f) {
-                        BrVector3Normalise(&p_vel, &p_vel);
-                        BrVector3Scale(&p_vel, &p_vel, 100);
+                    if (batwick_length > 10000.0f) {
+                        BrVector3Normalise(&normal_force, &normal_force);
+                        BrVector3Scale(&normal_force, &normal_force, 100);
                     }
                 }
             }
-            BrVector3Accumulate(&c->velocity_car_space, &p_vel);
-            BrVector3InvScale(&dir, &dir, total_force);
-            BrVector3Cross(&tv, &c->omega, &dir);
-            BrVector3Accumulate(&tv, &c->velocity_car_space);
-            batwick_length = BrVector3Length(&tv);
+            BrVector3Accumulate(&c->velocity_car_space, &normal_force);
+            BrVector3InvScale(&bb, &bb, total_force);
+            BrVector3Cross(&p_vel, &c->omega, &bb);
+            BrVector3Accumulate(&p_vel, &c->velocity_car_space);
+            point_vel = BrVector3Length(&p_vel);
             if (!c->collision_flag || (c->collision_flag == 1 && oldk < k)) {
                 for (i = 0; i < k; i++) {
                     BrVector3Cross(&vel, &c->omega, &r[i]);
@@ -3189,26 +3200,36 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                 }
             }
             oldk = k;
-            BrMatrix34ApplyP(&pos, &dir, &c->car_master_actor->t.t.mat);
-            BrVector3InvScale(&pos, &pos, WORLD_SCALE);
+            BrMatrix34ApplyP(&cc, &bb, &c->car_master_actor->t.t.mat);
+            BrVector3InvScale(&cc, &cc, WORLD_SCALE);
             noise_defeat = 0;
-            BrVector3Add(&normal_force, &friction_force, &p_vel);
-            BrMatrix34ApplyV(&norm, &normal_force, mat);
-            min = dt * 90.0f / 10.0f;
-            max = dt * 110.0f / 10.0f;
+            BrVector3Add(&a, &friction_force, &normal_force);
+            BrMatrix34ApplyV(&norm, &a, mat);
+            min_acc = dt * 90.0f / 10.0f;
+            max_acc = dt * 110.0f / 10.0f;
             if (c->last_special_volume != NULL) {
-                min *= c->last_special_volume->gravity_multiplier;
-                max *= c->last_special_volume->gravity_multiplier;
+                min_acc *= c->last_special_volume->gravity_multiplier;
+                max_acc *= c->last_special_volume->gravity_multiplier;
             }
             if (BrVector3LengthSquared(&c->velocity_car_space) < 0.05f
-                && 0.1f * total_force > BrVector3Dot(&c->omega, &tv)
+                && 0.1 * total_force > BrVector3Dot(&c->omega, &p_vel)
                 && k >= 3
-                && norm.v[1] > min
-                && norm.v[1] < max) {
-                if (c->driver <= eDriver_non_car || fabs(normal_force.v[2]) <= total_force * 0.9f) {
+                && norm.v[1] > min_acc
+                && norm.v[1] < max_acc) {
+                if (c->driver > eDriver_non_car && fabs(a.v[2]) > total_force * 0.9f) {
+                    BrVector3SetFloat(&tv2, 0.0f, -1.0f, 0.0f);
+                    tv.v[0] = mat->m[1][2] * tv2.v[1] - mat->m[1][1] * tv2.v[2];
+                    tv.v[1] = mat->m[1][0] * tv2.v[2] - mat->m[1][2] * tv2.v[0];
+                    tv.v[2] = mat->m[1][1] * tv2.v[0] - mat->m[1][0] * tv2.v[1];
+                    if (BrVector3Dot(&tv, (br_vector3*)&mat->m[0][0]) > 0.0f) {
+                        c->omega.v[0] = 0.5f;
+                    } else {
+                        c->omega.v[0] = -0.5f;
+                    }
+                } else {
                     BrVector3Set(&c->v, 0.f, 0.f, 0.f);
                     BrVector3Set(&norm, 0.f, 0.f, 0.f);
-                    BrVector3Set(&normal_force, 0.f, 0.f, 0.f);
+                    BrVector3Set(&a, 0.f, 0.f, 0.f);
                     BrVector3Set(&c->omega, 0.f, 0.f, 0.f);
                     BrVector3Set(&c->oldomega, 0.f, 0.f, 0.f);
                     if (c->driver <= eDriver_non_car || CAR(c)->max_force_rear == 0.0f) {
@@ -3217,39 +3238,27 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
                         }
                         c->doing_nothing_flag = 1;
                     }
-                } else {
-                    BrVector3SetFloat(&tv2, 0.0f, -1.0f, 0.0f);
-                    bb.v[0] = mat->m[1][2] * tv2.v[1] - mat->m[1][1] * tv2.v[2];
-                    bb.v[1] = mat->m[1][0] * tv2.v[2] - mat->m[1][2] * tv2.v[0];
-                    bb.v[2] = mat->m[1][1] * tv2.v[0] - mat->m[1][0] * tv2.v[1];
-                    if (BrVector3Dot(&bb, (br_vector3*)&mat->m[0][1]) <= 0.0f) {
-                        c->omega.v[0] = -0.5f;
-                    } else {
-                        c->omega.v[0] = 0.5f;
-                    }
                 }
             }
             BrVector3Accumulate(&c->v, &norm);
             if (c->driver >= eDriver_net_human) {
-                BrVector3Scale(&normal_force, &normal_force, gDefensive_powerup_factor[CAR(c)->power_up_levels[0]]);
+                BrVector3Scale(&a, &a, gDefensive_powerup_factor[CAR(c)->power_up_levels[0]]);
             }
-            if (c->driver < eDriver_net_human) {
-                BrVector3Scale(&normal_force, &normal_force, 0.01f);
+            if (c->driver >= eDriver_net_human) {
+                BrVector3Scale(&a, &a, 0.75f);
             } else {
-                BrVector3Scale(&normal_force, &normal_force, 0.75f);
+                BrVector3Scale(&a, &a, 0.01f);
             }
-            if (
+            if (!(
 #if defined(DETHRACE_FIX_BUGS)
-                // `c` is only a `tCar_spec*` if the driver is an opponent or human, otherwise, it will be a `tNon_car_spec*`. The following code
-                // assumes `c` is a `tCar_spec*`, causing invalid memory accesses
-                c->driver >= eDriver_oppo &&
+                    // `c` is only a `tCar_spec*` if the driver is an opponent or human, otherwise, it will be a `tNon_car_spec*`. The following code
+                    // assumes `c` is a `tCar_spec*`, causing invalid memory accesses
+                    c->driver >= eDriver_oppo &&
 #endif
-                (CAR(c)->invulnerable
-                    || (c->driver < eDriver_net_human && (c->driver != eDriver_oppo || PointOutOfSight(&c->pos, 150.0f)))
-                    || ((v_diff = (CAR(c)->pre_car_col_velocity.v[1] - c->v.v[1]) * gDefensive_powerup_factor[CAR(c)->power_up_levels[0]]) >= -20.0f)
-                    || CAR(c)->number_of_wheels_on_ground >= 3)) {
-                CrushAndDamageCar(CAR(c), &dir, &normal_force, NULL);
-            } else {
+                    (CAR(c)->invulnerable
+                        || (c->driver < eDriver_net_human && (c->driver != eDriver_oppo || PointOutOfSight(&c->pos, 150.0f)))
+                        || ((v_diff = (CAR(c)->pre_car_col_velocity.v[1] - c->v.v[1]) * gDefensive_powerup_factor[CAR(c)->power_up_levels[0]]) >= -20.0f)
+                        || CAR(c)->number_of_wheels_on_ground >= 3))) {
                 // Cops Special Forces is always stolen if destroyed!
                 if (c->driver == eDriver_oppo && c->index == 4 && v_diff < -40.0f) {
                     KnackerThisCar(CAR(c));
@@ -3263,31 +3272,30 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
 #endif
                 {
                     for (i = 0; i < CAR(c)->car_actor_count; i++) {
-                        ts2 = (v_diff + 20.0f) * -0.01f;
-                        TotallySpamTheModel(CAR(c), i, CAR(c)->car_model_actors[i].actor, &CAR(c)->car_model_actors[i].crush_data, ts2);
+                        TotallySpamTheModel(CAR(c), i, CAR(c)->car_model_actors[i].actor, &CAR(c)->car_model_actors[i].crush_data, (v_diff + 20.0f) * -0.01);
                     }
                     for (i = 0; i < COUNT_OF(CAR(c)->damage_units); i++) {
-                        DamageUnit(CAR(c), i, IRandomPosNeg(5) + (v_diff + 20.0f) * -1.5f);
+                        DamageUnit(CAR(c), i, IRandomPosNeg(5) + (v_diff + 20.0f) * -1.5);
                     }
                 }
+            } else {
+                CrushAndDamageCar(CAR(c), &bb, &a, NULL);
             }
             if (!noise_defeat) {
-                CrashNoise(&norm, &pos, gMaterial_index);
-                ScrapeNoise(batwick_length, &pos, gMaterial_index);
+                CrashNoise(&norm, &cc, gMaterial_index);
+                ScrapeNoise(point_vel, &cc, gMaterial_index);
             }
-            BrVector3InvScale(&tv, &tv, WORLD_SCALE);
-            BrMatrix34ApplyV(&bb, &tv, &c->car_master_actor->t.t.mat);
-            BrMatrix34ApplyV(&norm, &p_vel, &c->car_master_actor->t.t.mat);
-            CreateSparks(&pos, &bb, &norm, gCurrent_race.material_modifiers[gMaterial_index].sparkiness, CAR(c));
+            BrVector3InvScale(&p_vel, &p_vel, WORLD_SCALE);
+            BrMatrix34ApplyV(&tv, &p_vel, &c->car_master_actor->t.t.mat);
+            BrMatrix34ApplyV(&norm, &normal_force, &c->car_master_actor->t.t.mat);
+            CreateSparks(&cc, &tv, &norm, gCurrent_race.material_modifiers[gMaterial_index].sparkiness, CAR(c));
+        } else {
+            BrVector3Set(&c->v, 0.f, 0.f, 0.f);
+            BrVector3Set(&c->omega, 0.f, 0.f, 0.f);
+            BrVector3Set(&c->oldomega, 0.f, 0.f, 0.f);
         }
-        return k;
-    } else {
-        if (k != 0) {
-            c->old_point = r[0];
-            c->old_norm = n[0];
-        }
-        return k;
     }
+    return k;
 }
 
 // IDA: br_scalar __usercall AddFriction@<ST0>(tCollision_info *c@<EAX>, br_vector3 *vel@<EDX>, br_vector3 *normal_force@<EBX>, br_vector3 *pos@<ECX>, br_scalar total_force, br_vector3 *max_friction)
@@ -4194,8 +4202,6 @@ int AddEdgeCollPoints(br_vector3* p1, br_vector3* p2, br_bounds* pB, br_matrix34
     int plane3;
     int d;
 
-    float scale;
-
     plane1 = LineBoxColl(p1, p2, pB, &hp1);
     if (plane1 == 0) {
         return 0;
@@ -4207,104 +4213,106 @@ int AddEdgeCollPoints(br_vector3* p1, br_vector3* p2, br_bounds* pB, br_matrix34
     if (plane2 == 0) {
         return 0;
     }
-    if (plane1 != 8 && plane2 != 8 && (plane1 ^ plane2) == 4) {
-        BrVector3Add(&op1, &hp2, &hp1);
-        BrVector3Scale(&op1, &op1, .5f);
-        BrMatrix34ApplyP(&op2, &op1, pMold);
-        plane3 = LineBoxColl(&op2, &op1, pB, &hp3);
+    if (plane1 != 8 && plane2 != 8 && (plane2 ^ plane1) == 4) {
+        BrVector3Add(&a, &hp2, &hp1);
+        BrVector3Scale(&a, &a, .5f);
+        BrMatrix34ApplyP(&b, &a, pMold);
+        plane3 = LineBoxColl(&b, &a, pB, &hp3);
         if (plane3 == 8) {
             return 0;
         }
-        GetBoundsEdge(&pPoint_list[n], &edge, pB, plane1, plane3, &op2, &hp1, &hp2, c->collision_flag);
-        GetBoundsEdge(&pPoint_list[n + 1], &edge, pB, plane2, plane3, &op2, &hp1, &hp2, c->collision_flag);
+        GetBoundsEdge(&pPoint_list[n], &edge, pB, plane1, plane3, &b, &hp1, &hp2, c->collision_flag);
+        GetBoundsEdge(&pPoint_list[n + 1], &edge, pB, plane2, plane3, &b, &hp1, &hp2, c->collision_flag);
         GetPlaneNormal(&pNorm_list[n], plane3);
         BrVector3Copy(&pNorm_list[n + 1], &pNorm_list[n]);
         return 2;
-    } else if (plane1 == 8 && plane2 != 8) {
-        BrMatrix34ApplyP(&a, p1, pMold);
-        plane3 = LineBoxColl(&a, p1, pB, &hp3);
+    }
+    if (plane1 == 8 && plane2 != 8) {
+        BrMatrix34ApplyP(&op1, p1, pMold);
+        plane3 = LineBoxColl(&op1, p1, pB, &hp3);
         if (plane3 == 8) {
             return 0;
         }
         BrVector3Copy(&pPoint_list[n], &hp3);
         GetPlaneNormal(&pNorm_list[n], plane2);
-        if (plane2 == plane3 || (plane3 ^ plane2) == 4) {
+        if (plane3 == plane2 || (plane2 ^ plane3) == 4) {
             return 1;
         }
         GetBoundsEdge(&pPoint_list[n + 1], &edge, pB, plane2, plane3, p1, &hp2, &hp3, c->collision_flag);
-        BrVector3Sub(&op1, p1, p2);
-        BrVector3Cross(&pNorm_list[n + 1], &edge, &op1);
+        BrVector3Sub(&a, p1, p2);
+        BrVector3Cross(&pNorm_list[n + 1], &edge, &a);
         BrVector3Normalise(&pNorm_list[n + 1], &pNorm_list[n + 1]);
         d = (plane2 - 1) & 3;
         if ((pNorm_list[n + 1].v[d] < 0.f) == (plane2 & 4) >> 2) {
             BrVector3Negate(&pNorm_list[n + 1], &pNorm_list[n + 1]);
         }
-        BrVector3Copy(&op1, &pNorm_list[n + 1]);
-        BrMatrix34ApplyV(&pNorm_list[n + 1], &op1, pMold);
+        BrVector3Copy(&a, &pNorm_list[n + 1]);
+        BrMatrix34ApplyV(&pNorm_list[n + 1], &a, pMold);
         return 2;
-    } else if (plane2 == 8 && plane1 != 8) {
-        BrMatrix34ApplyP(&b, p2, pMold);
-        plane3 = LineBoxColl(&b, p2, pB, &hp3);
+    }
+    if (plane2 == 8 && plane1 != 8) {
+        BrMatrix34ApplyP(&op2, p2, pMold);
+        plane3 = LineBoxColl(&op2, p2, pB, &hp3);
         if (plane3 == 8) {
             return 0;
         }
-        pPoint_list[n] = hp3;
+        BrVector3Copy(&pPoint_list[n], &hp3);
         GetPlaneNormal(&pNorm_list[n], plane1);
         if (plane1 == plane3 || (plane3 ^ plane1) == 4) {
             return 1;
         }
         GetBoundsEdge(&pPoint_list[n + 1], &edge, pB, plane1, plane3, p2, &hp1, &hp3, c->collision_flag);
-        BrVector3Sub(&op1, p1, p2);
-        BrVector3Cross(&pNorm_list[n + 1], &edge, &op1);
+        BrVector3Sub(&a, p1, p2);
+        BrVector3Cross(&pNorm_list[n + 1], &edge, &a);
         BrVector3Normalise(&pNorm_list[n + 1], &pNorm_list[n + 1]);
         d = (plane1 - 1) & 3;
         if ((pNorm_list[n + 1].v[d] < 0.f) == (plane1 & 4) >> 2) {
             BrVector3Negate(&pNorm_list[n + 1], &pNorm_list[n + 1]);
         }
-        BrVector3Copy(&op1, &pNorm_list[n + 1]);
-        BrMatrix34ApplyV(&pNorm_list[n + 1], &op1, pMold);
+        BrVector3Copy(&a, &pNorm_list[n + 1]);
+        BrMatrix34ApplyV(&pNorm_list[n + 1], &a, pMold);
         return 2;
-    } else if (plane1 != 8 && plane2 != 8) {
-        BrVector3Add(&op1, &hp2, &hp1);
-        BrVector3Scale(&op1, &op1, .5f);
-        BrMatrix34ApplyP(&op2, &op1, pMold);
-        plane3 = LineBoxColl(&op2, &op1, pB, &hp3);
+    }
+    if (plane1 != 8 && plane2 != 8) {
+        BrVector3Add(&a, &hp2, &hp1);
+        BrVector3Scale(&a, &a, .5f);
+        BrMatrix34ApplyP(&b, &a, pMold);
+        plane3 = LineBoxColl(&b, &a, pB, &hp3);
         if (plane3 == 8 || plane3 == 0) {
             return 0;
         }
-        if (plane1 == plane3 || plane2 == plane3) {
-            GetBoundsEdge(&pPoint_list[n], &edge, pB, plane1, plane2, &op2, &hp1, &hp2, c->collision_flag);
-            BrVector3Sub(&op1, &hp1, &hp2);
-            BrVector3Cross(&op2, &edge, &op1);
-            BrVector3Normalise(&pNorm_list[n], &op2);
-            BrVector3Add(&op1, &pB->max, &pB->min);
-            BrVector3Scale(&op1, &op1, .5f);
-            BrVector3Sub(&op1, &pPoint_list[n], &op1);
-            if (BrVector3Dot(&pNorm_list[n], &op1) > 0.f) {
-                BrVector3Negate(&pNorm_list[n], &pNorm_list[n]);
-            }
-            BrVector3Copy(&op1, &pNorm_list[n]);
-            BrMatrix34ApplyV(&pNorm_list[n], &op1, pMold);
-            return 1;
-        } else {
+        if (plane1 != plane3 && plane2 != plane3) {
             GetBoundsEdge(&pPoint_list[n], &edge, pB, plane1, plane3, &hp3, &hp1, &hp2, c->collision_flag);
             GetBoundsEdge(&pPoint_list[n + 1], &edge, pB, plane2, plane3, &hp3, &hp1, &hp2, c->collision_flag);
             GetPlaneNormal(&pNorm_list[n], plane3);
             BrVector3Copy(&pNorm_list[n + 1], &pNorm_list[n]);
             return 2;
         }
-    } else if (plane1 == 8 && plane2 == 8) {
-        BrMatrix34ApplyP(&op1, p1, pMold);
-        plane3 = LineBoxColl(&op1, p1, pB, &pPoint_list[n]);
+        GetBoundsEdge(&pPoint_list[n], &edge, pB, plane1, plane2, &b, &hp1, &hp2, c->collision_flag);
+        BrVector3Sub(&a, &hp1, &hp2);
+        BrVector3Cross(&b, &edge, &a);
+        BrVector3Normalise(&pNorm_list[n], &b);
+        BrVector3Add(&a, &pB->max, &pB->min);
+        BrVector3Scale(&a, &a, .5f);
+        BrVector3Sub(&a, &pPoint_list[n], &a);
+        if (BrVector3Dot(&pNorm_list[n], &a) > 0.f) {
+            BrVector3Negate(&pNorm_list[n], &pNorm_list[n]);
+        }
+        BrVector3Copy(&a, &pNorm_list[n]);
+        BrMatrix34ApplyV(&pNorm_list[n], &a, pMold);
+        return 1;
+    }
+    if (plane1 == 8 && plane2 == 8) {
+        BrMatrix34ApplyP(&a, p1, pMold);
+        plane3 = LineBoxColl(&a, p1, pB, &pPoint_list[n]);
         GetPlaneNormal(&pNorm_list[n], plane3);
         d = n + (plane3 != 8);
-        BrMatrix34ApplyP(&op1, p2, pMold);
-        plane3 = LineBoxColl(&op1, p2, pB, &pPoint_list[d]);
+        BrMatrix34ApplyP(&a, p2, pMold);
+        plane3 = LineBoxColl(&a, p2, pB, &pPoint_list[d]);
         GetPlaneNormal(&pNorm_list[d], plane3);
         return (n != d) + (plane3 != 8);
-    } else {
-        return 0;
     }
+    return 0;
 }
 
 // IDA: void __usercall GetPlaneNormal(br_vector3 *n@<EAX>, int p@<EDX>)
@@ -5131,114 +5139,119 @@ int IncidentCam(tCar_spec* c, tU32 pTime) {
     br_vector3 old_cam_pos;
     int removed;
 
-    gPed_actor = NULL;
     m2 = &gCamera->t.t.mat;
+    gPed_actor = NULL;
     if (type == eNo_incident) {
         MoveCamToIncident(c, &type, &severity, &info, &next_incident_time);
     }
     if (type == eNo_incident) {
         return 0;
     }
-    if (type == eIncident_ped) {
-        BrVector3Copy(&old_cam_pos, &gCamera->t.t.translate.t);
+    switch (type) {
+    case eIncident_ped:
+        BrVector3Copy(&old_cam_pos, (br_vector3*)m2->m[3]);
         gPed_actor = info.ped_info.ped_actor;
         removed = PossibleRemoveNonCarFromWorld(info.ped_info.murderer_actor);
-        BrMatrix34Mul(&mat, &gPed_actor->t.t.mat, &gPed_actor->parent->t.t.mat);
+        BrMatrix34Mul(&mat, &info.ped_info.ped_actor->t.t.mat, &info.ped_info.ped_actor->parent->t.t.mat);
         info.ped_info.murderer_actor = c->car_master_actor;
         if (info.ped_info.murderer_actor != NULL) {
             BrVector3Copy(&murderer_pos, &c->pos);
         } else if (info.ped_info.murderer_actor->model != NULL) {
-            BrVector3Add(&murderer_pos, &info.ped_info.murderer_actor->model->bounds.max, &info.ped_info.murderer_actor->model->bounds.min);
-            BrVector3Scale(&murderer_pos, &murderer_pos, 0.5f);
-            BrMatrix34ApplyP(&murderer_pos, &murderer_pos, &info.ped_info.murderer_actor->t.t.mat);
+            BrVector3Sub(&tv, &info.ped_info.murderer_actor->model->bounds.max, &info.ped_info.murderer_actor->model->bounds.min);
+            BrVector3Scale(&tv, &tv, 0.5f);
+            BrMatrix34ApplyP(&murderer_pos, &tv, &info.ped_info.murderer_actor->t.t.mat);
         } else {
             BrVector3Copy(&murderer_pos, &info.ped_info.murderer_actor->t.t.translate.t);
         }
-        BrVector3Normalise(&vertical, (br_vector3*)mat.m[1]);
-        BrVector3Scale(&vertical, &vertical, PedHeightFromActor(info.ped_info.ped_actor) / 2.f);
-        BrVector3Accumulate((br_vector3*)mat.m[3], &vertical);
+        BrVector3Normalise(&tv, (br_vector3*)mat.m[1]);
+        BrVector3Scale(&tv, &tv, PedHeightFromActor(info.ped_info.ped_actor) / 2.f);
+        BrVector3Accumulate((br_vector3*)mat.m[3], &tv);
         if (next_incident_time > GetTotalTime() || !PipeSearchForwards()) {
             BrVector3Sub(&tv, (br_vector3*)mat.m[3], &murderer_pos);
             tv.v[1] = 0.f;
             BrVector3Normalise(&tv, &tv);
             BrVector3Set(&vertical, .0f, .4f, .0f);
-            BrVector3Cross(&perp, &tv, &vertical);
+            BrVector3Cross(&tv2, &tv, &vertical);
             if (random) {
-                BrVector3Negate(&perp, &perp);
+                BrVector3Negate(&tv2, &tv2);
             }
             if (PipeSearchForwards()) {
-                BrVector3Accumulate(&perp, &tv);
+                BrVector3Accumulate(&tv2, &tv);
             }
-            BrVector3Add(&gCamera->t.t.translate.t, (br_vector3*)mat.m[3], &perp);
-            CollideCamera2(&murderer_pos, &gCamera->t.t.translate.t, NULL, 1);
+            BrVector3Add((br_vector3*)m2->m[3], (br_vector3*)mat.m[3], &tv2);
+            m2->m[3][1] += 0.25f;
+            CollideCamera2(&murderer_pos, (br_vector3*)m2->m[3], NULL, 1);
         }
         PointCamera((br_vector3*)mat.m[3], m2);
-        BrVector3Sub(&tv, &gCamera->t.t.translate.t, &info.ped_info.murderer_actor->t.t.translate.t);
+        BrVector3Sub(&tv, (br_vector3*)m2->m[3], &info.ped_info.murderer_actor->t.t.translate.t);
         ts = BrVector3LengthSquared(&tv);
         if (abs(GetTotalTime() - next_incident_time) > 2500) {
             type = eNo_incident;
         }
         if ((PipeSearchForwards() ? (next_incident_time < GetTotalTime()) : (next_incident_time > GetTotalTime()))
-            && (ts > 25.f || CheckForWall(&info.ped_info.murderer_actor->t.t.translate.t, &gCamera->t.t.translate.t))) {
+            && (ts > 25.f || CheckForWall(&info.ped_info.murderer_actor->t.t.translate.t, (br_vector3*)m2->m[3]))) {
             type = eNo_incident;
         }
         if (removed) {
             PutNonCarBackInWorld(info.ped_info.murderer_actor);
         }
-        if (Vector3DistanceSquared((br_vector3*)mat.m[3], &gCamera->t.t.translate.t) < .15f * .15f) {
-            BrVector3Copy(&gCamera->t.t.translate.t, &old_cam_pos);
+        if (((mat.m[3][0] - m2->m[3][0]) * (mat.m[3][0] - m2->m[3][0])
+                + (mat.m[3][2] - m2->m[3][2]) * (mat.m[3][2] - m2->m[3][2]))
+            < .15 * .15) {
+            BrVector3Copy((br_vector3*)m2->m[3], &old_cam_pos);
             gPed_actor = NULL;
             return 0;
         }
-    } else if (type == eIncident_car) {
-        BrVector3Sub(&tv, &info.car_info.car->pos, &c->pos);
+        break;
+    case eIncident_wall:
+        PointCamera(&c->pos, m2);
+        BrVector3Sub(&tv, (br_vector3*)m2->m[3], &c->pos);
+        ts = BrVector3LengthSquared(&tv);
+        if ((float)fabs((int)(GetTotalTime() - next_incident_time)) > 2500.f) {
+            type = eNo_incident;
+        }
+        if ((PipeSearchForwards() ? (next_incident_time < GetTotalTime()) : (next_incident_time > GetTotalTime()))
+            && (ts > 25.f || CheckForWall(&c->pos, (br_vector3*)m2->m[3]))) {
+            type = eNo_incident;
+        }
+        break;
+    case eIncident_car:
+        car2 = info.car_info.car;
+        BrVector3Sub(&tv, &car2->pos, &c->pos);
         tv.v[1] = 0.f;
         BrVector3Normalise(&tv, &tv);
         BrVector3Scale(&tv, &tv, 2.f);
-        BrVector3Add(&gCamera->t.t.translate.t, &info.car_info.car->pos, &tv);
-        gCamera->t.t.translate.t.v[1] += 1.f;
-        CollideCamera2(&info.car_info.car->pos, &gCamera->t.t.translate.t, NULL, 1);
-        PointCamera(&info.car_info.car->pos, m2);
-        BrVector3Sub(&tv, &gCamera->t.t.translate.t, &c->pos);
+        BrVector3Add((br_vector3*)m2->m[3], &car2->pos, &tv);
+        m2->m[3][1] += 1.f;
+        CollideCamera2(&car2->pos, (br_vector3*)m2->m[3], NULL, 1);
+        PointCamera(&car2->pos, m2);
+        BrVector3Sub(&tv, (br_vector3*)m2->m[3], &c->pos);
         ts = BrVector3LengthSquared(&tv);
-        if (abs(GetTotalTime() - next_incident_time) > 2500) {
+        if ((float)fabs((int)(GetTotalTime() - next_incident_time)) > 2500.f) {
             type = eNo_incident;
         }
         if ((PipeSearchForwards() ? (next_incident_time < GetTotalTime()) : (next_incident_time > GetTotalTime()))
-            && (ts > 25.f || CheckForWall(&c->pos, &gCamera->t.t.translate.t))) {
+            && (ts > 25.f || CheckForWall(&c->pos, (br_vector3*)m2->m[3]))) {
             type = eNo_incident;
         }
-    } else if (type == eIncident_wall) {
-        PointCamera(&c->pos, m2);
-        BrVector3Sub(&tv, &gCamera->t.t.translate.t, &c->pos);
-        ts = BrVector3LengthSquared(&tv);
-        if (abs(GetTotalTime() - next_incident_time) > 2500) {
-            type = eNo_incident;
-        }
-        if ((PipeSearchForwards() ? (next_incident_time < GetTotalTime()) : (next_incident_time > GetTotalTime()))
-            && (ts > 25.f || CheckForWall(&c->pos, &gCamera->t.t.translate.t))) {
-            type = eNo_incident;
-        }
-    } else {
+        break;
+    default:
         type = eNo_incident;
     }
-    if (type == eNo_incident) {
-        if (count > 1) {
-            SetUpPanningCamera(c);
-            return 0;
-        } else {
-            count++;
-            if (IncidentCam(c, pTime)) {
-                count--;
-                return 1;
-            } else {
-                count--;
-                return 0;
-            }
-        }
-    } else {
+    if (type != eNo_incident) {
         return 1;
     }
+    if (count > 1) {
+        SetUpPanningCamera(c);
+        return 0;
+    }
+    count++;
+    if (IncidentCam(c, pTime)) {
+        count--;
+        return 1;
+    }
+    count--;
+    return 0;
 }
 
 // IDA: int __usercall MoveCamToIncident@<EAX>(tCar_spec *c@<EAX>, tIncident_type *type@<EDX>, float *severity@<EBX>, tIncident_info *info@<ECX>, tU32 *next_incident_time)
@@ -5493,14 +5506,13 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
     int manual_swing;
     int manual_zoom;
     br_vector3 old_camera_pos;
-    br_scalar scale;
 
-    m1 = &gCamera->t.t.mat;
-    m2 = &c->car_master_actor->t.t.mat;
+    m2 = &gCamera->t.t.mat;
+    m1 = &c->car_master_actor->t.t.mat;
     swoop = gCountdown && c->pos.v[1] + 0.001 < gCamera_height;
     manual_swing = gOld_yaw__car != gCamera_yaw || swoop;
-    manual_zoom = (double)gOld_zoom != gCamera_zoom;
-    BrVector3Copy(&old_camera_pos, &gCamera->t.t.translate.t);
+    manual_zoom = gOld_zoom != gCamera_zoom;
+    BrVector3Copy(&old_camera_pos, (br_vector3*)m2->m[3]);
 
     if (!gProgram_state.cockpit_on) {
         if (swoop) {
@@ -5509,7 +5521,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
         }
         if (fabs(c->speedo_speed) > 0.0006 && gCamera_mode > 0) {
             gCamera_mode = -1;
-            gCamera_sign = BrVector3Dot((br_vector3*)m2->m[2], &c->direction) > 0.0f;
+            gCamera_sign = BrVector3Dot((br_vector3*)m1->m[2], &c->direction) > 0.0f;
         }
         if (c->frame_collision_flag && gCamera_mode != -2) {
             gCamera_mode = 1;
@@ -5517,7 +5529,7 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
         if (gCar_flying || gCamera_reset || gCamera_mode == -2) {
             gCamera_mode = 0;
         }
-        d = sqrt(gCamera_zoom) + 4.f / WORLD_SCALE;
+        dist = (br_scalar)sqrt(gCamera_zoom) + 4.f / WORLD_SCALE;
         if (!gCamera_mode || gCamera_mode == -1) {
             BrVector3Copy(&vn, &c->direction);
             MoveWithWheels(c, &vn, manual_swing);
@@ -5526,32 +5538,33 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
             if (gCar_flying) {
                 gCamera_sign = 0;
             }
-            SwingCamera(c, m2, m1, &vn, pTime);
-            BrVector3Scale(&a, &vn, d);
-            BrVector3Sub(&gCamera->t.t.translate.t, &c->pos, &a);
+            SwingCamera(c, m1, m2, &vn, pTime);
+            BrVector3Scale(&tv, &vn, dist);
+            BrVector3Sub((br_vector3*)m2->m[3], &c->pos, &tv);
             BrVector3Copy(&gView_direction, &vn);
         }
         if (gCamera_mode == 1) {
             if (manual_swing || manual_zoom) {
                 BrVector3Copy(&old_camera_pos, &gCamera_pos_before_collide);
             }
-            BrVector3Sub(&a, &c->pos, &old_camera_pos);
-            a.v[1] = 0.0f;
+            BrVector3Sub(&tv, &c->pos, &old_camera_pos);
+            tv.v[1] = 0.0f;
             if (manual_swing) {
-                DrVector3RotateY(&a, (gCamera_sign == 0 ? 1 : -1) * (gCamera_yaw - gOld_yaw__car));
+                DrVector3RotateY(&tv, (gCamera_sign == 0 ? 1 : -1) * (gCamera_yaw - gOld_yaw__car));
                 gCamera_yaw = gOld_yaw__car;
             }
-            BrVector3Normalise(&vn, &a);
+            BrVector3Normalise(&vn, &tv);
             BrVector3Copy(&gView_direction, &vn);
-            BrVector3Scale(&vn, &vn, -d);
-            BrVector3Accumulate(&a, &vn);
-            dist = BrVector3Length(&a);
-            l = (float)pTime / 1000.0f * (dist + 1.0f) / dist;
-            if (l < 1.0f && BrVector3Dot(&a, &vn) > 0.0f) {
-                BrVector3Scale(&a, &a, (l - 1.f));
-                BrVector3Accumulate(&vn, &a);
+            BrVector3Scale(&vn, &vn, -dist);
+            BrVector3Accumulate(&tv, &vn);
+            ts2 = BrVector3Length(&tv);
+            ts = (ts2 + 1.0f) * ((float)pTime / 1000.0f);
+            ts /= ts2;
+            if (ts < 1.0f && BrVector3Dot(&tv, &vn) > 0.0f) {
+                BrVector3Scale(&tv, &tv, (ts - 1.f));
+                BrVector3Accumulate(&vn, &tv);
             }
-            BrVector3Add(&gCamera->t.t.translate.t, &c->pos, &vn);
+            BrVector3Add((br_vector3*)m2->m[3], &c->pos, &vn);
         }
         height_inc = gCamera_zoom * gCamera_zoom + 0.3f;
         time = pTime * 0.001f;
@@ -5567,25 +5580,25 @@ void NormalPositionExternalCamera(tCar_spec* c, tU32 pTime) {
                     gCamera_height = c->pos.v[1];
                 }
             } else {
-                gCamera_height = time * 5.0f * c->pos.v[1] + gCamera_height;
+                gCamera_height += c->pos.v[1] * (time * 5.0f);
                 gCamera_height = gCamera_height / (time * 5.0f + 1.0f);
             }
         }
-        l = c->direction.v[1] * d;
-        if (l > 0) {
-            if (c->pos.v[1] - l - height_inc / 2.0f > gCamera_height) {
-                gCamera_height = c->pos.v[1] - l - height_inc / 2.0f;
+        ts = c->direction.v[1] * dist;
+        if (ts > 0) {
+            if (c->pos.v[1] - ts - height_inc / 2.0f > gCamera_height) {
+                gCamera_height = c->pos.v[1] - ts - height_inc / 2.0f;
             }
         }
 
-        gCamera->t.t.translate.t.v[1] = height_inc + gCamera_height;
-        BrVector3Copy(&gCamera_pos_before_collide, &gCamera->t.t.translate.t);
-        CollideCameraWithOtherCars(&c->pos, &gCamera->t.t.translate.t);
-        CollideCamera2(&c->pos, &gCamera->t.t.translate.t, &old_camera_pos, manual_swing || manual_zoom);
+        m2->m[3][1] = height_inc + gCamera_height;
+        BrVector3Copy(&gCamera_pos_before_collide, (br_vector3*)m2->m[3]);
+        CollideCameraWithOtherCars(&c->pos, (br_vector3*)m2->m[3]);
+        CollideCamera2(&c->pos, (br_vector3*)m2->m[3], &old_camera_pos, manual_swing || manual_zoom);
         if (gCamera_has_collided && swoop) {
             gCamera_height = c->pos.v[1];
         }
-        PointCameraAtCar(c, m2, m1);
+        PointCameraAtCar(c, m1, m2);
     }
     gOld_yaw__car = gCamera_yaw;
     gOld_zoom = (br_angle)gCamera_zoom;
@@ -5644,64 +5657,57 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     // GLOBAL: CARM95 0x514e90
     static br_vector3 old_vn;
 
-    br_scalar v16, v17;
-    br_angle v8;
-
     manual_swing = gOld_yaw__car != gCamera_yaw;
     if (elapsed_time > 500) {
         elapsed_time = -1;
     }
     if (elapsed_time >= 0) {
-        elapsed_time += pTime;
+        elapsed_time += (int)pTime;
     }
-    sign = -BrVector3Dot((br_vector3*)m1->m[2], vn);
-    ts = BrVector3Dot(vn, &old_vn);
+    ts = -BrVector3Dot((br_vector3*)m1->m[2], vn);
+    sign = BrVector3Dot(vn, &old_vn);
 
     BrVector3Copy(&old_vn, vn);
-    if ((sign < 0.0f) == gCamera_sign) {
-        elapsed_time = -1;
-    } else if (ts <= 0.0 || elapsed_time >= 0) {
-        if (elapsed_time < 0) {
-            elapsed_time = 0;
-        }
-        if (elapsed_time < 500 && sign <= 0.0f) {
-            BrVector3Negate(vn, vn);
-        } else {
-            elapsed_time = 500;
-            if (sign <= 0.0) {
-                ts = 0.0006f;
+    if ((ts < 0.0f) != gCamera_sign) {
+        if (sign > 0.0f && elapsed_time < 0) {
+            gCamera_sign = gCamera_sign == 0;
+            if (gCamera_yaw > BR_ANGLE_DEG(180)) {
+                yaw = gCamera_yaw - BR_ANGLE_DEG(180);
             } else {
-                ts = 0.0001f;
+                yaw = gCamera_yaw;
             }
-            if (fabs(c->speedo_speed) <= ts || gCar_flying) {
-                BrVector3Negate(vn, vn);
-            } else {
-                gCamera_sign = gCamera_sign == 0;
-                omega = BrDegreeToAngle(pTime * 0.03f);
-                if (gCamera_yaw <= 32760) {
-                    yaw = gCamera_yaw;
-                } else {
-                    yaw = gCamera_yaw - 32760;
-                }
-                if ((gCamera_yaw + 16380) <= 32760) {
-                    if (yaw > 8190 && yaw < 24570) {
-                        gCamera_yaw = 32760 - gCamera_yaw;
+            if (yaw > BR_ANGLE_DEG(45) && yaw < BR_ANGLE_DEG(135)) {
+                gCamera_yaw = -gCamera_yaw;
+            }
+        } else {
+            if (elapsed_time < 0) {
+                elapsed_time = 0;
+            }
+            if (elapsed_time >= 500 || ts > 0.0f) {
+                elapsed_time = 500;
+                if (fabs(c->speedo_speed) > (ts <= 0.0f ? 0.0006 : 0.0001) && !gCar_flying) {
+                    gCamera_sign = gCamera_sign == 0;
+                    omega = BrDegreeToAngle((int)pTime * 0.03);
+                    if (gCamera_yaw > BR_ANGLE_DEG(180)) {
+                        yaw = gCamera_yaw - BR_ANGLE_DEG(180);
+                    } else {
+                        yaw = gCamera_yaw;
+                    }
+                    theta = gCamera_yaw + BR_ANGLE_DEG(90);
+                    if (theta > BR_ANGLE_DEG(180)) {
+                        gCamera_yaw = BR_ANGLE_DEG(180) - gCamera_yaw;
+                    } else if (yaw > BR_ANGLE_DEG(45) && yaw < BR_ANGLE_DEG(135)) {
+                        gCamera_yaw = BR_ANGLE_DEG(180) - gCamera_yaw;
                     }
                 } else {
-                    gCamera_yaw = 32760 - gCamera_yaw;
+                    BrVector3Negate(vn, vn);
                 }
+            } else {
+                BrVector3Negate(vn, vn);
             }
         }
     } else {
-        gCamera_sign = gCamera_sign == 0;
-        if (gCamera_yaw <= 32760) {
-            yaw = gCamera_yaw;
-        } else {
-            yaw = gCamera_yaw - 32760;
-        }
-        if (yaw > 8190 && yaw < 24570) {
-            gCamera_yaw = -gCamera_yaw;
-        }
+        elapsed_time = -1;
     }
     if (gCamera_sign) {
         yaw = -gCamera_yaw;
@@ -5711,43 +5717,41 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     if (!gCar_flying) {
         DrVector3RotateY(vn, yaw);
     }
-    sin_dtheta = 0.0;
-    v16 = vn->v[0] * gView_direction.v[2] - vn->v[2] * gView_direction.v[0];
-    v17 = vn->v[0] * gView_direction.v[0] + vn->v[2] * gView_direction.v[2];
+    ts = 0.0;
+    sin_dtheta = gView_direction.v[2] * vn->v[0] - gView_direction.v[0] * vn->v[2];
+    cos_dtheta = (double)(vn->v[0] * gView_direction.v[0]) + vn->v[2] * gView_direction.v[2];
 
-    v8 = BrRadianToAngle(sqrt(c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0] + c->omega.v[1] * c->omega.v[1]) * pTime / 1000.0);
-    sin_dtheta = sin(BrAngleToRadian(v8)) + 0.1;
-
-    if (omega || gCamera_reset || (c->speed < 0.0001f && !manual_swing) || gCamera_mode == -1 || (v17 > 0.0 && !manual_swing && fabs(v16) > sin_dtheta)) {
+    if (omega || gCamera_reset || (c->speed < 0.0001f && !manual_swing) || gCamera_mode == -1
+        || (cos_dtheta > 0.0f && !manual_swing
+            && (ts = (br_scalar)sin(BrAngleToRadian(BrRadianToAngle(BrVector3Length(&c->omega) * pTime / 1000.0f))) + 0.1f, 1)
+            && fabs(sin_dtheta) > ts)) {
         if (!gCar_flying) {
-            theta = BrRadianToAngle(asin(sin_dtheta));
-            if (omega < theta) {
-                omega = theta;
+            alpha = BrRadianToAngle(asin(ts));
+            if (omega < alpha) {
+                omega = alpha;
             }
             if (!omega) {
-                omega = BrDegreeToAngle(pTime * 0.03); // (__int64)((double)(int)pTime * 0.03 * 182.0444444444445);
+                omega = BrDegreeToAngle((int)pTime * 0.03); // (__int64)((double)(int)pTime * 0.03 * 182.0444444444445);
             }
-            cos_dtheta = cos(BrAngleToRadian(omega));
-            if (cos_dtheta <= v17) {
-                omega = 0;
-                gCamera_mode = 0;
-            } else {
-                ts = BrAngleToRadian(omega);
-                if (v16 <= 0.0) {
-                    vn->v[0] = cos(ts) * gView_direction.v[0] - sin(ts) * gView_direction.v[2];
-                    vn->v[2] = sin(ts) * gView_direction.v[0] + cos(ts) * gView_direction.v[2];
+            if (cos(BrAngleToRadian(omega)) > cos_dtheta) {
+                if (sin_dtheta > 0.0f) {
+                    vn->v[0] = cos(BrAngleToRadian(omega)) * gView_direction.v[0] + sin(BrAngleToRadian(omega)) * gView_direction.v[2];
+                    vn->v[2] = cos(BrAngleToRadian(omega)) * gView_direction.v[2] - sin(BrAngleToRadian(omega)) * gView_direction.v[0];
                 } else {
-                    vn->v[0] = sin(ts) * gView_direction.v[2] + cos(ts) * gView_direction.v[0];
-                    vn->v[2] = cos(ts) * gView_direction.v[2] - sin(ts) * gView_direction.v[0];
+                    vn->v[0] = cos(BrAngleToRadian(omega)) * gView_direction.v[0] - sin(BrAngleToRadian(omega)) * gView_direction.v[2];
+                    vn->v[2] = (br_scalar)(sin(BrAngleToRadian(omega)) * gView_direction.v[0]) + cos(BrAngleToRadian(omega)) * gView_direction.v[2];
                 }
-                omega += BrDegreeToAngle(pTime * 0.03f);
-                if (BrDegreeToAngle(pTime * 0.1f) < omega) {
-                    omega = BrDegreeToAngle(pTime * 0.1f);
+                omega += BrDegreeToAngle((int)pTime * 0.03);
+                if (BrDegreeToAngle((int)pTime * 0.1) < omega) {
+                    omega = BrDegreeToAngle((int)pTime * 0.1);
                 }
-                if (omega < theta) {
-                    omega = theta;
+                if (omega < alpha) {
+                    omega = alpha;
                 }
+                return;
             }
+            omega = 0;
+            gCamera_mode = 0;
         }
     }
 }
@@ -5765,22 +5769,22 @@ void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
     br_camera* camera_ptr;
     br_angle off_centre_angle;
     int swoop;
-    br_scalar scale;
 
     camera_ptr = gCamera->type_data;
-    theta = camera_ptr->field_of_view / 5;
+    off_centre_angle = camera_ptr->field_of_view / 5;
     swoop = gCountdown && c->pos.v[1] + 0.01f < gCamera_height;
-    if (0) {
+    if (swoop) {
         BrVector3Sub(&tv, &gAverage_grid_position, &c->pos);
         frac = (gCamera_height - c->pos.v[1]) / 10.0f;
         BrVector3Scale(&tv, &tv, frac);
         BrVector3Accumulate(&tv, &c->pos);
         pos = &tv;
-        theta = (1.0f - frac) * (float)theta;
+        off_centre_angle = (1.0f - frac) * (float)off_centre_angle;
     } else {
         pos = &c->pos;
     }
-    BrVector3Set(&vn, c->pos.v[0] - m2->m[3][0], 0.f, c->pos.v[2] - m2->m[3][2]);
+    BrVector3Sub(&vn, &c->pos, (br_vector3*)m2->m[3]);
+    vn.v[1] = 0.f;
     BrVector3Normalise(&vn, &vn);
     m2->m[0][0] = -vn.v[2];
     m2->m[0][1] = 0.0f;
@@ -5793,7 +5797,8 @@ void PointCameraAtCar(tCar_spec* c, br_matrix34* m1, br_matrix34* m2) {
     m2->m[2][2] = -vn.v[2];
     BrVector3Sub(&tv2, pos, (br_vector3*)m2->m[3]);
     dist = BrVector3Dot(&tv2, &vn);
-    BrMatrix34PreRotateX(m2, theta - BrRadianToAngle(atan2(m2->m[3][1] - pos->v[1], dist)));
+    theta = -BrRadianToAngle(atan2(m2->m[3][1] - pos->v[1], dist)) + off_centre_angle;
+    BrMatrix34PreRotateX(m2, theta);
 }
 
 // IDA: void __usercall PointCamera(br_vector3 *pos@<EAX>, br_matrix34 *m2@<EDX>)
@@ -5854,98 +5859,94 @@ int CollideCamera2(br_vector3* car_pos, br_vector3* cam_pos, br_vector3* old_cam
     hither = ((br_camera*)gCamera->type_data)->hither_z * 3.0f;
     gCamera_has_collided = 0;
     for (i = 0; i < 1; i++) {
-        BrVector3Sub(&tv, cam_pos, car_pos);
-        dist = BrVector3Length(&tv);
-        BrVector3Scale(&tv, &tv, 1.2f);
-        FindFace(car_pos, &tv, &a, &ts, &material);
-        if (ts <= 1.0) {
+        BrVector3Sub(&b, cam_pos, car_pos);
+        l = BrVector3Length(&b);
+        BrVector3Scale(&b, &b, 1.2f);
+        FindFace(car_pos, &b, &vn, &d, &material);
+        if (d <= 1.0f) {
             gCamera_has_collided = 1;
-            if (BrVector3Dot(&a, &tv) > 0.0f) {
-                BrVector3Negate(&a, &a);
+            if (BrVector3Dot(&vn, &b) > 0.0f) {
+                BrVector3Negate(&vn, &vn);
             }
             if (gCamera_mode == 1 && !manual_move) {
-                BrVector3Sub(&tv2, car_pos, old_camera_pos);
-                FindFace(old_camera_pos, &tv2, &b, &ts2, &material);
-                if (ts2 > 1.0f) {
+                BrVector3Sub(&tv, car_pos, old_camera_pos);
+                FindFace(old_camera_pos, &tv, &tv2, &ts, &material);
+                if (ts > 1.0f) {
                     BrVector3Copy(cam_pos, old_camera_pos);
-                    return i;
+                    break;
                 }
             }
-            BrVector3Scale(&tv, &tv, ts);
-            BrVector3Scale(&tv2, &a, hither);
-            BrVector3Accumulate(&tv, &tv2);
-            dist = BrVector3Length(&tv);
-            BrVector3Add(cam_pos, car_pos, &tv);
-            if (gMin_camera_car_distance > dist && i == 0 && a.v[1] > -0.7) {
-                BrVector3Scale(&tv2, &a, -a.v[1]);
-                tv2.v[1] += 1.f;
+            BrVector3Scale(&b, &b, d);
+            BrVector3Scale(&tv, &vn, hither);
+            BrVector3Accumulate(&b, &tv);
+            l = BrVector3Length(&b);
+            BrVector3Add(cam_pos, car_pos, &b);
+            if (gMin_camera_car_distance > l && i == 0 && vn.v[1] > -0.7) {
+                BrVector3Scale(&tv, &vn, -vn.v[1]);
+                tv.v[1] += 1.f;
                 if (gProgram_state.current_car.car_master_actor->t.t.mat.m[1][1] < 0.f) {
-                    BrVector3Negate(&tv2, &tv2);
+                    BrVector3Negate(&tv, &tv);
                 }
-                d = BrVector3LengthSquared(&tv2);
-                l = BrVector3Dot(&tv2, &tv);
-                alpha = BrVector3LengthSquared(&tv) - gMin_camera_car_distance * gMin_camera_car_distance;
-                ts2 = l * l - alpha * d * 4.0;
-                if (ts2 >= 0.f && d != 0.f) {
-                    sa = (sqrt(ts2) - l) / (d * 2.0f);
-                    BrVector3Scale(&tv2, &tv2, sa);
-                    FindFace(cam_pos, &tv2, &a, &ts, &material);
-                    if (ts < 1.0f) {
-                        BrVector3Scale(&tv2, &tv2, ts);
+                sa = BrVector3LengthSquared(&tv);
+                sb = BrVector3Dot(&tv, &b);
+                sc = BrVector3LengthSquared(&b) - gMin_camera_car_distance * gMin_camera_car_distance;
+                ts = sb * sb - sc * sa * 4.0f;
+                if (ts >= 0.f && sa != 0.f) {
+                    alpha = (sqrt(ts) + -sb) / (sa * 2.0f);
+                    BrVector3Scale(&tv, &tv, alpha);
+                    FindFace(cam_pos, &tv, &vn, &d, &material);
+                    if (d < 1.0f) {
+                        BrVector3Scale(&tv, &tv, d);
                     }
-                    BrVector3Set(&b, tv.v[0], 0.f, tv.v[2]);
-                    BrVector3Normalise(&b, &b);
-                    BrVector3Accumulate(&tv, &tv2);
-                    ts2 = BrVector3Dot(&tv, &b);
-                    if (ts2 < 0.03f && !gAction_replay_mode) {
-                        BrVector3Normalise(&tv2, &tv2);
-                        alpha = BrVector3Dot(&tv2, &b);
-                        if (alpha < -0.03f) {
-                            alpha = (0.03f - ts2) / alpha;
-                            BrVector3Scale(&tv2, &tv2, alpha);
-                            BrVector3Add(&tv, &tv2, &tv);
+                    BrVector3Set(&tv2, b.v[0], 0.f, b.v[2]);
+                    BrVector3Normalise(&tv2, &tv2);
+                    BrVector3Accumulate(&b, &tv);
+                    ts = BrVector3Dot(&b, &tv2);
+                    if (ts < 0.03f && !gAction_replay_mode) {
+                        BrVector3Normalise(&tv, &tv);
+                        ts2 = BrVector3Dot(&tv, &tv2);
+                        if (ts2 < -0.03f) {
+                            ts2 = (0.03f - ts) / ts2;
+                            BrVector3Scale(&tv, &tv, ts2);
+                            BrVector3Add(&b, &tv, &b);
                         }
                     }
                 }
-                BrVector3Add(cam_pos, car_pos, &tv);
+                BrVector3Add(cam_pos, car_pos, &b);
             }
         }
 
         bnds.mat = &mat;
-        BrMatrix34Identity(&mat);
-        BrVector3Set(&tv2, hither, hither, hither);
-        bnds.original_bounds.min.v[0] = cam_pos->v[0] - hither;
-        bnds.original_bounds.min.v[1] = cam_pos->v[1] - hither;
-        bnds.original_bounds.min.v[2] = cam_pos->v[2] - hither;
-        bnds.original_bounds.max.v[0] = cam_pos->v[0] + hither;
-        bnds.original_bounds.max.v[1] = cam_pos->v[1] + hither;
-        bnds.original_bounds.max.v[2] = cam_pos->v[2] + hither;
+        BrMatrix34Identity(bnds.mat);
+        BrVector3Set(&tv, hither, hither, hither);
+        BrVector3Sub(&bnds.original_bounds.min, cam_pos, &tv);
+        BrVector3Add(&bnds.original_bounds.max, cam_pos, &tv);
         k = FindFacesInBox(&bnds, face_list, 3);
         if (k > 0) {
-            BrVector3Sub(&tv2, cam_pos, &face_list[0].v[0]);
-            sa = BrVector3Dot(&face_list[0].normal, &tv2);
+            BrVector3Sub(&tv, cam_pos, &face_list[0].v[0]);
+            ts = BrVector3Dot(&face_list[0].normal, &tv);
             // ts2 = sa;
-            if (sa < hither && sa >= 0.0) {
-                BrVector3Scale(&tv2, &face_list[0].normal, hither - sa);
-                BrVector3Accumulate(cam_pos, &tv2);
+            if (ts < hither && ts >= 0.0f) {
+                BrVector3Scale(&tv, &face_list[0].normal, hither - ts);
+                BrVector3Accumulate(cam_pos, &tv);
             }
             if (k > 1) {
-                sb = BrVector3Dot(&face_list[0].normal, &face_list[1].normal);
-                if (sb > 0.95f && k > 2) {
+                ts2 = BrVector3Dot(&face_list[0].normal, &face_list[1].normal);
+                if (ts2 > 0.95f && k > 2) {
                     BrVector3Copy(&face_list[1].normal, &face_list[2].normal);
                     BrVector3Copy(&face_list[1].v[0], &face_list[2].v[0]);
-                    sb = BrVector3Dot(&face_list[0].normal, &face_list[2].normal);
+                    ts2 = BrVector3Dot(&face_list[1].normal, &face_list[0].normal);
                     k = 2;
                 }
-                if (sb <= 0.95f) {
-                    BrVector3Sub(&tv2, cam_pos, &face_list[1].v[0]);
-                    sc = BrVector3Dot(&face_list[1].normal, &tv2);
-                    if (sc < hither && sc >= 0.0) {
-                        sc = BrVector3Dot(&face_list[0].normal, &face_list[1].normal);
-                        BrVector3Scale(&b, &face_list[0].normal, sc);
-                        BrVector3Sub(&face_list[1].normal, &face_list[1].normal, &b);
-                        BrVector3Scale(&tv2, &face_list[1].normal, hither - ts2);
-                        BrVector3Accumulate(cam_pos, &tv2);
+                if (ts2 <= 0.95f) {
+                    BrVector3Sub(&tv, cam_pos, &face_list[1].v[0]);
+                    ts = BrVector3Dot(&face_list[1].normal, &tv);
+                    if (ts < hither && ts >= 0.0f) {
+                        ts2 = BrVector3Dot(&face_list[0].normal, &face_list[1].normal);
+                        BrVector3Scale(&tv2, &face_list[0].normal, ts2);
+                        BrVector3Sub(&face_list[1].normal, &face_list[1].normal, &tv2);
+                        BrVector3Scale(&tv, &face_list[1].normal, hither - ts);
+                        BrVector3Accumulate(cam_pos, &tv);
                     }
                 }
             }
@@ -6213,121 +6214,174 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
     tCollision_info* car_in_middle;
     tCollision_info* car_on_wall;
 
-    collided = 0;
+    k = 0;
     for (i = 0; i < gNum_cars_and_non_cars - 1; i++) {
         car_1 = (tCollision_info*)gActive_car_list[i];
         for (j = i + 1; j < gNum_cars_and_non_cars; j++) {
             car_2 = (tCollision_info*)gActive_car_list[j];
-            if (collide_list[i].ref > 0 || collide_list[j].ref > 0) {
-                collide_list[i].ref--;
-                collide_list[j].ref--;
-                if (SimpleCarCarCollisionTest(car_1, car_2)) {
-                    if (car_1->infinite_mass == -1 && car_2->infinite_mass > 0) {
-                        if (CollideTwoCars(car_1, car_2, -1)) {
-                            if (car_2->infinite_mass >= 256 || pPass >= 4) {
-                                BringCarToAGrindingHalt(car_2);
-                            } else {
-                                car_2->infinite_mass = 0;
-                                k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                                car_2->infinite_mass = 256;
-                                if (k < 0) {
-                                    BringCarToAGrindingHalt(car_2);
-                                }
-                            }
-                            collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                            collide_list[j].car = car_1;
-                            collided++;
+            if (collide_list[i].ref <= 0 && collide_list[j].ref <= 0) {
+                continue;
+            }
+            collide_list[i].ref--;
+            collide_list[j].ref--;
+            if (!SimpleCarCarCollisionTest(car_1, car_2)) {
+                continue;
+            }
+            collided = 0;
+            if (car_1->infinite_mass == -1 && car_2->infinite_mass > 0) {
+                if (CollideTwoCars(car_1, car_2, -1)) {
+                    if (car_2->infinite_mass < 256 && pPass < 4) {
+                        car_2->infinite_mass = 0;
+                        collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                        car_2->infinite_mass = 256;
+                        if (collided < 0) {
+                            BringCarToAGrindingHalt(car_2);
                         }
-                    } else if (car_2->infinite_mass == -1 && car_1->infinite_mass > 0) {
-                        if (CollideTwoCars(car_1, car_2, -1)) {
-                            if (car_1->infinite_mass >= 256 || pPass >= 4) {
-                                BringCarToAGrindingHalt(car_1);
-                            } else {
-                                car_1->infinite_mass = 0;
-                                k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                                car_1->infinite_mass = 256;
-                                if (k < 0) {
-                                    BringCarToAGrindingHalt(car_1);
-                                }
-                            }
+                    } else {
+                        BringCarToAGrindingHalt(car_2);
+                    }
+                    collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                    collide_list[j].car = car_1;
+                    k++;
+                }
+            } else if (car_2->infinite_mass == -1 && car_1->infinite_mass > 0) {
+                if (CollideTwoCars(car_1, car_2, -1)) {
+                    if (car_1->infinite_mass < 256 && pPass < 4) {
+                        car_1->infinite_mass = 0;
+                        collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                        car_1->infinite_mass = 256;
+                        if (collided < 0) {
+                            BringCarToAGrindingHalt(car_1);
+                        }
+                    } else {
+                        BringCarToAGrindingHalt(car_1);
+                    }
+                    collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                    collide_list[i].car = car_2;
+                    k++;
+                }
+            } else {
+                if (collide_list[i].car == NULL && collide_list[j].car == NULL) {
+                    collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                    if (collided) {
+                        collide_list[i].car = car_2;
+                        collide_list[j].car = car_1;
+                        collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                        collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                        if (collided == -1) {
+                            BringCarToAGrindingHalt(car_1);
+                            BringCarToAGrindingHalt(car_2);
                             collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                            collide_list[i].car = car_2;
-                            collided++;
+                            collide_list[j].ref = gNum_cars_and_non_cars - 2;
                         }
-                    } else if (collide_list[i].car || collide_list[j].car) {
-                        if ((collide_list[j].car == NULL) == (collide_list[i].car == NULL)) {
-                            if (collide_list[j].car != collide_list[i].car || (car_1->infinite_mass && car_2->infinite_mass)) {
-                                if (collide_list[i].car && collide_list[j].car) {
-                                    if (car_1->infinite_mass && car_2->infinite_mass) {
-                                        if ((car_1->infinite_mass != -1 || car_2->infinite_mass != -1) && CollideTwoCars(car_1, car_2, -1)) {
-                                            collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                                            collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                            if (car_1->infinite_mass && car_2->infinite_mass) {
-                                                BringCarToAGrindingHalt(car_1);
-                                                BringCarToAGrindingHalt(car_2);
-                                            } else {
-                                                k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                                                if (k >= 0) {
-                                                    if (k) {
-                                                        if (car_1->infinite_mass >= 0) {
-                                                            car_1->infinite_mass++;
-                                                        }
-                                                        if (car_2->infinite_mass >= 0) {
-                                                            car_2->infinite_mass++;
-                                                        }
-                                                        collided++;
-                                                    }
-                                                } else {
-                                                    BringCarToAGrindingHalt(car_1);
-                                                    BringCarToAGrindingHalt(car_2);
-                                                    collided++;
-                                                }
-                                            }
-                                            collided++;
-                                        }
-                                    } else {
-                                        c1im = car_1->infinite_mass;
-                                        c2im = car_2->infinite_mass;
-                                        k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                                        if (k > -1) {
-                                            if (k) {
-                                                if (!c2im) {
-                                                    collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                                }
-                                                if (!c1im) {
-                                                    collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                                                }
-                                                collided++;
-                                                if (car_1->infinite_mass >= 0) {
-                                                    car_1->infinite_mass++;
-                                                }
-                                                if (car_2->infinite_mass >= 0) {
-                                                    car_2->infinite_mass++;
-                                                }
-                                            }
-                                        } else {
-                                            BringCarToAGrindingHalt(car_1);
-                                            BringCarToAGrindingHalt(car_2);
-                                            if (c1im >= 0) {
-                                                collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                                            }
-                                            if (c2im >= 0) {
-                                                collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                            }
-                                            collided++;
-                                        }
-                                    }
-                                }
+                        k++;
+                    }
+                } else if ((collide_list[j].car == NULL) != (collide_list[i].car == NULL)) {
+                    c1im = car_1->infinite_mass;
+                    c2im = car_2->infinite_mass;
+                    collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                    if (collided == -1) {
+                        if (collide_list[i].car) {
+                            car_3 = collide_list[i].car;
+                        } else {
+                            car_3 = collide_list[j].car;
+                        }
+                        if (collide_list[i].car) {
+                            car_in_middle = car_1;
+                        } else {
+                            car_in_middle = car_2;
+                        }
+                        if (car_3->infinite_mass > 1 || car_3->infinite_mass == -1 || (car_in_middle->infinite_mass & 0xffu) > 1u || car_in_middle->infinite_mass == -1) {
+                            BringCarToAGrindingHalt(car_1);
+                            BringCarToAGrindingHalt(car_2);
+                            collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                            collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                        } else {
+                            if (collide_list[i].car) {
+                                car_on_wall = car_2;
                             } else {
-                                k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                                if (k) {
-                                    collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                                    collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                    if (k == -1) {
-                                        BringCarToAGrindingHalt(car_1);
-                                        BringCarToAGrindingHalt(car_2);
+                                car_on_wall = car_1;
+                            }
+                            car_in_middle->infinite_mass = 0;
+                            car_3->infinite_mass = 0;
+                            collided = CollideTwoCarsWithWalls(car_on_wall, car_in_middle, dt);
+                            car_in_middle->infinite_mass = 2;
+                            car_on_wall->infinite_mass++;
+                            collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                            collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                            if (collided < 0) {
+                                BringCarToAGrindingHalt(car_1);
+                                BringCarToAGrindingHalt(car_2);
+                            }
+                        }
+                        collide_list[i].car = car_2;
+                        collide_list[j].car = car_1;
+                        k++;
+                    } else if (collided) {
+                        if (collide_list[i].car) {
+                            car_3 = collide_list[i].car;
+                        } else {
+                            car_3 = collide_list[j].car;
+                        }
+                        collide_list[i].car = car_2;
+                        collide_list[j].car = car_1;
+                        if (!c2im) {
+                            collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                        }
+                        if (!c1im) {
+                            collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                        }
+                        k++;
+                        if (car_1->infinite_mass >= 0) {
+                            car_1->infinite_mass++;
+                        }
+                        if (car_2->infinite_mass >= 0) {
+                            car_2->infinite_mass++;
+                        }
+                    }
+                } else {
+                    if (collide_list[j].car == collide_list[i].car && (!car_1->infinite_mass || !car_2->infinite_mass)) {
+                        collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                        if (collided) {
+                            car_3 = collide_list[i].car;
+                            collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                            collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                            if (collided == -1) {
+                                BringCarToAGrindingHalt(car_1);
+                                BringCarToAGrindingHalt(car_2);
+                            }
+                            k++;
+                            if (car_1->infinite_mass >= 0) {
+                                car_1->infinite_mass++;
+                            }
+                            if (car_2->infinite_mass >= 0) {
+                                car_2->infinite_mass++;
+                            }
+                        }
+                    } else {
+                        if (collide_list[i].car && collide_list[j].car) {
+                            if (!car_1->infinite_mass || !car_2->infinite_mass) {
+                                c1im = car_1->infinite_mass;
+                                c2im = car_2->infinite_mass;
+                                collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                                if (collided <= -1) {
+                                    BringCarToAGrindingHalt(car_1);
+                                    BringCarToAGrindingHalt(car_2);
+                                    if (c1im >= 0) {
+                                        collide_list[i].ref = gNum_cars_and_non_cars - 2;
                                     }
-                                    collided++;
+                                    if (c2im >= 0) {
+                                        collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                                    }
+                                    k++;
+                                } else if (collided) {
+                                    if (!c2im) {
+                                        collide_list[j].ref = gNum_cars_and_non_cars - 2;
+                                    }
+                                    if (!c1im) {
+                                        collide_list[i].ref = gNum_cars_and_non_cars - 2;
+                                    }
+                                    k++;
                                     if (car_1->infinite_mass >= 0) {
                                         car_1->infinite_mass++;
                                     }
@@ -6335,88 +6389,40 @@ int CrashCarsTogetherSinglePass(br_scalar dt, int pPass, tCollison_data* collide
                                         car_2->infinite_mass++;
                                     }
                                 }
-                            }
-                        } else {
-                            c1im = car_1->infinite_mass;
-                            c2im = car_2->infinite_mass;
-                            k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                            if (k == -1) {
-                                if (collide_list[i].car) {
-                                    car_3 = collide_list[i].car;
-                                } else {
-                                    car_3 = collide_list[j].car;
-                                }
-                                if (collide_list[i].car) {
-                                    car_in_middle = car_1;
-                                } else {
-                                    car_in_middle = car_2;
-                                }
-                                if (car_3->infinite_mass > 1 || car_3->infinite_mass == -1 || (tU8)(car_in_middle->infinite_mass) > 1 || car_in_middle->infinite_mass == -1) {
-                                    BringCarToAGrindingHalt(car_1);
-                                    BringCarToAGrindingHalt(car_2);
+                            } else {
+                                if ((car_1->infinite_mass != -1 || car_2->infinite_mass != -1) && CollideTwoCars(car_1, car_2, -1)) {
                                     collide_list[i].ref = gNum_cars_and_non_cars - 2;
                                     collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                } else {
-                                    if (collide_list[i].car) {
-                                        car_on_wall = car_2;
+                                    if (!car_1->infinite_mass || !car_2->infinite_mass) {
+                                        collided = CollideTwoCarsWithWalls(car_1, car_2, dt);
+                                        if (collided < 0) {
+                                            BringCarToAGrindingHalt(car_1);
+                                            BringCarToAGrindingHalt(car_2);
+                                            k++;
+                                        } else if (collided) {
+                                            if (car_1->infinite_mass >= 0) {
+                                                car_1->infinite_mass++;
+                                            }
+                                            if (car_2->infinite_mass >= 0) {
+                                                car_2->infinite_mass++;
+                                            }
+                                            k++;
+                                        }
                                     } else {
-                                        car_on_wall = car_1;
-                                    }
-                                    car_in_middle->infinite_mass = 0;
-                                    car_3->infinite_mass = 0;
-                                    k = CollideTwoCarsWithWalls(car_on_wall, car_in_middle, dt);
-                                    car_in_middle->infinite_mass = 2;
-                                    car_on_wall->infinite_mass++;
-                                    collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                                    collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                    if (k < 0) {
                                         BringCarToAGrindingHalt(car_1);
                                         BringCarToAGrindingHalt(car_2);
                                     }
-                                }
-                                collide_list[i].car = car_2;
-                                collide_list[j].car = car_1;
-                                collided++;
-                            } else if (k) {
-                                collide_list[i].car = car_2;
-                                collide_list[j].car = car_1;
-                                if (!c2im) {
-                                    collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                                }
-                                if (!c1im) {
-                                    collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                                }
-                                collided++;
-                                if (car_1->infinite_mass >= 0) {
-                                    car_1->infinite_mass++;
-                                }
-                                if (car_2->infinite_mass >= 0) {
-                                    car_2->infinite_mass++;
+                                    k++;
                                 }
                             }
-                        }
-                    } else {
-                        k = CollideTwoCarsWithWalls(car_1, car_2, dt);
-                        if (k) {
-                            collide_list[i].car = car_2;
-                            collide_list[j].car = car_1;
-                            collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                            collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                            if (k == -1) {
-                                BringCarToAGrindingHalt(car_1);
-                                BringCarToAGrindingHalt(car_2);
-                                collide_list[i].ref = gNum_cars_and_non_cars - 2;
-                                collide_list[j].ref = gNum_cars_and_non_cars - 2;
-                            }
-                            collided++;
                         }
                     }
-                    CrashEarnings((tCar_spec*)car_1, (tCar_spec*)car_2);
                 }
             }
+            CrashEarnings((tCar_spec*)car_1, (tCar_spec*)car_2);
         }
     }
-    return collided;
+    return k;
 }
 
 // IDA: void __usercall BringCarToAGrindingHalt(tCollision_info *car@<EAX>)
@@ -6787,53 +6793,49 @@ int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_
     }
     for (i = 0; i < 4; i++) {
         if (i == 3) {
-            tp1 = pB2->min;
+            BrVector3Copy(&p1, &pB2->min);
         } else {
-            tp1 = pB2->max;
-            tp1.v[i] = pB2->min.v[i];
+            BrVector3Copy(&p1, &pB2->max);
+            p1.v[i] = pB2->min.v[i];
         }
         for (j = 0; j < 3; j++) {
-            tp2 = tp1;
-            if (pB2->max.v[j] == tp2.v[j]) {
-                tp2.v[j] = pB2->min.v[j];
+            BrVector3Copy(&p2, &p1);
+            if (pB2->max.v[j] == p2.v[j]) {
+                p2.v[j] = pB2->min.v[j];
             } else {
-                tp2.v[j] = pB2->max.v[j];
+                p2.v[j] = pB2->max.v[j];
             }
 
-            BrMatrix34ApplyP(&p1, &tp1, pM21);
-            BrMatrix34ApplyP(&p2, &tp2, pM21);
-            plane1 = LineBoxColl(&p1, &p2, pB1, &hp1);
+            BrMatrix34ApplyP(&tp1, &p1, pM21);
+            BrMatrix34ApplyP(&tp2, &p2, pM21);
+            plane1 = LineBoxColl(&tp1, &tp2, pB1, &hp1);
             if (plane1 == 0) {
                 continue;
             }
-            plane2 = LineBoxColl(&p2, &p1, pB1, &hp2);
+            plane2 = LineBoxColl(&tp2, &tp1, pB1, &hp2);
             if (plane1 == 8 || plane2 == 8 || plane2 == 0) {
                 continue;
             }
-            BrVector3Add(&p1, &hp1, &hp2);
-            BrVector3Scale(&p1, &p1, 0.5f);
-            BrMatrix34ApplyP(&tp3, &p1, pM12);
-            BrMatrix34ApplyP(&p2, &tp3, pMo21);
-            plane3 = LineBoxColl(&p2, &p1, pB1, &hp3);
+            BrVector3Add(&tp1, &hp1, &hp2);
+            BrVector3Scale(&tp1, &tp1, 0.5f);
+            BrMatrix34ApplyP(&tp3, &tp1, pM12);
+            BrMatrix34ApplyP(&tp2, &tp3, pMo21);
+            plane3 = LineBoxColl(&tp2, &tp1, pB1, &hp3);
             // if (plane3 != 8 && plane3 != 0) {
             //     goto LABEL_25;
             // }
             if (plane3 == 8 || plane3 == 0) {
-                BrVector3Sub(&tp3, &p2, &p1);
-                ts = BrVector3Length(&tp3);
-                ts = ts / 0.01f;
+                BrVector3Sub(&tp3, &tp2, &tp1);
+                ts = BrVector3Length(&tp3) / 0.01f;
                 if (ts == 0.0f) {
                     continue;
                 }
                 BrVector3InvScale(&tp3, &tp3, ts);
-                BrVector3Accumulate(&p2, &tp3);
-                plane3 = LineBoxColl(&p2, &p1, pB1, &hp3);
-                if (plane3 == 8) {
+                BrVector3Accumulate(&tp2, &tp3);
+                plane3 = LineBoxColl(&tp2, &tp1, pB1, &hp3);
+                if (plane3 == 8 || plane3 == 0) {
                     continue;
                 }
-            }
-            if (plane3 == 0) {
-                continue;
             }
 
             BrMatrix34ApplyP(&shp1, &hp1, pM12);
@@ -6842,36 +6844,51 @@ int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_
                 if (n >= pMax) {
                     return n;
                 }
-                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane2, &p2, &hp1, &hp2, 0);
+                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane2, &tp2, &hp1, &hp2, 0);
                 BrVector3Accumulate(&shp1, &shp2);
                 BrVector3Scale(&pPoint_list[2 * n + 1], &shp1, 0.5f);
-                BrVector3Sub(&p1, &hp1, &hp2);
-                BrVector3Cross(&p2, &edge, &p1);
-                BrVector3Normalise(&p2, &p2);
-                BrVector3Add(&p1, &pB1->max, &pB1->min);
-                BrVector3Scale(&p1, &p1, 0.5f);
-                BrVector3Sub(&p1, &pPoint_list[2 * n], &p1);
-                if (BrVector3Dot(&p1, &p2) > 0.0) {
-                    BrVector3Negate(&p2, &p2);
+                BrVector3Sub(&tp1, &hp1, &hp2);
+                BrVector3Cross(&tp2, &edge, &tp1);
+                BrVector3Normalise(&tp2, &tp2);
+                BrVector3Add(&tp1, &pB1->max, &pB1->min);
+                BrVector3Scale(&tp1, &tp1, 0.5f);
+                BrVector3Sub(&tp1, &pPoint_list[2 * n], &tp1);
+                if (BrVector3Dot(&tp1, &tp2) > 0.0f) {
+                    BrVector3Negate(&tp2, &tp2);
                 }
-                BrMatrix34ApplyV(&p1, &p2, pM12);
-                BrMatrix34TApplyV(&pNorm_list[2 * n], &p1, pMo12);
-                BrMatrix34TApplyV(&pNorm_list[2 * n + 1], &p2, pMo21);
+                BrMatrix34ApplyV(&tp1, &tp2, pM12);
+                BrMatrix34TApplyV(&pNorm_list[2 * n], &tp1, pMo12);
+                BrMatrix34TApplyV(&pNorm_list[2 * n + 1], &tp2, pMo21);
                 BrVector3Negate(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 1]);
                 n++;
-            } else if ((plane1 ^ plane2) == 4) {
+            } else if ((plane1 ^ plane2) != 4) {
                 if (pMax - 1 <= n) {
                     return n;
                 }
-                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &p2, &hp1, &hp2, 0);
-                GetBoundsEdge(&pPoint_list[2 * n + 2], &edge, pB1, plane2, plane3, &p2, &hp1, &hp2, 0);
-                pPoint_list[2 * n + 1] = shp1;
-                pPoint_list[2 * n + 3] = shp2;
-                BrVector3Sub(&p1, &hp1, &hp2);
-                BrMatrix34ApplyV(&p2, &p1, pM12);
-                BrMatrix34ApplyV(&p1, &p2, pMo21);
-                BrVector3Cross(&p2, &edge, &p1);
-                BrVector3Normalise(&pNorm_list[2 * n], &p2);
+                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &tp2, &hp1, &hp2, 0);
+                GetBoundsEdge(&pPoint_list[2 * n + 2], &edge, pB1, plane2, plane3, &tp2, &hp1, &hp2, 0);
+                BrMatrix34ApplyP(&pPoint_list[2 * n + 1], &hp1, pM12);
+                BrMatrix34ApplyP(&pPoint_list[2 * n + 3], &hp2, pM12);
+                GetPlaneNormal(&pNorm_list[2 * n], plane3);
+                BrMatrix34ApplyV(&pNorm_list[2 * n + 2], &pNorm_list[2 * n], pM1o1);
+                BrMatrix34ApplyV(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 2], pMo12);
+                BrVector3Copy(&pNorm_list[2 * n], &pNorm_list[2 * n + 2]);
+                BrVector3Negate(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 1]);
+                BrVector3Copy(&pNorm_list[2 * n + 3], &pNorm_list[2 * n + 1]);
+                n += 2;
+            } else {
+                if (pMax - 1 <= n) {
+                    return n;
+                }
+                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &tp2, &hp1, &hp2, 0);
+                GetBoundsEdge(&pPoint_list[2 * n + 2], &edge, pB1, plane2, plane3, &tp2, &hp1, &hp2, 0);
+                BrVector3Copy(&pPoint_list[2 * n + 1], &shp1);
+                BrVector3Copy(&pPoint_list[2 * n + 3], &shp2);
+                BrVector3Sub(&tp1, &hp1, &hp2);
+                BrMatrix34ApplyV(&tp2, &tp1, pM12);
+                BrMatrix34ApplyV(&tp1, &tp2, pMo21);
+                BrVector3Cross(&tp2, &edge, &tp1);
+                BrVector3Normalise(&pNorm_list[2 * n], &tp2);
                 GetPlaneNormal(&edge, plane3);
                 if (BrVector3Dot(&pNorm_list[2 * n], &edge) < 0.0f) {
                     BrVector3Negate(&pNorm_list[2 * n], &pNorm_list[2 * n]);
@@ -6880,23 +6897,8 @@ int GetEdgeEdgeCollisions(br_bounds* pB1, br_bounds* pB2, br_matrix34* pM21, br_
                 BrVector3Negate(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 1]);
                 BrMatrix34ApplyV(&tp3, &pNorm_list[2 * n], pM12);
                 BrMatrix34ApplyV(&pNorm_list[2 * n], &tp3, pMo21);
-                pNorm_list[2 * n + 2] = pNorm_list[2 * n];
-                pNorm_list[2 * n + 3] = pNorm_list[2 * n + 1];
-                n += 2;
-            } else {
-                if (pMax - 1 <= n) {
-                    return n;
-                }
-                GetBoundsEdge(&pPoint_list[2 * n], &edge, pB1, plane1, plane3, &p2, &hp1, &hp2, 0);
-                GetBoundsEdge(&pPoint_list[2 * n + 2], &edge, pB1, plane2, plane3, &p2, &hp1, &hp2, 0);
-                BrMatrix34ApplyP(&pPoint_list[2 * n + 1], &hp1, pM12);
-                BrMatrix34ApplyP(&pPoint_list[2 * n + 3], &hp2, pM12);
-                GetPlaneNormal(&pNorm_list[2 * n], plane3);
-                BrMatrix34ApplyV(&pNorm_list[2 * n + 2], &pNorm_list[2 * n], pM1o1);
-                BrMatrix34ApplyV(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 2], pMo12);
-                pNorm_list[2 * n] = pNorm_list[2 * n + 2];
-                BrVector3Negate(&pNorm_list[2 * n + 1], &pNorm_list[2 * n + 1]);
-                pNorm_list[2 * n + 3] = pNorm_list[2 * n + 1];
+                BrVector3Copy(&pNorm_list[2 * n + 2], &pNorm_list[2 * n]);
+                BrVector3Copy(&pNorm_list[2 * n + 3], &pNorm_list[2 * n + 1]);
                 n += 2;
             }
         }
