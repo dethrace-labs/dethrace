@@ -3308,7 +3308,6 @@ void FunkThoseTronics(void) {
                     if (!gAction_replay_mode || !ReplayIsPaused() || the_funk->matrix_mode == eMove_controlled || the_funk->matrix_mode == eMove_absolute) {
                         switch (the_funk->matrix_mod_type) {
                         case eMatrix_mod_spin:
-
                             BrMatrix23Identity(mat_matrix);
                             mat_matrix->m[2][0] -= .5f;
                             mat_matrix->m[2][1] -= .5f;
@@ -3372,7 +3371,7 @@ void FunkThoseTronics(void) {
                                                                                                                                                                                                                                                                       : (the_funk->matrix_mod_data.roll_info.y_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.roll_info.y_period) / the_funk->matrix_mod_data.roll_info.y_period) * 360)) * 1.0 : 0.f))))));
                             break;
 
-                            DETHRACE_FIX_BUGS;
+                            DETHRACE_DEFAULT_BREAK;
                         }
                         if (the_funk->matrix_mod_type != eMatrix_mod_none) {
                             BrMaterialUpdate(the_funk->material, BR_MATU_MAP_TRANSFORM);
