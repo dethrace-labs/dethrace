@@ -1562,6 +1562,7 @@ void CheckOtherRacingKeys(void) {
     // GLOBAL: CARM95 0x51cf4c
     static int stopped_repairing;
 
+    flip_up_flag = 0;
     car = GetCarSpec(eVehicle_self, 0);
     CheckMapRenderMove();
     CheckHorns();
@@ -1579,36 +1580,37 @@ void CheckOtherRacingKeys(void) {
         gLast_repair_time = GetTotalTime();
         gRepair_last_time = 1;
         if (!NeedToExpandBoundingBox) {
-            if (gFree_repairs
-                || gNet_mode == eNet_mode_none
-                || gProgram_state.credits_earned - gProgram_state.credits_lost >= 1) {
+            if (!gFree_repairs
+                && gNet_mode != eNet_mode_none
+                && gProgram_state.credits_earned - gProgram_state.credits_lost < 1) {
+                if (!stopped_repairing) {
+                    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_CANNOT_AFFORD_TO_REPAIR));
+                }
+                gAuto_repair = 0;
+                stopped_repairing = 1;
+            } else {
                 bodywork_repair_amount = RepairCar(gProgram_state.current_car.car_ID, gFrame_period, &amount);
                 NeedToExpandBoundingBox = bodywork_repair_amount > 0;
                 cost = 0;
-                for (j = 0; j < COUNT_OF(gProgram_state.current_car.damage_units); j++) {
-                    old_level = gProgram_state.current_car.damage_units[j].damage_level;
-                    if (amount == 0.0f) {
+                for (i = 0; i < COUNT_OF(gProgram_state.current_car.damage_units); i++) {
+                    old_level = gProgram_state.current_car.damage_units[i].damage_level;
+                    if (amount != 0.0f) {
+                        new_level = ((double)gProgram_state.current_car.damage_units[i].damage_level
+                            - floor(bodywork_repair_amount / amount * (double)gProgram_state.current_car.damage_units[i].damage_level));
+                    } else {
                         new_level = 0;
-                    } else {
-                        new_level = ((double)gProgram_state.current_car.damage_units[j].damage_level
-                            - floor(bodywork_repair_amount / amount * (double)gProgram_state.current_car.damage_units[j].damage_level));
                     }
-                    if (new_level >= 0) {
-                        if (new_level < 100) {
-                            gProgram_state.current_car.damage_units[j].damage_level = new_level;
-                        } else {
-                            gProgram_state.current_car.damage_units[j].damage_level = 99;
-                        }
+                    if (new_level < 0) {
+                        gProgram_state.current_car.damage_units[i].damage_level = 0;
+                    } else if (new_level >= 100) {
+                        gProgram_state.current_car.damage_units[i].damage_level = 99;
                     } else {
-                        gProgram_state.current_car.damage_units[j].damage_level = 0;
+                        gProgram_state.current_car.damage_units[i].damage_level = new_level;
                     }
-                    gProgram_state.current_car.damage_units[j].smoke_last_level = gProgram_state.current_car.damage_units[j].damage_level;
-                    if (gNet_mode) {
-                        ts = gNet_repair_cost[gCurrent_net_game->type];
-                    } else {
-                        ts = gRepair_cost[gProgram_state.skill_level];
-                    }
-                    cost = (old_level - gProgram_state.current_car.damage_units[j].damage_level) * ts + cost;
+                    gProgram_state.current_car.damage_units[i].smoke_last_level = gProgram_state.current_car.damage_units[i].damage_level;
+                    cost = (old_level - gProgram_state.current_car.damage_units[i].damage_level)
+                            * (gNet_mode ? gNet_repair_cost[gCurrent_net_game->type] : gRepair_cost[gProgram_state.skill_level])
+                        + cost;
                     total_difference += old_level - new_level;
                 }
                 if (!gFree_repairs) {
@@ -1622,7 +1624,7 @@ void CheckOtherRacingKeys(void) {
                 if (gProgram_state.current_car.num_smoke_columns) {
                     StopCarSmoking(&gProgram_state.current_car);
                 }
-                if (!cost && bodywork_repair_amount == 0.0) {
+                if (!cost && bodywork_repair_amount == 0.0f) {
                     gAuto_repair = 0;
                 }
                 if (!gFree_repairs) {
@@ -1637,12 +1639,6 @@ void CheckOtherRacingKeys(void) {
                         NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, s);
                     }
                 }
-            } else {
-                if (!stopped_repairing) {
-                    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_CANNOT_AFFORD_TO_REPAIR));
-                }
-                gAuto_repair = 0;
-                stopped_repairing = 1;
             }
         }
 
@@ -1652,8 +1648,12 @@ void CheckOtherRacingKeys(void) {
         total_repair_cost = 0;
         total_difference = 0;
         if (sound_tag) {
-            for (i = 0; i < 10 && S3SoundStillPlaying(sound_tag); ++i) {
-                DRS3StopSound(sound_tag);
+            for (i = 0; i < 10; ++i) {
+                if (S3SoundStillPlaying(sound_tag)) {
+                    DRS3StopSound(sound_tag);
+                } else {
+                    break;
+                }
             }
             sound_tag = 0;
         }
@@ -1661,36 +1661,29 @@ void CheckOtherRacingKeys(void) {
     if (NeedToExpandBoundingBox) {
         NeedToExpandBoundingBox = ExpandBoundingBox(&gProgram_state.current_car) == 0;
     }
-    if (!gRecover_car || gProgram_state.current_car.knackered) {
+    if (gRecover_car && !gProgram_state.current_car.knackered) {
+        if (CheckRecoverCost()) {
+            gRecover_timer = 0;
+            SetFlipUpCar(car);
+            if (gNet_mode != eNet_mode_none) {
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, " ");
+            }
+            if (gRecovery_voucher_count != 0) {
+                gRecovery_voucher_count--;
+                sprintf(s, "%s", GetMiscString(kMiscString_RecoveringForFree));
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, s);
+            } else {
+                SpendCredits(gNet_mode ? gNet_recovery_cost[gCurrent_net_game->type] : gRecovery_cost[gProgram_state.skill_level]);
+                sprintf(s, "%s %d", GetMiscString(kMiscString_RecoveryCostColon),
+                    (int)(gNet_mode ? gNet_recovery_cost[gCurrent_net_game->type] : gRecovery_cost[gProgram_state.skill_level]));
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, s);
+                LoseSomePSPowerups(2);
+            }
+            CancelPendingCunningStunt();
+            PipeSingleSpecial(ePipe_special_fade);
+        }
+    } else {
         gHad_auto_recover = 0;
-    } else if (CheckRecoverCost()) {
-        gRecover_timer = 0;
-        SetFlipUpCar(car);
-        if (gNet_mode != eNet_mode_none) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, " ");
-        }
-        if (gRecovery_voucher_count != 0) {
-            gRecovery_voucher_count--;
-            sprintf(s, "%s", GetMiscString(kMiscString_RecoveringForFree));
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, s);
-        } else {
-            if (gNet_mode) {
-                cost = gNet_recovery_cost[gCurrent_net_game->type];
-            } else {
-                cost = gRecovery_cost[gProgram_state.skill_level];
-            }
-            SpendCredits(cost);
-            if (gNet_mode) {
-                cost = gNet_recovery_cost[gCurrent_net_game->type];
-            } else {
-                cost = gRecovery_cost[gProgram_state.skill_level];
-            }
-            sprintf(s, "%s %d", GetMiscString(kMiscString_RecoveryCostColon), cost);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, s);
-            LoseSomePSPowerups(2);
-        }
-        CancelPendingCunningStunt();
-        PipeSingleSpecial(ePipe_special_fade);
     }
     gRecover_car = 0;
 }
