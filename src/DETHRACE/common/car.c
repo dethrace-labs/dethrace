@@ -2189,7 +2189,7 @@ void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scala
 // FUNCTION: CARM95 0x0047ba5d
 void CalcForce(tCar_spec* c, br_scalar dt) {
     int n;
-    int normnum = 0;
+    int normnum;
     int i;
     int x;
     int y;
@@ -2217,8 +2217,8 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     br_vector3 v_batwick;
     br_vector3 vplane;
     br_vector3 rightplane;
-    br_vector3 t = BR_VECTOR3(0, 0, 0);
-    br_vector3 f = BR_VECTOR3(0, 0, 0);
+    br_vector3 t;
+    br_vector3 f;
     br_vector3 ff;
     br_vector3 fb;
     br_scalar ffi;
@@ -2233,16 +2233,26 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     br_scalar fr_oil_factor;
     br_scalar rl_oil_factor;
     br_scalar rr_oil_factor;
-    br_matrix34* mat = &c->car_master_actor->t.t.mat;
-    tMaterial_modifiers* mat_list = gCurrent_race.material_modifiers;
+    br_matrix34* mat;
+    tMaterial_modifiers* mat_list;
     // GLOBAL: CARM95 0x00514e4c
     static br_scalar stop_timer = 0.0f;
     // GLOBAL: CARM95 0x00514e50
     static br_scalar slide_dist = 0;
     tDamage_type dam;
     br_scalar v;
-    tSpecial_volume* vol = c->last_special_volume;
+    tSpecial_volume* vol;
 
+    normnum = 0;
+    t.v[0] = 0.0f;
+    t.v[1] = 0.0f;
+    t.v[2] = 0.0f;
+    f.v[0] = 0.0f;
+    f.v[1] = 0.0f;
+    f.v[2] = 0.0f;
+    mat = &c->car_master_actor->t.t.mat;
+    mat_list = gCurrent_race.material_modifiers;
+    vol = c->last_special_volume;
     b.v[0] = -mat->m[1][0];
     b.v[1] = -mat->m[1][1];
     b.v[2] = -mat->m[1][2];
@@ -2386,8 +2396,8 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         ts5 = c->wpos[0].v[2] - c->wpos[2].v[2];
         ts5 = BR_SQRT(1 + c->curvature * (c->curvature * (ts5 * ts5)));
         front_retardation = ts3 / ts5;
-        ts4 = ts2 + front_retardation;
-        if (BR_ABS(max_retardation) < BR_ABS(ts4)) {
+        ts4 = (ts2 + front_retardation);
+        if ((BR_ABS((max_retardation))) < (BR_ABS((ts4)))) {
             ts2 = ts2 * (max_retardation / ts4);
             front_retardation = front_retardation * (max_retardation / ts4);
         }
