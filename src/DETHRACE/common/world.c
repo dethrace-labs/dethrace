@@ -3721,6 +3721,8 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
         }
         pGroove->object_position = pGroove->actor->t.t.translate.t;
         break;
+
+        DETHRACE_DEFAULT_BREAK;
     }
 }
 
