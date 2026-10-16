@@ -2698,20 +2698,14 @@ void CreateSplash(tCar_spec* pCar, tU32 pTime) {
                         }
                         back_val[1] = back_val[0];
                         back_val[0] = ts;
-                        back_point[1].v[0] = back_point[0].v[0];
-                        back_point[1].v[1] = back_point[0].v[1];
-                        back_point[1].v[2] = back_point[0].v[2];
-                        back_point[0].v[0] = p.v[0];
-                        back_point[0].v[1] = p.v[1];
-                        back_point[0].v[2] = p.v[2];
+                        BrVector3Copy(&back_point[1], &back_point[0]);
+                        BrVector3Copy(&back_point[0], &p);
                     } else if (back_val[1] > ts) {
                         if (back_val[1] < 0.0f) {
                             SingleSplash(pCar, &back_point[1], &normal_car_space, pTime);
                         }
                         back_val[1] = ts;
-                        back_point[1].v[0] = p.v[0];
-                        back_point[1].v[1] = p.v[1];
-                        back_point[1].v[2] = p.v[2];
+                        BrVector3Copy(&back_point[1], &p);
                     } else {
                         SingleSplash(pCar, &p, &normal_car_space, pTime);
                     }
