@@ -3814,6 +3814,34 @@ void PathGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat
     }
 }
 
+/* Expression macros: arguments must have no side effects. Keep the distinct
+ * floating-point conversions used for angles and scalar motion. */
+#define GROOVE_ANGLE(MODE, TIME, PERIOD) \
+    BrDegreeToAngle(((MODE) == eMove_continuous \
+        ? ((PERIOD) != 0.0f ? SAW(TIME, PERIOD) * 360.0 : 0.0) \
+        : ((MODE) == eMove_controlled \
+            ? (PERIOD) * 360.0 \
+            : ((MODE) == eMove_absolute \
+                ? (PERIOD) \
+                : ((MODE) == eMove_linear \
+                    ? ((PERIOD) != 0.0f ? MapSawToTriangle(SAW(TIME, PERIOD)) * 360.0 : 0.0) \
+                    : ((MODE) == eMove_flash \
+                        ? (fmod((TIME), (PERIOD)) * 2.0 > (PERIOD) ? -360.0 : 360.0) \
+                        : ((PERIOD) != 0.0f ? sin(BrAngleToRadian(BrDegreeToAngle(SAW(TIME, PERIOD) * 360.0))) * 360.0 : 0.0)))))))
+
+#define GROOVE_FLOAT(MODE, TIME, PERIOD, AMPLITUDE) \
+    ((MODE) == eMove_continuous \
+        ? ((PERIOD) != 0.0f ? SAW(TIME, PERIOD) * (AMPLITUDE) : 0.0) \
+        : ((MODE) == eMove_controlled \
+            ? (PERIOD) * (AMPLITUDE) \
+            : ((MODE) == eMove_absolute \
+                ? (PERIOD) \
+                : ((MODE) == eMove_linear \
+                    ? ((PERIOD) != 0.0f ? MapSawToTriangle(SAW(TIME, PERIOD)) * (AMPLITUDE) : 0.0f) \
+                    : ((MODE) == eMove_flash \
+                        ? (fmod((TIME), (PERIOD)) * 2.0 > (PERIOD) ? -(AMPLITUDE) : (AMPLITUDE)) \
+                        : ((PERIOD) != 0.0f ? (br_scalar)(sin(BrAngleToRadian(BrDegreeToAngle(SAW(TIME, PERIOD) * 360.0))) * (AMPLITUDE)) : 0.0f))))))
+
 // IDA: void __usercall ObjectGrooveBastard(tGroovidelic_spec *pGroove@<EAX>, tU32 pTime@<EDX>, br_matrix34 *pMat@<EBX>, int pInterrupt_it@<ECX>)
 // FUNCTION: CARM95 0x00440abe
 void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pMat, int pInterrupt_it) {
@@ -3835,59 +3863,23 @@ void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pM
     case eGroove_object_spin:
         switch (pGroove->object_data.spin_info.axis) {
         case eGroove_axis_x:
-            DRMatrix34PostRotateX(pMat, BrDegreeToAngle((pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.spin_info.period != 0.0f ? fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period * 360.0 : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove->object_data.spin_info.period * 360.0
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.spin_info.period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.spin_info.period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period) * 360.0 : 0.0)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.spin_info.period) * 2.0 > pGroove->object_data.spin_info.period ? -360.0 : 360.0)
-                                    : (pGroove->object_data.spin_info.period != 0.0f ? sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period * 360.0))) * 360.0 : 0.0))))))));
+            DRMatrix34PostRotateX(pMat, GROOVE_ANGLE(pGroove->object_mode, pTime,
+                pGroove->object_data.spin_info.period));
             break;
         case eGroove_axis_y:
-            DRMatrix34PostRotateY(pMat, BrDegreeToAngle((pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.spin_info.period != 0.0f ? fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period * 360.0 : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove->object_data.spin_info.period * 360.0
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.spin_info.period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.spin_info.period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period) * 360.0 : 0.0)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.spin_info.period) * 2.0 > pGroove->object_data.spin_info.period ? -360.0 : 360.0)
-                                    : (pGroove->object_data.spin_info.period != 0.0f ? sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period * 360.0))) * 360.0 : 0.0))))))));
+            DRMatrix34PostRotateY(pMat, GROOVE_ANGLE(pGroove->object_mode, pTime,
+                pGroove->object_data.spin_info.period));
             break;
         case eGroove_axis_z:
-            DRMatrix34PostRotateZ(pMat, BrDegreeToAngle((pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.spin_info.period != 0.0f ? fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period * 360.0 : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove->object_data.spin_info.period * 360.0
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.spin_info.period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.spin_info.period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period) * 360.0 : 0.0)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.spin_info.period) * 2.0 > pGroove->object_data.spin_info.period ? -360.0 : 360.0)
-                                    : (pGroove->object_data.spin_info.period != 0.0f ? sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.spin_info.period) / pGroove->object_data.spin_info.period * 360.0))) * 360.0 : 0.0))))))));
+            DRMatrix34PostRotateZ(pMat, GROOVE_ANGLE(pGroove->object_mode, pTime,
+                pGroove->object_data.spin_info.period));
             break;
         }
         break;
     case eGroove_object_rock:
         rock_it = 1;
-        pos = (pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.rock_info.period != 0.0f ? fmod(pTime, pGroove->object_data.rock_info.period) / pGroove->object_data.rock_info.period * pGroove->object_data.rock_info.max_angle : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove->object_data.rock_info.period * pGroove->object_data.rock_info.max_angle
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.rock_info.period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.rock_info.period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.rock_info.period) / pGroove->object_data.rock_info.period) * pGroove->object_data.rock_info.max_angle : 0.0f)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.rock_info.period) * 2.0 > pGroove->object_data.rock_info.period ? -pGroove->object_data.rock_info.max_angle : pGroove->object_data.rock_info.max_angle)
-                                    : (pGroove->object_data.rock_info.period != 0.0f ? (br_scalar)(sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.rock_info.period) / pGroove->object_data.rock_info.period * 360.0))) * pGroove->object_data.rock_info.max_angle) : 0.0f))))));
+        pos = GROOVE_FLOAT(pGroove->object_mode, pTime,
+            pGroove->object_data.rock_info.period, pGroove->object_data.rock_info.max_angle);
 
         if (pInterrupt_it) {
             pGroove->object_resumption_value = pos;
@@ -3927,39 +3919,12 @@ void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pM
         break;
     case eGroove_object_throb:
         BrMatrix34PostScale(pMat,
-            (pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.throb_info.x_period != 0.0f ? fmod(pTime, pGroove->object_data.throb_info.x_period) / pGroove->object_data.throb_info.x_period * pGroove->object_data.throb_info.x_magnitude : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove->object_data.throb_info.x_magnitude * pGroove->object_data.throb_info.x_period
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.throb_info.x_period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.throb_info.x_period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.throb_info.x_period) / pGroove->object_data.throb_info.x_period) * pGroove->object_data.throb_info.x_magnitude : 0.0f)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.throb_info.x_period) * 2.0 > pGroove->object_data.throb_info.x_period ? -pGroove->object_data.throb_info.x_magnitude : pGroove->object_data.throb_info.x_magnitude)
-                                    : (pGroove->object_data.throb_info.x_period != 0.0f ? (br_scalar)(sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.throb_info.x_period) / pGroove->object_data.throb_info.x_period * 360.0))) * pGroove->object_data.throb_info.x_magnitude) : 0.0f)))))) + 1.0,
-            (pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.throb_info.y_period != 0.0f ? fmod(pTime, pGroove->object_data.throb_info.y_period) / pGroove->object_data.throb_info.y_period * pGroove->object_data.throb_info.y_magnitude : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove[0].object_data.throb_info.y_magnitude * pGroove->object_data.throb_info.y_period
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.throb_info.y_period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.throb_info.y_period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.throb_info.y_period) / pGroove->object_data.throb_info.y_period) * pGroove->object_data.throb_info.y_magnitude : 0.0f)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.throb_info.y_period) * 2.0 > pGroove->object_data.throb_info.y_period ? -pGroove->object_data.throb_info.y_magnitude : pGroove->object_data.throb_info.y_magnitude)
-                                    : (pGroove->object_data.throb_info.y_period != 0.0f ? (br_scalar)(sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.throb_info.y_period) / pGroove->object_data.throb_info.y_period * 360.0))) * pGroove->object_data.throb_info.y_magnitude) : 0.0f)))))) + 1.0,
-            (pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.throb_info.z_period != 0.0f ? fmod(pTime, pGroove->object_data.throb_info.z_period) / pGroove->object_data.throb_info.z_period * pGroove->object_data.throb_info.z_magnitude : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove->object_data.throb_info.z_magnitude * pGroove->object_data.throb_info.z_period
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.throb_info.z_period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.throb_info.z_period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.throb_info.z_period) / pGroove->object_data.throb_info.z_period) * pGroove->object_data.throb_info.z_magnitude : 0.0f)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.throb_info.z_period) * 2.0 > pGroove->object_data.throb_info.z_period ? -pGroove->object_data.throb_info.z_magnitude : pGroove->object_data.throb_info.z_magnitude)
-                                    : (pGroove->object_data.throb_info.z_period != 0.0f ? (br_scalar)(sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.throb_info.z_period) / pGroove->object_data.throb_info.z_period * 360.0))) * pGroove->object_data.throb_info.z_magnitude) : 0.0f)))))) + 1.0);
+            GROOVE_FLOAT(pGroove->object_mode, pTime,
+                pGroove->object_data.throb_info.x_period, pGroove->object_data.throb_info.x_magnitude) + 1.0,
+            GROOVE_FLOAT(pGroove->object_mode, pTime,
+                pGroove->object_data.throb_info.y_period, pGroove->object_data.throb_info.y_magnitude) + 1.0,
+            GROOVE_FLOAT(pGroove->object_mode, pTime,
+                pGroove->object_data.throb_info.z_period, pGroove->object_data.throb_info.z_magnitude) + 1.0);
         /* FALLTHROUGH */
     case eGroove_object_shear:
         bounds = &pGroove->actor->model->bounds;
@@ -3968,76 +3933,22 @@ void ObjectGrooveBastard(tGroovidelic_spec* pGroove, tU32 pTime, br_matrix34* pM
         z_size = bounds->max.v[2] - bounds->min.v[2];
         if (pGroove->object_data.shear_info.x_magnitude == 0.0f) {
             BrMatrix34PostShearX(pMat,
-                (pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.shear_info.y_period != 0.0f ? fmod(pTime, pGroove->object_data.shear_info.y_period) / pGroove->object_data.shear_info.y_period * pGroove->object_data.shear_info.y_magnitude : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove[0].object_data.shear_info.y_magnitude * pGroove->object_data.shear_info.y_period
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.shear_info.y_period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.shear_info.y_period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.shear_info.y_period) / pGroove->object_data.shear_info.y_period) * pGroove->object_data.shear_info.y_magnitude : 0.0f)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.shear_info.y_period) * 2.0 > pGroove->object_data.shear_info.y_period ? -pGroove->object_data.shear_info.y_magnitude : pGroove->object_data.shear_info.y_magnitude)
-                                    : (pGroove->object_data.shear_info.y_period != 0.0f ? (br_scalar)(sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.shear_info.y_period) / pGroove->object_data.shear_info.y_period * 360.0))) * pGroove->object_data.shear_info.y_magnitude) : 0.0f)))))) / y_size,
-                (pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.shear_info.z_period != 0.0f ? fmod(pTime, pGroove->object_data.shear_info.z_period) / pGroove->object_data.shear_info.z_period * pGroove->object_data.shear_info.z_magnitude : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove->object_data.shear_info.z_magnitude * pGroove->object_data.shear_info.z_period
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.shear_info.z_period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.shear_info.z_period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.shear_info.z_period) / pGroove->object_data.shear_info.z_period) * pGroove->object_data.shear_info.z_magnitude : 0.0f)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.shear_info.z_period) * 2.0 > pGroove->object_data.shear_info.z_period ? -pGroove->object_data.shear_info.z_magnitude : pGroove->object_data.shear_info.z_magnitude)
-                                    : (pGroove->object_data.shear_info.z_period != 0.0f ? (br_scalar)(sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.shear_info.z_period) / pGroove->object_data.shear_info.z_period * 360.0))) * pGroove->object_data.shear_info.z_magnitude) : 0.0f)))))) / z_size);
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.y_period, pGroove->object_data.shear_info.y_magnitude) / y_size,
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.z_period, pGroove->object_data.shear_info.z_magnitude) / z_size);
         } else if (pGroove->object_data.shear_info.y_magnitude == 0.0f) {
             BrMatrix34PostShearY(pMat,
-                (pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.shear_info.x_period != 0.0f ? fmod(pTime, pGroove->object_data.shear_info.x_period) / pGroove->object_data.shear_info.x_period * pGroove->object_data.shear_info.x_magnitude : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove->object_data.shear_info.x_magnitude * pGroove->object_data.shear_info.x_period
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.shear_info.x_period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.shear_info.x_period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.shear_info.x_period) / pGroove->object_data.shear_info.x_period) * pGroove->object_data.shear_info.x_magnitude : 0.0f)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.shear_info.x_period) * 2.0 > pGroove->object_data.shear_info.x_period ? -pGroove->object_data.shear_info.x_magnitude : pGroove->object_data.shear_info.x_magnitude)
-                                    : (pGroove->object_data.shear_info.x_period != 0.0f ? (br_scalar)(sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.shear_info.x_period) / pGroove->object_data.shear_info.x_period * 360.0))) * pGroove->object_data.shear_info.x_magnitude) : 0.0f)))))) / x_size,
-                (pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.shear_info.z_period != 0.0f ? fmod(pTime, pGroove->object_data.shear_info.z_period) / pGroove->object_data.shear_info.z_period * pGroove->object_data.shear_info.z_magnitude : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove->object_data.shear_info.z_magnitude * pGroove->object_data.shear_info.z_period
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.shear_info.z_period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.shear_info.z_period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.shear_info.z_period) / pGroove->object_data.shear_info.z_period) * pGroove->object_data.shear_info.z_magnitude : 0.0f)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.shear_info.z_period) * 2.0 > pGroove->object_data.shear_info.z_period ? -pGroove->object_data.shear_info.z_magnitude : pGroove->object_data.shear_info.z_magnitude)
-                                    : (pGroove->object_data.shear_info.z_period != 0.0f ? (br_scalar)(sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.shear_info.z_period) / pGroove->object_data.shear_info.z_period * 360.0))) * pGroove->object_data.shear_info.z_magnitude) : 0.0f)))))) / z_size);
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.x_period, pGroove->object_data.shear_info.x_magnitude) / x_size,
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.z_period, pGroove->object_data.shear_info.z_magnitude) / z_size);
         } else {
             BrMatrix34PostShearZ(pMat,
-                (pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.shear_info.x_period != 0.0f ? fmod(pTime, pGroove->object_data.shear_info.x_period) / pGroove->object_data.shear_info.x_period * pGroove->object_data.shear_info.x_magnitude : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove->object_data.shear_info.x_magnitude * pGroove->object_data.shear_info.x_period
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.shear_info.x_period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.shear_info.x_period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.shear_info.x_period) / pGroove->object_data.shear_info.x_period) * pGroove->object_data.shear_info.x_magnitude : 0.0f)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.shear_info.x_period) * 2.0 > pGroove->object_data.shear_info.x_period ? -pGroove->object_data.shear_info.x_magnitude : pGroove->object_data.shear_info.x_magnitude)
-                                    : (pGroove->object_data.shear_info.x_period != 0.0f ? (br_scalar)(sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.shear_info.x_period) / pGroove->object_data.shear_info.x_period * 360.0))) * pGroove->object_data.shear_info.x_magnitude) : 0.0f)))))) / x_size,
-                (pGroove->object_mode == eMove_continuous
-                    ? (pGroove->object_data.shear_info.y_period != 0.0f ? fmod(pTime, pGroove->object_data.shear_info.y_period) / pGroove->object_data.shear_info.y_period * pGroove->object_data.shear_info.y_magnitude : 0.0)
-                    : (pGroove->object_mode == eMove_controlled
-                        ? pGroove[0].object_data.shear_info.y_magnitude * pGroove->object_data.shear_info.y_period
-                        : (pGroove->object_mode == eMove_absolute
-                            ? pGroove->object_data.shear_info.y_period
-                            : (pGroove->object_mode == eMove_linear
-                                ? (pGroove->object_data.shear_info.y_period != 0.0f ? MapSawToTriangle(fmod(pTime, pGroove->object_data.shear_info.y_period) / pGroove->object_data.shear_info.y_period) * pGroove->object_data.shear_info.y_magnitude : 0.0f)
-                                : (pGroove->object_mode == eMove_flash
-                                    ? (fmod(pTime, pGroove->object_data.shear_info.y_period) * 2.0 > pGroove->object_data.shear_info.y_period ? -pGroove->object_data.shear_info.y_magnitude : pGroove->object_data.shear_info.y_magnitude)
-                                    : (pGroove->object_data.shear_info.y_period != 0.0f ? (br_scalar)(sin(BrAngleToRadian(BrDegreeToAngle(fmod(pTime, pGroove->object_data.shear_info.y_period) / pGroove->object_data.shear_info.y_period * 360.0))) * pGroove->object_data.shear_info.y_magnitude) : 0.0f)))))) / y_size);
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.x_period, pGroove->object_data.shear_info.x_magnitude) / x_size,
+                GROOVE_FLOAT(pGroove->object_mode, pTime,
+                    pGroove->object_data.shear_info.y_period, pGroove->object_data.shear_info.y_magnitude) / y_size);
         }
     default:
         return;
