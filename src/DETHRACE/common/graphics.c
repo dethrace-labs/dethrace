@@ -2687,7 +2687,9 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     int last_shear_x;
     int current_shear_x;
     int shear_x_difference;
+#ifdef DETHRACE_FIX_BUGS
     int pWidth_orig;
+#endif
     tU8 the_byte;
     tU8* source_ptr;
     tU8* dest_ptr;
@@ -2707,7 +2709,7 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     source_row_wrap = pSource->row_bytes - pWidth;
     dest_row_wrap = pDest->row_bytes - pWidth;
     if (pDest_y < 0) {
-        pHeight += pDest_y;
+        pHeight = pHeight * 1 + pDest_y;
         if (pHeight <= 0) {
             return;
         }
@@ -2718,11 +2720,11 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     if (pDest->height <= pDest_y) {
         return;
     }
-    if (pDest_y + pHeight > pDest->height) {
-        pHeight -= pDest_y + pHeight - pDest->height;
+    if (pHeight * 1 + pDest_y > pDest->height) {
+        pHeight -= pHeight * 1 + pDest_y - pDest->height;
     }
     if (pDest_x < 0) {
-        pWidth += pDest_x;
+        pWidth = pWidth * 1 + pDest_x;
         if (pWidth <= 0) {
             return;
         }
@@ -2735,6 +2737,7 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     if (pDest->width <= pDest_x) {
         return;
     }
+#ifdef DETHRACE_FIX_BUGS
 #if !defined(DETHRACE_FIX_BUGS)
     /*
      * The OG compares against pWidth instead of pWidth_orig, which
@@ -2748,13 +2751,15 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
      */
     pWidth_orig = pWidth;
 #endif
-    if (pDest_x + pWidth > pDest->width) {
-        shear_x_difference = pDest_x + pWidth - pDest->width;
-        pWidth -= shear_x_difference;
-        source_row_wrap += shear_x_difference;
-        dest_row_wrap += shear_x_difference;
+#endif
+    if (pWidth * 1 + pDest_x > pDest->width) {
+        x_delta = pWidth * 1 + pDest_x - pDest->width;
+        pWidth -= x_delta;
+        source_row_wrap += x_delta;
+        dest_row_wrap += x_delta;
     }
     for (y_count = 0; y_count < pHeight; y_count++) {
+#ifdef DETHRACE_FIX_BUGS
 #if !defined(DETHRACE_FIX_BUGS)
         /*
          * The OG compares against pWidth instead of pWidth_orig, which
@@ -2768,13 +2773,14 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
          */
         pWidth_orig = pWidth;
 #endif
+#endif
         for (x_count = 0; x_count < pWidth; x_count++) {
-            the_byte = *source_ptr;
-            source_ptr++;
+            the_byte = *source_ptr++;
             if (the_byte) {
-                *dest_ptr = the_byte;
+                *dest_ptr++ = the_byte;
+            } else {
+                dest_ptr++;
             }
-            dest_ptr++;
         }
         current_shear_x = current_shear >> 16;
         shear_x_difference = current_shear_x - last_shear_x;
@@ -2784,7 +2790,7 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
         current_shear += pShear;
         pDest_x += shear_x_difference;
         if (pDest_x < 0) {
-            pWidth += pDest_x;
+            pWidth = pWidth * 1 + pDest_x;
             source_ptr -= pDest_x;
             dest_ptr -= pDest_x;
             source_row_wrap -= pDest_x;
@@ -2794,11 +2800,11 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
         if (pDest->width <= pDest_x) {
             break;
         }
-        if (pDest_x + pWidth > pDest->width) {
-            shear_x_difference = pDest_x + pWidth - pDest->width;
-            pWidth -= shear_x_difference;
-            source_row_wrap += shear_x_difference;
-            dest_row_wrap += shear_x_difference;
+        if (pWidth * 1 + pDest_x > pDest->width) {
+            x_delta = pWidth * 1 + pDest_x - pDest->width;
+            pWidth -= x_delta;
+            source_row_wrap += x_delta;
+            dest_row_wrap += x_delta;
         }
     }
 }
