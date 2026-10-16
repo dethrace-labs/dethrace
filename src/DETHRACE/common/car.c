@@ -2188,25 +2188,53 @@ void DoBumpiness(tCar_spec* c, br_vector3* wheel_pos, br_vector3* norm, br_scala
 // IDA: void __usercall CalcForce(tCar_spec *c@<EAX>, br_scalar dt)
 // FUNCTION: CARM95 0x0047ba5d
 void CalcForce(tCar_spec* c, br_scalar dt) {
-    int n, normnum = 0, i, x, y;
-    br_scalar force[4], d[4], ts, ts2, ts3, ts4, ts5, ts6, deltaomega, wheelratio;
-    br_scalar modf, maxfl, maxfr, max_retardation, front_retardation, friction_number;
-    br_vector3 a, b, tv, tv2, norm[4], v_batwick;
+    int n;
+    int normnum = 0;
+    int i;
+    int x;
+    int y;
+    br_scalar force[4];
+    br_scalar d[4];
+    br_scalar ts;
+    br_scalar ts2;
+    br_scalar ts3;
+    br_scalar ts4;
+    br_scalar ts5;
+    br_scalar ts6;
+    br_scalar deltaomega;
+    br_scalar wheelratio;
+    br_scalar modf;
+    br_scalar maxfl;
+    br_scalar maxfr;
+    br_scalar max_retardation;
+    br_scalar front_retardation;
+    br_scalar friction_number;
+    br_vector3 a;
+    br_vector3 b;
+    br_vector3 tv;
+    br_vector3 tv2;
+    br_vector3 norm[4];
+    br_vector3 v_batwick;
 
-    br_vector3 vplane, rightplane;
+    br_vector3 vplane;
+    br_vector3 rightplane;
     br_vector3 t = BR_VECTOR3(0, 0, 0);
     br_vector3 f = BR_VECTOR3(0, 0, 0);
     br_vector3 ff;
     br_vector3 fb;
-    br_scalar ffi, ffk, fbi, fbk;
+    br_scalar ffi;
+    br_scalar ffk;
+    br_scalar fbi;
+    br_scalar fbk;
     br_vector3 wheel_pos[4];
-    br_scalar direction, wheel_spin_force;
+    br_scalar direction;
+    br_scalar wheel_spin_force;
     br_scalar d_damage;
 
-    br_scalar fl_oil_factor,
-        fr_oil_factor,
-        rl_oil_factor,
-        rr_oil_factor;
+    br_scalar fl_oil_factor;
+    br_scalar fr_oil_factor;
+    br_scalar rl_oil_factor;
+    br_scalar rr_oil_factor;
 
     br_matrix34* mat = &c->car_master_actor->t.t.mat;
     tMaterial_modifiers* mat_list = gCurrent_race.material_modifiers;
