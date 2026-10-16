@@ -3554,32 +3554,32 @@ int PointOutOfSight(br_vector3* pPoint, br_scalar pMax_distance) {
     }
 }
 
-/* Arguments must have no side effects. PERIOD and AMPLITUDE must be simple
- * expressions: the controlled branch leaves them unparenthesized to preserve
- * MSVC 4.2 floating-point operand order. */
-#define GROOVE_PATH_SIN_COS(TRIG, TIME, PERIOD, AMPLITUDE) \
-    ((PERIOD) != 0.0f \
-        ? (br_scalar)(TRIG(BrAngleToRadian(BrDegreeToAngle( \
-              SAW(TIME, PERIOD) * 360.0f))) * (AMPLITUDE)) \
-        : 0.0f)
+#define GROOVE_PATH_SIN_COS(TRIG, TIME, PERIOD, AMPLITUDE)      \
+    ((PERIOD) != 0.0f                                           \
+            ? (br_scalar)(TRIG(BrAngleToRadian(BrDegreeToAngle( \
+                              SAW(TIME, PERIOD) * 360.0f)))     \
+                  * (AMPLITUDE))                                \
+            : 0.0f)
 
-#define GROOVE_PATH_FLOAT(MODE, TIME, PERIOD, AMPLITUDE) \
-    ((MODE) == eMove_continuous \
-        ? ((PERIOD) != 0.0f \
-            ? SAW(TIME, PERIOD) * (AMPLITUDE) : 0.0) \
-        : ((MODE) == eMove_controlled \
-            ? PERIOD * AMPLITUDE \
-            : ((MODE) == eMove_absolute \
-                ? (PERIOD) \
-                : ((MODE) == eMove_linear \
-                    ? ((PERIOD) != 0.0f \
-                        ? MapSawToTriangle(SAW(TIME, PERIOD)) \
-                            * (AMPLITUDE) \
-                        : 0.0f) \
-                    : ((MODE) == eMove_flash \
-                        ? (fmod((TIME), (PERIOD)) * 2.0 > (PERIOD) \
-                            ? -(AMPLITUDE) : (AMPLITUDE)) \
-                        : GROOVE_PATH_SIN_COS(sin, TIME, PERIOD, AMPLITUDE))))))
+#define GROOVE_PATH_FLOAT(MODE, TIME, PERIOD, AMPLITUDE)                                       \
+    ((MODE) == eMove_continuous                                                                \
+            ? ((PERIOD) != 0.0f                                                                \
+                      ? SAW(TIME, PERIOD) * (AMPLITUDE)                                        \
+                      : 0.0)                                                                   \
+            : ((MODE) == eMove_controlled                                                      \
+                      ? PERIOD * AMPLITUDE                                                     \
+                      : ((MODE) == eMove_absolute                                              \
+                                ? (PERIOD)                                                     \
+                                : ((MODE) == eMove_linear                                      \
+                                          ? ((PERIOD) != 0.0f                                  \
+                                                    ? MapSawToTriangle(SAW(TIME, PERIOD))      \
+                                                        * (AMPLITUDE)                          \
+                                                    : 0.0f)                                    \
+                                          : ((MODE) == eMove_flash                             \
+                                                    ? (fmod((TIME), (PERIOD)) * 2.0 > (PERIOD) \
+                                                              ? -(AMPLITUDE)                   \
+                                                              : (AMPLITUDE))                   \
+                                                    : GROOVE_PATH_SIN_COS(sin, TIME, PERIOD, AMPLITUDE))))))
 
 // IDA: void __usercall PathGrooveBastard(tGroovidelic_spec *pGroove@<EAX>, tU32 pTime@<EDX>, br_matrix34 *pMat@<EBX>, int pInterrupt_it@<ECX>)
 // FUNCTION: CARM95 0x0043fb08
