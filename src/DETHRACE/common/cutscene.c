@@ -69,7 +69,8 @@ void PlaySmackerFile(char* pSmack_name) {
     int len;
     int fuck_off;
 
-    if (!gSound_override && !gCut_scene_override) {
+    if (gSound_override || gCut_scene_override) {
+    } else {
         StopMusic();
         FadePaletteDown();
         ClearEntireScreen();
@@ -82,7 +83,10 @@ void PlaySmackerFile(char* pSmack_name) {
         if (smk == NULL) {
             dr_dprintf("Unable to open smack file - attempt to load smack from CD...");
             if (GetCDPathFromPathsTxtFile(the_path)) {
-                strcat(the_path, gDir_separator);
+                len = strlen(the_path);
+                if (len != 0 && the_path[len - 1] != gDir_separator[0]) {
+                    strcat(the_path, gDir_separator);
+                }
                 strcat(the_path, "DATA");
                 PathCat(the_path, the_path, "CUTSCENE");
                 PathCat(the_path, the_path, pSmack_name);
@@ -104,8 +108,9 @@ void PlaySmackerFile(char* pSmack_name) {
                         br_colours_ptr[j] = (smack_colours_ptr[j * 3] << 16) | smack_colours_ptr[j * 3 + 2] | (smack_colours_ptr[j * 3 + 1] << 8);
                     }
 
-                    // TOOD: remove the commented-out line below when smk->NewPalette is set correctly per-frame
-                    // memset(gBack_screen->pixels, 0, gBack_screen->row_bytes * gBack_screen->height);
+#ifndef DETHRACE_FIX_BUGS
+                    memset(gBack_screen->pixels, 0, gBack_screen->row_bytes * gBack_screen->height);
+#endif
                     DRSetPalette(gCurrent_palette);
                     PDScreenBufferSwap(0);
                     EnsurePaletteUp();
