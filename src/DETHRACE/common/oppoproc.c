@@ -23,50 +23,45 @@ int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* 
     NOT_IMPLEMENTED();
 }
 
-// There appears to be two different implementations of this function in different binaries.
-// One does calculations in 2d space, this one calculates in 3d space.
+// The DOS implementation uses 3D vectors; CARM95 calculates in the XZ plane.
 // FUNCTION: CARM95 0x0049feaa
 void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3* p4, br_vector3* p5, br_vector3* p6, br_vector3* p7, br_vector3* p8, float p9, float p10) {
-    br_vector3 rel1;
-    br_vector3 rel3;
+    br_scalar rel1; // z23, then dot product and cosine.
+    br_scalar dz12;
+    br_scalar tmp1;
+    br_scalar rel3; // x23, then cross product and absolute sine.
     br_vector3 rot1;
-    br_scalar tmp;
+    br_scalar tmp; // Tangent of half the corner angle.
     br_scalar tmp2;
-    br_scalar tmp3;
+    br_scalar tmp3; // x12.
     br_scalar tmp4;
 
-    #if 0
-    BrVector3Sub(&rel1, p6, p5);
-    BrVector3Sub(&rel3, p4, p5);
-    #endif
-    rel1.v[2] = p6->v[2] - p5->v[2];
-    rel1.v[0] = p6->v[0] - p5->v[0];
-    rel1.v[1] = 0.f;
-    rel3.v[2] = p4->v[2] - p5->v[2];
-    rel3.v[0] = p4->v[0] - p5->v[0];
-    rel3.v[1] = 0.f;
-    *p3 = BrVector3Length(&rel3);
+    // Unused locals are retained to preserve the retail stack frame.
+    dz12 = p6->v[2] - p5->v[2];
+    tmp3 = p6->v[0] - p5->v[0];
+    rel1 = p4->v[2] - p5->v[2];
+    rel3 = p4->v[0] - p5->v[0];
+    *p3 = sqrt(rel1 * rel1 + rel3 * rel3);
     if (*p3 <= 1.1920928955078125e-6f) {
         *p2 = 0.001f;
         *p3 = 0.001f;
     }
-    #if 0
-    tmp = BrVector3Dot(&rel1, &rel3);
-    BrVector3Cross(&rot1, &rel1, &rel3);
-    #endif
-    tmp = rel1.v[2] * rel3.v[2] + rel1.v[0] * rel3.v[0];
-    rel1.v[1] = rel1.v[2] * rel3.v[0] - rel1.v[0] * rel3.v[2];
-    rel3.v[1] = sqrt(tmp * tmp + rel1.v[1] * rel1.v[1]);
-    rot1.v[0] = fabs(rel1.v[1] / rel3.v[1]);
-    rot1.v[1] = p10 * tmp / rel3.v[1] + p9;
-    if ((rot1.v[0] < 1.f && fabs(rot1.v[1]) > rot1.v[0] * 1000.f) || rot1.v[0] < 0.001f) {
+    tmp2 = dz12 * rel1 + tmp3 * rel3;
+    rel3 = (-tmp3) * rel1 + rel3 * dz12;
+    rel1 = tmp2;
+    tmp2 = sqrt(rel1 * rel1 + rel3 * rel3);
+    rel1 = rel1 / tmp2;
+    rel3 = rel3 / tmp2;
+    rel3 = fabs(rel3);
+    tmp2 = (p10) * rel1 + p9;
+    if ((rel3 < 1.f && fabs(tmp2) > rel3 * 1000.f) || rel3 < 0.001f) {
         *p1 = 1000.f;
         *p2 = 1000.f;
     } else {
-        rot1.v[1] = rot1.v[1] / rot1.v[0];
-        rot1.v[0] = rot1.v[0] / (tmp / rel3.v[1] + 1.f);
-        *p2 = rot1.v[0] * p10 + sqrt((rot1.v[0] * rot1.v[0] * p10 + 2.f * rot1.v[0] * rot1.v[1] - p10) * p10) + rot1.v[1];
-        *p1 = *p2 * rot1.v[0];
+        tmp2 = tmp2 / rel3;
+        tmp = rel3 / (rel1 + 1.f);
+        *p2 = tmp * p10 + sqrt(((tmp * tmp * p10) + 2.f * (tmp) * tmp2 - p10) * p10) + tmp2;
+        *p1 = *p2 * tmp;
     }
 }
 
