@@ -3581,9 +3581,9 @@ int SwitchToLoresMode(void) {
         gCurrent_graf_data = &gGraf_data[gGraf_data_index];
         PDSwitchToLoresMode();
         return 1;
-    } else
-        ;
-    return 0;
+    } else {
+        return 0;
+    }
 }
 
 // IDA: void __usercall DRPixelmapDoubledCopy(br_pixelmap *pDestn@<EAX>, br_pixelmap *pSource@<EDX>, int pSource_width@<EBX>, int pSource_height@<ECX>, int pX_offset, int pY_offset)
