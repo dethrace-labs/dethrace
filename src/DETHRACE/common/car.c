@@ -2236,9 +2236,9 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     br_matrix34* mat;
     tMaterial_modifiers* mat_list;
     // GLOBAL: CARM95 0x00514e4c
-    static br_scalar stop_timer = 0.0f;
+    static br_scalar slide_dist = 0.0f;
     // GLOBAL: CARM95 0x00514e50
-    static br_scalar slide_dist = 0;
+    static br_scalar stop_timer = 0;
     tDamage_type dam;
     br_scalar v;
     tSpecial_volume* vol;
@@ -2489,7 +2489,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         c->wheel_slip = 0;
         switch ((force[0] > maxfl) + ((force[1] > maxfr) << 1)) {
         case (0):
-            slide_dist = 0;
+            stop_timer = 0;
             break;
         case (3):
             force[0] = (maxfl * c->freduction);
@@ -2528,7 +2528,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
                 force[1] = (maxfr * c->freduction);
                 c->wheel_slip |= 2;
             } else {
-                slide_dist = 0;
+                stop_timer = 0;
             }
             break;
         case (2):
@@ -2545,7 +2545,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
                 force[0] = (maxfl * c->freduction);
                 c->wheel_slip |= 2;
             } else {
-                slide_dist = 0;
+                stop_timer = 0;
             }
             break;
         }
@@ -2666,20 +2666,20 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         if (BrVector3Length(&c->omega) < 0.05) {
             ts = (vol) ? ((BrVector3Length(&b) / (((c->driver > eDriver_non_car) && c->underwater_ability) ? (1 - (1 - vol->gravity_multiplier) * 0.6) : vol->gravity_multiplier)) / BrFloatToScalar(gGravity_multiplier)) : BrVector3Length(&b);
             if (ts < 1 * c->M || (c->keys.brake && normnum >= 3)) {
-                if (stop_timer == 100.0f) {
-                    stop_timer = 0.0f;
+                if (slide_dist == 100.0f) {
+                    slide_dist = 0.0f;
                 }
-                if (stop_timer > 0.5f) {
+                if (slide_dist > 0.5f) {
                     BrVector3SetFloat(&c->v, 0, 0, 0);
                     BrVector3SetFloat(&c->omega, 0, 0, 0);
-                    stop_timer = 0.5f;
+                    slide_dist = 0.5f;
                 }
             }
         }
     }
-    stop_timer += dt;
-    if (stop_timer > 1) {
-        stop_timer = 100.0f;
+    slide_dist += dt;
+    if (slide_dist > 1) {
+        slide_dist = 100.0f;
     }
     AddDrag(c, dt);
     if (c->driver >= eDriver_net_human) {
