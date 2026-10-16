@@ -383,7 +383,7 @@ int DrawLine2D(br_vector3* o, br_vector3* p, br_pixelmap* pScreen, br_pixelmap* 
         zbuff_inc = (p->v[2] - o->v[2]) * 2.0f / (float)ay;
         while (1) {
             DrawDot(zbuff, scr_ptr, depth_ptr, shade_ptr);
-            if (y2 == y) {
+            if (DR_FF(y) == y2) {
                 break;
             }
             if (d >= 0) {
