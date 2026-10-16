@@ -432,3 +432,9 @@
 
 // LIBRARY: CARM95 0x004CA180
 // BrPixelmapCopy
+
+// LIBRARY: CARM95 0x004D3920
+// BrMatrix23PostScale
+
+// LIBRARY: CARM95 0x004DC8B0
+// BrMapUpdate
