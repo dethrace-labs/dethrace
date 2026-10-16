@@ -2235,52 +2235,26 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     br_scalar rr_oil_factor;
     br_matrix34* mat;
     tMaterial_modifiers* mat_list;
-    // GLOBAL: CARM95 0x514e4c
-    static br_scalar stop_timer;
-    // GLOBAL: CARM95 0x514e50
-    static br_scalar slide_dist;
+    // GLOBAL: CARM95 0x00514e4c
+    static br_scalar slide_dist = 0.0f;
+    // GLOBAL: CARM95 0x00514e50
+    static br_scalar stop_timer = 0;
     tDamage_type dam;
     br_scalar v;
     tSpecial_volume* vol;
-    br_scalar scale;
 
-    int v72;         // [esp+24h] [ebp-1C8h]
-    double v73;      // [esp+2Ch] [ebp-1C0h]
-    float v74;       // [esp+34h] [ebp-1B8h]
-    float v75;       // [esp+38h] [ebp-1B4h]
-    float v76;       // [esp+3Ch] [ebp-1B0h]
-    float v77;       // [esp+40h] [ebp-1ACh]
-    float v78;       // [esp+44h] [ebp-1A8h]
-    float v79;       // [esp+48h] [ebp-1A4h]
-    float v80;       // [esp+4Ch] [ebp-1A0h] MAPDST
-    float v82;       // [esp+50h] [ebp-19Ch] MAPDST
-    float v84;       // [esp+54h] [ebp-198h]
-    float v85;       // [esp+58h] [ebp-194h] MAPDST
-    float v87;       // [esp+5Ch] [ebp-190h] MAPDST
-    float v98;       // [esp+88h] [ebp-164h]
-    float v99;       // [esp+8Ch] [ebp-160h]
-    br_vector3 v102; // [esp+98h] [ebp-154h]
-    br_vector3 v103; // [esp+A4h] [ebp-148h]
-    int v105;        // [esp+B8h] [ebp-134h]
-    float v106;      // [esp+C0h] [ebp-12Ch]
-    br_vector3 v107; // [esp+C4h] [ebp-128h]
-    float v108;      // [esp+D0h] [ebp-11Ch]
-    float v109;      // [esp+D4h] [ebp-118h]
-    float v116;      // [esp+F8h] [ebp-F4h]
-    br_vector3 B;    // [esp+FCh] [ebp-F0h] BYREF
-    br_scalar pV;    // [esp+10Ch] [ebp-E0h]
-    br_vector3 v123; // [esp+130h] [ebp-BCh]
-    float v125;      // [esp+16Ch] [ebp-80h]
-    float v128;      // [esp+18Ch] [ebp-60h]
-    float v129;      // [esp+190h] [ebp-5Ch]
-    float v134;      // [esp+1D8h] [ebp-14h]
-    float v135;      // [esp+1DCh] [ebp-10h]
-    br_vector3 v136; // [esp+1E0h] [ebp-Ch]
-
-    BrVector3Set(&v136, 0, 0, 0);
     normnum = 0;
-    BrVector3Set(&f, 0, 0, 0);
-    BrVector3Set(&B, 0, 0, 0);
+    t.v[0] = 0.0f;
+    t.v[1] = 0.0f;
+    t.v[2] = 0.0f;
+    f.v[0] = 0.0f;
+    f.v[1] = 0.0f;
+    f.v[2] = 0.0f;
+#ifdef DETHRACE_FIX_BUGS
+    fb.v[0] = 0.0f;
+    fb.v[1] = 0.0f;
+    fb.v[2] = 0.0f;
+#endif
     mat = &c->car_master_actor->t.t.mat;
     mat_list = gCurrent_race.material_modifiers;
     vol = c->last_special_volume;
@@ -2292,512 +2266,429 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     c->material_index[2] = 0;
     c->material_index[3] = 0;
     wheelratio = (c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[0].v[2] - c->cmpos.v[2]);
-    BrVector3Set(&c->road_normal, 0, 0, 0);
-    for (i = 0; i < 4; ++i) {
-        BrMatrix34ApplyP(&wheel_pos[i], &c->wpos[i], mat);
+    BrVector3Set(&c->road_normal, 0.0f, 0.0f, 0.0f);
+    for (n = 0; n < 4; n++) {
+        BrMatrix34ApplyP(&wheel_pos[n], &c->wpos[n], mat);
     }
     MultiFindFloorInBoxM(4, wheel_pos, &b, c->nor, d, c, c->material_index);
     if (c->last_special_volume && c->last_special_volume->material_modifier_index) {
-        c->material_index[0] = c->last_special_volume->material_modifier_index;
-        c->material_index[1] = c->material_index[0];
-        c->material_index[2] = c->material_index[1];
-        c->material_index[3] = c->material_index[2];
+        c->material_index[3] = c->material_index[2] = c->material_index[1] = c->material_index[0] = c->last_special_volume->material_modifier_index;
     }
-    for (i = 0; i < 4; ++i) {
-        BrMatrix34TApplyV(&norm[i], &c->nor[i], mat);
-        if (mat_list[c->material_index[i]].bumpiness != 0.0) {
-            DoBumpiness(c, wheel_pos, norm, d, i);
+    for (n = 0; n < 4; n++) {
+        BrMatrix34TApplyV(&norm[n], &c->nor[n], mat);
+        if (mat_list[c->material_index[n]].bumpiness) {
+            DoBumpiness(c, wheel_pos, norm, d, n);
         }
-        if (d[i] < -0.5 || c->wheel_dam_offset[i ^ 2] * 6.9 + c->susp_height[i / 2] < d[i]) {
-            force[i] = 0.0;
-            d[i] = c->susp_height[i / 2];
-        } else {
-            BrVector3Accumulate(&c->road_normal, &norm[i]);
+        if (d[n] >= -0.5f && d[n] <= c->susp_height[n >> 1] + c->wheel_dam_offset[n ^ 2] * WORLD_SCALE_D) {
+            BrVector3Accumulate(&c->road_normal, &norm[n]);
             normnum++;
-            d[i] = d[i] - c->wheel_dam_offset[i ^ 2] * 6.9;
-            force[i] = (c->susp_height[i / 2] - d[i]) * c->sk[1 / 2];
-            force[i] = force[i] - (d[i] - c->oldd[i]) / dt * c->sb[i / 2];
-            if (c->susp_height[i / 2] == c->oldd[i]
-                && c->nor[i].v[2] * c->v.v[2] + c->nor[i].v[1] * c->v.v[1] + c->nor[i].v[0] * c->v.v[0] > -0.0099999998
-                && c->M * 20.0 / 4.0 < force[i]) {
-                d[i] = c->susp_height[i / 2];
-                force[i] = c->M * 20.0 / 4.0;
+            d[n] -= c->wheel_dam_offset[n ^ 2] * WORLD_SCALE_D;
+            force[n] = (c->sk[n >> 1] * (c->susp_height[n >> 1] - d[n]));
+            force[n] -= (c->sb[n >> 1] * ((d[n] - c->oldd[n]) / dt));
+            if (c->oldd[n] == c->susp_height[n >> 1] && BrVector3Dot(&c->v, &c->nor[n]) > -0.01f) {
+                if (force[n] > c->M * 10 * 2 / 4) {
+                    d[n] = c->susp_height[n >> 1];
+                    force[n] = c->M * 10 * 2 / 4;
+                }
             }
-            if (force[i] < 0.0) {
-                force[i] = 0.0;
+            if (force[n] < 0) {
+                force[n] = 0;
             }
-            B.v[1] = force[i] + B.v[1];
-            f.v[0] = f.v[0] - (c->wpos[i].v[2] - c->cmpos.v[2]) * force[i];
-            f.v[2] = (c->wpos[i].v[0] - c->cmpos.v[0]) * force[i] + f.v[2];
-        }
-        c->oldd[i] = d[i];
-    }
-    if (c->driver <= eDriver_non_car || !c->wall_climber_mode || (c->road_normal.v[0] == 0.0 && c->road_normal.v[1] == 0.0 && c->road_normal.v[2] == 0.0)) {
-        if (vol) {
-            friction_number = (1.0 - vol->gravity_multiplier) * c->water_depth_factor;
-            if (c->underwater_ability) {
-                friction_number = friction_number * 0.6;
-            }
-            friction_number = (1.0 - friction_number) * c->M;
+            f.v[1] += force[n];
+            t.v[0] -= (c->wpos[n].v[2] - c->cmpos.v[2]) * force[n];
+            t.v[2] += (c->wpos[n].v[0] - c->cmpos.v[0]) * force[n];
         } else {
-            friction_number = c->M;
+            force[n] = 0.0f;
+            d[n] = c->susp_height[n >> 1];
         }
-        friction_number = friction_number * gGravity_multiplier * 10.0;
-        B.v[0] = B.v[0] - mat->m[0][1] * friction_number;
-        B.v[1] = B.v[1] - mat->m[1][1] * friction_number;
-        B.v[2] = B.v[2] - mat->m[2][1] * friction_number;
+        c->oldd[n] = d[n];
+    }
+    if (c->driver <= eDriver_non_car || !c->wall_climber_mode || (!c->road_normal.v[0] && !c->road_normal.v[1] && !c->road_normal.v[2])) {
+        if (vol) {
+            ts = c->water_depth_factor * (1 - vol->gravity_multiplier);
+            if (c->underwater_ability) {
+                ts = ts * 0.6;
+            }
+            ts = c->M * (1 - ts);
+        } else {
+            ts = c->M;
+        }
+        ts = GRAVITY * ts * gGravity_multiplier;
+        f.v[0] -= mat->m[0][1] * ts;
+        f.v[1] -= mat->m[1][1] * ts;
+        f.v[2] -= mat->m[2][1] * ts;
     } else {
-        BrVector3Normalise(&v107, &c->road_normal);
-        BrVector3Scale(&v107, &v107, -(c->M * 10.0));
-        BrVector3Accumulate(&B, &v107);
+        BrVector3Normalise(&v_batwick, &c->road_normal);
+        BrVector3Scale(&v_batwick, &v_batwick, -(GRAVITY * c->M));
+        BrVector3Accumulate(&f, &v_batwick);
     }
     if (c->driver >= eDriver_net_human) {
         SteeringSelfCentre(c, dt, &c->road_normal);
     }
-    if (normnum) {
-        // ts = 1.0 / sqrt(1.0); <- looked like this in the windows build definitely wrong
-        // ts = 1.0 / sqrt(c->road_normal.v[0] * c->road_normal.v[0] + c->road_normal.v[1] * c->road_normal.v[1] + c->road_normal.v[2] * c->road_normal.v[2]);
-        // c->road_normal.v[0] = c->road_normal.v[0] * ts;
-        // c->road_normal.v[1] = c->road_normal.v[1] * ts;
-        // c->road_normal.v[2] = c->road_normal.v[2] * ts;
+    if (normnum != 0) {
         BrVector3NormaliseQuick(&c->road_normal, &c->road_normal);
-
-        friction_number = c->road_normal.v[1] * mat->m[1][1] + c->road_normal.v[2] * mat->m[2][1] + c->road_normal.v[0] * mat->m[0][1];
-        if (c->driver > eDriver_non_car && c->wall_climber_mode) {
-            friction_number = 1.0;
+        ts = (c->road_normal.v[0] * mat->m[0][1]) + (c->road_normal.v[1] * mat->m[1][1]) + (c->road_normal.v[2] * mat->m[2][1]);
+        if ((c->driver > eDriver_non_car) && c->wall_climber_mode) {
+            ts = 1;
         }
-        friction_number = gCurrent_race.material_modifiers[c->material_index[0]].down_force * friction_number;
-        if (friction_number > 0.0f) {
-            friction_number = fabs(c->velocity_car_space.v[2]) * c->M * 10.0 * friction_number / c->down_force_speed;
-            if (c->M * 10.0 < friction_number) {
-                friction_number = c->M * 10.0;
+        ts = ts * gCurrent_race.material_modifiers[c->material_index[0]].down_force;
+        if (ts > 0) {
+            ts = (((BR_ABS(c->velocity_car_space.v[2]) * c->M) * 10) * ts) / c->down_force_speed;
+            if (ts > 10 * c->M) {
+                ts = 10 * c->M;
             }
             if (c->number_of_wheels_on_ground == 4 && c->oldd[2] == c->susp_height[1] && c->oldd[3] == c->susp_height[1]) {
-                a.v[0] = c->wpos[2].v[2] * mat->m[2][0];
-                a.v[1] = c->wpos[2].v[2] * mat->m[2][1];
-                a.v[2] = c->wpos[2].v[2] * mat->m[2][2];
-                a.v[0] = mat->m[3][0] + a.v[0];
-                a.v[1] = mat->m[3][1] + a.v[1];
-                a.v[2] = mat->m[3][2] + a.v[2];
-                BrVector3Scale(&b, &b, (c->wpos[0].v[2] - c->wpos[2].v[2]));
-                findfloor(&a, &b, norm, &ts2);
-                if (ts2 > 1.0) {
+                BrVector3Scale(&tv, (br_vector3*)mat->m[2], c->wpos[2].v[2]);
+                BrVector3Add(&tv, &tv, (br_vector3*)mat->m[3]);
+                BrVector3Scale(&b, &b, c->wpos[0].v[2] - c->wpos[2].v[2]);
+                findfloor(&tv, &b, norm, &ts2);
+                if (ts2 > 1.0f) {
                     c->down_force_flag = 1;
                 }
             } else if (c->down_force_flag && (c->oldd[2] < c->susp_height[1] || c->oldd[3] < c->susp_height[1])) {
                 c->down_force_flag = 0;
             }
             if (c->down_force_flag) {
-                friction_number = (c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]) * friction_number;
-                f.v[0] = (c->wpos[0].v[2] - c->cmpos.v[2]) * friction_number + f.v[0];
+                ts = ts * ((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]));
+                t.v[0] += (c->wpos[0].v[2] - c->cmpos.v[2]) * ts;
             }
-            B.v[1] = B.v[1] - friction_number;
+            f.v[1] -= ts;
         }
-        vplane.v[0] = BrVector3Dot(&c->velocity_car_space, &c->road_normal) * c->road_normal.v[0];
-        vplane.v[1] = BrVector3Dot(&c->velocity_car_space, &c->road_normal) * c->road_normal.v[1];
-        vplane.v[2] = BrVector3Dot(&c->velocity_car_space, &c->road_normal) * c->road_normal.v[2];
+        BrVector3Scale(&vplane, &c->road_normal, BrVector3Dot(&c->velocity_car_space, &c->road_normal));
         BrVector3Sub(&vplane, &c->velocity_car_space, &vplane);
-        if (vplane.v[2] < 0.0) {
-            ts = 1.0;
-        } else {
-            ts = -1.0;
-        }
-        ts3 = BrVector3Length(&vplane);
-        deltaomega = ts3 * c->curvature * ts;
+        direction = (vplane.v[2] < 0) ? 1.0f : -1.0f;
+        deltaomega = c->curvature * BrVector3Length(&vplane);
+        deltaomega = deltaomega * direction;
         deltaomega = deltaomega - BrVector3Dot(&c->omega, &c->road_normal);
-        BrVector3Set(&v103, c->road_normal.v[1], -c->road_normal.v[0], 0);
-        BrVector3Normalise(&v103, &v103);
-
-        friction_number = c->I.v[1] / dt * deltaomega;
-        ts = friction_number / (c->wpos[2].v[2] - c->wpos[0].v[2]);
-        v108 = ts;
-        v109 = -ts;
-        BrVector3Set(&rightplane, 0, c->road_normal.v[2], -c->road_normal.v[1]);
+        rightplane.v[0] = c->road_normal.v[1];
+        rightplane.v[1] = -c->road_normal.v[0];
+        rightplane.v[2] = 0;
         BrVector3Normalise(&rightplane, &rightplane);
-        v99 = c->acc_force;
-        friction_number = BrVector3Dot(&rightplane, &vplane);
-        v87 = BrVector3Dot(&v103, &vplane);
-        ts2 = fabs(v87);
-        friction_number = (c->wpos[0].v[2] - c->cmpos.v[2]) * friction_number * fabs(c->curvature);
-        if (c->curvature <= 0.0) {
-            friction_number = v87 - friction_number;
-        } else {
-            friction_number = v87 + friction_number;
+        ts = (c->I.v[1] / dt) * deltaomega;
+        ffi = ts / (c->wpos[2].v[2] - c->wpos[0].v[2]);
+        fbi = -ffi;
+        a.v[0] = 0;
+        a.v[1] = c->road_normal.v[2];
+        a.v[2] = -c->road_normal.v[1];
+        BrVector3Normalise(&a, &a);
+        fbk = c->acc_force;
+        ts = BrVector3Dot(&a, &vplane);
+        ts3 = BrVector3Dot(&vplane, &rightplane);
+        ts2 = BR_ABS(ts3);
+        ts = (ts * (c->wpos[0].v[2] - c->cmpos.v[2])) * BR_ABS(c->curvature);
+        ts = (c->curvature > 0) ? (ts + ts3) : -ts + ts3;
+        ts *= -(c->M / dt);
+        ts -= BrVector3Dot(&rightplane, &f);
+        ts = ts / (1 - wheelratio);
+        ffi += ts;
+        fbi += ts * (-wheelratio);
+        ts = ffi * (c->wpos[0].v[2] - c->wpos[2].v[2]);
+        ffk = ts * c->curvature;
+        ts = (c->M * BrVector3Dot(&c->velocity_car_space, &a)) / dt;
+        max_retardation = ts + BrVector3Dot(&f, &a);
+        ts5 = (c->brake_force * c->mu[0]) / (c->mu[0] + (c->mu[1] / c->friction_elipticity));
+        ts6 = c->brake_force - ts5;
+        i = (c->damage_units[eDamage_lr_brake].damage_level + c->damage_units[eDamage_rr_brake].damage_level) / 2;
+        if (i > MAX_DAMAGE_LEVEL / 5) {
+            ts5 = ts5 * BR_SQR(1.0f - BrIntToScalar(i - MAX_DAMAGE_LEVEL / 5) / (MAX_DAMAGE_LEVEL * 4 / 5));
         }
-        friction_number = -(c->M / dt * friction_number);
-        friction_number = friction_number - BrVector3Dot(&B, &v103);
-
-        friction_number = friction_number / (1.0 - wheelratio);
-        v108 = friction_number + v108;
-        v109 = -wheelratio * friction_number + v109;
-        friction_number = (c->wpos[0].v[2] - c->wpos[2].v[2]) * v108;
-        v98 = friction_number * c->curvature;
-        friction_number = BrVector3Dot(&c->velocity_car_space, &rightplane) * c->M / dt;
-        v129 = BrVector3Dot(&rightplane, &B) + friction_number;
-        v128 = c->mu[0] * c->brake_force / (c->mu[1] / c->friction_elipticity + c->mu[0]);
-        v125 = c->brake_force - v128;
-        v105 = (c->damage_units[7].damage_level + c->damage_units[6].damage_level) / 2;
-        if (v105 > 20) {
-            v128 = (1.0 - (double)(v105 - 20) / 80.0) * (1.0 - (double)(v105 - 20) / 80.0) * v128;
+        i = (c->damage_units[eDamage_lf_brake].damage_level + c->damage_units[eDamage_rf_brake].damage_level) / 2;
+        if (i > MAX_DAMAGE_LEVEL / 5) {
+            ts6 = ts6 * BR_SQR(1.0f - BrIntToScalar(i - MAX_DAMAGE_LEVEL / 5) / (MAX_DAMAGE_LEVEL * 4 / 5));
         }
-        v105 = (c->damage_units[5].damage_level + c->damage_units[4].damage_level) / 2;
-        if (v105 > 20) {
-            v125 = (1.0 - (double)(v105 - 20) / 80.0) * (1.0 - (double)(v105 - 20) / 80.0) * v125;
+        ts2 = ((force[0] + force[1]) * c->rolling_r_back) + ts5;
+        ts3 = ((force[2] + force[3]) * c->rolling_r_front) + ts6;
+        ts5 = c->wpos[0].v[2] - c->wpos[2].v[2];
+        ts5 = BR_SQRT(1 + c->curvature * (c->curvature * (ts5 * ts5)));
+        front_retardation = ts3 / ts5;
+        ts4 = (ts2 + front_retardation);
+        if ((BR_ABS((max_retardation))) < (BR_ABS((ts4)))) {
+            ts2 = ts2 * (max_retardation / ts4);
+            front_retardation = front_retardation * (max_retardation / ts4);
         }
-        ts2 = (force[1] + force[0]) * c->rolling_r_back + v128;
-        v87 = (force[2] + force[3]) * c->rolling_r_front + v125;
-        v128 = c->wpos[0].v[2] - c->wpos[2].v[2];
-        v128 = sqrt(v128 * v128 * c->curvature * c->curvature + 1.0);
-        v106 = v87 / v128;
-        v134 = v106 + ts2;
-        if (fabs(v129) < fabs(v134)) {
-            ts2 = v129 / v134 * ts2;
-            v106 = v129 / v134 * v106;
-        }
-        if ((v87 + ts2) * v129 < 0.0) {
+        if ((max_retardation * (ts2 + ts3)) < 0.0f) {
             ts2 = -ts2;
-            v106 = -v106;
+            front_retardation = -front_retardation;
         }
-        v129 = v129 - (ts2 + v106);
-        v99 = v99 - ts2;
-        if (c->keys.brake && c->damage_units[eDamage_lr_brake].damage_level < 60 && c->damage_units[eDamage_rr_brake].damage_level < 60) {
-            v99 = v99 - v129;
+        max_retardation -= ts2 + front_retardation;
+        fbk += -ts2;
+        if (c->keys.brake && c->damage_units[eDamage_lr_brake].damage_level < HANDBRAKE_FAIL_DAMAGE
+            && c->damage_units[eDamage_rr_brake].damage_level < HANDBRAKE_FAIL_DAMAGE) {
+            fbk += -max_retardation;
             c->gear = 0;
         }
-        v99 = v99 / c->friction_elipticity;
-        v135 = sqrt(v99 * v99 + v109 * v109) / 2.0;
-
-        GetOilFrictionFactors(c, &fl_oil_factor, &fr_oil_factor, &rl_oil_factor, &rr_oil_factor);
-        if (c->driver <= eDriver_non_car) {
-            v116 = 1.0;
+        fbk = fbk / c->friction_elipticity;
+        modf = BR_LENGTH2(fbi, fbk) / 2;
+        GetOilFrictionFactors(c, &fl_oil_factor,
+            &fr_oil_factor,
+            &rl_oil_factor,
+            &rr_oil_factor);
+        friction_number = (c->driver > eDriver_non_car) ? c->grip_multiplier : 1.0f;
+        BrVector3Sub(&tv2, &c->wpos[0], &c->cmpos);
+        BrVector3Cross(&tv, &c->omega, &tv2);
+        BrVector3Accumulate(&tv, &c->velocity_car_space);
+        if ((c->driver >= eDriver_net_human) && ((((c->keys.left || c->joystick.left > 32768) && c->curvature > 0 && deltaomega > 0.1 && tv.v[0] > 0) || ((c->keys.right || c->joystick.right > 32768) && c->curvature < 0 && deltaomega < 0.1 && tv.v[0] < 0)) && direction > 0)) {
+            ts = c->mu[0];
         } else {
-            v116 = c->grip_multiplier;
-        }
-        BrVector3Sub(&v102, &c->wpos[0], &c->cmpos);
-        BrVector3Cross(&a, &c->omega, &v102);
-        BrVector3Accumulate(&a, &c->velocity_car_space);
-        if (c->driver >= eDriver_net_human
-            && (((c->keys.left || c->joystick.left > 0x8000) && c->curvature > 0.0 && deltaomega > 0.1 && a.v[0] > 0.0)
-                || ((c->keys.right || c->joystick.right > 0x8000) && c->curvature < 0.0 && deltaomega < 0.1 && a.v[0] < 0.0))
-            && ts > 0.0) {
-            friction_number = c->mu[0];
-        } else {
-            friction_number = c->mu[2];
-            ts2 = fabs(a.v[0]) / 10.0;
-            if (ts2 > 1) {
-                ts2 = 1.0;
+            ts = c->mu[2];
+            ts2 = BR_ABS(tv.v[0]) / 10;
+            if (ts2 > 1.0f) {
+                ts2 = 1.0f;
             }
-            friction_number = (c->mu[2] - c->mu[0]) * ts2 + friction_number;
+            ts += ts2 * (c->mu[2] - c->mu[0]);
         }
-
-        maxfl = sqrt(force[0]) * friction_number * (rl_oil_factor * v116) * mat_list[c->material_index[0]].tyre_road_friction;
-        maxfr = sqrt(force[1]) * friction_number * (rr_oil_factor * v116) * mat_list[c->material_index[1]].tyre_road_friction;
-        c->max_force_rear = maxfr + maxfl;
-        if (rl_oil_factor == 1.0 && rr_oil_factor == 1.0 && c->traction_control && v135 * 2.0 > c->max_force_rear && c->acc_force > 0.0
-            && (c->driver < eDriver_net_human || (c->target_revs > 1000.0 && c->gear > 0))) {
-            ts2 = v99;
-            if (v99 * v99 <= v135 * v135 * 4.0) {
-                v87 = sqrt(v135 * v135 * 4.0 - v99 * v99);
-            } else {
-                v87 = 0.0;
-            }
-            if (c->max_force_rear <= v87) {
-                c->torque = -(c->revs * c->revs / 100000000.0) - 0.1;
-            } else {
-                float v177 = sqrt(c->max_force_rear * c->max_force_rear - v87 * v87);
-                ts3 = ts2 < 0.0 ? -1.0 : 1.0;
-                // ts4 = (ts2 - ts3 * sqrt(ts3)) * 1.01;
-                // if (fabs(ts2) > fabs(ts4)) {
-                //     v87 = ts4;
-                //     ts2 = v87;
-                // }
-
-                ts4 = (ts2 - ts3 * v177) * 1.01;
-                if (fabs(ts2) > fabs(ts4)) {
-                    ts2 = ts4;
+        maxfl = ((ts * BR_SQRT(force[0])) * (friction_number * rl_oil_factor)) * mat_list[c->material_index[0]].tyre_road_friction;
+        maxfr = ((ts * BR_SQRT(force[1])) * (friction_number * rr_oil_factor)) * mat_list[c->material_index[1]].tyre_road_friction;
+        c->max_force_rear = maxfl + maxfr;
+        if (rl_oil_factor == 1.0f && rr_oil_factor == 1.0f && c->traction_control && 2 * modf > c->max_force_rear && c->acc_force > 0 && (c->driver < eDriver_net_human || (c->target_revs > 1000 && c->gear > 0))) {
+            ts2 = fbk;
+            ts3 = (BR_SQR(ts2) > 4 * BR_SQR(modf)) ? 0 : BR_SQRT(4 * (BR_SQR(modf)) - BR_SQR(ts2));
+            if (ts3 < c->max_force_rear) {
+                ts3 = ts2 - BR_SQRT(BR_SQR(c->max_force_rear) - BR_SQR(ts3)) * ((ts2 < 0) ? -1 : 1);
+                ts3 = ts3 * 1.01f;
+                if (BR_ABS(ts3) < BR_ABS(ts2)) {
+                    ts2 = ts3;
                 }
+            } else {
+                c->torque = -(c->revs * c->revs) / (10000 * 10000) - 0.1;
             }
-            v99 = v99 - ts2;
-            v135 = sqrt(v99 * v99 + v109 * v109) / 2.0;
-
-        } else if (c->driver >= eDriver_net_human && c->gear > 0 && c->revs > c->target_revs && !c->traction_control) {
+            fbk = fbk - ts2;
+            modf = BR_LENGTH2(fbi, fbk) / 2;
+        } else if ((c->driver >= eDriver_net_human) && c->gear > 0 && c->revs > c->target_revs && !c->traction_control) {
             if (!c->keys.change_down) {
                 c->traction_control = 1;
             }
-            friction_number = 1.0 - (c->revs - c->target_revs) / (double)(400 * c->gear);
-            if (friction_number < 0.40000001) {
-                friction_number = 0.40000001;
+            ts = 1.0f - ((c->revs - c->target_revs) / (br_scalar)(c->gear * 400));
+            if (ts < 0.4f) {
+                ts = 0.4f;
             }
-            maxfl = friction_number * maxfl;
-            maxfr = friction_number * maxfr;
+            maxfl = maxfl * ts;
+            maxfr = maxfr * ts;
         }
-        if (fabs(v109) > maxfr + maxfl && maxfr + maxfl > 0.1) {
-            v87 = (maxfr + maxfl) / fabs(v109) * dt;
-            v109 = v87 * v109;
-            v99 = c->friction_elipticity * v87 * v99;
-            friction_number = -((c->wpos[2].v[2] - c->cmpos.v[2]) * v108 * ((c->wpos[2].v[2] - c->cmpos.v[2]) * v108) / c->I.v[1] + (v98 * v98 + v108 * v108) / c->M);
-            ts2 = (BrVector3Dot(&v103, &vplane) + v109 / c->M) * v108;
-            ts2 = BrVector3Dot(&rightplane, &vplane) * v98 + ts2;
-            ts2 = BrVector3Dot(&c->omega, &c->road_normal) * (c->wpos[2].v[2] - c->cmpos.v[2]) * v108 + ts2;
-            ts2 = (c->wpos[0].v[2] - c->cmpos.v[2]) * (c->wpos[2].v[2] - c->cmpos.v[2]) * v109 / c->I.v[1] * v108 + ts2;
-            if (fabs(friction_number) > 0.1) {
-                friction_number = ts2 / (friction_number * dt);
-                v108 = friction_number * v108;
-                v98 = friction_number * v98;
+        if (BR_ABS(fbi) > (maxfl + maxfr) && maxfl + maxfr > 0.1) {
+            ts3 = (maxfl + maxfr) / BR_ABS(fbi) * dt;
+            fbi *= ts3;
+            fbk = fbk * (c->friction_elipticity * ts3);
+            ts = -(((BR_SQR(ffi) + BR_SQR(ffk)) / c->M) + (BR_SQR(((c->wpos[2].v[2] - c->cmpos.v[2]) * ffi)) / c->I.v[1]));
+            ts2 = (BrVector3Dot(&vplane, &rightplane) + fbi / c->M) * ffi;
+            ts2 += BrVector3Dot(&vplane, &a) * ffk;
+            ts2 += (BrVector3Dot(&c->omega, &c->road_normal) * (c->wpos[2].v[2] - c->cmpos.v[2])) * ffi;
+            ts2 += ((fbi * ((c->wpos[0].v[2] - c->cmpos.v[2]) * (c->wpos[2].v[2] - c->cmpos.v[2]))) / c->I.v[1]) * ffi;
+            if (BR_ABS(ts) > 0.1) {
+                ts = ts2 / (ts * dt);
+                ffi = ts * ffi;
+                ffk = ts * ffk;
             }
-            v109 = v109 / v87;
-            v99 = v99 / (c->friction_elipticity * v87);
+            fbi /= ts3;
+            fbk /= ts3 * c->friction_elipticity;
         }
-        v98 = v98 - v106;
-        v108 = (c->wpos[0].v[2] - c->wpos[2].v[2]) * c->curvature * v106 + v108;
-        if (v135 > 0.000099999997) {
-            v109 = v109 / (v135 * 2.0);
-            v99 = v99 / (v135 * 2.0);
+        ffk += -front_retardation;
+        ffi += front_retardation * (c->wpos[0].v[2] - c->wpos[2].v[2]) * c->curvature;
+        if (modf > 0.0001f) {
+            fbi = fbi / (modf * 2);
+            fbk = fbk / (modf * 2);
         }
-        v99 = c->friction_elipticity * v99;
-        force[0] = v135;
-        force[1] = v135;
+        fbk = fbk * c->friction_elipticity;
+        force[0] = modf;
+        force[1] = modf;
         c->wheel_slip = 0;
-        switch ((force[0] > maxfl) + 2 * (force[1] > maxfr)) {
-        case 0:
-            slide_dist = 0;
+        switch ((force[0] > maxfl) + ((force[1] > maxfr) << 1)) {
+        case (0):
+            stop_timer = 0;
             break;
-        case 1:
-            force[0] = c->freduction * maxfl;
-            force[1] = v135 - force[0] + force[1];
-            if (force[1] <= maxfr) {
-                slide_dist = 0;
-            } else {
-                if (maxfr > 0.1) {
-                    pV = (force[1] - maxfr) / maxfr;
-                    if (&gProgram_state.current_car == c) {
-                        v78 = 20.0;
-                    } else {
-                        v78 = 60.0;
-                    }
-                    if (v78 <= pV) {
-                        c->new_skidding |= 2u;
-                    }
-                    SkidNoise(c, 1, pV, c->material_index[1]);
-                }
-                force[1] = c->freduction * maxfr;
-                c->wheel_slip |= 2u;
-            }
-            break;
-        case 2:
-            force[1] = c->freduction * maxfr;
-            force[0] = v135 - force[1] + force[0];
-            if (force[0] <= maxfl) {
-                slide_dist = 0;
-            } else {
+        case (3):
+            force[0] = (maxfl * c->freduction);
+            force[1] = (maxfr * c->freduction);
+            c->wheel_slip |= 2;
+            v = (2 * modf - maxfl - maxfr) / (maxfl + maxfr);
+            if (v >= ((c == &gProgram_state.current_car) ? SKID_MIN_V_CURRENT_CAR : SKID_MIN_V_OTHER_CAR)) {
                 if (maxfl > 0.1) {
-                    pV = (force[0] - maxfl) / maxfl;
-                    if (&gProgram_state.current_car == c) {
-                        v77 = 20.0;
-                    } else {
-                        v77 = 60.0;
-                    }
-                    if (v77 <= pV) {
-                        c->new_skidding |= 1u;
-                    }
-                    SkidNoise(c, 0, pV, c->material_index[0]);
-                }
-                force[0] = c->freduction * maxfl;
-                c->wheel_slip |= 2u;
-            }
-            break;
-        case 3:
-            force[0] = c->freduction * maxfl;
-            force[1] = c->freduction * maxfr;
-            c->wheel_slip |= 2u;
-            pV = (v135 * 2.0 - maxfl - maxfr) / (maxfr + maxfl);
-            if (&gProgram_state.current_car == c) {
-                v79 = 20.0;
-            } else {
-                v79 = 60.0;
-            }
-            if (v79 <= pV) {
-                if (maxfl > 0.1) {
-                    c->new_skidding |= 1u;
+                    c->new_skidding |= 1;
                 }
                 if (maxfr > 0.1) {
-                    c->new_skidding |= 2u;
+                    c->new_skidding |= 2;
                 }
             }
             if (IRandomBetween(0, 1)) {
                 if (maxfl > 0.1) {
-                    SkidNoise(c, 0, pV, c->material_index[0]);
+                    SkidNoise(c, 0, v, c->material_index[0]);
                 }
-            } else if (maxfr > 0.1) {
-                SkidNoise(c, 1, pV, c->material_index[1]);
+            } else {
+                if (maxfr > 0.1) {
+                    SkidNoise(c, 1, v, c->material_index[1]);
+                }
             }
             break;
-        default:
+        case (1):
+            force[0] = (maxfl * c->freduction);
+            force[1] += modf - force[0];
+            if (force[1] > maxfr) {
+                if (maxfr > 0.1) {
+                    v = (force[1] - maxfr) / maxfr;
+                    if (v >= ((c == &gProgram_state.current_car) ? SKID_MIN_V_CURRENT_CAR : SKID_MIN_V_OTHER_CAR)) {
+                        c->new_skidding |= 2;
+                    }
+                    SkidNoise(c, 1, v, c->material_index[1]);
+                }
+                force[1] = (maxfr * c->freduction);
+                c->wheel_slip |= 2;
+            } else {
+                stop_timer = 0;
+            }
+            break;
+        case (2):
+            force[1] = (maxfr * c->freduction);
+            force[0] += modf - force[1];
+            if (force[0] > maxfl) {
+                if (maxfl > 0.1) {
+                    v = (force[0] - maxfl) / maxfl;
+                    if (v >= ((c == &gProgram_state.current_car) ? SKID_MIN_V_CURRENT_CAR : SKID_MIN_V_OTHER_CAR)) {
+                        c->new_skidding |= 1;
+                    }
+                    SkidNoise(c, 0, v, c->material_index[0]);
+                }
+                force[0] = (maxfl * c->freduction);
+                c->wheel_slip |= 2;
+            } else {
+                stop_timer = 0;
+            }
             break;
         }
-        if (c->wheel_slip && c->curvature * c->turn_speed > 0.0 && fabs(v109) > 0.0099999998 && c->curvature * v109 < 0.0 && !c->keys.brake && !c->keys.change_down) {
-            c->turn_speed = 0.0;
+        if (c->wheel_slip && (c->curvature * c->turn_speed) > 0 && BR_ABS(fbi) > 0.01f && (c->curvature * fbi) < 0 && !c->keys.brake && !c->keys.change_down) {
+            c->turn_speed = 0;
         }
-        v135 = sqrt(v108 * v108 + v98 * v98) / 2.0;
-        if (v135 > 0.000099999997) {
-            v108 = v108 / (v135 * 2.0);
-            v98 = v98 / (v135 * 2.0);
+        modf = BR_LENGTH2(ffi, ffk) / 2;
+        if (modf > 0.0001f) {
+            ffi = ffi / (modf * 2);
+            ffk = ffk / (modf * 2);
         }
-        maxfl = sqrt(force[2]) * c->mu[1] * (fl_oil_factor * v116) * mat_list[c->material_index[2]].tyre_road_friction;
-        maxfr = sqrt(force[3]) * c->mu[1] * (fr_oil_factor * v116) * mat_list[c->material_index[3]].tyre_road_friction;
-        c->max_force_front = maxfr + maxfl;
-        force[2] = v135;
-        force[3] = v135;
-        v72 = (v135 > maxfl) + 2 * (v135 > maxfr);
-        switch (v72) {
-        case 1:
-            force[2] = c->freduction * maxfl;
-            force[3] = v135 - force[2] + force[3];
+        maxfl = ((c->mu[1] * BR_SQRT(force[2])) * (friction_number * fl_oil_factor)) * mat_list[c->material_index[2]].tyre_road_friction;
+        maxfr = ((c->mu[1] * BR_SQRT(force[3])) * (friction_number * fr_oil_factor)) * mat_list[c->material_index[3]].tyre_road_friction;
+        c->max_force_front = maxfl + maxfr;
+        force[2] = modf;
+        force[3] = modf;
+        switch ((force[2] > maxfl) + ((force[3] > maxfr) << 1)) {
+        case (3):
+            force[2] = (maxfl * c->freduction);
+            force[3] = (maxfr * c->freduction);
+            c->wheel_slip |= 1;
+            v = (2 * modf - maxfl - maxfr) / (maxfl + maxfr);
+            if (v >= ((c == &gProgram_state.current_car) ? SKID_MIN_V_CURRENT_CAR : SKID_MIN_V_OTHER_CAR)) {
+                if (maxfl > 0.1) {
+                    c->new_skidding |= 4;
+                }
+                if (maxfr > 0.1) {
+                    c->new_skidding |= 8;
+                }
+            }
+            if (IRandomBetween(0, 1)) {
+                if (maxfl > 0.1) {
+                    SkidNoise(c, 2, v, c->material_index[2]);
+                }
+            } else {
+                if (maxfr > 0.1) {
+                    SkidNoise(c, 3, v, c->material_index[3]);
+                }
+            }
+            break;
+        case (1):
+            force[2] = (maxfl * c->freduction);
+            force[3] += modf - force[2];
             if (force[3] > maxfr) {
                 if (maxfr > 0.1) {
-                    pV = (force[3] - maxfr) / maxfr;
-                    if (&gProgram_state.current_car == c) {
-                        v75 = 20.0;
-                    } else {
-                        v75 = 60.0;
+                    v = (force[3] - maxfr) / maxfr;
+                    if (v >= ((c == &gProgram_state.current_car) ? SKID_MIN_V_CURRENT_CAR : SKID_MIN_V_OTHER_CAR)) {
+                        c->new_skidding |= 8;
                     }
-                    if (v75 <= pV) {
-                        c->new_skidding |= 8u;
-                    }
-                    SkidNoise(c, 3, pV, c->material_index[3]);
+                    SkidNoise(c, 3, v, c->material_index[3]);
                 }
-                force[3] = c->freduction * maxfr;
-                c->wheel_slip |= 1u;
+                force[3] = (maxfr * c->freduction);
+                c->wheel_slip |= 1;
             }
             break;
-        case 2:
-            force[3] = c->freduction * maxfr;
-            force[2] = v135 - force[3] + force[2];
+        case (2):
+            force[3] = (maxfr * c->freduction);
+            force[2] += modf - force[3];
             if (force[2] > maxfl) {
                 if (maxfl > 0.1) {
-                    pV = (force[2] - maxfl) / maxfl;
-                    if (&gProgram_state.current_car == c) {
-                        v74 = 20.0;
-                    } else {
-                        v74 = 60.0;
+                    v = (force[2] - maxfl) / maxfl;
+                    if (v >= ((c == &gProgram_state.current_car) ? SKID_MIN_V_CURRENT_CAR : SKID_MIN_V_OTHER_CAR)) {
+                        c->new_skidding |= 4;
                     }
-                    if (v74 <= pV) {
-                        c->new_skidding |= 4u;
-                    }
-                    SkidNoise(c, 2, pV, c->material_index[2]);
+                    SkidNoise(c, 2, v, c->material_index[2]);
                 }
-                force[2] = c->freduction * maxfl;
-                c->wheel_slip |= 1u;
-            }
-            break;
-        case 3:
-            force[2] = c->freduction * maxfl;
-            force[3] = c->freduction * maxfr;
-            c->wheel_slip |= 1u;
-            pV = (v135 * 2.0 - maxfl - maxfr) / (maxfr + maxfl);
-            if (&gProgram_state.current_car == c) {
-                v76 = 20.0;
-            } else {
-                v76 = 60.0;
-            }
-            if (v76 <= pV) {
-                if (maxfl > 0.1) {
-                    c->new_skidding |= 4u;
-                }
-                if (maxfr > 0.1) {
-                    c->new_skidding |= 8u;
-                }
-            }
-            if (IRandomBetween(0, 1)) {
-                if (maxfl > 0.1) {
-                    SkidNoise(c, 2, pV, c->material_index[2]);
-                }
-            } else if (maxfr > 0.1) {
-                SkidNoise(c, 3, pV, c->material_index[3]);
+                force[2] = (maxfl * c->freduction);
+                c->wheel_slip |= 1;
             }
             break;
         }
-        BrVector3Scale(&v136, &rightplane, v99);
-        BrVector3Scale(&a, &v103, v109);
-        BrVector3Accumulate(&v136, &a);
-        BrVector3Scale(&v123, &rightplane, v98);
-        BrVector3Scale(&a, &v103, v108);
-        BrVector3Accumulate(&v123, &a);
-
-        rightplane = c->wpos[0];
-        rightplane.v[1] = rightplane.v[1] - c->oldd[0];
-        BrVector3Sub(&rightplane, &rightplane, &c->cmpos);
-        BrVector3Scale(&b, &v136, force[0]);
-        BrVector3Accumulate(&B, &b);
-        BrVector3Cross(&a, &rightplane, &b);
-        BrVector3Accumulate(&f, &a);
-
-        rightplane = c->wpos[1];
-        rightplane.v[1] = rightplane.v[1] - c->oldd[1];
-        BrVector3Sub(&rightplane, &rightplane, &c->cmpos);
-        BrVector3Scale(&b, &v136, force[1]);
-        BrVector3Accumulate(&B, &b);
-        BrVector3Cross(&a, &rightplane, &b);
-        BrVector3Accumulate(&f, &a);
-
-        rightplane = c->wpos[2];
-        rightplane.v[1] = rightplane.v[1] - c->oldd[2];
-        BrVector3Sub(&rightplane, &rightplane, &c->cmpos);
-        BrVector3Scale(&b, &v123, force[2]);
-        BrVector3Accumulate(&B, &b);
-        BrVector3Cross(&a, &rightplane, &b);
-        BrVector3Accumulate(&f, &a);
-
-        rightplane = c->wpos[3];
-        rightplane.v[1] = rightplane.v[1] - c->oldd[3];
-        BrVector3Sub(&rightplane, &rightplane, &c->cmpos);
-        BrVector3Scale(&b, &v123, force[3]);
-        BrVector3Accumulate(&B, &b);
-        BrVector3Cross(&a, &rightplane, &b);
-        BrVector3Accumulate(&f, &a);
-
+        BrVector3Scale(&fb, &a, fbk);
+        BrVector3Scale(&tv, &rightplane, fbi);
+        BrVector3Accumulate(&fb, &tv);
+        BrVector3Scale(&ff, &a, ffk);
+        BrVector3Scale(&tv, &rightplane, ffi);
+        BrVector3Accumulate(&ff, &tv);
+        BrVector3Copy(&a, &c->wpos[0]);
+        a.v[1] -= c->oldd[0];
+        BrVector3Sub(&a, &a, &c->cmpos);
+        BrVector3Scale(&b, &fb, force[0]);
+        BrVector3Accumulate(&f, &b);
+        BrVector3Cross(&tv, &a, &b);
+        BrVector3Accumulate(&t, &tv);
+        BrVector3Copy(&a, &c->wpos[1]);
+        a.v[1] -= c->oldd[1];
+        BrVector3Sub(&a, &a, &c->cmpos);
+        BrVector3Scale(&b, &fb, force[1]);
+        BrVector3Accumulate(&f, &b);
+        BrVector3Cross(&tv, &a, &b);
+        BrVector3Accumulate(&t, &tv);
+        BrVector3Copy(&a, &c->wpos[2]);
+        a.v[1] -= c->oldd[2];
+        BrVector3Sub(&a, &a, &c->cmpos);
+        BrVector3Scale(&b, &ff, force[2]);
+        BrVector3Accumulate(&f, &b);
+        BrVector3Cross(&tv, &a, &b);
+        BrVector3Accumulate(&t, &tv);
+        BrVector3Copy(&a, &c->wpos[3]);
+        a.v[1] -= c->oldd[3];
+        BrVector3Sub(&a, &a, &c->cmpos);
+        BrVector3Scale(&b, &ff, force[3]);
+        BrVector3Accumulate(&f, &b);
+        BrVector3Cross(&tv, &a, &b);
+        BrVector3Accumulate(&t, &tv);
     } else {
-        c->max_force_front = 0.0;
-        c->max_force_rear = 0.0;
+        c->max_force_front = 0;
+        c->max_force_rear = 0;
         StopSkid(c);
     }
     c->number_of_wheels_on_ground = normnum;
-    BrMatrix34ApplyV(&b, &B, mat);
-    BrVector3Scale(&rightplane, &f, dt);
-    ApplyTorque(c, &rightplane);
-    BrVector3Scale(&rightplane, &b, dt / c->M);
-    BrVector3Accumulate(&c->v, &rightplane);
-    if (c->speed < 0.0001f
-        && ((!c->keys.acc && c->joystick.acc <= 0) || !c->gear)
-        && !c->keys.dec
-        && c->joystick.dec <= 0
-        && c->bounce_rate == 0.0
-        && BrVector3Length(&c->omega) < 0.05) {
-        if (vol) {
-            v73 = c->driver > eDriver_non_car && c->underwater_ability ? 1.0 - (1.0 - vol->gravity_multiplier) * 0.6 : vol->gravity_multiplier;
-            friction_number = BrVector3Length(&b) / v73 / gGravity_multiplier;
-        } else {
-            friction_number = BrVector3Length(&b);
-        }
-        if (c->M > friction_number || (c->keys.brake && normnum >= 3)) {
-            if (stop_timer == 100.0) {
-                stop_timer = 0.0;
-            }
-            if (stop_timer > 0.5) {
-                BrVector3SetFloat(&c->v, 0.0, 0.0, 0.0);
-                BrVector3SetFloat(&c->omega, 0.0, 0.0, 0.0);
-                stop_timer = 0.5;
+    BrMatrix34ApplyV(&b, &f, mat);
+    BrVector3Scale(&a, &t, dt);
+    ApplyTorque(c, &a);
+    BrVector3Scale(&a, &b, (dt / c->M));
+    BrVector3Accumulate(&c->v, &a);
+    if (c->speed < MIN_SPEED && (!(c->keys.acc || c->joystick.acc > 0) || c->gear == 0) && !(c->keys.dec || c->joystick.dec > 0) && !c->bounce_rate) {
+        if (BrVector3Length(&c->omega) < 0.05) {
+            ts = (vol) ? ((BrVector3Length(&b) / (((c->driver > eDriver_non_car) && c->underwater_ability) ? (1 - (1 - vol->gravity_multiplier) * 0.6) : vol->gravity_multiplier)) / BrFloatToScalar(gGravity_multiplier)) : BrVector3Length(&b);
+            if (ts < 1 * c->M || (c->keys.brake && normnum >= 3)) {
+                if (slide_dist == 100.0f) {
+                    slide_dist = 0.0f;
+                }
+                if (slide_dist > 0.5f) {
+                    BrVector3SetFloat(&c->v, 0, 0, 0);
+                    BrVector3SetFloat(&c->omega, 0, 0, 0);
+                    slide_dist = 0.5f;
+                }
             }
         }
     }
-    stop_timer = dt + stop_timer;
-    if (stop_timer > 1.0) {
-        stop_timer = 100.0;
+    slide_dist += dt;
+    if (slide_dist > 1) {
+        slide_dist = 100.0f;
     }
     AddDrag(c, dt);
     if (c->driver >= eDriver_net_human) {
-        c->acc_force = -(v136.v[2] * force[0]) - v136.v[2] * force[1];
-        // LOG_DEBUG("old %f new %f", old, c->acc_force);
+        c->acc_force = -(force[0] * fb.v[2]) - (force[1] * fb.v[2]);
     }
 }
 
