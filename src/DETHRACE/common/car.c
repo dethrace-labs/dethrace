@@ -3127,14 +3127,14 @@ int CollCheck(tCollision_info* c, br_scalar dt) {
             }
             if (!(
 #if defined(DETHRACE_FIX_BUGS)
-                // `c` is only a `tCar_spec*` if the driver is an opponent or human, otherwise, it will be a `tNon_car_spec*`. The following code
-                // assumes `c` is a `tCar_spec*`, causing invalid memory accesses
-                c->driver >= eDriver_oppo &&
+                    // `c` is only a `tCar_spec*` if the driver is an opponent or human, otherwise, it will be a `tNon_car_spec*`. The following code
+                    // assumes `c` is a `tCar_spec*`, causing invalid memory accesses
+                    c->driver >= eDriver_oppo &&
 #endif
-                (CAR(c)->invulnerable
-                    || (c->driver < eDriver_net_human && (c->driver != eDriver_oppo || PointOutOfSight(&c->pos, 150.0f)))
-                    || ((v_diff = (CAR(c)->pre_car_col_velocity.v[1] - c->v.v[1]) * gDefensive_powerup_factor[CAR(c)->power_up_levels[0]]) >= -20.0f)
-                    || CAR(c)->number_of_wheels_on_ground >= 3))) {
+                    (CAR(c)->invulnerable
+                        || (c->driver < eDriver_net_human && (c->driver != eDriver_oppo || PointOutOfSight(&c->pos, 150.0f)))
+                        || ((v_diff = (CAR(c)->pre_car_col_velocity.v[1] - c->v.v[1]) * gDefensive_powerup_factor[CAR(c)->power_up_levels[0]]) >= -20.0f)
+                        || CAR(c)->number_of_wheels_on_ground >= 3))) {
                 // Cops Special Forces is always stolen if destroyed!
                 if (c->driver == eDriver_oppo && c->index == 4 && v_diff < -40.0f) {
                     KnackerThisCar(CAR(c));
@@ -5072,7 +5072,8 @@ int IncidentCam(tCar_spec* c, tU32 pTime) {
             PutNonCarBackInWorld(info.ped_info.murderer_actor);
         }
         if (((mat.m[3][0] - m2->m[3][0]) * (mat.m[3][0] - m2->m[3][0])
-                + (mat.m[3][2] - m2->m[3][2]) * (mat.m[3][2] - m2->m[3][2])) < .15 * .15) {
+                + (mat.m[3][2] - m2->m[3][2]) * (mat.m[3][2] - m2->m[3][2]))
+            < .15 * .15) {
             BrVector3Copy((br_vector3*)m2->m[3], &old_cam_pos);
             gPed_actor = NULL;
             return 0;
@@ -5532,64 +5533,57 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     // GLOBAL: CARM95 0x514e90
     static br_vector3 old_vn;
 
-    br_scalar v16, v17;
-    br_angle v8;
-
     manual_swing = gOld_yaw__car != gCamera_yaw;
     if (elapsed_time > 500) {
         elapsed_time = -1;
     }
     if (elapsed_time >= 0) {
-        elapsed_time += pTime;
+        elapsed_time += (int)pTime;
     }
-    sign = -BrVector3Dot((br_vector3*)m1->m[2], vn);
-    ts = BrVector3Dot(vn, &old_vn);
+    ts = -BrVector3Dot((br_vector3*)m1->m[2], vn);
+    sign = BrVector3Dot(vn, &old_vn);
 
     BrVector3Copy(&old_vn, vn);
-    if ((sign < 0.0f) == gCamera_sign) {
-        elapsed_time = -1;
-    } else if (ts <= 0.0 || elapsed_time >= 0) {
-        if (elapsed_time < 0) {
-            elapsed_time = 0;
-        }
-        if (elapsed_time < 500 && sign <= 0.0f) {
-            BrVector3Negate(vn, vn);
-        } else {
-            elapsed_time = 500;
-            if (sign <= 0.0) {
-                ts = 0.0006f;
+    if ((ts < 0.0f) != gCamera_sign) {
+        if (sign > 0.0f && elapsed_time < 0) {
+            gCamera_sign = gCamera_sign == 0;
+            if (gCamera_yaw > BR_ANGLE_DEG(180)) {
+                yaw = gCamera_yaw - BR_ANGLE_DEG(180);
             } else {
-                ts = 0.0001f;
+                yaw = gCamera_yaw;
             }
-            if (fabs(c->speedo_speed) <= ts || gCar_flying) {
-                BrVector3Negate(vn, vn);
-            } else {
-                gCamera_sign = gCamera_sign == 0;
-                omega = BrDegreeToAngle(pTime * 0.03f);
-                if (gCamera_yaw <= 32760) {
-                    yaw = gCamera_yaw;
-                } else {
-                    yaw = gCamera_yaw - 32760;
-                }
-                if ((gCamera_yaw + 16380) <= 32760) {
-                    if (yaw > 8190 && yaw < 24570) {
-                        gCamera_yaw = 32760 - gCamera_yaw;
+            if (yaw > BR_ANGLE_DEG(45) && yaw < BR_ANGLE_DEG(135)) {
+                gCamera_yaw = -gCamera_yaw;
+            }
+        } else {
+            if (elapsed_time < 0) {
+                elapsed_time = 0;
+            }
+            if (elapsed_time >= 500 || ts > 0.0f) {
+                elapsed_time = 500;
+                if (fabs(c->speedo_speed) > (ts <= 0.0f ? 0.0006 : 0.0001) && !gCar_flying) {
+                    gCamera_sign = gCamera_sign == 0;
+                    omega = BrDegreeToAngle((int)pTime * 0.03);
+                    if (gCamera_yaw > BR_ANGLE_DEG(180)) {
+                        yaw = gCamera_yaw - BR_ANGLE_DEG(180);
+                    } else {
+                        yaw = gCamera_yaw;
+                    }
+                    theta = gCamera_yaw + BR_ANGLE_DEG(90);
+                    if (theta > BR_ANGLE_DEG(180)) {
+                        gCamera_yaw = BR_ANGLE_DEG(180) - gCamera_yaw;
+                    } else if (yaw > BR_ANGLE_DEG(45) && yaw < BR_ANGLE_DEG(135)) {
+                        gCamera_yaw = BR_ANGLE_DEG(180) - gCamera_yaw;
                     }
                 } else {
-                    gCamera_yaw = 32760 - gCamera_yaw;
+                    BrVector3Negate(vn, vn);
                 }
+            } else {
+                BrVector3Negate(vn, vn);
             }
         }
     } else {
-        gCamera_sign = gCamera_sign == 0;
-        if (gCamera_yaw <= 32760) {
-            yaw = gCamera_yaw;
-        } else {
-            yaw = gCamera_yaw - 32760;
-        }
-        if (yaw > 8190 && yaw < 24570) {
-            gCamera_yaw = -gCamera_yaw;
-        }
+        elapsed_time = -1;
     }
     if (gCamera_sign) {
         yaw = -gCamera_yaw;
@@ -5599,43 +5593,41 @@ void SwingCamera(tCar_spec* c, br_matrix34* m1, br_matrix34* m2, br_vector3* vn,
     if (!gCar_flying) {
         DrVector3RotateY(vn, yaw);
     }
-    sin_dtheta = 0.0;
-    v16 = vn->v[0] * gView_direction.v[2] - vn->v[2] * gView_direction.v[0];
-    v17 = vn->v[0] * gView_direction.v[0] + vn->v[2] * gView_direction.v[2];
+    ts = 0.0;
+    sin_dtheta = gView_direction.v[2] * vn->v[0] - gView_direction.v[0] * vn->v[2];
+    cos_dtheta = (double)(vn->v[0] * gView_direction.v[0]) + vn->v[2] * gView_direction.v[2];
 
-    v8 = BrRadianToAngle(sqrt(c->omega.v[2] * c->omega.v[2] + c->omega.v[0] * c->omega.v[0] + c->omega.v[1] * c->omega.v[1]) * pTime / 1000.0);
-    sin_dtheta = sin(BrAngleToRadian(v8)) + 0.1;
-
-    if (omega || gCamera_reset || (c->speed < 0.0001f && !manual_swing) || gCamera_mode == -1 || (v17 > 0.0 && !manual_swing && fabs(v16) > sin_dtheta)) {
+    if (omega || gCamera_reset || (c->speed < 0.0001f && !manual_swing) || gCamera_mode == -1
+        || (cos_dtheta > 0.0f && !manual_swing
+            && (ts = (br_scalar)sin(BrAngleToRadian(BrRadianToAngle(BrVector3Length(&c->omega) * pTime / 1000.0f))) + 0.1f, 1)
+            && fabs(sin_dtheta) > ts)) {
         if (!gCar_flying) {
-            theta = BrRadianToAngle(asin(sin_dtheta));
-            if (omega < theta) {
-                omega = theta;
+            alpha = BrRadianToAngle(asin(ts));
+            if (omega < alpha) {
+                omega = alpha;
             }
             if (!omega) {
-                omega = BrDegreeToAngle(pTime * 0.03); // (__int64)((double)(int)pTime * 0.03 * 182.0444444444445);
+                omega = BrDegreeToAngle((int)pTime * 0.03); // (__int64)((double)(int)pTime * 0.03 * 182.0444444444445);
             }
-            cos_dtheta = cos(BrAngleToRadian(omega));
-            if (cos_dtheta <= v17) {
-                omega = 0;
-                gCamera_mode = 0;
-            } else {
-                ts = BrAngleToRadian(omega);
-                if (v16 <= 0.0) {
-                    vn->v[0] = cos(ts) * gView_direction.v[0] - sin(ts) * gView_direction.v[2];
-                    vn->v[2] = sin(ts) * gView_direction.v[0] + cos(ts) * gView_direction.v[2];
+            if (cos(BrAngleToRadian(omega)) > cos_dtheta) {
+                if (sin_dtheta > 0.0f) {
+                    vn->v[0] = cos(BrAngleToRadian(omega)) * gView_direction.v[0] + sin(BrAngleToRadian(omega)) * gView_direction.v[2];
+                    vn->v[2] = cos(BrAngleToRadian(omega)) * gView_direction.v[2] - sin(BrAngleToRadian(omega)) * gView_direction.v[0];
                 } else {
-                    vn->v[0] = sin(ts) * gView_direction.v[2] + cos(ts) * gView_direction.v[0];
-                    vn->v[2] = cos(ts) * gView_direction.v[2] - sin(ts) * gView_direction.v[0];
+                    vn->v[0] = cos(BrAngleToRadian(omega)) * gView_direction.v[0] - sin(BrAngleToRadian(omega)) * gView_direction.v[2];
+                    vn->v[2] = (br_scalar)(sin(BrAngleToRadian(omega)) * gView_direction.v[0]) + cos(BrAngleToRadian(omega)) * gView_direction.v[2];
                 }
-                omega += BrDegreeToAngle(pTime * 0.03f);
-                if (BrDegreeToAngle(pTime * 0.1f) < omega) {
-                    omega = BrDegreeToAngle(pTime * 0.1f);
+                omega += BrDegreeToAngle((int)pTime * 0.03);
+                if (BrDegreeToAngle((int)pTime * 0.1) < omega) {
+                    omega = BrDegreeToAngle((int)pTime * 0.1);
                 }
-                if (omega < theta) {
-                    omega = theta;
+                if (omega < alpha) {
+                    omega = alpha;
                 }
+                return;
             }
+            omega = 0;
+            gCamera_mode = 0;
         }
     }
 }
