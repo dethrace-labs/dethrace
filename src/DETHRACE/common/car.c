@@ -2250,6 +2250,11 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     f.v[0] = 0.0f;
     f.v[1] = 0.0f;
     f.v[2] = 0.0f;
+#ifdef DETHRACE_FIX_BUGS
+    fb.v[0] = 0.0f;
+    fb.v[1] = 0.0f;
+    fb.v[2] = 0.0f;
+#endif
     mat = &c->car_master_actor->t.t.mat;
     mat_list = gCurrent_race.material_modifiers;
     vol = c->last_special_volume;
