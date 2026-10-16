@@ -1359,7 +1359,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
 #endif
             break;
 
-        DETHRACE_DEFAULT_BREAK
+            DETHRACE_DEFAULT_BREAK
         }
         the_funk->lighting_animation_type = GetALineAndInterpretCommand(pF, gFunk_move_names, COUNT_OF(gFunk_move_names));
         if (the_funk->lighting_animation_type != eMove_none) {
@@ -1455,7 +1455,7 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
             }
             break;
 
-        DETHRACE_DEFAULT_BREAK
+            DETHRACE_DEFAULT_BREAK
         }
 
         the_funk->proximity_count = 0;
@@ -1625,7 +1625,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
             the_groove->path_data.circular_info.axis = GetALineAndInterpretCommand(pF, gAxis_names, COUNT_OF(gAxis_names));
             break;
 
-        DETHRACE_DEFAULT_BREAK
+            DETHRACE_DEFAULT_BREAK
         }
 
         the_groove->object_type = GetALineAndInterpretCommand(pF, gGroove_object_names, COUNT_OF(gGroove_object_names));
@@ -1724,7 +1724,7 @@ void AddGroovidelics(FILE* pF, int pOwner, br_actor* pParent_actor, int pRef_off
                 &the_groove->object_data.shear_info.z_magnitude);
             break;
 
-        DETHRACE_DEFAULT_BREAK
+            DETHRACE_DEFAULT_BREAK
         }
     }
 }
@@ -2123,10 +2123,10 @@ void SetCarStorageTexturingLevel(tBrender_storage* pStorage, tCar_texturing_leve
         case eCTL_none:
             RevealStoredTransparentTextures(pStorage);
 
-        DETHRACE_DEFAULT_BREAK
+            DETHRACE_DEFAULT_BREAK
         }
 
-    DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -3288,8 +3288,9 @@ void FunkThoseTronics(void) {
                 if (the_funk->mode == eFunk_mode_distance && the_funk->proximity_array != NULL) {
                     for (j = 0, the_proximity = the_funk->proximity_array; j < the_funk->proximity_count; j++, the_proximity++) {
                         if (((the_proximity->v[0] - gOur_pos->v[0]) * (the_proximity->v[0] - gOur_pos->v[0])
-                            + ((the_proximity->v[2] - gOur_pos->v[2]) * (the_proximity->v[2] - gOur_pos->v[2])
-                            + (the_proximity[0].v[1] - gOur_pos->v[1]) * (the_proximity[0].v[1] - gOur_pos->v[1]))) <= gSight_distance_squared) {
+                                + ((the_proximity->v[2] - gOur_pos->v[2]) * (the_proximity->v[2] - gOur_pos->v[2])
+                                    + (the_proximity[0].v[1] - gOur_pos->v[1]) * (the_proximity[0].v[1] - gOur_pos->v[1])))
+                            <= gSight_distance_squared) {
                             j = -1;
                             break;
                         }
@@ -3317,12 +3318,7 @@ void FunkThoseTronics(void) {
                                 rot_amount = fmod(-the_funk->matrix_mod_data.spin_info.period, 1.f);
                             }
 
-                            DRMatrix23PostRotate(mat_matrix, (br_angle)(the_funk->matrix_mode == eMove_continuous ? (rot_amount != 0.f ? (fmod(f_the_time, rot_amount) / rot_amount) * 65536.0 : 0.0)
-                                : (the_funk->matrix_mode == eMove_controlled ? rot_amount * 65536.0
-                                : (the_funk->matrix_mode == eMove_absolute ? rot_amount
-                                : (the_funk->matrix_mode == eMove_linear ? (rot_amount != 0.f ? MapSawToTriangle((fmod(f_the_time, rot_amount) / rot_amount)) * 65536.0 : 0.f)
-                                : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, rot_amount) > rot_amount ? -65536.0 : 65536.0)
-                                : (rot_amount != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, rot_amount) / rot_amount) * 360)) * 65536.0 : 0.f)))))));
+                            DRMatrix23PostRotate(mat_matrix, (br_angle)(the_funk->matrix_mode == eMove_continuous ? (rot_amount != 0.f ? (fmod(f_the_time, rot_amount) / rot_amount) * 65536.0 : 0.0) : (the_funk->matrix_mode == eMove_controlled ? rot_amount * 65536.0 : (the_funk->matrix_mode == eMove_absolute ? rot_amount : (the_funk->matrix_mode == eMove_linear ? (rot_amount != 0.f ? MapSawToTriangle((fmod(f_the_time, rot_amount) / rot_amount)) * 65536.0 : 0.f) : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, rot_amount) > rot_amount ? -65536.0 : 65536.0) : (rot_amount != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, rot_amount) / rot_amount) * 360)) * 65536.0 : 0.f)))))));
 
                             mat_matrix->m[2][0] += .5f;
                             mat_matrix->m[2][1] += .5f;
@@ -3332,12 +3328,7 @@ void FunkThoseTronics(void) {
                             mat_matrix->m[2][0] -= the_funk->matrix_mod_data.rock_info.x_centre;
                             mat_matrix->m[2][1] -= the_funk->matrix_mod_data.rock_info.y_centre;
 
-                            DRMatrix23PostRotate(mat_matrix, BrDegreeToAngle(NormaliseDegreeAngle((the_funk->matrix_mode == eMove_continuous ? (the_funk->matrix_mod_data.rock_info.period != 0.f ? (fmod(f_the_time, the_funk->matrix_mod_data.rock_info.period) / the_funk->matrix_mod_data.rock_info.period) * the_funk->matrix_mod_data.rock_info.rock_angle : 0.0)
-                                : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.rock_info.period * the_funk->matrix_mod_data.rock_info.rock_angle
-                                : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.rock_info.period
-                                : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.rock_info.period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.rock_info.period) / the_funk->matrix_mod_data.rock_info.period)) * the_funk->matrix_mod_data.rock_info.rock_angle : 0.f)
-                                : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.rock_info.period) > the_funk->matrix_mod_data.rock_info.period ? -the_funk->matrix_mod_data.rock_info.rock_angle : the_funk->matrix_mod_data.rock_info.rock_angle)
-                                : (the_funk->matrix_mod_data.rock_info.period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.rock_info.period) / the_funk->matrix_mod_data.rock_info.period) * 360)) * the_funk->matrix_mod_data.rock_info.rock_angle : 0.f)))))))));
+                            DRMatrix23PostRotate(mat_matrix, BrDegreeToAngle(NormaliseDegreeAngle((the_funk->matrix_mode == eMove_continuous ? (the_funk->matrix_mod_data.rock_info.period != 0.f ? (fmod(f_the_time, the_funk->matrix_mod_data.rock_info.period) / the_funk->matrix_mod_data.rock_info.period) * the_funk->matrix_mod_data.rock_info.rock_angle : 0.0) : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.rock_info.period * the_funk->matrix_mod_data.rock_info.rock_angle : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.rock_info.period : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.rock_info.period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.rock_info.period) / the_funk->matrix_mod_data.rock_info.period)) * the_funk->matrix_mod_data.rock_info.rock_angle : 0.f) : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.rock_info.period) > the_funk->matrix_mod_data.rock_info.period ? -the_funk->matrix_mod_data.rock_info.rock_angle : the_funk->matrix_mod_data.rock_info.rock_angle) : (the_funk->matrix_mod_data.rock_info.period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.rock_info.period) / the_funk->matrix_mod_data.rock_info.period) * 360)) * the_funk->matrix_mod_data.rock_info.rock_angle : 0.f)))))))));
 
                             mat_matrix->m[2][0] += the_funk->matrix_mod_data.rock_info.x_centre;
                             mat_matrix->m[2][1] += the_funk->matrix_mod_data.rock_info.y_centre;
@@ -3347,75 +3338,52 @@ void FunkThoseTronics(void) {
                             mat_matrix->m[2][0] -= the_funk->matrix_mod_data.throb_info.x_centre;
                             mat_matrix->m[2][1] -= the_funk->matrix_mod_data.throb_info.y_centre;
 
-                            BrMatrix23PostScale(mat_matrix, (the_funk->matrix_mode == eMove_continuous ? (the_funk->matrix_mod_data.throb_info.x_period != 0.f ? (fmod(f_the_time, the_funk->matrix_mod_data.throb_info.x_period) / the_funk->matrix_mod_data.throb_info.x_period) * the_funk->matrix_mod_data.throb_info.x_magnitude : 0.0)
-                                : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.throb_info.x_period * the_funk->matrix_mod_data.throb_info.x_magnitude
-                                : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.throb_info.x_period
-                                : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.throb_info.x_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.throb_info.x_period) / the_funk->matrix_mod_data.throb_info.x_period)) * the_funk->matrix_mod_data.throb_info.x_magnitude : 0.f)
-                                : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.throb_info.x_period) > the_funk->matrix_mod_data.throb_info.x_period ? -the_funk->matrix_mod_data.throb_info.x_magnitude : the_funk->matrix_mod_data.throb_info.x_magnitude)
-                                : (the_funk->matrix_mod_data.throb_info.x_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.throb_info.x_period) / the_funk->matrix_mod_data.throb_info.x_period) * 360)) * the_funk->matrix_mod_data.throb_info.x_magnitude : 0.f)))))) + 1.0, (the_funk->matrix_mode == eMove_continuous ? (the_funk->matrix_mod_data.throb_info.y_period != 0.f ? (fmod(f_the_time, the_funk->matrix_mod_data.throb_info.y_period) / the_funk->matrix_mod_data.throb_info.y_period) * the_funk->matrix_mod_data.throb_info.y_magnitude : 0.0)
-                                : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.throb_info.y_period * the_funk->matrix_mod_data.throb_info.y_magnitude
-                                : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.throb_info.y_period
-                                : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.throb_info.y_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.throb_info.y_period) / the_funk->matrix_mod_data.throb_info.y_period)) * the_funk->matrix_mod_data.throb_info.y_magnitude : 0.f)
-                                : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.throb_info.y_period) > the_funk->matrix_mod_data.throb_info.y_period ? -the_funk->matrix_mod_data.throb_info.y_magnitude : the_funk->matrix_mod_data.throb_info.y_magnitude)
-                                : (the_funk->matrix_mod_data.throb_info.y_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.throb_info.y_period) / the_funk->matrix_mod_data.throb_info.y_period) * 360)) * the_funk->matrix_mod_data.throb_info.y_magnitude : 0.f)))))) + 1.0);
+                            BrMatrix23PostScale(mat_matrix, (the_funk->matrix_mode == eMove_continuous ? (the_funk->matrix_mod_data.throb_info.x_period != 0.f ? (fmod(f_the_time, the_funk->matrix_mod_data.throb_info.x_period) / the_funk->matrix_mod_data.throb_info.x_period) * the_funk->matrix_mod_data.throb_info.x_magnitude : 0.0) : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.throb_info.x_period * the_funk->matrix_mod_data.throb_info.x_magnitude : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.throb_info.x_period : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.throb_info.x_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.throb_info.x_period) / the_funk->matrix_mod_data.throb_info.x_period)) * the_funk->matrix_mod_data.throb_info.x_magnitude : 0.f) : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.throb_info.x_period) > the_funk->matrix_mod_data.throb_info.x_period ? -the_funk->matrix_mod_data.throb_info.x_magnitude : the_funk->matrix_mod_data.throb_info.x_magnitude) : (the_funk->matrix_mod_data.throb_info.x_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.throb_info.x_period) / the_funk->matrix_mod_data.throb_info.x_period) * 360)) * the_funk->matrix_mod_data.throb_info.x_magnitude : 0.f)))))) + 1.0, (the_funk->matrix_mode == eMove_continuous ? (the_funk->matrix_mod_data.throb_info.y_period != 0.f ? (fmod(f_the_time, the_funk->matrix_mod_data.throb_info.y_period) / the_funk->matrix_mod_data.throb_info.y_period) * the_funk->matrix_mod_data.throb_info.y_magnitude : 0.0) : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.throb_info.y_period * the_funk->matrix_mod_data.throb_info.y_magnitude : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.throb_info.y_period : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.throb_info.y_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.throb_info.y_period) / the_funk->matrix_mod_data.throb_info.y_period)) * the_funk->matrix_mod_data.throb_info.y_magnitude : 0.f) : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.throb_info.y_period) > the_funk->matrix_mod_data.throb_info.y_period ? -the_funk->matrix_mod_data.throb_info.y_magnitude : the_funk->matrix_mod_data.throb_info.y_magnitude) : (the_funk->matrix_mod_data.throb_info.y_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.throb_info.y_period) / the_funk->matrix_mod_data.throb_info.y_period) * 360)) * the_funk->matrix_mod_data.throb_info.y_magnitude : 0.f)))))) + 1.0);
 
                             mat_matrix->m[2][0] += the_funk->matrix_mod_data.throb_info.x_centre;
                             mat_matrix->m[2][1] += the_funk->matrix_mod_data.throb_info.y_centre;
                             break;
                         case eMatrix_mod_slither:
                             mat_matrix->m[2][0] = (the_funk->matrix_mode == eMove_continuous ? (the_funk->matrix_mod_data.slither_info.x_period != 0.f ? (fmod(f_the_time, the_funk->matrix_mod_data.slither_info.x_period) / the_funk->matrix_mod_data.slither_info.x_period) * the_funk->matrix_mod_data.slither_info.x_magnitude : 0.0)
-                                : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.slither_info.x_period * the_funk->matrix_mod_data.slither_info.x_magnitude
-                                : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.slither_info.x_period
-                                : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.slither_info.x_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.slither_info.x_period) / the_funk->matrix_mod_data.slither_info.x_period)) * the_funk->matrix_mod_data.slither_info.x_magnitude : 0.f)
-                                : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.slither_info.x_period) > the_funk->matrix_mod_data.slither_info.x_period ? -the_funk->matrix_mod_data.slither_info.x_magnitude : the_funk->matrix_mod_data.slither_info.x_magnitude)
-                                : (the_funk->matrix_mod_data.slither_info.x_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.slither_info.x_period) / the_funk->matrix_mod_data.slither_info.x_period) * 360)) * the_funk->matrix_mod_data.slither_info.x_magnitude : 0.f))))));
+                                                                                             : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.slither_info.x_period * the_funk->matrix_mod_data.slither_info.x_magnitude
+                                                                                                                                          : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.slither_info.x_period
+                                                                                                                                                                                     : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.slither_info.x_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.slither_info.x_period) / the_funk->matrix_mod_data.slither_info.x_period)) * the_funk->matrix_mod_data.slither_info.x_magnitude : 0.f)
+                                                                                                                                                                                                                              : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.slither_info.x_period) > the_funk->matrix_mod_data.slither_info.x_period ? -the_funk->matrix_mod_data.slither_info.x_magnitude : the_funk->matrix_mod_data.slither_info.x_magnitude)
+                                                                                                                                                                                                                                                                      : (the_funk->matrix_mod_data.slither_info.x_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.slither_info.x_period) / the_funk->matrix_mod_data.slither_info.x_period) * 360)) * the_funk->matrix_mod_data.slither_info.x_magnitude : 0.f))))));
                             mat_matrix->m[2][1] = (the_funk->matrix_mode == eMove_continuous ? (the_funk->matrix_mod_data.slither_info.y_period != 0.f ? (fmod(f_the_time, the_funk->matrix_mod_data.slither_info.y_period) / the_funk->matrix_mod_data.slither_info.y_period) * the_funk->matrix_mod_data.slither_info.y_magnitude : 0.0)
-                                : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.slither_info.y_period * the_funk->matrix_mod_data.slither_info.y_magnitude
-                                : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.slither_info.y_period
-                                : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.slither_info.y_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.slither_info.y_period) / the_funk->matrix_mod_data.slither_info.y_period)) * the_funk->matrix_mod_data.slither_info.y_magnitude : 0.f)
-                                : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.slither_info.y_period) > the_funk->matrix_mod_data.slither_info.y_period ? -the_funk->matrix_mod_data.slither_info.y_magnitude : the_funk->matrix_mod_data.slither_info.y_magnitude)
-                                : (the_funk->matrix_mod_data.slither_info.y_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.slither_info.y_period) / the_funk->matrix_mod_data.slither_info.y_period) * 360)) * the_funk->matrix_mod_data.slither_info.y_magnitude : 0.f))))));
+                                                                                             : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.slither_info.y_period * the_funk->matrix_mod_data.slither_info.y_magnitude
+                                                                                                                                          : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.slither_info.y_period
+                                                                                                                                                                                     : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.slither_info.y_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.slither_info.y_period) / the_funk->matrix_mod_data.slither_info.y_period)) * the_funk->matrix_mod_data.slither_info.y_magnitude : 0.f)
+                                                                                                                                                                                                                              : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.slither_info.y_period) > the_funk->matrix_mod_data.slither_info.y_period ? -the_funk->matrix_mod_data.slither_info.y_magnitude : the_funk->matrix_mod_data.slither_info.y_magnitude)
+                                                                                                                                                                                                                                                                      : (the_funk->matrix_mod_data.slither_info.y_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.slither_info.y_period) / the_funk->matrix_mod_data.slither_info.y_period) * 360)) * the_funk->matrix_mod_data.slither_info.y_magnitude : 0.f))))));
                             break;
                         case eMatrix_mod_roll:
                             mat_matrix->m[2][0] = (the_funk->matrix_mode == eMove_continuous ? (the_funk->matrix_mod_data.roll_info.x_period != 0.f ? (fmod(f_the_time, the_funk->matrix_mod_data.roll_info.x_period) / the_funk->matrix_mod_data.roll_info.x_period) * 1.0 : 0.0)
-                                : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.roll_info.x_period * 1.0
-                                : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.roll_info.x_period
-                                : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.roll_info.x_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.roll_info.x_period) / the_funk->matrix_mod_data.roll_info.x_period)) * 1.0 : 0.f)
-                                : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.roll_info.x_period) > the_funk->matrix_mod_data.roll_info.x_period ? -1.0 : 1.0)
-                                : (the_funk->matrix_mod_data.roll_info.x_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.roll_info.x_period) / the_funk->matrix_mod_data.roll_info.x_period) * 360)) * 1.0 : 0.f))))));
+                                                                                             : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.roll_info.x_period * 1.0
+                                                                                                                                          : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.roll_info.x_period
+                                                                                                                                                                                     : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.roll_info.x_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.roll_info.x_period) / the_funk->matrix_mod_data.roll_info.x_period)) * 1.0 : 0.f)
+                                                                                                                                                                                                                              : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.roll_info.x_period) > the_funk->matrix_mod_data.roll_info.x_period ? -1.0 : 1.0)
+                                                                                                                                                                                                                                                                      : (the_funk->matrix_mod_data.roll_info.x_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.roll_info.x_period) / the_funk->matrix_mod_data.roll_info.x_period) * 360)) * 1.0 : 0.f))))));
                             mat_matrix->m[2][1] = (the_funk->matrix_mode == eMove_continuous ? (the_funk->matrix_mod_data.roll_info.y_period != 0.f ? (fmod(f_the_time, the_funk->matrix_mod_data.roll_info.y_period) / the_funk->matrix_mod_data.roll_info.y_period) * 1.0 : 0.0)
-                                : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.roll_info.y_period * 1.0
-                                : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.roll_info.y_period
-                                : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.roll_info.y_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.roll_info.y_period) / the_funk->matrix_mod_data.roll_info.y_period)) * 1.0 : 0.f)
-                                : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.roll_info.y_period) > the_funk->matrix_mod_data.roll_info.y_period ? -1.0 : 1.0)
-                                : (the_funk->matrix_mod_data.roll_info.y_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.roll_info.y_period) / the_funk->matrix_mod_data.roll_info.y_period) * 360)) * 1.0 : 0.f))))));
+                                                                                             : (the_funk->matrix_mode == eMove_controlled ? the_funk->matrix_mod_data.roll_info.y_period * 1.0
+                                                                                                                                          : (the_funk->matrix_mode == eMove_absolute ? the_funk->matrix_mod_data.roll_info.y_period
+                                                                                                                                                                                     : (the_funk->matrix_mode == eMove_linear ? (the_funk->matrix_mod_data.roll_info.y_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->matrix_mod_data.roll_info.y_period) / the_funk->matrix_mod_data.roll_info.y_period)) * 1.0 : 0.f)
+                                                                                                                                                                                                                              : (the_funk->matrix_mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->matrix_mod_data.roll_info.y_period) > the_funk->matrix_mod_data.roll_info.y_period ? -1.0 : 1.0)
+                                                                                                                                                                                                                                                                      : (the_funk->matrix_mod_data.roll_info.y_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->matrix_mod_data.roll_info.y_period) / the_funk->matrix_mod_data.roll_info.y_period) * 360)) * 1.0 : 0.f))))));
                             break;
+
+                            DETHRACE_FIX_BUGS;
                         }
                         if (the_funk->matrix_mod_type != eMatrix_mod_none) {
                             BrMaterialUpdate(the_funk->material, BR_MATU_MAP_TRANSFORM);
                         }
                     }
                     if (the_funk->lighting_animation_type != eMove_none) {
-                        the_material->ka = the_funk->ambient_base + (the_funk->lighting_animation_type == eMove_continuous ? (the_funk->lighting_animation_period != 0.f ? (fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * the_funk->ambient_delta : 0.0)
-                            : (the_funk->lighting_animation_type == eMove_controlled ? the_funk->ambient_delta * the_funk[0].lighting_animation_period
-                            : (the_funk->lighting_animation_type == eMove_absolute ? the_funk->lighting_animation_period
-                            : (the_funk->lighting_animation_type == eMove_linear ? (the_funk->lighting_animation_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period)) * the_funk->ambient_delta : 0.f)
-                            : (the_funk->lighting_animation_type == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->lighting_animation_period) > the_funk->lighting_animation_period ? -the_funk->ambient_delta : the_funk->ambient_delta)
-                            : (the_funk->lighting_animation_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * 360)) * the_funk->ambient_delta : 0.f))))));
+                        the_material->ka = the_funk->ambient_base + (the_funk->lighting_animation_type == eMove_continuous ? (the_funk->lighting_animation_period != 0.f ? (fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * the_funk->ambient_delta : 0.0) : (the_funk->lighting_animation_type == eMove_controlled ? the_funk->ambient_delta * the_funk[0].lighting_animation_period : (the_funk->lighting_animation_type == eMove_absolute ? the_funk->lighting_animation_period : (the_funk->lighting_animation_type == eMove_linear ? (the_funk->lighting_animation_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period)) * the_funk->ambient_delta : 0.f) : (the_funk->lighting_animation_type == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->lighting_animation_period) > the_funk->lighting_animation_period ? -the_funk->ambient_delta : the_funk->ambient_delta) : (the_funk->lighting_animation_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * 360)) * the_funk->ambient_delta : 0.f))))));
 
-                        the_material->kd = the_funk->direct_base + (the_funk->lighting_animation_type == eMove_continuous ? (the_funk->lighting_animation_period != 0.f ? (fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * the_funk->direct_delta : 0.0)
-                            : (the_funk->lighting_animation_type == eMove_controlled ? the_funk->lighting_animation_period * the_funk->direct_delta
-                            : (the_funk->lighting_animation_type == eMove_absolute ? the_funk->lighting_animation_period
-                            : (the_funk->lighting_animation_type == eMove_linear ? (the_funk->lighting_animation_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period)) * the_funk->direct_delta : 0.f)
-                            : (the_funk->lighting_animation_type == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->lighting_animation_period) > the_funk->lighting_animation_period ? -the_funk->direct_delta : the_funk->direct_delta)
-                            : (the_funk->lighting_animation_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * 360)) * the_funk->direct_delta : 0.f))))));
+                        the_material->kd = the_funk->direct_base + (the_funk->lighting_animation_type == eMove_continuous ? (the_funk->lighting_animation_period != 0.f ? (fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * the_funk->direct_delta : 0.0) : (the_funk->lighting_animation_type == eMove_controlled ? the_funk->lighting_animation_period * the_funk->direct_delta : (the_funk->lighting_animation_type == eMove_absolute ? the_funk->lighting_animation_period : (the_funk->lighting_animation_type == eMove_linear ? (the_funk->lighting_animation_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period)) * the_funk->direct_delta : 0.f) : (the_funk->lighting_animation_type == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->lighting_animation_period) > the_funk->lighting_animation_period ? -the_funk->direct_delta : the_funk->direct_delta) : (the_funk->lighting_animation_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * 360)) * the_funk->direct_delta : 0.f))))));
 
-                        the_material->ks = the_funk->specular_base + (the_funk->lighting_animation_type == eMove_continuous ? (the_funk->lighting_animation_period != 0.f ? (fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * the_funk->specular_delta : 0.0)
-                            : (the_funk->lighting_animation_type == eMove_controlled ? the_funk[0].specular_delta * the_funk[0].lighting_animation_period
-                            : (the_funk->lighting_animation_type == eMove_absolute ? the_funk->lighting_animation_period
-                            : (the_funk->lighting_animation_type == eMove_linear ? (the_funk->lighting_animation_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period)) * the_funk->specular_delta : 0.f)
-                            : (the_funk->lighting_animation_type == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->lighting_animation_period) > the_funk->lighting_animation_period ? -the_funk->specular_delta : the_funk->specular_delta)
-                            : (the_funk->lighting_animation_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * 360)) * the_funk->specular_delta : 0.f))))));
+                        the_material->ks = the_funk->specular_base + (the_funk->lighting_animation_type == eMove_continuous ? (the_funk->lighting_animation_period != 0.f ? (fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * the_funk->specular_delta : 0.0) : (the_funk->lighting_animation_type == eMove_controlled ? the_funk[0].specular_delta * the_funk[0].lighting_animation_period : (the_funk->lighting_animation_type == eMove_absolute ? the_funk->lighting_animation_period : (the_funk->lighting_animation_type == eMove_linear ? (the_funk->lighting_animation_period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period)) * the_funk->specular_delta : 0.f) : (the_funk->lighting_animation_type == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->lighting_animation_period) > the_funk->lighting_animation_period ? -the_funk->specular_delta : the_funk->specular_delta) : (the_funk->lighting_animation_period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->lighting_animation_period) / the_funk->lighting_animation_period) * 360)) * the_funk->specular_delta : 0.f))))));
                     }
                     switch (the_funk->texture_animation_type) {
                     case eTexture_animation_frames:
@@ -3431,11 +3399,11 @@ void FunkThoseTronics(void) {
                             if (the_funk->time_mode == eTime_mode_accurate) {
 
                                 the_material->colour_map = the_funk->texture_animation_data.frames_info.textures[(int)(the_funk->texture_animation_data.frames_info.mode == eMove_continuous ? (the_funk->texture_animation_data.frames_info.period != 0.f ? (fmod(f_the_time, the_funk->texture_animation_data.frames_info.period) / the_funk->texture_animation_data.frames_info.period) * the_funk->texture_animation_data.frames_info.texture_count : 0.0)
-                                    : (the_funk->texture_animation_data.frames_info.mode == eMove_controlled ? the_funk->texture_animation_data.frames_info.period * the_funk->texture_animation_data.frames_info.texture_count
-                                    : (the_funk->texture_animation_data.frames_info.mode == eMove_absolute ? the_funk->texture_animation_data.frames_info.period
-                                    : (the_funk->texture_animation_data.frames_info.mode == eMove_linear ? (the_funk->texture_animation_data.frames_info.period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->texture_animation_data.frames_info.period) / the_funk->texture_animation_data.frames_info.period)) * the_funk->texture_animation_data.frames_info.texture_count : 0.f)
-                                    : (the_funk->texture_animation_data.frames_info.mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->texture_animation_data.frames_info.period) > the_funk->texture_animation_data.frames_info.period ? -the_funk->texture_animation_data.frames_info.texture_count : the_funk->texture_animation_data.frames_info.texture_count)
-                                    : (the_funk->texture_animation_data.frames_info.period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->texture_animation_data.frames_info.period) / the_funk->texture_animation_data.frames_info.period) * 360)) * the_funk->texture_animation_data.frames_info.texture_count : 0.f))))))];
+                                                                                                                                                                                             : (the_funk->texture_animation_data.frames_info.mode == eMove_controlled ? the_funk->texture_animation_data.frames_info.period * the_funk->texture_animation_data.frames_info.texture_count
+                                                                                                                                                                                                                                                                      : (the_funk->texture_animation_data.frames_info.mode == eMove_absolute ? the_funk->texture_animation_data.frames_info.period
+                                                                                                                                                                                                                                                                                                                                             : (the_funk->texture_animation_data.frames_info.mode == eMove_linear ? (the_funk->texture_animation_data.frames_info.period != 0.f ? MapSawToTriangle((fmod(f_the_time, the_funk->texture_animation_data.frames_info.period) / the_funk->texture_animation_data.frames_info.period)) * the_funk->texture_animation_data.frames_info.texture_count : 0.f)
+                                                                                                                                                                                                                                                                                                                                                                                                                  : (the_funk->texture_animation_data.frames_info.mode == eMove_flash ? (2.0 * fmod(f_the_time, the_funk->texture_animation_data.frames_info.period) > the_funk->texture_animation_data.frames_info.period ? -the_funk->texture_animation_data.frames_info.texture_count : the_funk->texture_animation_data.frames_info.texture_count)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      : (the_funk->texture_animation_data.frames_info.period != 0.f ? BR_SIN(BrDegreeToAngle((fmod(f_the_time, the_funk->texture_animation_data.frames_info.period) / the_funk->texture_animation_data.frames_info.period) * 360)) * the_funk->texture_animation_data.frames_info.texture_count : 0.f))))))];
                             } else {
                                 if (the_funk->texture_animation_data.frames_info.period <= f_time_diff) {
                                     the_funk->last_frame = f_the_time;
@@ -3488,6 +3456,8 @@ void FunkThoseTronics(void) {
                             }
                         }
                         break;
+
+                        DETHRACE_DEFAULT_BREAK;
                     }
                 }
             }
@@ -3519,7 +3489,7 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
         BrVector3SetFloat(&fixed_axis, 0.f, 0.f, 1.f);
         break;
 
-    DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
     }
     BrVector3Cross(&vector_a, &ref_to_subject, &fixed_axis);
     BrVector3Normalise(&vector_a, &vector_a);
@@ -3570,7 +3540,7 @@ void LollipopizeActor(br_actor* pSubject_actor, br_matrix34* ref_to_world, tLoll
         mat.m[3][2] = 0.f;
         break;
 
-    DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
     }
     BrMatrix34Pre(&pSubject_actor->t.t.mat, &mat);
 }
