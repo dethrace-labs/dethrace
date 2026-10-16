@@ -38,7 +38,6 @@ void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3* p4, br
     // br_scalar numerator;
     // br_scalar x;
 
-    // Guessed DOS-symbol roles below follow values through reused Windows stack slots.
     // Vector component 1 denotes the Z component of the XZ projection.
     br_scalar rel1; // rel3.v[1] -> rot1.v[0] -> rot1u.v[0] (cosine).
     br_scalar dz12; // rel1.v[1].
