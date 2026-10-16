@@ -2250,11 +2250,11 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             DoBumpiness(c, wheel_pos, norm, d, n);
         }
 
-        if (d[n] >= -0.5f && d[n] <= c->susp_height[n >> 1] + c->wheel_dam_offset[n ^ 2] * WORLD_SCALE) {
+        if (d[n] >= -0.5f && d[n] <= c->susp_height[n >> 1] + c->wheel_dam_offset[n ^ 2] * WORLD_SCALE_D) {
             BrVector3Accumulate(&c->road_normal, &norm[n]);
             normnum++;
 
-            d[n] -= c->wheel_dam_offset[n ^ 2] * WORLD_SCALE;
+            d[n] -= c->wheel_dam_offset[n ^ 2] * WORLD_SCALE_D;
             force[n] = (c->sk[n >> 1] * (c->susp_height[n >> 1] - d[n]));
             force[n] -= (c->sb[n >> 1] * ((d[n] - c->oldd[n]) / dt));
 
@@ -2286,7 +2286,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         if (vol) {
             ts = c->water_depth_factor * (1 - vol->gravity_multiplier);
             if (c->underwater_ability) {
-                ts = ts * UNDERWATER_ABILITY_FACTOR;
+                ts = ts * 0.6;
             }
             ts = c->M * (1 - ts);
         } else {
@@ -2408,7 +2408,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         ts3 = ((force[2] + force[3]) * c->rolling_r_front) + ts6;
 
         ts5 = c->wpos[0].v[2] - c->wpos[2].v[2];
-        ts5 = BR_SQRT(1 + (c->curvature * c->curvature * ts5 * ts5));
+        ts5 = BR_SQRT(1 + c->curvature * (c->curvature * (ts5 * ts5)));
         front_retardation = ts3 / ts5;
 
         ts4 = ts2 + front_retardation;
@@ -2494,7 +2494,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         if (BR_ABS(fbi) > (maxfl + maxfr) && maxfl + maxfr > 0.1) {
             ts3 = (maxfl + maxfr) / BR_ABS(fbi) * dt;
             fbi *= ts3;
-            fbk *= ts3 * c->friction_elipticity;
+            fbk = fbk * (c->friction_elipticity * ts3);
 
             ts = -(((BR_SQR(ffi) + BR_SQR(ffk)) / c->M) + (BR_SQR(((c->wpos[2].v[2] - c->cmpos.v[2]) * ffi)) / c->I.v[1]));
             ts2 = (BrVector3Dot(&vplane, &rightplane) + fbi / c->M) * ffi;
@@ -2727,8 +2727,8 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     BrVector3Accumulate(&c->v, &a);
 
     if (c->speed < MIN_SPEED && (!(c->keys.acc || c->joystick.acc > 0) || c->gear == 0) && !(c->keys.dec || c->joystick.dec > 0) && !c->bounce_rate) {
-        if (BrVector3Length(&c->omega) < MIN_OMEGA) {
-            ts = (vol) ? ((BrVector3Length(&b) / (((c->driver > eDriver_non_car) && c->underwater_ability) ? (1 - (1 - vol->gravity_multiplier) * UNDERWATER_ABILITY_FACTOR) : vol->gravity_multiplier)) / BrFloatToScalar(gGravity_multiplier)) : BrVector3Length(&b);
+        if (BrVector3Length(&c->omega) < 0.05) {
+            ts = (vol) ? ((BrVector3Length(&b) / (((c->driver > eDriver_non_car) && c->underwater_ability) ? (1 - (1 - vol->gravity_multiplier) * 0.6) : vol->gravity_multiplier)) / BrFloatToScalar(gGravity_multiplier)) : BrVector3Length(&b);
             if (ts < 1 * c->M || (c->keys.brake && normnum >= 3)) {
                 if (stop_timer == 100.0f) {
                     stop_timer = 0.0f;
