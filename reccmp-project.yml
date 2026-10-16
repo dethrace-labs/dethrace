@@ -237,6 +237,8 @@ targets:
           "BrLightEnable",
           "BrTableAddMany",
           "BrMatrix34PostTransform",
+          "BrMatrix23PostScale",
+          "BrMapUpdate",
 
           "S3OutletSoundsPlaying",
           "S3StopAllOutletSounds",
@@ -354,4 +356,6 @@ targets:
           "PDNetSendMessageToAddress",
           "PDNetInitClient",
           "PDNetGetHeaderSize",
+
+          "DoModelThing",  // contains V11MODEL references which dont match due to BRender-v1.3.2 being different
         ]
