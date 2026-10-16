@@ -2215,7 +2215,6 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     br_vector3 tv2;
     br_vector3 norm[4];
     br_vector3 v_batwick;
-
     br_vector3 vplane;
     br_vector3 rightplane;
     br_vector3 t = BR_VECTOR3(0, 0, 0);
@@ -2230,86 +2229,65 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     br_scalar direction;
     br_scalar wheel_spin_force;
     br_scalar d_damage;
-
     br_scalar fl_oil_factor;
     br_scalar fr_oil_factor;
     br_scalar rl_oil_factor;
     br_scalar rr_oil_factor;
-
     br_matrix34* mat = &c->car_master_actor->t.t.mat;
     tMaterial_modifiers* mat_list = gCurrent_race.material_modifiers;
-
     // GLOBAL: CARM95 0x00514e4c
     static br_scalar stop_timer = 0.0f;
     // GLOBAL: CARM95 0x00514e50
     static br_scalar slide_dist = 0;
     tDamage_type dam;
-
     br_scalar v;
     tSpecial_volume* vol = c->last_special_volume;
 
     b.v[0] = -mat->m[1][0];
     b.v[1] = -mat->m[1][1];
     b.v[2] = -mat->m[1][2];
-
     c->material_index[0] = 0;
     c->material_index[1] = 0;
     c->material_index[2] = 0;
     c->material_index[3] = 0;
-
     wheelratio = (c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[0].v[2] - c->cmpos.v[2]);
-
     BrVector3Set(&c->road_normal, 0.0f, 0.0f, 0.0f);
-
     for (n = 0; n < 4; n++) {
         BrMatrix34ApplyP(&wheel_pos[n], &c->wpos[n], mat);
     }
-
     MultiFindFloorInBoxM(4, wheel_pos, &b, c->nor, d, c, c->material_index);
-
     if (c->last_special_volume && c->last_special_volume->material_modifier_index) {
         c->material_index[3] = c->material_index[2] = c->material_index[1] = c->material_index[0] = c->last_special_volume->material_modifier_index;
     }
-
     for (n = 0; n < 4; n++) {
         BrMatrix34TApplyV(&norm[n], &c->nor[n], mat);
-
         if (mat_list[c->material_index[n]].bumpiness) {
             DoBumpiness(c, wheel_pos, norm, d, n);
         }
-
         if (d[n] >= -0.5f && d[n] <= c->susp_height[n >> 1] + c->wheel_dam_offset[n ^ 2] * WORLD_SCALE_D) {
             BrVector3Accumulate(&c->road_normal, &norm[n]);
             normnum++;
-
             d[n] -= c->wheel_dam_offset[n ^ 2] * WORLD_SCALE_D;
             force[n] = (c->sk[n >> 1] * (c->susp_height[n >> 1] - d[n]));
             force[n] -= (c->sb[n >> 1] * ((d[n] - c->oldd[n]) / dt));
-
             if (c->oldd[n] == c->susp_height[n >> 1] && BrVector3Dot(&c->v, &c->nor[n]) > -0.01f) {
                 if (force[n] > c->M * 10 * 2 / 4) {
                     d[n] = c->susp_height[n >> 1];
                     force[n] = c->M * 10 * 2 / 4;
                 }
             }
-
             if (force[n] < 0) {
                 force[n] = 0;
             }
-
             f.v[1] += force[n];
-
             t.v[0] -= (c->wpos[n].v[2] - c->cmpos.v[2]) * force[n];
             t.v[2] += (c->wpos[n].v[0] - c->cmpos.v[0]) * force[n];
-
         } else {
             force[n] = 0.0f;
             d[n] = c->susp_height[n >> 1];
         }
-
         c->oldd[n] = d[n];
     }
-
     if (c->driver <= eDriver_non_car || !c->wall_climber_mode || (!c->road_normal.v[0] && !c->road_normal.v[1] && !c->road_normal.v[2])) {
         if (vol) {
             ts = c->water_depth_factor * (1 - vol->gravity_multiplier);
@@ -2320,7 +2298,6 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         } else {
             ts = c->M;
         }
-
         ts = GRAVITY * ts * gGravity_multiplier;
         f.v[0] -= mat->m[0][1] * ts;
         f.v[1] -= mat->m[1][1] * ts;
@@ -2330,29 +2307,21 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         BrVector3Scale(&v_batwick, &v_batwick, -(GRAVITY * c->M));
         BrVector3Accumulate(&f, &v_batwick);
     }
-
     if (c->driver >= eDriver_net_human) {
         SteeringSelfCentre(c, dt, &c->road_normal);
     }
-
     if (normnum != 0) {
         BrVector3NormaliseQuick(&c->road_normal, &c->road_normal);
-
         ts = (c->road_normal.v[0] * mat->m[0][1]) + (c->road_normal.v[1] * mat->m[1][1]) + (c->road_normal.v[2] * mat->m[2][1]);
-
         if ((c->driver > eDriver_non_car) && c->wall_climber_mode) {
             ts = 1;
         }
-
         ts = ts * gCurrent_race.material_modifiers[c->material_index[0]].down_force;
-
         if (ts > 0) {
             ts = (((BR_ABS(c->velocity_car_space.v[2]) * c->M) * 10) * ts) / c->down_force_speed;
-
             if (ts > 10 * c->M) {
                 ts = 10 * c->M;
             }
-
             if (c->number_of_wheels_on_ground == 4 && c->oldd[2] == c->susp_height[1] && c->oldd[3] == c->susp_height[1]) {
                 BrVector3Scale(&tv, (br_vector3*)mat->m[2], c->wpos[2].v[2]);
                 BrVector3Add(&tv, &tv, (br_vector3*)mat->m[3]);
@@ -2364,63 +2333,44 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             } else if (c->down_force_flag && (c->oldd[2] < c->susp_height[1] || c->oldd[3] < c->susp_height[1])) {
                 c->down_force_flag = 0;
             }
-
             if (c->down_force_flag) {
                 ts = ts * ((c->wpos[2].v[2] - c->cmpos.v[2]) / (c->wpos[2].v[2] - c->wpos[0].v[2]));
-
                 t.v[0] += (c->wpos[0].v[2] - c->cmpos.v[2]) * ts;
             }
-
             f.v[1] -= ts;
         }
-
         BrVector3Scale(&vplane, &c->road_normal, BrVector3Dot(&c->velocity_car_space, &c->road_normal));
         BrVector3Sub(&vplane, &c->velocity_car_space, &vplane);
-
         direction = (vplane.v[2] < 0) ? 1.0f : -1.0f;
         deltaomega = c->curvature * BrVector3Length(&vplane);
         deltaomega = deltaomega * direction;
         deltaomega = deltaomega - BrVector3Dot(&c->omega, &c->road_normal);
-
         rightplane.v[0] = c->road_normal.v[1];
         rightplane.v[1] = -c->road_normal.v[0];
         rightplane.v[2] = 0;
         BrVector3Normalise(&rightplane, &rightplane);
-
         ts = (c->I.v[1] / dt) * deltaomega;
-
         ffi = ts / (c->wpos[2].v[2] - c->wpos[0].v[2]);
         fbi = -ffi;
-
         a.v[0] = 0;
         a.v[1] = c->road_normal.v[2];
         a.v[2] = -c->road_normal.v[1];
         BrVector3Normalise(&a, &a);
-
         fbk = c->acc_force;
-
         ts = BrVector3Dot(&a, &vplane);
-
         ts3 = BrVector3Dot(&vplane, &rightplane);
         ts2 = BR_ABS(ts3);
-
         ts = (ts * (c->wpos[0].v[2] - c->cmpos.v[2])) * BR_ABS(c->curvature);
-
         ts = (c->curvature > 0) ? (ts + ts3) : -ts + ts3;
         ts *= -(c->M / dt);
         ts -= BrVector3Dot(&rightplane, &f);
-
         ts = ts / (1 - wheelratio);
         ffi += ts;
         fbi += ts * (-wheelratio);
-
         ts = ffi * (c->wpos[0].v[2] - c->wpos[2].v[2]);
-
         ffk = ts * c->curvature;
-
         ts = (c->M * BrVector3Dot(&c->velocity_car_space, &a)) / dt;
         max_retardation = ts + BrVector3Dot(&f, &a);
-
         ts5 = (c->brake_force * c->mu[0]) / (c->mu[0] + (c->mu[1] / c->friction_elipticity));
         ts6 = c->brake_force - ts5;
         i = (c->damage_units[eDamage_lr_brake].damage_level + c->damage_units[eDamage_rr_brake].damage_level) / 2;
@@ -2431,14 +2381,11 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         if (i > MAX_DAMAGE_LEVEL / 5) {
             ts6 = ts6 * BR_SQR(1.0f - BrIntToScalar(i - MAX_DAMAGE_LEVEL / 5) / (MAX_DAMAGE_LEVEL * 4 / 5));
         }
-
         ts2 = ((force[0] + force[1]) * c->rolling_r_back) + ts5;
         ts3 = ((force[2] + force[3]) * c->rolling_r_front) + ts6;
-
         ts5 = c->wpos[0].v[2] - c->wpos[2].v[2];
         ts5 = BR_SQRT(1 + c->curvature * (c->curvature * (ts5 * ts5)));
         front_retardation = ts3 / ts5;
-
         ts4 = ts2 + front_retardation;
         if (BR_ABS(max_retardation) < BR_ABS(ts4)) {
             ts2 = ts2 * (max_retardation / ts4);
@@ -2449,30 +2396,22 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             front_retardation = -front_retardation;
         }
         max_retardation -= ts2 + front_retardation;
-
         fbk += -ts2;
-
         if (c->keys.brake && c->damage_units[eDamage_lr_brake].damage_level < HANDBRAKE_FAIL_DAMAGE
             && c->damage_units[eDamage_rr_brake].damage_level < HANDBRAKE_FAIL_DAMAGE) {
             fbk += -max_retardation;
             c->gear = 0;
         }
-
         fbk = fbk / c->friction_elipticity;
-
         modf = BR_LENGTH2(fbi, fbk) / 2;
-
         GetOilFrictionFactors(c, &fl_oil_factor,
             &fr_oil_factor,
             &rl_oil_factor,
             &rr_oil_factor);
-
         friction_number = (c->driver > eDriver_non_car) ? c->grip_multiplier : 1.0f;
-
         BrVector3Sub(&tv2, &c->wpos[0], &c->cmpos);
         BrVector3Cross(&tv, &c->omega, &tv2);
         BrVector3Accumulate(&tv, &c->velocity_car_space);
-
         if ((c->driver >= eDriver_net_human) && ((((c->keys.left || c->joystick.left > 32768) && c->curvature > 0 && deltaomega > 0.1 && tv.v[0] > 0) || ((c->keys.right || c->joystick.right > 32768) && c->curvature < 0 && deltaomega < 0.1 && tv.v[0] < 0)) && direction > 0)) {
             ts = c->mu[0];
         } else {
@@ -2483,15 +2422,11 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             }
             ts += ts2 * (c->mu[2] - c->mu[0]);
         }
-
         maxfl = ((ts * BR_SQRT(force[0])) * (friction_number * rl_oil_factor)) * mat_list[c->material_index[0]].tyre_road_friction;
         maxfr = ((ts * BR_SQRT(force[1])) * (friction_number * rr_oil_factor)) * mat_list[c->material_index[1]].tyre_road_friction;
-
         c->max_force_rear = maxfl + maxfr;
-
         if (rl_oil_factor == 1.0f && rr_oil_factor == 1.0f && c->traction_control && 2 * modf > c->max_force_rear && c->acc_force > 0 && (c->driver < eDriver_net_human || (c->target_revs > 1000 && c->gear > 0))) {
             ts2 = fbk;
-
             ts3 = (BR_SQR(ts2) > 4 * BR_SQR(modf)) ? 0 : BR_SQRT(4 * (BR_SQR(modf)) - BR_SQR(ts2));
             if (ts3 < c->max_force_rear) {
                 ts3 = ts2 - BR_SQRT(BR_SQR(c->max_force_rear) - BR_SQR(ts3)) * ((ts2 < 0) ? -1 : 1);
@@ -2502,34 +2437,28 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             } else {
                 c->torque = -(c->revs * c->revs) / (10000 * 10000) - 0.1;
             }
-
             fbk = fbk - ts2;
             modf = BR_LENGTH2(fbi, fbk) / 2;
         } else if ((c->driver >= eDriver_net_human) && c->gear > 0 && c->revs > c->target_revs && !c->traction_control) {
             if (!c->keys.change_down) {
                 c->traction_control = 1;
             }
-
             ts = 1.0f - ((c->revs - c->target_revs) / (br_scalar)(c->gear * 400));
-
             if (ts < 0.4f) {
                 ts = 0.4f;
             }
             maxfl = maxfl * ts;
             maxfr = maxfr * ts;
         }
-
         if (BR_ABS(fbi) > (maxfl + maxfr) && maxfl + maxfr > 0.1) {
             ts3 = (maxfl + maxfr) / BR_ABS(fbi) * dt;
             fbi *= ts3;
             fbk = fbk * (c->friction_elipticity * ts3);
-
             ts = -(((BR_SQR(ffi) + BR_SQR(ffk)) / c->M) + (BR_SQR(((c->wpos[2].v[2] - c->cmpos.v[2]) * ffi)) / c->I.v[1]));
             ts2 = (BrVector3Dot(&vplane, &rightplane) + fbi / c->M) * ffi;
             ts2 += BrVector3Dot(&vplane, &a) * ffk;
             ts2 += (BrVector3Dot(&c->omega, &c->road_normal) * (c->wpos[2].v[2] - c->cmpos.v[2])) * ffi;
             ts2 += ((fbi * ((c->wpos[0].v[2] - c->cmpos.v[2]) * (c->wpos[2].v[2] - c->cmpos.v[2]))) / c->I.v[1]) * ffi;
-
             if (BR_ABS(ts) > 0.1) {
                 ts = ts2 / (ts * dt);
                 ffi = ts * ffi;
@@ -2538,32 +2467,24 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             fbi /= ts3;
             fbk /= ts3 * c->friction_elipticity;
         }
-
         ffk += -front_retardation;
         ffi += front_retardation * (c->wpos[0].v[2] - c->wpos[2].v[2]) * c->curvature;
-
         if (modf > 0.0001f) {
             fbi = fbi / (modf * 2);
             fbk = fbk / (modf * 2);
         }
-
         fbk = fbk * c->friction_elipticity;
-
         force[0] = modf;
         force[1] = modf;
-
         c->wheel_slip = 0;
-
         switch ((force[0] > maxfl) + ((force[1] > maxfr) << 1)) {
         case (0):
             slide_dist = 0;
             break;
-
         case (3):
             force[0] = (maxfl * c->freduction);
             force[1] = (maxfr * c->freduction);
             c->wheel_slip |= 2;
-
             v = (2 * modf - maxfl - maxfr) / (maxfl + maxfr);
             if (v >= ((c == &gProgram_state.current_car) ? SKID_MIN_V_CURRENT_CAR : SKID_MIN_V_OTHER_CAR)) {
                 if (maxfl > 0.1) {
@@ -2583,7 +2504,6 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
                 }
             }
             break;
-
         case (1):
             force[0] = (maxfl * c->freduction);
             force[1] += modf - force[0];
@@ -2600,7 +2520,6 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             } else {
                 slide_dist = 0;
             }
-
             break;
         case (2):
             force[1] = (maxfr * c->freduction);
@@ -2618,29 +2537,21 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             } else {
                 slide_dist = 0;
             }
-
             break;
         }
-
         if (c->wheel_slip && (c->curvature * c->turn_speed) > 0 && BR_ABS(fbi) > 0.01f && (c->curvature * fbi) < 0 && !c->keys.brake && !c->keys.change_down) {
             c->turn_speed = 0;
         }
-
         modf = BR_LENGTH2(ffi, ffk) / 2;
-
         if (modf > 0.0001f) {
             ffi = ffi / (modf * 2);
             ffk = ffk / (modf * 2);
         }
-
         maxfl = ((c->mu[1] * BR_SQRT(force[2])) * (friction_number * fl_oil_factor)) * mat_list[c->material_index[2]].tyre_road_friction;
         maxfr = ((c->mu[1] * BR_SQRT(force[3])) * (friction_number * fr_oil_factor)) * mat_list[c->material_index[3]].tyre_road_friction;
-
         c->max_force_front = maxfl + maxfr;
-
         force[2] = modf;
         force[3] = modf;
-
         switch ((force[2] > maxfl) + ((force[3] > maxfr) << 1)) {
         case (3):
             force[2] = (maxfl * c->freduction);
@@ -2696,32 +2607,26 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
             }
             break;
         }
-
         BrVector3Scale(&fb, &a, fbk);
         BrVector3Scale(&tv, &rightplane, fbi);
         BrVector3Accumulate(&fb, &tv);
         BrVector3Scale(&ff, &a, ffk);
         BrVector3Scale(&tv, &rightplane, ffi);
         BrVector3Accumulate(&ff, &tv);
-
         BrVector3Copy(&a, &c->wpos[0]);
         a.v[1] -= c->oldd[0];
         BrVector3Sub(&a, &a, &c->cmpos);
         BrVector3Scale(&b, &fb, force[0]);
         BrVector3Accumulate(&f, &b);
-
         BrVector3Cross(&tv, &a, &b);
         BrVector3Accumulate(&t, &tv);
-
         BrVector3Copy(&a, &c->wpos[1]);
         a.v[1] -= c->oldd[1];
         BrVector3Sub(&a, &a, &c->cmpos);
         BrVector3Scale(&b, &fb, force[1]);
         BrVector3Accumulate(&f, &b);
-
         BrVector3Cross(&tv, &a, &b);
         BrVector3Accumulate(&t, &tv);
-
         BrVector3Copy(&a, &c->wpos[2]);
         a.v[1] -= c->oldd[2];
         BrVector3Sub(&a, &a, &c->cmpos);
@@ -2729,7 +2634,6 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         BrVector3Accumulate(&f, &b);
         BrVector3Cross(&tv, &a, &b);
         BrVector3Accumulate(&t, &tv);
-
         BrVector3Copy(&a, &c->wpos[3]);
         a.v[1] -= c->oldd[3];
         BrVector3Sub(&a, &a, &c->cmpos);
@@ -2737,23 +2641,17 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
         BrVector3Accumulate(&f, &b);
         BrVector3Cross(&tv, &a, &b);
         BrVector3Accumulate(&t, &tv);
-
     } else {
         c->max_force_front = 0;
         c->max_force_rear = 0;
         StopSkid(c);
     }
-
     c->number_of_wheels_on_ground = normnum;
-
     BrMatrix34ApplyV(&b, &f, mat);
-
     BrVector3Scale(&a, &t, dt);
     ApplyTorque(c, &a);
-
     BrVector3Scale(&a, &b, (dt / c->M));
     BrVector3Accumulate(&c->v, &a);
-
     if (c->speed < MIN_SPEED && (!(c->keys.acc || c->joystick.acc > 0) || c->gear == 0) && !(c->keys.dec || c->joystick.dec > 0) && !c->bounce_rate) {
         if (BrVector3Length(&c->omega) < 0.05) {
             ts = (vol) ? ((BrVector3Length(&b) / (((c->driver > eDriver_non_car) && c->underwater_ability) ? (1 - (1 - vol->gravity_multiplier) * 0.6) : vol->gravity_multiplier)) / BrFloatToScalar(gGravity_multiplier)) : BrVector3Length(&b);
@@ -2773,9 +2671,7 @@ void CalcForce(tCar_spec* c, br_scalar dt) {
     if (stop_timer > 1) {
         stop_timer = 100.0f;
     }
-
     AddDrag(c, dt);
-
     if (c->driver >= eDriver_net_human) {
         c->acc_force = -(force[0] * fb.v[2]) - (force[1] * fb.v[2]);
     }
