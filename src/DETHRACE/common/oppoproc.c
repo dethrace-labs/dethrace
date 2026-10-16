@@ -23,20 +23,33 @@ int StraightestArcForCorner2D(br_vector2* pCent, br_scalar* pRadius, br_scalar* 
     NOT_IMPLEMENTED();
 }
 
-// The DOS implementation uses 3D vectors; CARM95 calculates in the XZ plane.
+// There appears to be two different implementations of this function in different binaries.
+// CARM95 does calculations in 2d space, DOS calculates in 3d space.
 // FUNCTION: CARM95 0x0049feaa
 void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3* p4, br_vector3* p5, br_vector3* p6, br_vector3* p7, br_vector3* p8, float p9, float p10) {
-    br_scalar rel1; // z23, then dot product and cosine.
-    br_scalar dz12;
+
+    // br_vector2 rel1;
+    // br_vector2 rel3;
+    // br_vector2 rot1;
+    // br_vector2 rot1u;
+    // br_scalar len12_squared;
+    // br_scalar len23_squared;
+    // br_scalar c;
+    // br_scalar numerator;
+    // br_scalar x;
+
+    // Guessed DOS-symbol roles below follow values through reused Windows stack slots.
+    // Vector component 1 denotes the Z component of the XZ projection.
+    br_scalar rel1; // rel3.v[1] -> rot1.v[0] -> rot1u.v[0] (cosine).
+    br_scalar dz12; // rel1.v[1].
     br_scalar tmp1;
-    br_scalar rel3; // x23, then cross product and absolute sine.
+    br_scalar rel3; // rel3.v[0] -> rot1.v[1] -> fabs(rot1u.v[1]) (sine).
     br_vector3 rot1;
-    br_scalar tmp; // Tangent of half the corner angle.
-    br_scalar tmp2;
-    br_scalar tmp3; // x12.
+    br_scalar tmp;  // x: tan(angle / 2).
+    br_scalar tmp2; // rot1.v[0] -> normalization length (c?) -> numerator -> numerator / sine.
+    br_scalar tmp3; // rel1.v[0].
     br_scalar tmp4;
 
-    // Unused locals are retained to preserve the retail stack frame.
     dz12 = p6->v[2] - p5->v[2];
     tmp3 = p6->v[0] - p5->v[0];
     rel1 = p4->v[2] - p5->v[2];
@@ -53,14 +66,14 @@ void StraightestArcForCorner(float* p1, float* p2, float* p3, br_vector3* p4, br
     rel1 = rel1 / tmp2;
     rel3 = rel3 / tmp2;
     rel3 = fabs(rel3);
-    tmp2 = (p10) * rel1 + p9;
+    tmp2 = (p10)*rel1 + p9;
     if ((rel3 < 1.f && fabs(tmp2) > rel3 * 1000.f) || rel3 < 0.001f) {
         *p1 = 1000.f;
         *p2 = 1000.f;
     } else {
         tmp2 = tmp2 / rel3;
         tmp = rel3 / (rel1 + 1.f);
-        *p2 = tmp * p10 + sqrt(((tmp * tmp * p10) + 2.f * (tmp) * tmp2 - p10) * p10) + tmp2;
+        *p2 = tmp * p10 + sqrt(((tmp * tmp * p10) + 2.f * (tmp)*tmp2 - p10) * p10) + tmp2;
         *p1 = *p2 * tmp;
     }
 }
@@ -198,7 +211,6 @@ tFollow_path_result ProcessFollowPath(tOpponent_spec* pOpponent_spec, tProcess_o
     int left_not_right;
     int later_straight;
     int next_left_not_right;
-
 
     car_spec = pOpponent_spec->car_spec;
     engine_damage = car_spec->damage_units[0].damage_level;
