@@ -1975,7 +1975,7 @@ void RenderAFrame(int pDepth_mask_on) {
     if (cockpit_on) {
         if (-gScreen_wobble_x > gX_offset) {
             x_shift = -gX_offset;
-        } else if (gScreen_wobble_x + gX_offset + gRender_screen->width > gBack_screen->width) {
+        } else if ((int)((unsigned int)gRender_screen->width + gX_offset) + gScreen_wobble_x > gBack_screen->width) {
             x_shift = gBack_screen->width - gRender_screen->width - gX_offset;
         } else {
             x_shift = gScreen_wobble_x;
@@ -1991,9 +1991,9 @@ void RenderAFrame(int pDepth_mask_on) {
         x_shift = 0;
         y_shift = 0;
     }
-    BrMatrix34Copy(&old_camera_matrix, &gCamera->t.t.mat);
+    old_camera_matrix = gCamera->t.t.mat;
     if (gMirror_on__graphics) {
-        BrMatrix34Copy(&old_mirror_cam_matrix, &gRearview_camera->t.t.mat);
+        old_mirror_cam_matrix = gRearview_camera->t.t.mat;
     }
     if (cockpit_on) {
         gSheer_mat.m[2][1] = y_shift / (float)gRender_screen->height;
@@ -2085,7 +2085,7 @@ void RenderAFrame(int pDepth_mask_on) {
     PDLockRealBackScreen(1);
 #endif
 
-    BrMatrix34Copy(&gCamera->t.t.mat, &old_camera_matrix);
+    gCamera->t.t.mat = old_camera_matrix;
 #ifdef DETHRACE_3DFX_PATCH
     if (cockpit_on) {
         PDUnlockRealBackScreen(1);
@@ -2155,7 +2155,7 @@ void RenderAFrame(int pDepth_mask_on) {
 #ifdef DETHRACE_3DFX_PATCH
         PDLockRealBackScreen(1);
 #endif
-        BrMatrix34Copy(&gRearview_camera->t.t.mat, &old_mirror_cam_matrix);
+        gRearview_camera->t.t.mat = old_mirror_cam_matrix;
         gRendering_mirror = 0;
     }
     if (!gMap_mode) {
