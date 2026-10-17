@@ -690,7 +690,7 @@ void MungePedGibs(tU32 pFrame_period) {
 
                 the_ped_gib->actor->t.t.translate.t.v[X] += the_ped_gib->x_speed * s_frame_period / pedestrian->width;
                 the_ped_gib->actor->t.t.translate.t.v[Y] += the_ped_gib->y_speed * s_frame_period / pedestrian->height2;
-                the_ped_gib->y_speed -= gFrame_period * gGravity_multiplier * 1.420289855072464e-6;
+                the_ped_gib->y_speed -= gFrame_period * gGravity_multiplier * PED_GRAVITY;
                 AddPedGibToPipingSession(i, &the_ped_gib->actor->t.t.mat, the_ped_gib->size, the_ped_gib->gib_index, the_ped_gib->parent_index);
             }
         } else if (the_ped_gib->size == 0) {
@@ -1402,9 +1402,9 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
 
     pPedestrian->last_special_volume = FindSpecialVolume(&pPedestrian->actor->t.t.translate.t, pPedestrian->last_special_volume);
     if (pPedestrian->last_special_volume != NULL) {
-        ped_gravity = pPedestrian->last_special_volume->gravity_multiplier * 1.420289855072464e-6;
+        ped_gravity = pPedestrian->last_special_volume->gravity_multiplier * PED_GRAVITY;
     } else {
-        ped_gravity = 1.420289855072464e-6;
+        ped_gravity = PED_GRAVITY;
     }
     ped_gravity = ped_gravity * gGravity_multiplier;
     if (gVesuvian_corpses
