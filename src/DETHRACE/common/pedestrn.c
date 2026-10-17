@@ -1378,10 +1378,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
         pPedestrian->current_speed *= gPedestrian_speed_factor;
         if (!pPedestrian->irreversable
             && pDanger_level != 0.f
-            && (pDanger_direction->v[Z] * pPedestrian->direction.v[Z]
-                   + pPedestrian->direction.v[X] * pDanger_direction->v[X])
-                    + pPedestrian->direction.v[Y] * pDanger_direction->v[Y]
-                > 0.f) {
+            && BrVector3Dot(&pPedestrian->direction, pDanger_direction) > 0.f) {
             pPedestrian->instruction_direction = -pPedestrian->instruction_direction;
             gInitial_instruction = NULL;
             if (PedestrianNextInstruction(pPedestrian, pDanger_level, 0, 1) != 0) {
@@ -1475,10 +1472,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                         }
                         damage = (pPedestrian->falling_speed - 0.0015) * 100000.;
                         if (damage > 0 || pPedestrian->hit_points < 0) {
-                            if (pPedestrian->hit_points >= 0) {
-                                pPedestrian->hit_points -= damage;
-                            }
-                            if (pPedestrian->hit_points <= 0) {
+                            if (pPedestrian->hit_points < 0 || (pPedestrian->hit_points -= damage) <= 0) {
                                 if (pPedestrian->hit_points <= -100) {
                                     pPedestrian->hit_points = -99;
                                 }
