@@ -783,17 +783,16 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
     int choice;
     int the_marker_ref;
 
-    if (pPedestrian->number_of_instructions <= 1) {
+    result = 0;
+    if (pPedestrian->number_of_instructions < 2) {
         pPedestrian->current_instruction = 0;
-        instruction = &pPedestrian->instruction_list[0];
-        pPedestrian->to_pos = instruction->data.point_data.position;
+        pPedestrian->to_pos = pPedestrian->instruction_list->data.point_data.position;
         BrVector3Set(&pPedestrian->direction, 1.f, 0.f, 0.f);
         if (pPosition_explicitly) {
             pPedestrian->pos = pPedestrian->actor->t.t.translate.t = pPedestrian->to_pos;
         }
         return 0;
     }
-    result = 0;
     if (pMove_pc) {
         pPedestrian->current_instruction += pPedestrian->instruction_direction;
         if (pPedestrian->current_instruction >= pPedestrian->number_of_instructions) {
@@ -809,7 +808,7 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
     if (instruction->type != ePed_instruc_point && instruction->type != ePed_instruc_reverse) {
         KillPedestrian(pPedestrian);
         return 0;
-    }
+    } else {
 
     switch (instruction->type) {
 
@@ -817,7 +816,7 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
         pPedestrian->irreversable = 1;
         // fall through
     case ePed_instruc_point:
-        BrVector3Copy(&pPedestrian->to_pos, &instruction->data.point_data.position);
+        pPedestrian->to_pos = instruction->data.point_data.position;
         BrVector3Sub(&pPedestrian->direction, &pPedestrian->to_pos, &pPedestrian->actor->t.t.translate.t);
         if (pPedestrian->to_pos.v[Y] >= 500.f) {
             pPedestrian->direction.v[Y] = 0.f;
@@ -836,8 +835,8 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
         break;
     case ePed_instruc_bchoice:
     case ePed_instruc_fchoice:
-        if ((instruction->type == ePed_instruc_fchoice && pPedestrian->instruction_direction > 0)
-            || (instruction->type == ePed_instruc_bchoice && pPedestrian->instruction_direction < 0)) {
+        if ((pPedestrian->instruction_direction > 0 && instruction->type == ePed_instruc_fchoice)
+            || (pPedestrian->instruction_direction < 0 && instruction->type == ePed_instruc_bchoice)) {
             most_dangerous = -1.f;
 #if defined(DETHRACE_FIX_BUGS)
             start_index = 0;
@@ -864,10 +863,11 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
                     break;
                 }
             }
+            the_marker_ref = instruction->data.choice_data.choices[choice].marker_ref;
             for (i = 0; i < pPedestrian->number_of_instructions; i++) {
                 if (((pPedestrian->instruction_list[i].type == ePed_instruc_bmarker && pPedestrian->instruction_direction < 0)
                         || (pPedestrian->instruction_list[i].type == ePed_instruc_fmarker && pPedestrian->instruction_direction > 0))) {
-                    if (pPedestrian->instruction_list[i].data.marker_data.marker_ref == instruction->data.choice_data.choices[choice].marker_ref) {
+                    if (pPedestrian->instruction_list[i].data.marker_data.marker_ref == the_marker_ref) {
                         pPedestrian->current_instruction = i;
                         break;
                     }
@@ -903,16 +903,11 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
                     for (j = 0; j < pPedestrian->instruction_list[i].data.choice_data.number_of_choices; j++) {
                         if (pPedestrian->instruction_list[i].data.choice_data.choices[j].marker_ref == pPedestrian->instruction_list[pPedestrian->current_instruction].data.marker_data.marker_ref) {
                             pPedestrian->current_instruction = i;
+                            break;
                         }
                     }
                 }
             }
-        }
-        result = PedestrianNextInstruction(pPedestrian, pDanger_level, pPosition_explicitly, 1);
-        break;
-    case ePed_instruc_baction:
-        if (pPedestrian->instruction_direction < 0) {
-            pPedestrian->current_action_mode = instruction->data.action_data.action_index;
         }
         result = PedestrianNextInstruction(pPedestrian, pDanger_level, pPosition_explicitly, 1);
         break;
@@ -922,11 +917,18 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
         }
         result = PedestrianNextInstruction(pPedestrian, pDanger_level, pPosition_explicitly, 1);
         break;
+    case ePed_instruc_baction:
+        if (pPedestrian->instruction_direction < 0) {
+            pPedestrian->current_action_mode = instruction->data.action_data.action_index;
+        }
+        result = PedestrianNextInstruction(pPedestrian, pDanger_level, pPosition_explicitly, 1);
+        break;
     case ePed_instruc_reverse:
         pPedestrian->instruction_direction = -pPedestrian->instruction_direction;
         PedestrianNextInstruction(pPedestrian, pDanger_level, pPosition_explicitly, 1);
         result = 1;
         break;
+    }
     }
     return result;
 }
