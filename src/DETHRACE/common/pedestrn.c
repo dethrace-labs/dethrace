@@ -2886,7 +2886,7 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
     BrVector3Set(&the_pedestrian->offset, 0.0f, 0.0f, 0.0f);
     gInitial_instruction = 0;
     PedestrianNextInstruction(the_pedestrian, 0.0f, 1, 0);
-    the_pedestrian->from_pos = the_pedestrian->actor->t.t.translate.t;
+    BrVector3Copy(&the_pedestrian->from_pos, &the_pedestrian->actor->t.t.translate.t);
     MungePedModel(the_pedestrian);
 }
 
