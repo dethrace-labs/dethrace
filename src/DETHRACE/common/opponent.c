@@ -275,7 +275,7 @@ tS16 ReallocExtraPathNodes(int pHow_many_then) {
     if (pHow_many_then != 0) {
         first_new_node = gProgram_state.AI_vehicles.number_of_path_nodes;
         new_nodes = BrMemAllocate(sizeof(tPath_node) * (pHow_many_then + gProgram_state.AI_vehicles.number_of_path_nodes), kMem_oppo_new_nodes);
-        memcpy(new_nodes, gProgram_state.AI_vehicles.path_nodes, sizeof(tPath_node) * gProgram_state.AI_vehicles.number_of_path_nodes);
+        DR_SAFE_MEMCPY(new_nodes, gProgram_state.AI_vehicles.path_nodes, sizeof(tPath_node) * gProgram_state.AI_vehicles.number_of_path_nodes);
         if (gProgram_state.AI_vehicles.path_nodes != NULL) {
             BrMemFree(gProgram_state.AI_vehicles.path_nodes);
         }
@@ -299,7 +299,7 @@ tS16 ReallocExtraPathSections(int pHow_many_then) {
     if (pHow_many_then != 0) {
         first_new_section = gProgram_state.AI_vehicles.number_of_path_sections;
         new_sections = BrMemAllocate(sizeof(tPath_section) * (pHow_many_then + gProgram_state.AI_vehicles.number_of_path_sections), kMem_oppo_new_sections);
-        memcpy(new_sections, gProgram_state.AI_vehicles.path_sections, sizeof(tPath_section) * gProgram_state.AI_vehicles.number_of_path_sections);
+        DR_SAFE_MEMCPY(new_sections, gProgram_state.AI_vehicles.path_sections, sizeof(tPath_section) * gProgram_state.AI_vehicles.number_of_path_sections);
         if (gProgram_state.AI_vehicles.path_sections != NULL) {
             BrMemFree(gProgram_state.AI_vehicles.path_sections);
         }
@@ -3884,6 +3884,16 @@ int ConsistencyCheck(void) {
     tU8* sections_referenced_by_nodes_array;
 
     failed = 0;
+
+#ifdef DETHRACE_FIX_BUGS
+    nodes_referenced_by_sections_array = NULL;
+    sections_referenced_by_nodes_array = NULL;
+    if (gProgram_state.AI_vehicles.number_of_path_nodes == 0 || gProgram_state.AI_vehicles.number_of_path_sections == 0) {
+        // Fix -Wmaybe-uninitialized warning (nodes_referenced_by_sections_array and sections_referenced_by_nodes_array might be reference uninitialized)
+        failed = 1;
+        goto cleanup;
+    }
+#endif
     if (gProgram_state.AI_vehicles.number_of_path_nodes != 0) {
         nodes_referenced_by_sections_array = BrMemAllocate(gProgram_state.AI_vehicles.number_of_path_nodes, kMem_nodes_array);
         memset(nodes_referenced_by_sections_array, 0, gProgram_state.AI_vehicles.number_of_path_nodes);
@@ -3994,6 +4004,9 @@ int ConsistencyCheck(void) {
             failed = 1;
         }
     }
+#ifdef DETHRACE_FIX_BUGS
+    cleanup:
+#endif
     if (gProgram_state.AI_vehicles.number_of_path_nodes != 0) {
         BrMemFree(nodes_referenced_by_sections_array);
     }
