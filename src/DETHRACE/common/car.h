@@ -247,7 +247,7 @@ void GetPlaneNormal(br_vector3* n, int p);
 
 int GetBoundsEdge(br_vector3* pos, br_vector3* edge, br_bounds* pB, int plane1, int plane2, br_vector3* a, br_vector3* b, br_vector3* c, int flag);
 
-void oldMoveOurCar(tU32 pTime_difference);
+void oldMoveOurCar(br_scalar pNew_y, tU32 pTime_difference, br_model* pThe_model, int pFace_index);
 
 void ToggleCollisionDetection(void);
 
