@@ -2962,13 +2962,8 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
     }
     gPed_count = 0;
     gLast_ped_splat_time = 0;
-    temp_int = GetAnInt(pF);
-    if (gAusterity_mode) {
-        ped_count = temp_int / 2 + 2;
-    } else {
-        ped_count = temp_int;
-    }
-    gPedestrian_array = BrMemAllocate(sizeof(tPedestrian_data) * (ped_count + (gAusterity_mode ? 0 : 200)), kMem_ped_array_stain);
+    ped_count = GetAnInt(pF);
+    gPedestrian_array = BrMemAllocate(sizeof(tPedestrian_data) * ((gAusterity_mode ? ped_count / 2 + 2 : ped_count) + (gAusterity_mode ? 0 : 200)), kMem_ped_array_stain);
     if (PDKeyDown(KEY_CTRL_ANY) && PDKeyDown(KEY_SHIFT_ANY) && PDKeyDown(KEY_A)) {
         check_for_duplicates = 1;
         DRS3StartSound(gEffects_outlet, 3202);
@@ -2991,37 +2986,37 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
             PossibleService();
             the_instruction->type = GetALineAndInterpretCommand(pF, gInstruc_commands, COUNT_OF(gInstruc_commands));
             if (the_instruction->type != ePed_instruc_point && the_instruction->type != ePed_instruc_reverse) {
-                FatalError(kFatalError_FindPedestrianRefNum_S, "");
+                FatalError(kFatalError_FindPedestrianRefNum_S);
             }
             switch (the_instruction->type) {
-            case ePed_instruc_point:
-                GetThreeFloats(pF, &the_instruction->data.point_data.position.v[0], &the_instruction->data.point_data.position.v[1], &the_instruction->data.point_data.position.v[2]);
-                the_instruction->data.point_data.irreversable = 0;
+            case ePed_instruc_xpoint:
+                ReadThreeFloats(pF, the_instruction->data.point_data.position.v[0], the_instruction->data.point_data.position.v[1], the_instruction->data.point_data.position.v[2]);
+                the_instruction->data.point_data.irreversable = 1;
                 break;
 
-            case ePed_instruc_xpoint:
-                GetThreeFloats(pF, &the_instruction->data.point_data.position.v[0], &the_instruction->data.point_data.position.v[1], &the_instruction->data.point_data.position.v[2]);
-                the_instruction->data.point_data.irreversable = 1;
+            case ePed_instruc_point:
+                ReadThreeFloats(pF, the_instruction->data.point_data.position.v[0], the_instruction->data.point_data.position.v[1], the_instruction->data.point_data.position.v[2]);
+                the_instruction->data.point_data.irreversable = 0;
                 break;
 
             case ePed_instruc_bchoice:
             case ePed_instruc_fchoice:
-                GetALineAndDontArgue(pF, s);
-                str = strtok(s, "\t ,/");
-                sscanf(str, "%d", &the_instruction->data.choice_data.number_of_choices);
+                GetALineAndDontArgue(pF, s2);
+                str2 = strtok(s2, "\t ,/");
+                sscanf(str2, "%d", &the_instruction->data.choice_data.number_of_choices);
                 if (the_instruction->data.choice_data.number_of_choices > COUNT_OF(the_instruction->data.choice_data.choices)) {
                     FatalError(kFatalError_PedSeqTooManyChoices);
                 }
-                for (k = 0; k < the_instruction->data.choice_data.number_of_choices; k++) {
-                    str = strtok(NULL, "\t ,/");
-                    sscanf(str, "%f", &temp_float1);
-                    the_instruction->data.choice_data.choices[k].danger_level = (tU16)temp_float1;
-                    str = strtok(NULL, "\t ,/");
-                    sscanf(str, "%f", &temp_float1);
-                    the_instruction->data.choice_data.choices[k].percentage_chance = (tU8)temp_float1;
-                    str = strtok(NULL, "\t ,/");
-                    sscanf(str, "%d", &temp_int);
-                    the_instruction->data.choice_data.choices[k].marker_ref = (tU8)temp_int;
+                for (k = 0, the_choice = the_instruction->data.choice_data.choices; k < the_instruction->data.choice_data.number_of_choices; k++, the_choice++) {
+                    str2 = strtok(NULL, "\t ,/");
+                    sscanf(str2, "%f", &temp_float1);
+                    the_choice->danger_level = (tU16)temp_float1;
+                    str2 = strtok(NULL, "\t ,/");
+                    sscanf(str2, "%f", &temp_float1);
+                    the_choice->percentage_chance = (tU8)temp_float1;
+                    str2 = strtok(NULL, "\t ,/");
+                    sscanf(str2, "%d", &temp_int);
+                    the_choice->marker_ref = (tU8)temp_int;
                 }
                 break;
 
@@ -3057,19 +3052,19 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
                 if (Vector3AreEqual(&gPedestrian_array[j].instruction_list->data.point_data.position, &instructions->data.point_data.position)) {
                     i--;
                     ped_count--;
-                    instruc_count = 0;
-                    BrMemFree(instructions);
                     duplicates_found++;
+                    BrMemFree(instructions);
+                    instruc_count = 0;
                 }
             }
         }
-        if (instruc_count > 0) {
+        if (instruc_count != 0) {
             if (gAusterity_mode && ref_number >= 100) {
                 // swap MINE for LANDMINE and only one type of powerup ?
-                if (ref_number == 114) {
-                    CreatePedestrian(g, instructions, instruc_count, init_instruc, 146, 0);
-                } else {
+                if (ref_number != 114) {
                     CreatePedestrian(g, instructions, instruc_count, init_instruc, 100, 0);
+                } else {
+                    CreatePedestrian(g, instructions, instruc_count, init_instruc, 146, 0);
                 }
             } else {
                 CreatePedestrian(g, instructions, instruc_count, init_instruc, ref_number, 0);
@@ -3086,7 +3081,7 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
     fclose(g);
     if (duplicates_found) {
         WriteOutPeds();
-        sprintf(s2,
+        sprintf(s,
             "DUPLICATE PED EXPLOSION!!\n"
             "%d DOPPELGANGERS FOUND AND DESTROYED.\n"
             "NEW PED LIST WRITTEN TO PEDPATHS.TXT\n"
@@ -3094,7 +3089,7 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
             "\n"
             "NOW DON'T DO IT AGAIN!!\n",
             duplicates_found);
-        PDFatalError(s2);
+        PDFatalError(s);
     }
     InitPedGibs();
     ResetProxRay();
