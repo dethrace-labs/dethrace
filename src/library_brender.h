@@ -421,8 +421,20 @@
 // LIBRARY: CARM95 0x004D2880
 // BrMatrix34PostTransform
 
+// LIBRARY: CARM95 0x004DD030
+// BrLightEnable
+
 // GLOBAL: CARM95 0x00521ab0
 // BrFontProp7x9
 
 // GLOBAL: CARM95 0x00521ab4
 // BrFontFixed3x5
+
+// LIBRARY: CARM95 0x004CA180
+// BrPixelmapCopy
+
+// LIBRARY: CARM95 0x004D3920
+// BrMatrix23PostScale
+
+// LIBRARY: CARM95 0x004DC8B0
+// BrMapUpdate
