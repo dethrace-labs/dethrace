@@ -267,123 +267,97 @@ int DrawLine2D(br_vector3* o, br_vector3* p, br_pixelmap* pScreen, br_pixelmap* 
     scr_ptr = (tU8*)pScreen->pixels + pScreen->base_x + pScreen->base_y * pScreen->row_bytes;
     depth_ptr = (tU16*)pDepth_buffer->pixels;
     shade_ptr = (tU8*)shade_table->pixels + shade_table->base_y * shade_table->row_bytes;
-    x1 = pScreen->width / 2 + o->v[0];
-    x2 = pScreen->width / 2 + p->v[0];
-    y1 = pScreen->height / 2 - o->v[1];
-    y2 = pScreen->height / 2 - p->v[1];
-    if (brightness < 0.001 || brightness > 1.0) {
+    x1 = DR_FF((int)o->v[0]) + pScreen->width / 2;
+    x2 = DR_FF((int)p->v[0]) + pScreen->width / 2;
+    y1 = DR_FF(-(int)o->v[1]) + pScreen->height / 2;
+    y2 = DR_FF(-(int)p->v[1]) + pScreen->height / 2;
+    if (brightness < 0.001f || brightness > 1.0f) {
         return 0;
     }
     if (x1 < 0 || x2 < 0) {
         if (x1 < 0 && x2 < 0) {
             return 0;
         }
-        if (x1 >= 0) {
-            y2 = y1 - x1 * (y1 - y2) / (x1 - x2);
-            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (float)x1 / (float)(x1 - x2);
-            x2 = 0;
-        } else {
+        if (x1 < 0) {
             y1 = y2 - x2 * (y2 - y1) / (x2 - x1);
             o->v[2] = p->v[2] - (p->v[2] - o->v[2]) * (float)x2 / (float)(x2 - x1);
             x1 = 0;
+        } else {
+            y2 = y1 - x1 * (y1 - y2) / (x1 - x2);
+            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (float)x1 / (float)(x1 - x2);
+            x2 = 0;
         }
     }
     if (pScreen->width <= x1 || pScreen->width <= x2) {
         if (pScreen->width <= x1 && pScreen->width <= x2) {
             return 0;
         }
-        if (pScreen->width > x1) {
-            y2 = y1 - (y1 - y2) * (x1 - (pScreen->width - 1)) / (x1 - x2);
-            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (x1 - (float)(pScreen->width - 1)) / (float)(x1 - x2);
-            x2 = pScreen->width - 1;
-        } else {
+        if (pScreen->width <= x1) {
             y1 = y2 - (y2 - y1) * (x2 - (pScreen->width - 1)) / (x2 - x1);
-            o->v[2] = p->v[2] - (p->v[2] - o->v[2]) * (x2 - (float)(pScreen->width - 1)) / (float)(x2 - x1);
+            o->v[2] = p->v[2] - (p->v[2] - o->v[2]) * (x2 - (pScreen->width - 1)) / (float)(x2 - x1);
             x1 = pScreen->width - 1;
+        } else {
+            y2 = y1 - (y1 - y2) * (x1 - (pScreen->width - 1)) / (x1 - x2);
+            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (x1 - (pScreen->width - 1)) / (float)(x1 - x2);
+            x2 = pScreen->width - 1;
         }
     }
     if (y1 < 0 || y2 < 0) {
         if (y1 < 0 && y2 < 0) {
             return 0;
         }
-        if (y1 >= 0) {
-            x2 = x1 - y1 * (x1 - x2) / (y1 - y2);
-            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (float)y1 / (float)(y1 - y2);
-            y2 = 0;
-        } else {
+        if (y1 < 0) {
             x1 = x2 - y2 * (x2 - x1) / (y2 - y1);
             o->v[2] = p->v[2] - (p->v[2] - o->v[2]) * (float)y2 / (float)(y2 - y1);
             y1 = 0;
+        } else {
+            x2 = x1 - y1 * (x1 - x2) / (y1 - y2);
+            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (float)y1 / (float)(y1 - y2);
+            y2 = 0;
         }
     }
     if (pScreen->height <= y1 || pScreen->height <= y2) {
         if (pScreen->height <= y1 && pScreen->height <= y2) {
             return 0;
         }
-        if (pScreen->height > y1) {
-            x2 = x1 - (x1 - x2) * (y1 - (pScreen->height - 1)) / (y1 - y2);
-            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (float)(y1 - (pScreen->height - 1)) / (float)(y1 - y2);
-            y2 = pScreen->height - 1;
-        } else {
+        if (pScreen->height <= y1) {
             x1 = x2 - (x2 - x1) * (y2 - (pScreen->height - 1)) / (y2 - y1);
-            o->v[2] = p->v[2] - (p->v[2] - o->v[2]) * (float)(y2 - (pScreen->height - 1)) / (float)(y2 - y1);
+            o->v[2] = p->v[2] - (p->v[2] - o->v[2]) * (y2 - (pScreen->height - 1)) / (float)(y2 - y1);
             y1 = pScreen->height - 1;
+        } else {
+            x2 = x1 - (x1 - x2) * (y1 - (pScreen->height - 1)) / (y1 - y2);
+            p->v[2] = o->v[2] - (o->v[2] - p->v[2]) * (y1 - (pScreen->height - 1)) / (float)(y1 - y2);
+            y2 = pScreen->height - 1;
         }
     }
     zbuff = o->v[2];
     dx = x2 - x1;
     dy = y2 - y1;
     ax = 2 * abs(dx);
-    if (x2 - x1 < 0) {
-        sx = -1;
-    } else {
+    if (dx >= 0) {
         sx = 1;
+    } else {
+        sx = -1;
     }
     ay = 2 * abs(dy);
-    if (dy < 0) {
-        sy = -1;
-    } else {
+    if (dy >= 0) {
         sy = 1;
+    } else {
+        sy = -1;
     }
     x = x1;
     y = y1;
-    scr_ptr += x1 + y1 * pScreen->row_bytes;
-    depth_ptr += x1 + y1 * (pDepth_buffer->row_bytes / 2);
-    darken_init = (brightness - 0.001) * (float)shade_table->height;
-    if (ay >= ax) {
-        d = ax - ay / 2;
-        darken_init = 500 * ay / darken_init;
-        darken_count = darken_init;
-        zbuff_inc = (p->v[2] - o->v[2]) * 2.0 / (float)ay;
-        while (1) {
-            DrawDot(zbuff, scr_ptr, depth_ptr, shade_ptr);
-            if (y == y2) {
-                break;
-            }
-            if (d >= 0) {
-                scr_ptr += sx;
-                depth_ptr += sx;
-                d -= ay;
-            }
-            y += sy;
-            d += ax;
-            scr_ptr += sy * pScreen->row_bytes;
-            depth_ptr += sy * (pDepth_buffer->row_bytes / 2);
-            zbuff = zbuff_inc + zbuff;
-            darken_count -= 1000;
-            while (darken_count <= 0) {
-                darken_count += darken_init;
-                shade_ptr += shade_table->row_bytes;
-            }
-        }
-    } else {
+    scr_ptr += x + y * pScreen->row_bytes;
+    depth_ptr += x + y * (pDepth_buffer->row_bytes / 2);
+    darken_init = (brightness - 0.001f) * shade_table->height;
+    if (ay < ax) {
         d = ay - ax / 2;
         darken_init = 500 * ax / darken_init;
         darken_count = darken_init;
-        zbuff_inc = (p->v[2] - o->v[2]) * 2.0 / (float)ax;
+        zbuff_inc = (p->v[2] - o->v[2]) * 2.0f / (float)ax;
         while (1) {
             DrawDot(zbuff, scr_ptr, depth_ptr, shade_ptr);
-            if (x == x2) {
+            if (x2 == x) {
                 break;
             }
             if (d >= 0) {
@@ -395,6 +369,32 @@ int DrawLine2D(br_vector3* o, br_vector3* p, br_pixelmap* pScreen, br_pixelmap* 
             scr_ptr += sx;
             depth_ptr += sx;
             d += ay;
+            zbuff = zbuff_inc + zbuff;
+            darken_count -= 1000;
+            while (darken_count <= 0) {
+                darken_count += darken_init;
+                shade_ptr += shade_table->row_bytes;
+            }
+        }
+    } else {
+        d = ax - ay / 2;
+        darken_init = 500 * ay / darken_init;
+        darken_count = darken_init;
+        zbuff_inc = (p->v[2] - o->v[2]) * 2.0f / (float)ay;
+        while (1) {
+            DrawDot(zbuff, scr_ptr, depth_ptr, shade_ptr);
+            if (DR_FF(y) == y2) {
+                break;
+            }
+            if (d >= 0) {
+                scr_ptr += sx;
+                depth_ptr += sx;
+                d -= ay;
+            }
+            y += sy;
+            d += ax;
+            scr_ptr += sy * pScreen->row_bytes;
+            depth_ptr += sy * (pDepth_buffer->row_bytes / 2);
             zbuff = zbuff_inc + zbuff;
             darken_count -= 1000;
             while (darken_count <= 0) {
