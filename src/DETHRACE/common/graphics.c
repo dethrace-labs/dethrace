@@ -2738,7 +2738,6 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
         return;
     }
 #ifdef DETHRACE_FIX_BUGS
-#if !defined(DETHRACE_FIX_BUGS)
     /*
      * The OG compares against pWidth instead of pWidth_orig, which
      * ends up clipped to the dest pixelmap width. This effectively
@@ -2751,7 +2750,6 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
      */
     pWidth_orig = pWidth;
 #endif
-#endif
     if (pWidth * 1 + pDest_x > pDest->width) {
         x_delta = pWidth * 1 + pDest_x - pDest->width;
         pWidth -= x_delta;
@@ -2759,21 +2757,6 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
         dest_row_wrap += x_delta;
     }
     for (y_count = 0; y_count < pHeight; y_count++) {
-#ifdef DETHRACE_FIX_BUGS
-#if !defined(DETHRACE_FIX_BUGS)
-        /*
-         * The OG compares against pWidth instead of pWidth_orig, which
-         * ends up clipped to the dest pixelmap width. This effectively
-         * clips the consecutive rows of pixels along the shear, leaving
-         * a visible gap on the screen. Instead, when comparing against
-         * pWidth_orig, the clip takes place vertically along the dest
-         * pixelmap edge, allowing all pixels to be displayed.
-         *
-         * Simulate OG behavior by overwriting pWidth_orig with pWidth.
-         */
-        pWidth_orig = pWidth;
-#endif
-#endif
         for (x_count = 0; x_count < pWidth; x_count++) {
             the_byte = *source_ptr++;
             if (the_byte) {
@@ -2800,7 +2783,11 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
         if (pDest->width <= pDest_x) {
             break;
         }
+#ifdef DETHRACE_FIX_BUGS
+        if (pWidth_orig * 1 + pDest_x > pDest->width) {
+#else
         if (pWidth * 1 + pDest_x > pDest->width) {
+#endif
             x_delta = pWidth * 1 + pDest_x - pDest->width;
             pWidth -= x_delta;
             source_row_wrap += x_delta;
