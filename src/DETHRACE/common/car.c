@@ -5948,14 +5948,8 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
     static br_scalar vel = 0.f;
     tFace_ref faces[20];
     tBounds bnds;
-    int i;                 // Added by DethRace
-    br_scalar tmp_scalar1; // Added by DethRace
-    br_scalar tmp_scalar2; // Added by DethRace
-    br_vector3 tmp1;       // Added by DethRace
-    br_vector3 tmp2;       // Added by DethRace
-    br_vector3 tmp3;       // Added by DethRace
 
-    i = 0;
+    accflag = 0;
     turnflag = 0;
     mat = &c->car_master_actor->t.t.mat;
     bnds.mat = &c->car_master_actor->t.t.mat;
@@ -5967,28 +5961,28 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
     BrVector3Scale((br_vector3*)bnds.mat->m[3], (br_vector3*)bnds.mat->m[3], WORLD_SCALE_D);
     if (c->keys.acc || c->joystick.acc > 0) {
         vel += 10.f * dt;
-        i = 1;
+        accflag = 1;
     }
     if (c->keys.dec || c->joystick.dec > 0) {
         vel -= 10.f * dt;
-        i = 1;
+        accflag = 1;
     }
-    if (!i) {
+    if (!accflag) {
         if (vel < 20.f * dt && vel > -20.f * dt) {
             vel = 0.f;
         } else {
             vel -= vel / (br_scalar)fabs(vel) * dt * 20.f;
         }
     }
-    BrVector3Scale(&tmp1, &c->v, dt);
-    BrVector3Accumulate((br_vector3*)mat->m[3], &tmp1);
-    BrVector3Scale(&tmp1, (br_vector3*)mat->m[1], dt);
+    BrVector3Scale(&step, &c->v, dt);
+    BrVector3Accumulate((br_vector3*)mat->m[3], &step);
+    BrVector3Scale(&step, (br_vector3*)mat->m[1], dt);
     if (c->keys.left || c->joystick.left > 0) {
-        BrVector3Accumulate(&c->omega, &tmp1);
+        BrVector3Accumulate(&c->omega, &step);
         turnflag = 1;
     }
     if (c->keys.right || c->joystick.right > 0) {
-        BrVector3Sub(&c->omega, &c->omega, &tmp1);
+        BrVector3Sub(&c->omega, &c->omega, &step);
         turnflag = 1;
     }
     if (!turnflag) {
@@ -6004,40 +5998,51 @@ void FlyCar(tCar_spec* c, br_scalar dt) {
         BrMatrix34PreRotateX(mat, -BrDegreeToAngle(5));
     }
     BrVector3Scale(&c->v, (br_vector3*)mat->m[2], -vel);
-    BrVector3Scale(&tmp1, &c->v, dt);
-    BrVector3Accumulate((br_vector3*)&mat->m[3], &tmp1);
+    BrVector3Scale(&step, &c->v, dt);
+    BrVector3Accumulate((br_vector3*)&mat->m[3], &step);
     if (c->keys.holdw) {
+        br_vector3 a;
+        br_vector3 b;
+        br_vector3 norm;
+        br_vector3 norm2;
+        br_scalar dist;
+        br_scalar dist2;
+        br_scalar ts;
+        br_angle phi;
+        int i;
+        br_angle theta;
+
         theta = -BrRadianToAngle(atan2(mat->m[2][2], mat->m[2][0])) + 90 * BrDegreeToAngle(1);
-        BrVector3Copy(&tmp1, (br_vector3*)mat->m[3]);
+        BrVector3Copy(&b, (br_vector3*)mat->m[3]);
         BrMatrix34RotateY(mat, theta);
-        BrVector3Copy((br_vector3*)mat->m[3], &tmp1);
-        BrVector3SetFloat(&tmp1, 0.f, -100.f, 0.f);
-        BrVector3Copy(&step, (br_vector3*)&mat->m[3]);
-        findfloor(&step, &tmp1, &tmp2, &tmp_scalar1);
-        step.v[1] += 100.f;
-        findfloor(&step, &tmp1, &tmp3, &tmp_scalar2);
-        if (tmp_scalar2 <= 1.f) {
-            BrVector3SetFloat(&tmp1, 0.f, -5.01f, 0.f);
-            step.v[1] -= 20 * 5.f;
-            for (accflag = 0; accflag < 20; accflag++) {
-                step.v[1] += 5.f;
-                findfloor(&step, &tmp1, &tmp3, &tmp_scalar2);
-                if (tmp_scalar2 <= 1.f) {
+        BrVector3Copy((br_vector3*)mat->m[3], &b);
+        BrVector3SetFloat(&b, 0.f, -100.f, 0.f);
+        BrVector3Copy(&a, (br_vector3*)&mat->m[3]);
+        findfloor(&a, &b, &norm, &dist);
+        a.v[1] += 100.f;
+        findfloor(&a, &b, &norm2, &dist2);
+        if (dist2 <= 1.f) {
+            BrVector3SetFloat(&b, 0.f, -5.01f, 0.f);
+            a.v[1] -= 20 * 5.f;
+            for (i = 0; i < 20; i++) {
+                a.v[1] += 5.f;
+                findfloor(&a, &b, &norm2, &dist2);
+                if (dist2 <= 1.f) {
                     break;
                 }
             }
-            tmp_scalar2 = -tmp_scalar2 / 20.f + (accflag + 1) * 0.05f;
+            dist2 = -dist2 / 20.f + (i + 1) * 0.05f;
         }
-        if (tmp_scalar2 < tmp_scalar1) {
-            tmp_scalar1 = -tmp_scalar2;
-            BrVector3Copy(&tmp2, &tmp3);
+        if (dist2 < dist) {
+            dist = -dist2;
+            BrVector3Copy(&norm, &norm2);
         }
-        if ((br_scalar)fabs(tmp_scalar1) <= 1.f) {
-            mat->m[3][1] -= tmp_scalar1 * 100.f;
-            theta = BrRadianToAngle(asin(tmp_scalar2 = BrVector3Dot((br_vector3*)mat->m[2], &tmp2)));
-            BrMatrix34PreRotateX(mat, theta);
-            theta = -BrRadianToAngle(asin(tmp_scalar2 = BrVector3Dot((br_vector3*)mat->m[0], &tmp2)));
-            BrMatrix34PreRotateZ(mat, theta);
+        if ((br_scalar)fabs(dist) <= 1.f) {
+            mat->m[3][1] -= dist * 100.f;
+            phi = BrRadianToAngle(asin(ts = (mat->m[2][0] * norm.v[0] + (mat->m[2][2] * norm.v[2] + mat->m[2][1] * norm.v[1]))));
+            BrMatrix34PreRotateX(mat, phi);
+            phi = -BrRadianToAngle(asin(ts = (mat->m[0][0] * norm.v[0] + (mat->m[0][2] * norm.v[2] + mat->m[0][1] * norm.v[1]))));
+            BrMatrix34PreRotateZ(mat, phi);
         }
     }
     BrVector3Negate((br_vector3*)&c->direction, (br_vector3*)mat->m[2]);
