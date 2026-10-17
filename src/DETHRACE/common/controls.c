@@ -223,7 +223,7 @@ tEdit_func* gEdit_funcs[10][18][8] = {
         { DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7, DropSpecVol7 },
         // 8
         { DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8, DropSpecVol8 },
-        // 09
+        // 9
         { DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9, DropSpecVol9 },
         { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL } },
 
@@ -572,8 +572,6 @@ int gInstant_handbrake;
 
 // GLOBAL: CARM95 0x00550554
 int gAuto_repair;
-
-int _unittest_controls_lastGetPowerup = 0;
 
 // IDA: void __cdecl AbortRace()
 // FUNCTION: CARM95 0x004a0c70
@@ -1564,6 +1562,7 @@ void CheckOtherRacingKeys(void) {
     // GLOBAL: CARM95 0x51cf4c
     static int stopped_repairing;
 
+    flip_up_flag = 0;
     car = GetCarSpec(eVehicle_self, 0);
     CheckMapRenderMove();
     CheckHorns();
@@ -1581,36 +1580,37 @@ void CheckOtherRacingKeys(void) {
         gLast_repair_time = GetTotalTime();
         gRepair_last_time = 1;
         if (!NeedToExpandBoundingBox) {
-            if (gFree_repairs
-                || gNet_mode == eNet_mode_none
-                || gProgram_state.credits_earned - gProgram_state.credits_lost >= 1) {
+            if (!gFree_repairs
+                && gNet_mode != eNet_mode_none
+                && gProgram_state.credits_earned - gProgram_state.credits_lost < 1) {
+                if (!stopped_repairing) {
+                    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_CANNOT_AFFORD_TO_REPAIR));
+                }
+                gAuto_repair = 0;
+                stopped_repairing = 1;
+            } else {
                 bodywork_repair_amount = RepairCar(gProgram_state.current_car.car_ID, gFrame_period, &amount);
                 NeedToExpandBoundingBox = bodywork_repair_amount > 0;
                 cost = 0;
-                for (j = 0; j < COUNT_OF(gProgram_state.current_car.damage_units); j++) {
-                    old_level = gProgram_state.current_car.damage_units[j].damage_level;
-                    if (amount == 0.0f) {
+                for (i = 0; i < COUNT_OF(gProgram_state.current_car.damage_units); i++) {
+                    old_level = gProgram_state.current_car.damage_units[i].damage_level;
+                    if (amount != 0.0f) {
+                        new_level = ((double)gProgram_state.current_car.damage_units[i].damage_level
+                            - floor(bodywork_repair_amount / amount * (double)gProgram_state.current_car.damage_units[i].damage_level));
+                    } else {
                         new_level = 0;
-                    } else {
-                        new_level = ((double)gProgram_state.current_car.damage_units[j].damage_level
-                            - floor(bodywork_repair_amount / amount * (double)gProgram_state.current_car.damage_units[j].damage_level));
                     }
-                    if (new_level >= 0) {
-                        if (new_level < 100) {
-                            gProgram_state.current_car.damage_units[j].damage_level = new_level;
-                        } else {
-                            gProgram_state.current_car.damage_units[j].damage_level = 99;
-                        }
+                    if (new_level < 0) {
+                        gProgram_state.current_car.damage_units[i].damage_level = 0;
+                    } else if (new_level >= 100) {
+                        gProgram_state.current_car.damage_units[i].damage_level = 99;
                     } else {
-                        gProgram_state.current_car.damage_units[j].damage_level = 0;
+                        gProgram_state.current_car.damage_units[i].damage_level = new_level;
                     }
-                    gProgram_state.current_car.damage_units[j].smoke_last_level = gProgram_state.current_car.damage_units[j].damage_level;
-                    if (gNet_mode) {
-                        ts = gNet_repair_cost[gCurrent_net_game->type];
-                    } else {
-                        ts = gRepair_cost[gProgram_state.skill_level];
-                    }
-                    cost = (old_level - gProgram_state.current_car.damage_units[j].damage_level) * ts + cost;
+                    gProgram_state.current_car.damage_units[i].smoke_last_level = gProgram_state.current_car.damage_units[i].damage_level;
+                    cost = (old_level - gProgram_state.current_car.damage_units[i].damage_level)
+                            * (gNet_mode ? gNet_repair_cost[gCurrent_net_game->type] : gRepair_cost[gProgram_state.skill_level])
+                        + cost;
                     total_difference += old_level - new_level;
                 }
                 if (!gFree_repairs) {
@@ -1624,7 +1624,7 @@ void CheckOtherRacingKeys(void) {
                 if (gProgram_state.current_car.num_smoke_columns) {
                     StopCarSmoking(&gProgram_state.current_car);
                 }
-                if (!cost && bodywork_repair_amount == 0.0) {
+                if (!cost && bodywork_repair_amount == 0.0f) {
                     gAuto_repair = 0;
                 }
                 if (!gFree_repairs) {
@@ -1639,12 +1639,6 @@ void CheckOtherRacingKeys(void) {
                         NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, s);
                     }
                 }
-            } else {
-                if (!stopped_repairing) {
-                    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_CANNOT_AFFORD_TO_REPAIR));
-                }
-                gAuto_repair = 0;
-                stopped_repairing = 1;
             }
         }
 
@@ -1654,8 +1648,14 @@ void CheckOtherRacingKeys(void) {
         total_repair_cost = 0;
         total_difference = 0;
         if (sound_tag) {
-            for (i = 0; i < 10 && S3SoundStillPlaying(sound_tag); ++i) {
-                DRS3StopSound(sound_tag);
+            int loop;
+
+            for (loop = 0; loop < 10; loop++) {
+                if (S3SoundStillPlaying(sound_tag)) {
+                    DRS3StopSound(sound_tag);
+                } else {
+                    break;
+                }
             }
             sound_tag = 0;
         }
@@ -1663,36 +1663,29 @@ void CheckOtherRacingKeys(void) {
     if (NeedToExpandBoundingBox) {
         NeedToExpandBoundingBox = ExpandBoundingBox(&gProgram_state.current_car) == 0;
     }
-    if (!gRecover_car || gProgram_state.current_car.knackered) {
+    if (gRecover_car && !gProgram_state.current_car.knackered) {
+        if (CheckRecoverCost()) {
+            gRecover_timer = 0;
+            SetFlipUpCar(car);
+            if (gNet_mode != eNet_mode_none) {
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, " ");
+            }
+            if (gRecovery_voucher_count != 0) {
+                gRecovery_voucher_count--;
+                sprintf(s, "%s", GetMiscString(kMiscString_RecoveringForFree));
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, s);
+            } else {
+                SpendCredits(gNet_mode ? gNet_recovery_cost[gCurrent_net_game->type] : gRecovery_cost[gProgram_state.skill_level]);
+                sprintf(s, "%s %d", GetMiscString(kMiscString_RecoveryCostColon),
+                    (int)(gNet_mode ? gNet_recovery_cost[gCurrent_net_game->type] : gRecovery_cost[gProgram_state.skill_level]));
+                NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, s);
+                LoseSomePSPowerups(2);
+            }
+            CancelPendingCunningStunt();
+            PipeSingleSpecial(ePipe_special_fade);
+        }
+    } else {
         gHad_auto_recover = 0;
-    } else if (CheckRecoverCost()) {
-        gRecover_timer = 0;
-        SetFlipUpCar(car);
-        if (gNet_mode != eNet_mode_none) {
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, " ");
-        }
-        if (gRecovery_voucher_count != 0) {
-            gRecovery_voucher_count--;
-            sprintf(s, "%s", GetMiscString(kMiscString_RecoveringForFree));
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, s);
-        } else {
-            if (gNet_mode) {
-                cost = gNet_recovery_cost[gCurrent_net_game->type];
-            } else {
-                cost = gRecovery_cost[gProgram_state.skill_level];
-            }
-            SpendCredits(cost);
-            if (gNet_mode) {
-                cost = gNet_recovery_cost[gCurrent_net_game->type];
-            } else {
-                cost = gRecovery_cost[gProgram_state.skill_level];
-            }
-            sprintf(s, "%s %d", GetMiscString(kMiscString_RecoveryCostColon), cost);
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1500, -kFont_MEDIUMHD, s);
-            LoseSomePSPowerups(2);
-        }
-        CancelPendingCunningStunt();
-        PipeSingleSpecial(ePipe_special_fade);
     }
     gRecover_car = 0;
 }
@@ -1701,19 +1694,19 @@ void CheckOtherRacingKeys(void) {
 // FUNCTION: CARM95 0x004a2208
 int CheckRecoverCost(void) {
 
-    if (gProgram_state.current_car.knackered
-        || gNet_mode == eNet_mode_none
-        || (gProgram_state.credits_earned - gProgram_state.credits_lost) >= gNet_recovery_cost[gCurrent_net_game->type]
-        || gRecovery_voucher_count) {
-        return 1;
+    if (!(gProgram_state.current_car.knackered
+            || gNet_mode == eNet_mode_none
+            || (gProgram_state.credits_earned - gProgram_state.credits_lost) >= (gNet_mode != eNet_mode_none ? gNet_recovery_cost[gCurrent_net_game->type] : gRecovery_cost[gProgram_state.skill_level])
+            || gRecovery_voucher_count)) {
+        gProgram_state.credits_earned = 0;
+        gProgram_state.credits_lost = 0;
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_CANNOT_AFFORD_TO_RECOVER));
+        DoFancyHeadup(kFancyHeadupNetworkRaceNoMoreMoney);
+        KnackerThisCar(&gProgram_state.current_car);
+        SendGameplayToHost(eNet_gameplay_suicide, 0, 0, 0, 0);
+        return 0;
     }
-    gProgram_state.credits_earned = 0;
-    gProgram_state.credits_lost = 0;
-    NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_CANNOT_AFFORD_TO_RECOVER));
-    DoFancyHeadup(kFancyHeadupNetworkRaceNoMoreMoney);
-    KnackerThisCar(&gProgram_state.current_car);
-    SendGameplayToHost(eNet_gameplay_suicide, 0, 0, 0, 0);
-    return 0;
+    return 1;
 }
 
 // IDA: void __usercall SortOutRecover(tCar_spec *pCar@<EAX>)
@@ -1787,8 +1780,8 @@ void FlipUpCar(tCar_spec* car) {
     car->doing_nothing_flag = 0;
     EnableCar(car);
     new_pos = 1;
-    for (i = 0; i < 4; ++i) {
-        if (car->susp_height[i >> 1] <= car->oldd[i]) {
+    for (j = 0; j < 4; ++j) {
+        if (car->susp_height[j >> 1] <= car->oldd[j]) {
             new_pos = 0;
         }
     }
@@ -1830,13 +1823,15 @@ void FlipUpCar(tCar_spec* car) {
         car->direction.v[0] = -car->oldmat.m[2][0];
         car->direction.v[1] = -car->oldmat.m[2][1];
         car->direction.v[2] = -car->oldmat.m[2][2];
-        for (i = 0; i <= new_pos; i++) {
-            for (j = 0; j < 4; j++) {
-                BrMatrix34Copy(&car->last_safe_positions[j], &car->last_safe_positions[j + 1]);
+        for (j = 0; j <= new_pos; j++) {
+            for (i = 0; i < 4; i++) {
+                BrMatrix34Copy(&car->last_safe_positions[i], &car->last_safe_positions[i + 1]);
             }
         }
-        for (l = 0; l < 10; l++) {
-            BrVector3Scale(&car->old_norm, &car->old_norm, 0.072463766);
+        l = 0;
+        while (!TestForCarInSensiblePlace(car) && l < 10) {
+            dist = 0.072463766f;
+            BrVector3Scale(&car->old_norm, &car->old_norm, dist);
             BrMatrix34ApplyV(&tv, &car->old_norm, &car->car_master_actor->t.t.mat);
             car->car_master_actor->t.t.mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0] + tv.v[0];
             car->car_master_actor->t.t.mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] + tv.v[1];
@@ -1847,9 +1842,7 @@ void FlipUpCar(tCar_spec* car) {
             car->old_frame_mat.m[3][0] = car->car_master_actor->t.t.mat.m[3][0];
             car->old_frame_mat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1];
             car->old_frame_mat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2];
-            if (TestForCarInSensiblePlace(car)) {
-                break;
-            }
+            l++;
         }
         count++;
     } while (l == 10 && count < 3);
@@ -1857,8 +1850,8 @@ void FlipUpCar(tCar_spec* car) {
     car->oldmat.m[3][1] = car->car_master_actor->t.t.mat.m[3][1] * WORLD_SCALE;
     car->oldmat.m[3][2] = car->car_master_actor->t.t.mat.m[3][2] * WORLD_SCALE;
     car->curvature = 0.0;
-    for (j = 0; j < 4; ++j) {
-        car->oldd[j] = car->ride_height;
+    for (i = 0; i < 4; ++i) {
+        car->oldd[i] = car->ride_height;
     }
     car->revs = 0.0;
     car->gear = 0;
@@ -1872,10 +1865,6 @@ void FlipUpCar(tCar_spec* car) {
 // IDA: void __usercall GetPowerup(int pNum@<EAX>)
 // FUNCTION: CARM95 0x004a291d
 void GetPowerup(int pNum) {
-
-    // FIXME: remove unittest variables from dethrace
-    _unittest_controls_lastGetPowerup = pNum;
-
     GotPowerup(&gProgram_state.current_car, pNum);
 }
 
@@ -2305,6 +2294,8 @@ void CycleCarTexturingLevel(void) {
     case eCTL_full:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_FullCarTextures));
         break;
+
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -2326,6 +2317,8 @@ void CycleWallTexturingLevel(void) {
     case eWTL_full:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_BestWallTextures));
         break;
+
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -2344,6 +2337,8 @@ void CycleRoadTexturingLevel(void) {
     case eRTL_full:
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_RoadTextures));
         break;
+
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -2540,31 +2535,26 @@ void EnterUserMessage(void) {
     int the_key;
     int abuse_num;
 
-    if (!gEntering_message) {
-        return;
-    }
-    if (gNet_mode == eNet_mode_none) {
-        return;
-    }
-    if (!gCurrent_net_game->options.enable_text_messages) {
+    the_message = &gString[20];
+    if (!gEntering_message || gNet_mode == eNet_mode_none || !gCurrent_net_game->options.enable_text_messages) {
         return;
     }
     the_key = PDAnyKeyDown();
     if (gEntering_message == 1) {
-        if (the_key != -1) {
+        if (the_key == -1) {
+            gEntering_message = 2;
+        } else {
             return;
         }
-        gEntering_message = 2;
     }
     if (about_to_die) {
-        if (the_key != -1) {
-            return;
+        if (the_key == -1) {
+            about_to_die = 0;
+            gEntering_message = 0;
         }
-        gEntering_message = 0;
-        about_to_die = 0;
         return;
     }
-    if (the_key == last_key) {
+    if (the_key + 0 == last_key) {
         if (next_time < PDGetTotalTime()) {
             next_time += 100;
         } else {
@@ -2578,6 +2568,22 @@ void EnterUserMessage(void) {
     case -1:
     case KEY_SHIFT_ANY:
         break;
+    case KEY_RETURN:
+    case KEY_KP_ENTER:
+        len = strlen(gNet_players[gThis_net_player_index].player_name);
+        if (len > 18) {
+            break;
+        }
+        p = the_message - len - 2;
+        strcpy(p, gNet_players[gThis_net_player_index].player_name);
+        p[len + 0] = ':';
+        p[len + 1] = ' ';
+        gString[COUNT_OF(gString) - 1] = '\0';
+        NetSendHeadupToAllPlayers(p);
+        the_message[0] = '\0';
+        NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_MESSAGE_SENT));
+        about_to_die = 1;
+        break;
     case KEY_CTRL_ANY:
     case KEY_CTRL_ANY_2:
     case KEY_TAB:
@@ -2587,50 +2593,41 @@ void EnterUserMessage(void) {
     case KEY_BACKSPACE:
     case KEY_DELETE:
     case KEY_LEFT:
-        len = strlen(&gString[20]);
+        len = strlen(the_message);
         if (len > 0) {
-            gString[20 + len - 1] = '\0';
-        }
-        break;
-    case KEY_RETURN:
-    case KEY_KP_ENTER:
-        len = strlen(gNet_players[gThis_net_player_index].player_name);
-        if (len <= 18) {
-            the_message = gString + 18 - len;
-            strcpy(the_message, gNet_players[gThis_net_player_index].player_name);
-            the_message[len + 0] = ':';
-            the_message[len + 1] = ' ';
-            gString[COUNT_OF(gString) - 1] = '\0';
-            NetSendHeadupToAllPlayers(the_message);
-            gString[20] = '\0';
-            NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_MESSAGE_SENT));
-            about_to_die = 1;
+            the_message[len - 1] = '\0';
         }
         break;
     default:
         if (gKey_mapping[KEYMAP_SEND_MESSAGE] == the_key) {
             about_to_die = 1;
-        } else if (the_key <= KEY_KP_NUMLOCK || the_key >= KEY_SPACE) {
-            len = strlen(&gString[20]);
-            if (len < 64 - 1) {
-                gString[20 + len] = PDGetASCIIFromKey(the_key);
-                if (gString[20 + len] < gFonts[4].offset || gString[20 + len] >= gFonts[4].offset + gFonts[4].num_entries) {
-                    gString[20 + len] = '\0';
+            break;
+        }
+        if (the_key >= KEY_KP_NUMLOCK + 1 && the_key <= KEY_SPACE - 1) {
+            if (the_key >= KEY_KP_0 && the_key <= KEY_KP_9) {
+                if (the_key == KEY_KP_0) {
+                    abuse_num = 9;
+                } else {
+                    abuse_num = the_key - KEY_KP_1;
                 }
-                gString[20 + len + 1] = '\0';
-            }
-        } else if (the_key < KEY_KP_0 || the_key > KEY_KP_9) {
-            gEntering_message = 0;
-        } else {
-            if (the_key == KEY_KP_0) {
-                abuse_num = 9;
+                if (gAbuse_text[abuse_num] != NULL) {
+                    strcpy(the_message, gAbuse_text[abuse_num]);
+                }
+                break;
             } else {
-                abuse_num = the_key - KEY_KP_1;
-            }
-            if (gAbuse_text[abuse_num] != NULL) {
-                strcpy(&gString[20], gAbuse_text[abuse_num]);
+                gEntering_message = 0;
+                break;
             }
         }
+        len = strlen(the_message);
+        if (len < 64 - 1) {
+            the_message[len] = PDGetASCIIFromKey(the_key);
+            if (the_message[len] < gFonts[4].offset || the_message[len] >= gFonts[4].offset + gFonts[4].num_entries) {
+                the_message[len] = '\0';
+            }
+            the_message[len + 1] = '\0';
+        }
+        break;
     }
 }
 

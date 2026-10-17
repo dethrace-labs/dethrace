@@ -909,6 +909,11 @@ tS8* ConvertPixTo16BitStripMap(br_pixelmap* pBr_map) {
     tU8 byte;
     tU16* palette_entry;
 
+#ifdef DETHRACE_FIX_BUGS
+    // Fix -Wmaybe-uninitialized warning
+    byte = 0;
+#endif
+
     palette_entry = PaletteOf16Bits(gRender_palette)->pixels;
     max_line_bytes = 125 * ((pBr_map->width + 61) / 62) + 2;
     new_line = BrMemAllocate(max_line_bytes, kMem_strip_image);
@@ -994,6 +999,11 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
     tU8* temp_strip_image;
     tU8 new_line[800];
     tU8 the_byte;
+
+#ifdef DETHRACE_FIX_BUGS
+    // Fix -Wmaybe-uninitialized warning
+    the_byte = 0;
+#endif
 
     the_strip_image = BrMemAllocate(pThe_br_map->row_bytes * pThe_br_map->height, kMem_strip_image);
     current_strip_pointer = the_strip_image;

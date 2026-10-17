@@ -32,6 +32,7 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
+#include <netinet/in.h>
 
 #if SUPPORT_TRACEBACK
 #include <execinfo.h>
