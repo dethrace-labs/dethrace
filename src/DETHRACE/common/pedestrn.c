@@ -2310,22 +2310,23 @@ void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_
     br_vector3 old_pos;
 
     pedestrian = &gPedestrian_array[pIndex];
-    if (pAction_index < 0 || pAction_index >= pedestrian->number_of_actions) {
+    if (pAction_index >= pedestrian->number_of_actions || pAction_index < 0) {
         pAction_index = 0;
     }
     pedestrian->current_action = pAction_index;
     pedestrian->hit_points = pHit_points;
     pedestrian->done_initial = pDone_initial;
     old_pos = pedestrian->actor->t.t.translate.t;
-    parent = pedestrian->actor->parent;
     if (pParent == (tU16)-1) {
-        if (parent != gDont_render_actor) {
-            BrActorRelink(gDont_render_actor, pedestrian->actor);
+        parent = gDont_render_actor;
+        if (pedestrian->actor->parent != parent) {
+            BrActorRelink(parent, pedestrian->actor);
         }
         pedestrian->actor->render_style = BR_RSTYLE_NONE;
     } else {
-        if (parent != pParent_actor) {
-            BrActorRelink(pParent_actor, pedestrian->actor);
+        parent = pParent_actor;
+        if (pedestrian->actor->parent != parent) {
+            BrActorRelink(parent, pedestrian->actor);
         }
         pedestrian->actor->render_style = BR_RSTYLE_NONE;
     }
@@ -2335,8 +2336,8 @@ void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_
         BrVector3Set(&pedestrian->offset, 0.f, 0.f, 0.f);
     } else {
         pedestrian->spin_period = pSpin_period;
-        pedestrian->jump_magnitude = pJump_magnitude;
         pedestrian->offset = *pOffset;
+        pedestrian->jump_magnitude = pJump_magnitude;
     }
     if (pedestrian->hit_points == -100) {
         pedestrian->actor->render_style = BR_RSTYLE_NONE;
