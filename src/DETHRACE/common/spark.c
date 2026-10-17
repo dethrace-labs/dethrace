@@ -145,23 +145,17 @@ br_matrix34 gSmoke_camera_to_world;
 // Bugfix: At higher FPS, `CreatePuffOfSmoke` is called too often and causes smoke cirlces to be recycled too quickly so assume around 25fps
 #define SMOKE_COLUMN_NEW_PUFF_INTERVAL 30
 
-<<<<<<< HEAD
-=======
 #ifdef DETHRACE_FIX_BUGS
 #define TEST_BIT(var, pos) (var & (1u << pos))
 #define SET_BIT(var, pos) (var |= (1u << pos))
 #define FLIP_BIT(var, pos) (var ^= (1u << pos))
 #define CLEAR_BIT(var, pos) (var &= ~(1u << pos))
 #else
->>>>>>> main
 #define TEST_BIT(var, pos) (var & (1 << pos))
 #define SET_BIT(var, pos) (var |= (1 << pos))
 #define FLIP_BIT(var, pos) (var ^= (1 << pos))
 #define CLEAR_BIT(var, pos) (var &= ~(1 << pos))
-<<<<<<< HEAD
-=======
 #endif
->>>>>>> main
 
 // IDA: void __cdecl DrawDot(br_scalar z, tU8 *scr_ptr, tU16 *depth_ptr, tU8 *shade_ptr)
 // FUNCTION: CARM95 0x00466310
@@ -602,17 +596,10 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
     int num;
     int i;
 
-<<<<<<< HEAD
     ts = sqrt(
-        pForce->v[2] * pForce->v[2]
-        + pForce->v[0] * pForce->v[0]
-        + pForce->v[1] * pForce->v[1]);
-=======
-    ts = BR_SQRT(BR_MAC3(
-        pForce->v[2], pForce->v[2],
-        pForce->v[1], pForce->v[1],
-        pForce->v[0], pForce->v[0]));
->>>>>>> main
+        pForce->v[1] * pForce->v[1]
+        + (pForce->v[0] * pForce->v[0]
+            + pForce->v[2] * pForce->v[2]));
     BrVector3InvScale(&normal, pForce, ts);
     ts2 = BrVector3Dot(pForce, v);
     if (ts2 < 0) {
@@ -648,45 +635,9 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
             gNext_spark = 0;
         }
     }
-<<<<<<< HEAD
     sparkiness *= ts;
     if (sparkiness < 10.f) {
         return;
-=======
-    if ((ts * sparkiness) >= 10.f) {
-        tv.v[0] = pos->v[0] - pCar->car_master_actor->t.t.translate.t.v[0] / WORLD_SCALE;
-        tv.v[1] = pos->v[1] - pCar->car_master_actor->t.t.translate.t.v[1] / WORLD_SCALE;
-        tv.v[2] = pos->v[2] - pCar->car_master_actor->t.t.translate.t.v[2] / WORLD_SCALE;
-        BrMatrix34TApplyV(&pos2, &tv, &pCar->car_master_actor->t.t.mat);
-        BrMatrix34TApplyV(&norm, &normal, &pCar->car_master_actor->t.t.mat);
-        BrVector3Scale(&tv, &norm, .1f);
-        BrVector3Accumulate(&pos2, &tv);
-        num = (ts * sparkiness / 10.f) + 3;
-        if (num > 10) {
-            num = 10;
-        }
-#ifdef DETHRACE_FIX_BUGS
-        num = Harness_Hook_ScaleEmissionCountWithDt(num, gDt);
-#endif
-        for (i = 0; i < num; i++) {
-            BrVector3Copy(&gSparks[gNext_spark].pos, &pos2);
-            BrVector3Copy(&gSparks[gNext_spark].normal, &norm);
-            BrVector3SetFloat(&tv, FRandomBetween(-1.f, 1.f), FRandomBetween(-.2f, 1.f), FRandomBetween(-1.f, 1.f));
-            ts2 = BrVector3Dot(&norm, &tv);
-            BrVector3Scale(&tv2, &norm, ts2);
-            BrVector3Sub(&gSparks[gNext_spark].v, &tv, &tv2);
-            gSparks[gNext_spark].count = 1000;
-            gSparks[gNext_spark].car = pCar;
-            SET_BIT(gSpark_flags, gNext_spark);
-            gSparks[gNext_spark].time_sync = gMechanics_time_sync;
-            gSparks[gNext_spark].colour = 0;
-            gNext_spark++;
-            if (gNext_spark >= COUNT_OF(gSparks)) {
-                gNext_spark = 0;
-            }
-        }
-        CreateShrapnelShower(pos, v, &normal, ts, pCar, pCar);
->>>>>>> main
     }
     BrVector3InvScale(&tv, &pCar->car_master_actor->t.t.translate.t, WORLD_SCALE);
     BrVector3Sub(&tv, pos, &tv);
@@ -698,6 +649,9 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
     if (num > 10) {
         num = 10;
     }
+#ifdef DETHRACE_FIX_BUGS
+    num = Harness_Hook_ScaleEmissionCountWithDt(num, gDt);
+#endif
     for (i = 0; i < num; i++) {
         BrVector3Copy(&gSparks[gNext_spark].pos, &pos2);
         BrVector3Copy(&gSparks[gNext_spark].normal, &norm);
