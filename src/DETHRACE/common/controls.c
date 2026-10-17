@@ -1648,7 +1648,9 @@ void CheckOtherRacingKeys(void) {
         total_repair_cost = 0;
         total_difference = 0;
         if (sound_tag) {
-            for (i = 0; i < 10; ++i) {
+            int loop;
+
+            for (loop = 0; loop < 10; loop++) {
                 if (S3SoundStillPlaying(sound_tag)) {
                     DRS3StopSound(sound_tag);
                 } else {
@@ -1693,9 +1695,9 @@ void CheckOtherRacingKeys(void) {
 int CheckRecoverCost(void) {
 
     if (!(gProgram_state.current_car.knackered
-          || gNet_mode == eNet_mode_none
-          || (gProgram_state.credits_earned - gProgram_state.credits_lost) >= (gNet_mode != eNet_mode_none ? gNet_recovery_cost[gCurrent_net_game->type] : gRecovery_cost[gProgram_state.skill_level])
-          || gRecovery_voucher_count)) {
+            || gNet_mode == eNet_mode_none
+            || (gProgram_state.credits_earned - gProgram_state.credits_lost) >= (gNet_mode != eNet_mode_none ? gNet_recovery_cost[gCurrent_net_game->type] : gRecovery_cost[gProgram_state.skill_level])
+            || gRecovery_voucher_count)) {
         gProgram_state.credits_earned = 0;
         gProgram_state.credits_lost = 0;
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 1000, -kFont_MEDIUMHD, GetMiscString(kMiscString_CANNOT_AFFORD_TO_RECOVER));
@@ -2293,7 +2295,7 @@ void CycleCarTexturingLevel(void) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_FullCarTextures));
         break;
 
-    DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -2316,7 +2318,7 @@ void CycleWallTexturingLevel(void) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_BestWallTextures));
         break;
 
-    DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -2336,7 +2338,7 @@ void CycleRoadTexturingLevel(void) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_RoadTextures));
         break;
 
-    DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
     }
 }
 
