@@ -3,10 +3,15 @@
 
 #include "dr_types.h"
 
+
 extern tNet_mode gNet_mode;
 extern tNet_game_player_info gNet_players[6];
 extern br_matrix34 gRoot_to_camera;
+#ifdef DETHRACE_FIX_BUGS
+extern tCar_detail_info* gCar_details;
+#else
 extern tCar_detail_info gCar_details[60];
+#endif
 extern int gThis_net_player_index;
 extern br_scalar gPedestrian_distance_squared;
 extern int gPending_race;

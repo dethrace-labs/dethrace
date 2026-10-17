@@ -139,8 +139,6 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
             memcpy(&gMr_blendy->model->faces[gMr_blendy->model->nfaces], face, sizeof(br_face));
             gMr_blendy->model->nfaces++;
             if (i < (pModel->nfaces - 1)) {
-                // this is a memcpy call in the original code. Cannot figure out how to make it not be replaced with
-                // intrinsic memcpy
                 memmove(pModel->faces + i, pModel->faces + i + 1, (pModel->nfaces - i - 1) * sizeof(br_face));
             }
             pModel->nfaces--;
@@ -450,64 +448,61 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
             min_z = column_z;
             max_z = column_z;
             tan_fov_ish = BR_DIV(BR_SIN(camera->field_of_view / 2), BR_COS(camera->field_of_view / 2));
-
-            edge_after.v[0] = tan_fov_ish * camera->aspect;
+            edge_after.v[0] = BR_MUL(camera->aspect, tan_fov_ish);
             edge_after.v[1] = tan_fov_ish;
             edge_after.v[2] = -1.0;
-            edge_before.v[0] = edge_after.v[0] * camera->yon_z * gYon_factor;
-            edge_before.v[1] = camera->yon_z * gYon_factor * tan_fov_ish;
-            edge_before.v[2] = camera->yon_z * gYon_factor * edge_after.v[2];
+            edge_before.v[0] = edge_after.v[0] * (camera->yon_z * gYon_factor);
+            edge_before.v[1] = edge_after.v[1] * (camera->yon_z * gYon_factor);
+            edge_before.v[2] = edge_after.v[2] * (camera->yon_z * gYon_factor);
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x < min_x) {
+            if (min_x > 0 + column_x) {
                 min_x = column_x;
-            } else if (column_x > max_x) {
+            } else if (max_x < 0 + column_x) {
                 max_x = column_x;
             }
-            if (column_z < min_z) {
+            if (min_z > 0 + column_z) {
                 min_z = column_z;
-            } else if (column_z > max_z) {
+            } else if (max_z < 0 + column_z) {
                 max_z = column_z;
             }
             edge_before.v[0] = -edge_before.v[0];
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x < min_x) {
+            if (min_x > 0 + column_x) {
                 min_x = column_x;
-            } else if (column_x > max_x) {
+            } else if (max_x < 0 + column_x) {
                 max_x = column_x;
             }
-            if (column_z < min_z) {
+            if (min_z > 0 + column_z) {
                 min_z = column_z;
-            } else {
-                if (column_z > max_z) {
-                    max_z = column_z;
-                }
+            } else if (max_z < 0 + column_z) {
+                max_z = column_z;
             }
             edge_before.v[1] = -edge_before.v[1];
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x < min_x) {
+            if (min_x > 0 + column_x) {
                 min_x = column_x;
-            } else if (column_x > max_x) {
+            } else if (max_x < 0 + column_x) {
                 max_x = column_x;
             }
-            if (column_z < min_z) {
+            if (min_z > 0 + column_z) {
                 min_z = column_z;
-            } else if (column_z > max_z) {
+            } else if (max_z < 0 + column_z) {
                 max_z = column_z;
             }
             edge_before.v[0] = -edge_before.v[0];
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x < min_x) {
+            if (min_x > 0 + column_x) {
                 min_x = column_x;
-            } else if (column_x > max_x) {
+            } else if (max_x < 0 + column_x) {
                 max_x = column_x;
             }
-            if (column_z < min_z) {
+            if (min_z > 0 + column_z) {
                 min_z = column_z;
-            } else if (column_z > max_z) {
+            } else if (max_z < 0 + column_z) {
                 max_z = column_z;
             }
             if (min_x > 0) {

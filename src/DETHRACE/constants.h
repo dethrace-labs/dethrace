@@ -856,6 +856,12 @@ enum ExceptionFlags {
     ExceptionFlag_Mipmap = 4,
 };
 
+enum kEngineNoiseTypes {
+    kEngineNoise_Normal = 0,
+    kEngineNoise_EnclosedSpace = 1,
+    kEngineNoise_Underwater = 2
+};
+
 #define FONT_TYPEABLE 0
 #define FONT_ORANGHED 1
 #define FONT_BLUEHEAD 2
@@ -902,6 +908,17 @@ enum ExceptionFlags {
 #define SHADOW_MAX_RENDER_DISTANCE 36.0f
 
 #define DOUBLESIDED_USER_FLAG (void*)12345
+
+#define PHYSICS_STEP_TIME 40
+
+#define GRAVITY 10.0f
+#define UNDERWATER_ABILITY_FACTOR 0.6f
+#define MIN_SPEED 0.0001f
+#define MIN_OMEGA 0.05f
+#define MAX_DAMAGE_LEVEL 100
+#define HANDBRAKE_FAIL_DAMAGE 60
+#define SKID_MIN_V_CURRENT_CAR 20.0f
+#define SKID_MIN_V_OTHER_CAR 60.0f
 
 // average frame time in carm95
 #define MUNGE_ENGINE_INTERVAL 50
