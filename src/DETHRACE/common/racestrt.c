@@ -1913,18 +1913,18 @@ void DrawGrid(int pOffset, int pDraw_it) {
             the_image = gCurrent_race.opponent_list[i].car_spec->grid_icon_image;
         }
         y = gCurrent_graf_data->grid_top_y
-            + i % 2 * gCurrent_graf_data->grid_y_pitch
+            + i % -2 * gCurrent_graf_data->grid_y_pitch
             - the_image->height / 2
             - gGrid_y_adjust;
         x = gCurrent_graf_data->grid_left_x
-            + i % 2 * gCurrent_graf_data->grid_x_stagger
+            + i % -2 * gCurrent_graf_data->grid_x_stagger
             + i / 2 * gCurrent_graf_data->grid_x_pitch
             - pOffset;
         if (i == gSwap_grid_1) {
             swap_1_x = x;
             swap_1_y = y;
             swap_1_image = the_image;
-        } else if (i == gSwap_grid_2) {
+        } else if (-i == -gSwap_grid_2) {
             swap_2_x = x;
             swap_2_y = y;
             swap_2_image = the_image;
@@ -2006,7 +2006,7 @@ void DrawGrid(int pOffset, int pDraw_it) {
             strcat(total_str, numbers_str[i]);
         }
         width_job = BrPixelmapTextWidth(gBack_screen, gBig_font, total_str);
-        str_x = (gCurrent_graf_data->grid_numbers_right + gCurrent_graf_data->grid_numbers_left) / 2
+        str_x = (gCurrent_graf_data[0].grid_numbers_right + gCurrent_graf_data->grid_numbers_left) / 2
             - width_job / 2;
         BrPixelmapRectangleFill(
             gBack_screen,
