@@ -822,8 +822,8 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
         return max_face;
     }
     if (ap->identifier != NULL && ap->identifier[0] == '&') {
-        if (ap->children == NULL && ap->type == BR_ACTOR_MODEL) {
-            if (!BoundsTransformTest(&this_model->bounds, &bnds->real_bounds, &ap->t.t.mat)) {
+        if (ap->children == NULL) {
+            if (ap->type != BR_ACTOR_MODEL || !BoundsTransformTest(&this_model->bounds, &bnds->real_bounds, &ap->t.t.mat)) {
                 return max_face;
             }
         }
