@@ -1781,7 +1781,9 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
     br_scalar distance_factor;
 
     if (gShadow_level != eShadow_none) {
-        for (cat = eVehicle_self; cat <= (gShadow_level == eShadow_everyone ? 4 : gShadow_level == eShadow_us_and_opponents ? 3 : 0); ++cat) {
+        for (cat = eVehicle_self; cat <= (gShadow_level == eShadow_everyone ? 4 : gShadow_level == eShadow_us_and_opponents ? 3
+                                                                                                                            : 0);
+            ++cat) {
             if (cat == eVehicle_self) {
                 car_count = 1;
             } else {
@@ -1917,9 +1919,10 @@ void RenderAFrame(int pDepth_mask_on) {
     if (gVoodoo_rush_mode >= 1) {
         gRender_screen->pixels = gBack_screen->pixels;
     }
+#else
+    gRender_screen->pixels = gBack_screen->pixels;
 #endif
 
-    gRender_screen->pixels = gBack_screen->pixels;
     the_time = GetTotalTime();
     old_pixels = gRender_screen->pixels;
     cockpit_on = gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0 && !gMap_mode;
@@ -1975,7 +1978,7 @@ void RenderAFrame(int pDepth_mask_on) {
     if (cockpit_on) {
         if (-gScreen_wobble_x > gX_offset) {
             x_shift = -gX_offset;
-        } else if ((int)((unsigned int)gRender_screen->width + gX_offset) + gScreen_wobble_x > gBack_screen->width) {
+        } else if (DR_FF(gRender_screen->width + gX_offset) + gScreen_wobble_x > gBack_screen->width) {
             x_shift = gBack_screen->width - gRender_screen->width - gX_offset;
         } else {
             x_shift = gScreen_wobble_x;
@@ -1999,8 +2002,8 @@ void RenderAFrame(int pDepth_mask_on) {
         gSheer_mat.m[2][1] = y_shift / (float)gRender_screen->height;
         gSheer_mat.m[2][0] = -x_shift / (float)gRender_screen->width;
         BrMatrix34Pre(&gCamera->t.t.mat, &gSheer_mat);
-        gCamera->t.t.translate.t.v[0] -= gScreen_wobble_x * 1.5f / (__int64)gRender_screen->width / WORLD_SCALE;
-        gCamera->t.t.translate.t.v[1] += gScreen_wobble_y * 1.5f / (__int64)gRender_screen->width / WORLD_SCALE;
+        gCamera->t.t.translate.t.v[0] -= gScreen_wobble_x * 1.5f / (float)gRender_screen->width / WORLD_SCALE;
+        gCamera->t.t.translate.t.v[1] += gScreen_wobble_y * 1.5f / (float)gRender_screen->width / WORLD_SCALE;
     }
     gRender_screen->pixels = (char*)gRender_screen->pixels + x_shift + y_shift * gRender_screen->row_bytes;
     CalculateConcussion(the_time);
