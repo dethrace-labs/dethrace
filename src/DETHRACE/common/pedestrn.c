@@ -2986,7 +2986,11 @@ void LoadInPedestrians(FILE* pF, int pSubs_count, tPed_subs* pSubs_array) {
             PossibleService();
             the_instruction->type = GetALineAndInterpretCommand(pF, gInstruc_commands, COUNT_OF(gInstruc_commands));
             if (the_instruction->type != ePed_instruc_point && the_instruction->type != ePed_instruc_reverse) {
+#ifdef DETHRACE_FIX_BUGS
+                FatalError(kFatalError_FindPedestrianRefNum_S, "<missing>");
+#else
                 FatalError(kFatalError_FindPedestrianRefNum_S);
+#endif
             }
             switch (the_instruction->type) {
             case ePed_instruc_xpoint:
