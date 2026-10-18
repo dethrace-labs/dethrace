@@ -1125,8 +1125,8 @@ void SelectRandomItOrFox(int pNot_this_one) {
 // IDA: void __cdecl CalcPlayerScores()
 // FUNCTION: CARM95 0x00432865
 void CalcPlayerScores(void) {
-    int i[1];
-    int j[1];
+    int i;
+    int j;
     int knock_out_bit;
     int e_dam;
     int t_dam;
@@ -1153,12 +1153,12 @@ void CalcPlayerScores(void) {
     case eNet_game_type_carnage:
         highest = 0;
         next_highest = 0;
-        for (i[0] = 0; i[0] < gNumber_of_net_players; ++i[0]) {
-            if (gNet_players[i[0]].score > highest) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; ++i) {
+            if (gNet_players[i].score > highest) {
                 next_highest = highest;
-                highest = gNet_players[i[0]].score;
-            } else if (gNet_players[i[0]].score > next_highest) {
-                next_highest = gNet_players[i[0]].score;
+                highest = gNet_players[i].score;
+            } else if (gNet_players[i].score > next_highest) {
+                next_highest = gNet_players[i].score;
             }
         }
         gPed_target = (gTotal_peds - (gProgram_state.peds_killed - highest - next_highest)) / 2 + 1;
@@ -1182,39 +1182,39 @@ void CalcPlayerScores(void) {
     lowest_score = 9999;
     lowest_score_player = NULL;
     cars_left = 0;
-    for (i[0] = 0; i[0] < gNumber_of_net_players; i[0]++) {
-        car = gNet_players[i[0]].car;
-        if (gNet_players[i[0]].reposition_time != 0 && gNet_players[i[0]].reposition_time <= time && (!gRace_finished || gRace_over_reason == -1)) {
-            RepositionPlayer(i[0]);
+    for (i = 0; DR_FF(i) < gNumber_of_net_players; i++) {
+        car = gNet_players[i].car;
+        if (gNet_players[i].reposition_time != 0 && gNet_players[i].reposition_time <= time && (!gRace_finished || gRace_over_reason == -1)) {
+            RepositionPlayer(i);
         }
-        if (gNet_players[i[0]].last_waste_message != 0
-            && !gNet_players[i[0]].wasteage_attributed
-            && time - gNet_players[i[0]].last_waste_message > 500) {
-            sprintf(s, "%s %s", gNet_players[i[0]].player_name, GetMiscString(kMiscString_COMMITTED_SUICIDE));
-            gNet_players[i[0]].last_waste_message = 0;
-            gNet_players[i[0]].wasteage_attributed = 0;
+        if (gNet_players[i].last_waste_message != 0
+            && !gNet_players[i].wasteage_attributed
+            && time - gNet_players[i].last_waste_message > 500) {
+            sprintf(s, "%s %s", gNet_players[i].player_name, GetMiscString(kMiscString_COMMITTED_SUICIDE));
+            gNet_players[i].last_waste_message = 0;
+            gNet_players[i].wasteage_attributed = 0;
             if (gCurrent_net_game->type == eNet_game_type_car_crusher) {
-                gNet_players[i[0]].score--;
+                gNet_players[i].score--;
             }
             NetSendHeadupToEverybody(s);
         }
         SetKnackeredFlag(car);
-        if (car->knackered && !gNet_players[i[0]].wasted) {
-            gNet_players[i[0]].wasted = 1;
+        if (car->knackered && !gNet_players[i].wasted) {
+            gNet_players[i].wasted = 1;
             message = NetBuildMessage(NETMSGID_WASTED, 0);
-            message->contents.data.wasted.victim = gNet_players[i[0]].ID;
+            message->contents.data.wasted.victim = gNet_players[i].ID;
             message->contents.data.wasted.culprit = -1;
             NetGuaranteedSendMessageToEverybody(gCurrent_net_game, message, 0);
             switch (gCurrent_net_game->type) {
             case eNet_game_type_fight_to_death:
                 cars_left = 0;
-                for (j[0] = 0; j[0] < gNumber_of_net_players; j[0]++) {
-                    if (!gNet_players[j[0]].wasted) {
+                for (j = 0; DR_FF(j) < gNumber_of_net_players; j++) {
+                    if (!gNet_players[j].wasted) {
                         cars_left++;
-                        car_left = j[0];
+                        car_left = j;
                     }
                 }
-                gNet_players[i[0]].games_score += gGame_scores[6 - cars_left - 1];
+                gNet_players[i].games_score += gGame_scores[6 - cars_left - 1];
 
                 if (cars_left == 1) {
                     DeclareWinner(car_left);
@@ -1223,35 +1223,35 @@ void CalcPlayerScores(void) {
                 }
                 break;
             case eNet_game_type_checkpoint:
-                if (gNet_players[i[0]].score >> 16 != gCurrent_race.check_point_count) {
+                if (gNet_players[i].score >> 16 != gCurrent_race.check_point_count) {
                     knock_out_bit = IRandomBetween(0, gCurrent_race.check_point_count - 1);
-                    while (((1 << knock_out_bit) & gNet_players[i[0]].score) != 0) {
+                    while (((1 << knock_out_bit) & gNet_players[i].score) != 0) {
                         knock_out_bit++;
                         if (gCurrent_race.check_point_count <= knock_out_bit) {
                             knock_out_bit = 0;
                         }
                     }
-                    gNet_players[i[0]].score |= 1 << knock_out_bit;
+                    gNet_players[i].score |= 1 << knock_out_bit;
                 }
-                gNet_players[i[0]].reposition_time = GetTotalTime() + 5000;
+                gNet_players[i].reposition_time = GetTotalTime() + 5000;
                 break;
             case eNet_game_type_carnage:
-                gNet_players[i[0]].reposition_time = GetTotalTime() + 5000;
-                gNet_players[i[0]].score /= 2;
+                gNet_players[i].reposition_time = GetTotalTime() + 5000;
+                gNet_players[i].score /= 2;
                 break;
             case eNet_game_type_car_crusher:
             case eNet_game_type_sudden_death:
-                gNet_players[i[0]].reposition_time = GetTotalTime() + 5000;
+                gNet_players[i].reposition_time = GetTotalTime() + 5000;
                 break;
             case eNet_game_type_tag:
-                gNet_players[i[0]].reposition_time = GetTotalTime() + 5000;
-                PlayerIsIt(&gNet_players[i[0]]);
+                gNet_players[i].reposition_time = GetTotalTime() + 5000;
+                PlayerIsIt(&gNet_players[i]);
                 break;
             case eNet_game_type_foxy:
-                gNet_players[i[0]].reposition_time = GetTotalTime() + 5000;
-                gNet_players[i[0]].score /= 2;
-                if (gNumber_of_net_players > 1 && gIt_or_fox == i[0]) {
-                    SelectRandomItOrFox(i[0]);
+                gNet_players[i].reposition_time = GetTotalTime() + 5000;
+                gNet_players[i].score /= 2;
+                if (gNumber_of_net_players > 1 && gIt_or_fox == DR_FF(i)) {
+                    SelectRandomItOrFox(i);
                 }
                 break;
 
@@ -1263,9 +1263,9 @@ void CalcPlayerScores(void) {
             if (car->knackered) {
                 if (gCurrent_net_game->type == eNet_game_type_checkpoint
                     || gCurrent_net_game->type == eNet_game_type_tag) {
-                    gNet_players[i[0]].score = 1000000;
+                    gNet_players[i].score = 1000000;
                 } else {
-                    gNet_players[i[0]].score = -1000000;
+                    gNet_players[i].score = -1000000;
                 }
             } else {
                 e_dam = car->damage_units[eDamage_engine].damage_level;
@@ -1278,61 +1278,61 @@ void CalcPlayerScores(void) {
                     / 4;
 
                 if (e_dam > t_dam && e_dam > d_dam && e_dam > w_dam) {
-                    gNet_players[i[0]].score = 100 - e_dam;
+                    gNet_players[i].score = 100 - e_dam;
                 } else if (t_dam > d_dam && t_dam > w_dam) {
-                    gNet_players[i[0]].score = 100 - t_dam;
+                    gNet_players[i].score = 100 - t_dam;
                 } else if (w_dam < d_dam) {
-                    gNet_players[i[0]].score = 100 - d_dam;
+                    gNet_players[i].score = 100 - d_dam;
                 } else {
-                    gNet_players[i[0]].score = 100 - w_dam;
+                    gNet_players[i].score = 100 - w_dam;
                 }
             }
             break;
         case eNet_game_type_carnage:
-            if (gNet_players[i[0]].score >= gPed_target && !gRace_finished) {
-                DeclareWinner(i[0]);
+            if (gNet_players[i].score >= gPed_target && !gRace_finished) {
+                DeclareWinner(i);
             }
             break;
         case eNet_game_type_checkpoint:
             score = 0;
-            gNet_players[i[0]].score = gNet_players[i[0]].score & 0xffff;
-            flags = gNet_players[i[0]].score;
-            for (j[0] = 0; *(const int*)j < gCurrent_race.check_point_count; j[0]++) {
+            gNet_players[i].score = gNet_players[i].score & 0xffff;
+            flags = gNet_players[i].score;
+            for (j = 0; j < gCurrent_race.check_point_count; j++) {
                 if ((flags & 1) != 0) {
                     score++;
                 }
                 flags >>= 1;
             }
-            gNet_players[i[0]].score |= score << 16;
+            gNet_players[i].score |= score << 16;
             if (!score && !gRace_finished) {
-                DeclareWinner(i[0]);
+                DeclareWinner(i);
             }
             break;
         case eNet_game_type_sudden_death:
-            if (gNet_players[i[0]].score >= 0) {
-                if (gNet_players[i[0]].score < lowest_score) {
-                    lowest_score = gNet_players[i[0]].score;
-                    lowest_score_player = &gNet_players[i[0]];
+            if (gNet_players[i].score >= 0) {
+                if (gNet_players[i].score < lowest_score) {
+                    lowest_score = gNet_players[i].score;
+                    lowest_score_player = &gNet_players[i];
                 } else {
-                    if (gNet_players[i[0]].score == lowest_score) {
+                    if (gNet_players[i].score == lowest_score) {
                         lowest_score_player = 0;
                     }
                 }
             }
             break;
         case eNet_game_type_tag:
-            if (i[0] == gIt_or_fox && !gCountdown && gNet_players[i[0]].score >= 0) {
-                gNet_players[i[0]].score += gFrame_period;
-                if (gNet_players[i[0]].score >= gCurrent_net_game->options.race_end_target) {
-                    lowest_score_player = &gNet_players[i[0]];
+            if (DR_FF(i) == gIt_or_fox && !gCountdown && gNet_players[i].score >= 0) {
+                gNet_players[i].score += gFrame_period;
+                if (gNet_players[i].score >= gCurrent_net_game->options.race_end_target) {
+                    lowest_score_player = &gNet_players[i];
                 }
             }
             break;
         case eNet_game_type_foxy:
-            if (i[0] == gIt_or_fox && !gCountdown && !gRace_finished) {
-                gNet_players[i[0]].score += gFrame_period;
-                if (gNet_players[i[0]].score >= gCurrent_net_game->options.race_end_target) {
-                    DeclareWinner(i[0]);
+            if (DR_FF(i) == gIt_or_fox && !gCountdown && !gRace_finished) {
+                gNet_players[i].score += gFrame_period;
+                if (gNet_players[i].score >= gCurrent_net_game->options.race_end_target) {
+                    DeclareWinner(i);
                 }
             }
             break;
@@ -1345,11 +1345,11 @@ void CalcPlayerScores(void) {
         && lowest_score_player->score >= 0) {
         player_left = -1;
         cars_left = 0;
-        for (i[0] = 0; i[0] < gNumber_of_net_players; ++i[0]) {
-            if (gNet_players[i[0]].score >= 0 && &gNet_players[i[0]] != lowest_score_player) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; ++i) {
+            if (gNet_players[i].score >= 0 && &gNet_players[i] != lowest_score_player) {
                 ++cars_left;
                 if (player_left == -1) {
-                    player_left = i[0];
+                    player_left = i;
                 } else {
                     player_left = -2;
                 }
@@ -1366,7 +1366,7 @@ void CalcPlayerScores(void) {
                 DeclareWinner(player_left);
             } else {
                 if (gCurrent_net_game->type == eNet_game_type_tag) {
-                    SelectRandomItOrFox(i[0]);
+                    SelectRandomItOrFox(i);
                 }
                 SendGameplay(lowest_score_player->ID, eNet_gameplay_suddenly_death, 0, 0, 0, 0);
                 sprintf(s, "%s %s", lowest_score_player->player_name, GetMiscString(kMiscString_IS_OUT));
