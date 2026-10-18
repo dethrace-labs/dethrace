@@ -1271,9 +1271,9 @@ void CalcPlayerScores(void) {
                 e_dam = car->damage_units[eDamage_engine].damage_level;
                 t_dam = car->damage_units[eDamage_transmission].damage_level;
                 d_dam = car->damage_units[eDamage_driver].damage_level;
-                w_dam = ((int)((unsigned int)car->damage_units[eDamage_rf_wheel].damage_level
-                                   + car->damage_units[eDamage_rr_wheel].damage_level
-                                   + car->damage_units[eDamage_lf_wheel].damage_level)
+                w_dam = (DR_FF(car->damage_units[eDamage_rf_wheel].damage_level
+                             + car->damage_units[eDamage_rr_wheel].damage_level
+                             + car->damage_units[eDamage_lf_wheel].damage_level)
                             + car->damage_units[eDamage_lr_wheel].damage_level)
                     / 4;
 
