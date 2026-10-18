@@ -490,10 +490,11 @@ void PollActionReplayControls(tU32 pFrame_period) {
         if ((old_key_down == -1 || old_key_down == KEY_KP_4 || old_key_down == KEY_KP_6 || old_key_down == KEY_KP_MULTIPLY) && EitherMouseButtonDown()) {
             GetMousePosition(&x_coord, &y_coord);
             for (i = 0; i < COUNT_OF(mouse_areas[0]); i++) {
-                if (mouse_areas[gGraf_data_index][i].left <= x_coord
-                    && mouse_areas[gGraf_data_index][i].top <= y_coord
-                    && mouse_areas[gGraf_data_index][i].right > x_coord
-                    && mouse_areas[gGraf_data_index][i].bottom > y_coord) {
+                // Multiplication by 1 preserves the retail index evaluation order.
+                if (mouse_areas[gGraf_data_index][i * 1].left <= x_coord
+                    && mouse_areas[gGraf_data_index][i * 1].top <= y_coord
+                    && mouse_areas[gGraf_data_index][i * 1].right > x_coord
+                    && mouse_areas[gGraf_data_index][i * 1].bottom > y_coord) {
                     gKey_down = psuedo_mouse_keys[i];
                     break;
                 }
@@ -598,7 +599,8 @@ void PollActionReplayControls(tU32 pFrame_period) {
         gReplay_rate = gPending_replay_rate;
         gPending_replay_rate = 0;
     }
-    if (old_replay_rate * gReplay_rate < 0.f) {
+    // Unary + preserves the retail x87 operand order.
+    if ((+old_replay_rate) * gReplay_rate < 0.f) {
         gPending_replay_rate = gReplay_rate;
         gReplay_rate = 0.f;
     } else {
