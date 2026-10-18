@@ -4793,7 +4793,7 @@ void ViewNetPlayer(void) {
 // FUNCTION: CARM95 0x00487248
 void ViewOpponent(void) {
     // GLOBAL: CARM95 0x514e68
-    static int n;
+    static int n = -1;
 
     n++;
     if (gNet_mode != eNet_mode_none) {
@@ -4915,7 +4915,7 @@ void CheckDisablePlingMaterials(tCar_spec* pCar) {
 // FUNCTION: CARM95 0x0048754a
 void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
     // GLOBAL: CARM95 0x514e6c
-    static int old_camera_mode;
+    static int old_camera_mode = -1;
     br_camera* camera_ptr;
 
     camera_ptr = (br_camera*)gCamera->type_data;
@@ -5501,7 +5501,7 @@ void MoveWithWheels(tCar_spec* c, br_vector3* vn, int manual_swing) {
     br_angle yaw;
     br_angle theta;
     // GLOBAL: CARM95 0x514e84
-    static int move_with_wheels;
+    static int move_with_wheels = 1;
 
     if (c->speed <= 0.0001f && !gCamera_mode) {
         if (manual_swing) {

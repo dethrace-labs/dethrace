@@ -33,7 +33,7 @@ tU32 gMess_mid_flags;
 tU32 gMess_min_flags;
 
 // GLOBAL: CARM95 0x0050d224
-tU32 gGuarantee_number;
+tU32 gGuarantee_number = 1;
 
 // GLOBAL: CARM95 0x0050d228
 int gNet_service_disable = 0;

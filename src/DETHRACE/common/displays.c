@@ -18,13 +18,13 @@
 #include <stdlib.h>
 
 // GLOBAL: CARM95 0x00521678
-int gLast_fancy_index;
+int gLast_fancy_index = -1;
 
 // GLOBAL: CARM95 0x0052167c
-int gLast_credit_headup__displays; // suffix added to avoid duplicate symbol
+int gLast_credit_headup__displays = -1; // suffix added to avoid duplicate symbol
 
 // GLOBAL: CARM95 0x00521680
-int gLast_time_credit_headup;
+int gLast_time_credit_headup = -1;
 
 // GLOBAL: CARM95 0x00521684
 tDR_font* gCached_font;
