@@ -28,7 +28,7 @@ void ShowCutScene(int pIndex, int pWait_end, int pSound_ID, br_scalar pDelay) {
     gProgram_state.cut_scene = 1;
     if (pSound_ID >= 0) {
         DRS3LoadSound(pSound_ID);
-        SetFlicSound(pSound_ID, PDGetTotalTime() + 1000.f * pDelay);
+        SetFlicSound(pSound_ID, PDGetTotalTime() + (int)(1000.f * pDelay));
     }
     SetNonFatalAllocationErrors();
     RunFlic(pIndex);
@@ -69,7 +69,8 @@ void PlaySmackerFile(char* pSmack_name) {
     int len;
     int fuck_off;
 
-    if (!gSound_override && !gCut_scene_override) {
+    if (gSound_override || gCut_scene_override) {
+    } else {
         StopMusic();
         FadePaletteDown();
         ClearEntireScreen();
@@ -82,7 +83,10 @@ void PlaySmackerFile(char* pSmack_name) {
         if (smk == NULL) {
             dr_dprintf("Unable to open smack file - attempt to load smack from CD...");
             if (GetCDPathFromPathsTxtFile(the_path)) {
-                strcat(the_path, gDir_separator);
+                len = strlen(the_path);
+                if (len != 0 && the_path[len - 1] != gDir_separator[0]) {
+                    strcat(the_path, gDir_separator);
+                }
                 strcat(the_path, "DATA");
                 PathCat(the_path, the_path, "CUTSCENE");
                 PathCat(the_path, the_path, pSmack_name);
@@ -104,8 +108,9 @@ void PlaySmackerFile(char* pSmack_name) {
                         br_colours_ptr[j] = (smack_colours_ptr[j * 3] << 16) | smack_colours_ptr[j * 3 + 2] | (smack_colours_ptr[j * 3 + 1] << 8);
                     }
 
-                    // TOOD: remove the commented-out line below when smk->NewPalette is set correctly per-frame
-                    // memset(gBack_screen->pixels, 0, gBack_screen->row_bytes * gBack_screen->height);
+#ifndef DETHRACE_FIX_BUGS
+                    memset(gBack_screen->pixels, 0, gBack_screen->row_bytes * gBack_screen->height);
+#endif
                     DRSetPalette(gCurrent_palette);
                     PDScreenBufferSwap(0);
                     EnsurePaletteUp();
@@ -167,21 +172,22 @@ void DoEndRaceAnimation(void) {
     int made_a_profit;
     int went_up_a_rank;
 
-    made_a_profit = gProgram_state.credits_earned >= gProgram_state.credits_lost;
-    went_up_a_rank = gProgram_state.credits_earned >= gProgram_state.credits_per_rank;
-
     FadePaletteDown();
 
-    if (gAusterity_mode || gNet_mode != eNet_mode_none) {
-        return;
-    }
-    if (gProgram_state.credits + gProgram_state.credits_earned - gProgram_state.credits_lost >= 0) {
-        if (made_a_profit && went_up_a_rank) {
-            PlaySmackerFile("SUCCESS.SMK");
-        } else if (made_a_profit || went_up_a_rank) {
-            PlaySmackerFile("MUNDANE.SMK");
-        } else {
-            PlaySmackerFile("UNSUCSES.SMK");
+    if (!gAusterity_mode) {
+        if (gNet_mode == eNet_mode_none) {
+            if (gProgram_state.credits_earned - gProgram_state.credits_lost + gProgram_state.credits >= 0) {
+                made_a_profit = gProgram_state.credits_earned >= gProgram_state.credits_lost;
+                went_up_a_rank = gProgram_state.credits_earned >= gProgram_state.credits_per_rank;
+
+                if (made_a_profit && went_up_a_rank) {
+                    PlaySmackerFile("SUCCESS.SMK");
+                } else if (made_a_profit || went_up_a_rank) {
+                    PlaySmackerFile("MUNDANE.SMK");
+                } else {
+                    PlaySmackerFile("UNSUCSES.SMK");
+                }
+            }
         }
     }
 }
