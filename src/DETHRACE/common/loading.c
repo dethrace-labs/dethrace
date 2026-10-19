@@ -84,10 +84,13 @@ tHeadup_info gHeadup_image_info[] = {
 };
 
 // GLOBAL: CARM95 0x0050A4E8
-char* gYour_car_names[2][6];
+char* gYour_car_names[2][6] = {
+    { "CARFRANK.PIX", "CARANNIE.PIX", "CARFR2.PIX", "CARFR3.PIX", "CARFR4.PIX", "CARFR5.PIX" },
+    { "CARFRANK.PIX", "CARANNIE.PIX", "CARAN2.PIX", "CARAN3.PIX", "CARAN4.PIX", "CARAN5.PIX" }
+};
 
 // GLOBAL: CARM95 0x0050A518
-char* gDrivable_car_names[6];
+char* gDrivable_car_names[6] = { "BLKEAGLE.TXT", "ANNIE.TXT", "ED101.TXT", "OFFROAD.TXT", "APC.TXT", "YANK.TXT" };
 
 // GLOBAL: CARM95 0x0050a530
 char* gDamage_names[] = {

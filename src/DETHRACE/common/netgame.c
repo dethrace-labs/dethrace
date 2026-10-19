@@ -67,7 +67,7 @@ void SendCarData(tU32 pNext_frame_time) {
     int i;
     int j;
     // GLOBAL: CARM95 0x50c608
-    static tU32 last_time;
+    static tU32 last_time = 0xffffffff;
     tU32 time;
     int damaged_wheels;
 
