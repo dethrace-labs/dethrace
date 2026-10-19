@@ -1781,8 +1781,9 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
     br_scalar distance_factor;
 
     if (gShadow_level != eShadow_none) {
-        for (cat = eVehicle_self; cat <= (gShadow_level == eShadow_everyone ? 4 : gShadow_level == eShadow_us_and_opponents ? 3
-                                                                                                                            : 0);
+        for (cat = eVehicle_self; cat <= (gShadow_level == eShadow_everyone           ? 4
+                                          : gShadow_level == eShadow_us_and_opponents ? 3
+                                                                                      : 0);
             ++cat) {
             if (cat == eVehicle_self) {
                 car_count = 1;
