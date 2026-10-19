@@ -1871,20 +1871,22 @@ void ControlCar1(tCar_spec* c, br_scalar dt) {
         c->acc_force = 7.f * c->M;
     }
     if (c->keys.dec) {
-        c->acc_force = -7.f * c->M;
+        c->acc_force = -(7.f * c->M);
     }
     if (c->keys.left) {
-        if (c->curvature >= 0.f) {
-            c->curvature += dt / (PHYSICS_STEP_TIME / 1000.0f) * 0.05f / (5.f + BrVector3Length(&c->v));
+        if (c->curvature < 0.f) {
+            c->curvature += 0.01 * dt / 0.04;
         } else {
-            c->curvature += 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f);
+            c->curvature += (0.05f / (5.f + BrVector3Length(&c->v)))
+                * (dt / 0.04f);
         }
     }
     if (c->keys.right) {
-        if (c->curvature <= 0.f) {
-            c->curvature -= dt / (PHYSICS_STEP_TIME / 1000.0f) * 0.05f / (5.f + BrVector3Length(&c->v));
+        if (c->curvature > 0.f) {
+            c->curvature -= 0.01 * dt / 0.04;
         } else {
-            c->curvature -= 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f);
+            c->curvature -= (0.05f / (5.f + BrVector3Length(&c->v)))
+                * (dt / 0.04f);
         }
     }
     if (c->curvature > c->maxcurve) {
