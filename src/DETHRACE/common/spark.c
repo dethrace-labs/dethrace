@@ -2095,7 +2095,12 @@ void InitFlame(void) {
     if (num != COUNT_OF(gFlame_map)) {
         FatalError(kFatalError_LoadPixelmapFile_S, the_path);
     }
-    BrMapAddMany(gFlame_map, num);
+#ifdef DETHRACE_3DFX_PATCH
+    for (i = 0; i < COUNT_OF(gFlame_map); i++) {
+        gFlame_map[i] = PurifiedPixelmap(gFlame_map[i]);
+    }
+#endif
+    BrMapAddMany(gFlame_map, COUNT_OF(gFlame_map));
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
         gSmoke_column[i].flame_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
         for (j = 0; j < COUNT_OF(gSmoke_column[0].frame_count); j++) {
@@ -2169,6 +2174,11 @@ void InitSplash(FILE* pF) {
         PathCat(the_path, the_path, "SPLSHBLU.PIX");
         gNum_splash_types = DRPixelmapLoadMany(the_path, splash_maps, 0x14u);
     }
+#ifdef DETHRACE_3DFX_PATCH
+    for (i = 0; i < gNum_splash_types; i++) {
+        splash_maps[i] = PurifiedPixelmap(splash_maps[i]);
+    }
+#endif
     BrMapAddMany(splash_maps, gNum_splash_types);
     the_blend_table = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
     for (i = 0; i < gNum_splash_types; i++) {

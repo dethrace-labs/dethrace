@@ -405,7 +405,19 @@ br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 p
 // IDA: br_pixelmap* __usercall DRPixelmapMatchSized@<EAX>(br_pixelmap *pSrc@<EAX>, tU8 pMatch_type@<EDX>, tS32 pWidth@<EBX>, tS32 pHeight@<ECX>)
 br_pixelmap* DRPixelmapMatchSized(br_pixelmap* pSrc, tU8 pMatch_type, tS32 pWidth, tS32 pHeight) {
     br_pixelmap* result;
-    NOT_IMPLEMENTED();
+
+    result = BrPixelmapMatchSized(pSrc, pMatch_type, pWidth, pHeight);
+    if (result != NULL) {
+        if (pSrc->identifier != NULL) {
+            result->identifier = BrResStrDup(result, pSrc->identifier);
+        }
+        result->user = BrResAllocate(result, sizeof(tPixelmap_user_data), kMem_pixelmap_dimensions);
+        if (result->user != NULL) {
+            ((tPixelmap_user_data*)result->user)->orig_width = pSrc->width;
+            ((tPixelmap_user_data*)result->user)->orig_height = pSrc->height;
+        }
+    }
+    return result;
 }
 
 // IDA: void __usercall CopyDoubled8BitTo16BitRectangle(br_pixelmap *pDst@<EAX>, br_pixelmap *pSrc@<EDX>, int pSrc_width@<EBX>, int pSrc_height@<ECX>, int pDst_x, int pDst_y, br_pixelmap *pPalette)
@@ -446,7 +458,18 @@ br_pixelmap* Scale8BitPixelmap(br_pixelmap* pSrc, int pWidth, int pHeight) {
     int y;
     tU8* src_pixels;
     tU8* dst_pixels;
-    NOT_IMPLEMENTED();
+
+    result = DRPixelmapMatchSized(pSrc, BR_PMMATCH_NO_RENDER, pWidth, pHeight);
+    if (result != NULL) {
+        src_pixels = pSrc->pixels;
+        dst_pixels = result->pixels;
+        for (y = 0; y < pHeight; y++) {
+            for (x = 0; x < pWidth; x++) {
+                dst_pixels[x + y * result->row_bytes] = src_pixels[pSrc->row_bytes * (y * pSrc->height / pHeight) + x * pSrc->width / pWidth];
+            }
+        }
+    }
+    return result;
 }
 
 // IDA: br_pixelmap* __usercall Tile8BitPixelmap@<EAX>(br_pixelmap *pSrc@<EAX>, int pN@<EDX>)
@@ -459,12 +482,41 @@ br_pixelmap* Tile8BitPixelmap(br_pixelmap* pSrc, int pN) {
     int y;
     tU8* src_pixels;
     tU8* dst_pixels;
-    NOT_IMPLEMENTED();
+
+    new_width = pN * pSrc->width;
+    new_height = pN * pSrc->height;
+    if (new_width > gMax_texture_side || new_height > gMax_texture_side) {
+        FatalError(kFatalError_CannotTilePixelmap_S, pSrc->identifier);
+    }
+    result = DRPixelmapMatchSized(pSrc, BR_PMMATCH_NO_RENDER, new_width, new_height);
+    if (result == NULL) {
+        FatalError(kFatalError_CannotTilePixelmap_S, pSrc->identifier);
+    }
+    result->map = gRender_palette;
+    src_pixels = pSrc->pixels;
+    dst_pixels = result->pixels;
+    for (y2 = 0; y2 < pN; y2++) {
+        for (y = 0; y < pSrc->height; y++) {
+            x = 0;
+            do {
+                memcpy(dst_pixels + x * pSrc->width + result->row_bytes * (y + y2 * pSrc->height),
+                    src_pixels + y * pSrc->row_bytes, pSrc->width);
+                x++;
+            } while (x < pN);
+        }
+    }
+    return result;
 }
 
 // IDA: tException_list __usercall FindExceptionInList@<EAX>(char *pName@<EAX>, tException_list pList@<EDX>)
 tException_list FindExceptionInList(char* pName, tException_list pList) {
 
+#ifdef DETHRACE_FIX_BUGS
+    // some pixmaps do not have identifiers, for example pixelmaps from FLIC frames. OG code read garbage in those cases
+    if (pName == NULL) {
+        return NULL;
+    }
+#endif
     while (pList) {
         if (DRStricmp(pName, pList->name) == 0) {
             return pList;
@@ -487,8 +539,69 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
         return pSrc;
     }
 
-    LOG_INFO("PurifiedPixelmap not implemented");
-    return pSrc;
+    if (pSrc == NULL) {
+        return NULL;
+    }
+
+    if (gTextures_need_powers_of_2
+        && (((pSrc->width - 1) & pSrc->width) != 0 || ((pSrc->height - 1) & pSrc->height) != 0)) {
+        for (new_width = 1; new_width < pSrc->width; new_width *= 2) {
+        }
+        for (new_height = 1; new_height < pSrc->height; new_height *= 2) {
+        }
+        while (new_width < new_height / gMax_texture_aspect_ratio) {
+            new_width *= 2;
+        }
+        while (new_height < new_width / gMax_texture_aspect_ratio) {
+            new_height *= 2;
+        }
+        if (new_width > gMax_texture_side) {
+            new_width = gMax_texture_side;
+        }
+        if (new_height > gMax_texture_side) {
+            new_height = gMax_texture_side;
+        }
+        intermediate = Scale8BitPixelmap(pSrc, new_width, new_height);
+        if (intermediate == NULL) {
+            FatalError(kFatalError_CannotPurifyPixelmap_S, pSrc->identifier);
+        }
+        BrPixelmapFree(pSrc);
+    } else {
+        intermediate = pSrc;
+    }
+
+    if (intermediate->identifier) {
+        LOG_DEBUG("purifiedpix %s", intermediate->identifier);
+    }
+    e = FindExceptionInList(intermediate->identifier, gExceptions);
+    if (e != NULL && (e->flags & (ExceptionFlag_Double | ExceptionFlag_Quadruple | ExceptionFlag_Mipmap)) != 0) {
+        switch (e->flags & (ExceptionFlag_Double | ExceptionFlag_Quadruple)) {
+        case ExceptionFlag_Double:
+            result = Tile8BitPixelmap(intermediate, 2);
+            BrPixelmapFree(intermediate);
+            break;
+        case ExceptionFlag_Quadruple:
+            result = Tile8BitPixelmap(intermediate, 4);
+            BrPixelmapFree(intermediate);
+            break;
+        default:
+            result = intermediate;
+            break;
+        }
+        if ((e->flags & ExceptionFlag_Mipmap) != 0) {
+            intermediate = BrPixelmapMakeMipMap(result, result->type, gRender_palette, 0, 256, 1);
+            BrPixelmapFree(result);
+        } else {
+            intermediate = result;
+        }
+    }
+
+    if (intermediate->map != NULL) {
+        NobbleNonzeroBlacks(intermediate->map);
+    } else {
+        intermediate->map = gRender_palette;
+    }
+    return intermediate;
 }
 
 // IDA: br_pixelmap* __usercall DRPixelmapLoad@<EAX>(char *pFile_name@<EAX>)
@@ -1707,7 +1820,6 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
     for (i = 0; i < pCount; i++) {
         if (pArray[i]->colour_map != NULL) {
             e = FindExceptionInList(pArray[i]->colour_map->identifier, gExceptions);
-
             if (gInterpolate_textures) {
                 // use linear texture filtering unless we have a "nobilinear" flag or the texture has transparent parts
                 if ((e == NULL || (e->flags & ExceptionFlag_NoBilinear) == 0) && !DRPixelmapHasZeros(pArray[i]->colour_map)) {
@@ -1723,9 +1835,11 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
             if (e && (e->flags & ExceptionFlag_Double)) {
                 pArray[i]->map_transform.m[0][0] = 0.5f;
                 pArray[i]->map_transform.m[1][1] = 0.5f;
+                LOG_DEBUG("doubled %s, %s", pArray[i]->identifier, pArray[i]->colour_map->identifier);
             } else if (e && (e->flags & ExceptionFlag_Quadruple)) {
                 pArray[i]->map_transform.m[0][0] = 0.25f;
                 pArray[i]->map_transform.m[1][1] = 0.25f;
+                LOG_DEBUG("quad %s, %s", pArray[i]->identifier, pArray[i]->colour_map->identifier);
             }
         } else {
             c = pArray[i]->index_base + pArray[i]->index_range / 2;

@@ -370,6 +370,9 @@ void InitPedGibs(void) {
             } else {
                 the_pix = LoadPixelmap(gPed_gib_names[i][j]);
             }
+#ifdef DETHRACE_3DFX_PATCH
+            the_pix = PurifiedPixelmap(the_pix);
+#endif
             BrMapAdd(the_pix);
             gPed_gib_materials[i].count = gPed_size_counts[i];
             gPed_gib_materials[i].materials[j] = BrMaterialAllocate(NULL);
@@ -2836,6 +2839,9 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
                         if (the_sequence->frames[k].pixelmap == NULL) {
                             FatalError(kFatalError_FindPedestrianPixelmap_S, s);
                         }
+#ifdef DETHRACE_3DFX_PATCH
+                        the_sequence->frames[k].pixelmap = PurifiedPixelmap(the_sequence->frames[k].pixelmap);
+#endif
                         BrMapAdd(the_sequence->frames[k].pixelmap);
                     }
                     GetALineAndDontArgue(pG, s);
