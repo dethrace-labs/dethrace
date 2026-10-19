@@ -1871,8 +1871,8 @@ void DrawGrid(int pOffset, int pDraw_it) {
     int x;
     int str_x;
     int width_job;
-    int done_highest;
-    int str_index;
+    int done_highest = 0;
+    int str_index = 0;
     int swap_1_x;
     int swap_1_y;
     int swap_2_x;
@@ -1880,23 +1880,9 @@ void DrawGrid(int pOffset, int pDraw_it) {
     br_pixelmap* the_image;
     br_pixelmap* swap_1_image;
     br_pixelmap* swap_2_image;
-    char numbers_str[4][100];
-    char total_str[256];
+    char numbers_str[4][100] = { "", "", "", "" };
+    char total_str[256] = "";
     tU32 the_time;
-
-    done_highest = 0;
-    str_index = 0;
-
-    numbers_str[0][0] = *"";
-    memset(&numbers_str[0][1], 0, sizeof(numbers_str[0]) - 1);
-    numbers_str[1][0] = *"";
-    memset(&numbers_str[1][1], 0, sizeof(numbers_str[1]) - 1);
-    numbers_str[2][0] = *"";
-    memset(&numbers_str[2][1], 0, sizeof(numbers_str[2]) - 1);
-    numbers_str[3][0] = *"";
-    memset(&numbers_str[3][1], 0, sizeof(numbers_str[3]) - 1);
-    total_str[0] = *"";
-    memset(&total_str[1], 0, sizeof(total_str) - 1);
 
     the_time = PDGetTotalTime();
     BrPixelmapRectangleFill(
@@ -1924,7 +1910,7 @@ void DrawGrid(int pOffset, int pDraw_it) {
             swap_1_x = x;
             swap_1_y = y;
             swap_1_image = the_image;
-        } else if (-i == -gSwap_grid_2) {
+        } else if (i == gSwap_grid_2) {
             swap_2_x = x;
             swap_2_y = y;
             swap_2_image = the_image;
