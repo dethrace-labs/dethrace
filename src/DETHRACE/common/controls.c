@@ -2524,7 +2524,7 @@ void UserSendMessage(void) {
 // FUNCTION: CARM95 0x004a50cf
 void EnterUserMessage(void) {
     // GLOBAL: CARM95 0x51cf58
-    static int last_key;
+    static int last_key = -1;
     // GLOBAL: CARM95 0x51cf5c
     static int about_to_die;
     // GLOBAL: CARM95 0x53d69c

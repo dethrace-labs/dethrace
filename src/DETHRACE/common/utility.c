@@ -402,6 +402,7 @@ br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 p
     return the_map;
 }
 
+#ifdef DETHRACE_3DFX_PATCH
 // IDA: br_pixelmap* __usercall DRPixelmapMatchSized@<EAX>(br_pixelmap *pSrc@<EAX>, tU8 pMatch_type@<EDX>, tS32 pWidth@<EBX>, tS32 pHeight@<ECX>)
 br_pixelmap* DRPixelmapMatchSized(br_pixelmap* pSrc, tU8 pMatch_type, tS32 pWidth, tS32 pHeight) {
     br_pixelmap* result;
@@ -419,6 +420,8 @@ br_pixelmap* DRPixelmapMatchSized(br_pixelmap* pSrc, tU8 pMatch_type, tS32 pWidt
     }
     return result;
 }
+
+#endif
 
 // IDA: void __usercall CopyDoubled8BitTo16BitRectangle(br_pixelmap *pDst@<EAX>, br_pixelmap *pSrc@<EDX>, int pSrc_width@<EBX>, int pSrc_height@<ECX>, int pDst_x, int pDst_y, br_pixelmap *pPalette)
 void CopyDoubled8BitTo16BitRectangle(br_pixelmap* pDst, br_pixelmap* pSrc, int pSrc_width, int pSrc_height, int pDst_x, int pDst_y, br_pixelmap* pPalette) {
@@ -451,6 +454,7 @@ void CopyDoubled8BitTo16BitRectangle(br_pixelmap* pDst, br_pixelmap* pSrc, int p
     }
 }
 
+#ifdef DETHRACE_3DFX_PATCH
 // IDA: br_pixelmap* __usercall Scale8BitPixelmap@<EAX>(br_pixelmap *pSrc@<EAX>, int pWidth@<EDX>, int pHeight@<EBX>)
 br_pixelmap* Scale8BitPixelmap(br_pixelmap* pSrc, int pWidth, int pHeight) {
     br_pixelmap* result;
@@ -508,6 +512,8 @@ br_pixelmap* Tile8BitPixelmap(br_pixelmap* pSrc, int pN) {
     return result;
 }
 
+#endif
+
 // IDA: tException_list __usercall FindExceptionInList@<EAX>(char *pName@<EAX>, tException_list pList@<EDX>)
 tException_list FindExceptionInList(char* pName, tException_list pList) {
 
@@ -526,6 +532,7 @@ tException_list FindExceptionInList(char* pName, tException_list pList) {
     return NULL;
 }
 
+#ifdef DETHRACE_3DFX_PATCH
 // IDA: br_pixelmap* __usercall PurifiedPixelmap@<EAX>(br_pixelmap *pSrc@<EAX>)
 br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
     br_pixelmap* intermediate;
@@ -600,6 +607,8 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
     }
     return intermediate;
 }
+
+#endif
 
 // IDA: br_pixelmap* __usercall DRPixelmapLoad@<EAX>(char *pFile_name@<EAX>)
 // FUNCTION: CARM95 0x004c1fbb
