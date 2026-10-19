@@ -1884,6 +1884,15 @@ void DrawGrid(int pOffset, int pDraw_it) {
     char total_str[256] = "";
     tU32 the_time;
 
+#ifdef DETHRACE_FIX_BUGS
+    swap_1_x = 0;
+    swap_1_y = 0;
+    swap_2_x = 0;
+    swap_2_y = 0;
+    swap_1_image = NULL;
+    swap_2_image = NULL;
+#endif
+
     the_time = PDGetTotalTime();
     BrPixelmapRectangleFill(
         gBack_screen,
