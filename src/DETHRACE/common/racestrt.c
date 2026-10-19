@@ -1988,7 +1988,7 @@ void DrawGrid(int pOffset, int pDraw_it) {
             numbers_str[2][strlen(numbers_str[2]) - 1] = '\0';
         }
         strcpy(total_str, numbers_str[0]);
-        for (i = 1; i <= 3; i++) {
+        for (i = 1; i < COUNT_OF(numbers_str); i++) {
             strcat(total_str, numbers_str[i]);
         }
         width_job = BrPixelmapTextWidth(gBack_screen, gBig_font, total_str);
