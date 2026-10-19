@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <sys/param.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/sysctl.h>
@@ -35,7 +36,7 @@
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof(A[0]))
 
 static int stack_nbr = 0;
-static char _program_name[1024];
+static char _program_name[PATH_MAX];
 #define MAX_STACK_FRAMES 64
 static void* stack_traces[MAX_STACK_FRAMES];
 static char name_buf[4096];
@@ -171,22 +172,29 @@ void signal_handler(int sig, siginfo_t* siginfo, void* context) {
 
 static uint8_t alternate_stack[SIGSTKSZ];
 
-void resolve_full_path(char* path, const char* argv0) {
+void resolve_full_path(char* path, size_t path_size, const char* argv0) {
     if (argv0[0] == '/') { // run with absolute path
-        strcpy(path, argv0);
+        strncpy(path, argv0, path_size - 1);
+        path[path_size - 1] = '\0';
     } else { // run with relative path
-        if (NULL == getcwd(path, PATH_MAX)) {
+        // Leave room for "/" and argv0
+        size_t argv0_len = strlen(argv0);
+        if (argv0_len + 2 >= path_size) {
+            return; // argv0 too long
+        }
+        size_t max_cwd_len = path_size - argv0_len - 2;
+        if (NULL == getcwd(path, max_cwd_len)) {
             perror("getcwd error");
             return;
         }
-        strcat(path, "/");
-        strcat(path, argv0);
+        strncat(path, "/", path_size - strlen(path) - 1);
+        strncat(path, argv0, path_size - strlen(path) - 1);
     }
 }
 
 void OS_InstallSignalHandler(char* program_name) {
 
-    resolve_full_path(_program_name, program_name);
+    resolve_full_path(_program_name, sizeof(_program_name), program_name);
 
     /* setup alternate stack */
     {
