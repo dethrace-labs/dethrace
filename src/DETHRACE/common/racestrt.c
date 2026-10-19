@@ -1899,11 +1899,11 @@ void DrawGrid(int pOffset, int pDraw_it) {
             the_image = gCurrent_race.opponent_list[i].car_spec->grid_icon_image;
         }
         y = gCurrent_graf_data->grid_top_y
-            + i % -2 * gCurrent_graf_data->grid_y_pitch
+            + i % 2 * gCurrent_graf_data->grid_y_pitch
             - the_image->height / 2
             - gGrid_y_adjust;
         x = gCurrent_graf_data->grid_left_x
-            + i % -2 * gCurrent_graf_data->grid_x_stagger
+            + i % 2 * gCurrent_graf_data->grid_x_stagger
             + i / 2 * gCurrent_graf_data->grid_x_pitch
             - pOffset;
         if (i == gSwap_grid_1) {
