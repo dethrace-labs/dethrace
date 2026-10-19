@@ -570,12 +570,9 @@ br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc) {
         intermediate = pSrc;
     }
 
-    if (intermediate->identifier) {
-        LOG_DEBUG("purifiedpix %s", intermediate->identifier);
-    }
     e = FindExceptionInList(intermediate->identifier, gExceptions);
-    if (e != NULL && (e->flags & (ExceptionFlag_Double | ExceptionFlag_Quadruple | ExceptionFlag_Mipmap)) != 0) {
-        switch (e->flags & (ExceptionFlag_Double | ExceptionFlag_Quadruple)) {
+    if (e != NULL) {
+        switch (e->flags) {
         case ExceptionFlag_Double:
             result = Tile8BitPixelmap(intermediate, 2);
             BrPixelmapFree(intermediate);
@@ -1835,11 +1832,9 @@ void GlorifyMaterial(br_material** pArray, int pCount) {
             if (e && (e->flags & ExceptionFlag_Double)) {
                 pArray[i]->map_transform.m[0][0] = 0.5f;
                 pArray[i]->map_transform.m[1][1] = 0.5f;
-                LOG_DEBUG("doubled %s, %s", pArray[i]->identifier, pArray[i]->colour_map->identifier);
             } else if (e && (e->flags & ExceptionFlag_Quadruple)) {
                 pArray[i]->map_transform.m[0][0] = 0.25f;
                 pArray[i]->map_transform.m[1][1] = 0.25f;
-                LOG_DEBUG("quad %s, %s", pArray[i]->identifier, pArray[i]->colour_map->identifier);
             }
         } else {
             c = pArray[i]->index_base + pArray[i]->index_range / 2;
