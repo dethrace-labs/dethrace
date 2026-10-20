@@ -74,7 +74,7 @@ br_scalar gCut_delay_3;
 br_scalar gCut_delay_4;
 
 // GLOBAL: CARM95 0x00521354
-br_scalar gYon_multiplier;
+br_scalar gYon_multiplier = 1.0f;
 
 // GLOBAL: CARM95 0x00521358
 tSave_game* gPre_race_saved_game;
