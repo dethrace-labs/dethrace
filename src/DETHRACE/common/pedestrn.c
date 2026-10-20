@@ -690,7 +690,7 @@ void MungePedGibs(tU32 pFrame_period) {
 
                 the_ped_gib->actor->t.t.translate.t.v[X] += the_ped_gib->x_speed * s_frame_period / pedestrian->width;
                 the_ped_gib->actor->t.t.translate.t.v[Y] += the_ped_gib->y_speed * s_frame_period / pedestrian->height2;
-                the_ped_gib->y_speed -= gFrame_period * gGravity_multiplier * 1.420289855072464e-6;
+                the_ped_gib->y_speed -= gFrame_period * gGravity_multiplier * PED_GRAVITY;
                 AddPedGibToPipingSession(i, &the_ped_gib->actor->t.t.mat, the_ped_gib->size, the_ped_gib->gib_index, the_ped_gib->parent_index);
             }
         } else if (the_ped_gib->size == 0) {
@@ -1364,10 +1364,10 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
         && pPedestrian->current_action != pPedestrian->fatal_ground_impact_action
         && pPedestrian->current_action != pPedestrian->giblets_action) {
         the_action = &pPedestrian->action_list[pPedestrian->current_action];
-        if (!pPedestrian->done_initial) {
-            terminal_speed = the_action->initial_speed;
-        } else {
+        if (pPedestrian->done_initial) {
             terminal_speed = the_action->looping_speed;
+        } else {
+            terminal_speed = the_action->initial_speed;
         }
         if (pPedestrian->current_speed < terminal_speed) {
             pPedestrian->current_speed += gFrame_period * pPedestrian->acceleration;
@@ -1376,7 +1376,9 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
             pPedestrian->current_speed = terminal_speed;
         }
         pPedestrian->current_speed *= gPedestrian_speed_factor;
-        if (!pPedestrian->irreversable && pDanger_level != 0.f && BrVector3Dot(&pPedestrian->direction, pDanger_direction) > 0.f) {
+        if (!pPedestrian->irreversable
+            && pDanger_level != 0.f
+            && BrVector3Dot(&pPedestrian->direction, pDanger_direction) > 0.f) {
             pPedestrian->instruction_direction = -pPedestrian->instruction_direction;
             gInitial_instruction = NULL;
             if (PedestrianNextInstruction(pPedestrian, pDanger_level, 0, 1) != 0) {
@@ -1399,12 +1401,12 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
     }
 
     pPedestrian->last_special_volume = FindSpecialVolume(&pPedestrian->actor->t.t.translate.t, pPedestrian->last_special_volume);
-    if (pPedestrian->last_special_volume == NULL) {
-        ped_gravity = 1.42029e-6f;
+    if (pPedestrian->last_special_volume != NULL) {
+        ped_gravity = pPedestrian->last_special_volume->gravity_multiplier * PED_GRAVITY;
     } else {
-        ped_gravity = pPedestrian->last_special_volume->gravity_multiplier * 1.42029e-6f;
+        ped_gravity = PED_GRAVITY;
     }
-    ped_gravity *= gGravity_multiplier;
+    ped_gravity = ped_gravity * gGravity_multiplier;
     if (gVesuvian_corpses
         && (pPedestrian->current_action == pPedestrian->fatal_car_impact_action || pPedestrian->current_action == pPedestrian->fatal_ground_impact_action)) {
         if (PercentageChance(100 / (gVesuvians_last_time != 0 ? gVesuvians_last_time : 1))) {
@@ -1412,11 +1414,8 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
         }
         gVesuvians_this_time++;
     }
-    if (pPedestrian->to_pos.v[Y] < 500.f) {
-        pPedestrian->falling_speed = 0.f;
-        pPedestrian->mid_air = 0;
-    } else {
-        BrVector3Copy(&cast_point, &pPedestrian->actor->t.t.translate.t);
+    if (pPedestrian->to_pos.v[Y] >= 500.f) {
+        cast_point = pPedestrian->actor->t.t.translate.t;
         if (cast_point.v[Y] >= 500.f) {
             cast_point.v[Y] -= 999.6f;
             pPedestrian->pos.v[Y] = pPedestrian->actor->t.t.translate.t.v[Y] = FindYVerticallyBelow2(&cast_point);
@@ -1425,9 +1424,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
             pPedestrian->spin_period = 0;
             BrVector3Set(&pPedestrian->offset, 0.f, 0.f, 0.f);
         } else {
-            if (pPedestrian->current_speed == 0.f && !pPedestrian->mid_air) {
-                pPedestrian->mid_air = 0;
-            } else {
+            if (pPedestrian->current_speed != 0.f || pPedestrian->mid_air) {
                 cast_point.v[Y] = old_y + .4f;
                 new_y = FindYVerticallyBelow2(&cast_point);
                 if (new_y > old_y) {
@@ -1446,7 +1443,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                     }
                     if (pPedestrian->hit_points > 0
                         && pPedestrian->falling_sound >= 0
-                        && pPedestrian->falling_speed >= 0.0008f) {
+                        && pPedestrian->falling_speed >= 0.0008) {
                         DRS3StopSound(pPedestrian->last_sound);
                         the_pitch = 65536.f / gPed_scale_factor;
                         pPedestrian->last_sound = DRS3StartSound3D(gPedestrians_outlet,
@@ -1465,9 +1462,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                             &pPedestrian->pos);
                         pPedestrian->falling_sound = -1;
                     }
-                    if (new_y <= pPedestrian->actor->t.t.translate.t.v[Y]) {
-                        pPedestrian->mid_air = 1;
-                    } else {
+                    if (pPedestrian->actor->t.t.translate.t.v[Y] < new_y) {
                         pPedestrian->pos.v[Y] = pPedestrian->actor->t.t.translate.t.v[Y] = new_y;
                         if (pPedestrian->spin_period != 0.f) {
                             pPedestrian->offset.v[Y] = pPedestrian->pos.v[Y];
@@ -1475,13 +1470,9 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                         if (pPedestrian->hit_points < 0) {
                             BrVector3Copy(&pPedestrian->to_pos, &pPedestrian->pos);
                         }
-                        damage = (pPedestrian->falling_speed - 0.0015f) * 100000.f;
+                        damage = (pPedestrian->falling_speed - 0.0015) * 100000.;
                         if (damage > 0 || pPedestrian->hit_points < 0) {
-                            if (pPedestrian->hit_points >= 0 && (pPedestrian->hit_points -= damage, pPedestrian->hit_points > 0)) {
-                                if (pPedestrian->hit_points < damage) {
-                                    ChangeActionTo(pPedestrian, pPedestrian->non_fatal_ground_impact_action, 1);
-                                }
-                            } else {
+                            if (pPedestrian->hit_points < 0 || (pPedestrian->hit_points -= damage) <= 0) {
                                 if (pPedestrian->hit_points <= -100) {
                                     pPedestrian->hit_points = -99;
                                 }
@@ -1497,14 +1488,23 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                                 if (pPedestrian->mid_air) {
                                     BurstPedestrian(pPedestrian, pPedestrian->falling_speed * 3.f, 0);
                                 }
+                            } else if (pPedestrian->hit_points < damage) {
+                                ChangeActionTo(pPedestrian, pPedestrian->non_fatal_ground_impact_action, 1);
                             }
                         }
                         pPedestrian->falling_speed = 0.f;
                         pPedestrian->mid_air = 0;
+                    } else {
+                        pPedestrian->mid_air = 1;
                     }
                 }
+            } else {
+                pPedestrian->mid_air = 0;
             }
         }
+    } else {
+        pPedestrian->falling_speed = 0.f;
+        pPedestrian->mid_air = 0;
     }
 }
 
