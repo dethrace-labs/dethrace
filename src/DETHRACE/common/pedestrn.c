@@ -821,7 +821,7 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
         if (pPedestrian->to_pos.v[Y] >= 500.f) {
             pPedestrian->direction.v[Y] = 0.f;
         }
-        if (Vector3IsZero(&pPedestrian->direction) && instruction != gInitial_instruction) {
+        if (Vector3IsZero(&pPedestrian->direction) && DR_FF_PTR(instruction) != gInitial_instruction) {
             if (gInitial_instruction == NULL) {
                 gInitial_instruction = instruction;
             }
