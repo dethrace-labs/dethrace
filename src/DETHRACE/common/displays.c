@@ -488,99 +488,49 @@ void DoHeadups(tU32 pThe_time) {
                     || Flash(the_headup->flash_period, &the_headup->last_flash, &the_headup->flash_state)) {
                     switch (the_headup->type) {
                     case eHeadup_text:
-                        if (the_headup->cockpit_anchored) {
-                            y_offset = gScreen_wobble_y;
-                        } else {
-                            y_offset = 0;
-                        }
-                        if (the_headup->cockpit_anchored) {
-                            x_offset = gScreen_wobble_x;
-                        } else {
-                            x_offset = 0;
-                        }
                         TransBrPixelmapText(
                             gBack_screen,
-                            x_offset + the_headup->x,
-                            y_offset + the_headup->y,
+                            DR_FF(the_headup->x + (the_headup->cockpit_anchored ? gScreen_wobble_x : 0)) + x_offset,
+                            the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0),
                             the_headup->data.text_info.colour,
                             the_headup->data.text_info.font,
                             the_headup->data.text_info.text);
                         break;
                     case eHeadup_coloured_text:
                         if (the_headup->clever) {
-                            if (the_headup->cockpit_anchored) {
-                                y_offset = gScreen_wobble_y;
-                            } else {
-                                y_offset = 0;
-                            }
-                            if (the_headup->cockpit_anchored) {
-                                x_offset = gScreen_wobble_x;
-                            } else {
-                                x_offset = 0;
-                            }
                             TransDRPixelmapCleverText(
                                 gBack_screen,
-                                x_offset + the_headup->x,
-                                y_offset + the_headup->y,
+                                DR_FF(the_headup->x + (the_headup->cockpit_anchored ? gScreen_wobble_x : 0)) + x_offset,
+                                the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0),
                                 the_headup->data.coloured_text_info.coloured_font,
                                 the_headup->data.coloured_text_info.text,
                                 the_headup->right_edge);
                         } else {
-                            if (the_headup->cockpit_anchored) {
-                                y_offset = gScreen_wobble_y;
-                            } else {
-                                y_offset = 0;
-                            }
-                            if (the_headup->cockpit_anchored) {
-                                x_offset = gScreen_wobble_x;
-                            } else {
-                                x_offset = 0;
-                            }
                             TransDRPixelmapText(
                                 gBack_screen,
-                                x_offset + the_headup->x,
-                                y_offset + the_headup->y,
+                                DR_FF(the_headup->x + (the_headup->cockpit_anchored ? gScreen_wobble_x : 0)) + x_offset,
+                                the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0),
                                 the_headup->data.coloured_text_info.coloured_font,
                                 the_headup->data.coloured_text_info.text,
                                 the_headup->right_edge);
                         }
                         break;
                     case eHeadup_box_text:
-                        if (the_headup->cockpit_anchored) {
-                            y_offset = gScreen_wobble_y;
-                        } else {
-                            y_offset = 0;
-                        }
-                        if (the_headup->cockpit_anchored) {
-                            x_offset = gScreen_wobble_y;
-                        } else {
-                            x_offset = 0;
-                        }
                         OoerrIveGotTextInMeBoxMissus(
                             the_headup->data.coloured_text_info.coloured_font - gFonts,
                             the_headup->data.coloured_text_info.text,
                             gBack_screen,
                             gBack_screen->width / 10,
-                            y_offset + x_offset + the_headup->y,
+                            the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0),
                             9 * gBack_screen->width / 10,
-                            y_offset + y_offset + the_headup->y + 60,
+                            the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0) + 60,
                             1);
                         break;
                     case eHeadup_image:
-                        if (the_headup->cockpit_anchored) {
-                            y_offset = gScreen_wobble_y;
-                        } else {
-                            y_offset = 0;
-                        }
-                        if (the_headup->cockpit_anchored) {
-                            x_offset = gScreen_wobble_x;
-                        } else {
-                            x_offset = 0;
-                        }
                         DRPixelmapRectangleMaskedCopy(
                             gBack_screen,
-                            x_offset + the_headup->x,
-                            y_offset + the_headup->y,
+                            DR_FF(the_headup->x + (the_headup->cockpit_anchored ? gScreen_wobble_x : 0)) + x_offset,
+                            the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0),
                             the_headup->data.image_info.image,
                             0,
                             0,
@@ -604,8 +554,8 @@ void DoHeadups(tU32 pThe_time) {
                                 the_headup->data.fancy_info.image,
                                 0,
                                 0,
-                                the_headup->data.fancy_info.image->width,
-                                the_headup->data.fancy_info.image->height,
+                                the_headup->data.fancy_info.image->width & 0xffff,
+                                the_headup->data.fancy_info.image->height & 0xffff,
                                 -BrIntToFixed(1));
                             break;
                         case eFancy_stage_halting:
@@ -616,14 +566,14 @@ void DoHeadups(tU32 pThe_time) {
 #endif
                                 DRPixelmapRectangleShearedCopy(
                                     gBack_screen,
-                                    the_headup->x - the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500 + x_offset,
+                                    the_headup->x - (DR_FF(time_factor) - 500) * the_headup->data.fancy_info.shear_amount / 500 + x_offset,
                                     the_headup->y + y_offset,
                                     the_headup->data.image_info.image,
                                     0,
                                     0,
-                                    the_headup->data.image_info.image->width,
-                                    the_headup->data.image_info.image->height,
-                                    BrIntToFixed(the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500)
+                                    the_headup->data.image_info.image->width & 0xffff,
+                                    the_headup->data.image_info.image->height & 0xffff,
+                                    BrIntToFixed((DR_FF(time_factor) - 500) * the_headup->data.fancy_info.shear_amount / 500)
                                         / the_headup->data.image_info.image->height);
                             } else {
                                 if (time_factor > 1500) {
@@ -638,8 +588,8 @@ void DoHeadups(tU32 pThe_time) {
                                     the_headup->data.image_info.image,
                                     0,
                                     0,
-                                    the_headup->data.image_info.image->width,
-                                    the_headup->data.image_info.image->height,
+                                    the_headup->data.image_info.image->width & 0xffff,
+                                    the_headup->data.image_info.image->height & 0xffff,
                                     BrIntToFixed((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500)
                                         / the_headup->data.image_info.image->height);
                             }
@@ -674,8 +624,8 @@ void DoHeadups(tU32 pThe_time) {
                                 the_headup->data.image_info.image,
                                 0,
                                 0,
-                                the_headup->data.image_info.image->width,
-                                the_headup->data.image_info.image->height,
+                                the_headup->data.image_info.image->width & 0xffff,
+                                the_headup->data.image_info.image->height & 0xffff,
                                 -BrIntToFixed(time_factor * the_headup->data.fancy_info.shear_amount / 1000)
                                     / the_headup->data.image_info.image->height);
                             break;
@@ -691,8 +641,8 @@ void DoHeadups(tU32 pThe_time) {
                                     the_headup->data.image_info.image,
                                     0,
                                     0,
-                                    the_headup->data.image_info.image->width,
-                                    the_headup->data.image_info.image->height,
+                                    the_headup->data.image_info.image->width & 0xffff,
+                                    the_headup->data.image_info.image->height & 0xffff,
                                     -BrIntToFixed(1));
                             }
                             break;
