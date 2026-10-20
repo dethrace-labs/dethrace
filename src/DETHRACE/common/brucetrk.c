@@ -176,9 +176,7 @@ br_uintptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
             return 1;
         }
         r1 = BrVector3LengthSquared((br_vector3*)pActor->t.t.mat.m[0]);
-        r2 = pActor->t.t.mat.m[1][0] * pActor->t.t.mat.m[1][0]
-            + (pActor->t.t.mat.m[1][1] * pActor->t.t.mat.m[1][1]
-                + pActor->t.t.mat.m[1][2] * pActor->t.t.mat.m[1][2]);
+        r2 = BrVector3LengthSquared((br_vector3*)pActor->t.t.mat.m[1]);
         r3 = BrVector3LengthSquared((br_vector3*)pActor->t.t.mat.m[2]);
         if (r1 < .999 || r2 < .999 || r3 < .999) {
             dr_dprintf("non car was scaled down %s", pActor->identifier);
