@@ -2240,37 +2240,37 @@ void ResendGuaranteedMessages(void) {
     int j;
     tU32 time;
 
-    i = 0;
+    j = 0;
     time = PDGetTotalTime();
-    for (j = 0; j < gNext_guarantee; j++) {
-        if (i != j) {
-            memcpy(&gGuarantee_list[i], &gGuarantee_list[j], sizeof(tGuaranteed_message));
+    for (i = 0; i < gNext_guarantee; i++) {
+        if (j != i) {
+            memcpy(&gGuarantee_list[j], &gGuarantee_list[i], sizeof(tGuaranteed_message));
         }
-        if (!gGuarantee_list[i].recieved) {
-            if (gGuarantee_list[i].NotifyFail != NULL) {
-                gGuarantee_list[i].recieved |= gGuarantee_list[i].NotifyFail(time - gGuarantee_list[i].send_time, gGuarantee_list[i].message);
+        if (!gGuarantee_list[j].recieved) {
+            if (gGuarantee_list[j].NotifyFail != NULL) {
+                gGuarantee_list[j].recieved |= gGuarantee_list[j].NotifyFail(time - gGuarantee_list[j].send_time, gGuarantee_list[j].message);
             } else {
-                if (time - gGuarantee_list[i].send_time > 10000) {
-                    gGuarantee_list[i].recieved = 1;
+                if (time - gGuarantee_list[j].send_time > 10000) {
+                    gGuarantee_list[j].recieved = 1;
                 }
             }
         }
-        if (!gGuarantee_list[i].recieved) {
-            if (time > gGuarantee_list[i].next_resend_time) {
-                gGuarantee_list[i].message->guarantee_number = gGuarantee_list[i].guarantee_number;
-                DoCheckSum(gGuarantee_list[i].message);
-                PDNetSendMessageToAddress(gCurrent_net_game, gGuarantee_list[i].message, &gGuarantee_list[i].pd_address);
-                gGuarantee_list[i].resend_period = (tU32)(gGuarantee_list[i].resend_period * 1.2f);
-                gGuarantee_list[i].next_resend_time += gGuarantee_list[i].resend_period;
+        if (!gGuarantee_list[j].recieved) {
+            if (time > gGuarantee_list[j].next_resend_time) {
+                gGuarantee_list[j].message->guarantee_number = gGuarantee_list[j].guarantee_number;
+                DoCheckSum(gGuarantee_list[j].message);
+                PDNetSendMessageToAddress(gCurrent_net_game, gGuarantee_list[j].message, &gGuarantee_list[j].pd_address);
+                gGuarantee_list[j].resend_period = (tU32)(gGuarantee_list[j].resend_period * 1.2);
+                gGuarantee_list[j].next_resend_time += gGuarantee_list[j].resend_period;
             }
-            i++;
-        } else if ((i <= 0 || gGuarantee_list[i - 1].message != gGuarantee_list[i].message)
-            && (gNext_guarantee <= j + 1 || gGuarantee_list[j + 1].message != gGuarantee_list[i].message)) {
-            gGuarantee_list[i].message->guarantee_number = 0;
-            NetDisposeMessage(gCurrent_net_game, gGuarantee_list[i].message);
+            j++;
+        } else if ((j < 1 || gGuarantee_list[j - 1].message != gGuarantee_list[j].message)
+            && (gNext_guarantee <= i + 1 || gGuarantee_list[i + 1].message != gGuarantee_list[j].message)) {
+            gGuarantee_list[j].message->guarantee_number = 0;
+            NetDisposeMessage(gCurrent_net_game, gGuarantee_list[j].message);
         }
     }
-    gNext_guarantee = i;
+    gNext_guarantee = j;
 }
 
 // IDA: int __usercall SampleFailNotifier@<EAX>(tU32 pAge@<EAX>, tNet_message *pMessage@<EDX>)
