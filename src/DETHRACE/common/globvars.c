@@ -74,7 +74,7 @@ br_scalar gCut_delay_3;
 br_scalar gCut_delay_4;
 
 // GLOBAL: CARM95 0x00521354
-br_scalar gYon_multiplier;
+br_scalar gYon_multiplier = 1.0f;
 
 // GLOBAL: CARM95 0x00521358
 tSave_game* gPre_race_saved_game;
@@ -82,7 +82,7 @@ tSave_game* gPre_race_saved_game;
 FILE* gDiagnostic_file;
 
 // GLOBAL: CARM95 0x00521360
-br_vector3 gDisabled_vector = { 1000.f, 1000.f, 1000.f };
+br_vector3 gDisabled_vector = { { 1000.f, 1000.f, 1000.f } };
 
 // GLOBAL: CARM95 0x0052136c
 tU32 gI_am_cheating;

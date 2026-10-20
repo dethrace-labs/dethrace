@@ -911,6 +911,16 @@ enum kEngineNoiseTypes {
 
 #define PHYSICS_STEP_TIME 40
 
+#define GRAVITY 10.0f
+#define PED_GRAVITY (9.8 / WORLD_SCALE_D / 1000.0 / 1000.0) // World units per millisecond squared
+#define UNDERWATER_ABILITY_FACTOR 0.6f
+#define MIN_SPEED 0.0001f
+#define MIN_OMEGA 0.05f
+#define MAX_DAMAGE_LEVEL 100
+#define HANDBRAKE_FAIL_DAMAGE 60
+#define SKID_MIN_V_CURRENT_CAR 20.0f
+#define SKID_MIN_V_OTHER_CAR 60.0f
+
 // average frame time in carm95
 #define MUNGE_ENGINE_INTERVAL 50
 
