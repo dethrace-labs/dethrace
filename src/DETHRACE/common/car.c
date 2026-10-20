@@ -1871,20 +1871,22 @@ void ControlCar1(tCar_spec* c, br_scalar dt) {
         c->acc_force = 7.f * c->M;
     }
     if (c->keys.dec) {
-        c->acc_force = -7.f * c->M;
+        c->acc_force = -(7.f * c->M);
     }
     if (c->keys.left) {
-        if (c->curvature >= 0.f) {
-            c->curvature += dt / (PHYSICS_STEP_TIME / 1000.0f) * 0.05f / (5.f + BrVector3Length(&c->v));
+        if (c->curvature < 0.f) {
+            c->curvature += 0.01 * dt / 0.04;
         } else {
-            c->curvature += 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f);
+            c->curvature += (0.05f / (5.f + BrVector3Length(&c->v)))
+                * (dt / 0.04f);
         }
     }
     if (c->keys.right) {
-        if (c->curvature <= 0.f) {
-            c->curvature -= dt / (PHYSICS_STEP_TIME / 1000.0f) * 0.05f / (5.f + BrVector3Length(&c->v));
+        if (c->curvature > 0.f) {
+            c->curvature -= 0.01 * dt / 0.04;
         } else {
-            c->curvature -= 0.01f * dt / (PHYSICS_STEP_TIME / 1000.0f);
+            c->curvature -= (0.05f / (5.f + BrVector3Length(&c->v)))
+                * (dt / 0.04f);
         }
     }
     if (c->curvature > c->maxcurve) {
@@ -4260,28 +4262,32 @@ int GetBoundsEdge(br_vector3* pos, br_vector3* edge, br_bounds* pB, int plane1, 
 // IDA: void __usercall oldMoveOurCar(br_scalar pNew_y@<EAX>, tU32 pTime_difference@<EDX>, br_model *pThe_model@<EBX>, int pFace_index@<ECX>)
 // FUNCTION: CARM95 0x00485bea
 void oldMoveOurCar(br_scalar pNew_y, tU32 pTime_difference, br_model* pThe_model, int pFace_index) {
-    br_transform direction_transform;
     br_vector3 thrust_vector;
-    br_scalar speed;
+    {
+        br_transform direction_matrix;
+        {
+            br_scalar speed;
 
-    speed = (gSelf->t.t.translate.t.v[1] - pNew_y) * 100.0f;
-    if (pTime_difference == 0
-        || speed / (br_scalar)pTime_difference > 0.6f) {
-        gSelf->t.t.translate.t.v[1] -= (br_scalar)pTime_difference * 0.6f / 100.0f;
-    } else {
-        gSelf->t.t.translate.t.v[1] = pNew_y;
-        gGround_normal__car = gNew_ground_normal__car;
+            speed = (gSelf->t.t.translate.t.v[1] - pNew_y) * 100.0f;
+            if (pTime_difference == 0
+                || speed / (br_scalar)pTime_difference > 0.6f) {
+                gSelf->t.t.translate.t.v[1] -= (br_scalar)pTime_difference * 0.6f / 100.0f;
+            } else {
+                gSelf->t.t.translate.t.v[1] = pNew_y;
+                gGround_normal__car = gNew_ground_normal__car;
+            }
+        }
+
+        thrust_vector.v[0] = -cos(BrAngleToRadian(BrDegreeToAngle(gOur_yaw__car)));
+        thrust_vector.v[1] = 0.f;
+        thrust_vector.v[2] = sin(BrAngleToRadian(BrDegreeToAngle(gOur_yaw__car)));
+
+        direction_matrix.type = BR_TRANSFORM_LOOK_UP;
+        BrVector3Cross(&direction_matrix.t.look_up.look, &thrust_vector, &gGround_normal__car);
+        direction_matrix.t.look_up.up = gGround_normal__car;
+        direction_matrix.t.look_up.t = gSelf->t.t.translate.t;
+        BrTransformToTransform(&gSelf->t, &direction_matrix);
     }
-
-    thrust_vector.v[0] = -cos(BrAngleToRadian(BrDegreeToAngle(gOur_yaw__car)));
-    thrust_vector.v[1] = 0.f;
-    thrust_vector.v[2] = sin(BrAngleToRadian(BrDegreeToAngle(gOur_yaw__car)));
-
-    direction_transform.type = BR_TRANSFORM_LOOK_UP;
-    BrVector3Cross(&direction_transform.t.look_up.look, &thrust_vector, &gGround_normal__car);
-    direction_transform.t.look_up.up = gGround_normal__car;
-    direction_transform.t.look_up.t = gSelf->t.t.translate.t;
-    BrTransformToTransform(&gSelf->t, &direction_transform);
 }
 
 // IDA: void __cdecl ToggleCollisionDetection()
@@ -4793,7 +4799,7 @@ void ViewNetPlayer(void) {
 // FUNCTION: CARM95 0x00487248
 void ViewOpponent(void) {
     // GLOBAL: CARM95 0x514e68
-    static int n;
+    static int n = -1;
 
     n++;
     if (gNet_mode != eNet_mode_none) {
@@ -4915,7 +4921,7 @@ void CheckDisablePlingMaterials(tCar_spec* pCar) {
 // FUNCTION: CARM95 0x0048754a
 void PositionExternalCamera(tCar_spec* c, tU32 pTime) {
     // GLOBAL: CARM95 0x514e6c
-    static int old_camera_mode;
+    static int old_camera_mode = -1;
     br_camera* camera_ptr;
 
     camera_ptr = (br_camera*)gCamera->type_data;
@@ -5501,7 +5507,7 @@ void MoveWithWheels(tCar_spec* c, br_vector3* vn, int manual_swing) {
     br_angle yaw;
     br_angle theta;
     // GLOBAL: CARM95 0x514e84
-    static int move_with_wheels;
+    static int move_with_wheels = 1;
 
     if (c->speed <= 0.0001f && !gCamera_mode) {
         if (manual_swing) {

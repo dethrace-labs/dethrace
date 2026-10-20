@@ -198,10 +198,10 @@ br_matrix34 gIdentity34 = {
 tShadow_level gShadow_level = eShadow_us_only;
 
 // GLOBAL: CARM95 0x0052022c
-br_scalar gShadow_hither_z_move;
+br_scalar gShadow_hither_z_move = 1.0f;
 
 // GLOBAL: CARM95 0x00520230
-br_scalar gShadow_hither_min_move;
+br_scalar gShadow_hither_min_move = 0.0002f;
 
 /* clang-format off */
 // arrows pointing to 180, 202, 224, 246 degrees (step = 90 / 4 = 22(.5) degrees)

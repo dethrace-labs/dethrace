@@ -23,13 +23,13 @@
 tDepth_effect gDistance_depth_effects[4];
 
 // GLOBAL: CARM95 0x00513430
-int gSky_on;
+int gSky_on = 1;
 
 // GLOBAL: CARM95 0x00513434
-int gDepth_cueing_on;
+int gDepth_cueing_on = 1;
 
 // GLOBAL: CARM95 0x00513438
-tDepth_effect_type gSwap_depth_effect_type;
+tDepth_effect_type gSwap_depth_effect_type = eDepth_effect_none;
 
 // GLOBAL: CARM95 0x00537944
 br_scalar gSky_height;
