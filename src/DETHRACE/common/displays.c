@@ -560,7 +560,7 @@ void DoHeadups(tU32 pThe_time) {
                             break;
                         case eFancy_stage_halting:
                             time_factor = 1000 * (pThe_time - the_headup->data.fancy_info.start_time) / 100;
-                            if (!(time_factor > 1000)) {
+                            if ((time_factor <= 1000)) {
 #if DETHRACE_FIX_BUGS
                                 time_factor = MAX(time_factor, 0);
 #endif
