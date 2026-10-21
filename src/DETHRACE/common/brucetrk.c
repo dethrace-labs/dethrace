@@ -167,7 +167,7 @@ br_uintptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
 
     if (pActor->identifier != NULL && pActor->identifier[0] == '&' && pActor->identifier[1] >= '0' && pActor->identifier[1] <= '9') {
 
-        i = (int)((unsigned int)(pActor->identifier[5] - '0') << 2) * 25
+        i = ((pActor->identifier[5] - '0') << 2) * 25
             + (pActor->identifier[6] - '0') * 10
             + (pActor->identifier[7] - '0')
             + (pActor->identifier[4] - '0') * 1000u;
