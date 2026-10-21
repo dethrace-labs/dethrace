@@ -648,6 +648,8 @@ void DoHeadups(tU32 pThe_time) {
                             break;
                         }
                         break;
+
+                        DETHRACE_DEFAULT_BREAK;
                     }
                 }
             }
