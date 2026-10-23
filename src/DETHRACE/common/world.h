@@ -66,7 +66,11 @@ void DisposeStorageSpace(tBrender_storage* pStorage_space);
 
 void ClearOutStorageSpace(tBrender_storage* pStorage_space);
 
+#ifdef DETHRACE_3DFX_PATCH
+tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm_address);
+#else
 tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_pm);
+#endif
 
 tAdd_to_storage_result AddShadeTableToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_st);
 

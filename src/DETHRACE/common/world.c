@@ -303,7 +303,12 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
 // IDA: tAdd_to_storage_result __usercall AddPixelmapToStorage@<EAX>(tBrender_storage *pStorage_space@<EAX>, br_pixelmap **pThe_pm@<EDX>)
 // This seems like the signature should be `br_pixelmap* pThe_pm`
 // FUNCTION: CARM95 0x00435014
+#ifdef DETHRACE_3DFX_PATCH
+tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap** pThe_pm_ptr) {
+    br_pixelmap* pThe_pm = *pThe_pm_ptr;
+#else
 tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br_pixelmap* pThe_pm) {
+#endif
     int i;
 
     if (pStorage_space->pixelmaps_count < pStorage_space->max_pixelmaps) {
@@ -314,6 +319,10 @@ tAdd_to_storage_result AddPixelmapToStorage(tBrender_storage* pStorage_space, br
                 return eStorage_duplicate;
             }
         }
+#ifdef DETHRACE_3DFX_PATCH
+        pThe_pm = PurifiedPixelmap(pThe_pm);
+        *pThe_pm_ptr = pThe_pm;
+#endif
         pStorage_space->pixelmaps[pStorage_space->pixelmaps_count] = pThe_pm;
         pStorage_space->pixelmaps_count++;
         return eStorage_allocated;
@@ -421,7 +430,11 @@ int LoadNPixelmaps(tBrender_storage* pStorage_space, FILE* pF, int pCount) {
         }
         for (j = 0; j < new_ones; j++) {
             if (temp_array[j] != NULL) {
+#ifdef DETHRACE_3DFX_PATCH
+                switch (AddPixelmapToStorage(pStorage_space, &temp_array[j])) {
+#else
                 switch (AddPixelmapToStorage(pStorage_space, temp_array[j])) {
+#endif
                 case eStorage_allocated:
                     BrMapAdd(temp_array[j]);
                     total++;
@@ -446,10 +459,24 @@ br_pixelmap* LoadSinglePixelmap(tBrender_storage* pStorage_space, char* pName) {
 
     temp = LoadPixelmap(pName);
     if (!temp) {
+#ifdef DETHRACE_3DFX_PATCH
+        temp = BrMapFind(pName);
+        if (temp) {
+            BrMapRemove(temp);
+            temp = PurifiedPixelmap(temp);
+            BrMapAdd(temp);
+        }
+        return temp;
+#else
         return BrMapFind(pName);
+#endif
     }
 
+#ifdef DETHRACE_3DFX_PATCH
+    switch (AddPixelmapToStorage(pStorage_space, &temp)) {
+#else
     switch (AddPixelmapToStorage(pStorage_space, temp)) {
+#endif
     case eStorage_allocated:
         BrMapAdd(temp);
         return temp;
@@ -2582,6 +2609,7 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
     tPath_name the_path;
 #ifdef DETHRACE_3DFX_PATCH
     tPath_name general_file_path;
+    br_pixelmap* temp_pixmap;
 #endif
     char s[256];
     char* str;
@@ -3010,7 +3038,17 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
         } else {
             sl = strlen(str);
             strcat(str, ".PIX");
+#ifdef DETHRACE_3DFX_PATCH
+            temp_pixmap = BrMapFind(str);
+            if (temp_pixmap != NULL) {
+                BrMapRemove(temp_pixmap);
+                BrMapAdd(PurifiedPixelmap(temp_pixmap));
+            } else {
+                LoadSinglePixelmap(&gTrack_storage_space, str);
+            }
+#else
             LoadSinglePixelmap(&gTrack_storage_space, str);
+#endif
             str[sl] = 0;
             strcat(str, ".MAT");
             pRace_info->material_modifiers[i].skid_mark_material = LoadSingleMaterial(&gTrack_storage_space, str);

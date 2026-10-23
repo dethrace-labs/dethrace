@@ -5,8 +5,12 @@
 
 extern br_allocator gAllocator;
 extern int gNon_fatal_allocation_errors;
-extern char* gMem_names[246];
+extern char* gMem_names[247];
+#ifdef DETHRACE_3DFX_PATCH
+extern br_resource_class gStainless_classes[118];
+#else
 extern br_resource_class gStainless_classes[117];
+#endif
 
 void SetNonFatalAllocationErrors(void);
 

@@ -51,6 +51,9 @@ void InitSkids(void) {
 #if defined(DETHRACE_FIX_BUGS)
     char mat_name[32];
 #endif
+#ifdef DETHRACE_3DFX_PATCH
+    br_pixelmap* temp;
+#endif
 
     for (mat = 0; mat < COUNT_OF(gMaterial_names); mat++) {
         gMaterial[mat] = BrMaterialFind(gProgram_state.sausage_eater_mode ? gBoring_material_names[mat] : gMaterial_names[mat]);
@@ -67,18 +70,26 @@ void InitSkids(void) {
 
             sl = strlen(str);
             strcat(str, ".PIX");
+#ifdef DETHRACE_3DFX_PATCH
+            temp = LoadPixelmap(str);
+            if (temp != NULL) {
+                temp = PurifiedPixelmap(temp);
+                BrMapAdd(temp);
+            }
+#else
             BrMapAdd(LoadPixelmap(str));
+#endif
             str[sl] = '\0';
             strcat(str, ".MAT");
             gMaterial[mat] = LoadMaterial(str);
             if (gMaterial[mat] == NULL) {
                 BrFatal("C:\\Msdev\\Projects\\DethRace\\SKIDMARK.C", 207, "Couldn't find %s", gMaterial_names[mat]);
-            } else {
-#ifdef DETHRACE_3DFX_PATCH
-                GlorifyMaterial(&gMaterial[mat], 1);
-#endif
-                BrMaterialAdd(gMaterial[mat]);
             }
+#ifdef DETHRACE_3DFX_PATCH
+            GlorifyMaterial(&gMaterial[mat], 1);
+#endif
+            BrMaterialAdd(gMaterial[mat]);
+
         }
 #ifdef DETHRACE_3DFX_PATCH
         else {
