@@ -1916,6 +1916,13 @@ void RenderAFrame(int pDepth_mask_on) {
     char the_text[256];
     tCar_spec* car;
 
+#ifdef DETHRACE_FIX_BUGS
+    real_origin_x = 0;
+    real_origin_y = 0;
+    real_base_x = 0;
+    real_base_y = 0;
+#endif
+
 #ifdef DETHRACE_3DFX_PATCH
     if (gVoodoo_rush_mode >= 1) {
         gRender_screen->pixels = gBack_screen->pixels;
@@ -2048,7 +2055,11 @@ void RenderAFrame(int pDepth_mask_on) {
     if (!ConditionallyFillWithSky(gRender_screen)
 #endif
         && !gProgram_state.cockpit_on
+#ifdef DETHRACE_FIX_BUGS
+        && !(gAction_replay_mode && gAction_replay_camera_mode)) {
+#else
         && !(gAction_replay_mode * gAction_replay_camera_mode)) {
+#endif
 #ifdef DETHRACE_3DFX_PATCH
         if (!gBlitting_is_slow)
 #endif
