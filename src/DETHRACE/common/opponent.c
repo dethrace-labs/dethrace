@@ -1761,8 +1761,8 @@ void ChooseNewObjective(tOpponent_spec* pOpponent_spec, int pMust_choose_one) {
                     NewObjective(pOpponent_spec, eOOT_return_to_start);
                     return;
                 } else {
-                    if (gNum_of_opponents_getting_near + gNum_of_opponents_pursuing < 3 && pOpponent_spec->player_to_oppo_d > 10.0f) {
-                        dr_dprintf("%s: Choosing to get_near because not enough oppos are yet (%d/%d)", pOpponent_spec->car_spec->driver_name, gNum_of_opponents_getting_near + gNum_of_opponents_pursuing, 3);
+                    if (DR_FF(gNum_of_opponents_getting_near) + gNum_of_opponents_pursuing < 3 && pOpponent_spec->player_to_oppo_d > 10.0f) {
+                        dr_dprintf("%s: Choosing to get_near because not enough oppos are yet (%d/%d)", pOpponent_spec->car_spec->driver_name, DR_FF(gNum_of_opponents_getting_near) + gNum_of_opponents_pursuing, 3);
                         NewObjective(pOpponent_spec, eOOT_get_near_player);
                         return;
                     }
