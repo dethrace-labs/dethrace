@@ -336,7 +336,7 @@ int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
 // FUNCTION: CARM95 0x004021f1
 br_scalar SkidLen(int pSkid) {
     return sqrt(
-        gSkids[pSkid].actor->t.t.mat.m[0][2] * gSkids[pSkid].actor->t.t.mat.m[0][2]
+        DR_FF(gSkids[pSkid].actor->t.t.mat.m[0][2] * gSkids[pSkid].actor->t.t.mat.m[0][2])
         + gSkids[pSkid].actor->t.t.mat.m[0][1] * gSkids[pSkid].actor->t.t.mat.m[0][1]
         + gSkids[pSkid].actor->t.t.mat.m[0][0] * gSkids[pSkid].actor->t.t.mat.m[0][0]);
 }
