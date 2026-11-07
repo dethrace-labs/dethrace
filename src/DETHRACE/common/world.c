@@ -749,7 +749,7 @@ br_material* WallPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* new_mat;
 
     old_mat = pModel->faces[pFace].material;
-    if (old_mat->colour_map != NULL && FaceIsRoad(pModel, pFace)) {
+    if (old_mat->colour_map != NULL && !FaceIsRoad(pModel, pFace)) {
 
         if (old_mat->flags & BR_MATF_PERSPECTIVE) {
             new_mat = SuffixedMaterial(old_mat, ".pwall");
