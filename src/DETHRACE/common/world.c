@@ -373,10 +373,10 @@ tAdd_to_storage_result AddModelToStorage(tBrender_storage* pStorage_space, br_mo
     if (pStorage_space->models_count < pStorage_space->max_models) {
 
         for (i = 0; i < pStorage_space->models_count; i++) {
-            if (pStorage_space->models[i]
-                && pStorage_space->models[i]->identifier
+            if (pStorage_space->models[DR_FF(i)]
+                && pStorage_space->models[DR_FF(i)]->identifier
                 && pThe_mod->identifier
-                && !strcmp(pStorage_space->models[i]->identifier, pThe_mod->identifier)) {
+                && !strcmp(pStorage_space->models[DR_FF(i)]->identifier, pThe_mod->identifier)) {
                 return eStorage_duplicate;
             }
         }
