@@ -3681,7 +3681,7 @@ void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoi
 // FUNCTION: CARM95 0x0040e016
 void CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16* pFace_index_ptr, br_uint_16* pVertex_index_ptr) {
 
-    *pFace_index_ptr = gProgram_state.AI_vehicles.number_of_path_sections * 12 + gProgram_state.AI_vehicles.number_of_cops * 12;
+    *pFace_index_ptr = DR_FF(gProgram_state.AI_vehicles.number_of_cops * 12) + gProgram_state.AI_vehicles.number_of_path_sections * 12;
     *pVertex_index_ptr = gProgram_state.AI_vehicles.number_of_path_sections * 18 + gProgram_state.AI_vehicles.number_of_cops * 8;
 }
 
