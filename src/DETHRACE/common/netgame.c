@@ -1772,7 +1772,7 @@ void GetExpandedMatrix(br_matrix34* m1, tReduced_matrix* m2) {
 
     m1->m[2][0] = m2->row2.v[2] * m2->row1.v[1] - m2->row2.v[1] * m2->row1.v[2];
     m1->m[2][1] = m2->row1.v[2] * m2->row2.v[0] - m2->row2.v[2] * m2->row1.v[0];
-    m1->m[2][2] = m2->row2.v[1] * m2->row1.v[0] - m2->row1.v[1] * m2->row2.v[0];
+    m1->m[2][2] = m2->row2.v[1] * m2->row1.v[0] - m2[0].row1.v[1] * m2->row2.v[0];
 }
 
 // IDA: void __usercall NetEarnCredits(tNet_game_player_info *pPlayer@<EAX>, tS32 pCredits@<EDX>)
