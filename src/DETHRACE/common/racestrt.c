@@ -769,7 +769,7 @@ void CalcPartPrice(int pCategory, int pIndex, int* pPrice, int* pCost) {
         *pCost = 0;
     } else {
         current_value = gProgram_state.current_car.power_ups[pCategory].info[gProgram_state.current_car.power_up_levels[pCategory]].prices[gProgram_state.skill_level];
-        *pCost = *pPrice - (current_value * gRefund_rate / 1000) * 10;
+        *pCost = *pPrice - ((current_value + 0) * gRefund_rate / 1000) * 10;
     }
 }
 
