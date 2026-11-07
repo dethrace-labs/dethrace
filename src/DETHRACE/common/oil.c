@@ -18,10 +18,10 @@ char* gOil_pixie_names[1] = { "OIL.PIX" };
 int gNext_oil_pixie = 0;
 
 // GLOBAL: CARM95 0x00509a40
-br_scalar gZ_buffer_diff;
+br_scalar gZ_buffer_diff = 1.0f;
 
 // GLOBAL: CARM95 0x00509a44
-br_scalar gMin_z_diff;
+br_scalar gMin_z_diff = 0.1f;
 
 // GLOBAL: CARM95 0x00551dc0
 br_pixelmap* gOil_pixies[1];
