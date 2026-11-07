@@ -399,12 +399,12 @@ void LoadPowerups(void) {
         the_powerup->number_of_float_params = GetAnInt(f);
         the_powerup->float_params = BrMemAllocate(sizeof(float) * the_powerup->number_of_float_params, kMem_powerup_float_parms);
         for (j = 0; j < the_powerup->number_of_float_params; j++) {
-            the_powerup->float_params[j] = GetAFloat(f);
+            the_powerup[0].float_params[j] = GetAFloat(f);
         }
         the_powerup->number_of_integer_params = GetAnInt(f);
         the_powerup->integer_params = BrMemAllocate(sizeof(int) * the_powerup->number_of_integer_params, kMem_powerup_int_parms);
         for (j = 0; j < the_powerup->number_of_integer_params; j++) {
-            the_powerup->integer_params[j] = GetAnInt(f);
+            the_powerup[0].integer_params[j] = GetAnInt(f);
         }
         the_powerup->group_inclusion = GetAnInt(f);
         the_powerup->prat_cam_event = GetAnInt(f);
