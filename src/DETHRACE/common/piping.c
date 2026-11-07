@@ -2358,14 +2358,14 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 
     temp_ptr = pChunk_ptr;
     if (SHOULD_SCAN_FORWARDS()) {
-        if (gEnd_time >= pTime) {
+        if (DR_FF(gEnd_time) >= pTime) {
             return 0;
         }
-    } else if (gEnd_time <= pTime) {
+    } else if (DR_FF(gEnd_time) <= pTime) {
         return 0;
     }
 
-    for (i = 0; i < pChunk_count; i++) {
+    for (i = 0; DR_FF(i) < pChunk_count; i++) {
         if ((temp_ptr->subject_index >> 8) == 0) {
             car = &gProgram_state.current_car;
         } else {
