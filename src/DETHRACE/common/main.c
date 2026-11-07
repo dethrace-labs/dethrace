@@ -95,14 +95,10 @@ void ServiceTheGame(int pRacing) {
         QuitGame();
     }
     if (!pRacing) {
-        CheckSystemKeys(0);
+        CheckSystemKeys(pRacing);
     }
     if (!pRacing && gSound_enabled) {
-        if (gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
-            S3Service(1, 2);
-        } else {
-            S3Service(0, 2);
-        }
+        S3Service(gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0, 2);
     }
     NetService(pRacing);
 }

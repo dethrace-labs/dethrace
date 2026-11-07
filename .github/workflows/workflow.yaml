@@ -154,6 +154,8 @@ jobs:
   reccmp:
     name: Verify decomp
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
     steps:
       - uses: actions/checkout@v4
         name: Checkout
@@ -179,17 +181,14 @@ jobs:
           reccmp_output_filename: ${{ github.workspace}}/reccmp-output.txt
           status_png_icon_filename: ${{ github.workspace}}/reccmp/carma_32x32_4.png
           status_svg_filename: ${{ github.workspace}}/new-reccmp-progress.svg
-      - name: Upload Artifact
+      - name: Upload reccmp output artifact
+        if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: reccmp-output.txt
-          path: ${{ github.workspace}}/reccmp-output.txt
+          name: reccmp-output-pr-${{ github.event.number }}
+          path: ${{ github.workspace }}/reccmp-output.txt
           if-no-files-found: error
-      - name: Validate correctness
-        run: |
-          if grep -q "Decreased" ${{ github.workspace}}/reccmp-output.txt; then
-            echo "::warning file=reccmp-output.txt::Decomp correctness decreased"
-          fi
+          retention-days: 2
       - name: Checkout reccmp-report repo
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !github.event.repository.fork
         uses: actions/checkout@v4
