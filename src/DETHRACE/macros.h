@@ -115,6 +115,8 @@
 
 // "Force first" - for asm matching it can be helpful to try and force one branch/operation to be evaluated first
 #define DR_FF(x) ((x) * 1)
+// Object-pointer variant; uintptr_t preserves the pointer width.
+#define DR_FF_PTR(x) ((void*)DR_FF((uintptr_t)(x)))
 
 // MACROS_H
 #endif
