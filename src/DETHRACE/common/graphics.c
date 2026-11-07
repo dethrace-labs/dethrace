@@ -1781,7 +1781,10 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
     br_scalar distance_factor;
 
     if (gShadow_level != eShadow_none) {
-        for (cat = eVehicle_self; cat <= (gShadow_level == eShadow_everyone ? 4 : gShadow_level == eShadow_us_and_opponents ? 3 : 0); ++cat) {
+        for (cat = eVehicle_self; cat <= (gShadow_level == eShadow_everyone           ? 4
+                                          : gShadow_level == eShadow_us_and_opponents ? 3
+                                                                                      : 0);
+            ++cat) {
             if (cat == eVehicle_self) {
                 car_count = 1;
             } else {
@@ -1897,10 +1900,10 @@ void RenderAFrame(int pDepth_mask_on) {
     int x_shift;
     int y_shift;
     int cockpit_on;
-    int real_origin_x = 0;
-    int real_origin_y = 0;
-    int real_base_x = 0;
-    int real_base_y = 0;
+    int real_origin_x;
+    int real_origin_y;
+    int real_base_x;
+    int real_base_y;
     int map_timer_x;
     int map_timer_width;
     int ped_type;
@@ -1913,10 +1916,19 @@ void RenderAFrame(int pDepth_mask_on) {
     char the_text[256];
     tCar_spec* car;
 
+#ifdef DETHRACE_FIX_BUGS
+    real_origin_x = 0;
+    real_origin_y = 0;
+    real_base_x = 0;
+    real_base_y = 0;
+#endif
+
 #ifdef DETHRACE_3DFX_PATCH
     if (gVoodoo_rush_mode >= 1) {
         gRender_screen->pixels = gBack_screen->pixels;
     }
+#else
+    gRender_screen->pixels = gBack_screen->pixels;
 #endif
 
     the_time = GetTotalTime();
@@ -1964,8 +1976,8 @@ void RenderAFrame(int pDepth_mask_on) {
             gBack_screen,
             gMap_render_x_i - gCurrent_graf_data->map_render_x_marg,
             gMap_render_y_i - gCurrent_graf_data->map_render_y_marg,
-            gMap_render_x_i + gMap_render_width_i + gCurrent_graf_data->map_render_x_marg,
-            gMap_render_y_i + gMap_render_height_i + gCurrent_graf_data->map_render_y_marg,
+            (gCurrent_graf_data->map_render_x_marg + gMap_render_width_i) + gMap_render_x_i,
+            (gCurrent_graf_data->map_render_y_marg + gMap_render_height_i) + gMap_render_y_i,
             1);
     }
     if (!gAction_replay_mode) {
@@ -1974,7 +1986,7 @@ void RenderAFrame(int pDepth_mask_on) {
     if (cockpit_on) {
         if (-gScreen_wobble_x > gX_offset) {
             x_shift = -gX_offset;
-        } else if (gScreen_wobble_x + gX_offset + gRender_screen->width > gBack_screen->width) {
+        } else if (DR_FF(gRender_screen->width + gX_offset) + gScreen_wobble_x > gBack_screen->width) {
             x_shift = gBack_screen->width - gRender_screen->width - gX_offset;
         } else {
             x_shift = gScreen_wobble_x;
@@ -1990,16 +2002,16 @@ void RenderAFrame(int pDepth_mask_on) {
         x_shift = 0;
         y_shift = 0;
     }
-    BrMatrix34Copy(&old_camera_matrix, &gCamera->t.t.mat);
+    old_camera_matrix = gCamera->t.t.mat;
     if (gMirror_on__graphics) {
-        BrMatrix34Copy(&old_mirror_cam_matrix, &gRearview_camera->t.t.mat);
+        old_mirror_cam_matrix = gRearview_camera->t.t.mat;
     }
     if (cockpit_on) {
         gSheer_mat.m[2][1] = y_shift / (float)gRender_screen->height;
         gSheer_mat.m[2][0] = -x_shift / (float)gRender_screen->width;
         BrMatrix34Pre(&gCamera->t.t.mat, &gSheer_mat);
-        gCamera->t.t.translate.t.v[0] -= gScreen_wobble_x * 1.5f / gRender_screen->width / WORLD_SCALE;
-        gCamera->t.t.translate.t.v[1] += gScreen_wobble_y * 1.5f / gRender_screen->width / WORLD_SCALE;
+        gCamera->t.t.translate.t.v[0] -= gScreen_wobble_x * 1.5f / (float)gRender_screen->width / WORLD_SCALE;
+        gCamera->t.t.translate.t.v[1] += gScreen_wobble_y * 1.5f / (float)gRender_screen->width / WORLD_SCALE;
     }
     gRender_screen->pixels = (char*)gRender_screen->pixels + x_shift + y_shift * gRender_screen->row_bytes;
     CalculateConcussion(the_time);
@@ -2043,7 +2055,11 @@ void RenderAFrame(int pDepth_mask_on) {
     if (!ConditionallyFillWithSky(gRender_screen)
 #endif
         && !gProgram_state.cockpit_on
-        && !(gAction_replay_camera_mode && gAction_replay_mode)) {
+#ifdef DETHRACE_FIX_BUGS
+        && !(gAction_replay_mode && gAction_replay_camera_mode)) {
+#else
+        && !(gAction_replay_mode * gAction_replay_camera_mode)) {
+#endif
 #ifdef DETHRACE_3DFX_PATCH
         if (!gBlitting_is_slow)
 #endif
@@ -2084,7 +2100,7 @@ void RenderAFrame(int pDepth_mask_on) {
     PDLockRealBackScreen(1);
 #endif
 
-    BrMatrix34Copy(&gCamera->t.t.mat, &old_camera_matrix);
+    gCamera->t.t.mat = old_camera_matrix;
 #ifdef DETHRACE_3DFX_PATCH
     if (cockpit_on) {
         PDUnlockRealBackScreen(1);
@@ -2154,10 +2170,48 @@ void RenderAFrame(int pDepth_mask_on) {
 #ifdef DETHRACE_3DFX_PATCH
         PDLockRealBackScreen(1);
 #endif
-        BrMatrix34Copy(&gRearview_camera->t.t.mat, &old_mirror_cam_matrix);
+        gRearview_camera->t.t.mat = old_mirror_cam_matrix;
         gRendering_mirror = 0;
     }
-    if (gMap_mode) {
+    if (!gMap_mode) {
+#if !defined(DETHRACE_3DFX_PATCH)
+        if (cockpit_on) {
+            CopyStripImage(
+                gBack_screen,
+                -gCurrent_graf_data->cock_margin_x,
+                gScreen_wobble_x,
+                -gCurrent_graf_data->cock_margin_y,
+                gScreen_wobble_y,
+                gProgram_state.current_car.cockpit_images[gProgram_state.cockpit_image_index],
+                0,
+                0,
+                gCurrent_graf_data->total_cock_width,
+                gCurrent_graf_data->total_cock_height);
+            if (gMirror_on__graphics) {
+                BrPixelmapRectangleCopy(
+                    gBack_screen,
+                    gScreen_wobble_x + gProgram_state.current_car.mirror_left,
+                    gScreen_wobble_y + gProgram_state.current_car.mirror_top,
+                    gRearview_screen,
+                    -gRearview_screen->origin_x,
+                    -gRearview_screen->origin_y,
+                    gProgram_state.current_car.mirror_right - gProgram_state.current_car.mirror_left,
+                    gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top);
+            }
+        }
+#endif
+        DimAFewBits();
+        DoDamageScreen(the_time);
+        if (!gAction_replay_mode || gAR_fudge_headups) {
+            DoPratcam(the_time);
+            DoHeadups(the_time);
+        }
+        DoInstruments(the_time);
+        DoSteeringWheel(the_time);
+        if (!gAction_replay_mode || gAR_fudge_headups) {
+            DrawPowerups(the_time);
+        }
+    } else {
         if (gNet_mode == eNet_mode_none) {
             GetTimerString(the_text, 0);
             map_timer_width = DRTextWidth(&gFonts[kFont_BLUEHEAD], the_text);
@@ -2211,86 +2265,39 @@ void RenderAFrame(int pDepth_mask_on) {
         } else {
             cat = eVehicle_self;
         }
-        while (cat >= eVehicle_self) {
-            if (cat) {
-                car_count = GetCarCount(cat);
-            } else {
+        for (; cat >= eVehicle_self; cat--) {
+            if (cat == eVehicle_self) {
                 car_count = 1;
+            } else {
+                car_count = GetCarCount(cat);
             }
             for (i = 0; i < car_count; i++) {
-                if (cat) {
-                    car = GetCarSpec(cat, i);
-                } else {
+                if (cat == eVehicle_self) {
                     car = &gProgram_state.current_car;
+                } else {
+                    car = GetCarSpec(cat, i);
                 }
                 if (gNet_mode == eNet_mode_none || (!car->knackered && !NetPlayerFromCar(car)->wasted)) {
-                    if (cat) {
-                        car_pos = &GetCarSpec(cat, i)->car_master_actor->t.t.euler.t;
-                    } else {
+                    if (cat == eVehicle_self) {
                         car_pos = &gSelf->t.t.euler.t;
-                    }
-                    if (gNet_mode) {
-                        DrawMapBlip(
-                            car,
-                            the_time,
-                            &car->car_master_actor->t.t.mat,
-                            car_pos,
-                            car->shrapnel_material[0]->index_range + car->shrapnel_material[0]->index_base - 1);
-                    } else if (car->knackered) {
-                        DrawMapBlip(car, the_time, &car->car_master_actor->t.t.mat, car_pos, 0);
                     } else {
-                        DrawMapBlip(car, the_time, &car->car_master_actor->t.t.mat, car_pos, gMap_colours[cat]);
+                        car_pos = &GetCarSpec(cat, i)->car_master_actor->t.t.euler.t;
                     }
+                    DrawMapBlip(
+                        car,
+                        the_time,
+                        &car->car_master_actor->t.t.mat,
+                        car_pos,
+                        gNet_mode
+                            ? car->shrapnel_material[0]->index_range + car->shrapnel_material[0]->index_base - 1
+                            : (car->knackered ? 0 : gMap_colours[cat]));
                 }
             }
-            cat--;
         }
         gBack_screen->origin_x = real_origin_x;
         gBack_screen->origin_y = real_origin_y;
         gBack_screen->base_x = real_base_x;
         gBack_screen->base_y = real_base_y;
-    } else {
-#if !defined(DETHRACE_3DFX_PATCH)
-        if (cockpit_on) {
-            CopyStripImage(
-                gBack_screen,
-                -gCurrent_graf_data->cock_margin_x,
-                gScreen_wobble_x,
-                -gCurrent_graf_data->cock_margin_y,
-                gScreen_wobble_y,
-                gProgram_state.current_car.cockpit_images[gProgram_state.cockpit_image_index],
-                0,
-                0,
-                gCurrent_graf_data->total_cock_width,
-                gCurrent_graf_data->total_cock_height);
-            if (gMirror_on__graphics) {
-                BrPixelmapRectangleCopy(
-                    gBack_screen,
-                    gScreen_wobble_x + gProgram_state.current_car.mirror_left,
-                    gScreen_wobble_y + gProgram_state.current_car.mirror_top,
-                    gRearview_screen,
-                    -gRearview_screen->origin_x,
-                    -gRearview_screen->origin_y,
-                    gProgram_state.current_car.mirror_right - gProgram_state.current_car.mirror_left,
-                    gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top);
-            }
-        }
-#endif
-        DimAFewBits();
-        DoDamageScreen(the_time);
-        if (!gAction_replay_mode || gAR_fudge_headups) {
-            // Added by dethrace
-            // Pratcam is drawn on top of the 2d cockpit, so we must ensure that all the 2d pixel
-            // writes have been flushed to the framebuffer first
-            BrPixelmapFlush(gBack_screen);
-            DoPratcam(the_time);
-            DoHeadups(the_time);
-        }
-        DoInstruments(the_time);
-        DoSteeringWheel(the_time);
-        if (!gAction_replay_mode || gAR_fudge_headups) {
-            DrawPowerups(the_time);
-        }
     }
     if (gNet_mode != eNet_mode_none) {
         DisplayUserMessage();
