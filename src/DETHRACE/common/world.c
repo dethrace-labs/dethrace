@@ -1470,7 +1470,11 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                     if (the_funk->proximity_array[j].v[0] == the_funk->proximity_array[i].v[0]
                         && the_funk->proximity_array[j].v[1] == the_funk->proximity_array[i].v[1]
                         && the_funk->proximity_array[j].v[2] == the_funk->proximity_array[i].v[2]) {
+#ifdef DETHRACE_FIX_BUGS
+                        memmove(
+#else
                         memcpy(
+#endif
                             &the_funk->proximity_array[j],
                             &the_funk->proximity_array[j] + 1,
                             (the_funk->proximity_count - j - 1) * sizeof(br_vector3));
