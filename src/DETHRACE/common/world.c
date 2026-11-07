@@ -1412,47 +1412,47 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
             the_funk->texture_animation_data.flic_info.flic_data = 0;
             if (LoadFlicData(s, &the_funk->texture_animation_data.flic_info.flic_data, &the_funk->texture_animation_data.flic_info.flic_data_length) == 0) {
                 the_funk->texture_animation_type = eTexture_animation_none;
-            } else {
-                the_funk->texture_animation_data.flic_info.flic_descriptor.data_start = NULL;
-                StartFlic(
-                    s,
-                    -1,
-                    &the_funk->texture_animation_data.flic_info.flic_descriptor,
-                    the_funk->texture_animation_data.flic_info.flic_data_length,
-                    (tS8*)the_funk->texture_animation_data.flic_info.flic_data,
-                    0,
-                    0,
-                    0,
-                    0);
-                the_funk->last_frame = 0.0f;
-                the_pixels = BrMemAllocate(
-                    the_funk->texture_animation_data.flic_info.flic_descriptor.height
-                        * ((the_funk->texture_animation_data.flic_info.flic_descriptor.width + 3) & ~3),
-                    kMem_video_pixels);
-                if (gScreen->row_bytes < 0) {
-                    BrFatal(
-                        "C:\\Msdev\\Projects\\DethRace\\World.c",
-                        1729,
-                        "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\World.c",
-                        1729);
-                }
-                the_pixelmap = DRPixelmapAllocate(
+                break;
+            }
+            the_funk->texture_animation_data.flic_info.flic_descriptor.data_start = NULL;
+            StartFlic(
+                s,
+                -1,
+                &the_funk->texture_animation_data.flic_info.flic_descriptor,
+                the_funk->texture_animation_data.flic_info.flic_data_length,
+                (tS8*)the_funk->texture_animation_data.flic_info.flic_data,
+                0,
+                0,
+                0,
+                0);
+            the_funk->last_frame = 0.0f;
+            the_pixels = BrMemAllocate(
+                the_funk->texture_animation_data.flic_info.flic_descriptor.height
+                    * ((the_funk->texture_animation_data.flic_info.flic_descriptor.width + 3) & ~3),
+                kMem_video_pixels);
+            if (gScreen->row_bytes < 0) {
+                BrFatal(
+                    "C:\\Msdev\\Projects\\DethRace\\World.c",
+                    1729,
+                    "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\World.c",
+                    1729);
+            }
+            the_pixelmap = DRPixelmapAllocate(
 #ifdef DETHRACE_3DFX_PATCH
                     BR_PMT_INDEX_8,
 #else
                     gScreen->type,
 #endif
-                    the_funk->texture_animation_data.flic_info.flic_descriptor.width,
-                    the_funk->texture_animation_data.flic_info.flic_descriptor.height,
-                    the_pixels,
-                    0);
+                the_funk->texture_animation_data.flic_info.flic_descriptor.width,
+                the_funk->texture_animation_data.flic_info.flic_descriptor.height,
+                the_pixels,
+                0);
 #ifdef DETHRACE_3DFX_PATCH
                 the_pixelmap = PurifiedPixelmap(the_pixelmap);
 #endif
-                AssertFlicPixelmap(&the_funk->texture_animation_data.flic_info.flic_descriptor, the_pixelmap);
-                the_funk->material->colour_map = the_pixelmap;
-                BrMaterialUpdate(the_funk->material, BR_MATU_ALL);
-            }
+            AssertFlicPixelmap(&the_funk->texture_animation_data.flic_info.flic_descriptor, the_pixelmap);
+            the_funk->material->colour_map = the_pixelmap;
+            BrMaterialUpdate(the_funk->material, BR_MATU_ALL);
             break;
 
             DETHRACE_DEFAULT_BREAK
@@ -1470,9 +1470,9 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                     if (the_funk->proximity_array[j].v[0] == the_funk->proximity_array[i].v[0]
                         && the_funk->proximity_array[j].v[1] == the_funk->proximity_array[i].v[1]
                         && the_funk->proximity_array[j].v[2] == the_funk->proximity_array[i].v[2]) {
-                        memmove(
+                        memcpy(
                             &the_funk->proximity_array[j],
-                            &the_funk->proximity_array[j + 1],
+                            &the_funk->proximity_array[j] + 1,
                             (the_funk->proximity_count - j - 1) * sizeof(br_vector3));
 
                         j--;
