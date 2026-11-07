@@ -108,7 +108,7 @@ void SendCarData(tU32 pNext_frame_time) {
             }
             contents->data.mech.front = car->bounds[1].min.v[2];
             contents->data.mech.back = car->bounds[1].max.v[2];
-            contents->data.mech.powerups = PACK_POWERUPS(car);
+            contents->data.mech.powerups = (car->power_up_levels[2] << 6) + (car->power_up_levels[1] << 3) + car->power_up_levels[0];
             contents->data.mech.repair_time = car->repair_time;
             contents->data.mech.cc_coll_time = car->last_car_car_collision;
             if (damaged_wheels) {
@@ -178,7 +178,7 @@ void SendCarData(tU32 pNext_frame_time) {
         }
         contents->data.mech.front = car->bounds[1].min.v[2];
         contents->data.mech.back = car->bounds[1].max.v[2];
-        contents->data.mech.powerups = PACK_POWERUPS(car);
+        contents->data.mech.powerups = (car->power_up_levels[2] << 6) + (car->power_up_levels[1] << 3) + car->power_up_levels[0];
         contents->data.mech.repair_time = car->repair_time;
         if (damaged_wheels) {
             for (j = 0; j < COUNT_OF(contents->data.mech.wheel_dam_offset); j++) {
