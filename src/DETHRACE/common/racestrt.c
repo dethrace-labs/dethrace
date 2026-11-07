@@ -999,8 +999,8 @@ int UpPart(int* pCurrent_choice, int* pCurrent_mode) {
     gJust_bought_part = 0;
     AddToFlicQueue(
         gStart_interface_spec->pushed_flics[5].flic_index,
-        gStart_interface_spec->pushed_flics[5].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[5].y[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[5].x[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[5].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     RemoveTransientBitmaps(1);
