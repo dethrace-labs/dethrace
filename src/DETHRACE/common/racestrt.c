@@ -1034,8 +1034,8 @@ int DownPart(int* pCurrent_choice, int* pCurrent_mode) {
     gJust_bought_part = 0;
     AddToFlicQueue(
         gStart_interface_spec->pushed_flics[6].flic_index,
-        gStart_interface_spec->pushed_flics[6].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[6].y[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[6].x[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[6].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     RemoveTransientBitmaps(1);
@@ -1051,10 +1051,9 @@ int DownPart(int* pCurrent_choice, int* pCurrent_mode) {
         gCurrent_graf_data->parts_image_y,
         gCurrent_graf_data->parts_top_clip,
         gCurrent_graf_data->parts_bottom_clip);
-    pCurrent_choice = (int*)&gProgram_state.current_car.power_ups[gPart_category];
     ChangePanelFlic(0,
-        ((tParts_spec*)pCurrent_choice)->info[gPart_index].data_ptr,
-        ((tParts_spec*)pCurrent_choice)->info[gPart_index].data_length);
+        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_ptr,
+        gProgram_state.current_car.power_ups[gPart_category].info[gPart_index].data_length);
     DropInImageFromBottom(
         GetPanelPixelmap(0),
         gCurrent_graf_data->parts_image_x,
