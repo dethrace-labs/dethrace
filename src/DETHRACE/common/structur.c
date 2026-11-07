@@ -413,7 +413,7 @@ void SelectOpponents(tRace_info* pRace_info) {
             rank_band = 0;
         }
         for (i = 0; i < OPPONENT_COUNT; i++) {
-            nastiness = gOpponent_mix[rank_band][i];
+            nastiness = gOpponent_mix[rank_band][i * 1];
             pRace_info->opponent_list[i].index = ChooseOpponent(nastiness, &had_scum);
             pRace_info->opponent_list[i].ranking = IRandomBetween(gProgram_state.rank - 10, gProgram_state.rank + 10);
         }
