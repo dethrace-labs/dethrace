@@ -554,7 +554,11 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
 #else
             gMr_chunky2 = (tPipe_chunk*)&gMr_chunky2->chunk_data;
 #endif
+#ifdef DETHRACE_FIX_BUGS
+            memmove(gMr_chunky2, pData, pData_length);
+#else
             memcpy(gMr_chunky2, pData, pData_length);
+#endif
             gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + pData_length);
             gLocal_buffer_size = temp_buffer_size;
             PIPING_REQUIRE(gLocal_buffer_size <= LOCAL_BUFFER_SIZE);
