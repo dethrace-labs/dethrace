@@ -1130,7 +1130,7 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
             }
             if (pPedestrian->current_action == pPedestrian->fatal_car_impact_action) {
                 if (pPedestrian->actor->parent != gDont_render_actor) {
-                    pPedestrian->actor->t.t.translate.t = pPedestrian->offset;
+                    BrVector3Copy(&pPedestrian->actor->t.t.translate.t, &pPedestrian->offset);
                 }
                 DetachPedFromCar(pPedestrian);
                 pPedestrian->spin_period = 0.f;
