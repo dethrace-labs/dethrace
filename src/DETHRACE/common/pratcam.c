@@ -97,8 +97,9 @@ void TogglePratcam(void) {
         the_time = GetTotalTime();
         gProgram_state.prat_cam_on = !gProgram_state.prat_cam_on;
         time_diff = the_time - gProgram_state.pratcam_move_start;
-        gProgram_state.pratcam_move_start = the_time;
-        if (time_diff <= 400) {
+        if (time_diff > 400) {
+            gProgram_state.pratcam_move_start = the_time;
+        } else {
             gProgram_state.pratcam_move_start = the_time - 400 + time_diff;
         }
     }
@@ -285,23 +286,18 @@ void ChangeAmbientPratcamNow(int pIndex, int pStart_chunk) {
 // FUNCTION: CARM95 0x0044d1f0
 void ChangeAmbientPratcam(int pIndex) {
 
-    if (gRace_finished) {
-        return;
-    }
-    if (gInterface_within_race_mode) {
-        return;
-    }
-    if (pIndex == gCurrent_ambient_prat_sequence) {
-        return;
-    }
-    if (!gProgram_state.prat_cam_on) {
-        return;
-    }
-
-    if (gCurrent_pratcam_index == -1) {
-        ChangeAmbientPratcamNow(pIndex, 0);
+    if (gRace_finished || gInterface_within_race_mode) {
+        ;
     } else {
-        gPending_ambient_prat = pIndex;
+        if (pIndex != gCurrent_ambient_prat_sequence
+            && !gRace_finished
+            && gProgram_state.prat_cam_on) {
+            if (gCurrent_pratcam_index != -1) {
+                gPending_ambient_prat = pIndex;
+            } else {
+                ChangeAmbientPratcamNow(pIndex, 0);
+            }
+        }
     }
 }
 
@@ -317,10 +313,7 @@ void PratcamEventNow(int pIndex) {
 // FUNCTION: CARM95 0x0044d517
 void PratcamEvent(int pIndex) {
 
-    if (gRace_finished) {
-        return;
-    }
-    if (gInterface_within_race_mode) {
+    if (gRace_finished || gInterface_within_race_mode) {
         return;
     }
 #if defined(DETHRACE_FIX_BUGS)
@@ -329,13 +322,11 @@ void PratcamEvent(int pIndex) {
         return;
     }
 #endif
-    if (gPratcam_sequences[pIndex].precedence <= gCurrent_pratcam_precedence) {
-        return;
+    if (gPratcam_sequences[pIndex].precedence > gCurrent_pratcam_precedence) {
+        if (!gRace_finished && gProgram_state.prat_cam_on) {
+            PratcamEventNow(pIndex);
+        }
     }
-    if (!gProgram_state.prat_cam_on) {
-        return;
-    }
-    PratcamEventNow(pIndex);
 }
 
 // IDA: int __cdecl HighResPratBufferWidth()
@@ -375,51 +366,40 @@ void InitPratcam(void) {
     gWhirr_noise = 0;
     gPrat_flic.data = NULL;
     gCurrent_ambient_prat_sequence = -1;
-    switch (gGraf_data_index) {
-    case 0:
-        the_pixels = BrMemAllocate(52 * 46, kMem_pratcam_pixelmap);
-        break;
-    case 1:
+    if (gGraf_data_index != 0) {
 #ifdef DETHRACE_3DFX_PATCH
         the_pixels = BrMemAllocate(HighResPratBufferWidth() * HighResPratBufferHeight(), kMem_pratcam_pixelmap);
 #else
         the_pixels = BrMemAllocate(104 * 110, kMem_pratcam_pixelmap);
 #endif
-        break;
-    default:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
+    } else {
+        the_pixels = BrMemAllocate(52 * 46, kMem_pratcam_pixelmap);
     }
     if (gScreen->row_bytes < 0) {
         BrFatal("C:\\Msdev\\Projects\\DethRace\\Pratcam.c", 409, "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\Pratcam.c", 409);
     }
-    switch (gGraf_data_index) {
-    case 0:
-        gPrat_buffer = DRPixelmapAllocate(gScreen->type, 52, 46, the_pixels, 0);
-        break;
-    case 1:
+    if (gGraf_data_index != 0) {
 #ifdef DETHRACE_3DFX_PATCH
         gPrat_buffer = DRPixelmapAllocate(BR_PMT_INDEX_8, HighResPratBufferWidth(), HighResPratBufferHeight(), the_pixels, 0);
 #else
         gPrat_buffer = DRPixelmapAllocate(gScreen->type, 104, 110, the_pixels, 0);
 #endif
-        break;
-    default:
-        TELL_ME_IF_WE_PASS_THIS_WAY();
+    } else {
+        gPrat_buffer = DRPixelmapAllocate(gScreen->type, 52, 46, the_pixels, 0);
     }
     gCurrent_pratcam_index = -1;
     gPending_ambient_prat = -1;
     gCurrent_pratcam_precedence = 0;
-    if (gNet_mode == eNet_mode_none) {
-        if (gProgram_state.frank_or_anniness == eFrankie) {
-            LoadPratcam("FRANK");
-        } else {
-            LoadPratcam("ANNIE");
-        }
-    } else if (gNet_players[gThis_net_player_index].car_index == 1 || gNet_players[gThis_net_player_index].car_index > 34) {
-        LoadPratcam("ANNIE");
-    } else {
-        LoadPratcam("FRANK");
-    }
+
+    LoadPratcam(
+        (gNet_mode != eNet_mode_none)
+            ? ((gNet_players[gThis_net_player_index].car_index == 1
+                   || gNet_players[gThis_net_player_index].car_index >= 35)
+                      ? "ANNIE"
+                      : "FRANK")
+            : ((gProgram_state.frank_or_anniness != eFrankie)
+                      ? "ANNIE"
+                      : "FRANK"));
 }
 
 // IDA: void __cdecl DisposePratcam()
@@ -476,40 +456,45 @@ void DoPratcam(tU32 pThe_time) {
     if (gAusterity_mode) {
         return;
     }
-    right_image = gProgram_state.current_car.prat_cam_right;
-    left_image = gProgram_state.current_car.prat_cam_left;
-    y_offset = (gNet_mode == eNet_mode_none) ? 0 : gCurrent_graf_data->net_head_box_bot + 1;
-
-    right_hand = gProgram_state.current_car.prat_left <= gBack_screen->width / 2;
-    if (right_hand) {
-        prat_cam_move_width = gProgram_state.current_car.prat_right + (right_image != NULL ? right_image->width : 0);
+    if (gNet_mode != eNet_mode_none) {
+        y_offset = gCurrent_graf_data->net_head_box_bot + 1;
     } else {
+        y_offset = 0;
+    }
+
+    right_hand = gProgram_state.current_car.prat_left > gBack_screen->width / 2;
+    left_image = gProgram_state.current_car.prat_cam_left;
+    right_image = gProgram_state.current_car.prat_cam_right;
+    if (right_hand) {
         prat_cam_move_width = gBack_screen->width - gProgram_state.current_car.prat_left + (left_image != NULL ? left_image->width : 0);
+    } else {
+        prat_cam_move_width = gProgram_state.current_car.prat_right + (right_image != NULL ? right_image->width : 0);
     }
     time_diff = pThe_time - gProgram_state.pratcam_move_start;
-    if (time_diff <= 400) {
-        offset = prat_cam_move_width * time_diff / (float)400;
-    } else {
+    if (time_diff > 400) {
         if (gWhirr_noise) {
             DRS3StopSound(gWhirr_noise);
             gWhirr_noise = 0;
         }
         if (!gProgram_state.prat_cam_on) {
             gCurrent_pratcam_index = -1;
-            gCurrent_pratcam_precedence = 0;
             gPending_ambient_prat = -1;
+            gCurrent_pratcam_precedence = 0;
             return;
+        } else {
+            offset = prat_cam_move_width;
         }
-        offset = prat_cam_move_width;
+    } else {
+        offset = prat_cam_move_width * ((float)time_diff / 400.0);
     }
 
-    old_last_time = gLast_pratcam_frame_time;
     if (gProgram_state.prat_cam_on) {
         offset = prat_cam_move_width - offset;
     }
-    if (right_hand) {
+    if (!right_hand) {
         offset = -offset;
     }
+    old_last_time = gLast_pratcam_frame_time;
 
     DontLetFlicFuckWithPalettes();
     DisableTranslationText();
@@ -589,16 +574,17 @@ void DoPratcam(tU32 pThe_time) {
         gPrat_buffer->width, gPrat_buffer->height);
 #endif
 
-    if (gProgram_state.current_car.prat_cam_top != NULL) {
-        top_border_height = gProgram_state.current_car.prat_cam_top->height;
+    the_image = gProgram_state.current_car.prat_cam_top;
+    if (the_image != NULL) {
+        top_border_height = the_image->height;
         DRPixelmapRectangleMaskedCopy(
             gBack_screen,
             gProgram_state.current_car.prat_left + offset,
             gProgram_state.current_car.prat_top - top_border_height + y_offset,
-            gProgram_state.current_car.prat_cam_top,
+            the_image,
             0, 0,
-            gProgram_state.current_car.prat_cam_top->width,
-            gProgram_state.current_car.prat_cam_top->height);
+            the_image->width,
+            the_image->height);
     } else {
         top_border_height = 0;
     }
@@ -619,15 +605,16 @@ void DoPratcam(tU32 pThe_time) {
             0, 0,
             right_image->width, right_image->height);
     }
-    if (gProgram_state.current_car.prat_cam_bottom != NULL) {
+    the_image = gProgram_state.current_car.prat_cam_bottom;
+    if (the_image != NULL) {
         DRPixelmapRectangleMaskedCopy(
             gBack_screen,
             gProgram_state.current_car.prat_left + offset,
             gProgram_state.current_car.prat_bottom + y_offset,
-            gProgram_state.current_car.prat_cam_bottom,
+            the_image,
             0, 0,
-            gProgram_state.current_car.prat_cam_bottom->width,
-            gProgram_state.current_car.prat_cam_bottom->height);
+            the_image->width,
+            the_image->height);
     }
 }
 
