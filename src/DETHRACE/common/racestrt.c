@@ -1347,26 +1347,29 @@ int SelectRaceDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int pE
 // FUNCTION: CARM95 0x00450f2a
 int StartRaceGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 
-    if (*pCurrent_choice != 1 || *pCurrent_mode) {
+    if (*pCurrent_choice == 1 && *pCurrent_mode == 0) {
+        RemoveTransientBitmaps(1);
+        DismissSceneyMappyInfoVieweyThing();
+        gProgram_state.view_type++;
+        if (gProgram_state.view_type > eVT_Opponents) {
+            gProgram_state.view_type = eVT_Scene;
+        }
+        switch (gProgram_state.view_type) {
+        case eVT_Scene:
+            RunFlic(213);
+            break;
+        case eVT_Info:
+            RunFlic(210);
+            break;
+        case eVT_Opponents:
+            RunFlic(212);
+            break;
+        }
+        DrawSceneyMappyInfoVieweyThing();
+        return 0;
+    } else {
         return 1;
     }
-    RemoveTransientBitmaps(1);
-    DismissSceneyMappyInfoVieweyThing();
-    gProgram_state.view_type++;
-    if (gProgram_state.view_type > eVT_Opponents) {
-        gProgram_state.view_type = eVT_Scene;
-    }
-    if (gProgram_state.view_type) {
-        if (gProgram_state.view_type == eVT_Info) {
-            RunFlic(210);
-        } else if (gProgram_state.view_type == eVT_Opponents) {
-            RunFlic(212);
-        }
-    } else {
-        RunFlic(213);
-    }
-    DrawSceneyMappyInfoVieweyThing();
-    return 0;
 }
 
 // IDA: int __usercall TryToMoveToArrows@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
@@ -1868,24 +1871,27 @@ void DrawGrid(int pOffset, int pDraw_it) {
     int x;
     int str_x;
     int width_job;
-    int done_highest;
-    int str_index;
-    int swap_1_x = 0;
-    int swap_1_y = 0;
-    int swap_2_x = 0;
-    int swap_2_y = 0;
-    br_pixelmap* the_image = NULL;
-    br_pixelmap* swap_1_image = NULL;
-    br_pixelmap* swap_2_image = NULL;
-    char numbers_str[4][100];
-    char total_str[256];
+    int done_highest = 0;
+    int str_index = 0;
+    int swap_1_x;
+    int swap_1_y;
+    int swap_2_x;
+    int swap_2_y;
+    br_pixelmap* the_image;
+    br_pixelmap* swap_1_image;
+    br_pixelmap* swap_2_image;
+    char numbers_str[4][100] = { "", "", "", "" };
+    char total_str[256] = "";
     tU32 the_time;
 
-    done_highest = 0;
-    str_index = 0;
-
-    memset(numbers_str, 0, sizeof(numbers_str));
-    memset(total_str, 0, sizeof(total_str));
+#ifdef DETHRACE_FIX_BUGS
+    swap_1_x = 0;
+    swap_1_y = 0;
+    swap_2_x = 0;
+    swap_2_y = 0;
+    swap_1_image = NULL;
+    swap_2_image = NULL;
+#endif
 
     the_time = PDGetTotalTime();
     BrPixelmapRectangleFill(
@@ -1902,11 +1908,11 @@ void DrawGrid(int pOffset, int pDraw_it) {
             the_image = gCurrent_race.opponent_list[i].car_spec->grid_icon_image;
         }
         y = gCurrent_graf_data->grid_top_y
-            + i % 2 * gCurrent_graf_data->grid_y_pitch
+            + i % -2 * gCurrent_graf_data->grid_y_pitch
             - the_image->height / 2
             - gGrid_y_adjust;
         x = gCurrent_graf_data->grid_left_x
-            + i % 2 * gCurrent_graf_data->grid_x_stagger
+            + i % -2 * gCurrent_graf_data->grid_x_stagger
             + i / 2 * gCurrent_graf_data->grid_x_pitch
             - pOffset;
         if (i == gSwap_grid_1) {
@@ -1950,29 +1956,27 @@ void DrawGrid(int pOffset, int pDraw_it) {
         if (gCurrent_race.opponent_list[i].index < 0) {
             str_index = 2;
         } else if (gProgram_state.rank <= gCurrent_race.opponent_list[i].ranking) {
-            if (str_index >= 2) {
-                str_index = 3;
-            } else {
+            if (str_index < 2) {
                 str_index = 1;
+            } else {
+                str_index = 3;
             }
         }
-        if (gCurrent_race.opponent_list[i].index >= 0) {
-            if (gOpponents[gCurrent_race.opponent_list[i].index].car_number <= 0
-                || gOpponents[gCurrent_race.opponent_list[i].index].car_number >= 100) {
-                if (gOpponents[gCurrent_race.opponent_list[i].index].car_number < 0) {
-                    sprintf(&numbers_str[str_index][strlen(numbers_str[str_index])], "%c ", ':');
-                }
+        if (gCurrent_race.opponent_list[i].index < 0) {
+            if (!gProgram_state.frank_or_anniness) {
+                sprintf(&numbers_str[str_index][strlen(numbers_str[str_index])], "%c ", ';');
             } else {
+                sprintf(&numbers_str[str_index][strlen(numbers_str[str_index])], "%c ", '<');
+            }
+        } else {
+            if (gOpponents[gCurrent_race.opponent_list[i].index].car_number > 0
+                && gOpponents[gCurrent_race.opponent_list[i].index].car_number < 100) {
                 sprintf(
                     &numbers_str[str_index][strlen(numbers_str[str_index])],
                     "%d ",
                     gOpponents[gCurrent_race.opponent_list[i].index].car_number);
-            }
-        } else {
-            if (gProgram_state.frank_or_anniness == eAnnie) {
-                sprintf(&numbers_str[str_index][strlen(numbers_str[str_index])], "%c ", '<');
-            } else {
-                sprintf(&numbers_str[str_index][strlen(numbers_str[str_index])], "%c ", ';');
+            } else if (gOpponents[gCurrent_race.opponent_list[i].index].car_number < 0) {
+                sprintf(&numbers_str[str_index][strlen(numbers_str[str_index])], "%c ", ':');
             }
         }
     }
@@ -1993,11 +1997,12 @@ void DrawGrid(int pOffset, int pDraw_it) {
             numbers_str[2][strlen(numbers_str[2]) - 1] = '\0';
         }
         strcpy(total_str, numbers_str[0]);
-        for (i = 1; i < COUNT_OF(numbers_str); i++) {
+        for (i = 1; i <= COUNT_OF(numbers_str) - 1; i++) {
             strcat(total_str, numbers_str[i]);
         }
-        str_x = (gCurrent_graf_data->grid_numbers_left + gCurrent_graf_data->grid_numbers_right) / 2
-            - (BrPixelmapTextWidth(gBack_screen, gBig_font, total_str) / 2);
+        width_job = BrPixelmapTextWidth(gBack_screen, gBig_font, total_str);
+        str_x = (gCurrent_graf_data[0].grid_numbers_right + gCurrent_graf_data->grid_numbers_left) / 2
+            - width_job / 2;
         BrPixelmapRectangleFill(
             gBack_screen,
             gCurrent_graf_data->grid_numbers_left,
@@ -2930,6 +2935,11 @@ tSO_result NetSynchRaceStart2(tNet_synch_mode pMode) {
     case eNet_synch_client:
         result = DoInterfaceScreen(&interface_spec_c, 0, -1);
         break;
+#ifdef DETHRACE_FIX_BUGS
+    default:
+        result = 1;
+        break;
+#endif
     }
     TurnOffPaletteConversion();
     FadePaletteDown();

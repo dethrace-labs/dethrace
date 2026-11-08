@@ -31,7 +31,7 @@
 #include <stdlib.h>
 
 // GLOBAL: CARM95 0x00509a60
-int gLast_wrong_checkpoint;
+int gLast_wrong_checkpoint = -1;
 
 // GLOBAL: CARM95 0x00509a64
 int gMirror_on__structur = 1; // suffix added to avoid duplicate symbol
