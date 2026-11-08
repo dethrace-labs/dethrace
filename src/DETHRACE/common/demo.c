@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 // GLOBAL: CARM95 0x00512080
-int gLast_demo;
+int gLast_demo = -1;
 
 // IDA: void __cdecl DoDemo()
 // FUNCTION: CARM95 0x00461110
