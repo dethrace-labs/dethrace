@@ -51,9 +51,6 @@ target_sources(harness PRIVATE
     harness.c
     harness.h
 
-    platforms/null.c
-    platforms/null.h
-
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 )
 
@@ -72,7 +69,7 @@ elseif(WIN32)
     target_link_libraries(harness PRIVATE dbghelp ws2_32 iphlpapi)
 elseif(APPLE)
     target_sources(harness PRIVATE os/macos.c)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+elseif(UNIX)
     target_sources(harness PRIVATE os/linux.c)
 else()
     message(FATAL_ERROR "Unsupported or unknown platform: ${CMAKE_SYSTEM_NAME}")
@@ -135,5 +132,4 @@ if(DETHRACE_PLATFORM_SDL_DYNAMIC)
     target_compile_definitions(harness PRIVATE DETHRACE_SDL_DYNAMIC)
     target_link_libraries(harness PRIVATE ${CMAKE_DL_LIBS})
 endif()
-
 
