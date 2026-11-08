@@ -327,9 +327,8 @@ void MoveToEndOfReplay(void) {
 
     DisablePipedSounds();
     old_replay_rate = gReplay_rate;
-    gReplay_rate = 100.f;
-#define INT32_MAX 2147483647
-    MoveReplayBuffer(INT32_MAX);
+    gReplay_rate = 100.0f;
+    MoveReplayBuffer(DR_INT32_MAX);
     gReplay_rate = old_replay_rate;
     EnablePipedSounds();
 }
@@ -342,7 +341,7 @@ void MoveToStartOfReplay(void) {
     DisablePipedSounds();
     old_replay_rate = gReplay_rate;
     gReplay_rate = -100.f;
-    MoveReplayBuffer(-INT32_MAX);
+    MoveReplayBuffer(-DR_INT32_MAX);
     gReplay_rate = old_replay_rate;
     EnablePipedSounds();
 }
@@ -398,7 +397,10 @@ void ToggleReplay(void) {
 // IDA: void __usercall ReverseSound(tS3_effect_tag pEffect_index@<EAX>, tS3_sound_tag pSound_tag@<EDX>)
 // FUNCTION: CARM95 0x0041b7fe
 void ReverseSound(tS3_effect_tag pEffect_index, tS3_sound_tag pSound_tag) {
-    NOT_IMPLEMENTED();
+    // Reverse playback is not implemented yet, but it must not abort replay.
+    STUB_ONCE();
+    (void)pEffect_index;
+    (void)pSound_tag;
 }
 
 // IDA: int __cdecl FindUniqueFile()
@@ -488,10 +490,10 @@ void PollActionReplayControls(tU32 pFrame_period) {
         if ((old_key_down == -1 || old_key_down == KEY_KP_4 || old_key_down == KEY_KP_6 || old_key_down == KEY_KP_MULTIPLY) && EitherMouseButtonDown()) {
             GetMousePosition(&x_coord, &y_coord);
             for (i = 0; i < COUNT_OF(mouse_areas[0]); i++) {
-                if (mouse_areas[gGraf_data_index][i].left <= x_coord
-                    && mouse_areas[gGraf_data_index][i].top <= y_coord
-                    && mouse_areas[gGraf_data_index][i].right > x_coord
-                    && mouse_areas[gGraf_data_index][i].bottom > y_coord) {
+                if (mouse_areas[gGraf_data_index][DR_FF(i)].left <= x_coord
+                    && mouse_areas[gGraf_data_index][DR_FF(i)].top <= y_coord
+                    && mouse_areas[gGraf_data_index][DR_FF(i)].right > x_coord
+                    && mouse_areas[gGraf_data_index][DR_FF(i)].bottom > y_coord) {
                     gKey_down = psuedo_mouse_keys[i];
                     break;
                 }
@@ -596,7 +598,7 @@ void PollActionReplayControls(tU32 pFrame_period) {
         gReplay_rate = gPending_replay_rate;
         gPending_replay_rate = 0;
     }
-    if (old_replay_rate * gReplay_rate < 0.f) {
+    if (DR_FF(old_replay_rate) * gReplay_rate < 0.f) {
         gPending_replay_rate = gReplay_rate;
         gReplay_rate = 0.f;
     } else {

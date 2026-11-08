@@ -181,6 +181,8 @@ void ReinitialiseForwardCamera(void) {
                 &gCamera->t.t.mat,
                 BrDegreeToAngle(gProgram_state.current_car.head_right_angle));
             break;
+
+        DETHRACE_DEFAULT_BREAK
         }
         gCamera->t.t.mat.m[3][0] = gProgram_state.current_car.driver_x_offset;
         gCamera->t.t.mat.m[3][1] = gProgram_state.current_car.driver_y_offset;
@@ -296,17 +298,19 @@ void InstallFindFailedHooks(void) {
 // FUNCTION: CARM95 0x004bbcdb
 void AllocateStandardLamp(void) {
     br_actor* lamp;
+    br_actor* child;
     int i;
 
     for (i = 0; i < gNumber_of_lights; i++) {
-        BrActorAdd(gUniverse_actor, gLight_array[i]);
-        lamp = gLight_array[i]->children;
-        if (lamp) {
-            BrActorRemove(lamp);
-            gLight_array[i]->children = NULL;
-            BrActorFree(lamp);
+        lamp = gLight_array[i];
+        BrActorAdd(gUniverse_actor, lamp);
+        child = lamp->children;
+        if (child) {
+            BrActorRemove(child);
+            lamp->children = NULL;
+            BrActorFree(child);
         }
-        BrLightEnable(gLight_array[i]);
+        BrLightEnable(lamp);
     }
 }
 
