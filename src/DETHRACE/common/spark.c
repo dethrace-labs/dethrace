@@ -502,7 +502,7 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
             gSparks[i].count = 0;
             CLEAR_BIT(gSpark_flags, i);
         }
-        ts = gSparks[i].normal.v[2] * gSparks[i].v.v[2] + gSparks[i].normal.v[1] * gSparks[i].v.v[1] + gSparks[i].normal.v[0] * gSparks[i].v.v[0];
+        ts = BrVector3Dot(&gSparks[i].normal, &gSparks[i].v);
         BrVector3Scale(&tv, &gSparks[i].normal, ts);
         BrVector3Sub(&gSparks[i].v, &gSparks[i].v, &tv);
         if (gSparks[i].time_sync) {
