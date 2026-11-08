@@ -84,10 +84,13 @@ tHeadup_info gHeadup_image_info[] = {
 };
 
 // GLOBAL: CARM95 0x0050A4E8
-char* gYour_car_names[2][6];
+char* gYour_car_names[2][6] = {
+    { "CARFRANK.PIX", "CARANNIE.PIX", "CARFR2.PIX", "CARFR3.PIX", "CARFR4.PIX", "CARFR5.PIX" },
+    { "CARFRANK.PIX", "CARANNIE.PIX", "CARAN2.PIX", "CARAN3.PIX", "CARAN4.PIX", "CARAN5.PIX" }
+};
 
 // GLOBAL: CARM95 0x0050A518
-char* gDrivable_car_names[6];
+char* gDrivable_car_names[6] = { "BLKEAGLE.TXT", "ANNIE.TXT", "ED101.TXT", "OFFROAD.TXT", "APC.TXT", "YANK.TXT" };
 
 // GLOBAL: CARM95 0x0050a530
 char* gDamage_names[] = {
@@ -3586,12 +3589,8 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
 int TestForOriginalCarmaCDinDrive(void) {
     // The symbol dump didn't include any local variable information.
     // These names are not necessarily the original names.
-    char CD_dir[512];        // [esp+Ch] [ebp-608h] BYREF
-    char ch;                 // [esp+20Ch] [ebp-408h]
-    tPath_name path_file;    // [esp+210h] [ebp-404h] BYREF
-    char CD_data_dir[512];   // [esp+310h] [ebp-304h] BYREF
-    FILE* fp;                // [esp+510h] [ebp-104h]
-    tPath_name cutscene_dir; // [esp+514h] [ebp-100h] BYREF
+    FILE* fp;
+    tPath_name cutscene_dir;
 
 #ifdef DETHRACE_FIX_BUGS
     if (harness_game_config.enable_cd_check == 0) {
@@ -3599,52 +3598,59 @@ int TestForOriginalCarmaCDinDrive(void) {
     }
 #endif
 
-    path_file[0] = 0;
-    strcpy(path_file, gApplication_path);
-    strcat(path_file, gDir_separator);
-    strcat(path_file, "PATHS.TXT");
-    if (!PDCheckDriveExists(path_file)) {
-        return 0;
-    }
-    fp = fopen(path_file, "rt");
-    if (!fp) {
-        return 0;
-    }
-    ch = fgetc(fp);
-    ungetc(ch, fp);
-    CD_dir[0] = 0;
-    GetALineAndDontArgue(fp, CD_dir);
-    fclose(fp);
-    strcpy(CD_data_dir, CD_dir);
-    if (!strchr(gDir_separator, CD_data_dir[strlen(CD_data_dir) - 1])) {
-        strcat(CD_data_dir, gDir_separator);
-    }
-    strcat(CD_data_dir, "DATA");
-    if (!DRStricmp(CD_data_dir, gApplication_path)) {
-        return 0;
-    }
-    strcpy(cutscene_dir, CD_data_dir);
-    if (!strchr(gDir_separator, cutscene_dir[strlen(cutscene_dir) - 1])) {
-        strcat(cutscene_dir, gDir_separator);
-    }
-    strcat(cutscene_dir, "CUTSCENE");
-    if (!PDCheckDriveExists2(CD_data_dir, "GENERAL.TXT", 100)
-        || (!PDCheckDriveExists2(CD_dir, "CARMA.EXE", 0xF4240)
-            && !PDCheckDriveExists2(CD_dir, "CARMAG.EXE", 1000000)
-            && !PDCheckDriveExists2(CD_dir, "MAINPROG.EXE", 1000000)
-            && !PDCheckDriveExists2(CD_dir, "CARMSPLT.EXE", 1000000)
-            && !PDCheckDriveExists2(CD_dir, "CARMGSPL.EXE", 1000000))
+    {
+        char CD_dir[512];
+        char ch;
+        tPath_name path_file;
+        char CD_data_dir[512];
+
+        path_file[0] = 0;
+        strcpy(path_file, gApplication_path);
+        strcat(path_file, gDir_separator);
+        strcat(path_file, "PATHS.TXT");
+        if (!PDCheckDriveExists(path_file)) {
+            return 0;
+        }
+        fp = fopen(path_file, "rt");
+        if (!fp) {
+            return 0;
+        }
+        ch = fgetc(fp);
+        ungetc(ch, fp);
+        CD_dir[0] = 0;
+        GetALineAndDontArgue(fp, CD_dir);
+        fclose(fp);
+        strcpy(CD_data_dir, CD_dir);
+        if (!strchr(gDir_separator, CD_data_dir[strlen(CD_data_dir) - 1])) {
+            strcat(CD_data_dir, gDir_separator);
+        }
+        strcat(CD_data_dir, "DATA");
+        if (!DRStricmp(CD_data_dir, gApplication_path)) {
+            return 0;
+        }
+        strcpy(cutscene_dir, CD_data_dir);
+        if (!strchr(gDir_separator, cutscene_dir[strlen(cutscene_dir) - 1])) {
+            strcat(cutscene_dir, gDir_separator);
+        }
+        strcat(cutscene_dir, "CUTSCENE");
+        if (!PDCheckDriveExists2(CD_data_dir, "GENERAL.TXT", 100)
+            || (!PDCheckDriveExists2(CD_dir, "CARMA.EXE", 0xF4240)
+                && !PDCheckDriveExists2(CD_dir, "CARMAG.EXE", 1000000)
+                && !PDCheckDriveExists2(CD_dir, "MAINPROG.EXE", 1000000)
+                && !PDCheckDriveExists2(CD_dir, "CARMSPLT.EXE", 1000000)
+                && !PDCheckDriveExists2(CD_dir, "CARMGSPL.EXE", 1000000))
 #ifdef DETHRACE_FIX_BUGS
-        || !PDCheckDriveExists2(cutscene_dir, harness_game_info.defines.INTRO_SMK_FILE, 2000000)) {
+            || !PDCheckDriveExists2(cutscene_dir, harness_game_info.defines.INTRO_SMK_FILE, 2000000)) {
 #else
-        || !PDCheckDriveExists2(cutscene_dir, "SPLINTRO.SMK", 2000000)) {
+            || !PDCheckDriveExists2(cutscene_dir, "SPLINTRO.SMK", 2000000)) {
 #endif
-        return 0;
+            return 0;
+        }
+        if (ch != '@') {
+            EncodeFile(path_file);
+        }
+        return 1;
     }
-    if (ch != '@') {
-        EncodeFile(path_file);
-    }
-    return 1;
 
     // paths_txt[0] = 0;
     // strcat(paths_txt, gApplication_path);
