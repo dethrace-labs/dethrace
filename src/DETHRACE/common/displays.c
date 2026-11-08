@@ -18,13 +18,13 @@
 #include <stdlib.h>
 
 // GLOBAL: CARM95 0x00521678
-int gLast_fancy_index;
+int gLast_fancy_index = -1;
 
 // GLOBAL: CARM95 0x0052167c
-int gLast_credit_headup__displays; // suffix added to avoid duplicate symbol
+int gLast_credit_headup__displays = -1; // suffix added to avoid duplicate symbol
 
 // GLOBAL: CARM95 0x00521680
-int gLast_time_credit_headup;
+int gLast_time_credit_headup = -1;
 
 // GLOBAL: CARM95 0x00521684
 tDR_font* gCached_font;
@@ -449,6 +449,10 @@ void DoHeadups(tU32 pThe_time) {
     tHeadup* the_headup;
     int time_factor;
 
+    the_headup = &gHeadups[0];
+    x_offset = 0;
+    y_offset = 0;
+
     if (gNet_mode) {
         DoNetScores();
     }
@@ -460,8 +464,7 @@ void DoHeadups(tU32 pThe_time) {
         KillOldestQueuedHeadup();
     }
 
-    for (i = 0; i < COUNT_OF(gHeadups); i++) {
-        the_headup = &gHeadups[i];
+    for (i = 0; i < COUNT_OF(gHeadups); i++, the_headup++) {
         if (the_headup->type != eHeadup_unused
             && (gProgram_state.which_view == eView_forward || !the_headup->cockpit_anchored)
             && (the_headup->type == eHeadup_image
@@ -469,7 +472,9 @@ void DoHeadups(tU32 pThe_time) {
                 || (the_headup->type == eHeadup_text && the_headup->data.text_info.text[0] != '\0')
                 || ((the_headup->type == eHeadup_coloured_text || the_headup->type == eHeadup_box_text)
                     && the_headup->data.text_info.text[0] != '\0'))) {
-            if (the_headup->type == eHeadup_fancy || the_headup->end_time == 0 || pThe_time < the_headup->end_time) {
+            if (the_headup->type != eHeadup_fancy && the_headup->end_time != 0 && the_headup->end_time <= pThe_time) {
+                ClearHeadup(i);
+            } else {
                 if (the_headup->dimmed_background) {
                     DimRectangle(
                         gBack_screen,
@@ -483,78 +488,49 @@ void DoHeadups(tU32 pThe_time) {
                     || Flash(the_headup->flash_period, &the_headup->last_flash, &the_headup->flash_state)) {
                     switch (the_headup->type) {
                     case eHeadup_text:
-                        if (the_headup->cockpit_anchored) {
-                            y_offset = gScreen_wobble_y;
-                        } else {
-                            y_offset = 0;
-                        }
-                        if (the_headup->cockpit_anchored) {
-                            x_offset = gScreen_wobble_x;
-                        } else {
-                            x_offset = 0;
-                        }
                         TransBrPixelmapText(
                             gBack_screen,
-                            x_offset + the_headup->x,
-                            y_offset + the_headup->y,
+                            DR_FF(the_headup->x + (the_headup->cockpit_anchored ? gScreen_wobble_x : 0)) + x_offset,
+                            the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0),
                             the_headup->data.text_info.colour,
                             the_headup->data.text_info.font,
                             the_headup->data.text_info.text);
                         break;
                     case eHeadup_coloured_text:
                         if (the_headup->clever) {
-                            if (the_headup->cockpit_anchored) {
-                                y_offset = gScreen_wobble_y;
-                            } else {
-                                y_offset = 0;
-                            }
-                            if (the_headup->cockpit_anchored) {
-                                x_offset = gScreen_wobble_x;
-                            } else {
-                                x_offset = 0;
-                            }
                             TransDRPixelmapCleverText(
                                 gBack_screen,
-                                x_offset + the_headup->x,
-                                y_offset + the_headup->y,
+                                DR_FF(the_headup->x + (the_headup->cockpit_anchored ? gScreen_wobble_x : 0)) + x_offset,
+                                the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0),
                                 the_headup->data.coloured_text_info.coloured_font,
                                 the_headup->data.coloured_text_info.text,
                                 the_headup->right_edge);
                         } else {
-                            if (the_headup->cockpit_anchored) {
-                                y_offset = gScreen_wobble_y;
-                            } else {
-                                y_offset = 0;
-                            }
-                            if (the_headup->cockpit_anchored) {
-                                x_offset = gScreen_wobble_x;
-                            } else {
-                                x_offset = 0;
-                            }
                             TransDRPixelmapText(
                                 gBack_screen,
-                                x_offset + the_headup->x,
-                                y_offset + the_headup->y,
+                                DR_FF(the_headup->x + (the_headup->cockpit_anchored ? gScreen_wobble_x : 0)) + x_offset,
+                                the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0),
                                 the_headup->data.coloured_text_info.coloured_font,
                                 the_headup->data.coloured_text_info.text,
                                 the_headup->right_edge);
                         }
                         break;
+                    case eHeadup_box_text:
+                        OoerrIveGotTextInMeBoxMissus(
+                            the_headup->data.coloured_text_info.coloured_font - gFonts,
+                            the_headup->data.coloured_text_info.text,
+                            gBack_screen,
+                            gBack_screen->width / 10,
+                            the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0),
+                            9 * gBack_screen->width / 10,
+                            the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0) + 60,
+                            1);
+                        break;
                     case eHeadup_image:
-                        if (the_headup->cockpit_anchored) {
-                            y_offset = gScreen_wobble_y;
-                        } else {
-                            y_offset = 0;
-                        }
-                        if (the_headup->cockpit_anchored) {
-                            x_offset = gScreen_wobble_x;
-                        } else {
-                            x_offset = 0;
-                        }
                         DRPixelmapRectangleMaskedCopy(
                             gBack_screen,
-                            x_offset + the_headup->x,
-                            y_offset + the_headup->y,
+                            DR_FF(the_headup->x + (the_headup->cockpit_anchored ? gScreen_wobble_x : 0)) + x_offset,
+                            the_headup->y + y_offset + (the_headup->cockpit_anchored ? gScreen_wobble_y : 0),
                             the_headup->data.image_info.image,
                             0,
                             0,
@@ -573,18 +549,33 @@ void DoHeadups(tU32 pThe_time) {
                             }
                             DRPixelmapRectangleShearedCopy(
                                 gBack_screen,
-                                the_headup->x + the_headup->data.fancy_info.offset,
-                                the_headup->y,
+                                the_headup->x + the_headup->data.fancy_info.offset + x_offset,
+                                the_headup->y + y_offset,
                                 the_headup->data.fancy_info.image,
                                 0,
                                 0,
-                                the_headup->data.fancy_info.image->width,
-                                the_headup->data.fancy_info.image->height,
+                                the_headup->data.fancy_info.image->width & 0xffff,
+                                the_headup->data.fancy_info.image->height & 0xffff,
                                 -BrIntToFixed(1));
                             break;
                         case eFancy_stage_halting:
                             time_factor = 1000 * (pThe_time - the_headup->data.fancy_info.start_time) / 100;
-                            if (time_factor > 1000) {
+                            if ((time_factor <= 1000)) {
+#if DETHRACE_FIX_BUGS
+                                time_factor = MAX(time_factor, 0);
+#endif
+                                DRPixelmapRectangleShearedCopy(
+                                    gBack_screen,
+                                    the_headup->x - (DR_FF(time_factor) - 500) * the_headup->data.fancy_info.shear_amount / 500 + x_offset,
+                                    the_headup->y + y_offset,
+                                    the_headup->data.image_info.image,
+                                    0,
+                                    0,
+                                    the_headup->data.image_info.image->width & 0xffff,
+                                    the_headup->data.image_info.image->height & 0xffff,
+                                    BrIntToFixed((DR_FF(time_factor) - 500) * the_headup->data.fancy_info.shear_amount / 500)
+                                        / the_headup->data.image_info.image->height);
+                            } else {
                                 if (time_factor > 1500) {
                                     time_factor = 1500;
                                     the_headup->data.fancy_info.fancy_stage = eFancy_stage_waiting;
@@ -592,29 +583,14 @@ void DoHeadups(tU32 pThe_time) {
                                 }
                                 DRPixelmapRectangleShearedCopy(
                                     gBack_screen,
-                                    the_headup->x - (1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500,
-                                    the_headup->y,
+                                    the_headup->x - (1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500 + x_offset,
+                                    the_headup->y + y_offset,
                                     the_headup->data.image_info.image,
                                     0,
                                     0,
-                                    the_headup->data.image_info.image->width,
-                                    the_headup->data.image_info.image->height,
+                                    the_headup->data.image_info.image->width & 0xffff,
+                                    the_headup->data.image_info.image->height & 0xffff,
                                     BrIntToFixed((1500 - time_factor) * the_headup->data.fancy_info.shear_amount / 500)
-                                        / the_headup->data.image_info.image->height);
-                            } else {
-#if DETHRACE_FIX_BUGS
-                                time_factor = MAX(time_factor, 0);
-#endif
-                                DRPixelmapRectangleShearedCopy(
-                                    gBack_screen,
-                                    the_headup->x - the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500,
-                                    the_headup->y,
-                                    the_headup->data.image_info.image,
-                                    0,
-                                    0,
-                                    the_headup->data.image_info.image->width,
-                                    the_headup->data.image_info.image->height,
-                                    BrIntToFixed(the_headup->data.fancy_info.shear_amount * (time_factor - 500) / 500)
                                         / the_headup->data.image_info.image->height);
                             }
                             break;
@@ -625,8 +601,8 @@ void DoHeadups(tU32 pThe_time) {
                             }
                             DRPixelmapRectangleMaskedCopy(
                                 gBack_screen,
-                                the_headup->x,
-                                the_headup->y,
+                                the_headup->x + x_offset,
+                                the_headup->y + y_offset,
                                 the_headup->data.image_info.image,
                                 0,
                                 0,
@@ -643,13 +619,13 @@ void DoHeadups(tU32 pThe_time) {
                             }
                             DRPixelmapRectangleShearedCopy(
                                 gBack_screen,
-                                the_headup->x,
-                                the_headup->y,
+                                the_headup->x + x_offset,
+                                the_headup->y + y_offset,
                                 the_headup->data.image_info.image,
                                 0,
                                 0,
-                                the_headup->data.image_info.image->width,
-                                the_headup->data.image_info.image->height,
+                                the_headup->data.image_info.image->width & 0xffff,
+                                the_headup->data.image_info.image->height & 0xffff,
                                 -BrIntToFixed(time_factor * the_headup->data.fancy_info.shear_amount / 1000)
                                     / the_headup->data.image_info.image->height);
                             break;
@@ -660,48 +636,22 @@ void DoHeadups(tU32 pThe_time) {
                             } else {
                                 DRPixelmapRectangleShearedCopy(
                                     gBack_screen,
-                                    the_headup->data.fancy_info.offset + the_headup->x,
-                                    the_headup->y,
+                                    the_headup->data.fancy_info.offset + the_headup->x + x_offset,
+                                    the_headup->y + y_offset,
                                     the_headup->data.image_info.image,
                                     0,
                                     0,
-                                    the_headup->data.image_info.image->width,
-                                    the_headup->data.image_info.image->height,
+                                    the_headup->data.image_info.image->width & 0xffff,
+                                    the_headup->data.image_info.image->height & 0xffff,
                                     -BrIntToFixed(1));
                             }
-                            break;
-                        default:
                             break;
                         }
                         break;
 
-                    case eHeadup_box_text:
-                        if (the_headup->cockpit_anchored) {
-                            y_offset = gScreen_wobble_y;
-                        } else {
-                            y_offset = 0;
-                        }
-                        if (the_headup->cockpit_anchored) {
-                            x_offset = gScreen_wobble_x;
-                        } else {
-                            x_offset = 0;
-                        }
-                        OoerrIveGotTextInMeBoxMissus(
-                            the_headup->data.coloured_text_info.coloured_font - gFonts,
-                            the_headup->data.coloured_text_info.text,
-                            gBack_screen,
-                            gBack_screen->width / 10,
-                            x_offset + the_headup->y,
-                            9 * gBack_screen->width / 10,
-                            y_offset + the_headup->y + 60,
-                            1);
-                        break;
-                    default:
-                        break;
+                        DETHRACE_DEFAULT_BREAK;
                     }
                 }
-            } else {
-                ClearHeadup(i);
             }
         }
     }
@@ -1179,15 +1129,19 @@ void DoInstruments(tU32 pThe_time) {
     int the_wobble_x;
     int the_wobble_y;
     int gear;
+#ifdef DETHRACE_FIX_BUGS
     int gear_height; /* Added by dethrace. */
+#endif
     double the_angle;
     double the_angle2;
     double sin_angle;
     double cos_angle;
     double speed_mph;
 
-    if (gProgram_state.current_car_index == gProgram_state.current_car.index) {
-        speed_mph = gCar_to_view->speedo_speed * WORLD_SCALE / 1600.0f * 3600000.0f;
+    if (gProgram_state.current_car_index != gProgram_state.current_car.index) {
+        return;
+    }
+    speed_mph = gCar_to_view->speedo_speed * WORLD_SCALE / 1600.0 * 3600000.0;
         if (speed_mph < 0.0f) {
             speed_mph = 0.0f;
         }
@@ -1197,54 +1151,85 @@ void DoInstruments(tU32 pThe_time) {
             }
             the_wobble_x = gScreen_wobble_x;
             the_wobble_y = gScreen_wobble_y;
-        } else {
+    } else {
             the_wobble_x = 0;
             the_wobble_y = 0;
         }
         tacho_image = gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on];
-        if (gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] >= 0) {
-            if (gCar_to_view->red_line >= gCar_to_view->revs) {
-                the_angle = DEG_TO_RAD((double)(gProgram_state.current_car.tacho_end_angle[gProgram_state.cockpit_on] - gProgram_state.current_car.tacho_start_angle[gProgram_state.cockpit_on]) * gCar_to_view->revs / (double)gCar_to_view->red_line + (double)gProgram_state.current_car.tacho_start_angle[gProgram_state.cockpit_on]);
-            } else {
+        if (gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] < 0) {
+            if (tacho_image != NULL) {
+#ifdef DETHRACE_3DFX_PATCH
+                DRPixelmapRectangleCopy(
+#else
+                BrPixelmapRectangleCopy(
+#endif
+                    gBack_screen,
+                    the_wobble_x + gProgram_state.current_car.tacho_x[gProgram_state.cockpit_on],
+                    the_wobble_y + gProgram_state.current_car.tacho_y[gProgram_state.cockpit_on],
+                    gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on],
+                    0,
+                    0,
+                    (((float)(gCar_to_view->revs - 1.0f)) / (double)gCar_to_view->red_line * (double)gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on]->width + 1.0f),
+                    gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on]->height);
+            }
+        } else {
+            if (gCar_to_view->revs > gCar_to_view->red_line) {
                 the_angle = DEG_TO_RAD((double)gProgram_state.current_car.tacho_end_angle[gProgram_state.cockpit_on]);
-            }
-            if (the_angle >= 0.0) {
-                if (the_angle >= TAU) {
-                    the_angle -= TAU;
-                }
             } else {
-                the_angle += TAU;
+                the_angle = DEG_TO_RAD((double)(gProgram_state.current_car.tacho_end_angle[gProgram_state.cockpit_on] - gProgram_state.current_car.tacho_start_angle[gProgram_state.cockpit_on]) * gCar_to_view->revs / (double)gCar_to_view->red_line + (double)gProgram_state.current_car.tacho_start_angle[gProgram_state.cockpit_on]);
             }
-            the_angle2 = DR_PI_OVER_2 - the_angle;
+            if (the_angle < 0.0) {
+                the_angle += TAU;
+            } else if (the_angle >= TAU) {
+                the_angle -= TAU;
+            }
+            the_angle2 = DR_PI / 2 - the_angle;
             if (the_angle2 < 0) {
                 the_angle2 += TAU;
             }
+#if defined(DETHRACE_FIX_BUGS)
             if (the_angle2 > DR_3PI_OVER_2) {
-                cos_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
+                sin_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
             } else if (the_angle2 > DR_PI) {
-                cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
+                sin_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
 #if defined(DETHRACE_FIX_BUGS)
             } else if (the_angle2 >= DR_PI_OVER_2) {
 #else
             } else if (the_angle2 > DR_PI_OVER_2) {
 #endif
-                cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
+                sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
             } else {
-                cos_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
+                sin_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
             }
             if (the_angle > DR_3PI_OVER_2) {
-                sin_angle = gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)];
+                cos_angle = gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)];
             } else if (the_angle > DR_PI) {
-                sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
+                cos_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
 #if defined(DETHRACE_FIX_BUGS)
             } else if (the_angle >= DR_PI_OVER_2) {
 #else
             } else if (the_angle > DR_PI_OVER_2) {
 #endif
-                sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
+                cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
             } else {
-                sin_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
+                cos_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
             }
+#else
+            sin_angle = (double)(the_angle2 > DR_3PI_OVER_2
+                ? gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)]
+                : (the_angle2 > DR_PI
+                    ? -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)]
+                    : (the_angle2 > DR_PI / 2
+                        ? -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)]
+                        : gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)])));
+            cos_angle = (double)(the_angle > DR_3PI_OVER_2
+                ? gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)]
+                : (the_angle > DR_PI
+                    ? -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)]
+                    : (the_angle > DR_PI / 2
+                        ? -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)]
+                        : gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)])));
+#endif
             if (tacho_image != NULL) {
                 DRPixelmapRectangleMaskedCopy(
                     gBack_screen,
@@ -1260,39 +1245,25 @@ void DoInstruments(tU32 pThe_time) {
             PoshDrawLine(
                 the_angle,
                 gBack_screen,
-                ((double)gProgram_state.current_car.tacho_radius_1[gProgram_state.cockpit_on] * sin_angle
+                ((double)gProgram_state.current_car.tacho_radius_1[gProgram_state.cockpit_on] * cos_angle
                     + (double)gProgram_state.current_car.tacho_centre_x[gProgram_state.cockpit_on]
                     + (double)the_wobble_x),
                 ((double)gProgram_state.current_car.tacho_centre_y[gProgram_state.cockpit_on]
-                    - (double)gProgram_state.current_car.tacho_radius_1[gProgram_state.cockpit_on] * cos_angle
+                    - (double)gProgram_state.current_car.tacho_radius_1[gProgram_state.cockpit_on] * sin_angle
                     + (double)the_wobble_y),
-                ((double)gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] * sin_angle
+                ((double)gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] * cos_angle
                     + (double)gProgram_state.current_car.tacho_centre_x[gProgram_state.cockpit_on]
                     + (double)the_wobble_x),
                 ((double)gProgram_state.current_car.tacho_centre_y[gProgram_state.cockpit_on]
-                    - (double)gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] * cos_angle
+                    - (double)gProgram_state.current_car.tacho_radius_2[gProgram_state.cockpit_on] * sin_angle
                     + (double)the_wobble_y),
                 gProgram_state.current_car.tacho_needle_colour[gProgram_state.cockpit_on]);
-        } else if (tacho_image != NULL) {
-#ifdef DETHRACE_3DFX_PATCH
-            DRPixelmapRectangleCopy(
-#else
-            BrPixelmapRectangleCopy(
-#endif
-                gBack_screen,
-                the_wobble_x + gProgram_state.current_car.tacho_x[gProgram_state.cockpit_on],
-                the_wobble_y + gProgram_state.current_car.tacho_y[gProgram_state.cockpit_on],
-                gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on],
-                0,
-                0,
-                ((gCar_to_view->revs - 1.0) / (double)gCar_to_view->red_line * (double)gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on]->width + 1.0),
-                gProgram_state.current_car.tacho_image[gProgram_state.cockpit_on]->height);
         }
         if (!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0 || gProgram_state.which_view == eView_forward) {
-            if (gCar_to_view->gear < 0) {
-                gear = -1;
-            } else {
+            if (gCar_to_view->gear >= 0) {
                 gear = gCar_to_view->gear;
+            } else {
+                gear = -1;
             }
 #if defined(DETHRACE_FIX_BUGS)
 /*
@@ -1307,19 +1278,41 @@ void DoInstruments(tU32 pThe_time) {
 #define GEAR_HEIGHT ((int)gProgram_state.current_car.gears_image->height / 8)
 #define GEAR_HEIGHT_HIRES GEAR_HEIGHT
 #endif
+#ifdef DETHRACE_FIX_BUGS
             gear_height = gGraf_spec_index ? GEAR_HEIGHT_HIRES : GEAR_HEIGHT;
+#endif
             DRPixelmapRectangleMaskedCopy(
                 gBack_screen,
                 the_wobble_x + gProgram_state.current_car.gear_x[gProgram_state.cockpit_on],
                 the_wobble_y + gProgram_state.current_car.gear_y[gProgram_state.cockpit_on],
                 gProgram_state.current_car.gears_image,
                 0,
+#ifdef DETHRACE_FIX_BUGS
                 (gear + 1) * gear_height,
+#else
+                (gear + 1) * GEAR_HEIGHT,
+#endif
                 gProgram_state.current_car.gears_image->width,
+#ifdef DETHRACE_FIX_BUGS
                 gear_height);
+#else
+                GEAR_HEIGHT);
+#endif
         }
         speedo_image = gProgram_state.current_car.speedo_image[gProgram_state.cockpit_on];
-        if (gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] >= 0) {
+        if (gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] < 0) {
+            if (speedo_image != NULL) {
+                DrawNumberAt(
+                    speedo_image,
+                    the_wobble_x + gProgram_state.current_car.speedo_x[gProgram_state.cockpit_on],
+                    the_wobble_y + gProgram_state.current_car.speedo_y[gProgram_state.cockpit_on],
+                    gProgram_state.current_car.speedo_x_pitch[gProgram_state.cockpit_on],
+                    gProgram_state.current_car.speedo_y_pitch[gProgram_state.cockpit_on],
+                    speed_mph,
+                    3,
+                    1);
+            }
+        } else {
             if (speedo_image && (!gProgram_state.cockpit_on || gProgram_state.cockpit_image_index < 0)) {
                 DRPixelmapRectangleMaskedCopy(
                     gBack_screen,
@@ -1331,10 +1324,10 @@ void DoInstruments(tU32 pThe_time) {
                     speedo_image->width,
                     speedo_image->height);
             }
-            if ((double)gProgram_state.current_car.max_speed >= speed_mph) {
-                the_angle = DEG_TO_RAD((double)(gProgram_state.current_car.speedo_end_angle[gProgram_state.cockpit_on] - gProgram_state.current_car.speedo_start_angle[gProgram_state.cockpit_on]) * speed_mph / (double)gProgram_state.current_car.max_speed + (double)gProgram_state.current_car.speedo_start_angle[gProgram_state.cockpit_on]);
-            } else {
+            if ((double)gProgram_state.current_car.max_speed < speed_mph) {
                 the_angle = DEG_TO_RAD((double)gProgram_state.current_car.speedo_end_angle[gProgram_state.cockpit_on]);
+            } else {
+                the_angle = DEG_TO_RAD((double)(gProgram_state.current_car.speedo_end_angle[gProgram_state.cockpit_on] - gProgram_state.current_car.speedo_start_angle[gProgram_state.cockpit_on]) * speed_mph / (double)gProgram_state.current_car.max_speed + (double)gProgram_state.current_car.speedo_start_angle[gProgram_state.cockpit_on]);
             }
 
             if (the_angle < 0.0) {
@@ -1342,44 +1335,40 @@ void DoInstruments(tU32 pThe_time) {
             } else if (the_angle >= TAU) {
                 the_angle -= TAU;
             }
-            the_angle2 = DR_PI_OVER_2 - the_angle;
+            the_angle2 = DR_PI / 2 - the_angle;
             if (the_angle2 < 0.0) {
                 the_angle2 += TAU;
             }
-            if (the_angle2 > DR_3PI_OVER_2) {
-                cos_angle = gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)];
-            } else if (the_angle2 > DR_PI) {
-                cos_angle = -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)];
-            } else if (the_angle2 > DR_PI_OVER_2) {
-                cos_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)];
-            } else {
-                cos_angle = gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)];
-            }
+            sin_angle = (double)(the_angle2 > DR_3PI_OVER_2
+                ? gCosine_array[(unsigned int)((TAU - the_angle2) / DR_PI * 128.0)]
+                : (the_angle2 > DR_PI
+                    ? -gCosine_array[(unsigned int)((the_angle2 - DR_PI) / DR_PI * 128.0)]
+                    : (the_angle2 > DR_PI / 2
+                        ? -gCosine_array[(unsigned int)((DR_PI - the_angle2) / DR_PI * 128.0)]
+                        : gCosine_array[(unsigned int)(the_angle2 / DR_PI * 128.0)])));
 
-            if (the_angle > DR_3PI_OVER_2) {
-                sin_angle = gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)];
-            } else if (the_angle > DR_PI) {
-                sin_angle = -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)];
-            } else if (the_angle > DR_PI_OVER_2) {
-                sin_angle = -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)];
-            } else {
-                sin_angle = gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)];
-            }
+            cos_angle = (double)(the_angle > DR_3PI_OVER_2
+                ? gCosine_array[(unsigned int)((TAU - the_angle) / DR_PI * 128.0)]
+                : (the_angle > DR_PI
+                    ? -gCosine_array[(unsigned int)((the_angle - DR_PI) / DR_PI * 128.0)]
+                    : (the_angle > DR_PI / 2
+                        ? -gCosine_array[(unsigned int)((DR_PI - the_angle) / DR_PI * 128.0)]
+                        : gCosine_array[(unsigned int)(the_angle / DR_PI * 128.0)])));
 
             PoshDrawLine(
                 the_angle,
                 gBack_screen,
-                ((double)gProgram_state.current_car.speedo_radius_1[gProgram_state.cockpit_on] * sin_angle
+                ((double)gProgram_state.current_car.speedo_radius_1[gProgram_state.cockpit_on] * cos_angle
                     + (double)gProgram_state.current_car.speedo_centre_x[gProgram_state.cockpit_on]
                     + (double)the_wobble_x),
                 ((double)gProgram_state.current_car.speedo_centre_y[gProgram_state.cockpit_on]
-                    - (double)gProgram_state.current_car.speedo_radius_1[gProgram_state.cockpit_on] * cos_angle
+                    - (double)gProgram_state.current_car.speedo_radius_1[gProgram_state.cockpit_on] * sin_angle
                     + (double)the_wobble_y),
-                ((double)gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] * sin_angle
+                ((double)gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] * cos_angle
                     + (double)gProgram_state.current_car.speedo_centre_x[gProgram_state.cockpit_on]
                     + (double)the_wobble_x),
                 ((double)gProgram_state.current_car.speedo_centre_y[gProgram_state.cockpit_on]
-                    - (double)gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] * cos_angle
+                    - (double)gProgram_state.current_car.speedo_radius_2[gProgram_state.cockpit_on] * sin_angle
                     + (double)the_wobble_y),
                 gProgram_state.current_car.speedo_needle_colour[gProgram_state.cockpit_on]);
             if (speedo_image != NULL && gProgram_state.cockpit_on && gProgram_state.cockpit_image_index >= 0) {
@@ -1393,17 +1382,6 @@ void DoInstruments(tU32 pThe_time) {
                     speedo_image->width,
                     speedo_image->height);
             }
-        } else if (speedo_image != NULL) {
-            DrawNumberAt(
-                speedo_image,
-                the_wobble_x + gProgram_state.current_car.speedo_x[gProgram_state.cockpit_on],
-                the_wobble_y + gProgram_state.current_car.speedo_y[gProgram_state.cockpit_on],
-                gProgram_state.current_car.speedo_x_pitch[gProgram_state.cockpit_on],
-                gProgram_state.current_car.speedo_y_pitch[gProgram_state.cockpit_on],
-                speed_mph,
-                3,
-                1);
-        }
     }
 }
 

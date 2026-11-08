@@ -198,10 +198,10 @@ br_matrix34 gIdentity34 = {
 tShadow_level gShadow_level = eShadow_us_only;
 
 // GLOBAL: CARM95 0x0052022c
-br_scalar gShadow_hither_z_move;
+br_scalar gShadow_hither_z_move = 1.0f;
 
 // GLOBAL: CARM95 0x00520230
-br_scalar gShadow_hither_min_move;
+br_scalar gShadow_hither_min_move = 0.0002f;
 
 /* clang-format off */
 // arrows pointing to 180, 202, 224, 246 degrees (step = 90 / 4 = 22(.5) degrees)
@@ -1535,7 +1535,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
     gShadow_points[7].v[2] = bounds_z_max;
     gShadow_clip_plane_count = 0;
     BrMatrix34TApplyV(&light_ray_car, &gShadow_light_ray, &pCar->car_master_actor->t.t.mat);
-    y_offset = (bounds_y_max + bounds_y_min) / 2.0;
+    y_offset = (bounds_y_max + bounds_y_min) / 2.0f;
     TryThisEdge(pCar, &light_ray_car, 2, 1.0, 1, 1.0, 0, 3, y_offset);
     TryThisEdge(pCar, &light_ray_car, 2, -1.0, 1, 1.0, 1, 2, y_offset);
     TryThisEdge(pCar, &light_ray_car, 2, -1.0, 1, -1.0, 6, 5, y_offset);
@@ -1551,145 +1551,137 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
     for (i = 0; i < gShadow_clip_plane_count; i++) {
         BrClipPlaneEnable(gShadow_clip_planes[i].clip);
     }
-    face_count = GetPrecalculatedFacesUnderCar(pCar, &face_ref);
-
-    if (!gAction_replay_mode && pCar->number_of_wheels_on_ground >= 3 && face_count != 0) {
-        highest_underneath = 0.0;
-    } else {
-        kev_bounds.original_bounds.min.v[0] = 1000.0;
-        kev_bounds.original_bounds.min.v[1] = 1000.0;
-        kev_bounds.original_bounds.min.v[2] = 1000.0;
-        kev_bounds.original_bounds.max.v[0] = -1000.0;
-        kev_bounds.original_bounds.max.v[1] = -1000.0;
-        kev_bounds.original_bounds.max.v[2] = -1000.0;
+    if (gAction_replay_mode || pCar->number_of_wheels_on_ground < 3 || (face_count = GetPrecalculatedFacesUnderCar(pCar, &list_ptr)) == 0) {
+        kev_bounds.original_bounds.min.v[0] = 1000.0f;
+        kev_bounds.original_bounds.min.v[1] = 1000.0f;
+        kev_bounds.original_bounds.min.v[2] = 1000.0f;
+        kev_bounds.original_bounds.max.v[0] = -1000.0f;
+        kev_bounds.original_bounds.max.v[1] = -1000.0f;
+        kev_bounds.original_bounds.max.v[2] = -1000.0f;
         for (i = 0; i < COUNT_OF(shadow_points_world); i++) {
             BrMatrix34ApplyP(&shadow_points_world[i], &gShadow_points[i], &pCar->car_master_actor->t.t.mat);
-            if (shadow_points_world[i].v[0] >= kev_bounds.original_bounds.min.v[0]) {
-                if (shadow_points_world[i].v[0] > kev_bounds.original_bounds.max.v[0]) {
-                    kev_bounds.original_bounds.max.v[0] = shadow_points_world[i].v[0];
-                }
-            } else {
+            if (shadow_points_world[i].v[0] < kev_bounds.original_bounds.min.v[0]) {
                 kev_bounds.original_bounds.min.v[0] = shadow_points_world[i].v[0];
+            } else if (shadow_points_world[i].v[0] > kev_bounds.original_bounds.max.v[0]) {
+                kev_bounds.original_bounds.max.v[0] = shadow_points_world[i].v[0];
             }
-            if (shadow_points_world[i].v[1] >= kev_bounds.original_bounds.min.v[1]) {
-                if (shadow_points_world[i].v[1] > kev_bounds.original_bounds.max.v[1]) {
-                    kev_bounds.original_bounds.max.v[1] = shadow_points_world[i].v[1];
-                }
-            } else {
+            if (shadow_points_world[i].v[1] < kev_bounds.original_bounds.min.v[1]) {
                 kev_bounds.original_bounds.min.v[1] = shadow_points_world[i].v[1];
+            } else if (shadow_points_world[i].v[1] > kev_bounds.original_bounds.max.v[1]) {
+                kev_bounds.original_bounds.max.v[1] = shadow_points_world[i].v[1];
             }
-            if (shadow_points_world[i].v[2] >= kev_bounds.original_bounds.min.v[2]) {
-                if (shadow_points_world[i].v[2] > kev_bounds.original_bounds.max.v[2]) {
-                    kev_bounds.original_bounds.max.v[2] = shadow_points_world[i].v[2];
-                }
-            } else {
+            if (shadow_points_world[i].v[2] < kev_bounds.original_bounds.min.v[2]) {
                 kev_bounds.original_bounds.min.v[2] = shadow_points_world[i].v[2];
+            } else if (shadow_points_world[i].v[2] > kev_bounds.original_bounds.max.v[2]) {
+                kev_bounds.original_bounds.max.v[2] = shadow_points_world[i].v[2];
             }
         }
-        kev_bounds.original_bounds.min.v[1] = kev_bounds.original_bounds.min.v[1] - 4.4000001;
+        kev_bounds.original_bounds.min.v[1] = kev_bounds.original_bounds.min.v[1] - 4.4000001f;
         kev_bounds.mat = &gIdentity34;
         face_count = FindFacesInBox(&kev_bounds, the_list, 100);
-        face_ref = the_list;
-        highest_underneath = 1000.0;
+        list_ptr = the_list;
+        height = 1000.0f;
         ray_length = kev_bounds.original_bounds.max.v[1] - kev_bounds.original_bounds.min.v[1];
-        ray.v[0] = 0.0;
+        ray.v[0] = 0.0f;
         ray.v[1] = -ray_length;
-        ray.v[2] = 0.0;
-        ray_pos = pCar->car_master_actor->t.t.translate.t;
+        ray.v[2] = 0.0f;
+        BrVector3Copy(&ray_pos, &pCar->car_master_actor->t.t.translate.t);
         ray_pos.v[1] = kev_bounds.original_bounds.max.v[1];
+    } else {
+        height = 0.0f;
     }
     if (face_count) {
-        first_poly_below = -1000.0;
-        i = 0;
-        list_ptr = face_ref;
-        for (i = 0; i < face_count; i++) {
-            v1 = &list_ptr->v[1];
-            v2 = &list_ptr->v[2];
-            if (list_ptr->normal.v[1] >= -0.1 || (list_ptr->material && (list_ptr->material->flags & BR_MATF_TWO_SIDED) != 0)) {
-                if (list_ptr->normal.v[1] < 0.0 || (list_ptr->material && ((list_ptr->material->identifier && list_ptr->material->identifier[0] == '!') || list_ptr->material->index_blend))) {
-                    list_ptr->d = SHADOW_D_IGNORE_FLAG;
-                } else if ((list_ptr->v[0].v[1] > pCar->pos.v[1] || v1->v[1] > pCar->pos.v[1] || v2->v[1] > pCar->pos.v[1]) && list_ptr->normal.v[1] < 0.1) {
-                    list_ptr->d = SHADOW_D_IGNORE_FLAG;
-                }
-            } else {
-                poly_centre.v[0] = v1->v[0] + list_ptr->v[0].v[0];
-                poly_centre.v[1] = v1->v[1] + list_ptr->v[0].v[1];
-                poly_centre.v[2] = v1->v[2] + list_ptr->v[0].v[2];
+        models_used = 0;
+        highest_underneath = -1000.0f;
+        for (i = 0, face_ref = list_ptr; i < face_count; i++, face_ref++) {
+            v0 = &face_ref->v[0];
+            v1 = &face_ref->v[1];
+            v2 = &face_ref->v[2];
+            if (face_ref->normal.v[1] < -0.1 && (!face_ref->material || (face_ref->material->flags & BR_MATF_TWO_SIDED) == 0)) {
+                poly_centre.v[0] = v1->v[0] + v0->v[0];
+                poly_centre.v[1] = v1->v[1] + v0->v[1];
+                poly_centre.v[2] = v1->v[2] + v0->v[2];
                 poly_centre.v[0] = v2->v[0] + poly_centre.v[0];
                 poly_centre.v[1] = v2->v[1] + poly_centre.v[1];
                 poly_centre.v[2] = v2->v[2] + poly_centre.v[2];
-                poly_centre.v[0] = poly_centre.v[0] / 3.0;
-                poly_centre.v[1] = poly_centre.v[1] / 3.0;
-                poly_centre.v[2] = poly_centre.v[2] / 3.0;
-                poly_centre.v[1] = (v2->v[1] + v1->v[1] + list_ptr->v[0].v[1]) / 3.0;
-                if (poly_centre.v[1] > first_poly_below) {
+                poly_centre.v[0] = poly_centre.v[0] / 3.0f;
+                poly_centre.v[1] = poly_centre.v[1] / 3.0f;
+                poly_centre.v[2] = poly_centre.v[2] / 3.0f;
+                poly_centre.v[1] = (v2->v[1] + v1->v[1] + v0->v[1]) / 3.0f;
+                if (poly_centre.v[1] > highest_underneath) {
                     car_to_poly.v[0] = poly_centre.v[0] - pCar->car_master_actor->t.t.mat.m[3][0];
                     car_to_poly.v[1] = poly_centre.v[1] - pCar->car_master_actor->t.t.mat.m[3][1];
                     car_to_poly.v[2] = poly_centre.v[2] - pCar->car_master_actor->t.t.mat.m[3][2];
 
-                    if (BrVector3Dot(&list_ptr->normal, &car_to_poly) > 0.0) {
-                        first_poly_below = poly_centre.v[1];
+                    if (BrVector3Dot(&face_ref->normal, &car_to_poly) > 0.0f) {
+                        highest_underneath = poly_centre.v[1];
                     }
                 }
-                list_ptr->d = SHADOW_D_IGNORE_FLAG;
+                face_ref->d = SHADOW_D_IGNORE_FLAG;
+            } else if (face_ref->normal.v[1] < 0.0f || (face_ref->material && ((face_ref->material->identifier && face_ref->material->identifier[0] == '!') || face_ref->material->index_blend))) {
+                face_ref->d = SHADOW_D_IGNORE_FLAG;
+            } else if ((v0[0].v[1] > pCar->pos.v[1] || v1[0].v[1] > pCar->pos.v[1] || v2[0].v[1] > pCar->pos.v[1]) && face_ref->normal.v[1] < 0.1) {
+                face_ref->d = SHADOW_D_IGNORE_FLAG;
             }
-            list_ptr++;
         }
-        list_ptr = face_ref;
-        for (i = 0; i < face_count; i++) {
-            if (list_ptr->d != 10000.0) {
-                if (list_ptr->v[0].v[1] >= first_poly_below || list_ptr->v[1].v[1] >= first_poly_below || list_ptr->v[2].v[1] >= first_poly_below) {
-                    if (gFancy_shadow) {
-                        faces[f_num].material = list_ptr->material;
+        for (i = 0, face_ref = list_ptr; i < face_count; i++, face_ref++) {
+            if (face_ref->d == 10000.0f) {
+                continue;
+            }
+            force_shadow = 0;
+            if (!force_shadow && face_ref->v[0].v[1] < highest_underneath && face_ref->v[1].v[1] < highest_underneath && face_ref->v[2].v[1] < highest_underneath) {
+                continue;
+            }
+            if (!gFancy_shadow) {
+                faces[f_num].material = gShadow_material;
+            } else {
+                faces[f_num].material = face_ref->material;
 #ifdef DETHRACE_3DFX_PATCH
-                        if (gShade_tables_do_not_work) {
-                            list_ptr->material->ka = 0.75f;
-                            BrMaterialUpdate(list_ptr->material, BR_MATU_LIGHTING);
-                        } else
+                if (gShade_tables_do_not_work) {
+                    face_ref->material->ka = 0.75f;
+                    BrMaterialUpdate(face_ref->material, BR_MATU_LIGHTING);
+                } else
 #endif
-                        {
-                            if (list_ptr->material && list_ptr->material->colour_map && (list_ptr->material->flags & BR_MATF_LIGHT) == 0) {
-                                list_ptr->material->flags |= BR_MATF_SMOOTH | BR_MATF_LIGHT;
-                                BrMaterialUpdate(list_ptr->material, BR_MATU_RENDERING);
-                            }
-                        }
-                    } else {
-                        faces[f_num].material = gShadow_material;
-                    }
-
-                    verts[3 * f_num].p = list_ptr->v[0];
-                    verts[3 * f_num].map = *list_ptr->map[0];
-                    verts[3 * f_num + 1].p = list_ptr->v[1];
-                    verts[3 * f_num + 1].map = *list_ptr->map[1];
-                    verts[3 * f_num + 2].p = list_ptr->v[2];
-                    verts[3 * f_num + 2].map = *list_ptr->map[2];
-                    faces[f_num].vertices[0] = 3 * f_num;
-                    faces[f_num].vertices[1] = 3 * f_num + 1;
-                    faces[f_num].vertices[2] = 3 * f_num + 2;
-                    f_num++;
-                    if (highest_underneath > 0.0) {
-                        CheckSingleFace(list_ptr, &ray_pos, &ray, &normal, &distance);
-                        if (distance < 1.0 && ray_length * distance < highest_underneath) {
-                            highest_underneath = ray_length * distance;
-                        }
-                    }
-                    if (f_num >= LEN(faces)) {
-                        break;
+                {
+                    if (face_ref->material && face_ref->material->colour_map && (face_ref->material->flags & BR_MATF_LIGHT) == 0) {
+                        face_ref->material->flags |= BR_MATF_SMOOTH | BR_MATF_LIGHT;
+                        BrMaterialUpdate(face_ref->material, BR_MATU_RENDERING);
                     }
                 }
             }
-            list_ptr++;
-        }
-        highest_underneath = highest_underneath - (bounds_y_max - bounds_y_min);
-        if (highest_underneath < 2.2) {
-            if (highest_underneath < 0.0) {
-                highest_underneath = 0.0;
+
+            BrVector3Copy(&verts[3 * f_num].p, &face_ref->v[0]);
+            BrVector3Copy(&verts[3 * f_num + 1].p, &face_ref->v[1]);
+            BrVector3Copy(&verts[3 * f_num + 2].p, &face_ref->v[2]);
+            verts[3 * f_num].map.v[0] = face_ref->map[0]->v[0];
+            verts[3 * f_num].map.v[1] = face_ref->map[0]->v[1];
+            verts[3 * f_num + 1].map.v[0] = face_ref->map[1]->v[0];
+            verts[3 * f_num + 1].map.v[1] = face_ref->map[1]->v[1];
+            verts[3 * f_num + 2].map.v[0] = face_ref->map[2]->v[0];
+            verts[3 * f_num + 2].map.v[1] = face_ref->map[2]->v[1];
+            faces[f_num].vertices[0] = 3 * f_num;
+            faces[f_num].vertices[1] = 3 * f_num + 1;
+            faces[f_num].vertices[2] = 3 * f_num + 2;
+            f_num++;
+            if (height > 0.0f) {
+                CheckSingleFace(face_ref, &ray_pos, &ray, &normal, &distance);
+                if (distance < 1.0f && ray_length * distance < height) {
+                    height = ray_length * distance;
+                    BrVector3Copy(&the_normal, &normal);
+                }
             }
-        } else {
-            highest_underneath = 2.2;
+            if (f_num >= (int)LEN(faces)) {
+                break;
+            }
+        }
+        height = height - (bounds_y_max - bounds_y_min);
+        if (height > 2.2) {
+            height = 2.2;
+        } else if (height < 0.0f) {
+            height = 0.0f;
         }
         if (gFancy_shadow) {
-            gShadow_dim_amount = ((2.2 - highest_underneath) * 5.0 / 2.2 + 2.5);
+            gShadow_dim_amount = ((2.2 - height) * 5.0 / 2.2 + 2.5);
             for (i = 0; i < gSaved_table_count; i++) {
                 gSaved_shade_tables[i].original->height = 1;
                 gSaved_shade_tables[i].original->pixels = (tU8*)gDepth_shade_table->pixels + gShadow_dim_amount * gDepth_shade_table->row_bytes;
@@ -1697,26 +1689,30 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
                 BrTableUpdate(gSaved_shade_tables[i].original, BR_TABU_ALL);
             }
         }
-        shadow_scaling_factor = (2.2 - highest_underneath) * 0.52 / 2.2 + 0.4;
+        shadow_scaling_factor = (2.2 - height) * 0.52 / 2.2 + 0.4;
         for (i = 0; i < gShadow_clip_plane_count; i++) {
             clip_normal = (br_vector4*)gShadow_clip_planes[i].clip->type_data;
-            distance = DistanceFromPlane(&pCar->car_master_actor->t.t.euler.t, clip_normal->v[0], clip_normal->v[1], clip_normal->v[2], clip_normal->v[3]);
-            gShadow_clip_planes[i].clip->t.t.mat.m[3][0] = (1.0 - shadow_scaling_factor) * distance * clip_normal->v[0];
-            gShadow_clip_planes[i].clip->t.t.mat.m[3][1] = (1.0 - shadow_scaling_factor) * distance * clip_normal->v[1];
-            gShadow_clip_planes[i].clip->t.t.mat.m[3][2] = (1.0 - shadow_scaling_factor) * distance * clip_normal->v[2];
+            distance = DistanceFromPlane(&pCar->car_master_actor->t.t.euler.t,
+                ((br_vector4*)gShadow_clip_planes[i].clip->type_data)->v[0],
+                ((br_vector4*)gShadow_clip_planes[i].clip->type_data)->v[1],
+                ((br_vector4*)gShadow_clip_planes[i].clip->type_data)->v[2],
+                ((br_vector4*)gShadow_clip_planes[i].clip->type_data)->v[3]);
+            gShadow_clip_planes[i].clip->t.t.mat.m[3][0] = clip_normal->v[0] * ((1.0 - shadow_scaling_factor) * distance);
+            gShadow_clip_planes[i].clip->t.t.mat.m[3][1] = clip_normal->v[1] * ((1.0 - shadow_scaling_factor) * distance);
+            gShadow_clip_planes[i].clip->t.t.mat.m[3][2] = clip_normal->v[2] * ((1.0 - shadow_scaling_factor) * distance);
         }
 
         camera_ptr = (br_camera*)gCamera->type_data;
         DRMatrix34TApplyP(&pos_cam_space, &pCar->car_master_actor->t.t.euler.t, &gCamera_to_world);
-        if (pos_cam_space.v[2] >= 36.0 || pos_cam_space.v[2] >= camera_ptr->yon_z) {
-            camera_hither_fudge = 0.0;
-        } else {
-            camera_angle_additional_fudge = sqr(camera_ptr->yon_z - camera_ptr->hither_z);
-            camera_hither_fudge = camera_angle_additional_fudge * (pos_cam_space.v[2] * 1.0) / ((pos_cam_space.v[2] - camera_ptr->yon_z) * camera_ptr->yon_z * 65536.0);
-            if (camera_hither_fudge < 0.0002) {
-                camera_hither_fudge = 0.0002;
+        if (pos_cam_space.v[2] < 36.0f && pos_cam_space.v[2] < camera_ptr->yon_z) {
+            camera_hither_fudge = pos_cam_space.v[2] * gShadow_hither_z_move * sqr(camera_ptr->yon_z - camera_ptr->hither_z)
+                / ((pos_cam_space.v[2] - camera_ptr->yon_z) * camera_ptr->yon_z * 65536.0f);
+            if ((&camera_hither_fudge)[0] < gShadow_hither_min_move) {
+                camera_hither_fudge = gShadow_hither_min_move;
             }
             camera_ptr->hither_z += camera_hither_fudge;
+        } else {
+            camera_hither_fudge = 0.0f;
         }
         if (f_num) {
 #ifdef DETHRACE_3DFX_PATCH
@@ -1736,7 +1732,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
             BrModelRemove(gShadow_model);
             if (pCar->shadow_intersection_flags) {
                 oily_count = GetOilSpillCount();
-                for (i = 0; i < oily_count; ++i) {
+                for (i = 0; i < oily_count; i++) {
                     if (((1 << i) & pCar->shadow_intersection_flags) != 0) {
                         GetOilSpillDetails(i, &oily_actor, &oily_size);
                         if (oily_actor) {
@@ -1751,7 +1747,7 @@ void ProcessShadow(tCar_spec* pCar, br_actor* pWorld, tTrack_spec* pTrack_spec, 
         camera_ptr->hither_z -= camera_hither_fudge;
         for (i = 0; i < f_num; i++) {
             if (gFancy_shadow) {
-                material = gShadow_model->faces[i].material;
+                material = gShadow_model[0].faces[i].material;
                 if (material) {
 #ifdef DETHRACE_3DFX_PATCH
                     if (gShade_tables_do_not_work) {
@@ -1785,7 +1781,10 @@ void RenderShadows(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera
     br_scalar distance_factor;
 
     if (gShadow_level != eShadow_none) {
-        for (cat = eVehicle_self; cat <= (gShadow_level == eShadow_everyone ? 4 : gShadow_level == eShadow_us_and_opponents ? 3 : 0); ++cat) {
+        for (cat = eVehicle_self; cat <= (gShadow_level == eShadow_everyone           ? 4
+                                          : gShadow_level == eShadow_us_and_opponents ? 3
+                                                                                      : 0);
+            ++cat) {
             if (cat == eVehicle_self) {
                 car_count = 1;
             } else {
@@ -1901,10 +1900,10 @@ void RenderAFrame(int pDepth_mask_on) {
     int x_shift;
     int y_shift;
     int cockpit_on;
-    int real_origin_x = 0;
-    int real_origin_y = 0;
-    int real_base_x = 0;
-    int real_base_y = 0;
+    int real_origin_x;
+    int real_origin_y;
+    int real_base_x;
+    int real_base_y;
     int map_timer_x;
     int map_timer_width;
     int ped_type;
@@ -1917,10 +1916,19 @@ void RenderAFrame(int pDepth_mask_on) {
     char the_text[256];
     tCar_spec* car;
 
+#ifdef DETHRACE_FIX_BUGS
+    real_origin_x = 0;
+    real_origin_y = 0;
+    real_base_x = 0;
+    real_base_y = 0;
+#endif
+
 #ifdef DETHRACE_3DFX_PATCH
     if (gVoodoo_rush_mode >= 1) {
         gRender_screen->pixels = gBack_screen->pixels;
     }
+#else
+    gRender_screen->pixels = gBack_screen->pixels;
 #endif
 
     the_time = GetTotalTime();
@@ -1968,8 +1976,8 @@ void RenderAFrame(int pDepth_mask_on) {
             gBack_screen,
             gMap_render_x_i - gCurrent_graf_data->map_render_x_marg,
             gMap_render_y_i - gCurrent_graf_data->map_render_y_marg,
-            gMap_render_x_i + gMap_render_width_i + gCurrent_graf_data->map_render_x_marg,
-            gMap_render_y_i + gMap_render_height_i + gCurrent_graf_data->map_render_y_marg,
+            (gCurrent_graf_data->map_render_x_marg + gMap_render_width_i) + gMap_render_x_i,
+            (gCurrent_graf_data->map_render_y_marg + gMap_render_height_i) + gMap_render_y_i,
             1);
     }
     if (!gAction_replay_mode) {
@@ -1978,7 +1986,7 @@ void RenderAFrame(int pDepth_mask_on) {
     if (cockpit_on) {
         if (-gScreen_wobble_x > gX_offset) {
             x_shift = -gX_offset;
-        } else if (gScreen_wobble_x + gX_offset + gRender_screen->width > gBack_screen->width) {
+        } else if (DR_FF(gRender_screen->width + gX_offset) + gScreen_wobble_x > gBack_screen->width) {
             x_shift = gBack_screen->width - gRender_screen->width - gX_offset;
         } else {
             x_shift = gScreen_wobble_x;
@@ -1994,16 +2002,16 @@ void RenderAFrame(int pDepth_mask_on) {
         x_shift = 0;
         y_shift = 0;
     }
-    BrMatrix34Copy(&old_camera_matrix, &gCamera->t.t.mat);
+    old_camera_matrix = gCamera->t.t.mat;
     if (gMirror_on__graphics) {
-        BrMatrix34Copy(&old_mirror_cam_matrix, &gRearview_camera->t.t.mat);
+        old_mirror_cam_matrix = gRearview_camera->t.t.mat;
     }
     if (cockpit_on) {
         gSheer_mat.m[2][1] = y_shift / (float)gRender_screen->height;
         gSheer_mat.m[2][0] = -x_shift / (float)gRender_screen->width;
         BrMatrix34Pre(&gCamera->t.t.mat, &gSheer_mat);
-        gCamera->t.t.translate.t.v[0] -= gScreen_wobble_x * 1.5f / gRender_screen->width / WORLD_SCALE;
-        gCamera->t.t.translate.t.v[1] += gScreen_wobble_y * 1.5f / gRender_screen->width / WORLD_SCALE;
+        gCamera->t.t.translate.t.v[0] -= gScreen_wobble_x * 1.5f / (float)gRender_screen->width / WORLD_SCALE;
+        gCamera->t.t.translate.t.v[1] += gScreen_wobble_y * 1.5f / (float)gRender_screen->width / WORLD_SCALE;
     }
     gRender_screen->pixels = (char*)gRender_screen->pixels + x_shift + y_shift * gRender_screen->row_bytes;
     CalculateConcussion(the_time);
@@ -2047,7 +2055,11 @@ void RenderAFrame(int pDepth_mask_on) {
     if (!ConditionallyFillWithSky(gRender_screen)
 #endif
         && !gProgram_state.cockpit_on
-        && !(gAction_replay_camera_mode && gAction_replay_mode)) {
+#ifdef DETHRACE_FIX_BUGS
+        && !(gAction_replay_mode && gAction_replay_camera_mode)) {
+#else
+        && !(gAction_replay_mode * gAction_replay_camera_mode)) {
+#endif
 #ifdef DETHRACE_3DFX_PATCH
         if (!gBlitting_is_slow)
 #endif
@@ -2088,7 +2100,7 @@ void RenderAFrame(int pDepth_mask_on) {
     PDLockRealBackScreen(1);
 #endif
 
-    BrMatrix34Copy(&gCamera->t.t.mat, &old_camera_matrix);
+    gCamera->t.t.mat = old_camera_matrix;
 #ifdef DETHRACE_3DFX_PATCH
     if (cockpit_on) {
         PDUnlockRealBackScreen(1);
@@ -2158,10 +2170,48 @@ void RenderAFrame(int pDepth_mask_on) {
 #ifdef DETHRACE_3DFX_PATCH
         PDLockRealBackScreen(1);
 #endif
-        BrMatrix34Copy(&gRearview_camera->t.t.mat, &old_mirror_cam_matrix);
+        gRearview_camera->t.t.mat = old_mirror_cam_matrix;
         gRendering_mirror = 0;
     }
-    if (gMap_mode) {
+    if (!gMap_mode) {
+#if !defined(DETHRACE_3DFX_PATCH)
+        if (cockpit_on) {
+            CopyStripImage(
+                gBack_screen,
+                -gCurrent_graf_data->cock_margin_x,
+                gScreen_wobble_x,
+                -gCurrent_graf_data->cock_margin_y,
+                gScreen_wobble_y,
+                gProgram_state.current_car.cockpit_images[gProgram_state.cockpit_image_index],
+                0,
+                0,
+                gCurrent_graf_data->total_cock_width,
+                gCurrent_graf_data->total_cock_height);
+            if (gMirror_on__graphics) {
+                BrPixelmapRectangleCopy(
+                    gBack_screen,
+                    gScreen_wobble_x + gProgram_state.current_car.mirror_left,
+                    gScreen_wobble_y + gProgram_state.current_car.mirror_top,
+                    gRearview_screen,
+                    -gRearview_screen->origin_x,
+                    -gRearview_screen->origin_y,
+                    gProgram_state.current_car.mirror_right - gProgram_state.current_car.mirror_left,
+                    gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top);
+            }
+        }
+#endif
+        DimAFewBits();
+        DoDamageScreen(the_time);
+        if (!gAction_replay_mode || gAR_fudge_headups) {
+            DoPratcam(the_time);
+            DoHeadups(the_time);
+        }
+        DoInstruments(the_time);
+        DoSteeringWheel(the_time);
+        if (!gAction_replay_mode || gAR_fudge_headups) {
+            DrawPowerups(the_time);
+        }
+    } else {
         if (gNet_mode == eNet_mode_none) {
             GetTimerString(the_text, 0);
             map_timer_width = DRTextWidth(&gFonts[kFont_BLUEHEAD], the_text);
@@ -2215,86 +2265,39 @@ void RenderAFrame(int pDepth_mask_on) {
         } else {
             cat = eVehicle_self;
         }
-        while (cat >= eVehicle_self) {
-            if (cat) {
-                car_count = GetCarCount(cat);
-            } else {
+        for (; cat >= eVehicle_self; cat--) {
+            if (cat == eVehicle_self) {
                 car_count = 1;
+            } else {
+                car_count = GetCarCount(cat);
             }
             for (i = 0; i < car_count; i++) {
-                if (cat) {
-                    car = GetCarSpec(cat, i);
-                } else {
+                if (cat == eVehicle_self) {
                     car = &gProgram_state.current_car;
+                } else {
+                    car = GetCarSpec(cat, i);
                 }
                 if (gNet_mode == eNet_mode_none || (!car->knackered && !NetPlayerFromCar(car)->wasted)) {
-                    if (cat) {
-                        car_pos = &GetCarSpec(cat, i)->car_master_actor->t.t.euler.t;
-                    } else {
+                    if (cat == eVehicle_self) {
                         car_pos = &gSelf->t.t.euler.t;
-                    }
-                    if (gNet_mode) {
-                        DrawMapBlip(
-                            car,
-                            the_time,
-                            &car->car_master_actor->t.t.mat,
-                            car_pos,
-                            car->shrapnel_material[0]->index_range + car->shrapnel_material[0]->index_base - 1);
-                    } else if (car->knackered) {
-                        DrawMapBlip(car, the_time, &car->car_master_actor->t.t.mat, car_pos, 0);
                     } else {
-                        DrawMapBlip(car, the_time, &car->car_master_actor->t.t.mat, car_pos, gMap_colours[cat]);
+                        car_pos = &GetCarSpec(cat, i)->car_master_actor->t.t.euler.t;
                     }
+                    DrawMapBlip(
+                        car,
+                        the_time,
+                        &car->car_master_actor->t.t.mat,
+                        car_pos,
+                        gNet_mode
+                            ? car->shrapnel_material[0]->index_range + car->shrapnel_material[0]->index_base - 1
+                            : (car->knackered ? 0 : gMap_colours[cat]));
                 }
             }
-            cat--;
         }
         gBack_screen->origin_x = real_origin_x;
         gBack_screen->origin_y = real_origin_y;
         gBack_screen->base_x = real_base_x;
         gBack_screen->base_y = real_base_y;
-    } else {
-#if !defined(DETHRACE_3DFX_PATCH)
-        if (cockpit_on) {
-            CopyStripImage(
-                gBack_screen,
-                -gCurrent_graf_data->cock_margin_x,
-                gScreen_wobble_x,
-                -gCurrent_graf_data->cock_margin_y,
-                gScreen_wobble_y,
-                gProgram_state.current_car.cockpit_images[gProgram_state.cockpit_image_index],
-                0,
-                0,
-                gCurrent_graf_data->total_cock_width,
-                gCurrent_graf_data->total_cock_height);
-            if (gMirror_on__graphics) {
-                BrPixelmapRectangleCopy(
-                    gBack_screen,
-                    gScreen_wobble_x + gProgram_state.current_car.mirror_left,
-                    gScreen_wobble_y + gProgram_state.current_car.mirror_top,
-                    gRearview_screen,
-                    -gRearview_screen->origin_x,
-                    -gRearview_screen->origin_y,
-                    gProgram_state.current_car.mirror_right - gProgram_state.current_car.mirror_left,
-                    gProgram_state.current_car.mirror_bottom - gProgram_state.current_car.mirror_top);
-            }
-        }
-#endif
-        DimAFewBits();
-        DoDamageScreen(the_time);
-        if (!gAction_replay_mode || gAR_fudge_headups) {
-            // Added by dethrace
-            // Pratcam is drawn on top of the 2d cockpit, so we must ensure that all the 2d pixel
-            // writes have been flushed to the framebuffer first
-            BrPixelmapFlush(gBack_screen);
-            DoPratcam(the_time);
-            DoHeadups(the_time);
-        }
-        DoInstruments(the_time);
-        DoSteeringWheel(the_time);
-        if (!gAction_replay_mode || gAR_fudge_headups) {
-            DrawPowerups(the_time);
-        }
     }
     if (gNet_mode != eNet_mode_none) {
         DisplayUserMessage();
@@ -2691,7 +2694,9 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     int last_shear_x;
     int current_shear_x;
     int shear_x_difference;
+#ifdef DETHRACE_FIX_BUGS
     int pWidth_orig;
+#endif
     tU8 the_byte;
     tU8* source_ptr;
     tU8* dest_ptr;
@@ -2711,7 +2716,7 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
     source_row_wrap = pSource->row_bytes - pWidth;
     dest_row_wrap = pDest->row_bytes - pWidth;
     if (pDest_y < 0) {
-        pHeight += pDest_y;
+        pHeight = pHeight * 1 + pDest_y;
         if (pHeight <= 0) {
             return;
         }
@@ -2719,68 +2724,81 @@ void DRPixelmapRectangleShearedCopy(br_pixelmap* pDest, br_int_16 pDest_x, br_in
         dest_ptr -= pDest_y * pDest->row_bytes;
         pDest_y = 0;
     }
-    if (pDest->height > pDest_y) {
-        if (pDest_y + pHeight > pDest->height) {
-            pHeight = pDest->height - pDest_y;
+    if (pDest->height <= pDest_y) {
+        return;
+    }
+    if (pHeight * 1 + pDest_y > pDest->height) {
+        pHeight -= pHeight * 1 + pDest_y - pDest->height;
+    }
+    if (pDest_x < 0) {
+        pWidth = pWidth * 1 + pDest_x;
+        if (pWidth <= 0) {
+            return;
         }
-        if (pDest_x < 0) {
-            pWidth += pDest_x;
-            if (pWidth <= 0) {
-                return;
+        source_ptr -= pDest_x;
+        dest_ptr -= pDest_x;
+        source_row_wrap -= pDest_x;
+        dest_row_wrap -= pDest_x;
+        pDest_x = 0;
+    }
+    if (pDest->width <= pDest_x) {
+        return;
+    }
+#ifdef DETHRACE_FIX_BUGS
+    /*
+     * The OG compares against pWidth instead of pWidth_orig, which
+     * ends up clipped to the dest pixelmap width. This effectively
+     * clips the consecutive rows of pixels along the shear, leaving
+     * a visible gap on the screen. Instead, when comparing against
+     * pWidth_orig, the clip takes place vertically along the dest
+     * pixelmap edge, allowing all pixels to be displayed.
+     *
+     * Simulate OG behavior by overwriting pWidth_orig with pWidth.
+     */
+    pWidth_orig = pWidth;
+#endif
+    if (pWidth * 1 + pDest_x > pDest->width) {
+        x_delta = pWidth * 1 + pDest_x - pDest->width;
+        pWidth -= x_delta;
+        source_row_wrap += x_delta;
+        dest_row_wrap += x_delta;
+    }
+    for (y_count = 0; y_count < pHeight; y_count++) {
+        for (x_count = 0; x_count < pWidth; x_count++) {
+            the_byte = *source_ptr++;
+            if (the_byte) {
+                *dest_ptr++ = the_byte;
+            } else {
+                dest_ptr++;
             }
+        }
+        current_shear_x = current_shear >> 16;
+        shear_x_difference = current_shear_x - last_shear_x;
+        dest_ptr += shear_x_difference + dest_row_wrap;
+        last_shear_x = current_shear_x;
+        source_ptr += source_row_wrap;
+        current_shear += pShear;
+        pDest_x += shear_x_difference;
+        if (pDest_x < 0) {
+            pWidth = pWidth * 1 + pDest_x;
             source_ptr -= pDest_x;
             dest_ptr -= pDest_x;
             source_row_wrap -= pDest_x;
             dest_row_wrap -= pDest_x;
             pDest_x = 0;
         }
-        if (pDest->width > pDest_x) {
-            pWidth_orig = pWidth;
-            for (y_count = 0; pHeight > y_count; ++y_count) {
-#if !defined(DETHRACE_FIX_BUGS)
-                /*
-                 * The OG compares against pWidth instead of pWidth_orig, which
-                 * ends up clipped to the dest pixelmap width. This effectively
-                 * clips the consecutive rows of pixels along the shear, leaving
-                 * a visible gap on the screen. Instead, when comparing against
-                 * pWidth_orig, the clip takes place vertically along the dest
-                 * pixelmap edge, allowing all pixels to be displayed.
-                 *
-                 * Simulate OG behavior by overwriting pWidth_orig with pWidth.
-                 */
-                pWidth_orig = pWidth;
+        if (pDest->width <= pDest_x) {
+            break;
+        }
+#ifdef DETHRACE_FIX_BUGS
+        if (pWidth_orig * 1 + pDest_x > pDest->width) {
+#else
+        if (pWidth * 1 + pDest_x > pDest->width) {
 #endif
-                if (pDest_x + pWidth_orig > pDest->width) {
-                    shear_x_difference = pDest_x + pWidth - pDest->width;
-                    pWidth = pDest->width - pDest_x;
-                    source_row_wrap += shear_x_difference;
-                    dest_row_wrap += shear_x_difference;
-                }
-                for (x_count = 0; pWidth > x_count; ++x_count) {
-                    the_byte = *source_ptr++;
-                    if (the_byte) {
-                        *dest_ptr = the_byte;
-                    }
-                    ++dest_ptr;
-                }
-                current_shear_x = (current_shear >> 16) - last_shear_x;
-                dest_ptr += dest_row_wrap + current_shear_x;
-                last_shear_x = current_shear >> 16;
-                source_ptr += source_row_wrap;
-                current_shear += pShear;
-                pDest_x += current_shear_x;
-                if (pDest_x < 0) {
-                    pWidth += pDest_x;
-                    source_ptr -= pDest_x;
-                    dest_ptr -= pDest_x;
-                    source_row_wrap -= pDest_x;
-                    dest_row_wrap -= pDest_x;
-                    pDest_x = 0;
-                }
-                if (pDest->width <= pDest_x) {
-                    break;
-                }
-            }
+            x_delta = pWidth * 1 + pDest_x - pDest->width;
+            pWidth -= x_delta;
+            source_row_wrap += x_delta;
+            dest_row_wrap += x_delta;
         }
     }
 }
@@ -3579,14 +3597,15 @@ int SwitchToRealResolution(void) {
 // IDA: int __cdecl SwitchToLoresMode()
 // FUNCTION: CARM95 0x004ba5e7
 int SwitchToLoresMode(void) {
-    if (!gGraf_data_index || gGraf_data_index != gReal_graf_data_index) {
+    if (gGraf_data_index != 0 && gGraf_data_index == gReal_graf_data_index) {
+        gGraf_data_index = 0;
+        gGraf_spec_index = 0;
+        gCurrent_graf_data = &gGraf_data[gGraf_data_index];
+        PDSwitchToLoresMode();
+        return 1;
+    } else {
         return 0;
     }
-    gGraf_data_index = 0;
-    gGraf_spec_index = 0;
-    gCurrent_graf_data = gGraf_data;
-    PDSwitchToLoresMode();
-    return 1;
 }
 
 // IDA: void __usercall DRPixelmapDoubledCopy(br_pixelmap *pDestn@<EAX>, br_pixelmap *pSource@<EDX>, int pSource_width@<EBX>, int pSource_height@<ECX>, int pX_offset, int pY_offset)
