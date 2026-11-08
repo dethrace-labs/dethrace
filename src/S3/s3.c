@@ -197,6 +197,7 @@ void S3CloseDevices(void) {
     AudioBackend_UnInitCDA();
 }
 
+// FUNCTION: CARM95 0x004994b7
 int S3ReleaseSound(tS3_sound_id id) {
     tS3_channel* c;       // [esp+Ch] [ebp-10h]
     tS3_outlet* o;        // [esp+10h] [ebp-Ch]
@@ -1212,6 +1213,23 @@ int S3StopSound(tS3_sound_tag pTag) {
     }
     chan->repetitions = 1;
     return 0;
+}
+
+// FUNCTION: CARM95 0x0049C6E2
+int S3OutletSoundsPlaying(tS3_outlet* pOutlet) {
+    int sound_count;
+    tS3_channel* c;
+
+    sound_count = 0;
+    if (!gS3_enabled) {
+        return 0;
+    }
+    for (c = pOutlet->channel_list; c != NULL; c = c->next) {
+        if (c->active) {
+            sound_count++;
+        }
+    }
+    return sound_count;
 }
 
 // FUNCTION: CARM95 0x0049C748
