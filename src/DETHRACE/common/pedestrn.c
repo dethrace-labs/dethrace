@@ -1692,7 +1692,7 @@ int BloodyWheels(tCar_spec* pCar, br_vector3* pPed_car, br_scalar pSize, br_vect
             if (dist_sqr < size_sqr) {
                 pCar->blood_remaining[wheel] = SRandomBetween(2.0f, 8.0f) * pSize;
 >>>>>>> main
-                pCar->special_start[wheel] = *pPed_glob;
+                BrVector3Copy(&pCar->special_start[wheel], pPed_glob);
                 squish = 1;
             }
         }
