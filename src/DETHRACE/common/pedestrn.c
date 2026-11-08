@@ -959,7 +959,7 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
         if (heading_difference <= the_action->sequences[i].max_bearing) {
             the_sequence = the_action->sequences[i].sequence_index;
             if (pPedestrian->current_sequence != the_sequence) {
-                sequence_ptr = &pPedestrian->sequences[the_sequence];
+                sequence_ptr = &((tPedestrian_sequence*)DR_FF_PTR(pPedestrian->sequences))[the_sequence];
                 current_looping = pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start;
                 if (pAction_changed || current_looping > pPedestrian->current_frame) {
                     pPedestrian->current_frame = -1;
