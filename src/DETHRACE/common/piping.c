@@ -177,6 +177,55 @@ tU32 gLocal_buffer_size;
 
 #define SHOULD_SCAN_FORWARDS() gPipe_play_ptr == gPipe_record_ptr ? 0 : gPipe_play_ptr == gPipe_buffer_oldest ? 1 \
                                                                                                               : (GetReplayRate() != 0.0f ? GetReplayRate() > 0.0f : GetReplayDirection() > 0)
+#ifdef DETHRACE_FIX_BUGS
+#define PIPING_REQUIRE(V) do { if (!(V)) { dr_dprintf("Piping require failed: %s (%s:%d)", #V, __FILE__, __LINE__); assert(V); FatalError(kFatalError_PipingSystem); } } while (0)
+
+static const char *get_pipe_chunk_type_name(tPipe_chunk_type type)
+{
+    switch (type) {
+#define CASE_RET_STR(V) case V: return #V;
+        CASE_RET_STR(ePipe_chunk_actor_rstyle);
+        CASE_RET_STR(ePipe_chunk_actor_translate);
+        CASE_RET_STR(ePipe_chunk_actor_transform);
+        CASE_RET_STR(ePipe_chunk_actor_create);
+        CASE_RET_STR(ePipe_chunk_actor_destroy);
+        CASE_RET_STR(ePipe_chunk_actor_relink);
+        CASE_RET_STR(ePipe_chunk_actor_material);
+        CASE_RET_STR(ePipe_chunk_face_material);
+        CASE_RET_STR(ePipe_chunk_material_trans);
+        CASE_RET_STR(ePipe_chunk_material_pixelmap);
+        CASE_RET_STR(ePipe_chunk_model_geometry);
+        CASE_RET_STR(ePipe_chunk_pedestrian);
+        CASE_RET_STR(ePipe_chunk_frame_boundary);
+        CASE_RET_STR(ePipe_chunk_car);
+        CASE_RET_STR(ePipe_chunk_sound);
+        CASE_RET_STR(ePipe_chunk_damage);
+        CASE_RET_STR(ePipe_chunk_special);
+        CASE_RET_STR(ePipe_chunk_ped_gib);
+        CASE_RET_STR(ePipe_chunk_incident);
+        CASE_RET_STR(ePipe_chunk_spark);
+        CASE_RET_STR(ePipe_chunk_shrapnel);
+        CASE_RET_STR(ePipe_chunk_screen_shake);
+        CASE_RET_STR(ePipe_chunk_groove_stop);
+        CASE_RET_STR(ePipe_chunk_non_car);
+        CASE_RET_STR(ePipe_chunk_smoke);
+        CASE_RET_STR(ePipe_chunk_oil_spill);
+        CASE_RET_STR(ePipe_chunk_smoke_column);
+        CASE_RET_STR(ePipe_chunk_flame);
+        CASE_RET_STR(ePipe_chunk_smudge);
+        CASE_RET_STR(ePipe_chunk_splash);
+        CASE_RET_STR(ePipe_chunk_prox_ray);
+        CASE_RET_STR(ePipe_chunk_skid_adjustment);
+        CASE_RET_STR(ePipe_chunk_enum_count);
+#undef CASE_RET_STR
+    default:
+        return "unknown";
+    }
+}
+
+#else
+#define PIPING_REQUIRE(V)
+#endif
 
 // IDA: void __usercall GetReducedPos(br_vector3 *v@<EAX>, tReduced_pos *p@<EDX>)
 // FUNCTION: CARM95 0x00427ed0
@@ -399,6 +448,7 @@ void StartPipingSession2(tPipe_chunk_type pThe_type, int pMunge_reentrancy) {
         ((tPipe_session*)gLocal_buffer)->pipe_magic1 = REPLAY_DEBUG_SESSION_MAGIC1;
 #endif
         gLocal_buffer_size = (tU8*)&((tPipe_session*)gLocal_buffer)->chunks - gLocal_buffer;
+        PIPING_REQUIRE(gLocal_buffer_size <= LOCAL_BUFFER_SIZE);
         gMr_chunky2 = (tPipe_chunk*)(gLocal_buffer + gLocal_buffer_size);
     }
 }
@@ -424,6 +474,7 @@ void EndPipingSession2(int pMunge_reentrancy) {
         gLocal_buffer_size = PIPE_ALIGN(gLocal_buffer_size);
         *(tU16*)&gLocal_buffer[gLocal_buffer_size - sizeof(tU16)] = gLocal_buffer_size - sizeof(tU16);
 #endif
+        PIPING_REQUIRE(gLocal_buffer_size <= LOCAL_BUFFER_SIZE);
         if (((tPipe_session*)gLocal_buffer)->number_of_chunks != 0 && gLocal_buffer_size <= LOCAL_BUFFER_SIZE) {
             if (gPipe_buffer_phys_end < gPipe_record_ptr + gLocal_buffer_size) {
                 // Put session at begin of pipe, as no place at end
@@ -479,16 +530,34 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
     if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
         temp_buffer_size = pData_length + (gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data));
         if (temp_buffer_size < LOCAL_BUFFER_SIZE) {
+#ifdef DETHRACE_FIX_BUGS
+            int amount = ((tPipe_session*)gLocal_buffer)->number_of_chunks;
+            if (255 - amount < 3) {
+                LOG_WARN("Piping session has only %d remaining chunks, type=%s (%d)", 255 - amount, get_pipe_chunk_type_name(((tPipe_session*)gLocal_buffer)->chunk_type), ((tPipe_session*)gLocal_buffer)->chunk_type);
+            }
+#endif
             REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
             ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
+            PIPING_REQUIRE(((tPipe_session*)gLocal_buffer)->number_of_chunks != 0);
+#ifdef DETHRACE_FIX_BUGS
+            // Avoid unaligned access of gMr_chunky2
+            tChunk_subject_index tmp_subject_index = pSubject_index;
+            memcpy((tU8*)gMr_chunky2 + offsetof(tPipe_chunk, subject_index), &tmp_subject_index, sizeof(tmp_subject_index));
+#else
             gMr_chunky2->subject_index = pSubject_index;
+#endif
 #if defined(DETHRACE_REPLAY_DEBUG)
             gMr_chunky2->chunk_magic1 = REPLAY_DEBUG_CHUNK_MAGIC1;
 #endif
+#ifdef DETHRACE_FIX_BUGS
+            gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + offsetof(tPipe_chunk, chunk_data));
+#else
             gMr_chunky2 = (tPipe_chunk*)&gMr_chunky2->chunk_data;
+#endif
             memcpy(gMr_chunky2, pData, pData_length);
             gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + pData_length);
             gLocal_buffer_size = temp_buffer_size;
+            PIPING_REQUIRE(gLocal_buffer_size <= LOCAL_BUFFER_SIZE);
         } else {
             variable_for_breaking_on = 1;
         }
@@ -715,7 +784,12 @@ void AddSoundToPipingSession(tS3_outlet_ptr pOutlet, int pSound_index, tS3_volum
     } else {
         BrVector3Set(&data.position, 0.f, 0.f, 0.f);
     }
+#ifdef DETHRACE_FIX_BUGS
+    // Fixes ubsan runtime error: shifting negative number is UB
+    data.volume = ((unsigned)pR_volume << 8) + (unsigned)pL_volume;
+#else
     data.volume = (pR_volume << 8) + pL_volume;
+#endif
     data.outlet_index = GetIndexFromOutlet(pOutlet);
     AddDataToSession(pSound_index, &data, sizeof(tPipe_sound_data));
 }
@@ -2097,6 +2171,10 @@ int UndoPipedSession(tU8** pPtr) {
     chunk_type = ((tPipe_session*)*pPtr)->chunk_type;
     for (i = 0; i < ((tPipe_session*)*pPtr)->number_of_chunks; i++) {
         pushed_end_of_session = gEnd_of_session;
+#ifdef DETHRACE_FIX_BUGS
+        // Fix -Wmaybe-uninitialized warning
+        prev_chunk = NULL;
+#endif
         if (!(chunk_type == ePipe_chunk_model_geometry || chunk_type == ePipe_chunk_sound || chunk_type == ePipe_chunk_damage || chunk_type == ePipe_chunk_special || chunk_type == ePipe_chunk_incident || chunk_type == ePipe_chunk_prox_ray || chunk_type == ePipe_chunk_smudge)) {
             prev_chunk = FindPreviousChunk(*pPtr, ((tPipe_session*)*pPtr)->chunk_type, chunk_ptr->subject_index);
         }

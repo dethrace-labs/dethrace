@@ -139,8 +139,6 @@ void StripBlendedFaces(br_actor* pActor, br_model* pModel) {
             memcpy(&gMr_blendy->model->faces[gMr_blendy->model->nfaces], face, sizeof(br_face));
             gMr_blendy->model->nfaces++;
             if (i < (pModel->nfaces - 1)) {
-                // this is a memcpy call in the original code. Cannot figure out how to make it not be replaced with
-                // intrinsic memcpy
                 memmove(pModel->faces + i, pModel->faces + i + 1, (pModel->nfaces - i - 1) * sizeof(br_face));
             }
             pModel->nfaces--;
@@ -169,17 +167,17 @@ br_uintptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
 
     if (pActor->identifier != NULL && pActor->identifier[0] == '&' && pActor->identifier[1] >= '0' && pActor->identifier[1] <= '9') {
 
-        i = (pActor->identifier[5] - '0') * 100
+        i = ((pActor->identifier[5] - '0') << 2) * 25
             + (pActor->identifier[6] - '0') * 10
-            + pActor->identifier[7] - '0'
-            + (pActor->identifier[4] - '0') * 1000;
+            + (pActor->identifier[7] - '0')
+            + (pActor->identifier[4] - '0') * 1000u;
 
         if (i < 0 || pTrack_spec->ampersand_digits <= i) {
             return 1;
         }
-        r1 = BR_SQR3(pActor->t.t.mat.m[0][2], pActor->t.t.mat.m[0][1], pActor->t.t.mat.m[0][0]);
-        r2 = BR_SQR3(pActor->t.t.mat.m[1][2], pActor->t.t.mat.m[1][0], pActor->t.t.mat.m[1][1]);
-        r3 = BR_SQR3(pActor->t.t.mat.m[2][2], pActor->t.t.mat.m[2][0], pActor->t.t.mat.m[2][1]);
+        r1 = BrVector3LengthSquared((br_vector3*)pActor->t.t.mat.m[0]);
+        r2 = BrVector3LengthSquared((br_vector3*)pActor->t.t.mat.m[1]);
+        r3 = BrVector3LengthSquared((br_vector3*)pActor->t.t.mat.m[2]);
         if (r1 < .999 || r2 < .999 || r3 < .999) {
             dr_dprintf("non car was scaled down %s", pActor->identifier);
             pActor->t.t.translate.t.v[0] += 2000.f;
@@ -206,8 +204,8 @@ br_uintptr_t FindNonCarsCB(br_actor* pActor, tTrack_spec* pTrack_spec) {
         if (pActor->model != NULL && !gAusterity_mode && pActor->identifier != NULL && pActor->identifier[0] != '&') {
             StripBlendedFaces(pActor, pActor->model);
         }
-        return BrActorEnum(pActor, (br_actor_enum_cbfn*)FindNonCarsCB, pTrack_spec);
     }
+    return BrActorEnum(pActor, (br_actor_enum_cbfn*)FindNonCarsCB, pTrack_spec);
 }
 
 // IDA: br_uint_32 __cdecl ProcessModelsCB(br_actor *pActor, tTrack_spec *pTrack_spec)
@@ -450,64 +448,61 @@ void RenderTrack(br_actor* pWorld, tTrack_spec* pTrack_spec, br_actor* pCamera, 
             min_z = column_z;
             max_z = column_z;
             tan_fov_ish = BR_DIV(BR_SIN(camera->field_of_view / 2), BR_COS(camera->field_of_view / 2));
-
-            edge_after.v[0] = tan_fov_ish * camera->aspect;
+            edge_after.v[0] = BR_MUL(camera->aspect, tan_fov_ish);
             edge_after.v[1] = tan_fov_ish;
             edge_after.v[2] = -1.0;
-            edge_before.v[0] = edge_after.v[0] * camera->yon_z * gYon_factor;
-            edge_before.v[1] = camera->yon_z * gYon_factor * tan_fov_ish;
-            edge_before.v[2] = camera->yon_z * gYon_factor * edge_after.v[2];
+            edge_before.v[0] = edge_after.v[0] * (camera->yon_z * gYon_factor);
+            edge_before.v[1] = edge_after.v[1] * (camera->yon_z * gYon_factor);
+            edge_before.v[2] = edge_after.v[2] * (camera->yon_z * gYon_factor);
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x < min_x) {
+            if (min_x > 0 + column_x) {
                 min_x = column_x;
-            } else if (column_x > max_x) {
+            } else if (max_x < 0 + column_x) {
                 max_x = column_x;
             }
-            if (column_z < min_z) {
+            if (min_z > 0 + column_z) {
                 min_z = column_z;
-            } else if (column_z > max_z) {
+            } else if (max_z < 0 + column_z) {
                 max_z = column_z;
             }
             edge_before.v[0] = -edge_before.v[0];
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x < min_x) {
+            if (min_x > 0 + column_x) {
                 min_x = column_x;
-            } else if (column_x > max_x) {
+            } else if (max_x < 0 + column_x) {
                 max_x = column_x;
             }
-            if (column_z < min_z) {
+            if (min_z > 0 + column_z) {
                 min_z = column_z;
-            } else {
-                if (column_z > max_z) {
-                    max_z = column_z;
-                }
+            } else if (max_z < 0 + column_z) {
+                max_z = column_z;
             }
             edge_before.v[1] = -edge_before.v[1];
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x < min_x) {
+            if (min_x > 0 + column_x) {
                 min_x = column_x;
-            } else if (column_x > max_x) {
+            } else if (max_x < 0 + column_x) {
                 max_x = column_x;
             }
-            if (column_z < min_z) {
+            if (min_z > 0 + column_z) {
                 min_z = column_z;
-            } else if (column_z > max_z) {
+            } else if (max_z < 0 + column_z) {
                 max_z = column_z;
             }
             edge_before.v[0] = -edge_before.v[0];
             BrMatrix34ApplyV(&edge_after, &edge_before, pCamera_to_world);
             XZToColumnXZ(&column_x, &column_z, pCamera_to_world->m[3][0] + edge_after.v[0], pCamera_to_world->m[3][2] + edge_after.v[2], pTrack_spec);
-            if (column_x < min_x) {
+            if (min_x > 0 + column_x) {
                 min_x = column_x;
-            } else if (column_x > max_x) {
+            } else if (max_x < 0 + column_x) {
                 max_x = column_x;
             }
-            if (column_z < min_z) {
+            if (min_z > 0 + column_z) {
                 min_z = column_z;
-            } else if (column_z > max_z) {
+            } else if (max_z < 0 + column_z) {
                 max_z = column_z;
             }
             if (min_x > 0) {

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 // GLOBAL: CARM95 0x00520038
-br_scalar gYon_factor;
+br_scalar gYon_factor = 0.25f;
 
 // GLOBAL: CARM95 0x00530c80
 br_material* gMaterial[2];

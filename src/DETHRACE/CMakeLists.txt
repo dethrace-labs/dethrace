@@ -1,9 +1,38 @@
-# Create object files so we can link them into the main binary and into tests without building twice.
-add_library(dethrace_obj OBJECT)
-
 option(DETHRACE_REPLAY_DEBUG "Debug replay" OFF)
 
-target_include_directories(dethrace_obj
+# Create our main game binary.
+if(MSVC_42_FOR_RECCMP)
+    add_executable(dethrace WIN32)
+
+    set(CMAKE_C_FLAGS_DEBUG "/Oi /Zi /MLd /G5 /w")
+
+    add_compile_definitions(_DEBUG)
+    set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
+    target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
+    target_link_libraries(dethrace PRIVATE ws2_32)
+
+    file(GLOB DETHRACE_COMMON_C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/common/*.c")
+    set_source_files_properties(${DETHRACE_COMMON_C_FILES} PROPERTIES COMPILE_FLAGS "/FAs")
+
+    reccmp_add_target(dethrace ID CARM95)
+    reccmp_configure()
+else()
+    add_executable(dethrace
+        WIN32
+        ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
+        ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
+    )
+    get_property(build_rpaths GLOBAL PROPERTY DETHRACE_BUILD_RPATHS)
+    set_property(TARGET dethrace APPEND PROPERTY BUILD_RPATH "${build_rpaths}")
+
+    if(MSVC)
+        target_link_libraries(dethrace PRIVATE dbghelp)
+        target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
+        target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
+    endif()
+endif()
+
+target_include_directories(dethrace
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     common
@@ -11,26 +40,27 @@ target_include_directories(dethrace_obj
 )
 
 if(DETHRACE_ASAN)
-    target_compile_options(dethrace_obj PUBLIC -fsanitize=address)
-    target_link_options(dethrace_obj PUBLIC -fsanitize=address)
+    target_compile_options(dethrace PUBLIC -fsanitize=address)
+    target_link_options(dethrace PUBLIC -fsanitize=address)
 endif()
 
-target_link_libraries(dethrace_obj PUBLIC smackw32 harness BRender::Full BRender::DDI s3)
+target_link_libraries(dethrace PRIVATE smackw32 harness BRender::Full BRender::DDI s3 compile_with_werror)
 
 if(MSVC_42_FOR_RECCMP)
 # do nothing
 elseif(MSVC)
-    target_compile_definitions(dethrace_obj PRIVATE -D_CRT_SECURE_NO_WARNINGS)
-    target_compile_options(dethrace_obj PRIVATE
+    target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS)
+    target_compile_options(dethrace PRIVATE
         /wd4101
         /wd4996
     )
 else()
-    target_compile_options(dethrace_obj PRIVATE
-        -Wall
+    target_compile_options(dethrace PRIVATE
+        $<$<COMPILE_LANGUAGE:C,CXX>:-Wall>
     )
-    add_compile_flags_if_supported(dethrace_obj
+    add_compile_flags_if_supported(dethrace
         -Wformat
+        -Wno-format-overflow
         -Wno-unused-but-set-variable
         -Wno-unused-variable
         -Wno-unused-result
@@ -39,31 +69,31 @@ else()
     )
 endif()
 
-target_compile_definitions(dethrace_obj PRIVATE INSIDE_DETHRACE)
+target_compile_definitions(dethrace PRIVATE INSIDE_DETHRACE)
 
 if(DETHRACE_FIX_BUGS)
-    target_compile_definitions(dethrace_obj PRIVATE DETHRACE_FIX_BUGS)
+    target_compile_definitions(dethrace PRIVATE DETHRACE_FIX_BUGS)
 endif()
 
 if(DETHRACE_3DFX_PATCH)
-    target_compile_definitions(dethrace_obj PRIVATE DETHRACE_3DFX_PATCH)
+    target_compile_definitions(dethrace PRIVATE DETHRACE_3DFX_PATCH)
 endif()
 
 if(IS_BIGENDIAN)
-    target_compile_definitions(dethrace_obj PRIVATE BR_ENDIAN_BIG=1)
+    target_compile_definitions(dethrace PRIVATE BR_ENDIAN_BIG=1)
 else()
-    target_compile_definitions(dethrace_obj PRIVATE BR_ENDIAN_LITTLE=1)
+    target_compile_definitions(dethrace PRIVATE BR_ENDIAN_LITTLE=1)
 endif()
 
 if(DETHRACE_REPLAY_DEBUG)
-    target_compile_definitions(dethrace_obj PRIVATE DETHRACE_REPLAY_DEBUG)
+    target_compile_definitions(dethrace PRIVATE DETHRACE_REPLAY_DEBUG)
 endif()
 
 if(MINGW)
-    target_compile_options(dethrace_obj PRIVATE -Wno-error=incompatible-pointer-types)
+    target_compile_options(dethrace PRIVATE -Wno-error=incompatible-pointer-types)
 endif()
 
-target_sources(dethrace_obj PRIVATE
+target_sources(dethrace PRIVATE
     common/skidmark.c
     common/opponent.c
     common/oil.c
@@ -177,45 +207,11 @@ target_sources(dethrace_obj PRIVATE
 )
 
 if(MSVC_42_FOR_RECCMP)
-    target_sources(dethrace_obj PRIVATE pc-win95/win95net.c)
+    target_sources(dethrace PRIVATE pc-win95/win95net.c)
 else()
     # dethrace-added cross platform sys and network implementation
-    target_sources(dethrace_obj PRIVATE pc-all/allnet.c)
+    target_sources(dethrace PRIVATE pc-all/allnet.c)
 endif()
-
-# Create our main game binary.
-if(MSVC_42_FOR_RECCMP)
-    add_executable(dethrace WIN32)
-
-    set(CMAKE_C_FLAGS_DEBUG "/Oi /Zi /MLd /G5")
-
-    add_compile_definitions(_DEBUG)
-    set_target_properties(dethrace PROPERTIES OUTPUT_NAME "CARM95")
-    target_link_options(dethrace PRIVATE /INCREMENTAL:NO /subsystem:windows /ENTRY:mainCRTStartup)
-    target_link_libraries(dethrace PRIVATE ws2_32)
-
-    file(GLOB DETHRACE_COMMON_C_FILES "${CMAKE_CURRENT_SOURCE_DIR}/common/*.c")
-    set_source_files_properties(${DETHRACE_COMMON_C_FILES} PROPERTIES COMPILE_FLAGS "/FA")
-
-    reccmp_add_target(dethrace ID CARM95)
-    reccmp_configure()
-else()
-    add_executable(dethrace
-        WIN32
-        ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
-        ${CMAKE_SOURCE_DIR}/packaging/windows/dethrace.rc
-    )
-    get_property(build_rpaths GLOBAL PROPERTY DETHRACE_BUILD_RPATHS)
-    set_property(TARGET dethrace APPEND PROPERTY BUILD_RPATH "${build_rpaths}")
-
-    if(MSVC)
-        target_link_libraries(dethrace PRIVATE dbghelp)
-        target_link_options(dethrace PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
-        target_compile_definitions(dethrace PRIVATE -D_CRT_SECURE_NO_WARNINGS -DSDL_MAIN_HANDLED -DWIN32_LEAN_AND_MEAN)
-    endif()
-endif()
-
-target_link_libraries(dethrace PRIVATE dethrace_obj compile_with_werror)
 target_sources(dethrace PRIVATE main.c)
 
 if(DETHRACE_IDE_ROOT_DIR)
@@ -234,11 +230,14 @@ if(DETHRACE_IDE_ARGUMENTS)
 endif()
 
 if(DETHRACE_INSTALL)
-    install(TARGETS dethrace
-        BUNDLE DESTINATION . COMPONENT Runtime
-        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT Runtime
-    )
-
+    if(CMAKE_SYSTEM_NAME MATCHES "Linux" AND DETHRACE_USE_LSB_GAMES)
+        install(TARGETS dethrace RUNTIME DESTINATION games)
+    else()
+        install(TARGETS dethrace
+            BUNDLE DESTINATION . COMPONENT Runtime
+            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT Runtime
+        )
+    endif()
     if(APPLE)
         set_target_properties(dethrace PROPERTIES
             BUNDLE True
@@ -252,18 +251,73 @@ if(DETHRACE_INSTALL)
         set_source_files_properties(${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns PROPERTIES
             MACOSX_PACKAGE_LOCATION "Resources"
         )
-        target_sources(dethrace_obj PRIVATE
+        target_sources(dethrace PRIVATE
             ${CMAKE_SOURCE_DIR}/packaging/macos/dethrace.icns
         )
+    endif()
+
+    install(TARGETS dethrace
+        BUNDLE DESTINATION . COMPONENT Runtime
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT Runtime
+    )
+
+    if(APPLE)
+        if(DETHRACE_PLATFORM_SDL_DYNAMIC)
+            if(DETHRACE_PLATFORM_SDL2)
+                install(CODE "
+                    set(app_root \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}\")
+                    set(app \"\${app_root}/Deth Race.app\")
+                    if(NOT EXISTS \"\${app}\")
+                        set(app \"\${app_root}/${CMAKE_INSTALL_BINDIR}/Deth Race.app\")
+                    endif()
+                    file(INSTALL
+                        DESTINATION \"\${app}/Contents/MacOS\"
+                        TYPE FILE
+                        FOLLOW_SYMLINK_CHAIN
+                        FILES \"$<TARGET_FILE:SDL2::SDL2>\"
+                    )
+                    "
+                    COMPONENT Runtime
+                )
+            endif()
+
+            if(DETHRACE_PLATFORM_SDL3)
+                install(CODE "
+                    set(app_root \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}\")
+                    set(app \"\${app_root}/Deth Race.app\")
+                    if(NOT EXISTS \"\${app}\")
+                        set(app \"\${app_root}/${CMAKE_INSTALL_BINDIR}/Deth Race.app\")
+                    endif()
+                    file(INSTALL
+                        DESTINATION \"\${app}/Contents/MacOS\"
+                        TYPE FILE
+                        FOLLOW_SYMLINK_CHAIN
+                        FILES \"$<TARGET_FILE:SDL3::SDL3>\"
+                    )
+                    file(CREATE_LINK
+                        \"libSDL3.0.dylib\"
+                        \"\${app}/Contents/MacOS/libSDL3.dylib\"
+                        SYMBOLIC
+                    )
+                    "
+                    COMPONENT Runtime
+                )
+            endif()
+        endif()
 
         install(CODE "
             include(BundleUtilities)
-            fixup_bundle(\"${CMAKE_BINARY_DIR}/Deth Race.app\" \"\" \"/Library/Frameworks\")
+            set(app_root \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}\")
+            set(app \"\${app_root}/Deth Race.app\")
+            if(NOT EXISTS \"\${app}\")
+                set(app \"\${app_root}/${CMAKE_INSTALL_BINDIR}/Deth Race.app\")
+            endif()
+            fixup_bundle(\"\${app}\" \"\" \"/Library/Frameworks\")
             execute_process(COMMAND
-                codesign -s - -f \"${CMAKE_BINARY_DIR}/Deth Race.app/Contents/Frameworks/SDL2.framework\"
+                codesign -s - -f --deep \"\${app}\"
             )
             "
-            COMPONENT RUNTIME
+            COMPONENT Runtime
         )
     endif()
 
