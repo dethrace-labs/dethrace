@@ -67,7 +67,7 @@ void SendCarData(tU32 pNext_frame_time) {
     int i;
     int j;
     // GLOBAL: CARM95 0x50c608
-    static tU32 last_time;
+    static tU32 last_time = 0xffffffff;
     tU32 time;
     int damaged_wheels;
 
@@ -1153,7 +1153,7 @@ void CalcPlayerScores(void) {
     case eNet_game_type_carnage:
         highest = 0;
         next_highest = 0;
-        for (i = 0; i < gNumber_of_net_players; ++i) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; ++i) {
             if (gNet_players[i].score > highest) {
                 next_highest = highest;
                 highest = gNet_players[i].score;
@@ -1182,7 +1182,7 @@ void CalcPlayerScores(void) {
     lowest_score = 9999;
     lowest_score_player = NULL;
     cars_left = 0;
-    for (i = 0; i < gNumber_of_net_players; i++) {
+    for (i = 0; DR_FF(i) < gNumber_of_net_players; i++) {
         car = gNet_players[i].car;
         if (gNet_players[i].reposition_time != 0 && gNet_players[i].reposition_time <= time && (!gRace_finished || gRace_over_reason == -1)) {
             RepositionPlayer(i);
@@ -1208,7 +1208,7 @@ void CalcPlayerScores(void) {
             switch (gCurrent_net_game->type) {
             case eNet_game_type_fight_to_death:
                 cars_left = 0;
-                for (j = 0; j < gNumber_of_net_players; j++) {
+                for (j = 0; DR_FF(j) < gNumber_of_net_players; j++) {
                     if (!gNet_players[j].wasted) {
                         cars_left++;
                         car_left = j;
@@ -1250,7 +1250,7 @@ void CalcPlayerScores(void) {
             case eNet_game_type_foxy:
                 gNet_players[i].reposition_time = GetTotalTime() + 5000;
                 gNet_players[i].score /= 2;
-                if (gNumber_of_net_players > 1 && gIt_or_fox == i) {
+                if (gNumber_of_net_players > 1 && gIt_or_fox == DR_FF(i)) {
                     SelectRandomItOrFox(i);
                 }
                 break;
@@ -1271,10 +1271,10 @@ void CalcPlayerScores(void) {
                 e_dam = car->damage_units[eDamage_engine].damage_level;
                 t_dam = car->damage_units[eDamage_transmission].damage_level;
                 d_dam = car->damage_units[eDamage_driver].damage_level;
-                w_dam = (car->damage_units[eDamage_lr_wheel].damage_level
-                            + car->damage_units[eDamage_lf_wheel].damage_level
-                            + car->damage_units[eDamage_rr_wheel].damage_level
-                            + car->damage_units[eDamage_rf_wheel].damage_level)
+                w_dam = (DR_FF(car->damage_units[eDamage_rf_wheel].damage_level
+                             + car->damage_units[eDamage_rr_wheel].damage_level
+                             + car->damage_units[eDamage_lf_wheel].damage_level)
+                            + car->damage_units[eDamage_lr_wheel].damage_level)
                     / 4;
 
                 if (e_dam > t_dam && e_dam > d_dam && e_dam > w_dam) {
@@ -1321,7 +1321,7 @@ void CalcPlayerScores(void) {
             }
             break;
         case eNet_game_type_tag:
-            if (i == gIt_or_fox && !gCountdown && gNet_players[i].score >= 0) {
+            if (DR_FF(i) == gIt_or_fox && !gCountdown && gNet_players[i].score >= 0) {
                 gNet_players[i].score += gFrame_period;
                 if (gNet_players[i].score >= gCurrent_net_game->options.race_end_target) {
                     lowest_score_player = &gNet_players[i];
@@ -1329,7 +1329,7 @@ void CalcPlayerScores(void) {
             }
             break;
         case eNet_game_type_foxy:
-            if (i == gIt_or_fox && !gCountdown && !gRace_finished) {
+            if (DR_FF(i) == gIt_or_fox && !gCountdown && !gRace_finished) {
                 gNet_players[i].score += gFrame_period;
                 if (gNet_players[i].score >= gCurrent_net_game->options.race_end_target) {
                     DeclareWinner(i);
@@ -1345,7 +1345,7 @@ void CalcPlayerScores(void) {
         && lowest_score_player->score >= 0) {
         player_left = -1;
         cars_left = 0;
-        for (i = 0; i < gNumber_of_net_players; ++i) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; ++i) {
             if (gNet_players[i].score >= 0 && &gNet_players[i] != lowest_score_player) {
                 ++cars_left;
                 if (player_left == -1) {

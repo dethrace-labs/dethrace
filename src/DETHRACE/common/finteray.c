@@ -823,61 +823,70 @@ int ActorBoxPick(tBounds* bnds, br_actor* ap, br_model* model, br_material* mate
     }
     if (ap->identifier != NULL && ap->identifier[0] == '&') {
         if (ap->children == NULL) {
-            if (ap->type != BR_ACTOR_MODEL) {
-                return max_face;
-            }
-            if (!BoundsTransformTest(&this_model->bounds, &bnds->real_bounds, &ap->t.t.mat)) {
+            if (ap->type != BR_ACTOR_MODEL || !BoundsTransformTest(&this_model->bounds, &bnds->real_bounds, &ap->t.t.mat)) {
                 return max_face;
             }
         }
-        if (pMat != NULL) {
-            BrMatrix34Mul(&mat, &ap->t.t.mat, pMat);
-            pMat = &mat;
-        } else {
+        if (pMat == NULL) {
             pMat = &ap->t.t.mat;
+        } else {
+            BrMatrix34Mul(&mat2, &ap->t.t.mat, pMat);
+            pMat = &mat2;
         }
         BrMatrix34LPInverse(&invmat, &ap->t.t.mat);
-        BrMatrix34Mul(&mat2, bnds->mat, &invmat);
-        new_bounds.mat = &mat2;
+        BrMatrix34Mul(&box_to_actor, bnds->mat, &invmat);
+        new_bounds.mat = &box_to_actor;
         BrVector3Copy(&new_bounds.original_bounds.min, &bnds->original_bounds.min);
         BrVector3Copy(&new_bounds.original_bounds.max, &bnds->original_bounds.max);
         BrMatrix34ApplyP(&new_bounds.box_centre, &bnds->box_centre, &invmat);
         new_bounds.radius = bnds->radius;
         GetNewBoundingBox(&new_bounds.real_bounds, &new_bounds.original_bounds, new_bounds.mat);
         if (ap->identifier[1] >= '0' && ap->identifier[1] <= '9') {
-            if (!BoundsOverlapTest__finteray(&new_bounds.real_bounds, &this_model->bounds)) {
-                return max_face;
-            }
-            BrMatrix34LPInverse(&invmat, bnds->mat);
-            BrMatrix34Mul(&box_to_actor, &ap->t.t.mat, &invmat);
-            GetNewBoundingBox(&br_bnds, &ap->model->bounds, &box_to_actor);
-            if (!BoundsOverlapTest__finteray(&br_bnds, &bnds->original_bounds)) {
-                return max_face;
-            }
-            if (PullActorFromWorld(ap)) {
+            if (BoundsOverlapTest__finteray(&new_bounds.real_bounds, &this_model->bounds)) {
+                BrMatrix34LPInverse(&invmat, bnds->mat);
+                BrMatrix34Mul(&mat, &ap->t.t.mat, &invmat);
+                GetNewBoundingBox(&br_bnds, &ap->model->bounds, &mat);
+                if (BoundsOverlapTest__finteray(&br_bnds, &bnds->original_bounds)) {
+                    if (PullActorFromWorld(ap)) {
+                        return max_face;
+                    }
+                } else {
+                    return max_face;
+                }
+            } else {
                 return max_face;
             }
         }
         bnds = &new_bounds;
     }
-    if (ap->type == BR_ACTOR_MODEL) {
+    switch (ap->type) {
+    case BR_ACTOR_MODEL:
         if (BoundsOverlapTest__finteray(&bnds->real_bounds, &this_model->bounds)) {
             n = ModelPickBox(ap, bnds, this_model, this_material, &face_list[i], max_face, pMat);
-            if (pMat && max_face != n) {
-                StopGroovidelic(ap);
+            if (pMat) {
+                if (max_face - n != 0) {
+                    StopGroovidelic(ap);
+                }
             }
             i += max_face - n;
             max_face = n;
         }
-    } else if (ap->type == BR_ACTOR_BOUNDS || ap->type == BR_ACTOR_BOUNDS_CORRECT) {
+        break;
+    case BR_ACTOR_BOUNDS:
+    case BR_ACTOR_BOUNDS_CORRECT:
         test_children = BoundsOverlapTest__finteray(&bnds->real_bounds, (br_bounds*)ap->type_data);
+        break;
+    default:
+        break;
     }
     if (test_children) {
-        for (a = ap->children; a != NULL; a = next_a) {
+        a = ap->children;
+        while (a != NULL) {
             next_a = a->next;
             n = ActorBoxPick(bnds, a, this_model, this_material, &face_list[i], max_face, pMat);
             i += max_face - n;
             max_face = n;
+            a = next_a;
         }
     }
     return max_face;

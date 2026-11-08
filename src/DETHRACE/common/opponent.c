@@ -97,7 +97,7 @@ int gMade_path_filename;
 int gBIG_APC_index = -1;
 
 // GLOBAL: CARM95 0x00507138
-char* gPath_section_type_names[3];
+char* gPath_section_type_names[3] = { "General", "Race", "Cheat-only" };
 
 // GLOBAL: CARM95 0x00507144
 int gMin_bangness = 100;

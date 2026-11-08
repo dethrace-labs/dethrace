@@ -102,7 +102,7 @@ tWall_texturing_level gWall_texturing_level = eWTL_full;
 tCar_texturing_level gCar_texturing_level = eCTL_full;
 
 // GLOBAL: CARM95 0x0050c7dc
-int gRendering_accessories;
+int gRendering_accessories = 1;
 
 // GLOBAL: CARM95 0x0050c7e0
 int gNumber_of_actors;
