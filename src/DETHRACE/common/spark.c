@@ -1332,17 +1332,19 @@ void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAs
 
     cam = pCam->type_data;
 
+#ifdef DETHRACE_3DFX_PATCH
     if (gNo_2d_effects) {
         RecordSmokeCircle(o, r, strength, pShade_table, pAspect);
         return;
     }
+#endif
 
-    srand(o->v[2] * 16777216.0f + o->v[1] * 65536.0f + o->v[0] * 256.0f + r);
+    srand((o->v[2] * 16777216.0f) * 1 + o->v[1] * 65536.0f + o->v[0] * 256.0f + r);
     BrVector3Sub(&tv, o, (br_vector3*)gSmoke_camera_to_world.m[3]);
     BrMatrix34TApplyV(&p, &tv, &gSmoke_camera_to_world);
 
     if (-p.v[2] >= cam->hither_z && -p.v[2] <= cam->yon_z) {
-        scaled_r = gCameraToScreen.m[0][0] * r / -p.v[2];
+        scaled_r = gCameraToScreen.m[0][0] * r / (-p.v[2] * 1);
         extra_z = gCameraToScreen.m[3][2] * r / (p.v[2] * p.v[2]);
         BrMatrix4ApplyP(&o2, &p, &gCameraToScreen);
         BrVector3InvScale(&p, &o2, o2.v[3]);
