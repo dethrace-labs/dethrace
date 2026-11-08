@@ -35,7 +35,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 set(DETHRACE_IDE_ARGUMENTS "" CACHE STRING "DethRace arguments (only used by MSVC when debugging")
 set(DETHRACE_IDE_ROOT_DIR "" CACHE PATH "DethRace rootdir (only used by MSVC when debugging)")
-option(BUILD_TESTS "Build unit tests." OFF)
 option(DETHRACE_INSTALL "Add install target" OFF)
 option(DETHRACE_WERROR "Treat warnings as errors")
 option(DETHRACE_FIX_BUGS "Fix Dethrace bugs" ON)
@@ -165,52 +164,6 @@ if(DETHRACE_WERROR)
     endif()
 endif()
 
-if(BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(test)
-endif()
-
 if(DETHRACE_INSTALL)
-    install(FILES LICENSE
-        DESTINATION "${CMAKE_INSTALL_DOCDIR}"
-    )
-
-    set(DETHRACE_PACKAGE_PLATFORM "" CACHE STRING "Dethrace binary package platform")
-    set(DETHRACE_PACKAGE_ARCH "" CACHE STRING "Dethrace binary package architecture")
-
-    if(NOT DETHRACE_PACKAGE_PLATFORM)
-        set(DETHRACE_PACKAGE_PLATFORM "${CMAKE_SYSTEM_NAME}")
-    endif()
-
-    string(TOLOWER "${DETHRACE_PACKAGE_PLATFORM}" DETHRACE_PACKAGE_PLATFORM)
-    string(TOLOWER "${DETHRACE_PACKAGE_ARCH}" DETHRACE_PACKAGE_ARCH)
-
-    set(CPACK_PACKAGE_NAME "dethrace")
-    set(CPACK_SYSTEM_NAME "${DETHRACE_PACKAGE_PLATFORM}")
-
-    set(CPACK_PACKAGE_FILE_NAME "dethrace-${DETHRACE_VERSION}-${DETHRACE_PACKAGE_PLATFORM}")
-
-    if(DETHRACE_PACKAGE_ARCH)
-        string(APPEND CPACK_PACKAGE_FILE_NAME "-${DETHRACE_PACKAGE_ARCH}")
-    endif()
-
-    set(CPACK_PACKAGE_DIRECTORY dist)
-
-    if(APPLE)
-        set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK "ON")
-        set(CPACK_GENERATOR "DragNDrop")
-        set(ext ".dmg")
-    elseif(MSVC)
-        set(CPACK_GENERATOR ZIP)
-        set(ext ".zip")
-    else()
-        set(CPACK_GENERATOR TGZ)
-        set(ext ".tar.gz")
-    endif()
-
-    if(EXISTS "$ENV{GITHUB_OUTPUT}")
-        file(APPEND "$ENV{GITHUB_OUTPUT}" "filename=${CPACK_PACKAGE_FILE_NAME}${ext}")
-    endif()
-
-    include(CPack)
+    include(InstallConfig)
 endif()

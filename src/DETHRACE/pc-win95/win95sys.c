@@ -105,8 +105,6 @@ br_diaghandler gWin32_br_diaghandler;
 int gWin32_window_has_focus = 1;
 int gNetwork_profile_file_exists = 0;
 
-char* _unittest_last_fatal_error;
-
 int original_main(int pArgc, char** pArgv);
 
 /*static*/ void KeyboardHandler(void);
