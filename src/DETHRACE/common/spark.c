@@ -635,7 +635,7 @@ void CreateSparks(br_vector3* pos, br_vector3* v, br_vector3* pForce, br_scalar 
             gNext_spark = 0;
         }
     }
-    sparkiness *= ts;
+    sparkiness = DR_FF(ts) * sparkiness;
     if (sparkiness < 10.f) {
         return;
     }
