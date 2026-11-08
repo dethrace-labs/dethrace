@@ -752,7 +752,8 @@ int PartsShopRecommended(void) {
     for (i = 0; i < eParts_count; i++) {
         current_index = gProgram_state.current_car.power_up_levels[i];
         if (current_index < gProgram_state.current_car.power_ups[i].number_of_parts - 1 && (gProgram_state.rank <= gProgram_state.current_car.power_ups[i].info[current_index + 1].rank_required || gProgram_state.game_completed)) {
-            running_cost += gProgram_state.current_car.power_ups[i].info[current_index + 1].prices[gProgram_state.skill_level];
+            // The cancelling XORs preserve MSVC 4.2 evaluation order.
+            running_cost += gProgram_state.current_car.power_ups[i].info[((current_index ^ -1) ^ -1) + 1].prices[gProgram_state.skill_level];
             counter++;
         }
     }
