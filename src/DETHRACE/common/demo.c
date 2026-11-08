@@ -33,7 +33,7 @@ void DoDemo(void) {
     }
     count = GetAnInt(f);
     gLast_demo++;
-    if (count - gLast_demo <= 0) {
+    if (count <= gLast_demo) {
         gLast_demo = 0;
     }
     for (i = 0; i < gLast_demo + 1; i++) {
@@ -57,11 +57,8 @@ void DoDemo(void) {
         frame_time = ReadS32(f);
         fread(gBack_screen->pixels, gBack_screen->height * gBack_screen->width, 1, f);
         PDScreenBufferSwap(0);
-        while (1) {
-            if (!(frame_time > PDGetTotalTime() - start_time && AnyKeyDown() == 0 && EitherMouseButtonDown() == 0)) {
-                break;
-            }
-        }
+        do {
+        } while (frame_time > PDGetTotalTime() - start_time && AnyKeyDown() == 0 && EitherMouseButtonDown() == 0);
         if (!S3SoundStillPlaying(song_tag)) {
             song_tag = S3StartSound(gEffects_outlet, 10000);
         }
