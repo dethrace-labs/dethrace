@@ -183,7 +183,7 @@ int OKToSpillOil(tOil_spill_info* pOil) {
     BrVector3Set(&ray_dir, 0.f, kev_bounds.original_bounds.min.v[1] - kev_bounds.original_bounds.max.v[1], 0.f);
     if (face_count != 0) {
         found_one = 0;
-        for (i = 0, face_ref = the_list; i < face_count; i++, face_ref++) {
+        for (i = 0, face_ref = the_list; DR_FF(i) < face_count; i++, face_ref++) {
             if (!found_one) {
                 CheckSingleFace(face_ref, &ray_pos, &ray_dir, &normal, &distance);
                 if (distance < 100.f) {
@@ -202,7 +202,7 @@ int OKToSpillOil(tOil_spill_info* pOil) {
         if (!found_one || normal.v[1] < .97f) {
             return 0;
         } else {
-            for (i = 0, face_ref = the_list; i < face_count; i++, face_ref++) {
+            for (i = 0, face_ref = the_list; DR_FF(i) < face_count; i++, face_ref++) {
                 mr_dotty = BrVector3Dot(&face_ref->normal, &normal);
                 if (mr_dotty < .98f && (mr_dotty > .8f || !NormalSideOfPlane(&pOil->actor->t.t.translate.t, &face_ref->normal, face_ref->d))) {
                     return 0;
