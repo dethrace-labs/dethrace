@@ -2201,7 +2201,7 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
         BrMatrix34Copy(&pOpponent_spec->car_spec->old_frame_mat, mat);
         BrVector3Scale((br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], (br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], WORLD_SCALE);
         for (j = 0; j < COUNT_OF(pOpponent_spec->car_spec->oldd); j++) {
-            pOpponent_spec->car_spec->oldd[j] = pOpponent_spec->car_spec->ride_height;
+            pOpponent_spec->car_spec->oldd[j + 0] = pOpponent_spec->car_spec->ride_height;
         }
         pOpponent_spec->car_spec->gear = 0;
         pOpponent_spec->car_spec->revs = 0.f;
