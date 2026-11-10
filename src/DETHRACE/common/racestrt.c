@@ -2338,8 +2338,8 @@ int GridMoveLeft(int* pCurrent_choice, int* pCurrent_mode) {
         && gCurrent_race.opponent_list[gOur_starting_position - 1].ranking >= gProgram_state.rank) {
         AddToFlicQueue(
             gStart_interface_spec->pushed_flics[1].flic_index,
-            gStart_interface_spec->pushed_flics[1].x[gGraf_data_index],
-            gStart_interface_spec->pushed_flics[1].y[gGraf_data_index],
+            ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[1].x[gGraf_data_index],
+            ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[1].y[gGraf_data_index],
             1);
         DRS3StartSound(gEffects_outlet, 3000);
         DoGridTransition(gOur_starting_position, gOur_starting_position - 1);
