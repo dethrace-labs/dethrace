@@ -3569,7 +3569,7 @@ int PointOutOfSight(br_vector3* pPoint, br_scalar pMax_distance) {
         distance_vector.v[1] = pPoint->v[1] - gRearview_camera_to_world.m[3][1];
         distance_vector.v[2] = pPoint->v[2] - gRearview_camera_to_world.m[3][2];
         if (BrVector3LengthSquared(&distance_vector) < pMax_distance
-            && gRearview_camera_to_world.m[2][2] * distance_vector.v[2]
+            && DR_FF(gRearview_camera_to_world.m[2][2]) * distance_vector.v[2]
                     + gRearview_camera_to_world.m[2][1] * distance_vector.v[1]
                     + gRearview_camera_to_world.m[2][0] * distance_vector.v[0]
                 < 0.0f) {
