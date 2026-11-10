@@ -2096,10 +2096,10 @@ void RevealStoredTextures(tBrender_storage* pStorage) {
 
     for (i = 0; i < pStorage->materials_count; i++) {
         if (pStorage->saved_colour_maps[i]) {
-            pStorage->materials[i]->colour_map = pStorage->saved_colour_maps[i];
+            pStorage->materials[i + 0]->colour_map = pStorage->saved_colour_maps[i];
             pStorage->saved_colour_maps[i] = NULL;
-            pStorage->materials[i]->flags |= BR_MATF_PRELIT;
-            BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
+            pStorage->materials[i + i * 0]->flags |= BR_MATF_PRELIT;
+            BrMaterialUpdate(pStorage->materials[i + 0], BR_MATU_ALL);
         }
     }
 }
