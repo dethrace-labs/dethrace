@@ -906,7 +906,7 @@ int GetPartsMax(void) {
     int i;
 
     for (i = gProgram_state.current_car.power_ups[gPart_category].number_of_parts - 1; i >= 0; i--) {
-        if (gProgram_state.rank <= gProgram_state.current_car.power_ups[gPart_category].info[i].rank_required || gProgram_state.game_completed) {
+        if (gProgram_state.rank <= gProgram_state.current_car.power_ups[gPart_category].info[DR_FF(i)].rank_required || gProgram_state.game_completed) {
             return i;
         }
     }
