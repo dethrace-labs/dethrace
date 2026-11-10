@@ -1034,14 +1034,16 @@ int DownPart(int* pCurrent_choice, int* pCurrent_mode) {
     gJust_bought_part = 0;
     AddToFlicQueue(
         gStart_interface_spec->pushed_flics[6].flic_index,
-        gStart_interface_spec->pushed_flics[6].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[6].y[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[6].x[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[6].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     RemoveTransientBitmaps(1);
     ErasePartsText(0);
 
-    gPart_index = (gPart_index == GetPartsMax()) ? 0 : (gPart_index + 1);
+    if (gPart_index++ == GetPartsMax()) {
+        gPart_index = 0;
+    }
 
     DropOutImageThruTop(
         GetPanelPixelmap(0),
