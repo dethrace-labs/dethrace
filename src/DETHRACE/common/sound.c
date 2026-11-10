@@ -778,7 +778,7 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
                     if (pCDA_id == 9999) {
                         do {
                             pCDA_id = gRandom_CDA_tunes[IRandomBetween(0, 7)];
-                        } while (pCDA_id == gLast_tune);
+                        } while (DR_FF(pCDA_id) == gLast_tune);
                     }
                     gLast_tune = pCDA_id;
 
