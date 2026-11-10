@@ -3970,7 +3970,7 @@ void RenderProximityRays(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer
 
                 BrVector3Copy(&from_pos, &car_pos_cam);
 
-                seed = the_time + ped_pos.v[X] + ped_pos.v[Y] + ped_pos.v[Z] + car_pos.v[X] + car_pos.v[Y] + car_pos.v[Z];
+                seed = car_pos.v[Y] + (car_pos.v[X] + (ped_pos.v[X] + (ped_pos.v[Y] + ped_pos.v[Z] + car_pos.v[Z])));
 #ifdef DETHRACE_FIX_BUGS
                 // avoid punning
                 memcpy(&pTime, &seed, sizeof(seed));
