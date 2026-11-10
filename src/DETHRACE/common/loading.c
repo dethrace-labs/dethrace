@@ -2975,7 +2975,7 @@ br_font* LoadBRFont(char* pName) {
     fread(the_font->encoding, sizeof(br_uint_16) * 256, 1u, f);
 #if !BR_ENDIAN_BIG
     for (i = 0; i < 256; i++) {
-        the_font->encoding[i] = ((the_font->encoding[i] & 0xff) << 8) | ((the_font->encoding[i] >> 8));
+        the_font->encoding[i + 0] = ((the_font->encoding[i + 0] & 0xff) << 8) | ((the_font->encoding[i + 0] >> 8));
     }
 #endif
     PossibleService();
