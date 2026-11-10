@@ -240,6 +240,18 @@ int GotPowerupX(tCar_spec* pCar, int pIndex, int pTell_net_players, int pDisplay
     if (the_powerup->type == ePowerup_dummy) {
         return -1;
     }
+#ifdef DETHRACE_FIX_BUGS
+    // Only the local player owns the headup messages, the pratcam, the icon list
+    // and the powerup slots. When another car triggers a powerup - in practice an
+    // opponent or a cop driving over a mine, see CheckPedestrianDeathScenario() -
+    // apply the effect to that car only, and leave our own dashboard alone.
+    if (pCar->driver != eDriver_local_human) {
+        if (the_powerup->got_proc == NULL) {
+            return -1;
+        }
+        return the_powerup->got_proc(the_powerup, pCar);
+    }
+#endif
     if (the_powerup->got_proc == NULL) {
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 3000, -kFont_MEDIUMHD, GetMiscString(kMiscString_UNAVAILABLE_IN_DEMO));
         return -1;
