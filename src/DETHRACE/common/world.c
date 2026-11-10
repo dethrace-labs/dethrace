@@ -5124,8 +5124,10 @@ void IdentifySpecVol(void) {
         if (v->no_mat) {
             continue;
         }
-        d = Vector3DistanceSquared((br_vector3*)v->mat.m[3], p);
-        if (d < min_d) {
+        if ((d = (v->mat.m[3][2] - p->v[2]) * (v->mat.m[3][2] - p->v[2])
+                + ((v->mat.m[3][0] - p->v[0]) * (v->mat.m[3][0] - p->v[0])
+                    + (v->mat.m[3][1] - p->v[1]) * (v->mat.m[3][1] - p->v[1])))
+            < min_d) {
             min_d = d;
             min_index = i;
         }
