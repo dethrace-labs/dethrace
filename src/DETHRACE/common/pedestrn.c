@@ -385,6 +385,13 @@ void InitPedGibs(void) {
             gPed_gib_materials[i].materials[j]->colour_map = the_pix;
             gPed_gib_materials[i].materials[j]->map_transform = the_material->map_transform;
             gPed_gib_materials[i].materials[j]->index_shade = the_material->index_shade;
+#if defined(DETHRACE_FIX_BUGS)
+            // From the second race on, FrobFog has set BR_MATF_FOG_LOCAL on gPed_material, and the
+            // flags are copied above. Without the fog range (0 = all fog) the gibs are drawn in the fog colour.
+            gPed_gib_materials[i].materials[j]->fog_min = the_material->fog_min;
+            gPed_gib_materials[i].materials[j]->fog_max = the_material->fog_max;
+            gPed_gib_materials[i].materials[j]->fog_colour = the_material->fog_colour;
+#endif
             BrMaterialUpdate(gPed_gib_materials[i].materials[j], BR_MATU_ALL);
         }
     }
