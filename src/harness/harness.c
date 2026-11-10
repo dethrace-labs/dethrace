@@ -563,7 +563,7 @@ int Harness_ProcessIniFile(void) {
             }
             // if no default found, and we have some game dirs, default to first one
             if (i == harness_game_config.game_dirs_count) {
-                safe_strcpy(harness_game_config.selected_dir, harness_game_config.game_dirs[i].directory);
+                safe_strcpy(harness_game_config.selected_dir, harness_game_config.game_dirs[0].directory);
             }
         }
     }
