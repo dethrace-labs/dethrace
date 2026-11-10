@@ -5175,8 +5175,13 @@ void DeleteSpecVol(void) {
     index = FindSpecVolIndex(gLast_actor);
     if (index >= 0) {
         DelSpecVolumeGraph(index);
-        memmove(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
+#ifdef DETHRACE_FIX_BUGS
+        memmove(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index] + 1, (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
         memmove(&gSpec_vol_actors[index], &gSpec_vol_actors[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(br_actor*));
+#else
+        memcpy(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index] + 1, (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
+        memcpy(&gSpec_vol_actors[index], &gSpec_vol_actors[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(br_actor*));
+#endif
         gProgram_state.special_volume_count--;
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "There's been a special volumes MURDER!!");
         gLast_actor = NULL;
