@@ -1886,7 +1886,7 @@ void UpdateSpecVol(void) {
 
     index = FindSpecVolIndex(gLast_actor);
     if (index >= 0) {
-        v = &gProgram_state.special_volumes[index];
+        v = &gProgram_state.special_volumes[index * 1];
         BrMatrix34Copy(&v->mat, &gLast_actor->t.t.mat);
         FindInverseAndWorldBox(v);
         SetSpecVolMatSize(gLast_actor);
