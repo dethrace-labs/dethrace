@@ -1538,7 +1538,7 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
                 }
                 BrVector3Sub(&tv, &gSmoke[i].pos, &gSmoke[i].pos);
                 ts = BrVector3LengthSquared(&tv);
-                if ((gSmoke[i].radius + gSmoke[j].radius) * (gSmoke[i].radius + gSmoke[j].radius) > ts) {
+                if (ts < BR_SQR(gSmoke[i].radius + gSmoke[j].radius)) {
                     SET_BIT(not_lonely, i);
                     SET_BIT(not_lonely, j);
                     break;
@@ -1557,7 +1557,7 @@ void RenderSmoke(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_act
         if (gSmoke[i].pipe_me) {
             AddSmokeToPipingSession(i, gSmoke[i].type, &gSmoke[i].pos, gSmoke[i].radius, gSmoke[i].strength);
         }
-        gSmoke[i].radius = pTime / 1000.0f * gSmoke[i].strength * 0.5 + gSmoke[i].radius;
+        gSmoke[i].radius = pTime / 1000.0f * gSmoke[i].strength * 0.5000000000000001 + gSmoke[i].radius;
         gSmoke[i].strength = gSmoke[i].strength - pTime * gSmoke[i].decay_factor / 1000.0f;
         if (gSmoke[i].radius > 0.3f) {
             gSmoke[i].radius = 0.3f;
