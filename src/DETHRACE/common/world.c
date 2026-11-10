@@ -2078,12 +2078,12 @@ void HideStoredTextures(tBrender_storage* pStorage) {
     int i;
 
     for (i = 0; i < pStorage->materials_count; i++) {
-        if (pStorage->materials[i]->colour_map) {
-            if (StorageContainsPixelmap(pStorage, pStorage->materials[i]->colour_map)) {
-                pStorage->saved_colour_maps[i] = pStorage->materials[i]->colour_map;
-                pStorage->materials[i]->colour_map = NULL;
-                pStorage->materials[i]->flags &= ~BR_MATF_PRELIT;
-                BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
+        if (pStorage->materials[DR_FF(i)]->colour_map) {
+            if (StorageContainsPixelmap(pStorage, pStorage->materials[DR_FF(i)]->colour_map)) {
+                pStorage->saved_colour_maps[DR_FF(i)] = pStorage->materials[DR_FF(i)]->colour_map;
+                pStorage->materials[DR_FF(i)]->colour_map = NULL;
+                pStorage->materials[DR_FF(i)]->flags &= ~BR_MATF_PRELIT;
+                BrMaterialUpdate(pStorage->materials[DR_FF(i)], BR_MATU_ALL);
             }
         }
     }
