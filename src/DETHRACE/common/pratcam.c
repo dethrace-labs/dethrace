@@ -200,8 +200,8 @@ void LoadPratcam(char* pFolder_name) {
                     }
                     for (l = 0; l < gPratcam_sequences[i].chunks[j].alternatives[k].number_of_sounds; l++) {
                         str = strtok(NULL, "\t ,/");
-                        sscanf(str, "%d", &gPratcam_sequences[i].chunks[j].alternatives[k].sound_ids[l]);
-                        DRS3LoadSound(gPratcam_sequences[i].chunks[j].alternatives[k].sound_ids[l]);
+                        sscanf(str, "%d", &gPratcam_sequences[i].chunks[j].alternatives[DR_FF(k)].sound_ids[l]);
+                        DRS3LoadSound(gPratcam_sequences[i].chunks[j].alternatives[DR_FF(k)].sound_ids[l]);
                     }
                 }
             }
