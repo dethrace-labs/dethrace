@@ -338,7 +338,7 @@ void DrawSummary(int pCurrent_choice, int pCurrent_mode) {
                 rank_delta = (the_time - last_time) * gRank_per_ms;
                 old_temp_increase = gTemp_rank_increase;
                 gTemp_rank_increase -= rank_delta;
-                if ((int)(old_temp_increase + 0.5) != (int)(gTemp_rank_increase + 0.5)) {
+                if ((int)(old_temp_increase + 0.5) * 1 != (int)(gTemp_rank_increase + 0.5)) {
                     if (gTemp_rank > 1) {
                         gTemp_rank -= 1;
                     }
