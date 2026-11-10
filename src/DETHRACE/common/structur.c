@@ -436,14 +436,14 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
 
     if (pNet_race_sequence == eNet_sequence_sequential) {
         pCurrent_race++;
-        if (pCurrent_race >= gNumber_of_races) {
+        if (pCurrent_race >= DR_FF(gNumber_of_races)) {
             pCurrent_race = 0;
         }
         return pCurrent_race;
 
     } else {
         most_seldom_seen = 10000;
-        for (i = 0; i < gNumber_of_races; i++) {
+        for (i = 0; i < DR_FF(gNumber_of_races); i++) {
             if (gRace_list[i].been_there_done_that < most_seldom_seen) {
                 most_seldom_seen = gRace_list[i].been_there_done_that;
             }
@@ -452,7 +452,7 @@ int PickNetRace(int pCurrent_race, tNet_sequence_type pNet_race_sequence) {
 #ifdef DETHRACE_FIX_BUGS
         races_to_pick_from = BrMemAllocate(gNumber_of_races * sizeof(int), kMem_misc);
 #endif
-        for (i = 0; i < gNumber_of_races; i++) {
+        for (i = 0; i < DR_FF(gNumber_of_races); i++) {
             if (gRace_list[i].been_there_done_that == most_seldom_seen && (i != pCurrent_race)) {
                 races_to_pick_from[races_count] = i;
                 races_count++;
