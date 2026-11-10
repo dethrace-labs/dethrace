@@ -2368,49 +2368,49 @@ void LoadInOppoPaths(FILE* pF) {
             for (section_no = 0; section_no < gProgram_state.AI_vehicles.number_of_path_sections; section_no++) {
                 PossibleService();
                 GetNScalars(pF, 8, scalars);
-                gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0] = scalars[0];
-                gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1] = scalars[1];
-                gProgram_state.AI_vehicles.path_sections[section_no].min_speed[0] = scalars[2];
-                gProgram_state.AI_vehicles.path_sections[section_no].max_speed[0] = scalars[3];
-                gProgram_state.AI_vehicles.path_sections[section_no].min_speed[1] = scalars[4];
-                gProgram_state.AI_vehicles.path_sections[section_no].max_speed[1] = scalars[5];
-                gProgram_state.AI_vehicles.path_sections[section_no].width = scalars[6];
+                gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].node_indices[0] = scalars[0];
+                gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].node_indices[1] = scalars[1];
+                gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].min_speed[0] = scalars[2];
+                gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].max_speed[0] = scalars[3];
+                gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].min_speed[1] = scalars[4];
+                gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].max_speed[1] = scalars[5];
+                gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].width = scalars[6];
 
                 BrVector3Sub(&section_v,
-                    &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p,
-                    &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p);
+                    &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].node_indices[1]].p,
+                    &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].node_indices[0]].p);
 
-                gProgram_state.AI_vehicles.path_sections[section_no].length = BrVector3Length(&section_v);
+                gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].length = BrVector3Length(&section_v);
                 if (scalars[7] >= 1000.0f) {
-                    gProgram_state.AI_vehicles.path_sections[section_no].type = (tU8)(scalars[7] - 1000.0f);
-                    gProgram_state.AI_vehicles.path_sections[section_no].one_way = 1;
+                    gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].type = (tU8)(scalars[7] - 1000.0f);
+                    gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].one_way = 1;
                 } else {
-                    gProgram_state.AI_vehicles.path_sections[section_no].type = (tU8)scalars[7];
-                    gProgram_state.AI_vehicles.path_sections[section_no].one_way = 0;
+                    gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].type = (tU8)scalars[7];
+                    gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].one_way = 0;
                 }
                 for (node_no = 0; node_no < 2; node_no++) {
-                    node_ptr = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_no]];
+                    node_ptr = &gProgram_state.AI_vehicles.path_nodes[((tS16*)DR_FF_PTR(gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].node_indices))[node_no]];
                     if (node_ptr->number_of_sections < 8) {
                         node_ptr->sections[node_ptr->number_of_sections] = (tS16)section_no;
                         node_ptr->number_of_sections++;
                     } else {
                         dr_dprintf("ERROR: Too many sections (including section #%d) attached to node #%d",
                             section_no,
-                            gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_no]);
+                            ((tS16*)DR_FF_PTR(gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].node_indices))[node_no]);
                         data_errors = 1;
                     }
                 }
                 BrVector3Sub(&section_v,
-                    &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p,
-                    &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p);
+                    &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].node_indices[1]].p,
+                    &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].node_indices[0]].p);
 
                 if (BrVector3LengthSquared(&section_v) == 0.0f) {
                     dr_dprintf(
                         "ERROR: Opponent path section #%d has zero length (nodes #%d and #%d are in same position). Secti"
                         "on and one node will be deleted.",
                         section_no,
-                        gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0],
-                        gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]);
+                        gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].node_indices[0],
+                        gProgram_state.AI_vehicles.path_sections[DR_FF(section_no)].node_indices[1]);
                     delete_these[sections_to_delete] = section_no;
                     sections_to_delete++;
                 }
