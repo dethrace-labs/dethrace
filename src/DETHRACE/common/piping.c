@@ -248,16 +248,10 @@ void SaveReducedPos(tReduced_pos* p, br_vector3* v) {
 // IDA: int __cdecl PipeSearchForwards()
 // FUNCTION: CARM95 0x00427fdf
 int PipeSearchForwards(void) {
-    if (gPipe_play_ptr == gPipe_record_ptr) {
-        return 0;
-    }
-    if (gPipe_play_ptr == gPipe_buffer_oldest) {
-        return 1;
-    }
-    if (GetReplayRate() != 0.f) {
-        return GetReplayRate() > 0.f;
-    }
-    return GetReplayDirection() > 0 ? 1 : 0;
+    return gPipe_play_ptr == gPipe_record_ptr ? 0
+        : gPipe_play_ptr == gPipe_buffer_oldest ? 1
+        : GetReplayRate() != 0.f ? GetReplayRate() > 0.f
+                                  : GetReplayDirection() > 0;
 }
 
 // IDA: int __cdecl IsActionReplayAvailable()
