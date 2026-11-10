@@ -1574,11 +1574,11 @@ void ReadMechanicsData(FILE* pF, tCar_spec* c) {
 
     for (i = 0; i < c->extra_point_num; i++) {
         for (j = 0; j < 3; j++) {
-            if (c->extra_points[i].v[j] < c->bounds[0].min.v[j]) {
-                c->bounds[0].min.v[j] = c->extra_points[i].v[j];
+            if (c->extra_points[DR_FF(i)].v[j] < c->bounds[0].min.v[j]) {
+                c->bounds[0].min.v[j] = c->extra_points[DR_FF(i)].v[j];
             }
-            if (c->extra_points[i].v[j] > c->bounds[0].max.v[j]) {
-                c->bounds[0].max.v[j] = c->extra_points[i].v[j];
+            if (c->extra_points[DR_FF(i)].v[j] > c->bounds[0].max.v[j]) {
+                c->bounds[0].max.v[j] = c->extra_points[DR_FF(i)].v[j];
             }
         }
     }
