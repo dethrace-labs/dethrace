@@ -140,7 +140,10 @@ typedef enum dr_memory_classes {
     kMem_DOS_HMI_file_open = 242,                                        //  0xf2
     kMem_abuse_text = 243,                                               //  0xf3
     kMem_action_replay_buffer = 244,                                     //  0xf4
-    kMem_misc = 245                                                      //  0xf5
+    kMem_misc = 245,                                                     //  0xf5
+#ifdef DETHRACE_3DFX_PATCH
+    kMem_pixelmap_dimensions = 246 //  0xf6
+#endif
 } dr_memory_classes;
 
 typedef enum keycodes {
@@ -853,7 +856,7 @@ enum ExceptionFlags {
     ExceptionFlag_NoBilinear = 1,
     ExceptionFlag_Double = 2,
     ExceptionFlag_Quadruple = 4,
-    ExceptionFlag_Mipmap = 4,
+    ExceptionFlag_Mipmap = 8,
 };
 
 enum kEngineNoiseTypes {

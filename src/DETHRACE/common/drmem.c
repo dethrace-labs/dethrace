@@ -12,7 +12,7 @@ int gNon_fatal_allocation_errors = 0;
 
 // Is 247 in DOS executable, last entry NULL
 // GLOBAL: CARM95 0x00513618
-char* gMem_names[246] = {
+char* gMem_names[247] = {
     "",
     "BR_MEMORY_SCRATCH",
     "BR_MEMORY_PIXELMAP",
@@ -258,12 +258,21 @@ char* gMem_names[246] = {
     "kMem_DOS_HMI_file_open",
     "kMem_abuse_text",
     "kMem_action_replay_buffer",
-    "kMem_misc"
+    "kMem_misc",
+
+#if defined(DETHRACE_3DFX_PATCH) && defined(DETHRACE_FIX_BUGS)
+    // An extra resource class was added in the 3dfx patch to hold a scaled pixelmap's original size. This array should have
+    // been added to, but wasn't. We dont know what the resource class name was.
+    "kMem_pixelmap_dimensions"
+#endif
 };
 
-// Is 118 in DOS executable, with last entry unused
 // GLOBAL: CARM95 0x00537960
+#ifdef DETHRACE_3DFX_PATCH
+br_resource_class gStainless_classes[118];
+#else
 br_resource_class gStainless_classes[117];
+#endif
 
 // IDA: void __cdecl SetNonFatalAllocationErrors()
 // FUNCTION: CARM95 0x00463d80
@@ -366,14 +375,14 @@ void MAMSLock(void** pPtr) {
 void CreateStainlessClasses(void) {
     int i;
 
-    for (i = 129; i < 246; i++) {
+    for (i = 129; i < COUNT_OF(gStainless_classes) + 129; i++) {
         gStainless_classes[i - 129].res_class = i;
         if (!BrResClassAdd(&gStainless_classes[i - 129])) {
 #ifdef DETHRACE_FIX_BUGS
             FatalError(kFatalError_OOMCarmageddon_S, gStainless_classes[i - 129].identifier);
 #else
             FatalError(kFatalError_OOMCarmageddon_S);
-#endif      
+#endif
         }
     }
 }
