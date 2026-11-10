@@ -1758,21 +1758,15 @@ void GetReducedMatrix(tReduced_matrix* m1, br_matrix34* m2) {
 // FUNCTION: CARM95 0x004344f4
 void GetExpandedMatrix(br_matrix34* m1, tReduced_matrix* m2) {
 
-    m1->m[0][0] = m2->row1.v[0];
-    m1->m[0][1] = m2->row1.v[1];
-    m1->m[0][2] = m2->row1.v[2];
+    BrVector3Copy((br_vector3*)m1->m[0], &m2->row1);
 
-    m1->m[1][0] = m2->row2.v[0];
-    m1->m[1][1] = m2->row2.v[1];
-    m1->m[1][2] = m2->row2.v[2];
+    BrVector3Copy((br_vector3*)m1->m[1], &m2->row2);
 
-    m1->m[3][0] = m2->translation.v[0];
-    m1->m[3][1] = m2->translation.v[1];
-    m1->m[3][2] = m2->translation.v[2];
+    BrVector3Copy((br_vector3*)m1->m[3], &m2->translation);
 
     m1->m[2][0] = m2->row2.v[2] * m2->row1.v[1] - m2->row2.v[1] * m2->row1.v[2];
     m1->m[2][1] = m2->row1.v[2] * m2->row2.v[0] - m2->row2.v[2] * m2->row1.v[0];
-    m1->m[2][2] = m2->row2.v[1] * m2->row1.v[0] - m2->row1.v[1] * m2->row2.v[0];
+    m1->m[2][2] = m2->row2.v[1] * m2->row1.v[0] - m2[0].row1.v[1] * m2->row2.v[0];
 }
 
 // IDA: void __usercall NetEarnCredits(tNet_game_player_info *pPlayer@<EAX>, tS32 pCredits@<EDX>)
