@@ -1430,8 +1430,8 @@ int DownOpponent(int* pCurrent_choice, int* pCurrent_mode) {
     }
 #endif
     AddToFlicQueue(gStart_interface_spec->pushed_flics[6].flic_index,
-        gStart_interface_spec->pushed_flics[6].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[6].y[gGraf_data_index],
+        ((int*)DR_FF_PTR(gStart_interface_spec->pushed_flics[6].x))[gGraf_data_index],
+        ((int*)DR_FF_PTR(gStart_interface_spec->pushed_flics[6].y))[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     RemoveTransientBitmaps(1);
