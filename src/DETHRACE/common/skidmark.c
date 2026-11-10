@@ -268,13 +268,9 @@ void StretchMark(tSkid* pMark, br_vector3* pFrom, br_vector3* pTo, br_scalar pTe
     len = BrVector3Length(&temp);
 
     if (len < BR_SCALAR_EPSILON) {
-        rows[2].v[0] = pMark->normal.v[2] * temp.v[1] - pMark->normal.v[1] * temp.v[2];
-        rows[2].v[1] = pMark->normal.v[0] * temp.v[2] - pMark->normal.v[2] * temp.v[0];
-        rows[2].v[2] = pMark->normal.v[1] * temp.v[0] - pMark->normal.v[0] * temp.v[1];
+        BrVector3Cross(&rows[2], &temp, &pMark->normal);
     } else {
-        rows[2].v[0] = pMark->normal.v[2] * temp.v[1] - pMark->normal.v[1] * temp.v[2];
-        rows[2].v[1] = pMark->normal.v[0] * temp.v[2] - pMark->normal.v[2] * temp.v[0];
-        rows[2].v[2] = pMark->normal.v[1] * temp.v[0] - pMark->normal.v[0] * temp.v[1];
+        BrVector3Cross(&rows[2], &temp, &pMark->normal);
         rows[2].v[0] = 0.05f / len * rows[2].v[0];
         rows[2].v[1] = 0.05f / len * rows[2].v[1];
         rows[2].v[2] = 0.05f / len * rows[2].v[2];
