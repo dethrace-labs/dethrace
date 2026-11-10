@@ -1718,9 +1718,9 @@ intptr_t LinkModel(br_actor* pActor, tModel_pool* pModel_pool) {
 
     if (pActor->model && pActor->model->identifier) {
         for (i = 0; i < pModel_pool->model_count; i++) {
-            if (pModel_pool->model_array[i]->identifier
-                && !strcmp(pModel_pool->model_array[i]->identifier, pActor->model->identifier)) {
-                pActor->model = pModel_pool->model_array[i];
+            if (pModel_pool[0].model_array[i]->identifier
+                && !strcmp(pModel_pool[0].model_array[i]->identifier, pActor->model->identifier)) {
+                pActor->model = pModel_pool[0].model_array[i];
                 break;
             }
         }
