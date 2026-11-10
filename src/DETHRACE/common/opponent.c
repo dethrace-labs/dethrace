@@ -2968,7 +2968,7 @@ tS16 GetOpponentsSectionFinishNode(tOpponent_spec* pOpponent_spec, tS16 pSection
     if (pSection >= 20000 && pSection - 20000 < pOpponent_spec->nnext_sections) {
         section_no = pOpponent_spec->next_sections[pSection - 20000].section_no;
         node_index_index = pOpponent_spec->next_sections[pSection - 20000].direction;
-        return gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_index_index];
+        return *(tU16*)&gProgram_state.AI_vehicles.path_sections[section_no].node_indices[node_index_index];
     }
     dr_dprintf("BIG ERROR - GetOpponentsSectionFinishNode() - section not found in next_section array for opponent %s", pOpponent_spec->car_spec->driver_name);
     PDEnterDebugger("BIG ERROR - GetOpponentsSectionFinishNode()");
