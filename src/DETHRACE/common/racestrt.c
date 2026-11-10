@@ -2750,27 +2750,26 @@ int NetSynchStartDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int
 // FUNCTION: CARM95 0x00454047
 int NetSynchStartGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 
-    if (*pCurrent_choice == 0 || (gNet_mode == eNet_mode_host && *pCurrent_choice >= 0)) {
+    if (*pCurrent_choice != 0 && (gNet_mode != eNet_mode_host || *pCurrent_choice < 0)) {
+        DRS3StartSound(gEffects_outlet, 3100);
+        return 0;
+    } else {
         if (*pCurrent_choice == 0) {
             gProgram_state.prog_status = eProg_idling;
             return 1;
         } else if (gNet_mode == eNet_mode_host && *pCurrent_choice == 1) {
-            if (gNumber_of_net_players <= 1) {
-                DRS3StartSound(gEffects_outlet, 3100);
-                return 0;
-            } else {
+            if (gNumber_of_net_players > 1) {
                 SignalToStartRace();
                 gSynch_race_start = 1;
                 gNo_races_yet = 0;
                 return 1;
+            } else {
+                DRS3StartSound(gEffects_outlet, 3100);
+                return 0;
             }
-        } else {
-            return 1;
         }
-    } else {
-        DRS3StartSound(gEffects_outlet, 3100);
-        return 0;
     }
+    return 1;
 }
 
 // IDA: int __usercall ExitWhenReady@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
