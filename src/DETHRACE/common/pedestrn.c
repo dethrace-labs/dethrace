@@ -465,8 +465,8 @@ void MungeModelSize(br_actor* pActor, br_scalar pScaling_factor) {
     br_scalar half_height;
 
     the_pix = pActor->material->colour_map;
-    half_width = (the_pix->width / 2) * pScaling_factor * gPed_scale_factor;
-    half_height = (the_pix->height / 2) * pScaling_factor * gPed_scale_factor;
+    half_width = DR_FF((the_pix->width / 2) * pScaling_factor) * gPed_scale_factor;
+    half_height = DR_FF((the_pix->height / 2) * pScaling_factor) * gPed_scale_factor;
     PedModelUpdate(pActor->model,
         -half_width, -half_height,
         -half_width, half_height,
