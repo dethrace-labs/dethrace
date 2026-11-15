@@ -12,7 +12,7 @@ int gNon_fatal_allocation_errors = 0;
 
 // Is 247 in DOS executable, last entry NULL
 // GLOBAL: CARM95 0x00513618
-char* gMem_names[247] = {
+char* gMem_names[] = {
     "",
     "BR_MEMORY_SCRATCH",
     "BR_MEMORY_PIXELMAP",
