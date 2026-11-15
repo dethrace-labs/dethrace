@@ -335,10 +335,7 @@ int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
 // IDA: br_scalar __usercall SkidLen@<ST0>(int pSkid@<EAX>)
 // FUNCTION: CARM95 0x004021f1
 br_scalar SkidLen(int pSkid) {
-    return sqrt(
-        gSkids[pSkid].actor->t.t.mat.m[0][2] * gSkids[pSkid].actor->t.t.mat.m[0][2]
-        + gSkids[pSkid].actor->t.t.mat.m[0][1] * gSkids[pSkid].actor->t.t.mat.m[0][1]
-        + gSkids[pSkid].actor->t.t.mat.m[0][0] * gSkids[pSkid].actor->t.t.mat.m[0][0]);
+    return BrVector3Length(&gSkids[pSkid].actor->t.t.look_up.look);
 }
 
 // IDA: void __usercall InitCarSkidStuff(tCar_spec *pCar@<EAX>)
