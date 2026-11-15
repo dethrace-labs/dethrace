@@ -544,7 +544,7 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
         BrMatrix34TApplyV(&o, &tv, &gCamera_to_world);
         BrVector3SetFloat(&tv, FRandomBetween(-0.1f, 0.1f), FRandomBetween(-0.1f, 0.1f), FRandomBetween(-0.1f, 0.1f));
         BrVector3Accumulate(&gSparks[i].v, &tv);
-        ts = 1.0f - (br_scalar)sqrt(BrVector3LengthSquared(&gSparks[i].v)) / 1.4f * pTime / 1000.0f;
+        ts = 1.0f - BrVector3Length(&gSparks[i].v) / 1.4f * pTime / 1000.0f;
         if (ts < 0.1f) {
             ts = 0.1f;
         }
