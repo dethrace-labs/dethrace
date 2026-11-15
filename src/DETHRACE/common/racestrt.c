@@ -490,8 +490,8 @@ void SetCarFlic(void) {
 int UpCar(int* pCurrent_choice, int* pCurrent_mode) {
 
     AddToFlicQueue(gStart_interface_spec->pushed_flics[2].flic_index,
-        gStart_interface_spec->pushed_flics[2].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
+        ((tInterface_spec*)DR_FF_PTR(gStart_interface_spec))->pushed_flics[2].x[gGraf_data_index],
+        ((tInterface_spec*)DR_FF_PTR(gStart_interface_spec))->pushed_flics[2].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     if (gCurrent_car_index != 0) {
