@@ -141,9 +141,8 @@ typedef enum dr_memory_classes {
     kMem_abuse_text = 243,                                               //  0xf3
     kMem_action_replay_buffer = 244,                                     //  0xf4
     kMem_misc = 245,                                                     //  0xf5
-#ifdef DETHRACE_3DFX_PATCH
-    kMem_pixelmap_dimensions = 246 //  0xf6
-#endif
+    kMem_pixelmap_scaled_dimensions = 246                                //  0xf6 (only defined in DETHRACE_3DFX_PATCH)
+
 } dr_memory_classes;
 
 typedef enum keycodes {

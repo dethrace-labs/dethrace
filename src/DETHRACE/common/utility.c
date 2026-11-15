@@ -412,7 +412,7 @@ br_pixelmap* DRPixelmapMatchSized(br_pixelmap* pSrc, tU8 pMatch_type, tS32 pWidt
         if (pSrc->identifier != NULL) {
             result->identifier = BrResStrDup(result, pSrc->identifier);
         }
-        result->user = BrResAllocate(result, sizeof(tPixelmap_user_data), kMem_pixelmap_dimensions);
+        result->user = BrResAllocate(result, sizeof(tPixelmap_user_data), kMem_pixelmap_scaled_dimensions);
         if (result->user != NULL) {
             ((tPixelmap_user_data*)result->user)->orig_width = pSrc->width;
             ((tPixelmap_user_data*)result->user)->orig_height = pSrc->height;
