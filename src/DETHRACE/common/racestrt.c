@@ -2300,13 +2300,13 @@ void DoChallengeScreen(void) {
     gOriginal_position = gOur_starting_position;
     gChallenger_position = IRandomBetween(0, 1);
     if (gOpponents[gCurrent_race.opponent_list[gChallenger_position].index].car_number < 0) {
-        gChallenger_position ^= 1u;
+        gChallenger_position ^= 1;
     }
     gChallenger_index__racestrt = gCurrent_race.opponent_list[gChallenger_position].index;
     LoadOpponentMugShot(gChallenger_index__racestrt);
     gDraw_grid_status = eGrid_draw_none;
     gGrid_y_adjust = gCurrent_graf_data->dare_y_adjust;
-    DoInterfaceScreen(&interface_spec, 0, 0);
+    result = DoInterfaceScreen(&interface_spec, 0, 0);
 }
 
 // IDA: int __usercall GridDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
