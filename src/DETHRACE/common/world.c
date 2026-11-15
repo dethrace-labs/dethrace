@@ -2063,10 +2063,10 @@ void RevealStoredTransparentTextures(tBrender_storage* pStorage) {
     for (i = 0; i < pStorage->materials_count; i++) {
         if (pStorage->saved_colour_maps[i]) {
             if (DRPixelmapHasZeros(pStorage->saved_colour_maps[i])) {
-                pStorage->materials[i]->colour_map = pStorage->saved_colour_maps[i];
+                ((br_material**)DR_FF_PTR(pStorage->materials))[i]->colour_map = pStorage->saved_colour_maps[i];
                 pStorage->saved_colour_maps[i] = NULL;
-                pStorage->materials[i]->flags |= 2u;
-                BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
+                ((br_material**)DR_FF_PTR(pStorage->materials))[i]->flags |= 2u;
+                BrMaterialUpdate(((br_material**)DR_FF_PTR(pStorage->materials))[i], BR_MATU_ALL);
             }
         }
     }
