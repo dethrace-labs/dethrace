@@ -283,8 +283,8 @@ int UpRace(int* pCurrent_choice, int* pCurrent_mode) {
 int DownRace(int* pCurrent_choice, int* pCurrent_mode) {
 
     AddToFlicQueue(gStart_interface_spec->pushed_flics[3].flic_index,
-        gStart_interface_spec->pushed_flics[3].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[3].y[gGraf_data_index],
+        ((int*)DR_FF_PTR(gStart_interface_spec->pushed_flics[3].x))[gGraf_data_index],
+        ((int*)DR_FF_PTR(gStart_interface_spec->pushed_flics[3].y))[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     if ((gProgram_state.rank <= gRace_list[gCurrent_race_index + 1].rank_required || gProgram_state.game_completed || gChange_race_net_mode) && gCurrent_race_index < gNumber_of_races - 1) {
