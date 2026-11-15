@@ -350,9 +350,9 @@ tAdd_to_storage_result AddMaterialToStorage(tBrender_storage* pStorage_space, br
 
     if (pStorage_space->materials_count < pStorage_space->max_materials) {
         for (i = 0; i < pStorage_space->materials_count; i++) {
-            if (pStorage_space->materials[i]->identifier
+            if (((br_material**)DR_FF_PTR(pStorage_space->materials))[i]->identifier
                 && pThe_mat->identifier
-                && !strcmp(pStorage_space->materials[i]->identifier, pThe_mat->identifier)) {
+                && !strcmp(((br_material**)DR_FF_PTR(pStorage_space->materials))[i]->identifier, pThe_mat->identifier)) {
                 return eStorage_duplicate;
             }
         }
