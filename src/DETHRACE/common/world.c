@@ -2336,7 +2336,7 @@ void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
     };
 
     if (gWall_texturing_level != pLevel) {
-        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, tweaker[gWall_texturing_level * 1][pLevel]);
+        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, tweaker[DR_FF(gWall_texturing_level)][pLevel]);
     }
 }
 
