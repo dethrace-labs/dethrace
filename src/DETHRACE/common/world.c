@@ -4049,7 +4049,7 @@ tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
             && v->bounds.max.v[0] > pP->v[0]
             && v->bounds.min.v[2] < pP->v[2]
             && v->bounds.max.v[2] > pP->v[2]
-            && v->bounds.min.v[1] < pP->v[1]
+            && v->bounds.min.v[1] < DR_FF(pP->v[1])
             && v->bounds.max.v[1] > pP->v[1]) {
             BrMatrix34ApplyP(&p, pP, &v->inv_mat);
             if (p.v[0] < -1.f || p.v[0] > 1.f) {
