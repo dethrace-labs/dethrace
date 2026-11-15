@@ -2354,8 +2354,8 @@ int GridMoveRight(int* pCurrent_choice, int* pCurrent_mode) {
     if (gOur_starting_position < gCurrent_race.number_of_racers - 1) {
         AddToFlicQueue(
             gStart_interface_spec->pushed_flics[2].flic_index,
-            gStart_interface_spec->pushed_flics[2].x[gGraf_data_index],
-            gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
+            ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[2].x[gGraf_data_index],
+            ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[2].y[gGraf_data_index],
             1);
         DRS3StartSound(gEffects_outlet, 3000);
         DoGridTransition(gOur_starting_position, gOur_starting_position + 1);
