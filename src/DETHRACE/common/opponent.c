@@ -2827,7 +2827,7 @@ tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
         return &gProgram_state.current_car;
 
     case eVehicle_net_player:
-        return pIndex >= gThis_net_player_index ? gNet_players[pIndex + 1].car : gNet_players[pIndex].car;
+        return pIndex >= DR_FF(gThis_net_player_index) ? gNet_players[pIndex + 1].car : gNet_players[pIndex].car;
 
     case eVehicle_opponent:
         return gProgram_state.AI_vehicles.opponents[pIndex].car_spec;
