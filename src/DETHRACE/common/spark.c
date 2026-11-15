@@ -507,7 +507,7 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
         BrVector3Sub(&gSparks[i].v, &gSparks[i].v, &tv);
         if (gSparks[i].time_sync) {
             BrVector3Scale(&pos, &gSparks[i].v, gSparks[i].time_sync / 1000.0f);
-            gSparks[i].count = gSparks[i].time_sync + gSparks[i].count + -pTime;
+            gSparks[i].count = gSparks[i].count + gSparks[i].time_sync + -pTime;
             gSparks[i].time_sync = 0;
         } else {
             BrVector3Scale(&pos, &gSparks[i].v, pTime / 1000.0f);
