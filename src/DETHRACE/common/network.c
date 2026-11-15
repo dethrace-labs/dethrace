@@ -161,7 +161,7 @@ int NetInitialise(void) {
         *(gMin_messages[i].buffer + gMessage_header_size + offsetof(tNet_message, contents.header.type)) = NETMSGID_NONE;
     }
     for (i = 0; i < MID_MESSAGES_CAPACITY; i++) {
-        *(gMid_messages[i].buffer + gMessage_header_size + offsetof(tNet_message, contents.header.type)) = NETMSGID_NONE;
+        *(gMid_messages[DR_FF(i)].buffer + gMessage_header_size + offsetof(tNet_message, contents.header.type)) = NETMSGID_NONE;
     }
     for (i = 0; i < MAX_MESSAGES_CAPACITY; i++) {
         *(gMax_messages[i].buffer + gMessage_header_size + offsetof(tNet_message, contents.header.type)) = NETMSGID_NONE;
