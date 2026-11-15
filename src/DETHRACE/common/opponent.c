@@ -3300,7 +3300,7 @@ void DeleteSection(tS16 pSection_to_delete) {
     tS16 found_it;
 
     for (node_no_index = 0; node_no_index < 2; node_no_index++) {
-        node_no = gProgram_state.AI_vehicles.path_sections[pSection_to_delete].node_indices[node_no_index];
+        node_no = gProgram_state.AI_vehicles.path_sections[pSection_to_delete].node_indices[DR_FF(node_no_index)];
         if (node_no >= 0) {
             found_it = 0;
             for (section_no_index = 0; section_no_index < (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections - 1); section_no_index++) {
