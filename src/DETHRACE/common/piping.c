@@ -2393,11 +2393,11 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 int CarTimeout(tU32 pTime) {
 
     if (SHOULD_SCAN_FORWARDS()) {
-        if (gLoop_abort_time < pTime) {
+        if (DR_FF(gLoop_abort_time) < pTime) {
             return 0;
         }
     } else {
-        if (gLoop_abort_time > pTime) {
+        if (DR_FF(gLoop_abort_time) > pTime) {
             return 0;
         }
     }
