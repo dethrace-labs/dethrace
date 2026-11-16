@@ -1102,22 +1102,21 @@ void SelectRandomItOrFox(int pNot_this_one) {
     new_choice = 0;
     gLast_lepper = NULL;
     if (gCurrent_net_game->type == eNet_game_type_tag) {
-        for (i = 0; i < gNumber_of_net_players; i++) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; i++) {
             if (gNet_players[i].last_score_index == 0) {
                 new_choice = i;
                 break;
             }
         }
     } else {
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            if (i != pNot_this_one && gNet_players[i].last_score_index == gNumber_of_net_players - 1) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; i++) {
+            if (DR_FF(i) != pNot_this_one && gNet_players[i].last_score_index == gNumber_of_net_players - 1) {
                 PlayerIsIt(&gNet_players[i]);
                 return;
             }
         }
-        do {
-            new_choice = IRandomBetween(0, gNumber_of_net_players - 1);
-        } while (new_choice == pNot_this_one && !gNet_players[new_choice].car->knackered);
+        while (DR_FF(new_choice = IRandomBetween(0, gNumber_of_net_players - 1)) == pNot_this_one && !gNet_players[new_choice].car->knackered) {
+        }
     }
     PlayerIsIt(&gNet_players[new_choice]);
 }
