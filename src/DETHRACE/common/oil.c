@@ -36,10 +36,18 @@ void InitOilSpills(void) {
     br_model* the_model;
     br_material* the_material;
 
+#ifdef DETHRACE_3DFX_PATCH
+    gOil_pixies[0] = LoadPixelmap(gOil_pixie_names[0]);
+    if (gOil_pixies[0] != NULL) {
+        gOil_pixies[0] = PurifiedPixelmap(gOil_pixies[0]);
+    }
+    BrMapAdd(gOil_pixies[0]);
+#else
     for (i = 0; i < COUNT_OF(gOil_pixie_names); i++) {
         gOil_pixies[i] = LoadPixelmap(gOil_pixie_names[i]);
         BrMapAdd(gOil_pixies[i]);
     }
+#endif
 
     for (i = 0; i < COUNT_OF(gOily_spills); i++) {
         the_material = BrMaterialAllocate(NULL);
