@@ -3821,32 +3821,32 @@ void RebuildOppoPathModel(void) {
             edge_mat_start_dk = gMat_dk_grn;
             edge_mat_finish_lt = gMat_lt_grn;
             edge_mat_finish_dk = gMat_dk_grn;
-            if (gProgram_state.AI_vehicles.path_sections[i].type == 1) {
+            if (gProgram_state.AI_vehicles.path_sections[1 * i].type == 1) {
                 centre_mat_lt = gMat_lt_red;
                 centre_mat_dk = gMat_dk_red;
-            } else if (gProgram_state.AI_vehicles.path_sections[i].type == 2) {
+            } else if (gProgram_state.AI_vehicles.path_sections[1 * i].type == 2) {
                 centre_mat_lt = gMat_lt_blu;
                 centre_mat_dk = gMat_dk_blu;
             }
-            if (gProgram_state.AI_vehicles.path_sections[i].one_way) {
+            if (gProgram_state.AI_vehicles.path_sections[1 * i].one_way) {
                 centre_mat_lt = gMat_lt_yel;
             }
-            if ((gProgram_state.AI_vehicles.path_sections[i].min_speed[0] != 0) || (gProgram_state.AI_vehicles.path_sections[i].max_speed[0] != 255)) {
+            if ((gProgram_state.AI_vehicles.path_sections[1 * i].min_speed[0] != 0) || (gProgram_state.AI_vehicles.path_sections[1 * i].max_speed[0] != 255)) {
                 edge_mat_start_lt = gMat_lt_turq;
                 edge_mat_start_dk = gMat_dk_turq;
             }
-            if ((gProgram_state.AI_vehicles.path_sections[i].min_speed[1] != 0) || (gProgram_state.AI_vehicles.path_sections[i].max_speed[1] != 255)) {
+            if ((gProgram_state.AI_vehicles.path_sections[1 * i].min_speed[1] != 0) || (gProgram_state.AI_vehicles.path_sections[1 * i].max_speed[1] != 255)) {
                 edge_mat_finish_lt = gMat_lt_turq;
                 edge_mat_finish_dk = gMat_dk_turq;
             }
             if (gAlready_elasticating && gMobile_section == i) {
-                BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[i].node_indices[1]].p,
+                BrVector3Copy(&gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[1 * i].node_indices[1]].p,
                     &gSelf->t.t.translate.t);
             }
             MakeSection(18 * i, 12 * i,
-                &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[i].node_indices[0]].p,
-                &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[i].node_indices[1]].p,
-                gProgram_state.AI_vehicles.path_sections[i].width,
+                &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[1 * i].node_indices[0]].p,
+                &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[1 * i].node_indices[1]].p,
+                gProgram_state.AI_vehicles.path_sections[1 * i].width,
                 centre_mat_lt, centre_mat_dk,
                 edge_mat_start_lt, edge_mat_start_dk,
                 edge_mat_finish_lt, edge_mat_finish_dk);
@@ -3858,7 +3858,7 @@ void RebuildOppoPathModel(void) {
 
         for (i = 0; i < gProgram_state.AI_vehicles.number_of_cops; i++) {
             MakeCube(first_vertex + 8 * i,
-                first_face + 12 * i,
+                first_face + i * 3 * 4,
                 gProgram_state.AI_vehicles.cop_start_points + i,
                 gMat_lt_turq,
                 gMat_lt_turq,
