@@ -1098,7 +1098,7 @@ int DamageScrnUp(int* pCurrent_choice, int* pCurrent_mode) {
             new_selection = gWreck_selected;
             for (i = 0; i < gWreck_count; i++) {
                 if (gWreck_array[gWreck_selected].pos_y - 1.f == gWreck_array[i].pos_y) {
-                    if (gWreck_array[i].pos_x == gWreck_array[gWreck_selected].pos_x) {
+                    if (gWreck_array[DR_FF(i)].pos_x == gWreck_array[gWreck_selected].pos_x) {
                         new_selection = i;
                         break;
                     } else {
