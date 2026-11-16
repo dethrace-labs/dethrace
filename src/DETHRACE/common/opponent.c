@@ -342,8 +342,7 @@ tS16 FindNearestPathNode(br_vector3* pActor_coords, br_scalar* pDistance) {
     *pDistance = FLT_MAX;
     for (i = 0; i < gProgram_state.AI_vehicles.number_of_path_nodes; i++) {
         BrVector3Sub(&actor_to_node, &gProgram_state.AI_vehicles.path_nodes[i].p, pActor_coords);
-        distance = BrVector3Length(&actor_to_node);
-        if (distance < *pDistance) {
+        if ((distance = BrVector3Length(&actor_to_node)) < *pDistance) {
             if (!gAlready_elasticating || gProgram_state.AI_vehicles.path_sections[gMobile_section].node_indices[1] != i) {
                 *pDistance = distance;
                 nearest_node = i;
