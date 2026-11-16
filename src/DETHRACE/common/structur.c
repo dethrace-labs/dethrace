@@ -274,15 +274,15 @@ void CheckCheckpoints(void) {
             for (i = 0; i < gCurrent_race.check_point_count; i++) {
                 for (j = 0; j < gCurrent_race.checkpoints[i].quad_count; j++) {
                     if (
-                        RayHitFace(&gCurrent_race.checkpoints[i].vertices[j][0],
-                            &gCurrent_race.checkpoints[i].vertices[j][1],
-                            &gCurrent_race.checkpoints[i].vertices[j][2],
-                            &gCurrent_race.checkpoints[i].normal[j],
+                        RayHitFace(&gCurrent_race.checkpoints[DR_FF(i)].vertices[j][0],
+                            &gCurrent_race.checkpoints[DR_FF(i)].vertices[j][1],
+                            &gCurrent_race.checkpoints[DR_FF(i)].vertices[j][2],
+                            &gCurrent_race.checkpoints[DR_FF(i)].normal[j],
                             &orig, &dir)
-                        || RayHitFace(&gCurrent_race.checkpoints[i].vertices[j][0],
-                            &gCurrent_race.checkpoints[i].vertices[j][2],
-                            &gCurrent_race.checkpoints[i].vertices[j][3],
-                            &gCurrent_race.checkpoints[i].normal[j],
+                        || RayHitFace(&gCurrent_race.checkpoints[DR_FF(i)].vertices[j][0],
+                            &gCurrent_race.checkpoints[DR_FF(i)].vertices[j][2],
+                            &gCurrent_race.checkpoints[DR_FF(i)].vertices[j][3],
+                            &gCurrent_race.checkpoints[DR_FF(i)].normal[j],
                             &orig,
                             &dir)) {
                         if (gNet_mode != eNet_mode_none) {
