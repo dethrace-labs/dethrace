@@ -403,8 +403,8 @@ tS16 FindNearestGeneralSection(tCar_spec* pPursuee, br_vector3* pActor_coords, b
             start = &pPursuee->my_trail.trail_nodes[section_no];
             finish = &pPursuee->my_trail.trail_nodes[section_no + 1];
         } else {
-            start = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[0]].p;
-            finish = &gProgram_state.AI_vehicles.path_nodes[gProgram_state.AI_vehicles.path_sections[section_no].node_indices[1]].p;
+            start = &gProgram_state.AI_vehicles.path_nodes[((tPath_section*)DR_FF_PTR(gProgram_state.AI_vehicles.path_sections))[section_no].node_indices[0]].p;
+            finish = &gProgram_state.AI_vehicles.path_nodes[((tPath_section*)DR_FF_PTR(gProgram_state.AI_vehicles.path_sections))[section_no].node_indices[1]].p;
         }
         if (!gAlready_elasticating || gMobile_section != section_no) {
             BrVector3Sub(&a, finish, start);
