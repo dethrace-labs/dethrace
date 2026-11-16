@@ -1042,11 +1042,11 @@ void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34* pMatrix, int pMaterial
 // FUNCTION: CARM95 0x00429559
 void ResetPiping(void) {
 
-    gWall_severity = 0.f;
-    gPipe_buffer_oldest = NULL;
     gPipe_record_ptr = gPipe_buffer_start;
     gPipe_buffer_working_end = gPipe_buffer_phys_end;
+    gPipe_buffer_oldest = NULL;
     gReentrancy_count = 0;
+    gWall_severity = 0.f;
 }
 
 // IDA: void __cdecl InitialisePiping()
