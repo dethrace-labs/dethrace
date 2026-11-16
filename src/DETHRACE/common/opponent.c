@@ -1418,9 +1418,9 @@ void ProcessLevitate(tOpponent_spec* pOpponent_spec, tProcess_objective_command 
             pOpponent_spec->car_spec->car_master_actor->t.t.translate.t.v[1] = pOpponent_spec->levitate_data.initial_y + y;
             if (y > 200.f) {
                 pOpponent_spec->finished_for_this_race = 1;
+                break;
             }
         }
-        break;
     case ePOC_die:
         return;
     default:
