@@ -271,9 +271,9 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     int i;
 
     for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
-        if (pStorage_space->pixelmaps[i] != NULL) {
-            BrMapRemove(pStorage_space->pixelmaps[i]);
-            BrPixelmapFree(pStorage_space->pixelmaps[i]);
+        if (pStorage_space->pixelmaps[DR_FF(i)] != NULL) {
+            BrMapRemove(pStorage_space->pixelmaps[DR_FF(i)]);
+            BrPixelmapFree(pStorage_space->pixelmaps[DR_FF(i)]);
         }
     }
     pStorage_space->pixelmaps_count = 0;
@@ -285,16 +285,16 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     }
     pStorage_space->shade_tables_count = 0;
     for (i = 0; i < pStorage_space->materials_count; i++) {
-        if (pStorage_space->materials[i] != NULL) {
-            BrMaterialRemove(pStorage_space->materials[i]);
-            BrMaterialFree(pStorage_space->materials[i]);
+        if (pStorage_space->materials[DR_FF(i)] != NULL) {
+            BrMaterialRemove(pStorage_space->materials[DR_FF(i)]);
+            BrMaterialFree(pStorage_space->materials[DR_FF(i)]);
         }
     }
     pStorage_space->materials_count = 0;
     for (i = 0; i < pStorage_space->models_count; i++) {
-        if (pStorage_space->models[i] != NULL) {
-            BrModelRemove(pStorage_space->models[i]);
-            BrModelFree(pStorage_space->models[i]);
+        if (pStorage_space->models[DR_FF(i)] != NULL) {
+            BrModelRemove(pStorage_space->models[DR_FF(i)]);
+            BrModelFree(pStorage_space->models[DR_FF(i)]);
         }
     }
     pStorage_space->models_count = 0;
