@@ -232,9 +232,7 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
     br_scalar dist;
     br_vector3 to_camera;
 
-    to_camera.v[0] = gCamera_to_world.m[3][0] - pOld_pos->v[0];
-    to_camera.v[1] = gCamera_to_world.m[3][1] - pOld_pos->v[1];
-    to_camera.v[2] = gCamera_to_world.m[3][2] - pOld_pos->v[2];
+    BrVector3Sub(&to_camera, (br_vector3*)gCamera_to_world.m[3], pOld_pos);
     dist = BrVector3Length(&to_camera);
     if (dist <= BR_SCALAR_EPSILON) {
         return;
