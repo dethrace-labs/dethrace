@@ -1005,10 +1005,10 @@ void DeclareWinner(int pWinner_index) {
         gNet_players[pWinner_index].games_score += gGame_scores[5];
     }
     sprintf(s, "%s %s", gNet_players[pWinner_index].player_name, GetMiscString(kMiscString_IS_THE_WINNER));
-    for (i = 0; i < gNumber_of_net_players; i++) {
+    for (i = 0; i < DR_FF(gNumber_of_net_players); i++) {
         if (gCurrent_net_game->type != eNet_game_type_sudden_death && gCurrent_net_game->type != eNet_game_type_tag && gCurrent_net_game->type != eNet_game_type_fight_to_death) {
             best_score_index = gNet_players[i].last_score_index;
-            for (j = 0; j < gNumber_of_net_players; j++) {
+            for (j = 0; j < DR_FF(gNumber_of_net_players); j++) {
                 if (gNet_players[i].score == gNet_players[j].score && gNet_players[j].last_score_index < best_score_index) {
                     best_score_index = gNet_players[j].last_score_index;
                 }
@@ -1025,7 +1025,7 @@ void DeclareWinner(int pWinner_index) {
     }
     gReceived_game_scores = 1;
     the_message = NetBuildMessage(NETMSGID_GAMESCORES, 0);
-    for (i = 0; i < gNumber_of_net_players; i++) {
+    for (i = 0; i < DR_FF(gNumber_of_net_players); i++) {
         the_message->contents.data.game_scores.scores[i].played = gNet_players[i].played;
         the_message->contents.data.game_scores.scores[i].won = gNet_players[i].won;
         the_message->contents.data.game_scores.scores[i].score = gNet_players[i].games_score;
