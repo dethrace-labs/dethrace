@@ -271,9 +271,9 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     int i;
 
     for (i = 0; i < pStorage_space->pixelmaps_count; i++) {
-        if (pStorage_space->pixelmaps[i] != NULL) {
-            BrMapRemove(pStorage_space->pixelmaps[i]);
-            BrPixelmapFree(pStorage_space->pixelmaps[i]);
+        if (pStorage_space->pixelmaps[DR_FF(i)] != NULL) {
+            BrMapRemove(pStorage_space->pixelmaps[DR_FF(i)]);
+            BrPixelmapFree(pStorage_space->pixelmaps[DR_FF(i)]);
         }
     }
     pStorage_space->pixelmaps_count = 0;
@@ -285,16 +285,16 @@ void ClearOutStorageSpace(tBrender_storage* pStorage_space) {
     }
     pStorage_space->shade_tables_count = 0;
     for (i = 0; i < pStorage_space->materials_count; i++) {
-        if (pStorage_space->materials[i] != NULL) {
-            BrMaterialRemove(pStorage_space->materials[i]);
-            BrMaterialFree(pStorage_space->materials[i]);
+        if (pStorage_space->materials[DR_FF(i)] != NULL) {
+            BrMaterialRemove(pStorage_space->materials[DR_FF(i)]);
+            BrMaterialFree(pStorage_space->materials[DR_FF(i)]);
         }
     }
     pStorage_space->materials_count = 0;
     for (i = 0; i < pStorage_space->models_count; i++) {
-        if (pStorage_space->models[i] != NULL) {
-            BrModelRemove(pStorage_space->models[i]);
-            BrModelFree(pStorage_space->models[i]);
+        if (pStorage_space->models[DR_FF(i)] != NULL) {
+            BrModelRemove(pStorage_space->models[DR_FF(i)]);
+            BrModelFree(pStorage_space->models[DR_FF(i)]);
         }
     }
     pStorage_space->models_count = 0;
@@ -350,9 +350,9 @@ tAdd_to_storage_result AddMaterialToStorage(tBrender_storage* pStorage_space, br
 
     if (pStorage_space->materials_count < pStorage_space->max_materials) {
         for (i = 0; i < pStorage_space->materials_count; i++) {
-            if (pStorage_space->materials[i]->identifier
+            if (((br_material**)DR_FF_PTR(pStorage_space->materials))[i]->identifier
                 && pThe_mat->identifier
-                && !strcmp(pStorage_space->materials[i]->identifier, pThe_mat->identifier)) {
+                && !strcmp(((br_material**)DR_FF_PTR(pStorage_space->materials))[i]->identifier, pThe_mat->identifier)) {
                 return eStorage_duplicate;
             }
         }
@@ -373,10 +373,10 @@ tAdd_to_storage_result AddModelToStorage(tBrender_storage* pStorage_space, br_mo
     if (pStorage_space->models_count < pStorage_space->max_models) {
 
         for (i = 0; i < pStorage_space->models_count; i++) {
-            if (pStorage_space->models[i]
-                && pStorage_space->models[i]->identifier
+            if (pStorage_space->models[DR_FF(i)]
+                && pStorage_space->models[DR_FF(i)]->identifier
                 && pThe_mod->identifier
-                && !strcmp(pStorage_space->models[i]->identifier, pThe_mod->identifier)) {
+                && !strcmp(pStorage_space->models[DR_FF(i)]->identifier, pThe_mod->identifier)) {
                 return eStorage_duplicate;
             }
         }
@@ -749,7 +749,7 @@ br_material* WallPerspToUntex(br_model* pModel, tU16 pFace) {
     br_material* new_mat;
 
     old_mat = pModel->faces[pFace].material;
-    if (old_mat->colour_map != NULL && FaceIsRoad(pModel, pFace)) {
+    if (old_mat->colour_map != NULL && !FaceIsRoad(pModel, pFace)) {
 
         if (old_mat->flags & BR_MATF_PERSPECTIVE) {
             new_mat = SuffixedMaterial(old_mat, ".pwall");
@@ -1412,47 +1412,47 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
             the_funk->texture_animation_data.flic_info.flic_data = 0;
             if (LoadFlicData(s, &the_funk->texture_animation_data.flic_info.flic_data, &the_funk->texture_animation_data.flic_info.flic_data_length) == 0) {
                 the_funk->texture_animation_type = eTexture_animation_none;
-            } else {
-                the_funk->texture_animation_data.flic_info.flic_descriptor.data_start = NULL;
-                StartFlic(
-                    s,
-                    -1,
-                    &the_funk->texture_animation_data.flic_info.flic_descriptor,
-                    the_funk->texture_animation_data.flic_info.flic_data_length,
-                    (tS8*)the_funk->texture_animation_data.flic_info.flic_data,
-                    0,
-                    0,
-                    0,
-                    0);
-                the_funk->last_frame = 0.0f;
-                the_pixels = BrMemAllocate(
-                    the_funk->texture_animation_data.flic_info.flic_descriptor.height
-                        * ((the_funk->texture_animation_data.flic_info.flic_descriptor.width + 3) & ~3),
-                    kMem_video_pixels);
-                if (gScreen->row_bytes < 0) {
-                    BrFatal(
-                        "C:\\Msdev\\Projects\\DethRace\\World.c",
-                        1729,
-                        "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\World.c",
-                        1729);
-                }
-                the_pixelmap = DRPixelmapAllocate(
+                break;
+            }
+            the_funk->texture_animation_data.flic_info.flic_descriptor.data_start = NULL;
+            StartFlic(
+                s,
+                -1,
+                &the_funk->texture_animation_data.flic_info.flic_descriptor,
+                the_funk->texture_animation_data.flic_info.flic_data_length,
+                (tS8*)the_funk->texture_animation_data.flic_info.flic_data,
+                0,
+                0,
+                0,
+                0);
+            the_funk->last_frame = 0.0f;
+            the_pixels = BrMemAllocate(
+                the_funk->texture_animation_data.flic_info.flic_descriptor.height
+                    * ((the_funk->texture_animation_data.flic_info.flic_descriptor.width + 3) & ~3),
+                kMem_video_pixels);
+            if (gScreen->row_bytes < 0) {
+                BrFatal(
+                    "C:\\Msdev\\Projects\\DethRace\\World.c",
+                    1729,
+                    "Bruce bug at line %d, file C:\\Msdev\\Projects\\DethRace\\World.c",
+                    1729);
+            }
+            the_pixelmap = DRPixelmapAllocate(
 #ifdef DETHRACE_3DFX_PATCH
                     BR_PMT_INDEX_8,
 #else
                     gScreen->type,
 #endif
-                    the_funk->texture_animation_data.flic_info.flic_descriptor.width,
-                    the_funk->texture_animation_data.flic_info.flic_descriptor.height,
-                    the_pixels,
-                    0);
+                the_funk->texture_animation_data.flic_info.flic_descriptor.width,
+                the_funk->texture_animation_data.flic_info.flic_descriptor.height,
+                the_pixels,
+                0);
 #ifdef DETHRACE_3DFX_PATCH
                 the_pixelmap = PurifiedPixelmap(the_pixelmap);
 #endif
-                AssertFlicPixelmap(&the_funk->texture_animation_data.flic_info.flic_descriptor, the_pixelmap);
-                the_funk->material->colour_map = the_pixelmap;
-                BrMaterialUpdate(the_funk->material, BR_MATU_ALL);
-            }
+            AssertFlicPixelmap(&the_funk->texture_animation_data.flic_info.flic_descriptor, the_pixelmap);
+            the_funk->material->colour_map = the_pixelmap;
+            BrMaterialUpdate(the_funk->material, BR_MATU_ALL);
             break;
 
             DETHRACE_DEFAULT_BREAK
@@ -1470,9 +1470,13 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
                     if (the_funk->proximity_array[j].v[0] == the_funk->proximity_array[i].v[0]
                         && the_funk->proximity_array[j].v[1] == the_funk->proximity_array[i].v[1]
                         && the_funk->proximity_array[j].v[2] == the_funk->proximity_array[i].v[2]) {
+#ifdef DETHRACE_FIX_BUGS
                         memmove(
+#else
+                        memcpy(
+#endif
                             &the_funk->proximity_array[j],
-                            &the_funk->proximity_array[j + 1],
+                            &the_funk->proximity_array[j] + 1,
                             (the_funk->proximity_count - j - 1) * sizeof(br_vector3));
 
                         j--;
@@ -1886,7 +1890,7 @@ void UpdateSpecVol(void) {
 
     index = FindSpecVolIndex(gLast_actor);
     if (index >= 0) {
-        v = &gProgram_state.special_volumes[index];
+        v = &gProgram_state.special_volumes[DR_FF(index)];
         BrMatrix34Copy(&v->mat, &gLast_actor->t.t.mat);
         FindInverseAndWorldBox(v);
         SetSpecVolMatSize(gLast_actor);
@@ -2063,10 +2067,10 @@ void RevealStoredTransparentTextures(tBrender_storage* pStorage) {
     for (i = 0; i < pStorage->materials_count; i++) {
         if (pStorage->saved_colour_maps[i]) {
             if (DRPixelmapHasZeros(pStorage->saved_colour_maps[i])) {
-                pStorage->materials[i]->colour_map = pStorage->saved_colour_maps[i];
+                ((br_material**)DR_FF_PTR(pStorage->materials))[i]->colour_map = pStorage->saved_colour_maps[i];
                 pStorage->saved_colour_maps[i] = NULL;
-                pStorage->materials[i]->flags |= 2u;
-                BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
+                ((br_material**)DR_FF_PTR(pStorage->materials))[i]->flags |= 2u;
+                BrMaterialUpdate(((br_material**)DR_FF_PTR(pStorage->materials))[i], BR_MATU_ALL);
             }
         }
     }
@@ -2078,12 +2082,12 @@ void HideStoredTextures(tBrender_storage* pStorage) {
     int i;
 
     for (i = 0; i < pStorage->materials_count; i++) {
-        if (pStorage->materials[i]->colour_map) {
-            if (StorageContainsPixelmap(pStorage, pStorage->materials[i]->colour_map)) {
-                pStorage->saved_colour_maps[i] = pStorage->materials[i]->colour_map;
-                pStorage->materials[i]->colour_map = NULL;
-                pStorage->materials[i]->flags &= ~BR_MATF_PRELIT;
-                BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
+        if (pStorage->materials[DR_FF(i)]->colour_map) {
+            if (StorageContainsPixelmap(pStorage, pStorage->materials[DR_FF(i)]->colour_map)) {
+                pStorage->saved_colour_maps[DR_FF(i)] = pStorage->materials[DR_FF(i)]->colour_map;
+                pStorage->materials[DR_FF(i)]->colour_map = NULL;
+                pStorage->materials[DR_FF(i)]->flags &= ~BR_MATF_PRELIT;
+                BrMaterialUpdate(pStorage->materials[DR_FF(i)], BR_MATU_ALL);
             }
         }
     }
@@ -2096,10 +2100,11 @@ void RevealStoredTextures(tBrender_storage* pStorage) {
 
     for (i = 0; i < pStorage->materials_count; i++) {
         if (pStorage->saved_colour_maps[i]) {
-            pStorage->materials[i]->colour_map = pStorage->saved_colour_maps[i];
+            pStorage->materials[DR_FF(i)]->colour_map = pStorage->saved_colour_maps[i];
             pStorage->saved_colour_maps[i] = NULL;
-            pStorage->materials[i]->flags |= BR_MATF_PRELIT;
-            BrMaterialUpdate(pStorage->materials[i], BR_MATU_ALL);
+            // degrades to [i], for asm matching
+            pStorage->materials[i + i * 0]->flags |= BR_MATF_PRELIT;
+            BrMaterialUpdate(pStorage->materials[DR_FF(i)], BR_MATU_ALL);
         }
     }
 }
@@ -2335,8 +2340,8 @@ void ReallySetWallTexturingLevel(tWall_texturing_level pLevel) {
         },
     };
 
-    if (pLevel != gWall_texturing_level) {
-        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, tweaker[gWall_texturing_level][pLevel]);
+    if (gWall_texturing_level != pLevel) {
+        ProcessFaceMaterials(gProgram_state.track_spec.the_actor, tweaker[DR_FF(gWall_texturing_level)][pLevel]);
     }
 }
 
@@ -4049,7 +4054,7 @@ tSpecial_volume* FindSpecialVolume(br_vector3* pP, tSpecial_volume* pLast_vol) {
             && v->bounds.max.v[0] > pP->v[0]
             && v->bounds.min.v[2] < pP->v[2]
             && v->bounds.max.v[2] > pP->v[2]
-            && v->bounds.min.v[1] < pP->v[1]
+            && v->bounds.min.v[1] < DR_FF(pP->v[1])
             && v->bounds.max.v[1] > pP->v[1]) {
             BrMatrix34ApplyP(&p, pP, &v->inv_mat);
             if (p.v[0] < -1.f || p.v[0] > 1.f) {
@@ -5175,8 +5180,13 @@ void DeleteSpecVol(void) {
     index = FindSpecVolIndex(gLast_actor);
     if (index >= 0) {
         DelSpecVolumeGraph(index);
-        memmove(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
+#ifdef DETHRACE_FIX_BUGS
+        memmove(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index] + 1, (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
         memmove(&gSpec_vol_actors[index], &gSpec_vol_actors[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(br_actor*));
+#else
+        memcpy(&gProgram_state.special_volumes[index], &gProgram_state.special_volumes[index] + 1, (gProgram_state.special_volume_count - index - 1) * sizeof(tSpecial_volume));
+        memcpy(&gSpec_vol_actors[index], &gSpec_vol_actors[index + 1], (gProgram_state.special_volume_count - index - 1) * sizeof(br_actor*));
+#endif
         gProgram_state.special_volume_count--;
         NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_BLUEHEAD, "There's been a special volumes MURDER!!");
         gLast_actor = NULL;

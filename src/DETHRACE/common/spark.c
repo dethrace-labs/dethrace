@@ -507,7 +507,7 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
         BrVector3Sub(&gSparks[i].v, &gSparks[i].v, &tv);
         if (gSparks[i].time_sync) {
             BrVector3Scale(&pos, &gSparks[i].v, gSparks[i].time_sync / 1000.0f);
-            gSparks[i].count = gSparks[i].time_sync + gSparks[i].count + -pTime;
+            gSparks[i].count = gSparks[i].count + gSparks[i].time_sync + -pTime;
             gSparks[i].time_sync = 0;
         } else {
             BrVector3Scale(&pos, &gSparks[i].v, pTime / 1000.0f);
@@ -1332,17 +1332,19 @@ void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAs
 
     cam = pCam->type_data;
 
+#ifdef DETHRACE_3DFX_PATCH
     if (gNo_2d_effects) {
         RecordSmokeCircle(o, r, strength, pShade_table, pAspect);
         return;
     }
+#endif
 
-    srand(o->v[2] * 16777216.0f + o->v[1] * 65536.0f + o->v[0] * 256.0f + r);
+    srand(DR_FF(o->v[2] * 16777216.0f) + o->v[1] * 65536.0f + o->v[0] * 256.0f + r);
     BrVector3Sub(&tv, o, (br_vector3*)gSmoke_camera_to_world.m[3]);
     BrMatrix34TApplyV(&p, &tv, &gSmoke_camera_to_world);
 
     if (-p.v[2] >= cam->hither_z && -p.v[2] <= cam->yon_z) {
-        scaled_r = gCameraToScreen.m[0][0] * r / -p.v[2];
+        scaled_r = gCameraToScreen.m[0][0] * r / DR_FF(-p.v[2]);
         extra_z = gCameraToScreen.m[3][2] * r / (p.v[2] * p.v[2]);
         BrMatrix4ApplyP(&o2, &p, &gCameraToScreen);
         BrVector3InvScale(&p, &o2, o2.v[3]);

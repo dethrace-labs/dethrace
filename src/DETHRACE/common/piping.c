@@ -248,16 +248,10 @@ void SaveReducedPos(tReduced_pos* p, br_vector3* v) {
 // IDA: int __cdecl PipeSearchForwards()
 // FUNCTION: CARM95 0x00427fdf
 int PipeSearchForwards(void) {
-    if (gPipe_play_ptr == gPipe_record_ptr) {
-        return 0;
-    }
-    if (gPipe_play_ptr == gPipe_buffer_oldest) {
-        return 1;
-    }
-    if (GetReplayRate() != 0.f) {
-        return GetReplayRate() > 0.f;
-    }
-    return GetReplayDirection() > 0 ? 1 : 0;
+    return gPipe_play_ptr == gPipe_record_ptr ? 0
+        : gPipe_play_ptr == gPipe_buffer_oldest ? 1
+        : GetReplayRate() != 0.f ? GetReplayRate() > 0.f
+                                  : GetReplayDirection() > 0;
 }
 
 // IDA: int __cdecl IsActionReplayAvailable()
@@ -528,7 +522,7 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
     int variable_for_breaking_on;
 
     if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
-        temp_buffer_size = pData_length + (gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data));
+        temp_buffer_size = DR_FF(pData_length) + gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data);
         if (temp_buffer_size < LOCAL_BUFFER_SIZE) {
 #ifdef DETHRACE_FIX_BUGS
             int amount = ((tPipe_session*)gLocal_buffer)->number_of_chunks;
@@ -554,7 +548,11 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
 #else
             gMr_chunky2 = (tPipe_chunk*)&gMr_chunky2->chunk_data;
 #endif
+#ifdef DETHRACE_FIX_BUGS
+            memmove(gMr_chunky2, pData, pData_length);
+#else
             memcpy(gMr_chunky2, pData, pData_length);
+#endif
             gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + pData_length);
             gLocal_buffer_size = temp_buffer_size;
             PIPING_REQUIRE(gLocal_buffer_size <= LOCAL_BUFFER_SIZE);
@@ -1042,11 +1040,11 @@ void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34* pMatrix, int pMaterial
 // FUNCTION: CARM95 0x00429559
 void ResetPiping(void) {
 
-    gWall_severity = 0.f;
-    gPipe_buffer_oldest = NULL;
     gPipe_record_ptr = gPipe_buffer_start;
     gPipe_buffer_working_end = gPipe_buffer_phys_end;
+    gPipe_buffer_oldest = NULL;
     gReentrancy_count = 0;
+    gWall_severity = 0.f;
 }
 
 // IDA: void __cdecl InitialisePiping()
@@ -2358,14 +2356,14 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 
     temp_ptr = pChunk_ptr;
     if (SHOULD_SCAN_FORWARDS()) {
-        if (gEnd_time >= pTime) {
+        if (DR_FF(gEnd_time) >= pTime) {
             return 0;
         }
-    } else if (gEnd_time <= pTime) {
+    } else if (DR_FF(gEnd_time) <= pTime) {
         return 0;
     }
 
-    for (i = 0; i < pChunk_count; i++) {
+    for (i = 0; DR_FF(i) < pChunk_count; i++) {
         if ((temp_ptr->subject_index >> 8) == 0) {
             car = &gProgram_state.current_car;
         } else {
@@ -2393,11 +2391,11 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 int CarTimeout(tU32 pTime) {
 
     if (SHOULD_SCAN_FORWARDS()) {
-        if (gLoop_abort_time < pTime) {
+        if (DR_FF(gLoop_abort_time) < pTime) {
             return 0;
         }
     } else {
-        if (gLoop_abort_time > pTime) {
+        if (DR_FF(gLoop_abort_time) > pTime) {
             return 0;
         }
     }

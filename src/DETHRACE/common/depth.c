@@ -608,7 +608,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     top_y = -hori_y - hori_pixels;
 
     while (dst_x < pRender_buffer->width) {
-        dx = pRender_buffer->width - dst_x < col_map->width - src_x ? pRender_buffer->width - dst_x : col_map->width - src_x;
+        dx = DR_FF(col_map->width - src_x) < pRender_buffer->width - dst_x ? DR_FF(col_map->width - src_x) : pRender_buffer->width - dst_x;
         DRPixelmapRectangleCopy(pRender_buffer, dst_x - pRender_buffer->origin_x, top_y, col_map, src_x - col_map->origin_x, -col_map->origin_y, dx, col_map->height);
         src_x = 0;
         dst_x += dx;
