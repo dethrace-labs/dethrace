@@ -235,7 +235,7 @@ void ReceivedMechanics(tNet_contents* pContents) {
             break;
         }
     }
-    if (car == NULL || car->message.time > pContents->data.mech.time) {
+    if (car == NULL || DR_FF(car->message.time) > pContents->data.mech.time) {
         return;
     }
     if (car->disabled) {
@@ -260,7 +260,7 @@ void ReceivedMechanics(tNet_contents* pContents) {
     }
     if (gNet_mode == eNet_mode_host) {
         if (gThis_net_player_index != i) {
-            if (car->last_car_car_collision <= pContents->data.mech.cc_coll_time) {
+            if (DR_FF(car->last_car_car_collision) <= pContents->data.mech.cc_coll_time) {
                 CopyMechanics(car, pContents);
             }
             car->power_up_levels[0] = pContents->data.mech.powerups & 7;
@@ -304,7 +304,7 @@ void ReceivedMechanics(tNet_contents* pContents) {
                 car->box_face_ref = gFace_num__car - 2;
             }
         } else {
-            if (car->last_car_car_collision < pContents->data.mech.cc_coll_time) {
+            if (DR_FF(car->last_car_car_collision) < pContents->data.mech.cc_coll_time) {
                 CopyMechanics(car, pContents);
             }
         }
