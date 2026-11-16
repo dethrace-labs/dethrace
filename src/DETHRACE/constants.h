@@ -142,7 +142,7 @@ typedef enum dr_memory_classes {
     kMem_action_replay_buffer = 244,                                     //  0xf4
     kMem_misc = 245,                                                     //  0xf5
 #ifdef DETHRACE_3DFX_PATCH
-    kMem_pixelmap_dimensions = 246
+    kMem_pixelmap_scaled_dimensions = 246
 #endif
 } dr_memory_classes;
 

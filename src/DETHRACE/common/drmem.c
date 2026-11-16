@@ -263,7 +263,7 @@ char* gMem_names[] = {
 #if defined(DETHRACE_3DFX_PATCH) && defined(DETHRACE_FIX_BUGS)
     // An extra resource class was added in the 3dfx patch to hold a scaled pixelmap's original size. This array should have
     // been added to, but wasn't. We dont know what the resource class name was.
-    "kMem_pixelmap_dimensions"
+    "kMem_pixelmap_scaled_dimensions"
 #endif
 };
 
