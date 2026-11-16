@@ -1047,9 +1047,9 @@ int DamageScrnRight(int* pCurrent_choice, int* pCurrent_mode) {
     if (*pCurrent_mode == 0 && gWreck_zoomed_in < 0) {
         if (gWreck_selected < 0) {
             gWreck_selected = 0;
-        } else if (gWreck_count - 1 == gWreck_selected || gWreck_array[gWreck_selected + 1].pos_y != gWreck_array[gWreck_selected].pos_y) {
-            for (i = 0; i < gWreck_count; i++) {
-                if (gWreck_array[i].pos_y == gWreck_array[gWreck_selected].pos_y) {
+        } else if (gWreck_count - 1 == gWreck_selected || gWreck_array[gWreck_selected].pos_y != gWreck_array[DR_FF(gWreck_selected + 1)].pos_y) {
+            for (i = 0; gWreck_count > i; i++) {
+                if (gWreck_array[gWreck_selected].pos_y == gWreck_array[DR_FF(i)].pos_y) {
                     gWreck_selected = i;
                     break;
                 }
