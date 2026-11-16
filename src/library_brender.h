@@ -441,3 +441,6 @@
 
 // LIBRARY: CARM95 0x004DC8B0
 // BrMapUpdate
+
+// LIBRARY: CARM95 0x004df920
+// BrBlockFill

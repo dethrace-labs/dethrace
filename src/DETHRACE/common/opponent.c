@@ -3693,8 +3693,7 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
     int i;
 
     new_vertices = BrResAllocate(pModel, pNum_vertices * sizeof(br_vertex), BR_MEMORY_VERTICES);
-    // LIBRARY: CARM95 0x004df920
-    // BrBlockFill
+
     BrBlockFill(new_vertices, 0, pNum_vertices * sizeof(br_vertex) / sizeof(br_uint_32));
     if (pModel->nvertices != 0) {
         for (i = 0; i < ((pNum_vertices <= pModel->nvertices) ? pNum_vertices : pModel->nvertices); i++) {
@@ -3710,7 +3709,7 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
     BrBlockFill(new_faces, 0, pNum_faces * sizeof(br_face) / sizeof(br_uint_32));
     if (pModel->nfaces != 0) {
         for (i = 0; i < ((pNum_faces <= pModel->nfaces) ? pNum_faces : pModel->nfaces); i++) {
-            CopyFace__opponent(&new_faces[i], &pModel[0].faces[i]);
+            CopyFace__opponent(&new_faces[i], (br_face*)DR_FF_PTR(pModel->faces) + i);
         }
         BrResRemove(pModel->faces);
         BrResFree(pModel->faces);
@@ -4005,7 +4004,7 @@ int ConsistencyCheck(void) {
         }
     }
 #ifdef DETHRACE_FIX_BUGS
-    cleanup:
+cleanup:
 #endif
     if (gProgram_state.AI_vehicles.number_of_path_nodes != 0) {
         BrMemFree(nodes_referenced_by_sections_array);
