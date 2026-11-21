@@ -243,9 +243,11 @@ void Harness_DetectAndSetWorkingDirectory(char* argv0) {
         path = OS_GetWorkingDirectory(argv0);
         if (access("DATA/GENERAL.TXT", F_OK) == 0) {
             // good, found
-        } else {
-            OS_GetPrefPath(pref_path, "dethrace");
+        } else if (OS_GetPrefPath(pref_path, "dethrace") == 0) {
             path = pref_path;
+        } else {
+            // no pref path (e.g. HOME without .local): stay in the current directory
+            path = NULL;
         }
     }
 
