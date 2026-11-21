@@ -239,6 +239,7 @@ targets:
           "BrMatrix34PostTransform",
           "BrMatrix23PostScale",
           "BrMapUpdate",
+          "BrBlockFill",
 
           "S3OutletSoundsPlaying",
           "S3StopAllOutletSounds",

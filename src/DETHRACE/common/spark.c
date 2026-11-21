@@ -507,7 +507,7 @@ void RenderSparks(br_pixelmap* pRender_screen, br_pixelmap* pDepth_buffer, br_ac
         BrVector3Sub(&gSparks[i].v, &gSparks[i].v, &tv);
         if (gSparks[i].time_sync) {
             BrVector3Scale(&pos, &gSparks[i].v, gSparks[i].time_sync / 1000.0f);
-            gSparks[i].count = gSparks[i].time_sync + gSparks[i].count + -pTime;
+            gSparks[i].count = gSparks[i].count + gSparks[i].time_sync + -pTime;
             gSparks[i].time_sync = 0;
         } else {
             BrVector3Scale(&pos, &gSparks[i].v, pTime / 1000.0f);
@@ -1332,17 +1332,19 @@ void SmokeCircle3D(br_vector3* o, br_scalar r, br_scalar strength, br_scalar pAs
 
     cam = pCam->type_data;
 
+#ifdef DETHRACE_3DFX_PATCH
     if (gNo_2d_effects) {
         RecordSmokeCircle(o, r, strength, pShade_table, pAspect);
         return;
     }
+#endif
 
-    srand(o->v[2] * 16777216.0f + o->v[1] * 65536.0f + o->v[0] * 256.0f + r);
+    srand(DR_FF(o->v[2] * 16777216.0f) + o->v[1] * 65536.0f + o->v[0] * 256.0f + r);
     BrVector3Sub(&tv, o, (br_vector3*)gSmoke_camera_to_world.m[3]);
     BrMatrix34TApplyV(&p, &tv, &gSmoke_camera_to_world);
 
     if (-p.v[2] >= cam->hither_z && -p.v[2] <= cam->yon_z) {
-        scaled_r = gCameraToScreen.m[0][0] * r / -p.v[2];
+        scaled_r = gCameraToScreen.m[0][0] * r / DR_FF(-p.v[2]);
         extra_z = gCameraToScreen.m[3][2] * r / (p.v[2] * p.v[2]);
         BrMatrix4ApplyP(&o2, &p, &gCameraToScreen);
         BrVector3InvScale(&p, &o2, o2.v[3]);
@@ -2096,7 +2098,12 @@ void InitFlame(void) {
     if (num != COUNT_OF(gFlame_map)) {
         FatalError(kFatalError_LoadPixelmapFile_S, the_path);
     }
-    BrMapAddMany(gFlame_map, num);
+#ifdef DETHRACE_3DFX_PATCH
+    for (i = 0; i < COUNT_OF(gFlame_map); i++) {
+        gFlame_map[i] = PurifiedPixelmap(gFlame_map[i]);
+    }
+#endif
+    BrMapAddMany(gFlame_map, COUNT_OF(gFlame_map));
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
         gSmoke_column[i].flame_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
         for (j = 0; j < COUNT_OF(gSmoke_column[0].frame_count); j++) {
@@ -2170,6 +2177,11 @@ void InitSplash(FILE* pF) {
         PathCat(the_path, the_path, "SPLSHBLU.PIX");
         gNum_splash_types = DRPixelmapLoadMany(the_path, splash_maps, 0x14u);
     }
+#ifdef DETHRACE_3DFX_PATCH
+    for (i = 0; i < gNum_splash_types; i++) {
+        splash_maps[i] = PurifiedPixelmap(splash_maps[i]);
+    }
+#endif
     BrMapAddMany(splash_maps, gNum_splash_types);
     the_blend_table = LoadSingleShadeTable(&gTrack_storage_space, "BLEND50.TAB");
     for (i = 0; i < gNum_splash_types; i++) {
