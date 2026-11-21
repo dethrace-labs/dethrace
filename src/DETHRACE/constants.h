@@ -140,7 +140,10 @@ typedef enum dr_memory_classes {
     kMem_DOS_HMI_file_open = 242,                                        //  0xf2
     kMem_abuse_text = 243,                                               //  0xf3
     kMem_action_replay_buffer = 244,                                     //  0xf4
-    kMem_misc = 245                                                      //  0xf5
+    kMem_misc = 245,                                                     //  0xf5
+#ifdef DETHRACE_3DFX_PATCH
+    kMem_pixelmap_scaled_dimensions = 246
+#endif
 } dr_memory_classes;
 
 typedef enum keycodes {
@@ -853,7 +856,7 @@ enum ExceptionFlags {
     ExceptionFlag_NoBilinear = 1,
     ExceptionFlag_Double = 2,
     ExceptionFlag_Quadruple = 4,
-    ExceptionFlag_Mipmap = 4,
+    ExceptionFlag_Mipmap = 8,
 };
 
 enum kEngineNoiseTypes {
@@ -912,6 +915,7 @@ enum kEngineNoiseTypes {
 #define PHYSICS_STEP_TIME 40
 
 #define GRAVITY 10.0f
+#define PED_GRAVITY (9.8 / WORLD_SCALE_D / 1000.0 / 1000.0) // World units per millisecond squared
 #define UNDERWATER_ABILITY_FACTOR 0.6f
 #define MIN_SPEED 0.0001f
 #define MIN_OMEGA 0.05f

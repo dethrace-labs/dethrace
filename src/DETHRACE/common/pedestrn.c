@@ -370,6 +370,9 @@ void InitPedGibs(void) {
             } else {
                 the_pix = LoadPixelmap(gPed_gib_names[i][j]);
             }
+#ifdef DETHRACE_3DFX_PATCH
+            the_pix = PurifiedPixelmap(the_pix);
+#endif
             BrMapAdd(the_pix);
             gPed_gib_materials[i].count = gPed_size_counts[i];
             gPed_gib_materials[i].materials[j] = BrMaterialAllocate(NULL);
@@ -465,8 +468,8 @@ void MungeModelSize(br_actor* pActor, br_scalar pScaling_factor) {
     br_scalar half_height;
 
     the_pix = pActor->material->colour_map;
-    half_width = (the_pix->width / 2) * pScaling_factor * gPed_scale_factor;
-    half_height = (the_pix->height / 2) * pScaling_factor * gPed_scale_factor;
+    half_width = DR_FF((the_pix->width / 2) * pScaling_factor) * gPed_scale_factor;
+    half_height = DR_FF((the_pix->height / 2) * pScaling_factor) * gPed_scale_factor;
     PedModelUpdate(pActor->model,
         -half_width, -half_height,
         -half_width, half_height,
@@ -690,7 +693,7 @@ void MungePedGibs(tU32 pFrame_period) {
 
                 the_ped_gib->actor->t.t.translate.t.v[X] += the_ped_gib->x_speed * s_frame_period / pedestrian->width;
                 the_ped_gib->actor->t.t.translate.t.v[Y] += the_ped_gib->y_speed * s_frame_period / pedestrian->height2;
-                the_ped_gib->y_speed -= gFrame_period * gGravity_multiplier * 1.420289855072464e-6;
+                the_ped_gib->y_speed -= gFrame_period * gGravity_multiplier * PED_GRAVITY;
                 AddPedGibToPipingSession(i, &the_ped_gib->actor->t.t.mat, the_ped_gib->size, the_ped_gib->gib_index, the_ped_gib->parent_index);
             }
         } else if (the_ped_gib->size == 0) {
@@ -783,17 +786,16 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
     int choice;
     int the_marker_ref;
 
-    if (pPedestrian->number_of_instructions <= 1) {
+    result = 0;
+    if (pPedestrian->number_of_instructions < 2) {
         pPedestrian->current_instruction = 0;
-        instruction = &pPedestrian->instruction_list[0];
-        pPedestrian->to_pos = instruction->data.point_data.position;
+        pPedestrian->to_pos = pPedestrian->instruction_list->data.point_data.position;
         BrVector3Set(&pPedestrian->direction, 1.f, 0.f, 0.f);
         if (pPosition_explicitly) {
             pPedestrian->pos = pPedestrian->actor->t.t.translate.t = pPedestrian->to_pos;
         }
         return 0;
     }
-    result = 0;
     if (pMove_pc) {
         pPedestrian->current_instruction += pPedestrian->instruction_direction;
         if (pPedestrian->current_instruction >= pPedestrian->number_of_instructions) {
@@ -809,7 +811,7 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
     if (instruction->type != ePed_instruc_point && instruction->type != ePed_instruc_reverse) {
         KillPedestrian(pPedestrian);
         return 0;
-    }
+    } else {
 
     switch (instruction->type) {
 
@@ -817,12 +819,12 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
         pPedestrian->irreversable = 1;
         // fall through
     case ePed_instruc_point:
-        BrVector3Copy(&pPedestrian->to_pos, &instruction->data.point_data.position);
+        pPedestrian->to_pos = instruction->data.point_data.position;
         BrVector3Sub(&pPedestrian->direction, &pPedestrian->to_pos, &pPedestrian->actor->t.t.translate.t);
         if (pPedestrian->to_pos.v[Y] >= 500.f) {
             pPedestrian->direction.v[Y] = 0.f;
         }
-        if (Vector3IsZero(&pPedestrian->direction) && instruction != gInitial_instruction) {
+        if (Vector3IsZero(&pPedestrian->direction) && DR_FF_PTR(instruction) != gInitial_instruction) {
             if (gInitial_instruction == NULL) {
                 gInitial_instruction = instruction;
             }
@@ -836,8 +838,8 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
         break;
     case ePed_instruc_bchoice:
     case ePed_instruc_fchoice:
-        if ((instruction->type == ePed_instruc_fchoice && pPedestrian->instruction_direction > 0)
-            || (instruction->type == ePed_instruc_bchoice && pPedestrian->instruction_direction < 0)) {
+        if ((pPedestrian->instruction_direction > 0 && instruction->type == ePed_instruc_fchoice)
+            || (pPedestrian->instruction_direction < 0 && instruction->type == ePed_instruc_bchoice)) {
             most_dangerous = -1.f;
 #if defined(DETHRACE_FIX_BUGS)
             start_index = 0;
@@ -864,10 +866,11 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
                     break;
                 }
             }
+            the_marker_ref = instruction->data.choice_data.choices[choice].marker_ref;
             for (i = 0; i < pPedestrian->number_of_instructions; i++) {
                 if (((pPedestrian->instruction_list[i].type == ePed_instruc_bmarker && pPedestrian->instruction_direction < 0)
                         || (pPedestrian->instruction_list[i].type == ePed_instruc_fmarker && pPedestrian->instruction_direction > 0))) {
-                    if (pPedestrian->instruction_list[i].data.marker_data.marker_ref == instruction->data.choice_data.choices[choice].marker_ref) {
+                    if (pPedestrian->instruction_list[i].data.marker_data.marker_ref == the_marker_ref) {
                         pPedestrian->current_instruction = i;
                         break;
                     }
@@ -903,16 +906,11 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
                     for (j = 0; j < pPedestrian->instruction_list[i].data.choice_data.number_of_choices; j++) {
                         if (pPedestrian->instruction_list[i].data.choice_data.choices[j].marker_ref == pPedestrian->instruction_list[pPedestrian->current_instruction].data.marker_data.marker_ref) {
                             pPedestrian->current_instruction = i;
+                            break;
                         }
                     }
                 }
             }
-        }
-        result = PedestrianNextInstruction(pPedestrian, pDanger_level, pPosition_explicitly, 1);
-        break;
-    case ePed_instruc_baction:
-        if (pPedestrian->instruction_direction < 0) {
-            pPedestrian->current_action_mode = instruction->data.action_data.action_index;
         }
         result = PedestrianNextInstruction(pPedestrian, pDanger_level, pPosition_explicitly, 1);
         break;
@@ -922,11 +920,18 @@ int PedestrianNextInstruction(tPedestrian_data* pPedestrian, float pDanger_level
         }
         result = PedestrianNextInstruction(pPedestrian, pDanger_level, pPosition_explicitly, 1);
         break;
+    case ePed_instruc_baction:
+        if (pPedestrian->instruction_direction < 0) {
+            pPedestrian->current_action_mode = instruction->data.action_data.action_index;
+        }
+        result = PedestrianNextInstruction(pPedestrian, pDanger_level, pPosition_explicitly, 1);
+        break;
     case ePed_instruc_reverse:
         pPedestrian->instruction_direction = -pPedestrian->instruction_direction;
         PedestrianNextInstruction(pPedestrian, pDanger_level, pPosition_explicitly, 1);
         result = 1;
         break;
+    }
     }
     return result;
 }
@@ -957,7 +962,7 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
         if (heading_difference <= the_action->sequences[i].max_bearing) {
             the_sequence = the_action->sequences[i].sequence_index;
             if (pPedestrian->current_sequence != the_sequence) {
-                sequence_ptr = &pPedestrian->sequences[the_sequence];
+                sequence_ptr = &((tPedestrian_sequence*)DR_FF_PTR(pPedestrian->sequences))[the_sequence];
                 current_looping = pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start;
                 if (pAction_changed || current_looping > pPedestrian->current_frame) {
                     pPedestrian->current_frame = -1;
@@ -1364,10 +1369,10 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
         && pPedestrian->current_action != pPedestrian->fatal_ground_impact_action
         && pPedestrian->current_action != pPedestrian->giblets_action) {
         the_action = &pPedestrian->action_list[pPedestrian->current_action];
-        if (!pPedestrian->done_initial) {
-            terminal_speed = the_action->initial_speed;
-        } else {
+        if (pPedestrian->done_initial) {
             terminal_speed = the_action->looping_speed;
+        } else {
+            terminal_speed = the_action->initial_speed;
         }
         if (pPedestrian->current_speed < terminal_speed) {
             pPedestrian->current_speed += gFrame_period * pPedestrian->acceleration;
@@ -1376,7 +1381,9 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
             pPedestrian->current_speed = terminal_speed;
         }
         pPedestrian->current_speed *= gPedestrian_speed_factor;
-        if (!pPedestrian->irreversable && pDanger_level != 0.f && BrVector3Dot(&pPedestrian->direction, pDanger_direction) > 0.f) {
+        if (!pPedestrian->irreversable
+            && pDanger_level != 0.f
+            && BrVector3Dot(&pPedestrian->direction, pDanger_direction) > 0.f) {
             pPedestrian->instruction_direction = -pPedestrian->instruction_direction;
             gInitial_instruction = NULL;
             if (PedestrianNextInstruction(pPedestrian, pDanger_level, 0, 1) != 0) {
@@ -1399,12 +1406,12 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
     }
 
     pPedestrian->last_special_volume = FindSpecialVolume(&pPedestrian->actor->t.t.translate.t, pPedestrian->last_special_volume);
-    if (pPedestrian->last_special_volume == NULL) {
-        ped_gravity = 1.42029e-6f;
+    if (pPedestrian->last_special_volume != NULL) {
+        ped_gravity = pPedestrian->last_special_volume->gravity_multiplier * PED_GRAVITY;
     } else {
-        ped_gravity = pPedestrian->last_special_volume->gravity_multiplier * 1.42029e-6f;
+        ped_gravity = PED_GRAVITY;
     }
-    ped_gravity *= gGravity_multiplier;
+    ped_gravity = ped_gravity * gGravity_multiplier;
     if (gVesuvian_corpses
         && (pPedestrian->current_action == pPedestrian->fatal_car_impact_action || pPedestrian->current_action == pPedestrian->fatal_ground_impact_action)) {
         if (PercentageChance(100 / (gVesuvians_last_time != 0 ? gVesuvians_last_time : 1))) {
@@ -1412,11 +1419,8 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
         }
         gVesuvians_this_time++;
     }
-    if (pPedestrian->to_pos.v[Y] < 500.f) {
-        pPedestrian->falling_speed = 0.f;
-        pPedestrian->mid_air = 0;
-    } else {
-        BrVector3Copy(&cast_point, &pPedestrian->actor->t.t.translate.t);
+    if (pPedestrian->to_pos.v[Y] >= 500.f) {
+        cast_point = pPedestrian->actor->t.t.translate.t;
         if (cast_point.v[Y] >= 500.f) {
             cast_point.v[Y] -= 999.6f;
             pPedestrian->pos.v[Y] = pPedestrian->actor->t.t.translate.t.v[Y] = FindYVerticallyBelow2(&cast_point);
@@ -1425,9 +1429,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
             pPedestrian->spin_period = 0;
             BrVector3Set(&pPedestrian->offset, 0.f, 0.f, 0.f);
         } else {
-            if (pPedestrian->current_speed == 0.f && !pPedestrian->mid_air) {
-                pPedestrian->mid_air = 0;
-            } else {
+            if (pPedestrian->current_speed != 0.f || pPedestrian->mid_air) {
                 cast_point.v[Y] = old_y + .4f;
                 new_y = FindYVerticallyBelow2(&cast_point);
                 if (new_y > old_y) {
@@ -1446,7 +1448,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                     }
                     if (pPedestrian->hit_points > 0
                         && pPedestrian->falling_sound >= 0
-                        && pPedestrian->falling_speed >= 0.0008f) {
+                        && pPedestrian->falling_speed >= 0.0008) {
                         DRS3StopSound(pPedestrian->last_sound);
                         the_pitch = 65536.f / gPed_scale_factor;
                         pPedestrian->last_sound = DRS3StartSound3D(gPedestrians_outlet,
@@ -1465,9 +1467,7 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                             &pPedestrian->pos);
                         pPedestrian->falling_sound = -1;
                     }
-                    if (new_y <= pPedestrian->actor->t.t.translate.t.v[Y]) {
-                        pPedestrian->mid_air = 1;
-                    } else {
+                    if (pPedestrian->actor->t.t.translate.t.v[Y] < new_y) {
                         pPedestrian->pos.v[Y] = pPedestrian->actor->t.t.translate.t.v[Y] = new_y;
                         if (pPedestrian->spin_period != 0.f) {
                             pPedestrian->offset.v[Y] = pPedestrian->pos.v[Y];
@@ -1475,13 +1475,9 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                         if (pPedestrian->hit_points < 0) {
                             BrVector3Copy(&pPedestrian->to_pos, &pPedestrian->pos);
                         }
-                        damage = (pPedestrian->falling_speed - 0.0015f) * 100000.f;
+                        damage = (pPedestrian->falling_speed - 0.0015) * 100000.;
                         if (damage > 0 || pPedestrian->hit_points < 0) {
-                            if (pPedestrian->hit_points >= 0 && (pPedestrian->hit_points -= damage, pPedestrian->hit_points > 0)) {
-                                if (pPedestrian->hit_points < damage) {
-                                    ChangeActionTo(pPedestrian, pPedestrian->non_fatal_ground_impact_action, 1);
-                                }
-                            } else {
+                            if (pPedestrian->hit_points < 0 || (pPedestrian->hit_points -= damage) <= 0) {
                                 if (pPedestrian->hit_points <= -100) {
                                     pPedestrian->hit_points = -99;
                                 }
@@ -1497,14 +1493,23 @@ void MungePedestrianPath(tPedestrian_data* pPedestrian, float pDanger_level, br_
                                 if (pPedestrian->mid_air) {
                                     BurstPedestrian(pPedestrian, pPedestrian->falling_speed * 3.f, 0);
                                 }
+                            } else if (pPedestrian->hit_points < damage) {
+                                ChangeActionTo(pPedestrian, pPedestrian->non_fatal_ground_impact_action, 1);
                             }
                         }
                         pPedestrian->falling_speed = 0.f;
                         pPedestrian->mid_air = 0;
+                    } else {
+                        pPedestrian->mid_air = 1;
                     }
                 }
+            } else {
+                pPedestrian->mid_air = 0;
             }
         }
+    } else {
+        pPedestrian->falling_speed = 0.f;
+        pPedestrian->mid_air = 0;
     }
 }
 
@@ -2310,22 +2315,23 @@ void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_
     br_vector3 old_pos;
 
     pedestrian = &gPedestrian_array[pIndex];
-    if (pAction_index < 0 || pAction_index >= pedestrian->number_of_actions) {
+    if (pAction_index >= pedestrian->number_of_actions || pAction_index < 0) {
         pAction_index = 0;
     }
     pedestrian->current_action = pAction_index;
     pedestrian->hit_points = pHit_points;
     pedestrian->done_initial = pDone_initial;
     old_pos = pedestrian->actor->t.t.translate.t;
-    parent = pedestrian->actor->parent;
     if (pParent == (tU16)-1) {
-        if (parent != gDont_render_actor) {
-            BrActorRelink(gDont_render_actor, pedestrian->actor);
+        parent = gDont_render_actor;
+        if (pedestrian->actor->parent != parent) {
+            BrActorRelink(parent, pedestrian->actor);
         }
         pedestrian->actor->render_style = BR_RSTYLE_NONE;
     } else {
-        if (parent != pParent_actor) {
-            BrActorRelink(pParent_actor, pedestrian->actor);
+        parent = pParent_actor;
+        if (pedestrian->actor->parent != parent) {
+            BrActorRelink(parent, pedestrian->actor);
         }
         pedestrian->actor->render_style = BR_RSTYLE_NONE;
     }
@@ -2335,8 +2341,8 @@ void AdjustPedestrian(int pIndex, int pAction_index, int pFrame_index, int pHit_
         BrVector3Set(&pedestrian->offset, 0.f, 0.f, 0.f);
     } else {
         pedestrian->spin_period = pSpin_period;
-        pedestrian->jump_magnitude = pJump_magnitude;
         pedestrian->offset = *pOffset;
+        pedestrian->jump_magnitude = pJump_magnitude;
     }
     if (pedestrian->hit_points == -100) {
         pedestrian->actor->render_style = BR_RSTYLE_NONE;
@@ -2835,6 +2841,9 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
                         if (the_sequence->frames[k].pixelmap == NULL) {
                             FatalError(kFatalError_FindPedestrianPixelmap_S, s2);
                         }
+#ifdef DETHRACE_3DFX_PATCH
+                        the_sequence->frames[k].pixelmap = PurifiedPixelmap(the_sequence->frames[k].pixelmap);
+#endif
                         BrMapAdd(the_sequence->frames[k].pixelmap);
                     }
                     GetALineAndDontArgue(pG, s2);

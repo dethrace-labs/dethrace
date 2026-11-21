@@ -347,13 +347,15 @@ void TotallySpamTheModel(tCar_spec* pCar, int pModel_index, br_actor* pActor, tC
     if (gArrow_mode || pCrush_data->number_of_crush_points == 0) {
         return;
     }
-    the_vertex = pActor->model->vertices;
+    vertices = pActor->model->vertices;
     for (i = 0; i < 15; i++) {
         the_index = IRandomBetween(0, pCrush_data->number_of_crush_points - 1);
-        energy_vector_model = the_vertex[pCrush_data->crush_points[the_index].vertex_index].p;
+        the_vertex = &vertices[pCrush_data->crush_points[the_index].vertex_index];
+        BrVector3Copy(&energy_vector_model, &the_vertex->p);
         BrVector3Normalise(&energy_vector_model, &energy_vector_model);
         BrVector3Scale(&energy_vector_model, &energy_vector_model, -pMagnitude);
-        CrushModelPoint(pCar, pModel_index, pActor->model, the_index, &energy_vector_model, pMagnitude, pCrush_data);
+        total_energy = pMagnitude;
+        CrushModelPoint(pCar, pModel_index, pActor->model, the_index, &energy_vector_model, total_energy, pCrush_data);
     }
     SetModelForUpdate(pActor->model, pCar, 1);
 }
@@ -637,19 +639,21 @@ void CheckPiledriverBonus(tCar_spec* pCar, br_vector3* pImpact_point, br_vector3
     }
 
     BrVector3Normalise(&norm_impact, pImpact_point);
-    norm_impact.v[1] = 0.f;
     BrVector3Normalise(&norm_energy, pEnergy);
+    norm_impact.v[1] = 0.f;
 
-    for (child = pCar->car_master_actor->children; child != NULL; child = child->next) {
-        if (ActorIsPedestrian(child) && PedestrianActorIsPerson(child) && pCar->speed > 0.001f) {
+    child = pCar->car_master_actor->children;
+    while (child != NULL) {
+        if (ActorIsPedestrian(child) && PedestrianActorIsPerson(child) && pCar->speed > 0.001) {
             BrVector3Normalise(&norm_child, &child->t.t.translate.t);
             norm_child.v[1] = 0.f;
-            if (BrVector3Dot(&norm_child, &norm_impact) > 0.8f && BrVector3Dot(&norm_energy, &norm_child) < -.65) {
+            if ((dp = BrVector3Dot(&norm_child, &norm_impact)) > 0.8 && (dp = BrVector3Dot(&norm_energy, &norm_child)) < -.65) {
                 DoFancyHeadup(kFancyHeadupPileDriverBonus);
                 EarnCredits(((GetPedestrianValue(child) / 2 + 12) / 25) * 25);
                 return;
             }
         }
+        child = child->next;
     }
 }
 

@@ -711,7 +711,7 @@ int SetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
 
     old_scale = gPed_scale_factor;
     gPed_scale_factor = pPowerup->float_params[0];
-    if (old_scale != gPed_scale_factor) {
+    if (DR_FF(old_scale) != gPed_scale_factor) {
         if (old_scale > 1.f) {
             PipeSingleSpecial(ePipe_special_giant_ped_off);
         } else if (old_scale < 1.f) {
