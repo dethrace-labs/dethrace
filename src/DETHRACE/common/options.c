@@ -389,6 +389,12 @@ void GetGraphicsOptions(void) {
     if (gRadio_bastards__options[5].current_value > 3) {
         gRadio_bastards__options[5].current_value = 3;
     }
+#ifdef DETHRACE_FIX_BUGS
+    // A view distance above 35 (raised in the race with the yon key) gave a negative radio index
+    if (gRadio_bastards__options[5].current_value < 0) {
+        gRadio_bastards__options[5].current_value = 0;
+    }
+#endif
 
     br_value = GetYonFactor();
     if (br_value >= 1.f) {
