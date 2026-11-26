@@ -67,7 +67,7 @@ void SendCarData(tU32 pNext_frame_time) {
     int i;
     int j;
     // GLOBAL: CARM95 0x50c608
-    static tU32 last_time;
+    static tU32 last_time = 0xffffffff;
     tU32 time;
     int damaged_wheels;
 
@@ -235,7 +235,7 @@ void ReceivedMechanics(tNet_contents* pContents) {
             break;
         }
     }
-    if (car == NULL || car->message.time > pContents->data.mech.time) {
+    if (car == NULL || DR_FF(car->message.time) > pContents->data.mech.time) {
         return;
     }
     if (car->disabled) {
@@ -260,7 +260,7 @@ void ReceivedMechanics(tNet_contents* pContents) {
     }
     if (gNet_mode == eNet_mode_host) {
         if (gThis_net_player_index != i) {
-            if (car->last_car_car_collision <= pContents->data.mech.cc_coll_time) {
+            if (DR_FF(car->last_car_car_collision) <= pContents->data.mech.cc_coll_time) {
                 CopyMechanics(car, pContents);
             }
             car->power_up_levels[0] = pContents->data.mech.powerups & 7;
@@ -304,7 +304,7 @@ void ReceivedMechanics(tNet_contents* pContents) {
                 car->box_face_ref = gFace_num__car - 2;
             }
         } else {
-            if (car->last_car_car_collision < pContents->data.mech.cc_coll_time) {
+            if (DR_FF(car->last_car_car_collision) < pContents->data.mech.cc_coll_time) {
                 CopyMechanics(car, pContents);
             }
         }
@@ -693,7 +693,7 @@ void DoNetworkHeadups(int pCredits) {
             NewTextHeadupSlot(eHeadupSlot_misc, 0, 2000, -kFont_MEDIUMHD, GetMiscString(kMiscString_THAT_HALVED_YOUR_TIME));
             break;
 
-            DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
         }
     }
 
@@ -1005,10 +1005,10 @@ void DeclareWinner(int pWinner_index) {
         gNet_players[pWinner_index].games_score += gGame_scores[5];
     }
     sprintf(s, "%s %s", gNet_players[pWinner_index].player_name, GetMiscString(kMiscString_IS_THE_WINNER));
-    for (i = 0; i < gNumber_of_net_players; i++) {
+    for (i = 0; i < DR_FF(gNumber_of_net_players); i++) {
         if (gCurrent_net_game->type != eNet_game_type_sudden_death && gCurrent_net_game->type != eNet_game_type_tag && gCurrent_net_game->type != eNet_game_type_fight_to_death) {
             best_score_index = gNet_players[i].last_score_index;
-            for (j = 0; j < gNumber_of_net_players; j++) {
+            for (j = 0; j < DR_FF(gNumber_of_net_players); j++) {
                 if (gNet_players[i].score == gNet_players[j].score && gNet_players[j].last_score_index < best_score_index) {
                     best_score_index = gNet_players[j].last_score_index;
                 }
@@ -1025,7 +1025,7 @@ void DeclareWinner(int pWinner_index) {
     }
     gReceived_game_scores = 1;
     the_message = NetBuildMessage(NETMSGID_GAMESCORES, 0);
-    for (i = 0; i < gNumber_of_net_players; i++) {
+    for (i = 0; i < DR_FF(gNumber_of_net_players); i++) {
         the_message->contents.data.game_scores.scores[i].played = gNet_players[i].played;
         the_message->contents.data.game_scores.scores[i].won = gNet_players[i].won;
         the_message->contents.data.game_scores.scores[i].score = gNet_players[i].games_score;
@@ -1089,7 +1089,7 @@ void CarInContactWithItOrFox(tNet_game_player_info* pPlayer) {
         }
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -1102,22 +1102,21 @@ void SelectRandomItOrFox(int pNot_this_one) {
     new_choice = 0;
     gLast_lepper = NULL;
     if (gCurrent_net_game->type == eNet_game_type_tag) {
-        for (i = 0; i < gNumber_of_net_players; i++) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; i++) {
             if (gNet_players[i].last_score_index == 0) {
                 new_choice = i;
                 break;
             }
         }
     } else {
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            if (i != pNot_this_one && gNet_players[i].last_score_index == gNumber_of_net_players - 1) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; i++) {
+            if (DR_FF(i) != pNot_this_one && gNet_players[i].last_score_index == gNumber_of_net_players - 1) {
                 PlayerIsIt(&gNet_players[i]);
                 return;
             }
         }
-        do {
-            new_choice = IRandomBetween(0, gNumber_of_net_players - 1);
-        } while (new_choice == pNot_this_one && !gNet_players[new_choice].car->knackered);
+        while (DR_FF(new_choice = IRandomBetween(0, gNumber_of_net_players - 1)) == pNot_this_one && !gNet_players[new_choice].car->knackered) {
+        }
     }
     PlayerIsIt(&gNet_players[new_choice]);
 }
@@ -1153,7 +1152,7 @@ void CalcPlayerScores(void) {
     case eNet_game_type_carnage:
         highest = 0;
         next_highest = 0;
-        for (i = 0; i < gNumber_of_net_players; ++i) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; ++i) {
             if (gNet_players[i].score > highest) {
                 next_highest = highest;
                 highest = gNet_players[i].score;
@@ -1176,13 +1175,13 @@ void CalcPlayerScores(void) {
         }
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
 
     lowest_score = 9999;
     lowest_score_player = NULL;
     cars_left = 0;
-    for (i = 0; i < gNumber_of_net_players; i++) {
+    for (i = 0; DR_FF(i) < gNumber_of_net_players; i++) {
         car = gNet_players[i].car;
         if (gNet_players[i].reposition_time != 0 && gNet_players[i].reposition_time <= time && (!gRace_finished || gRace_over_reason == -1)) {
             RepositionPlayer(i);
@@ -1208,7 +1207,7 @@ void CalcPlayerScores(void) {
             switch (gCurrent_net_game->type) {
             case eNet_game_type_fight_to_death:
                 cars_left = 0;
-                for (j = 0; j < gNumber_of_net_players; j++) {
+                for (j = 0; DR_FF(j) < gNumber_of_net_players; j++) {
                     if (!gNet_players[j].wasted) {
                         cars_left++;
                         car_left = j;
@@ -1250,12 +1249,12 @@ void CalcPlayerScores(void) {
             case eNet_game_type_foxy:
                 gNet_players[i].reposition_time = GetTotalTime() + 5000;
                 gNet_players[i].score /= 2;
-                if (gNumber_of_net_players > 1 && gIt_or_fox == i) {
+                if (gNumber_of_net_players > 1 && gIt_or_fox == DR_FF(i)) {
                     SelectRandomItOrFox(i);
                 }
                 break;
 
-                DETHRACE_DEFAULT_BREAK
+            DETHRACE_DEFAULT_BREAK
             }
         }
         switch (gCurrent_net_game->type) {
@@ -1271,10 +1270,10 @@ void CalcPlayerScores(void) {
                 e_dam = car->damage_units[eDamage_engine].damage_level;
                 t_dam = car->damage_units[eDamage_transmission].damage_level;
                 d_dam = car->damage_units[eDamage_driver].damage_level;
-                w_dam = (car->damage_units[eDamage_lr_wheel].damage_level
-                            + car->damage_units[eDamage_lf_wheel].damage_level
-                            + car->damage_units[eDamage_rr_wheel].damage_level
-                            + car->damage_units[eDamage_rf_wheel].damage_level)
+                w_dam = (DR_FF(car->damage_units[eDamage_rf_wheel].damage_level
+                             + car->damage_units[eDamage_rr_wheel].damage_level
+                             + car->damage_units[eDamage_lf_wheel].damage_level)
+                            + car->damage_units[eDamage_lr_wheel].damage_level)
                     / 4;
 
                 if (e_dam > t_dam && e_dam > d_dam && e_dam > w_dam) {
@@ -1321,7 +1320,7 @@ void CalcPlayerScores(void) {
             }
             break;
         case eNet_game_type_tag:
-            if (i == gIt_or_fox && !gCountdown && gNet_players[i].score >= 0) {
+            if (DR_FF(i) == gIt_or_fox && !gCountdown && gNet_players[i].score >= 0) {
                 gNet_players[i].score += gFrame_period;
                 if (gNet_players[i].score >= gCurrent_net_game->options.race_end_target) {
                     lowest_score_player = &gNet_players[i];
@@ -1329,7 +1328,7 @@ void CalcPlayerScores(void) {
             }
             break;
         case eNet_game_type_foxy:
-            if (i == gIt_or_fox && !gCountdown && !gRace_finished) {
+            if (DR_FF(i) == gIt_or_fox && !gCountdown && !gRace_finished) {
                 gNet_players[i].score += gFrame_period;
                 if (gNet_players[i].score >= gCurrent_net_game->options.race_end_target) {
                     DeclareWinner(i);
@@ -1337,7 +1336,7 @@ void CalcPlayerScores(void) {
             }
             break;
 
-            DETHRACE_DEFAULT_BREAK
+        DETHRACE_DEFAULT_BREAK
         }
     }
     if ((gCurrent_net_game->type == eNet_game_type_sudden_death || gCurrent_net_game->type == eNet_game_type_tag)
@@ -1345,7 +1344,7 @@ void CalcPlayerScores(void) {
         && lowest_score_player->score >= 0) {
         player_left = -1;
         cars_left = 0;
-        for (i = 0; i < gNumber_of_net_players; ++i) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; ++i) {
             if (gNet_players[i].score >= 0 && &gNet_players[i] != lowest_score_player) {
                 ++cars_left;
                 if (player_left == -1) {
@@ -1392,7 +1391,7 @@ void SendPlayerScores(void) {
         the_contents->data.scores.general_score = gNet_players[gIt_or_fox].ID;
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
     for (i = 0; i < gNumber_of_net_players; i++) {
         the_contents->data.scores.scores[i] = gNet_players[i].score;
@@ -1434,7 +1433,7 @@ void InitialisePlayerScore(tNet_game_player_info* pPlayer) {
         pPlayer->score = 0;
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
     pPlayer->credits = gInitial_net_credits[gCurrent_net_game->options.starting_money_index];
     pPlayer->wasted = 0;
@@ -1535,7 +1534,7 @@ void UseGeneralScore(int pScore) {
         }
         break;
 
-        DETHRACE_DEFAULT_BREAK
+    DETHRACE_DEFAULT_BREAK
     }
 }
 
@@ -1633,11 +1632,11 @@ void ReceivedGameplay(tNet_contents* pContents, tNet_message* pMessage, tU32 pRe
                 gRace_finished = 1;
                 break;
 
-                DETHRACE_DEFAULT_BREAK;
+            DETHRACE_DEFAULT_BREAK
             }
             break;
 
-            DETHRACE_DEFAULT_BREAK;
+        DETHRACE_DEFAULT_BREAK
         }
     }
 }
@@ -1691,7 +1690,7 @@ void SendGameplayToHost(tNet_gameplay_mess pMess, int pParam_1, int pParam_2, in
 void InitNetGameplayStuff(void) {
 
     switch (gCurrent_net_game->type) {
-        DETHRACE_DEFAULT_BREAK;
+    DETHRACE_DEFAULT_BREAK
     }
 }
 

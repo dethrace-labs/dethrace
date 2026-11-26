@@ -23,13 +23,13 @@
 tDepth_effect gDistance_depth_effects[4];
 
 // GLOBAL: CARM95 0x00513430
-int gSky_on;
+int gSky_on = 1;
 
 // GLOBAL: CARM95 0x00513434
-int gDepth_cueing_on;
+int gDepth_cueing_on = 1;
 
 // GLOBAL: CARM95 0x00513438
-tDepth_effect_type gSwap_depth_effect_type;
+tDepth_effect_type gSwap_depth_effect_type = eDepth_effect_none;
 
 // GLOBAL: CARM95 0x00537944
 br_scalar gSky_height;
@@ -373,9 +373,10 @@ br_model* CreateHorizonModel(br_actor* pCamera) {
     tU8 stripe;
     br_model* model;
 
-    model = BrModelAllocate(NULL, 88, 126);
+    nbands = 21;
+    model = BrModelAllocate(NULL, 4 * (nbands + 1), 6 * nbands);
     model->flags |= BR_MODF_KEEP_ORIGINAL;
-    for (band = 0; band < 21; band++) {
+    for (band = 0; band < nbands; band++) {
         for (stripe = 0; stripe < 3; stripe++) {
             model->faces[6 * band + 2 * stripe].vertices[0] = stripe + 4 * band + 0;
             model->faces[6 * band + 2 * stripe].vertices[1] = stripe + 4 * band + 1;
@@ -392,13 +393,14 @@ br_model* CreateHorizonModel(br_actor* pCamera) {
     for (vertex = 0; vertex < 12; vertex++) {
         model->vertices[vertex].map.v[1] = 0.9999999f;
     }
-    for (vertex = 80; vertex < 88; vertex++) {
-        model->vertices[vertex].map.v[1] = 0.f;
+    for (vertex = 80; vertex < 4 * (nbands + 1); vertex++) {
+        model->vertices[vertex].map.v[1] = 0.0f;
     }
     for (band = 1; band < 18; band++) {
-        model->vertices[4 * band + 8].map.v[1] = (float)(18 - band) / 18.f;
+        vertex = 4 * (band + 2);
+        model->vertices[vertex].map.v[1] = (float)(18 - band) / 18.0f;
         for (stripe = 1; stripe < 4; stripe++) {
-            model->vertices[4 * band + 8 + stripe].map.v[1] = model->vertices[4 * band + 8].map.v[1];
+            model->vertices[vertex + stripe].map.v[1] = model->vertices[vertex].map.v[1];
         }
     }
     return model;
@@ -606,7 +608,7 @@ void ExternalSky(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer, br_act
     top_y = -hori_y - hori_pixels;
 
     while (dst_x < pRender_buffer->width) {
-        dx = pRender_buffer->width - dst_x < col_map->width - src_x ? pRender_buffer->width - dst_x : col_map->width - src_x;
+        dx = DR_FF(col_map->width - src_x) < pRender_buffer->width - dst_x ? DR_FF(col_map->width - src_x) : pRender_buffer->width - dst_x;
         DRPixelmapRectangleCopy(pRender_buffer, dst_x - pRender_buffer->origin_x, top_y, col_map, src_x - col_map->origin_x, -col_map->origin_y, dx, col_map->height);
         src_x = 0;
         dst_x += dx;

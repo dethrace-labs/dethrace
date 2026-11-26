@@ -277,10 +277,10 @@ static void SDL1_Harness_PaletteChanged(br_colour entries[256]) {
     }
 }
 
-static int SDL1_Harness_ShowErrorMessage(char* text, char* caption) {
-    fprintf(stderr, "%s", text);
+static int SDL1_Harness_ShowErrorMessage(char* title, char* message) {
+    fprintf(stderr, "%s", message);
 #ifdef _WIN32
-    MessageBoxA(NULL, text, caption, MB_ICONERROR);
+    MessageBoxA(NULL, message, title, MB_ICONERROR);
 #endif
     return 0;
 }

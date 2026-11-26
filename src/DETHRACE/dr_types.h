@@ -38,6 +38,8 @@ typedef tU32 tPlayer_ID;
 typedef void tPipe_reset_proc(void);
 typedef struct tPowerup tPowerup;
 
+#define DR_INT32_MAX 0x7fffffff
+
 #ifdef DETHRACE_FIX_BUGS
 typedef int tGot_proc(tPowerup*, tCar_spec*);
 typedef void tLose_proc(tPowerup*, tCar_spec*);
@@ -2756,17 +2758,17 @@ typedef struct tHeadup_pair {
 // these structs hold data plus a void*. For 64 bits, we cannot assume a pointer is 4 bytes
 typedef struct tMax_message {
     char buffer[512];
-    void *ptr;
+    void* ptr;
 } tMax_message;
 
 typedef struct tMid_message {
     char buffer[132];
-    void *ptr;
+    void* ptr;
 } tMid_message;
 
 typedef struct tMin_message {
     char buffer[32];
-    void *ptr;
+    void* ptr;
 } tMin_message;
 
 #else
@@ -2918,74 +2920,74 @@ typedef struct tPedestrian_sequence {
     tPed_frame_info frames[10];
 } tPedestrian_sequence;
 
-typedef struct tPedestrian_data {
-    int magic_number;
-    br_scalar height;
-    br_scalar jump_magnitude;
-    br_scalar car_to_ped;
-    br_scalar min_x;
-    br_scalar max_x;
-    int credits_value;
-    int hit_points;
-    int number_of_exploding_sounds;
-    int exploding_sounds[3];
-    int falling_sound;
-    int last_sound_action;
-    tU16 killers_ID;
-    br_scalar width;
-    br_scalar height2;
-    tCar_spec* fate;
-    br_actor* actor;
-    tPlayer_ID murderer;
-    tPedestrian_instruction* instruction_list;
-    tPedestrian_action* action_list;
-    tU8 ref_number;
-    tU8 active;
-    tU8 munged;
-    tU8 collided_last_time;
-    tU8 flipped;
-    tU8 reverse_frames;
-    tU8 sent_dead_message;
-    tS8 image_index;
-    tS8 number_of_actions;
-    tS8 number_of_instructions;
-    tS8 first_instruction;
-    tS8 current_instruction;
-    tS8 fatal_car_impact_action;
-    tS8 non_fatal_car_impact_action;
-    tS8 after_impact_action;
-    tS8 fatal_ground_impact_action;
-    tS8 non_fatal_ground_impact_action;
-    tS8 giblets_action;
-    tS8 current_sequence;
-    tS8 current_action;
-    tS8 current_action_mode;
-    tS8 current_frame;
-    tS8 number_of_sequences;
-    tS8 done_initial;
-    tS8 giblets_being_sat_upon;
-    tS8 mid_air;
-    tS8 instruction_direction;
-    tS8 irreversable;
-    tS8 frightened_of_us;
-    tS8 cloned;
-    float current_speed;
-    float acceleration;
-    float spin_period;
-    tU32 last_frame;
-    tU32 last_action_change;
-    tU32 last_sound_make;
-    tS32 respawn_time;
-    br_vector3 pos;
-    br_vector3 direction;
-    br_vector3 from_pos;
-    br_vector3 to_pos;
-    br_vector3 offset;
-    float falling_speed;
-    tSpecial_volume* last_special_volume;
-    tPedestrian_sequence* sequences;
-    tS3_sound_tag last_sound;
-    br_pixelmap* colour_map;
+typedef struct tPedestrian_data {              // size: 0xe4
+    int magic_number;                          // @0x0
+    br_scalar height;                          // @0x4
+    br_scalar jump_magnitude;                  // @0x8
+    br_scalar car_to_ped;                      // @0xc
+    br_scalar min_x;                           // @0x10
+    br_scalar max_x;                           // @0x14
+    int credits_value;                         // @0x18
+    int hit_points;                            // @0x1c
+    int number_of_exploding_sounds;            // @0x20
+    int exploding_sounds[3];                   // @0x24
+    int falling_sound;                         // @0x30
+    int last_sound_action;                     // @0x34
+    tU16 killers_ID;                           // @0x38
+    br_scalar width;                           // @0x3c
+    br_scalar height2;                         // @0x40
+    tCar_spec* fate;                           // @0x44
+    br_actor* actor;                           // @0x48
+    tPlayer_ID murderer;                       // @0x4c
+    tPedestrian_instruction* instruction_list; // @0x50
+    tPedestrian_action* action_list;           // @0x54
+    tU8 ref_number;                            // @0x58
+    tU8 active;                                // @0x59
+    tU8 munged;                                // @0x5a
+    tU8 collided_last_time;                    // @0x5b
+    tU8 flipped;                               // @0x5c
+    tU8 reverse_frames;                        // @0x5d
+    tU8 sent_dead_message;                     // @0x5e
+    tS8 image_index;                           // @0x5f
+    tS8 number_of_actions;                     // @0x60
+    tS8 number_of_instructions;                // @0x61
+    tS8 first_instruction;                     // @0x62
+    tS8 current_instruction;                   // @0x63
+    tS8 fatal_car_impact_action;               // @0x64
+    tS8 non_fatal_car_impact_action;           // @0x65
+    tS8 after_impact_action;                   // @0x66
+    tS8 fatal_ground_impact_action;            // @0x67
+    tS8 non_fatal_ground_impact_action;        // @0x68
+    tS8 giblets_action;                        // @0x69
+    tS8 current_sequence;                      // @0x6a
+    tS8 current_action;                        // @0x6b
+    tS8 current_action_mode;                   // @0x6c
+    tS8 current_frame;                         // @0x6d
+    tS8 number_of_sequences;                   // @0x6e
+    tS8 done_initial;                          // @0x6f
+    tS8 giblets_being_sat_upon;                // @0x70
+    tS8 mid_air;                               // @0x71
+    tS8 instruction_direction;                 // @0x72
+    tS8 irreversable;                          // @0x73
+    tS8 frightened_of_us;                      // @0x74
+    tS8 cloned;                                // @0x75
+    float current_speed;                       // @0x78
+    float acceleration;                        // @0x7c
+    float spin_period;                         // @0x80
+    tU32 last_frame;                           // @0x84
+    tU32 last_action_change;                   // @0x88
+    tU32 last_sound_make;                      // @0x8c
+    tS32 respawn_time;                         // @0x90
+    br_vector3 pos;                            // @0x94
+    br_vector3 direction;                      // @0xa0
+    br_vector3 from_pos;                       // @0xac
+    br_vector3 to_pos;                         // @0xb8
+    br_vector3 offset;                         // @0xc4
+    float falling_speed;                       // @0xd0
+    tSpecial_volume* last_special_volume;      // @0xd4
+    tPedestrian_sequence* sequences;           // @0xd8
+    tS3_sound_tag last_sound;                  // @0xdc
+    br_pixelmap* colour_map;                   // @0xe0
 } tPedestrian_data;
 
 typedef struct tPed_gib {

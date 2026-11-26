@@ -105,10 +105,17 @@ extern int gS3_last_error;
 // IDA: void __cdecl UsePathFileToDetermineIfFullInstallation()
 // FUNCTION: CARM95 0x00463fb0
 void UsePathFileToDetermineIfFullInstallation(void) {
+#ifdef DETHRACE_FIX_BUGS
+    char line1[MAX_PATH_LENGTH];
+    char line2[MAX_PATH_LENGTH];
+    char line3[MAX_PATH_LENGTH];
+    char path_file[MAX_PATH_LENGTH];
+#else
     char line1[80];
     char line2[80];
     char line3[80];
     char path_file[80];
+#endif
     FILE* fp;
 
     strcpy(path_file, gApplication_path);
@@ -162,6 +169,12 @@ void InitSound(void) {
         UsePathFileToDetermineIfFullInstallation();
     }
     if (gSound_available != 0) {
+#ifdef DETHRACE_FIX_BUGS
+        // Fix -Wmaybe-uninitialized warning
+        engine_channel_count = 2;
+        car_channel_count = 2;
+        ped_channel_count = 3;
+#endif
         if (gSound_detail_level == 0) {
             engine_channel_count = 2;
             car_channel_count = 2;
@@ -765,7 +778,7 @@ int DRS3StartCDA(tS3_sound_id pCDA_id) {
                     if (pCDA_id == 9999) {
                         do {
                             pCDA_id = gRandom_CDA_tunes[IRandomBetween(0, 7)];
-                        } while (pCDA_id == gLast_tune);
+                        } while (DR_FF(pCDA_id) == gLast_tune);
                     }
                     gLast_tune = pCDA_id;
 

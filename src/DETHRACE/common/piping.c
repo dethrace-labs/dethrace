@@ -179,6 +179,50 @@ tU32 gLocal_buffer_size;
                                                                                                               : (GetReplayRate() != 0.0f ? GetReplayRate() > 0.0f : GetReplayDirection() > 0)
 #ifdef DETHRACE_FIX_BUGS
 #define PIPING_REQUIRE(V) do { if (!(V)) { dr_dprintf("Piping require failed: %s (%s:%d)", #V, __FILE__, __LINE__); assert(V); FatalError(kFatalError_PipingSystem); } } while (0)
+
+static const char *get_pipe_chunk_type_name(tPipe_chunk_type type)
+{
+    switch (type) {
+#define CASE_RET_STR(V) case V: return #V;
+        CASE_RET_STR(ePipe_chunk_actor_rstyle);
+        CASE_RET_STR(ePipe_chunk_actor_translate);
+        CASE_RET_STR(ePipe_chunk_actor_transform);
+        CASE_RET_STR(ePipe_chunk_actor_create);
+        CASE_RET_STR(ePipe_chunk_actor_destroy);
+        CASE_RET_STR(ePipe_chunk_actor_relink);
+        CASE_RET_STR(ePipe_chunk_actor_material);
+        CASE_RET_STR(ePipe_chunk_face_material);
+        CASE_RET_STR(ePipe_chunk_material_trans);
+        CASE_RET_STR(ePipe_chunk_material_pixelmap);
+        CASE_RET_STR(ePipe_chunk_model_geometry);
+        CASE_RET_STR(ePipe_chunk_pedestrian);
+        CASE_RET_STR(ePipe_chunk_frame_boundary);
+        CASE_RET_STR(ePipe_chunk_car);
+        CASE_RET_STR(ePipe_chunk_sound);
+        CASE_RET_STR(ePipe_chunk_damage);
+        CASE_RET_STR(ePipe_chunk_special);
+        CASE_RET_STR(ePipe_chunk_ped_gib);
+        CASE_RET_STR(ePipe_chunk_incident);
+        CASE_RET_STR(ePipe_chunk_spark);
+        CASE_RET_STR(ePipe_chunk_shrapnel);
+        CASE_RET_STR(ePipe_chunk_screen_shake);
+        CASE_RET_STR(ePipe_chunk_groove_stop);
+        CASE_RET_STR(ePipe_chunk_non_car);
+        CASE_RET_STR(ePipe_chunk_smoke);
+        CASE_RET_STR(ePipe_chunk_oil_spill);
+        CASE_RET_STR(ePipe_chunk_smoke_column);
+        CASE_RET_STR(ePipe_chunk_flame);
+        CASE_RET_STR(ePipe_chunk_smudge);
+        CASE_RET_STR(ePipe_chunk_splash);
+        CASE_RET_STR(ePipe_chunk_prox_ray);
+        CASE_RET_STR(ePipe_chunk_skid_adjustment);
+        CASE_RET_STR(ePipe_chunk_enum_count);
+#undef CASE_RET_STR
+    default:
+        return "unknown";
+    }
+}
+
 #else
 #define PIPING_REQUIRE(V)
 #endif
@@ -204,16 +248,10 @@ void SaveReducedPos(tReduced_pos* p, br_vector3* v) {
 // IDA: int __cdecl PipeSearchForwards()
 // FUNCTION: CARM95 0x00427fdf
 int PipeSearchForwards(void) {
-    if (gPipe_play_ptr == gPipe_record_ptr) {
-        return 0;
-    }
-    if (gPipe_play_ptr == gPipe_buffer_oldest) {
-        return 1;
-    }
-    if (GetReplayRate() != 0.f) {
-        return GetReplayRate() > 0.f;
-    }
-    return GetReplayDirection() > 0 ? 1 : 0;
+    return gPipe_play_ptr == gPipe_record_ptr ? 0
+        : gPipe_play_ptr == gPipe_buffer_oldest ? 1
+        : GetReplayRate() != 0.f ? GetReplayRate() > 0.f
+                                  : GetReplayDirection() > 0;
 }
 
 // IDA: int __cdecl IsActionReplayAvailable()
@@ -484,8 +522,14 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
     int variable_for_breaking_on;
 
     if (gPipe_buffer_start != NULL && !gAction_replay_mode && gProgram_state.racing) {
-        temp_buffer_size = pData_length + (gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data));
+        temp_buffer_size = DR_FF(pData_length) + gLocal_buffer_size + offsetof(tPipe_chunk, chunk_data);
         if (temp_buffer_size < LOCAL_BUFFER_SIZE) {
+#ifdef DETHRACE_FIX_BUGS
+            int amount = ((tPipe_session*)gLocal_buffer)->number_of_chunks;
+            if (255 - amount < 3) {
+                LOG_WARN("Piping session has only %d remaining chunks, type=%s (%d)", 255 - amount, get_pipe_chunk_type_name(((tPipe_session*)gLocal_buffer)->chunk_type), ((tPipe_session*)gLocal_buffer)->chunk_type);
+            }
+#endif
             REPLAY_DEBUG_ASSERT(((tPipe_session*)gLocal_buffer)->pipe_magic1 == REPLAY_DEBUG_SESSION_MAGIC1);
             ((tPipe_session*)gLocal_buffer)->number_of_chunks++;
             PIPING_REQUIRE(((tPipe_session*)gLocal_buffer)->number_of_chunks != 0);
@@ -504,7 +548,11 @@ void AddDataToSession(int pSubject_index, void* pData, tU32 pData_length) {
 #else
             gMr_chunky2 = (tPipe_chunk*)&gMr_chunky2->chunk_data;
 #endif
+#ifdef DETHRACE_FIX_BUGS
+            memmove(gMr_chunky2, pData, pData_length);
+#else
             memcpy(gMr_chunky2, pData, pData_length);
+#endif
             gMr_chunky2 = (tPipe_chunk*)((tU8*)gMr_chunky2 + pData_length);
             gLocal_buffer_size = temp_buffer_size;
             PIPING_REQUIRE(gLocal_buffer_size <= LOCAL_BUFFER_SIZE);
@@ -992,11 +1040,11 @@ void PipeSingleSkidAdjustment(int pSkid_num, br_matrix34* pMatrix, int pMaterial
 // FUNCTION: CARM95 0x00429559
 void ResetPiping(void) {
 
-    gWall_severity = 0.f;
-    gPipe_buffer_oldest = NULL;
     gPipe_record_ptr = gPipe_buffer_start;
     gPipe_buffer_working_end = gPipe_buffer_phys_end;
+    gPipe_buffer_oldest = NULL;
     gReentrancy_count = 0;
+    gWall_severity = 0.f;
 }
 
 // IDA: void __cdecl InitialisePiping()
@@ -2121,6 +2169,10 @@ int UndoPipedSession(tU8** pPtr) {
     chunk_type = ((tPipe_session*)*pPtr)->chunk_type;
     for (i = 0; i < ((tPipe_session*)*pPtr)->number_of_chunks; i++) {
         pushed_end_of_session = gEnd_of_session;
+#ifdef DETHRACE_FIX_BUGS
+        // Fix -Wmaybe-uninitialized warning
+        prev_chunk = NULL;
+#endif
         if (!(chunk_type == ePipe_chunk_model_geometry || chunk_type == ePipe_chunk_sound || chunk_type == ePipe_chunk_damage || chunk_type == ePipe_chunk_special || chunk_type == ePipe_chunk_incident || chunk_type == ePipe_chunk_prox_ray || chunk_type == ePipe_chunk_smudge)) {
             prev_chunk = FindPreviousChunk(*pPtr, ((tPipe_session*)*pPtr)->chunk_type, chunk_ptr->subject_index);
         }
@@ -2304,14 +2356,14 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 
     temp_ptr = pChunk_ptr;
     if (SHOULD_SCAN_FORWARDS()) {
-        if (gEnd_time >= pTime) {
+        if (DR_FF(gEnd_time) >= pTime) {
             return 0;
         }
-    } else if (gEnd_time <= pTime) {
+    } else if (DR_FF(gEnd_time) <= pTime) {
         return 0;
     }
 
-    for (i = 0; i < pChunk_count; i++) {
+    for (i = 0; DR_FF(i) < pChunk_count; i++) {
         if ((temp_ptr->subject_index >> 8) == 0) {
             car = &gProgram_state.current_car;
         } else {
@@ -2339,11 +2391,11 @@ int CheckCar(tPipe_chunk* pChunk_ptr, int pChunk_count, tU32 pTime) {
 int CarTimeout(tU32 pTime) {
 
     if (SHOULD_SCAN_FORWARDS()) {
-        if (gLoop_abort_time < pTime) {
+        if (DR_FF(gLoop_abort_time) < pTime) {
             return 0;
         }
     } else {
-        if (gLoop_abort_time > pTime) {
+        if (DR_FF(gLoop_abort_time) > pTime) {
             return 0;
         }
     }

@@ -19,7 +19,7 @@ static void copy_palette(Smack* smack) {
     memcpy(smack->Palette, pal, 256 * 3);
 }
 
-Smack* SmackOpen(const char* name, unsigned int flags, unsigned int extrabuf) {
+Smack* SMACK_CALL SmackOpen(const char* name, unsigned int flags, unsigned int extrabuf) {
     unsigned char track_mask_smk;
     unsigned char channels_smk[7];
     unsigned char bitdepth_smk[7];
@@ -78,11 +78,11 @@ Smack* SmackOpen(const char* name, unsigned int flags, unsigned int extrabuf) {
     return smack;
 }
 
-int SmackSoundUseDirectSound(void* dd) {
+int SMACK_CALL SmackSoundUseDirectSound(void* dd) {
     return 0;
 }
 
-void SmackToBuffer(Smack* smack, unsigned int left, unsigned int top, unsigned int pitch, unsigned int destheight, void* buf, unsigned int flags) {
+void SMACK_CALL SmackToBuffer(Smack* smack, unsigned int left, unsigned int top, unsigned int pitch, unsigned int destheight, void* buf, unsigned int flags) {
     unsigned long i; // Pierre-Marie Baty -- fixed type
     char* char_buf = buf;
     const unsigned char* frame;
@@ -98,7 +98,7 @@ void SmackToBuffer(Smack* smack, unsigned int left, unsigned int top, unsigned i
     }
 }
 
-int SmackDoFrame(Smack* smack) {
+int SMACK_CALL SmackDoFrame(Smack* smack) {
     const unsigned char* audio_data;
     unsigned long audio_data_size;
 
@@ -116,12 +116,12 @@ int SmackDoFrame(Smack* smack) {
     return 0;
 }
 
-void SmackNextFrame(Smack* smack) {
+void SMACK_CALL SmackNextFrame(Smack* smack) {
     smk_next(smack->smk_handle);
     copy_palette(smack);
 }
 
-int SmackWait(Smack* smack) {
+int SMACK_CALL SmackWait(Smack* smack) {
     unsigned int now = gHarness_platform.GetTicks();
     if (now < smack_last_frame_time + smack->MSPerFrame) {
         gHarness_platform.Sleep(1);
@@ -131,7 +131,7 @@ int SmackWait(Smack* smack) {
     return 0;
 }
 
-void SmackClose(Smack* smack) {
+void SMACK_CALL SmackClose(Smack* smack) {
     if (smack->audio_stream != NULL) {
         AudioBackend_StreamClose(smack->audio_stream);
     }

@@ -4,7 +4,7 @@
 #include "dr_types.h"
 #include "harness/compiler.h"
 
-extern char* gError_messages[126];
+extern char* gError_messages[];
 extern int gError_code;
 extern char* gPalette_copy__errors;    // suffix added to avoid duplicate symbol
 extern int gPixel_buffer_size__errors; // suffix added to avoid duplicate symbol

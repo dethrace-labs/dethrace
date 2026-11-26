@@ -711,7 +711,7 @@ int SetPedSize(tPowerup* pPowerup, tCar_spec* pCar) {
 
     old_scale = gPed_scale_factor;
     gPed_scale_factor = pPowerup->float_params[0];
-    if (old_scale != gPed_scale_factor) {
+    if (DR_FF(old_scale) != gPed_scale_factor) {
         if (old_scale > 1.f) {
             PipeSingleSpecial(ePipe_special_giant_ped_off);
         } else if (old_scale < 1.f) {
@@ -1161,12 +1161,16 @@ int HitMine(tPowerup* pPowerup, tCar_spec* pCar) {
     pCar->omega.v[0] += FRandomPosNeg(pPowerup->float_params[3]) * TAU / pCar->M;
 
     if (pCar->driver > eDriver_non_car && !pCar->invulnerable) {
+#ifdef DETHRACE_FIX_BUGS
+        // Fix -Wmaybe-uninitialized warning
+        fudge_multiplier = 1.0f;
+#endif
         for (i = 0; i < pCar->car_actor_count; i++) {
             fudge_multiplier = pCar->car_model_actors[pCar->principal_car_actor].crush_data.softness_factor / 0.7;
-            TotallySpamTheModel(pCar, i, pCar->car_model_actors[i].actor, &pCar->car_model_actors[i].crush_data, fudge_multiplier * .1f);
+            TotallySpamTheModel(pCar, i, pCar->car_model_actors[i].actor, &pCar->car_model_actors[i].crush_data, fudge_multiplier * 0.1f);
         }
         for (i = 0; i < COUNT_OF(pCar->damage_units); i++) {
-            DamageUnit(pCar, i, IRandomBetween(0, fudge_multiplier * 15.f));
+            DamageUnit(pCar, i, IRandomBetween(0, fudge_multiplier * 15.0f));
         }
     }
     return GET_POWERUP_INDEX(pPowerup);
