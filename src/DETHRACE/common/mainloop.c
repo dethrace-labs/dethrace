@@ -539,24 +539,25 @@ void CheckTimer(void) {
 // FUNCTION: CARM95 0x00471607
 int MungeRaceFinished(void) {
 
-    if (!gRace_finished || gAction_replay_mode || (gNet_mode != eNet_mode_none && gRace_over_reason == eRace_not_over_yet)) {
-        return 0;
-    }
-    if (gRace_finished > gFrame_period) {
-        gRace_finished -= gFrame_period;
-    } else {
-        if (!gTimer || gNet_mode != eNet_mode_none) {
-            gRace_finished = 0;
-            return 1;
+    if (gRace_finished && !gAction_replay_mode && (!gNet_mode || gRace_over_reason != eRace_not_over_yet)) {
+        if (gRace_finished <= gFrame_period) {
+            if (gTimer && !gNet_mode) {
+                gRace_finished = 15 * gTimer + 4500;
+                gRace_bonus_headup = NewTextHeadupSlot(eHeadupSlot_race_bonus, 0, 0, -kFont_MEDIUMHD, "");
+                gTime_bonus_headup = NewTextHeadupSlot(eHeadupSlot_time_bonus, 0, 0, -kFont_MEDIUMHD, "");
+                gTime_bonus = 0;
+                gTime_bonus_start = GetTotalTime();
+                gTime_bonus_state = eTime_bonus_initial_pause;
+            } else {
+                gRace_finished = 0;
+                return 1;
+            }
+        } else {
+            gRace_finished -= gFrame_period;
         }
-        gRace_finished = 15 * gTimer + 4500;
-        gRace_bonus_headup = NewTextHeadupSlot(eHeadupSlot_race_bonus, 0, 0, -kFont_MEDIUMHD, "");
-        gTime_bonus_headup = NewTextHeadupSlot(eHeadupSlot_time_bonus, 0, 0, -kFont_MEDIUMHD, "");
-        gTime_bonus = 0;
-        gTime_bonus_start = GetTotalTime();
-        gTime_bonus_state = eTime_bonus_initial_pause;
+        return PDKeyDown(KEY_RETURN) || PDKeyDown(KEY_KP_ENTER);
     }
-    return PDKeyDown(KEY_RETURN) || PDKeyDown(KEY_KP_ENTER);
+    return 0;
 }
 
 // IDA: tRace_result __cdecl MainGameLoop()
