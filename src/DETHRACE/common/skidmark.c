@@ -51,6 +51,9 @@ void InitSkids(void) {
 #if defined(DETHRACE_FIX_BUGS)
     char mat_name[32];
 #endif
+#ifdef DETHRACE_3DFX_PATCH
+    br_pixelmap* temp;
+#endif
 
     for (mat = 0; mat < COUNT_OF(gMaterial_names); mat++) {
         gMaterial[mat] = BrMaterialFind(gProgram_state.sausage_eater_mode ? gBoring_material_names[mat] : gMaterial_names[mat]);
@@ -67,18 +70,26 @@ void InitSkids(void) {
 
             sl = strlen(str);
             strcat(str, ".PIX");
+#ifdef DETHRACE_3DFX_PATCH
+            temp = LoadPixelmap(str);
+            if (temp != NULL) {
+                temp = PurifiedPixelmap(temp);
+                BrMapAdd(temp);
+            }
+#else
             BrMapAdd(LoadPixelmap(str));
+#endif
             str[sl] = '\0';
             strcat(str, ".MAT");
             gMaterial[mat] = LoadMaterial(str);
             if (gMaterial[mat] == NULL) {
                 BrFatal("C:\\Msdev\\Projects\\DethRace\\SKIDMARK.C", 207, "Couldn't find %s", gMaterial_names[mat]);
-            } else {
-#ifdef DETHRACE_3DFX_PATCH
-                GlorifyMaterial(&gMaterial[mat], 1);
-#endif
-                BrMaterialAdd(gMaterial[mat]);
             }
+#ifdef DETHRACE_3DFX_PATCH
+            GlorifyMaterial(&gMaterial[mat], 1);
+#endif
+            BrMaterialAdd(gMaterial[mat]);
+
         }
 #ifdef DETHRACE_3DFX_PATCH
         else {
@@ -335,10 +346,7 @@ int Reflex2D(br_vector3* pPt, br_vector3* pL1, br_vector3* pL2) {
 // IDA: br_scalar __usercall SkidLen@<ST0>(int pSkid@<EAX>)
 // FUNCTION: CARM95 0x004021f1
 br_scalar SkidLen(int pSkid) {
-    return sqrt(
-        gSkids[pSkid].actor->t.t.mat.m[0][2] * gSkids[pSkid].actor->t.t.mat.m[0][2]
-        + gSkids[pSkid].actor->t.t.mat.m[0][1] * gSkids[pSkid].actor->t.t.mat.m[0][1]
-        + gSkids[pSkid].actor->t.t.mat.m[0][0] * gSkids[pSkid].actor->t.t.mat.m[0][0]);
+    return BrVector3Length(&gSkids[pSkid].actor->t.t.look_up.look);
 }
 
 // IDA: void __usercall InitCarSkidStuff(tCar_spec *pCar@<EAX>)

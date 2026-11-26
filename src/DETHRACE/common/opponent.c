@@ -2201,7 +2201,8 @@ int RematerialiseOpponent(tOpponent_spec* pOpponent_spec, br_scalar pSpeed) {
         BrMatrix34Copy(&pOpponent_spec->car_spec->old_frame_mat, mat);
         BrVector3Scale((br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], (br_vector3*)pOpponent_spec->car_spec->oldmat.m[3], WORLD_SCALE);
         for (j = 0; j < COUNT_OF(pOpponent_spec->car_spec->oldd); j++) {
-            pOpponent_spec->car_spec->oldd[j] = pOpponent_spec->car_spec->ride_height;
+            // j+0 is used to force asm match
+            pOpponent_spec->car_spec->oldd[j + 0] = pOpponent_spec->car_spec->ride_height;
         }
         pOpponent_spec->car_spec->gear = 0;
         pOpponent_spec->car_spec->revs = 0.f;
@@ -2827,7 +2828,7 @@ tCar_spec* GetCarSpec(tVehicle_type pCategory, int pIndex) {
         return &gProgram_state.current_car;
 
     case eVehicle_net_player:
-        return pIndex >= gThis_net_player_index ? gNet_players[pIndex + 1].car : gNet_players[pIndex].car;
+        return pIndex >= DR_FF(gThis_net_player_index) ? gNet_players[pIndex + 1].car : gNet_players[pIndex].car;
 
     case eVehicle_opponent:
         return gProgram_state.AI_vehicles.opponents[pIndex].car_spec;
@@ -3300,7 +3301,7 @@ void DeleteSection(tS16 pSection_to_delete) {
     tS16 found_it;
 
     for (node_no_index = 0; node_no_index < 2; node_no_index++) {
-        node_no = gProgram_state.AI_vehicles.path_sections[pSection_to_delete].node_indices[node_no_index];
+        node_no = gProgram_state.AI_vehicles.path_sections[pSection_to_delete].node_indices[DR_FF(node_no_index)];
         if (node_no >= 0) {
             found_it = 0;
             for (section_no_index = 0; section_no_index < (gProgram_state.AI_vehicles.path_nodes[node_no].number_of_sections - 1); section_no_index++) {
@@ -3681,7 +3682,7 @@ void MakeCube(br_uint_16 pFirst_vertex, br_uint_16 pFirst_face, br_vector3* pPoi
 // FUNCTION: CARM95 0x0040e016
 void CalcNumberOfFacesAndVerticesForOppoPathModel(br_uint_16* pFace_index_ptr, br_uint_16* pVertex_index_ptr) {
 
-    *pFace_index_ptr = gProgram_state.AI_vehicles.number_of_path_sections * 12 + gProgram_state.AI_vehicles.number_of_cops * 12;
+    *pFace_index_ptr = DR_FF(gProgram_state.AI_vehicles.number_of_cops * 12) + gProgram_state.AI_vehicles.number_of_path_sections * 12;
     *pVertex_index_ptr = gProgram_state.AI_vehicles.number_of_path_sections * 18 + gProgram_state.AI_vehicles.number_of_cops * 8;
 }
 
@@ -3693,8 +3694,8 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
     int i;
 
     new_vertices = BrResAllocate(pModel, pNum_vertices * sizeof(br_vertex), BR_MEMORY_VERTICES);
-    // this is something like BrMemSet32 in the dissassembly, although no such function exists in open-source BRender
-    memset(new_vertices, 0, pNum_vertices * sizeof(br_vertex));
+
+    BrBlockFill(new_vertices, 0, pNum_vertices * sizeof(br_vertex) / sizeof(br_uint_32));
     if (pModel->nvertices != 0) {
         for (i = 0; i < ((pNum_vertices <= pModel->nvertices) ? pNum_vertices : pModel->nvertices); i++) {
             CopyVertex__opponent(&new_vertices[i], &pModel->vertices[i]);
@@ -3706,11 +3707,10 @@ void ReallocModelFacesAndVertices(br_model* pModel, int pNum_faces, int pNum_ver
     pModel->nvertices = pNum_vertices;
 
     new_faces = BrResAllocate(pModel, pNum_faces * sizeof(br_face), BR_MEMORY_FACES);
-    // this is something like BrMemSet32 in the dissassembly, although no such function exists in open-source BRender
-    memset(new_faces, 0, pNum_faces * sizeof(br_face));
+    BrBlockFill(new_faces, 0, pNum_faces * sizeof(br_face) / sizeof(br_uint_32));
     if (pModel->nfaces != 0) {
         for (i = 0; i < ((pNum_faces <= pModel->nfaces) ? pNum_faces : pModel->nfaces); i++) {
-            CopyFace__opponent(&new_faces[i], &pModel->faces[i]);
+            CopyFace__opponent(&new_faces[i], (br_face*)DR_FF_PTR(pModel->faces) + i);
         }
         BrResRemove(pModel->faces);
         BrResFree(pModel->faces);
@@ -4005,7 +4005,7 @@ int ConsistencyCheck(void) {
         }
     }
 #ifdef DETHRACE_FIX_BUGS
-    cleanup:
+cleanup:
 #endif
     if (gProgram_state.AI_vehicles.number_of_path_nodes != 0) {
         BrMemFree(nodes_referenced_by_sections_array);

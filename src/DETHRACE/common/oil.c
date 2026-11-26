@@ -36,10 +36,18 @@ void InitOilSpills(void) {
     br_model* the_model;
     br_material* the_material;
 
+#ifdef DETHRACE_3DFX_PATCH
+    gOil_pixies[0] = LoadPixelmap(gOil_pixie_names[0]);
+    if (gOil_pixies[0] != NULL) {
+        gOil_pixies[0] = PurifiedPixelmap(gOil_pixies[0]);
+    }
+    BrMapAdd(gOil_pixies[0]);
+#else
     for (i = 0; i < COUNT_OF(gOil_pixie_names); i++) {
         gOil_pixies[i] = LoadPixelmap(gOil_pixie_names[i]);
         BrMapAdd(gOil_pixies[i]);
     }
+#endif
 
     for (i = 0; i < COUNT_OF(gOily_spills); i++) {
         the_material = BrMaterialAllocate(NULL);
@@ -232,9 +240,7 @@ void EnsureGroundDetailVisible(br_vector3* pNew_pos, br_vector3* pGround_normal,
     br_scalar dist;
     br_vector3 to_camera;
 
-    to_camera.v[0] = gCamera_to_world.m[3][0] - pOld_pos->v[0];
-    to_camera.v[1] = gCamera_to_world.m[3][1] - pOld_pos->v[1];
-    to_camera.v[2] = gCamera_to_world.m[3][2] - pOld_pos->v[2];
+    BrVector3Sub(&to_camera, (br_vector3*)gCamera_to_world.m[3], pOld_pos);
     dist = BrVector3Length(&to_camera);
     if (dist <= BR_SCALAR_EPSILON) {
         return;

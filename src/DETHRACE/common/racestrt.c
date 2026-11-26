@@ -259,8 +259,8 @@ void MoveRaceList(int pFrom, int pTo, tS32 pTime_to_move) {
 int UpRace(int* pCurrent_choice, int* pCurrent_mode) {
 
     AddToFlicQueue(gStart_interface_spec->pushed_flics[2].flic_index,
-        gStart_interface_spec->pushed_flics[2].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[2].x[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[2].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
 #ifdef DETHRACE_FIX_BUGS
@@ -283,8 +283,8 @@ int UpRace(int* pCurrent_choice, int* pCurrent_mode) {
 int DownRace(int* pCurrent_choice, int* pCurrent_mode) {
 
     AddToFlicQueue(gStart_interface_spec->pushed_flics[3].flic_index,
-        gStart_interface_spec->pushed_flics[3].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[3].y[gGraf_data_index],
+        ((int*)DR_FF_PTR(gStart_interface_spec->pushed_flics[3].x))[gGraf_data_index],
+        ((int*)DR_FF_PTR(gStart_interface_spec->pushed_flics[3].y))[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     if ((gProgram_state.rank <= gRace_list[gCurrent_race_index + 1].rank_required || gProgram_state.game_completed || gChange_race_net_mode) && gCurrent_race_index < gNumber_of_races - 1) {
@@ -490,8 +490,8 @@ void SetCarFlic(void) {
 int UpCar(int* pCurrent_choice, int* pCurrent_mode) {
 
     AddToFlicQueue(gStart_interface_spec->pushed_flics[2].flic_index,
-        gStart_interface_spec->pushed_flics[2].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
+        ((tInterface_spec*)DR_FF_PTR(gStart_interface_spec))->pushed_flics[2].x[gGraf_data_index],
+        ((tInterface_spec*)DR_FF_PTR(gStart_interface_spec))->pushed_flics[2].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     if (gCurrent_car_index != 0) {
@@ -517,8 +517,8 @@ int UpCar(int* pCurrent_choice, int* pCurrent_mode) {
 int DownCar(int* pCurrent_choice, int* pCurrent_mode) {
 
     AddToFlicQueue(gStart_interface_spec->pushed_flics[3].flic_index,
-        gStart_interface_spec->pushed_flics[3].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[3].y[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[3].x[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[3].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     if (gCurrent_car_index < gProgram_state.number_of_cars - 1) {
@@ -559,11 +559,11 @@ int DownClickCar(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int pY
 // FUNCTION: CARM95 0x0044f788
 int ChangeCarGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 
-    if (gChange_race_net_mode == 0 || gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership != eCar_owner_someone) {
-        return 1;
-    } else {
+    if (gChange_race_net_mode != 0 && gCar_details[gProgram_state.cars_available[gCurrent_car_index]].ownership == eCar_owner_someone) {
         DRS3StartSound(gEffects_outlet, 3100);
         return 0;
+    } else {
+        return 1;
     }
 }
 
@@ -768,7 +768,8 @@ void CalcPartPrice(int pCategory, int pIndex, int* pPrice, int* pCost) {
     if (gProgram_state.current_car.power_up_levels[pCategory] == pIndex) {
         *pCost = 0;
     } else {
-        *pCost = *pPrice - 10 * (gRefund_rate * gProgram_state.current_car.power_ups[pCategory].info[gProgram_state.current_car.power_up_levels[pCategory]].prices[gProgram_state.skill_level] / 1000);
+        current_value = gProgram_state.current_car.power_ups[pCategory].info[gProgram_state.current_car.power_up_levels[pCategory]].prices[gProgram_state.skill_level];
+        *pCost = *pPrice - ((current_value + 0) * gRefund_rate / 1000) * 10;
     }
 }
 
@@ -906,7 +907,7 @@ int GetPartsMax(void) {
     int i;
 
     for (i = gProgram_state.current_car.power_ups[gPart_category].number_of_parts - 1; i >= 0; i--) {
-        if (gProgram_state.rank <= gProgram_state.current_car.power_ups[gPart_category].info[i].rank_required || gProgram_state.game_completed) {
+        if (gProgram_state.rank <= gProgram_state.current_car.power_ups[gPart_category].info[DR_FF(i)].rank_required || gProgram_state.game_completed) {
             return i;
         }
     }
@@ -958,8 +959,8 @@ int PartsShopGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
         flic_index = gStart_interface_spec->pushed_flics[*pCurrent_choice].flic_index;
         RunFlicAt(
             flic_index,
-            gStart_interface_spec->pushed_flics[*pCurrent_choice].x[gGraf_data_index],
-            gStart_interface_spec->pushed_flics[*pCurrent_choice].y[gGraf_data_index]);
+            ((tFlicette*)DR_FF_PTR(&gStart_interface_spec->pushed_flics[*pCurrent_choice]))->x[gGraf_data_index],
+            ((tFlicette*)DR_FF_PTR(&gStart_interface_spec->pushed_flics[*pCurrent_choice]))->y[gGraf_data_index]);
         TurnFlicTransparencyOff();
         LetFlicFuckWithPalettes();
         gJust_bought_part = 0;
@@ -982,8 +983,8 @@ int PartsShopGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
     } else if (*pCurrent_mode == 1) {
         AddToFlicQueue(
             gStart_interface_spec->pushed_flics[4].flic_index,
-            gStart_interface_spec->pushed_flics[4].x[gGraf_data_index],
-            gStart_interface_spec->pushed_flics[4].y[gGraf_data_index],
+            ((tFlicette*)DR_FF_PTR(&gStart_interface_spec->pushed_flics[4]))->x[gGraf_data_index],
+            ((tFlicette*)DR_FF_PTR(&gStart_interface_spec->pushed_flics[4]))->y[gGraf_data_index],
             1);
         DoExchangePart();
         return 0;
@@ -999,14 +1000,16 @@ int UpPart(int* pCurrent_choice, int* pCurrent_mode) {
     gJust_bought_part = 0;
     AddToFlicQueue(
         gStart_interface_spec->pushed_flics[5].flic_index,
-        gStart_interface_spec->pushed_flics[5].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[5].y[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[5].x[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[5].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     RemoveTransientBitmaps(1);
     ErasePartsText(0);
 
-    gPart_index = (gPart_index == 0) ? GetPartsMax() : (gPart_index - 1);
+    if (gPart_index-- == 0) {
+        gPart_index = GetPartsMax();
+    }
 
     DropOutImageThruBottom(
         GetPanelPixelmap(0),
@@ -1034,14 +1037,16 @@ int DownPart(int* pCurrent_choice, int* pCurrent_mode) {
     gJust_bought_part = 0;
     AddToFlicQueue(
         gStart_interface_spec->pushed_flics[6].flic_index,
-        gStart_interface_spec->pushed_flics[6].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[6].y[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[6].x[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[6].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     RemoveTransientBitmaps(1);
     ErasePartsText(0);
 
-    gPart_index = (gPart_index == GetPartsMax()) ? 0 : (gPart_index + 1);
+    if (gPart_index++ == GetPartsMax()) {
+        gPart_index = 0;
+    }
 
     DropOutImageThruTop(
         GetPanelPixelmap(0),
@@ -1099,12 +1104,12 @@ int PartsArrowsOn(int* pCurrent_choice, int* pCurrent_mode) {
 int PartsArrowsOff(int* pCurrent_choice, int* pCurrent_mode) {
 
     AddToFlicQueue(gStart_interface_spec->flicker_off_flics[5].flic_index,
-        gStart_interface_spec->flicker_off_flics[5].x[gGraf_data_index],
-        gStart_interface_spec->flicker_off_flics[5].y[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->flicker_off_flics))[5].x[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->flicker_off_flics))[5].y[gGraf_data_index],
         1);
     AddToFlicQueue(gStart_interface_spec->flicker_off_flics[6].flic_index,
-        gStart_interface_spec->flicker_off_flics[6].x[gGraf_data_index],
-        gStart_interface_spec->flicker_off_flics[6].y[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->flicker_off_flics))[6].x[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->flicker_off_flics))[6].y[gGraf_data_index],
         1);
     return 0;
 }
@@ -1397,8 +1402,8 @@ int UpOpponent(int* pCurrent_choice, int* pCurrent_mode) {
     }
 #endif
     AddToFlicQueue(gStart_interface_spec->pushed_flics[5].flic_index,
-        gStart_interface_spec->pushed_flics[5].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[5].y[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[5].x[gGraf_data_index],
+        ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[5].y[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     RemoveTransientBitmaps(1);
@@ -1430,8 +1435,8 @@ int DownOpponent(int* pCurrent_choice, int* pCurrent_mode) {
     }
 #endif
     AddToFlicQueue(gStart_interface_spec->pushed_flics[6].flic_index,
-        gStart_interface_spec->pushed_flics[6].x[gGraf_data_index],
-        gStart_interface_spec->pushed_flics[6].y[gGraf_data_index],
+        ((int*)DR_FF_PTR(gStart_interface_spec->pushed_flics[6].x))[gGraf_data_index],
+        ((int*)DR_FF_PTR(gStart_interface_spec->pushed_flics[6].y))[gGraf_data_index],
         1);
     DRS3StartSound(gEffects_outlet, 3000);
     RemoveTransientBitmaps(1);
@@ -2300,13 +2305,13 @@ void DoChallengeScreen(void) {
     gOriginal_position = gOur_starting_position;
     gChallenger_position = IRandomBetween(0, 1);
     if (gOpponents[gCurrent_race.opponent_list[gChallenger_position].index].car_number < 0) {
-        gChallenger_position ^= 1u;
+        gChallenger_position ^= 1;
     }
     gChallenger_index__racestrt = gCurrent_race.opponent_list[gChallenger_position].index;
     LoadOpponentMugShot(gChallenger_index__racestrt);
     gDraw_grid_status = eGrid_draw_none;
     gGrid_y_adjust = gCurrent_graf_data->dare_y_adjust;
-    DoInterfaceScreen(&interface_spec, 0, 0);
+    result = DoInterfaceScreen(&interface_spec, 0, 0);
 }
 
 // IDA: int __usercall GridDone@<EAX>(int pCurrent_choice@<EAX>, int pCurrent_mode@<EDX>, int pGo_ahead@<EBX>, int pEscaped@<ECX>, int pTimed_out)
@@ -2338,8 +2343,8 @@ int GridMoveLeft(int* pCurrent_choice, int* pCurrent_mode) {
         && gCurrent_race.opponent_list[gOur_starting_position - 1].ranking >= gProgram_state.rank) {
         AddToFlicQueue(
             gStart_interface_spec->pushed_flics[1].flic_index,
-            gStart_interface_spec->pushed_flics[1].x[gGraf_data_index],
-            gStart_interface_spec->pushed_flics[1].y[gGraf_data_index],
+            ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[1].x[gGraf_data_index],
+            ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[1].y[gGraf_data_index],
             1);
         DRS3StartSound(gEffects_outlet, 3000);
         DoGridTransition(gOur_starting_position, gOur_starting_position - 1);
@@ -2354,8 +2359,8 @@ int GridMoveRight(int* pCurrent_choice, int* pCurrent_mode) {
     if (gOur_starting_position < gCurrent_race.number_of_racers - 1) {
         AddToFlicQueue(
             gStart_interface_spec->pushed_flics[2].flic_index,
-            gStart_interface_spec->pushed_flics[2].x[gGraf_data_index],
-            gStart_interface_spec->pushed_flics[2].y[gGraf_data_index],
+            ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[2].x[gGraf_data_index],
+            ((tFlicette*)DR_FF_PTR(gStart_interface_spec->pushed_flics))[2].y[gGraf_data_index],
             1);
         DRS3StartSound(gEffects_outlet, 3000);
         DoGridTransition(gOur_starting_position, gOur_starting_position + 1);
@@ -2431,11 +2436,12 @@ int GridClickRight(int* pCurrent_choice, int* pCurrent_mode, int pX_offset, int 
 // FUNCTION: CARM95 0x0045378a
 int CheckChallenge(int* pCurrent_choice, int* pCurrent_mode) {
 
-    if (!gChallenge_time || PDGetTotalTime() < gChallenge_time) {
+    if (gChallenge_time && PDGetTotalTime() >= gChallenge_time) {
+        *pCurrent_choice = -2;
+        return 1;
+    } else {
         return 0;
     }
-    *pCurrent_choice = -2;
-    return 1;
 }
 
 // IDA: int __usercall FindBestPos@<EAX>(int pOur_rank@<EAX>)
@@ -2750,27 +2756,26 @@ int NetSynchStartDone(int pCurrent_choice, int pCurrent_mode, int pGo_ahead, int
 // FUNCTION: CARM95 0x00454047
 int NetSynchStartGoAhead(int* pCurrent_choice, int* pCurrent_mode) {
 
-    if (*pCurrent_choice == 0 || (gNet_mode == eNet_mode_host && *pCurrent_choice >= 0)) {
+    if (*pCurrent_choice != 0 && (gNet_mode != eNet_mode_host || *pCurrent_choice < 0)) {
+        DRS3StartSound(gEffects_outlet, 3100);
+        return 0;
+    } else {
         if (*pCurrent_choice == 0) {
             gProgram_state.prog_status = eProg_idling;
             return 1;
         } else if (gNet_mode == eNet_mode_host && *pCurrent_choice == 1) {
-            if (gNumber_of_net_players <= 1) {
-                DRS3StartSound(gEffects_outlet, 3100);
-                return 0;
-            } else {
+            if (gNumber_of_net_players > 1) {
                 SignalToStartRace();
                 gSynch_race_start = 1;
                 gNo_races_yet = 0;
                 return 1;
+            } else {
+                DRS3StartSound(gEffects_outlet, 3100);
+                return 0;
             }
-        } else {
-            return 1;
         }
-    } else {
-        DRS3StartSound(gEffects_outlet, 3100);
-        return 0;
     }
+    return 1;
 }
 
 // IDA: int __usercall ExitWhenReady@<EAX>(int *pCurrent_choice@<EAX>, int *pCurrent_mode@<EDX>)
