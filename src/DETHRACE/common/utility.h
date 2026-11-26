@@ -52,17 +52,23 @@ br_pixelmap* DRPixelmapAllocate(br_uint_8 pType, br_uint_16 pW, br_uint_16 pH, v
 
 br_pixelmap* DRPixelmapAllocateSub(br_pixelmap* pPm, br_uint_16 pX, br_uint_16 pY, br_uint_16 pW, br_uint_16 pH);
 
+#ifdef DETHRACE_3DFX_PATCH
 br_pixelmap* DRPixelmapMatchSized(br_pixelmap* pSrc, tU8 pMatch_type, tS32 pWidth, tS32 pHeight);
+#endif
 
 void CopyDoubled8BitTo16BitRectangle(br_pixelmap* pDst, br_pixelmap* pSrc, int pSrc_width, int pSrc_height, int pDst_x, int pDst_y, br_pixelmap* pPalette);
 
+#ifdef DETHRACE_3DFX_PATCH
 br_pixelmap* Scale8BitPixelmap(br_pixelmap* pSrc, int pWidth, int pHeight);
 
 br_pixelmap* Tile8BitPixelmap(br_pixelmap* pSrc, int pN);
+#endif
 
 tException_list FindExceptionInList(char* pName, tException_list pList);
 
+#ifdef DETHRACE_3DFX_PATCH
 br_pixelmap* PurifiedPixelmap(br_pixelmap* pSrc);
+#endif
 
 br_pixelmap* DRPixelmapLoad(char* pFile_name);
 

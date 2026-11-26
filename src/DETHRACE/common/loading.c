@@ -1024,34 +1024,29 @@ tS8* ConvertPixToStripMap(br_pixelmap* pThe_br_map) {
         j = 0;
 
         do {
-            if (counter <= 126 && j != pThe_br_map->width) {
-                the_byte = *next_byte;
-                if ((the_byte == 0) == counting_blanks) {
-                    goto linex;
+            if (counter > 126 || j == pThe_br_map->width || ((the_byte = *next_byte) == 0) != counting_blanks) {
+                if (counting_blanks) {
+                    new_line[new_line_length - 1] = counter;
+                } else {
+                    new_line[new_line_length - counter - 1] = ~counter + 1;
                 }
-            }
-            if (counting_blanks) {
-                new_line[new_line_length - 1] = counter;
-            } else {
-                new_line[new_line_length - counter - 1] = ~counter + 1;
-            }
 
-            counting_blanks = the_byte == 0;
-            counter = 0;
-            chunk_counter++;
-            if (j == pThe_br_map->width) {
-                break;
+                counting_blanks = the_byte == 0;
+                counter = 0;
+                chunk_counter++;
+                if (j == pThe_br_map->width) {
+                    break;
+                } else {
+                    new_line_length++;
+                }
             } else {
-                new_line_length++;
+                if (!counting_blanks) {
+                    new_line[new_line_length++] = the_byte;
+                }
+                next_byte++;
+                counter++;
+                j++;
             }
-            continue;
-        linex:
-            if (!counting_blanks) {
-                new_line[new_line_length++] = the_byte;
-            }
-            next_byte++;
-            counter++;
-            j++;
         } while (1);
 
         new_line[0] = chunk_counter;
@@ -2975,7 +2970,7 @@ br_font* LoadBRFont(char* pName) {
     fread(the_font->encoding, sizeof(br_uint_16) * 256, 1u, f);
 #if !BR_ENDIAN_BIG
     for (i = 0; i < 256; i++) {
-        the_font->encoding[i] = ((the_font->encoding[i] & 0xff) << 8) | ((the_font->encoding[i] >> 8));
+        the_font->encoding[DR_FF(i)] = ((the_font->encoding[DR_FF(i)] & 0xff) << 8) | ((the_font->encoding[DR_FF(i)] >> 8));
     }
 #endif
     PossibleService();

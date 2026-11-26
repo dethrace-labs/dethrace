@@ -234,9 +234,9 @@ static void limit_fps(void) {
     last_frame_time = SDL3_GetTicks();
 }
 
-static int SDL3_Harness_ShowErrorMessage(char* text, char* caption) {
-    fprintf(stderr, "%s", text);
-    SDL3_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, caption, text, window);
+static int SDL3_Harness_ShowErrorMessage(char* title, char* message) {
+    fprintf(stderr, "%s", message);
+    SDL3_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, window);
     return 0;
 }
 
