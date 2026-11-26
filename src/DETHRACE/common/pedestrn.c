@@ -1062,6 +1062,8 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
     case ePed_frame_variable:
         frame_period = 1000.f / FRandomBetween(the_sequence->frame_rate_factor1, the_sequence->frame_rate_factor2);
         break;
+
+        DETHRACE_DEFAULT_BREAK;
     }
     if (frame_period == 0.0f) {
         pPedestrian->current_frame = 0;
@@ -1083,7 +1085,7 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
                     }
                 }
             }
-            if (pPedestrian->current_frame >= the_sequence->looping_frame_start + number_of_frames) {
+            if (DR_FF(the_sequence->looping_frame_start + number_of_frames) <= pPedestrian->current_frame) {
                 pPedestrian->current_frame = the_sequence->looping_frame_start;
             }
         }
