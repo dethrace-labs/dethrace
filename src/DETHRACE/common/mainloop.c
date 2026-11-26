@@ -539,14 +539,9 @@ void CheckTimer(void) {
 // FUNCTION: CARM95 0x00471607
 int MungeRaceFinished(void) {
 
-    if (gRace_finished && !gAction_replay_mode) {
-        if (gNet_mode) {
-            if (gRace_over_reason == eRace_not_over_yet) {
-                return 0;
-            }
-        }
-        if (gFrame_period >= gRace_finished) {
-            if (gTimer && gNet_mode) {
+    if (gRace_finished && !gAction_replay_mode && (!gNet_mode || gRace_over_reason != eRace_not_over_yet)) {
+        if (gRace_finished <= gFrame_period) {
+            if (gTimer && !gNet_mode) {
                 gRace_finished = 15 * gTimer + 4500;
                 gRace_bonus_headup = NewTextHeadupSlot(eHeadupSlot_race_bonus, 0, 0, -kFont_MEDIUMHD, "");
                 gTime_bonus_headup = NewTextHeadupSlot(eHeadupSlot_time_bonus, 0, 0, -kFont_MEDIUMHD, "");
