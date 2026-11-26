@@ -1062,11 +1062,8 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
     case ePed_frame_variable:
         frame_period = 1000.f / FRandomBetween(the_sequence->frame_rate_factor1, the_sequence->frame_rate_factor2);
         break;
-<<<<<<< HEAD
 
         DETHRACE_DEFAULT_BREAK;
-=======
->>>>>>> main
     }
     if (frame_period == 0.0f) {
         pPedestrian->current_frame = 0;
@@ -1088,7 +1085,7 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
                     }
                 }
             }
-            if (pPedestrian->current_frame >= the_sequence->looping_frame_start + number_of_frames) {
+            if (DR_FF(the_sequence->looping_frame_start + number_of_frames) <= pPedestrian->current_frame) {
                 pPedestrian->current_frame = the_sequence->looping_frame_start;
             }
         }
@@ -1133,7 +1130,7 @@ void MungePedestrianFrames(tPedestrian_data* pPedestrian) {
             }
             if (pPedestrian->current_action == pPedestrian->fatal_car_impact_action) {
                 if (pPedestrian->actor->parent != gDont_render_actor) {
-                    BrVector3Copy(&pPedestrian->actor->t.t.translate.t, &pPedestrian->offset);
+                    pPedestrian->actor->t.t.translate.t = pPedestrian->offset;
                 }
                 DetachPedFromCar(pPedestrian);
                 pPedestrian->spin_period = 0.f;
