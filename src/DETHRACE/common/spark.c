@@ -2103,7 +2103,7 @@ void InitFlame(void) {
         gFlame_map[i] = PurifiedPixelmap(gFlame_map[i]);
     }
 #endif
-    BrMapAddMany(gFlame_map, COUNT_OF(gFlame_map));
+    BrMapAddMany(gFlame_map, num);
     for (i = 0; i < MAX_SMOKE_COLUMNS; i++) {
         gSmoke_column[i].flame_actor = BrActorAllocate(BR_ACTOR_NONE, NULL);
         for (j = 0; j < COUNT_OF(gSmoke_column[0].frame_count); j++) {
@@ -2116,7 +2116,7 @@ void InitFlame(void) {
             material->flags |= BR_MATF_ALWAYS_VISIBLE;
             material->colour_map = gFlame_map[0];
             BrMaterialAdd(material);
-            gSmoke_column[i].frame_count[j] = 100;
+            gSmoke_column[i].frame_count[DR_FF(j)] = 100;
         }
     }
     gLollipop_model->nvertices = 4;
