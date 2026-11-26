@@ -526,11 +526,7 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
             depth_ptr += depth_line_skip;
         }
     } else if (depth_shift_amount < 0) {
-<<<<<<< HEAD
-            depth_shift_amount = -depth_shift_amount;
-=======
         depth_shift_amount = -depth_shift_amount;
->>>>>>> main
         for (y = 0; pRender_buffer->height > y; ++y) {
             for (x = 0; pRender_buffer->width > x; ++x, ++render_ptr, ++depth_ptr) {
                 if (*depth_ptr != 0xFFFF) {
@@ -549,7 +545,7 @@ void DoDepthByShadeTable(br_pixelmap* pRender_buffer, br_pixelmap* pDepth_buffer
                 if (*depth_ptr != 0xFFFF) {
                     depth_value = *depth_ptr - depth_start;
                     if (depth_value < too_near) {
-                        *render_ptr = shade_table_pixels[(depth_value & 0xFF00) + *render_ptr];
+                        *render_ptr = shade_table_pixels[DR_FF(*render_ptr) + (depth_value & 0xFF00)];
                     }
                 }
             }
