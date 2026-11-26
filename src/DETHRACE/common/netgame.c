@@ -235,7 +235,7 @@ void ReceivedMechanics(tNet_contents* pContents) {
             break;
         }
     }
-    if (car == NULL || car->message.time > pContents->data.mech.time) {
+    if (car == NULL || DR_FF(car->message.time) > pContents->data.mech.time) {
         return;
     }
     if (car->disabled) {
@@ -260,7 +260,7 @@ void ReceivedMechanics(tNet_contents* pContents) {
     }
     if (gNet_mode == eNet_mode_host) {
         if (gThis_net_player_index != i) {
-            if (car->last_car_car_collision <= pContents->data.mech.cc_coll_time) {
+            if (DR_FF(car->last_car_car_collision) <= pContents->data.mech.cc_coll_time) {
                 CopyMechanics(car, pContents);
             }
             car->power_up_levels[0] = pContents->data.mech.powerups & 7;
@@ -304,7 +304,7 @@ void ReceivedMechanics(tNet_contents* pContents) {
                 car->box_face_ref = gFace_num__car - 2;
             }
         } else {
-            if (car->last_car_car_collision < pContents->data.mech.cc_coll_time) {
+            if (DR_FF(car->last_car_car_collision) < pContents->data.mech.cc_coll_time) {
                 CopyMechanics(car, pContents);
             }
         }
@@ -1005,10 +1005,10 @@ void DeclareWinner(int pWinner_index) {
         gNet_players[pWinner_index].games_score += gGame_scores[5];
     }
     sprintf(s, "%s %s", gNet_players[pWinner_index].player_name, GetMiscString(kMiscString_IS_THE_WINNER));
-    for (i = 0; i < gNumber_of_net_players; i++) {
+    for (i = 0; i < DR_FF(gNumber_of_net_players); i++) {
         if (gCurrent_net_game->type != eNet_game_type_sudden_death && gCurrent_net_game->type != eNet_game_type_tag && gCurrent_net_game->type != eNet_game_type_fight_to_death) {
             best_score_index = gNet_players[i].last_score_index;
-            for (j = 0; j < gNumber_of_net_players; j++) {
+            for (j = 0; j < DR_FF(gNumber_of_net_players); j++) {
                 if (gNet_players[i].score == gNet_players[j].score && gNet_players[j].last_score_index < best_score_index) {
                     best_score_index = gNet_players[j].last_score_index;
                 }
@@ -1025,7 +1025,7 @@ void DeclareWinner(int pWinner_index) {
     }
     gReceived_game_scores = 1;
     the_message = NetBuildMessage(NETMSGID_GAMESCORES, 0);
-    for (i = 0; i < gNumber_of_net_players; i++) {
+    for (i = 0; i < DR_FF(gNumber_of_net_players); i++) {
         the_message->contents.data.game_scores.scores[i].played = gNet_players[i].played;
         the_message->contents.data.game_scores.scores[i].won = gNet_players[i].won;
         the_message->contents.data.game_scores.scores[i].score = gNet_players[i].games_score;
@@ -1102,22 +1102,21 @@ void SelectRandomItOrFox(int pNot_this_one) {
     new_choice = 0;
     gLast_lepper = NULL;
     if (gCurrent_net_game->type == eNet_game_type_tag) {
-        for (i = 0; i < gNumber_of_net_players; i++) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; i++) {
             if (gNet_players[i].last_score_index == 0) {
                 new_choice = i;
                 break;
             }
         }
     } else {
-        for (i = 0; i < gNumber_of_net_players; i++) {
-            if (i != pNot_this_one && gNet_players[i].last_score_index == gNumber_of_net_players - 1) {
+        for (i = 0; DR_FF(i) < gNumber_of_net_players; i++) {
+            if (DR_FF(i) != pNot_this_one && gNet_players[i].last_score_index == gNumber_of_net_players - 1) {
                 PlayerIsIt(&gNet_players[i]);
                 return;
             }
         }
-        do {
-            new_choice = IRandomBetween(0, gNumber_of_net_players - 1);
-        } while (new_choice == pNot_this_one && !gNet_players[new_choice].car->knackered);
+        while (DR_FF(new_choice = IRandomBetween(0, gNumber_of_net_players - 1)) == pNot_this_one && !gNet_players[new_choice].car->knackered) {
+        }
     }
     PlayerIsIt(&gNet_players[new_choice]);
 }

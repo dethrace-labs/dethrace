@@ -161,7 +161,7 @@ int NetInitialise(void) {
         *(gMin_messages[i].buffer + gMessage_header_size + offsetof(tNet_message, contents.header.type)) = NETMSGID_NONE;
     }
     for (i = 0; i < MID_MESSAGES_CAPACITY; i++) {
-        *(gMid_messages[i].buffer + gMessage_header_size + offsetof(tNet_message, contents.header.type)) = NETMSGID_NONE;
+        *(gMid_messages[DR_FF(i)].buffer + gMessage_header_size + offsetof(tNet_message, contents.header.type)) = NETMSGID_NONE;
     }
     for (i = 0; i < MAX_MESSAGES_CAPACITY; i++) {
         *(gMax_messages[i].buffer + gMessage_header_size + offsetof(tNet_message, contents.header.type)) = NETMSGID_NONE;
@@ -2182,9 +2182,9 @@ int NetGuaranteedSendMessageToHost(tNet_game_details* pDetails, tNet_message* pM
 int NetGuaranteedSendMessageToPlayer(tNet_game_details* pDetails, tNet_message* pMessage, tPlayer_ID pPlayer, int (*pNotifyFail)(tU32, tNet_message*)) {
     int i;
 
-    for (i = 0; gNumber_of_net_players > i; i++) {
+    for (i = 0; i < DR_FF(gNumber_of_net_players); i++) {
         if (pPlayer == gNet_players[i].ID) {
-            if (gLocal_net_ID == pPlayer) {
+            if (pPlayer == DR_FF(gLocal_net_ID)) {
                 pMessage->sender = gLocal_net_ID;
                 pMessage->senders_time_stamp = PDGetTotalTime();
                 pMessage->num_contents = 1;
@@ -2277,7 +2277,10 @@ void ResendGuaranteedMessages(void) {
 // FUNCTION: CARM95 0x0044ad06
 int SampleFailNotifier(tU32 pAge, tNet_message* pMessage) {
 
-    return pAge > 9999;
+    if (pAge >= 10000) {
+        return 1;
+    }
+    return 0;
 }
 
 // IDA: void __cdecl NetWaitForGuaranteeReplies()

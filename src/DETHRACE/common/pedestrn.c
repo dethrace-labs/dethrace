@@ -370,6 +370,9 @@ void InitPedGibs(void) {
             } else {
                 the_pix = LoadPixelmap(gPed_gib_names[i][j]);
             }
+#ifdef DETHRACE_3DFX_PATCH
+            the_pix = PurifiedPixelmap(the_pix);
+#endif
             BrMapAdd(the_pix);
             gPed_gib_materials[i].count = gPed_size_counts[i];
             gPed_gib_materials[i].materials[j] = BrMaterialAllocate(NULL);
@@ -465,8 +468,8 @@ void MungeModelSize(br_actor* pActor, br_scalar pScaling_factor) {
     br_scalar half_height;
 
     the_pix = pActor->material->colour_map;
-    half_width = (the_pix->width / 2) * pScaling_factor * gPed_scale_factor;
-    half_height = (the_pix->height / 2) * pScaling_factor * gPed_scale_factor;
+    half_width = DR_FF((the_pix->width / 2) * pScaling_factor) * gPed_scale_factor;
+    half_height = DR_FF((the_pix->height / 2) * pScaling_factor) * gPed_scale_factor;
     PedModelUpdate(pActor->model,
         -half_width, -half_height,
         -half_width, half_height,
@@ -959,7 +962,7 @@ void MungePedestrianSequence(tPedestrian_data* pPedestrian, int pAction_changed)
         if (heading_difference <= the_action->sequences[i].max_bearing) {
             the_sequence = the_action->sequences[i].sequence_index;
             if (pPedestrian->current_sequence != the_sequence) {
-                sequence_ptr = &pPedestrian->sequences[the_sequence];
+                sequence_ptr = &((tPedestrian_sequence*)DR_FF_PTR(pPedestrian->sequences))[the_sequence];
                 current_looping = pPedestrian->sequences[pPedestrian->current_sequence].looping_frame_start;
                 if (pAction_changed || current_looping > pPedestrian->current_frame) {
                     pPedestrian->current_frame = -1;
@@ -2843,6 +2846,9 @@ void CreatePedestrian(FILE* pG, tPedestrian_instruction* pInstructions, int pIns
                         if (the_sequence->frames[k].pixelmap == NULL) {
                             FatalError(kFatalError_FindPedestrianPixelmap_S, s2);
                         }
+#ifdef DETHRACE_3DFX_PATCH
+                        the_sequence->frames[k].pixelmap = PurifiedPixelmap(the_sequence->frames[k].pixelmap);
+#endif
                         BrMapAdd(the_sequence->frames[k].pixelmap);
                     }
                     GetALineAndDontArgue(pG, s2);

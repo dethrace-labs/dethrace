@@ -200,8 +200,8 @@ void LoadPratcam(char* pFolder_name) {
                     }
                     for (l = 0; l < gPratcam_sequences[i].chunks[j].alternatives[k].number_of_sounds; l++) {
                         str = strtok(NULL, "\t ,/");
-                        sscanf(str, "%d", &gPratcam_sequences[i].chunks[j].alternatives[k].sound_ids[l]);
-                        DRS3LoadSound(gPratcam_sequences[i].chunks[j].alternatives[k].sound_ids[l]);
+                        sscanf(str, "%d", &gPratcam_sequences[i].chunks[j].alternatives[DR_FF(k)].sound_ids[l]);
+                        DRS3LoadSound(gPratcam_sequences[i].chunks[j].alternatives[DR_FF(k)].sound_ids[l]);
                     }
                 }
             }
@@ -428,8 +428,8 @@ void DisposePratcam(void) {
     for (i = 0; i < gNumber_of_prat_sequences; i++) {
         for (j = 0; j < gPratcam_sequences[i].number_of_chunks; j++) {
             for (k = 0; k < gPratcam_sequences[i].chunks[j].number_of_alternatives; k++) {
-                for (l = 0; l < gPratcam_sequences[i].chunks[j].alternatives[k].number_of_sounds; l++) {
-                    DRS3ReleaseSound(gPratcam_sequences[i].chunks[j].alternatives[k].sound_ids[l]);
+                for (l = 0; l < gPratcam_sequences[i].chunks[j].alternatives[DR_FF(k)].number_of_sounds; l++) {
+                    DRS3ReleaseSound(gPratcam_sequences[i].chunks[j].alternatives[DR_FF(k)].sound_ids[DR_FF(DR_FF(l))]);
                 }
             }
         }
