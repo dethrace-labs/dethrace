@@ -1466,16 +1466,16 @@ void AddFunkotronics(FILE* pF, int pOwner, int pRef_offset) {
             }
             the_pixelmap = DRPixelmapAllocate(
 #ifdef DETHRACE_3DFX_PATCH
-                    BR_PMT_INDEX_8,
+                BR_PMT_INDEX_8,
 #else
-                    gScreen->type,
+                gScreen->type,
 #endif
                 the_funk->texture_animation_data.flic_info.flic_descriptor.width,
                 the_funk->texture_animation_data.flic_info.flic_descriptor.height,
                 the_pixels,
                 0);
 #ifdef DETHRACE_3DFX_PATCH
-                the_pixelmap = PurifiedPixelmap(the_pixelmap);
+            the_pixelmap = PurifiedPixelmap(the_pixelmap);
 #endif
             AssertFlicPixelmap(&the_funk->texture_animation_data.flic_info.flic_descriptor, the_pixelmap);
             the_funk->material->colour_map = the_pixelmap;
@@ -3056,12 +3056,16 @@ void LoadTrack(char* pFile_name, tTrack_spec* pTrack_spec, tRace_info* pRace_inf
 #endif
             str[sl] = 0;
             strcat(str, ".MAT");
-            pRace_info->material_modifiers[i].skid_mark_material = LoadSingleMaterial(&gTrack_storage_space, str);
+
 #ifdef DETHRACE_3DFX_PATCH
+            material = LoadSingleMaterial(&gTrack_storage_space, str);
+            pRace_info->material_modifiers[i].skid_mark_material = material;
             if (material != NULL) {
                 GlorifyMaterial(&material, 1);
                 BrMaterialUpdate(material, BR_MATU_ALL);
             }
+#else
+            pRace_info->material_modifiers[i].skid_mark_material = LoadSingleMaterial(&gTrack_storage_space, str);
 #endif
 
 #if defined(DETHRACE_FIX_BUGS)

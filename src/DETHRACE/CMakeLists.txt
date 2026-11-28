@@ -67,6 +67,11 @@ else()
         -Wno-absolute-value
         -Wstrict-prototypes
     )
+    if(APPLE)
+        # The macOS SDK deprecates sprintf, which is widespread in the original
+        # game code. Keep these warnings visible without breaking WERROR builds.
+        add_compile_flag_if_supported(dethrace -Wno-error=deprecated-declarations)
+    endif()
 endif()
 
 target_compile_definitions(dethrace PRIVATE INSIDE_DETHRACE)
